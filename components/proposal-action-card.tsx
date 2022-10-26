@@ -11,8 +11,8 @@ import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
-import useOctokit from "x-hooks/use-octokit";
 import {AppStateContext} from "../contexts/app-state";
+import useOctokit from "x-hooks/use-octokit";
 
 import { ContextualSpan } from "./contextual-span";
 

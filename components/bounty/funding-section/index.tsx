@@ -18,8 +18,8 @@ import { getIssueState } from "helpers/handleTypeIssue";
 
 import { fundingBenefactor } from "interfaces/issue-data";
 
-import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 import {AppStateContext} from "../../../contexts/app-state";
+import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
 export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);

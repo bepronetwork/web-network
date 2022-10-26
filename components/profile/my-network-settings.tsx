@@ -21,8 +21,6 @@ import TokensSettings from "components/tokens-settings";
 import { WarningSpan } from "components/warning-span";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "x-hooks/use-authentication";
-import { useNetwork } from "x-hooks/use-network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast, toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
@@ -35,7 +33,9 @@ import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
+import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
 import RegistryGovernorSettings from "./registry-governor-settings";

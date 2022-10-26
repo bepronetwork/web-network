@@ -16,6 +16,7 @@ import { getIssueState } from "helpers/handleTypeIssue";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";
+
 import {AppStateContext} from "../contexts/app-state";
 
 export default function IssueListItem({

@@ -20,6 +20,7 @@ import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
+
 import {AppStateContext} from "../../contexts/app-state";
 
 export default function PageIssue() {
@@ -61,7 +62,7 @@ export default function PageIssue() {
   }
 
   useEffect(() => {
-    if (state.currentBounty?.comments) setCommentsIssue([...state.currentBounty?.comments]);
+    if (state.currentBounty?.comments) setCommentsIssue([...state.currentBounty?.comments || []]);
   }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   useEffect(() => {

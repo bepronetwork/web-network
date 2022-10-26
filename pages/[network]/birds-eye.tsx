@@ -11,6 +11,7 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import { User } from "interfaces/api";
 
 import useApi from "x-hooks/use-api";
+
 import {AppStateContext} from "../../contexts/app-state";
 
 interface PropsUserList extends Partial<User> {

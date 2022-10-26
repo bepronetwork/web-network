@@ -17,9 +17,8 @@ import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { AppStateContext } from "contexts/app-state";
-
-import { addToast } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
+import { addToast } from "contexts/reducers/change-toaster";
 
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
@@ -28,9 +27,9 @@ import { pullRequest } from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
-import {useNetwork} from "../../x-hooks/use-network";
-import {useBounty} from "../../x-hooks/use-bounty";
 import {changeCurrentBountyComments} from "../../contexts/reducers/change-current-bounty";
+import {useBounty} from "../../x-hooks/use-bounty";
+import {useNetwork} from "../../x-hooks/use-network";
 
 export default function PullRequestPage() {
   const router = useRouter();
@@ -85,7 +84,7 @@ export default function PullRequestPage() {
           comments: [...pullRequest.comments, response.data],
         });
 
-        dispatch(changeCurrentBountyComments([...state.currentBounty?.comments, response.data]))
+        dispatch(changeCurrentBountyComments([...state.currentBounty?.comments || [], response.data]))
 
         setShowModal(false);
       })

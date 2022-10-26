@@ -6,10 +6,10 @@ import Button from "components/button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TokensSettings from "components/tokens-settings";
 
-import { useNetwork } from "x-hooks/use-network";
 import { useNetworkSettings } from "contexts/network-settings";
 
 import useBepro from "x-hooks/use-bepro";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function RegistryGovernorSettings() {
   const { t } = useTranslation(["common", "custom-network"]);

@@ -14,13 +14,13 @@ import { ConnectionButton } from "components/profile/connect-button";
 import { FlexRow } from "components/profile/wallet-balance";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "x-hooks/use-authentication";
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
+import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { CustomSession } from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 export default function ConnectAccount() {
   const router = useRouter();

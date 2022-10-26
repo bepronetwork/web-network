@@ -1,3 +1,5 @@
+import {useContext} from "react";
+
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -10,11 +12,10 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
+import {AppStateContext} from "../contexts/app-state";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
-import {useContext} from "react";
-import {AppStateContext} from "../contexts/app-state";
 
 interface IPullRequestHeroProps {
   currentPullRequest: pullRequest;

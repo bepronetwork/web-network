@@ -1,14 +1,14 @@
-import {Actions, addReducer} from "./main";
-import {changeSettings,} from "./change-settings";
 import {changeChain} from "./change-chain";
-import {changeTxList} from "./change-tx-list";
-import {changeToaster} from "./change-toaster";
-import {changeShowProp} from "./update-show-prop";
-import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
-import {changeLoad} from "./change-load";
-import {changeCurrentUser} from "./change-current-user";
 import {changeCurrentBounty} from "./change-current-bounty";
+import {changeCurrentUser} from "./change-current-user";
+import {changeLoad} from "./change-load";
+import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
+import {changeSettings,} from "./change-settings";
 import {changeSpinners} from "./change-spinners";
+import {changeToaster} from "./change-toaster";
+import {changeTxList} from "./change-tx-list";
+import {Actions, addReducer} from "./main";
+import {changeShowProp} from "./update-show-prop";
 
 export default function loadApplicationStateReducers() {
   [
@@ -27,9 +27,7 @@ export default function loadApplicationStateReducers() {
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);
-  console.table(
-    Actions
+  console.table(Actions
       .map(({id, stateKey}) => ({id, stateKey}))
-      .reduce((p, c) => ({...p, [c.id]: c.stateKey}), {})
-  );
+      .reduce((p, c) => ({...p, [c.id]: c.stateKey}), {}));
 }

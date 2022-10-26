@@ -1,9 +1,10 @@
 import {useContext, useEffect,} from "react";
+
 import {AppStateContext} from "../contexts/app-state";
-import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
-import DAO from "../services/dao-service";
-import {toastError,} from "../contexts/reducers/change-toaster";
 import {changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
+import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
+import {toastError,} from "../contexts/reducers/change-toaster";
+import DAO from "../services/dao-service";
 
 /**
  * Populate `state.Settings` and instantiates a DAOService
@@ -36,17 +37,17 @@ export function useDao() {
    * @param networkAddress
    */
   function changeNetwork(networkAddress: string) {
-      if (!state.Service || !state.Service?.active || !networkAddress)
-        return;
+    if (!state.Service || !state.Service?.active || !networkAddress)
+      return;
 
-      if (state.Service.network.active.networkAddress === networkAddress)
-        return;
+    if (state.Service.network.active.networkAddress === networkAddress)
+      return;
 
-      const service = state.Service.active;
+    const service = state.Service.active;
 
-      dispatch(changeStarting(true));
+    dispatch(changeStarting(true));
 
-      service
+    service
         .loadNetwork(networkAddress)
         .then(started => {
           if (!started) {
@@ -63,7 +64,7 @@ export function useDao() {
         .finally(() => {
           dispatch(changeStarting(false));
         });
-    }
+  }
 
   /**
    * Starts DAOService

@@ -21,6 +21,7 @@ import { formatStringToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { BlockTransaction, Transaction } from "interfaces/transaction";
+
 import {useNetwork} from "../x-hooks/use-network";
 
 

@@ -1,3 +1,5 @@
+import {useContext} from "react";
+
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
 
@@ -6,7 +8,7 @@ import { hexadecimalToRGB } from "helpers/colors";
 import { ThemeColors } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
-import {useContext} from "react";
+
 import {AppStateContext} from "../contexts/app-state";
 
 export default function useNetworkTheme() {

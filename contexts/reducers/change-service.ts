@@ -5,12 +5,12 @@ import {
   ServiceState,
   State
 } from "../../interfaces/application-state";
-import {SimpleAction} from "./reducer";
+import {BranchesList} from "../../interfaces/branches-list";
 import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
-import DAO from "../../services/dao-service";
 import {Network} from "../../interfaces/network";
 import {ForksList, ReposList} from "../../interfaces/repos-list";
-import {BranchesList} from "../../interfaces/branches-list";
+import DAO from "../../services/dao-service";
+import {SimpleAction} from "./reducer";
 
 export class ChangeServiceProp<T = ServiceState | Partial<ServiceState>, A = keyof ServiceState>
   extends SimpleAction<T, A> {

@@ -1,9 +1,12 @@
+import {useContext} from "react";
+
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
+
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { Network } from "interfaces/network";
-import {useContext} from "react";
+
 import {AppStateContext} from "../contexts/app-state";
 interface NetworkListItemProps {
   network: Network;

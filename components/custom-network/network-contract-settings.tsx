@@ -1,10 +1,14 @@
-import { useTranslation } from "next-i18next";
-import { AppStateContext } from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { useContext } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
+
+import { AppStateContext } from "contexts/app-state";
+import { useNetworkSettings } from "contexts/network-settings";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
+
 
 export default function NetworkContractSettings() {
   const { t } = useTranslation(["common", "custom-network"]);

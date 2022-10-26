@@ -11,6 +11,7 @@ import ReactSelect from "components/react-select";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { getCoinInfoByContract } from "services/coingecko";
+
 import {AppStateContext} from "../contexts/app-state";
 
 interface IPriceConversiorModalProps{

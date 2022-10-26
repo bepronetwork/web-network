@@ -8,9 +8,9 @@ import ArrowRight from "assets/icons/arrow-right";
 
 import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
 
+import {AppStateContext} from "../contexts/app-state";
 import InputNumber from "./input-number";
 import TokensDropdown from "./tokens-dropdown";
-import {AppStateContext} from "../contexts/app-state";
 
 export default function CreateBountyTokenAmount({
   currentToken,

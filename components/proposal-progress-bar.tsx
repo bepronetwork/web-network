@@ -1,10 +1,11 @@
 import {useContext, useEffect, useState} from "react";
+
 import { useTranslation } from "next-i18next";
 
 import {formatNumberToNScale} from "helpers/formatNumber";
 
-import Translation from "./translation";
 import {AppStateContext} from "../contexts/app-state";
+import Translation from "./translation";
 
 export default function ProposalProgressBar({
   isDisputed = null,

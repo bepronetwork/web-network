@@ -1,6 +1,7 @@
+import {useSession} from "next-auth/react";
+
 import Avatar from "components/avatar";
 import Button from "components/button";
-import {useSession} from "next-auth/react";
 
 export default function GithubHandle() {
   const session = useSession();

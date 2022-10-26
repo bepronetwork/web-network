@@ -12,6 +12,7 @@ import Modal from "components/modal";
 import { formatDate } from "helpers/formatDate";
 
 import { pullRequest } from "interfaces/issue-data";
+
 import {AppStateContext} from "../contexts/app-state";
 interface CreateReviewModalModalProps{
   show: boolean,

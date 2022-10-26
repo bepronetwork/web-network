@@ -1,3 +1,5 @@
+import {useContext} from "react";
+
 import { signIn } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { setCookie } from "nookies";
@@ -5,7 +7,6 @@ import { setCookie } from "nookies";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import {useContext} from "react";
 import {AppStateContext} from "../contexts/app-state";
 
 export default function UpdateGithubTokenModal({

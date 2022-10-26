@@ -24,7 +24,6 @@ import useApi from "x-hooks/use-api";
 
 import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
 import {useNetwork} from "../x-hooks/use-network";
-
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface MyNetworkLink {

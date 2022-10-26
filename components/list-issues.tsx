@@ -27,8 +27,8 @@ import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
-import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 
+import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 

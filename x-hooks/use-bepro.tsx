@@ -1,13 +1,20 @@
-import DAO from "services/dao-service";
-import useApi from "x-hooks/use-api";
 import { useContext } from "react";
-import { useTranslation } from "next-i18next";
-import { parseTransaction } from "helpers/transactions";
+
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import { useTranslation } from "next-i18next";
+
+import { parseTransaction } from "helpers/transactions";
+
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { TransactionCurrency } from "interfaces/transaction";
+
+import DAO from "services/dao-service";
+
 import { NetworkParameters } from "types/dappkit";
+
+import useApi from "x-hooks/use-api";
+
 import {AppStateContext} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {useBounty} from "./use-bounty";

@@ -1,16 +1,17 @@
+import {useContext} from "react";
+
 import { useTranslation } from "next-i18next";
 
 import { pullRequest } from "interfaces/issue-data";
 import { DistribuitonPerUser } from "interfaces/proposal";
 
+import {AppStateContext} from "../contexts/app-state";
 import Avatar from "./avatar";
 import DateLabel from "./date-label";
 import GithubInfo from "./github-info";
 import ProposalProgress from "./proposal-progress";
 import PullRequestLabels from "./pull-request-labels";
 import Translation from "./translation";
-import {useContext} from "react";
-import {AppStateContext} from "../contexts/app-state";
 
 interface IProposalPRDetailsProps {
   currentPullRequest: pullRequest;
