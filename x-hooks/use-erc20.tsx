@@ -62,12 +62,12 @@ export default function useERC20() {
   }, [wallet?.address, DAOService, address]);
 
   function setDefaults() {
-    setName(undefined);
-    setSymbol(undefined);
-    setDecimals(undefined);
-    setTotalSupply(undefined);
-    setBalance(undefined);
-    setAllowance(undefined);
+    setName("");
+    setSymbol("");
+    setDecimals(18);
+    setTotalSupply(BigNumber(0));
+    setBalance(BigNumber(0));
+    setAllowance(BigNumber(0));
   }
 
   useEffect(() => {

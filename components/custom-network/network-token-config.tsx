@@ -7,10 +7,16 @@ export function NetworkTokenConfig({
   onChange,
   beproTokenAddress
 }) {
-  const [tokenAddress, setTokenAddress] = useState<string>();
+  const [customTokenAddress, setCustomTokenAddress] = useState<string>();
+  const [deployedTokenAddress, setDeployedTokenAddress] = useState<string>();
 
-  function handleTokenAddressChange(newAddress) {
-    setTokenAddress(newAddress);
+  function handleCustomTokenAddressChange(newAddress) {
+    setCustomTokenAddress(newAddress);
+    onChange(newAddress);
+  }
+
+  function handleDeployedTokenAddressChange(newAddress) {
+    setDeployedTokenAddress(newAddress);
     onChange(newAddress);
   }
 
@@ -32,8 +38,8 @@ export function NetworkTokenConfig({
       component: ( 
         <ERC20Details
           key="customToken"
-          onChange={handleTokenAddressChange}
-          address={tokenAddress}
+          onChange={handleCustomTokenAddressChange}
+          address={customTokenAddress}
         />
       )
     },
@@ -43,8 +49,8 @@ export function NetworkTokenConfig({
       component: ( 
         <ERC20Details
           key="deployedToken"
-          onChange={handleTokenAddressChange}
-          address={tokenAddress}
+          onChange={handleDeployedTokenAddressChange}
+          address={deployedTokenAddress}
           deployer
         />
       )
@@ -52,7 +58,13 @@ export function NetworkTokenConfig({
   ];
 
   function onTransition(newActiveKey: string) {
-    onChange(newActiveKey === "bepro" && beproTokenAddress || tokenAddress);
+    const addressesByTab = {
+      "bepro": beproTokenAddress,
+      "custom": customTokenAddress,
+      "deployed": deployedTokenAddress
+    };
+    
+    onChange(addressesByTab[newActiveKey]);
   }
 
   useEffect(() => {
