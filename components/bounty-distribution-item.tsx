@@ -15,11 +15,7 @@ export default function BountyDistributionItem({
   line,
 }: BountyDistribution) {
   function verifyAmount(): boolean {
-    if (amounts.length > 1 && BigNumber(amounts[1]).gt(0)) {
-      return true;
-    } else {
-      return false;
-    }
+    return amounts.length > 1 && BigNumber(amounts[1]).gt(0);
   }
 
   return (
@@ -36,7 +32,7 @@ export default function BountyDistributionItem({
             )}
           </span>
           {verifyAmount() && (
-            <span className="caption-small text-ligth-gray">{name}</span>
+            <span className="caption-small text-light-gray">{name}</span>
           )}
         </div>
 
@@ -51,9 +47,9 @@ export default function BountyDistributionItem({
           </div>
           {verifyAmount() && (
             <div className="d-flex justify-content-end">
-              <span className="caption-small text-ligth-gray">
+              <span className="caption-small text-light-gray">
                 {amounts[1]}{" "}
-                <label className="ps-1 caption-small text-uppercase text-ligth-gray">
+                <label className="ps-1 caption-small text-uppercase text-light-gray">
                   {symbols[1]}
                 </label>
               </span>
@@ -61,7 +57,7 @@ export default function BountyDistributionItem({
           )}
         </div>
       </li>
-      {line && <div className="mx-3 line bg-ligth-gray"></div>}
+      {line && <div className="mx-3 line bg-light-gray"></div>}
     </>
   );
 }

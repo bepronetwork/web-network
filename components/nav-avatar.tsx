@@ -85,7 +85,7 @@ export default function NavAvatar() {
   );
 
   const LinksSession = ({ children }) => (
-    <div className="row align-items-center border-bottom border-ligth-gray">
+    <div className="row align-items-center border-bottom border-light-gray">
       <div className="d-flex flex-column gap-3 pt-3 pb-3 px-0">
         {children}
       </div>
@@ -119,7 +119,7 @@ export default function NavAvatar() {
   const overlay = (
     <Popover id="profile-popover">
       <Popover.Body className="bg-shadow pt-3 px-4">
-        <div className="row align-items-center border-bottom border-ligth-gray pb-2">
+        <div className="row align-items-center border-bottom border-light-gray pb-2">
           <div className="col-3 px-0">
             {avatar()}
           </div>

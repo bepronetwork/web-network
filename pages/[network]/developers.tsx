@@ -1,24 +1,21 @@
-import { useEffect, useState } from "react";
-
-import BigNumber from "bignumber.js";
+import {useContext, useEffect, useState} from "react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
+import {AppStateContext} from "../../contexts/app-state";
 
+import BigNumber from "bignumber.js";
 import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
-
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-
 import useApi from "x-hooks/use-api";
+
 
 export default function PageDevelopers() {
   const { t } = useTranslation(["common"]);
 
+  const {state} = useContext(AppStateContext);
   const { getTotalUsers } = useApi();
-  const { service: DAOService } = useDAO();
-  const { activeNetwork } = useNetwork()
+
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -41,12 +38,12 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!DAOService) return;
+    if (!state.Service?.active) return;
 
     Promise.all([
-      DAOService.getClosedBounties().catch(() => 0),
-      DAOService.getOpenBounties().catch(() => 0),
-      DAOService.getTotalNetworkToken().catch(() => BigNumber(0)),
+      state.Service?.active.getClosedBounties().catch(() => 0),
+      state.Service?.active.getOpenBounties().catch(() => 0),
+      state.Service?.active.getTotalNetworkToken().catch(() => BigNumber(0)),
       getTotalUsers(),
     ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
       setInfos([
@@ -61,7 +58,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork.toNumber(),
           label: t("heroes.bounties-in-network"),
-          currency: t("$oracles",{ token: activeNetwork?.networkToken?.symbol || t("misc.$token") })
+          currency: t("$oracles",{ token: state.Service?.network?.active?.networkToken?.symbol || t("misc.$token") })
         },
         {
           value: totalUsers,
@@ -69,7 +66,7 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [DAOService, activeNetwork]);
+  }, [state.Service?.active, state.Service?.network?.active]);
 
   return (
     <>

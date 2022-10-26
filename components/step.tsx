@@ -22,7 +22,7 @@ export default function Step({
 
   const isActive = activeStep === index;
 
-  const textColor = isActive ? "white" : (validated && "success" || "ligth-gray");
+  const textColor = isActive ? "white" : (validated && "success" || "light-gray");
   const bgColor = !isActive && validated ? "bg-success-15" : "";
 
   function handleAction() {

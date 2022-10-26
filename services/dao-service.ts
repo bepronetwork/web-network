@@ -639,7 +639,7 @@ export default class DAO {
     return bountyToken.setDispatcher(dispatcher);
   }
 
-  isAddress(address: string): Promise<boolean> {
+  isAddress(address: string): boolean {
     return this.web3Connection.utils.isAddress(address);
   }
 

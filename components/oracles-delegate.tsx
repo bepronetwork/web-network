@@ -10,7 +10,6 @@ import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { AppStateContext } from "contexts/app-state";
-import { useNetwork } from "contexts/network";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -32,14 +31,12 @@ function OraclesDelegate({
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [availableAmount, setAvailableAmount] = useState<BigNumber>();
 
-  const { activeNetwork } = useNetwork();
-
   const {
-    state: { transactions }
+    state: { transactions, Service }
   } = useContext(AppStateContext);
 
-  const networkTokenDecimals = activeNetwork?.networkToken?.decimals || 18;
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol;
+  const networkTokenDecimals = Service?.network?.active?.networkToken?.decimals || 18;
+  const networkTokenSymbol = Service?.network?.active?.networkToken?.symbol;
 
   function handleChangeOracles(params: NumberFormatValues) {
     if (params.value === "") return setTokenAmount("");
@@ -51,7 +48,7 @@ function OraclesDelegate({
     setTokenAmount(params.value);
   }
 
-  function setMaxAmmount() {
+  function setMaxAmount() {
     return setTokenAmount(availableAmount.toFixed());
   }
 
@@ -120,7 +117,7 @@ function OraclesDelegate({
               {`${t("$oracles", { token: networkTokenSymbol })} ${t("misc.available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
-                onClick={setMaxAmmount}
+                onClick={setMaxAmount}
               >
                 {t("misc.max")}
               </span>

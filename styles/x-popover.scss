@@ -2,7 +2,7 @@
 
 .popover {
   border-radius: 7px;
-  border: solid 1px $ligth-gray;
+  border: solid 1px $light-gray;
 
   &#language-selector {
     margin-bottom: 10px;
@@ -33,7 +33,7 @@
       border-top-color: $bg-shadow;
     }
     &::before {
-      border-top-color: $ligth-gray;
+      border-top-color: $light-gray;
     }
   }
 }

@@ -119,7 +119,7 @@ export default function WrongNetworkModal({
         {error && (
           <p className="caption-small text-uppercase text-danger">{error}</p>
         )}
-        <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
+        <div className="small-info text-light-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
           {t("misc.by-connecting")}{" "}
           <a
             href="https://www.bepro.network/terms"

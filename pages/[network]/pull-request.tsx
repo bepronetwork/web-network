@@ -269,10 +269,8 @@ export default function PullRequestPage() {
                 }
 
                 <GithubLink
-                  repoId={String(state.Service?.network?.repos?.active?.id)}
                   forcePath={state.Service?.network?.repos?.active?.githubPath}
-                  hrefPath={`pull/${pullRequest?.githubId || ""}`}
-                >
+                  hrefPath={`pull/${pullRequest?.githubId || ""}`}>
                   {t("actions.view-on-github")}
                 </GithubLink>
               </div>

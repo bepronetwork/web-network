@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import { useRepos } from "contexts/repos";
+import {AppStateContext} from "contexts/app-state";
 
 import { trimString } from "helpers/string";
 
@@ -13,8 +13,8 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
   value?: { label: string, value: { id: string, path: string } }
   disabled?: boolean;
 }) {
-  const { repoList } = useRepos();
-  const [isFetching, setIsFetching] = useState<boolean>(false)
+  const {state} = useContext(AppStateContext);
+
   const [options, setOptions] = useState<{ value: { id: string, path: string }; label: string }[]>();
   const [option, setOption] = useState<{ value: { id: string, path: string }; label: string }>()
   const { t } = useTranslation("common");
@@ -27,19 +27,19 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
     });
   }
 
-  function loadReposFromBackend() {
-    if (!repoList) return;
+  function setOptionMapper() {
+    if (!state.Service?.network?.repos?.list) return;
     setIsFetching(true)
 
     function mapRepo({ id: value, githubPath: label }) {
       return { value: { id: value, path: label }, label };
     }
 
-    setOptions(repoList.map(mapRepo));
+    setOptions(state.Service?.network?.repos?.list.map(mapRepo));
     setIsFetching(false)
   }
 
-  useEffect(loadReposFromBackend, [repoList]);
+  useEffect(setOptionMapper, [state.Service?.network?.repos?.list]);
   useEffect(() => { if(value?.value !== option?.value) setOption(value) }, [value]);
 
   return (

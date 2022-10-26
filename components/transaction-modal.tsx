@@ -150,7 +150,7 @@ export default function TransactionModal({
         </div>
 
         <div className="caption-small d-flex flex-row mb-3">
-          <span className="text-ligth-gray">{t("misc.on")}</span>
+          <span className="text-light-gray">{t("misc.on")}</span>
           <InternalLink
             className={`${
               transaction?.network?.name === state.Settings?.defaultNetworkConfig?.name

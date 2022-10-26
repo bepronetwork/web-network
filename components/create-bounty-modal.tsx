@@ -278,7 +278,6 @@ export default function CreateBountyModal() {
                   label: branch,
                   value: branch,
                 }}
-                fromBountyCreation
               />
             </div>
           </div>

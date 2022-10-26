@@ -10,7 +10,6 @@ import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { AppStateContext } from "contexts/app-state";
-import { cookieKey } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load";
 import { Network } from "interfaces/network";
 import {NetworkSettingsProvider, useNetworkSettings} from "../../../contexts/network-settings";
@@ -37,7 +36,7 @@ export function MyNetwork() {
         const savedNetwork = count > 0 ? rows[0] : undefined;
 
         if (savedNetwork)
-          sessionStorage.setItem(`${cookieKey}:${savedNetwork.name.toLowerCase()}`, JSON.stringify(savedNetwork));
+          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}`, JSON.stringify(savedNetwork));
 
         setMyNetwork(savedNetwork);
         setForcedNetwork(savedNetwork);

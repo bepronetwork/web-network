@@ -70,7 +70,7 @@ export default function StatusBar() {
         {renderNetworkStatus()}
       </div>
 
-      <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
+      <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-light-gray">
         <Translation label="status.tagline" />
         <a
           href="https://www.bepro.network/terms"

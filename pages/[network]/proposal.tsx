@@ -15,51 +15,47 @@ import ProposalListAddresses from "components/proposal-list-addresses";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 
 import { AppStateContext } from "contexts/app-state";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/change-toaster";
 
 
 import { ProposalExtended } from "interfaces/bounty";
 import { MetamaskErrors } from "interfaces/enums/Errors";
 import { pullRequest } from "interfaces/issue-data";
-import {
-  Proposal,
-  DistribuitonPerUser
-} from "interfaces/proposal";
+import {Proposal, DistribuitonPerUser} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import {useBounty} from "../../x-hooks/use-bounty";
 
 export default function PageProposal() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const { dispatch } = useContext(AppStateContext);
+  const { dispatch, state } = useContext(AppStateContext);
   
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
   const [usersDistribution, setUsersDistribution] = useState<DistribuitonPerUser[]>([]);
   const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
   
-  const { activeNetwork } = useNetwork();
+  const {getChainBounty, getDatabaseBounty} = useBounty();
   const { getUserOf, processEvent, createNFT } = useApi();
-  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
+
   const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
 
   async function closeIssue() {
     try{
-      const {url} = await createNFT(activeIssue?.contractId, proposal.contractId)
+      const {url} = await createNFT(state.currentBounty?.data?.contractId, proposal.contractId)
       
-      handleCloseIssue(+activeIssue?.contractId, +proposal.contractId, url)
+      handleCloseIssue(+state.currentBounty?.data?.contractId, +proposal.contractId, url)
         .then(txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-          return processEvent("bounty", "closed", activeNetwork?.name, { fromBlock } );
+          return processEvent("bounty", "closed", state.Service?.network?.active?.name, { fromBlock } );
         })
         .then(() => {
-          updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
-  
+          getChainBounty(true);
+          getDatabaseBounty(true);
           dispatch(addToast({
               type: "success",
               title: t("actions.success"),
@@ -84,11 +80,11 @@ export default function PageProposal() {
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock } );
+        return processEvent("proposal", "disputed", state.Service?.network?.active?.name, { fromBlock } );
       })
       .then(() => {
-        updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
-        getNetworkIssue();
+        getDatabaseBounty(true);
+        getChainBounty(true);
       })
       .catch(error => {
         if (error?.code === MetamaskErrors.UserRejected) return;
@@ -104,15 +100,15 @@ export default function PageProposal() {
   }
 
   async function handleRefuse() {
-    return handleRefuseByOwner(+activeIssue?.contractId, +proposal.contractId)
+    return handleRefuseByOwner(+state.currentBounty?.data?.contractId, +proposal.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "refused", activeNetwork?.name, { fromBlock } );
+      return processEvent("proposal", "refused", state.Service?.network?.active?.name, { fromBlock } );
     })
     .then(() => {
-      updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
-      getNetworkIssue();
+      getDatabaseBounty(true);
+      getChainBounty(true);
       
       dispatch(addToast({
         type: "success",
@@ -141,7 +137,7 @@ export default function PageProposal() {
 
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = networkIssue.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
+      const distributedAmount = state.currentBounty?.chainData.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
 
       return { 
         githubLogin, 
@@ -151,21 +147,21 @@ export default function PageProposal() {
         distributedAmount,
       };
     })).then(setUsersDistribution);
-  }, [networkProposal, activeIssue]);
+  }, [networkProposal, state.currentBounty?.data]);
 
   useEffect(() => {
-    if (!activeIssue || !networkIssue) return;
+    if (!state.currentBounty?.data || !state.currentBounty?.chainData) return;
 
     const { proposalId } = router.query;
 
-    const mergeProposal = activeIssue?.mergeProposals?.find((p) => +p.id === +proposalId);
-    const networkProposals = networkIssue?.proposals?.[+mergeProposal?.scMergeId];
-    const pullRequest = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
+    const mergeProposal = state.currentBounty?.data?.mergeProposals?.find((p) => +p.id === +proposalId);
+    const networkProposals = state.currentBounty?.chainData?.proposals?.[+mergeProposal?.scMergeId];
+    const pullRequest = state.currentBounty?.data?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 
     setProposal(mergeProposal);
     setPullRequest(pullRequest);
     setNetworkProposal(networkProposals);
-  }, [router.query, activeIssue, networkIssue]);
+  }, [router.query, state.currentBounty?.data, state.currentBounty?.chainData]);
 
   return (
     <>
@@ -179,7 +175,7 @@ export default function PageProposal() {
           />
         </div>
         <div className="mt-3 row justify-content-between">
-          <ProposalListAddresses usersDistribution={usersDistribution} currency={activeIssue?.token?.symbol} />
+          <ProposalListAddresses usersDistribution={usersDistribution} currency={state.currentBounty?.data?.token?.symbol} />
           <ProposalActionCard
             proposal={proposal}
             networkProposal={networkProposal}

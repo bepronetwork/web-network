@@ -144,7 +144,7 @@ li {
       border-radius: 8px;
       border-width: 2px;
       &:hover {
-        border-color: $ligth-gray;
+        border-color: $light-gray;
       }
       &--is-focused {
         border-color: var(--bs-primary);
@@ -179,7 +179,7 @@ li {
     &__menu {
       min-width: 210px;
       border-radius: 8px;
-      border: 1px solid $ligth-gray;
+      border: 1px solid $light-gray;
       background-color: $bg-shadow;
 
       &-list {
@@ -409,7 +409,7 @@ li {
 }
 
 .border-dashed {
-  border: 1px dashed $ligth-gray
+  border: 1px dashed $light-gray
 }
 
 .banner-shadow {
@@ -1200,7 +1200,7 @@ textarea.form-control {
     }
 
     &:hover {
-      border: 2px solid $ligth-gray;
+      border: 2px solid $light-gray;
     }
 
     &:focus-within {
@@ -1237,7 +1237,7 @@ textarea.form-control {
     border: 2px solid transparent;
 
     &:hover {
-      border-color: $ligth-gray;
+      border-color: $light-gray;
     }
   }
 
@@ -1331,7 +1331,7 @@ textarea.form-control {
     border: 1px solid var(--bs-danger);
   }
 
-  color: $ligth-gray;
+  color: $light-gray;
   cursor: pointer;
 
   svg {
@@ -1339,13 +1339,13 @@ textarea.form-control {
     height: 14px;
 
     path {
-      fill: $ligth-gray;
+      fill: $light-gray;
     }
   }
 }
 
 .color-light-gray {
-  color: $ligth-gray
+  color: $light-gray
 }
 
 .custom-color-input-wrapper {
@@ -1403,10 +1403,10 @@ input[type="color"] {
         }
       }
     }
-    &-ligth-gray {
+    &-light-gray {
       svg {
         path {
-          fill: $ligth-gray;
+          fill: $light-gray;
         }
       }
     }

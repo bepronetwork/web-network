@@ -6,7 +6,7 @@ import Button from "components/button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TokensSettings from "components/tokens-settings";
 
-import { useNetwork } from "contexts/network";
+import { useNetwork } from "x-hooks/use-network";
 import { useNetworkSettings } from "contexts/network-settings";
 
 import useBepro from "x-hooks/use-bepro";
@@ -14,6 +14,7 @@ import useBepro from "x-hooks/use-bepro";
 export default function RegistryGovernorSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
   const { fields, settings } = useNetworkSettings();
+
   const { updateActiveNetwork } = useNetwork();
   const { handleFeeSettings } = useBepro()
 
@@ -21,7 +22,7 @@ export default function RegistryGovernorSettings() {
   async function saveFeeSettings() {
     await handleFeeSettings(settings?.treasury?.closeFee?.value,
                             settings?.treasury?.cancelFee?.value)
-                            .then(() => updateActiveNetwork())
+                            .then(() => updateActiveNetwork(true))
   }
 
   return (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 
@@ -10,14 +10,13 @@ import BountyStatusInfo from "components/bounty-status-info";
 import Identicon from "components/identicon";
 import Translation from "components/translation";
 
-import { useNetwork } from "contexts/network";
-
 import { formatDate } from "helpers/formatDate";
 import { formatNumberToNScale } from "helpers/formatNumber";
 import { getIssueState } from "helpers/handleTypeIssue";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function IssueListItem({
   issue = null,
@@ -29,7 +28,7 @@ export default function IssueListItem({
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
-  const { activeNetwork } = useNetwork();
+  const {state} = useContext(AppStateContext);
 
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
   const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
@@ -59,7 +58,7 @@ export default function IssueListItem({
       return (
         <div className="d-flex align-items-center" key={issue.githubId}>
           <span className="caption-medium mr-1 text-white">
-            {issue !== null && value || 0}
+            {value || 0}
           </span>
           <span className="caption-medium text-white-40 text-uppercase">
             {translation}
@@ -140,7 +139,7 @@ export default function IssueListItem({
           query: {
             id: issue?.githubId,
             repoId: issue?.repository_id,
-            network: activeNetwork.name,
+            network: state.Service?.network?.active.name,
           },
         });
       }}

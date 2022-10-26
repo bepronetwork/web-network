@@ -70,7 +70,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
       <Avatar userLogin={data?.githubLogin} />
       <span
         className={`ml-1 text-nowrap ${
-          data.isDisable ? "text-ligth-gray" : "text-gray hover-primary"
+          data.isDisable ? "text-light-gray" : "text-gray hover-primary"
         }`}
       >
         {data?.label}
