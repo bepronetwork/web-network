@@ -8,7 +8,13 @@ import { useAuthentication } from "contexts/authentication";
 
 import useApi from "x-hooks/use-api";
 
-export default function ConnectGithub() {
+import Button from "./button";
+
+interface IProps{
+  size?: 'md' | 'sm';
+}
+
+export default function ConnectGithub({size = 'md'}:IProps) {
   const { t } = useTranslation("common");
 
   const { push, asPath } = useRouter();
@@ -32,6 +38,14 @@ export default function ConnectGithub() {
       })
       .catch(e => console.error(e));
 
+  }
+
+  if(size === 'sm'){
+    return (
+    <Button onClick={clickSignIn}> 
+      <GithubImage  /> 
+      <span>{t("actions.connect")}</span>
+    </Button>)
   }
 
   return (
