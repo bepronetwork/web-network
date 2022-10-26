@@ -13,6 +13,7 @@ import Tokens from "./tokens.model";
 import NetworkTokens from "./network-tokens.model";
 import UserPayments from "./user-payments";
 import Settings from "./settings.model";
+import Benefactors from './benefactor.model';
 
 const Database = { sequelize: null };
 
@@ -31,6 +32,7 @@ Database.chainEvents = ChainEvents;
 Database.network = Network;
 Database.tokens = Tokens;
 Database.networkTokens = NetworkTokens;
+Database.benefactor = Benefactors;
 Database.userPayments = UserPayments;
 Database.settings = Settings;
 
