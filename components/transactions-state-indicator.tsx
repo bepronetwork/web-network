@@ -6,11 +6,13 @@ import TransactionIcon from "assets/icons/transaction";
 import Button from "components/button";
 import TransactionModal from "components/transaction-modal";
 import TransactionsList from "components/transactions-list";
+
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { Transaction } from "interfaces/transaction";
+
 import {AppStateContext} from "../contexts/app-state";
-import {WinStorage} from "../services/win-storage";
 import {setTxList} from "../contexts/reducers/change-tx-list";
+import {WinStorage} from "../services/win-storage";
 
 export default function TransactionsStateIndicator() {
   const {state: { transactions, currentUser: { walletAddress } }, dispatch} = useContext(AppStateContext);
@@ -54,8 +56,7 @@ export default function TransactionsStateIndicator() {
 
     const {eth: {getTransaction}} = (window as any).web3;
 
-    Promise.all(
-      storage.value
+    Promise.all(storage.value
         .filter(tx => tx.status !== TransactionStatus.rejected && tx.transactionHash)
         .map(tx =>
           getTransaction(tx.transactionHash)

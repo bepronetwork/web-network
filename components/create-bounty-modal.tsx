@@ -23,6 +23,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
 import { toastError, toastWarning } from "contexts/reducers/change-toaster";
+
 import { parseTransaction } from "helpers/transactions";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
@@ -37,8 +38,8 @@ import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {AppStateContext} from "../contexts/app-state";
+import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 
 interface BountyPayload {

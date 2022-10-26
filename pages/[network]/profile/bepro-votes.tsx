@@ -1,3 +1,4 @@
+import {useContext} from "react";
 import { Col, Row } from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
@@ -16,10 +17,10 @@ import TokenBalance from "components/profile/token-balance";
 import { FlexRow } from "components/profile/wallet-balance";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
+import { formatStringToCurrency } from "helpers/formatNumber";
+
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
-import {useContext} from "react";
 import {AppStateContext} from "../../../contexts/app-state";
 
 export default function BeproVotes() {

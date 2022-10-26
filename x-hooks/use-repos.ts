@@ -1,11 +1,13 @@
 import {useContext, useEffect} from "react";
-import {AppStateContext} from "../contexts/app-state";
-import {WinStorage} from "../services/win-storage";
-import {changeNetworkReposActive, changeNetworkReposList} from "../contexts/reducers/change-service";
-import {changeLoadState} from "../contexts/reducers/change-load";
-import useApi from "./use-api";
+
 import {useRouter} from "next/router";
+
+import {AppStateContext} from "../contexts/app-state";
+import {changeLoadState} from "../contexts/reducers/change-load";
+import {changeNetworkReposActive, changeNetworkReposList} from "../contexts/reducers/change-service";
 import {RepoInfo} from "../interfaces/repos-list";
+import {WinStorage} from "../services/win-storage";
+import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 
 export function useRepos() {

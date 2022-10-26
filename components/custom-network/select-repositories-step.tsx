@@ -1,3 +1,4 @@
+import {useContext} from "react";
 import { FormCheck } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -9,7 +10,7 @@ import Step from "components/step";
 import { useNetworkSettings } from "contexts/network-settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
-import {useContext} from "react";
+
 import {AppStateContext} from "../../contexts/app-state";
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {

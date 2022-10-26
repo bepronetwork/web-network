@@ -15,8 +15,8 @@ import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import TokenBalance, { TokenBalanceType } from "./token-balance";
 import {AppStateContext} from "../../contexts/app-state";
+import TokenBalance, { TokenBalanceType } from "./token-balance";
 
 export const FlexRow = ({ children, className = "" }) => 
   <div className={`d-flex flex-row ${className}`}>{children}</div>;

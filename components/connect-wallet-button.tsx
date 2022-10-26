@@ -1,15 +1,19 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
-import { useAuthentication } from "x-hooks/use-authentication";
-import { NetworkColors } from "interfaces/enums/network-colors";
-import { AppStateContext } from "../contexts/app-state";
-import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
-
 import Image from "next/image";
+
 import metamaskLogo from "assets/metamask.png";
+
 import Button from "components/button";
 import Modal from "components/modal";
+
+import { NetworkColors } from "interfaces/enums/network-colors";
+
+import { useAuthentication } from "x-hooks/use-authentication";
+
+import { AppStateContext } from "../contexts/app-state";
+import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({
   children = null,

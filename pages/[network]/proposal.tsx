@@ -25,6 +25,7 @@ import {Proposal, DistribuitonPerUser} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+
 import {useBounty} from "../../x-hooks/use-bounty";
 
 export default function PageProposal() {

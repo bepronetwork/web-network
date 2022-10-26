@@ -1,12 +1,19 @@
 import { useContext, useEffect, useState } from "react";
+import Creatable from "react-select/creatable";
+
 import { useTranslation } from "next-i18next";
+
+import DoneIcon from "assets/icons/done-icon";
+
+import ChangeTokenModal from "components/change-token-modal";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
+
 import { Token } from "interfaces/token";
+
 import { AppStateContext } from "../contexts/app-state";
 
-import Creatable from "react-select/creatable";
-import ChangeTokenModal from "components/change-token-modal";
-import DoneIcon from "assets/icons/done-icon";
+
 
 interface TokensDropdownProps {
   defaultToken?: Token;

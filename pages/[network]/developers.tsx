@@ -1,13 +1,17 @@
 import {useContext, useEffect, useState} from "react";
+
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
-import {AppStateContext} from "../../contexts/app-state";
 
-import BigNumber from "bignumber.js";
+
 import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
+
 import useApi from "x-hooks/use-api";
+
+import {AppStateContext} from "../../contexts/app-state";
 
 
 export default function PageDevelopers() {

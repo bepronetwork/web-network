@@ -1,7 +1,7 @@
-import {SimpleAction} from "./reducer";
-import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
 import {CurrentUserState, State} from "../../interfaces/application-state";
 import {Balance} from "../../interfaces/balance-state";
+import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
+import {SimpleAction} from "./reducer";
 
 
 export class ChangeCurrentUser<T = CurrentUserState|Partial<CurrentUserState>> extends SimpleAction<T> {

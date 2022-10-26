@@ -20,6 +20,7 @@ import { Payment } from "interfaces/payments";
 import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
+
 import {AppStateContext} from "../../../contexts/app-state";
 
 export default function Payments() {

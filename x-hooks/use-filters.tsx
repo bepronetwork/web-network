@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 
 import { IssueFilterBoxOption } from "interfaces/filters";
 import { RepoInfo } from "interfaces/repos-list";
+
 import {AppStateContext} from "../contexts/app-state";
 
 type FilterStateUpdater = (
@@ -64,8 +65,7 @@ export default function useFilters(): [
 
     setRepoFilters([
       makeFilterOption("All", "allrepos", !router.query?.repoId)]
-      .concat(state.Service?.network?.repos?.list?.map(mapRepo))
-    );
+      .concat(state.Service?.network?.repos?.list?.map(mapRepo)));
   }
 
   function loadFilters() {

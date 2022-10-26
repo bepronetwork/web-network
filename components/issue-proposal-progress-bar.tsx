@@ -1,8 +1,11 @@
-import { AppStateContext } from "../contexts/app-state";
 import { Fragment, useContext, useEffect, useState } from "react";
+
 import { add, addSeconds, compareAsc, intervalToDuration } from "date-fns";
 import { useTranslation } from "next-i18next";
+
 import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
+
+import { AppStateContext } from "../contexts/app-state";
 
 
 export default function IssueProposalProgressBar() {

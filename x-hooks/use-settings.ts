@@ -1,9 +1,10 @@
-import useApi from "./use-api";
 import {useContext, useEffect, useState} from "react";
+
 import {AppStateContext} from "../contexts/app-state";
-import {WinStorage} from "../services/win-storage";
 import {changeSettings} from "../contexts/reducers/change-settings";
 import {updateShowProp} from "../contexts/reducers/update-show-prop";
+import {WinStorage} from "../services/win-storage";
+import useApi from "./use-api";
 
 /**
  * Loads settings with useEffect if not loaded previously

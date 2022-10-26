@@ -1,18 +1,23 @@
 import { useContext, useState } from "react";
-import { useTranslation } from "next-i18next";
-import { AppStateContext } from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/change-toaster";
-import { psReadAsText } from "helpers/file-reader";
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
+import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
+
 import NetworksDropDown from "components/administration/networks-dropdown";
 import Button from "components/button";
 import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import Step from "components/step";
+
+import { AppStateContext } from "contexts/app-state";
+import { useNetworkSettings } from "contexts/network-settings";
+import { addToast } from "contexts/reducers/change-toaster";
+
+import { psReadAsText } from "helpers/file-reader";
+import { formatNumberToCurrency } from "helpers/formatNumber";
+import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+
+
 import useApi from "x-hooks/use-api";
 
 const { publicRuntimeConfig: { urls: { homeURL }} } = getConfig();
@@ -231,7 +236,7 @@ export default function NetworksStep({
 
     if (forcedNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
       await state.Service?.active.setNetworkParameter("percentageNeededForDispute",
-                                           parameters.percentageNeededForDispute.value).catch(console.log);
+                                                      parameters.percentageNeededForDispute.value).catch(console.log);
   }
  
   return (

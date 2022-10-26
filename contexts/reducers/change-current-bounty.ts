@@ -1,9 +1,12 @@
-import {SimpleAction} from "./reducer";
+import {PullRequest} from "@taikai/dappkit";
+
 import {CurrentBounty, State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
-import {IssueBigNumberData, IssueDataComment} from "../../interfaces/issue-data";
+
 import {BenefactorExtended, BountyExtended, ProposalExtended} from "../../interfaces/bounty";
-import {PullRequest} from "@taikai/dappkit";
+import {IssueBigNumberData, IssueDataComment} from "../../interfaces/issue-data";
+import {SimpleAction} from "./reducer";
+
 
 export class ChangeCurrentBounty<T = CurrentBounty|Partial<CurrentBounty>, A = keyof CurrentBounty & 'clear'>
   extends SimpleAction<T, A> {
@@ -15,16 +18,16 @@ export class ChangeCurrentBounty<T = CurrentBounty|Partial<CurrentBounty>, A = k
   reducer(state: State, payload, subAction): State {
     let transformed;
     switch (subAction) {
-      case 'comments':
-      case 'data':
-      case 'lastUpdated':
-      case 'chainData':
-        transformed = {...state.currentBounty, lastUpdated: +new Date(), ...payload}
-        break;
+    case 'comments':
+    case 'data':
+    case 'lastUpdated':
+    case 'chainData':
+      transformed = {...state.currentBounty, lastUpdated: +new Date(), ...payload}
+      break;
 
-      case 'clear':
-        transformed = null;
-        break;
+    case 'clear':
+      transformed = null;
+      break;
     }
 
     return super.reducer(state, transformed);

@@ -11,9 +11,10 @@ import { ConnectionButton } from "components/profile/connect-button";
 import ProfileLayout from "components/profile/profile-layout";
 import { RemoveGithubAccount } from "components/profile/remove-github-modal";
 
+import { truncateAddress } from "helpers/truncate-address";
+
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import { truncateAddress } from "helpers/truncate-address";
 import {AppStateContext} from "../../../contexts/app-state";
 
 export default function Profile() {

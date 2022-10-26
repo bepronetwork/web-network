@@ -10,11 +10,13 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
-import { useAuthentication } from "x-hooks/use-authentication";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TransactionTypes } from "interfaces/enums/transaction-types";
+
+import { useAuthentication } from "x-hooks/use-authentication";
+
 import {AppStateContext} from "../contexts/app-state";
 
 export default function UnlockBeproModal({

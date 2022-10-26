@@ -1,8 +1,9 @@
 import {useContext, useEffect} from "react";
-import {AppStateContext} from "../contexts/app-state";
+
+import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
-import useApi from "./use-api";
-import useOctokit from "./use-octokit";
+
+import {AppStateContext} from "../contexts/app-state";
 import {
   changeCurrentBountyComments,
   changeCurrentBountyData,
@@ -11,9 +12,10 @@ import {
   changeCurrentBountyDataIsFinished,
   changeCurrentBountyDataIsInValidation,
 } from "../contexts/reducers/change-current-bounty";
-import {IssueData} from "../interfaces/issue-data";
-import BigNumber from "bignumber.js";
 import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
+import {IssueData} from "../interfaces/issue-data";
+import useApi from "./use-api";
+import useOctokit from "./use-octokit";
 
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
@@ -124,8 +126,7 @@ export function useBounty() {
     const dbBounty = state.currentBounty.data;
     const wallet = state.currentUser?.walletAddress;
 
-    return Promise.all(
-      bounty.proposals.map(proposal =>
+    return Promise.all(bounty.proposals.map(proposal =>
         (dbBounty.merged
           ? Promise.resolve(+dbBounty.merged != proposal.id)
           : state.Service.active.isProposalDisputed(+bounty.id, proposal.id)

@@ -19,8 +19,8 @@ import Stepper from "components/stepper";
 
 import { AppStateContext } from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
-import { addToast } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
+import { addToast } from "contexts/reducers/change-toaster";
 
 import { 
   DEFAULT_COUNCIL_AMOUNT, 

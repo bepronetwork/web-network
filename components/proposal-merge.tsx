@@ -14,6 +14,7 @@ import { ProposalExtended } from "interfaces/bounty";
 import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
+
 import {AppStateContext} from "../contexts/app-state";
 
 

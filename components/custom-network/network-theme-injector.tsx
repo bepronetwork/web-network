@@ -1,7 +1,9 @@
 import {useContext, useEffect, useState} from "react";
 
 import { useRouter } from "next/router";
+
 import useNetworkTheme from "x-hooks/use-network-theme";
+
 import {AppStateContext} from "../../contexts/app-state";
 
 export default function NetworkThemeInjector() {

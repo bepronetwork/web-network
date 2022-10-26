@@ -1,5 +1,7 @@
-import GithubImage from "components/github-image";
 import { useTranslation } from "next-i18next";
+
+import GithubImage from "components/github-image";
+
 import { useAuthentication } from "x-hooks/use-authentication";
 
 interface IProps{

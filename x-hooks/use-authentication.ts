@@ -1,8 +1,9 @@
 import {useContext, useEffect, useState} from "react";
-import {AppStateContext} from "contexts/app-state";
+
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
-import {useDao} from "./use-dao";
+
+import {AppStateContext} from "contexts/app-state";
 import {
   changeCurrentUser,
   changeCurrentUserAccessToken,
@@ -13,13 +14,15 @@ import {
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 
-import useApi from "./use-api";
+import {Balance} from "interfaces/balance-state";
+import {Network} from "interfaces/network";
+
 import {WinStorage} from "services/win-storage";
 
-import {Balance} from "interfaces/balance-state";
 import {changeActiveNetwork} from "../contexts/reducers/change-service";
-import {Network} from "interfaces/network";
 import {changeSpinners} from "../contexts/reducers/change-spinners";
+import useApi from "./use-api";
+import {useDao} from "./use-dao";
 
 export function useAuthentication() {
   const session = useSession();

@@ -1,14 +1,23 @@
-import {AppStateContext} from "contexts/app-state";
 import {useContext, useState} from "react";
+
 import { useTranslation } from "next-i18next";
-import { useAuthentication } from "x-hooks/use-authentication";
-import { formatStringToCurrency } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
-import { DelegationExtended } from "interfaces/oracles-state";
 
 import OracleIcon from "assets/icons/oracle-icon";
+
 import Modal from "components/modal";
+
+import {AppStateContext} from "contexts/app-state";
+
+import { formatStringToCurrency } from "helpers/formatNumber";
+import { truncateAddress } from "helpers/truncate-address";
+
+import { DelegationExtended } from "interfaces/oracles-state";
+
+
+
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
+
 import TokenBalance from "./profile/token-balance";
 
 

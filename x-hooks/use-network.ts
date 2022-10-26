@@ -1,10 +1,16 @@
 import {useCallback, useContext, useEffect, useState} from "react";
+
 import {useRouter} from "next/router";
-import {WinStorage} from "services/win-storage";
-import {AppStateContext} from "contexts/app-state";
-import useApi from "./use-api";
-import {changeActiveNetwork, changeNetworkLastVisited} from "contexts/reducers/change-service";
 import {UrlObject} from "url";
+
+import {AppStateContext} from "contexts/app-state";
+import {changeActiveNetwork, changeNetworkLastVisited} from "contexts/reducers/change-service";
+
+import {WinStorage} from "services/win-storage";
+
+import useApi from "./use-api";
+
+
 
 export function useNetwork() {
   const {state, dispatch} = useContext(AppStateContext);

@@ -11,11 +11,14 @@ import Avatar from "components/avatar";
 import Button from "components/button";
 import Identicon from "components/identicon";
 
-import {AppStateContext} from "../contexts/app-state";
+import { truncateAddress } from "helpers/truncate-address";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
-import { truncateAddress } from "helpers/truncate-address";
+
+import {AppStateContext} from "../contexts/app-state";
+
+
 
 
 

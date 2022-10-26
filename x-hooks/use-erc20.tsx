@@ -5,6 +5,7 @@ import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-cor
 import BigNumber from "bignumber.js";
 
 import { AppStateContext } from "contexts/app-state";
+
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";

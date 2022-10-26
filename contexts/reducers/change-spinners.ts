@@ -1,6 +1,6 @@
-import {SimpleAction} from "./reducer";
-import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
 import {State} from "../../interfaces/application-state";
+import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
+import {SimpleAction} from "./reducer";
 
 interface Spinners {
   proposals: boolean;

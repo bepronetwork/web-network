@@ -1,21 +1,29 @@
 import { useContext, useEffect, useState } from "react";
-import { AppStateContext } from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
-import { orderByProperty } from "helpers/array";
-import { Network } from "interfaces/network";
-import { NetworksPageContext } from "pages/networks";
-import { getCoinInfoByContract } from "services/coingecko";
+
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import {useNetwork} from "x-hooks/use-network";
-import useApi from "x-hooks/use-api";
+
 
 import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
 import NetworkListBar from "components/network-list-bar";
 import NetworkListItem from "components/network-list-item";
 import NothingFound from "components/nothing-found";
+
+import { AppStateContext } from "contexts/app-state";
+import { changeLoadState } from "contexts/reducers/change-load";
+
+import { orderByProperty } from "helpers/array";
+
+import { Network } from "interfaces/network";
+
+import { NetworksPageContext } from "pages/networks";
+
+import { getCoinInfoByContract } from "services/coingecko";
 import DAO from "services/dao-service";
+
+import useApi from "x-hooks/use-api";
+import {useNetwork} from "x-hooks/use-network";
 
 export default function NetworksList() {
   const router = useRouter();

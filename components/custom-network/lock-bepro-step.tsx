@@ -13,11 +13,14 @@ import InputNumber from "components/input-number";
 import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
-import { useAuthentication } from "x-hooks/use-authentication";
 import { useNetworkSettings } from "contexts/network-settings";
+
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
+
+import { useAuthentication } from "x-hooks/use-authentication";
+
 import {AppStateContext} from "../../contexts/app-state";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {

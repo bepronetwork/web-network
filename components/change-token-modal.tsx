@@ -8,6 +8,7 @@ import Button from "components/button";
 import Modal from "components/modal";
 
 import { Token } from "interfaces/token";
+
 import {AppStateContext} from "../contexts/app-state";
 
 export default function ChangeTokenModal({

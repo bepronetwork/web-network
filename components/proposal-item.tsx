@@ -17,11 +17,11 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
+import {AppStateContext} from "../contexts/app-state";
+import {useBounty} from "../x-hooks/use-bounty";
 import Button from "./button";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import Translation from "./translation";
-import {AppStateContext} from "../contexts/app-state";
-import {useBounty} from "../x-hooks/use-bounty";
 
 interface ProposalItemProps {
   proposal: Proposal;

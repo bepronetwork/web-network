@@ -1,15 +1,17 @@
 import {createContext, useEffect, useReducer} from "react";
-import {mainReducer} from "./reducers/main";
-import loadApplicationStateReducers from "./reducers";
-import {AppState} from "../interfaces/application-state";
-import sanitizeHtml from "sanitize-html";
+
 import {useRouter} from "next/router";
-import {toastError} from "./reducers/change-toaster";
-import {useSettings} from "../x-hooks/use-settings";
+import sanitizeHtml from "sanitize-html";
+
+import {AppState} from "../interfaces/application-state";
+import {useAuthentication} from "../x-hooks/use-authentication";
 import {useDao} from "../x-hooks/use-dao";
 import {useNetwork} from "../x-hooks/use-network";
-import {useAuthentication} from "../x-hooks/use-authentication";
 import {useRepos} from "../x-hooks/use-repos";
+import {useSettings} from "../x-hooks/use-settings";
+import loadApplicationStateReducers from "./reducers";
+import {toastError} from "./reducers/change-toaster";
+import {mainReducer} from "./reducers/main";
 
 
 const appState: AppState = {

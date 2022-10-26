@@ -9,8 +9,8 @@ import PageHero, { InfosHero } from "components/page-hero";
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
-import CardBecomeCouncil from "./card-become-council";
 import {AppStateContext} from "../contexts/app-state";
+import CardBecomeCouncil from "./card-become-council";
 
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();

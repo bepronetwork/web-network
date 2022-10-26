@@ -7,8 +7,9 @@ import Icon from "components/icon";
 
 
 import { removeToast } from "contexts/reducers/change-toaster";
-import {ToastNotification} from "../interfaces/toast-notification";
+
 import {AppStateContext} from "../contexts/app-state";
+import {ToastNotification} from "../interfaces/toast-notification";
 
 enum IconMapper {
   info = "info",

@@ -15,17 +15,18 @@ import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "x-hooks/use-authentication";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { getIssueState } from "helpers/handleTypeIssue";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 
 import ConnectGithub from "./connect-github";
 import Modal from "./modal";
 import {useBounty} from "../x-hooks/use-bounty";
+import Modal from "./modal";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -367,7 +368,7 @@ export default function PageActions({
               {renderCreateProposalButton()}
 
               {renderViewPullRequestLink()}
-              
+
               {!user?.login && wallet?.address && <ConnectGithub size="sm"/>}
 
               <GithubLink
