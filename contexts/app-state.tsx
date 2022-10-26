@@ -12,6 +12,7 @@ import {useSettings} from "../x-hooks/use-settings";
 import loadApplicationStateReducers from "./reducers";
 import {toastError} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
+import {updateSettings} from "./reducers/change-settings";
 
 
 const appState: AppState = {
@@ -35,12 +36,14 @@ export const AppStateContext = createContext(appState);
 export function AppStateContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, appState.state);
   const {query: {authError}} = useRouter();
+  const {loadSettings} = useSettings();
 
+  // useSettings(); // loads settings from database and dispatches its state
   useDao(); // populate `state.Settings`
   useNetwork(); // start network state
   useAuthentication(); // github-connection, wallet & balance
   useRepos(); // load repos and hook to the query?.repoId param to load active repo
-  useSettings(); // loads settings from database and dispatches its state
+
 
   function parseError() {
     if (!authError)
@@ -53,6 +56,9 @@ export function AppStateContextProvider({children}) {
   function start() {
 
     loadApplicationStateReducers(); // load reducers into app-state
+    loadSettings().then(s => dispatch(updateSettings(s)));
+
+
     console.debug(`AppState Started`, new Date())
   }
 
