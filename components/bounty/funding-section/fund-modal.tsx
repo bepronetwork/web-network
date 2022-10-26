@@ -49,12 +49,12 @@ export default function FundModal({
     isExecuting,
     amountToFund?.isNaN(),
     amountToFund?.isZero(),
-    amountToFund?.plus(networkIssue?.fundedAmount).gt(networkIssue?.fundingAmount)
+    amountToFund?.plus(activeIssue?.fundedAmount).gt(activeIssue?.fundingAmount)
   ].some(c => c);
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
   const needsApproval = amountToFund?.gt(allowance);
-  const amountNotFunded = networkIssue?.fundingAmount?.minus(networkIssue?.fundedAmount) || BigNumber(0);
+  const amountNotFunded = activeIssue?.fundingAmount?.minus(activeIssue?.fundedAmount) || BigNumber(0);
 
   const ConfirmBtn = {
     label: needsApproval ? t("actions.approve") : t("funding:actions.fund-bounty"),
@@ -126,14 +126,14 @@ export default function FundModal({
   }
 
   useEffect(() => {
-    if (!networkIssue?.fundingAmount || !networkIssue?.rewardAmount) return;
+    if (!activeIssue?.fundingAmount || !networkIssue?.rewardAmount) return;
 
     if (amountToFund?.lte(amountNotFunded)) {
-      const preview = amountToFund.multipliedBy(networkIssue.rewardAmount).dividedBy(networkIssue.fundingAmount);
+      const preview = amountToFund.multipliedBy(networkIssue.rewardAmount).dividedBy(activeIssue?.fundingAmount);
       setRewardPreview(preview.toFixed());
     } else
       setRewardPreview("0");
-  }, [networkIssue?.fundingAmount, networkIssue?.rewardAmount, amountToFund]);
+  }, [activeIssue?.fundingAmount, networkIssue?.rewardAmount, amountToFund]);
 
   useEffect(() => {
     if (networkIssue?.transactionalTokenData?.address) 
@@ -150,10 +150,10 @@ export default function FundModal({
     >
       <div className="mt-2 px-2 d-grid gap-4">
         <FundingProgress
-          fundedAmount={networkIssue?.fundedAmount?.toFixed()}
-          fundingAmount={networkIssue?.fundingAmount?.toFixed()}
+          fundedAmount={activeIssue?.fundedAmount?.toFixed()}
+          fundingAmount={activeIssue?.fundingAmount?.toFixed()}
           fundingTokenSymbol={networkIssue?.transactionalTokenData?.symbol}
-          fundedPercent={networkIssue?.fundedPercent?.toFixed()}
+          fundedPercent={activeIssue?.fundedPercent?.toFixed()}
           amountToFund={amountToFund?.toFixed()}
         />
 
