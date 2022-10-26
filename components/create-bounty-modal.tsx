@@ -611,13 +611,15 @@ export default function CreateBountyModal() {
   }, [customTokens]);
 
   useEffect(() => {
+    let approved = true
+    
     if (isBountyType)
-      setIsTokenApproved(isAmountApproved(transactionalERC20.allowance, BigNumber(issueAmount.value)));
+      approved = isAmountApproved(transactionalERC20.allowance, BigNumber(issueAmount.value));
     else if (rewardChecked)
-      setIsTokenApproved(isAmountApproved(rewardERC20.allowance, BigNumber(rewardAmount.value)));
-    else
-      setIsTokenApproved(true);
-  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount.value, rewardAmount.value, rewardChecked]);
+      approved = isAmountApproved(rewardERC20.allowance, BigNumber(rewardAmount.value));
+    
+    setIsTokenApproved(approved);
+  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
     if (!settings?.contracts?.settlerToken || activeNetwork?.tokens === undefined) return;
@@ -635,6 +637,10 @@ export default function CreateBountyModal() {
     setCanAddCustomToken(false)
     getTokenInfo(activeNetwork.tokens);
   }, [activeNetwork?.tokens, settings]);
+
+  useEffect(()=>{
+    transactionalERC20.updateAllowanceAndBalance();
+  },[showCreateBounty])
 
   if (showCreateBounty && !wallet?.address)
     return <ConnectWalletButton asModal={true} />;
