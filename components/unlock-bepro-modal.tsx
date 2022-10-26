@@ -106,7 +106,7 @@ export default function UnlockBeproModal({
             />
 
             <div className="d-flex caption-small justify-content-between align-items-center p-20">
-              <span className="text-ligth-gray">
+              <span className="text-light-gray">
                 <span className="text-purple">
                   {t("$oracles", { token: networkTokenSymbol })}
                 </span>{" "}
@@ -140,7 +140,7 @@ export default function UnlockBeproModal({
         d-flex mb-2 caption-small bg-dark-gray justify-content-between
         border-radius-8 align-items-center p-20 amount-input
                       ">
-          <span className="text-ligth-gray">
+          <span className="text-light-gray">
             <span className="text-primary">{t("$bepro")}</span>{" "}
             {t("misc.available")}
           </span>

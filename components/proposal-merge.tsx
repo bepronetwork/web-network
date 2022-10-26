@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
@@ -7,8 +7,6 @@ import BountyDistributionItem from "components/bounty-distribution-item";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useNetwork } from "contexts/network";
-
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -16,6 +14,7 @@ import { ProposalExtended } from "interfaces/bounty";
 import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
+import {AppStateContext} from "../contexts/app-state";
 
 
 interface amount {
@@ -65,24 +64,24 @@ export default function ProposalMerge({
       proposerAmount: defaultAmount,
       proposals: [defaultAmount],
     });
+  
+  const {state} = useContext(AppStateContext);
 
-  const { activeNetwork } = useNetwork();
-
-  const amounTotalConverted = BigNumber(handleConversion(amountTotal));
+  const amountTotalConverted = BigNumber(handleConversion(amountTotal));
 
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
 
-    const distributions = calculateDistributedAmounts(activeNetwork?.treasury,
-                                                      activeNetwork?.mergeCreatorFeeShare,
-                                                      activeNetwork?.proposerFeeShare,
+    const distributions = calculateDistributedAmounts(state.Service?.network?.active?.treasury,
+                                                      state.Service?.network?.active?.mergeCreatorFeeShare,
+                                                      state.Service?.network?.active?.proposerFeeShare,
                                                       amountTotal,
                                                       proposal.details.map(({ percentage }) => percentage));
     setDistributedAmounts(distributions);
   }
 
   async function  getCoinInfo() { 
-    await getCoinInfoByContract(activeNetwork?.networkToken?.address).then((tokenInfo) => {
+    await getCoinInfoByContract(state.Service?.network?.active?.networkToken?.address).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
     }).catch(error => console.log("getCoinInfo", error));
   }
@@ -103,8 +102,8 @@ export default function ProposalMerge({
   useEffect(() => {
     if (
       !proposal ||
-      !activeNetwork?.mergeCreatorFeeShare ||
-      !activeNetwork?.treasury
+      !state.Service?.network?.active?.mergeCreatorFeeShare ||
+      !state.Service?.network?.active?.treasury
     )
       return;
 
@@ -113,10 +112,10 @@ export default function ProposalMerge({
   }, [
     proposal,
     amountTotal,
-    activeNetwork?.treasury,
-    activeNetwork?.mergeCreatorFeeShare,
-    activeNetwork?.proposerFeeShare,
-    activeNetwork?.networkToken?.address
+    state.Service?.network?.active?.treasury,
+    state.Service?.network?.active?.mergeCreatorFeeShare,
+    state.Service?.network?.active?.proposerFeeShare,
+    state.Service?.network?.active?.networkToken?.address
   ]);
 
   return (
@@ -219,7 +218,7 @@ export default function ProposalMerge({
 
           <div
             className={`d-flex flex-column cursor-pointer 
-          ${amounTotalConverted?.gt(0) ? "mt-1" : "mt-3"}`}
+          ${amountTotalConverted?.gt(0) ? "mt-1" : "mt-3"}`}
           >
             <div className="d-flex justify-content-end mb-1">
               <span className="text-white caption-medium">
@@ -229,11 +228,11 @@ export default function ProposalMerge({
                 {currentTokenSymbol()}
               </span>
             </div>
-            {amounTotalConverted?.gt(0) && (
+            {amountTotalConverted?.gt(0) && (
             <div className="d-flex justify-content-end">
-              <span className="text-white caption-small text-ligth-gray">
-                {amounTotalConverted?.toFixed()}</span>
-              <span className=" ms-2 caption-small text-ligth-gray">
+              <span className="text-white caption-small text-light-gray">
+                {amountTotalConverted?.toFixed()}</span>
+              <span className=" ms-2 caption-small text-light-gray">
                 EUR
               </span>
             </div>

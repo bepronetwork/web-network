@@ -15,7 +15,7 @@ $light-warning: #CCAB38;
 //Specials
 $dark-gray: #20222b;
 $gray: #c4c7d3;
-$ligth-gray: #434758;
+$light-gray: #434758;
 $blue: #4250e4;
 $blue-dark: #283089;
 // Fix-ME: Remove disabled color
@@ -49,7 +49,7 @@ $more-bg: (
   "success-15": rgba($success, 0.15),
   "success-50": rgba($success, 0.5),
   "dark-gray": $dark-gray,
-  "ligth-gray": $ligth-gray,
+  "light-gray": $light-gray,
   "disabled": $disabled,
   "danger": $danger,
   "danger-50": rgba($danger, 0.5),
@@ -81,7 +81,7 @@ $more-colors: (
   "blue-shadow": $bg-blue-shadow,
   "gray": $gray,
   "dark-gray": $dark-gray,
-  "ligth-gray": $ligth-gray,
+  "light-gray": $light-gray,
   "black": $black,
   "white": #fff
 );
@@ -146,7 +146,7 @@ $input-border-radius: 8px;
 // Tooltip
 $tooltip-opacity: 1;
 $tooltip-bg: $white;
-$tooltip-color: $ligth-gray;
+$tooltip-color: $light-gray;
 $tooltip-arrow-color: $white;
 
 @import "~bootstrap/scss/variables";

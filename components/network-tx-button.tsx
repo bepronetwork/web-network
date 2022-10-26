@@ -1,22 +1,19 @@
 import { forwardRef, useContext, useEffect, useState, ReactChild } from "react";
 import { useTranslation } from "next-i18next";
-import LockedIcon from "assets/icons/locked-icon";
-import Button from "components/button";
-import Icon from "components/icon";
-import Modal from "components/modal";
 import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "x-hooks/use-authentication";
-import { useDAO } from "contexts/dao";
-
 import { addToast } from "contexts/reducers/change-toaster";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { parseTransaction } from "helpers/transactions";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import useApi from "x-hooks/use-api";
-
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {MetamaskErrors} from "../interfaces/enums/Errors";
+import LockedIcon from "assets/icons/locked-icon";
+import Button from "components/button";
+import Icon from "components/icon";
+import Modal from "components/modal";
+import useApi from "x-hooks/use-api";
 
 interface NetworkTxButtonParams {
   txMethod: string;

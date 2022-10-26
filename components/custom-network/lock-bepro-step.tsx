@@ -69,13 +69,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     setIsLocking(true);
 
     state.Service?.active.lockInRegistry(amount.toFixed())
-      .then(() =>
-        Promise.all([
-          updateWalletBalance(),
-          updateAllowance(),
-          updateTokenBalance(),
-          setAmount(BigNumber(0))
-        ]))
+      .then(() => {
+        updateWalletBalance();
+        updateAllowance();
+        setAmount(BigNumber(0));
+        return updateTokenBalance()
+      })
       .catch(console.log)
       .finally(() => setIsLocking(false));
   }
@@ -199,7 +198,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                         />
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
-                          <span className="text-ligth-gray">
+                          <span className="text-light-gray">
                             <span className="text-primary">{networkTokenSymbol}</span>{" "}
                             {t("misc.available")}
                           </span>
@@ -248,7 +247,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           onClick={handleShowUnlockModal}
                         >
                           <div className="d-flex justify-content-between px-0">
-                            <span className="text-ligth-gray">
+                            <span className="text-light-gray">
                               <span className="text-purple text-uppercase">
                                 {t("$oracles", { token: networkTokenSymbol })}
                               </span>{" "}
@@ -337,7 +336,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                   <Button
                     disabled={isUnlockBtnDisabled || isUnlocking || isApproving || isLocking }
-                    color="ligth-gray"
+                    color="light-gray"
                     onClick={handleUnLock}
                     isLoading={isUnlocking}
                     withLockIcon={!isUnlocking && isUnlockBtnDisabled}

@@ -6,13 +6,13 @@ import ArrowLeft from "assets/icons/arrow-left";
 import Avatar from "components/avatar";
 import GithubInfo from "components/github-info";
 
-import { useIssue } from "contexts/issue";
-
 import { Proposal } from "interfaces/proposal";
 
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
+import {useContext} from "react";
+import {AppStateContext} from "../contexts/app-state";
 
 interface ProposalHeroProps {
   proposal: Proposal;
@@ -21,7 +21,7 @@ interface ProposalHeroProps {
 export default function ProposalHero({
   proposal,
 }: ProposalHeroProps) {
-  const { activeIssue } = useIssue();
+  const {state} = useContext(AppStateContext);
   const router = useRouter();
   const { t } = useTranslation(["proposal", "common"]);
 
@@ -43,10 +43,10 @@ export default function ProposalHero({
               </div>
               <div>
                 <span className="me-2 text-white-40 caption-large">
-                  #{activeIssue?.githubId}
+                  #{state.currentBounty?.data?.githubId}
                 </span>
                 <span className="text-gray caption-medium">
-                  {activeIssue?.title}
+                  {state.currentBounty?.data?.title}
                 </span>
               </div>
             </div>
@@ -74,8 +74,8 @@ export default function ProposalHero({
 
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
-              currentValue={activeIssue?.amount?.toFixed() || "0"}
-              currency={activeIssue?.token?.symbol || t('common:misc.token')}
+              currentValue={state.currentBounty?.data?.amount?.toFixed() || "0"}
+              currency={state.currentBounty?.data?.token?.symbol || t('common:misc.token')}
             />
           </div>
         </div>

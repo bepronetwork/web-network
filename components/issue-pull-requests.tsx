@@ -1,26 +1,25 @@
-import React from "react";
+import React, {useContext} from "react";
 
 import { useTranslation } from "next-i18next";
 
 import NothingFound from "components/nothing-found";
 import PullRequestItem from "components/pull-request-item";
 
-import { useIssue } from "contexts/issue";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function IssuePullRequests() {
   const { t } = useTranslation("pull-request");
 
-  const { activeIssue, networkIssue } = useIssue();
-
-  const hasPullRequests = !!activeIssue?.pullRequests?.length;
+  const {state} = useContext(AppStateContext);
+  const hasPullRequests = !!state.currentBounty?.data?.pullRequests?.length;
 
   return (
     <div className={`content-wrapper border-top-0 pt-0 ${ (hasPullRequests && "pb-0") || "pb-3" }`}>
       {hasPullRequests &&
-        React.Children.toArray(activeIssue?.pullRequests?.map((pullRequest) => (
+        React.Children.toArray(state.currentBounty?.data?.pullRequests?.map((pullRequest) => (
             <PullRequestItem
               pullRequest={pullRequest}
-              networkPullRequest={networkIssue?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)}
+              networkPullRequest={state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)}
             />
           ))) || 
         <NothingFound description={t("errors.not-found")} />

@@ -1,23 +1,16 @@
+import {AppStateContext} from "contexts/app-state";
 import {useContext, useState} from "react";
-
 import { useTranslation } from "next-i18next";
-
-import OracleIcon from "assets/icons/oracle-icon";
-
-import Modal from "components/modal";
-
 import { useAuthentication } from "x-hooks/use-authentication";
-import { useNetwork } from "contexts/network";
-
 import { formatStringToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
-
 import { DelegationExtended } from "interfaces/oracles-state";
 
+import OracleIcon from "assets/icons/oracle-icon";
+import Modal from "components/modal";
 import useBepro from "x-hooks/use-bepro";
-
 import TokenBalance from "./profile/token-balance";
-import {AppStateContext} from "../contexts/app-state";
+
 
 interface DelegationProps {
   type: "toMe" | "toOthers";

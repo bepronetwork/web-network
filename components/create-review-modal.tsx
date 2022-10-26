@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -9,12 +9,10 @@ import Button from "components/button";
 import GithubInfo from "components/github-info";
 import Modal from "components/modal";
 
-import { useIssue } from "contexts/issue";
-import { useRepos } from "contexts/repos";
-
 import { formatDate } from "helpers/formatDate";
 
 import { pullRequest } from "interfaces/issue-data";
+import {AppStateContext} from "../contexts/app-state";
 interface CreateReviewModalModalProps{
   show: boolean,
   isExecuting: boolean,
@@ -32,9 +30,8 @@ export default function CreateReviewModal({
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [body, setBody] = useState("");
-  
-  const { activeRepo } = useRepos();
-  const { activeIssue } = useIssue();
+
+  const {state} = useContext(AppStateContext);
 
   function isButtonDisabled(): boolean {
     return body.trim() === "" || isExecuting;
@@ -56,7 +53,7 @@ export default function CreateReviewModal({
       <div className="container">
         <div className="mb-2">
           <p className="caption-small trans mb-2">
-            #{activeIssue?.githubId} {activeIssue?.title}
+            #{state.currentBounty?.data?.githubId} {state.currentBounty?.data?.title}
           </p>
 
           <p className="h4 mb-2">
@@ -72,7 +69,7 @@ export default function CreateReviewModal({
             <GithubInfo
               parent="modal"
               variant="repository"
-              label={activeRepo?.githubPath?.split("/")[1]}
+              label={state.Service?.network?.repos?.active?.githubPath?.split("/")[1]}
             />
 
             <span className="caption-small text-gray ml-2 mr-2">

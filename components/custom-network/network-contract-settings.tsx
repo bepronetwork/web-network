@@ -1,16 +1,15 @@
 import { useTranslation } from "next-i18next";
+import { AppStateContext } from "contexts/app-state";
+import { useNetworkSettings } from "contexts/network-settings";
+import { formatNumberToCurrency } from "helpers/formatNumber";
+import { useContext } from "react";
 
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 
-import { useNetwork } from "contexts/network";
-import { useNetworkSettings } from "contexts/network-settings";
-
-import { formatNumberToCurrency } from "helpers/formatNumber";
-
 export default function NetworkContractSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
+  const {state} = useContext(AppStateContext);
 
-  const { activeNetwork } = useNetwork()
   const { fields, settings, LIMITS } = useNetworkSettings();
   
   const handleDraftTimeChange = value => fields.parameter.setter({ label: "draftTime", value });
@@ -21,7 +20,7 @@ export default function NetworkContractSettings() {
   const handlePercentageForDisputeChange = 
     value => fields.parameter.setter({ label: "percentageNeededForDispute", value });
 
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
 
   const parameterInputs = [
     { 

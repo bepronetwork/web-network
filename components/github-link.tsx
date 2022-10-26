@@ -2,8 +2,6 @@ import React, { ReactNode } from "react";
 
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
-import useGithubRepo from "x-hooks/use-github-repo";
-
 interface GithubLinkParams {
   repoId?: string;
   forcePath?: string;
@@ -14,19 +12,18 @@ interface GithubLinkParams {
 }
 
 export default function GithubLink({
-  repoId,
   hrefPath,
   children,
   forcePath,
   onClick,
   color = "dark-gray"
 }: GithubLinkParams) {
-  const [githubPath] = useGithubRepo(repoId, forcePath);
+
 
   return (
     <div onClick={onClick}>
       <a
-        href={!onClick ?`https://github.com/${githubPath}/${hrefPath}`: "#"}
+        href={!onClick ?`https://github.com/${forcePath}/${hrefPath}`: "#"}
         target="_blank"
         className={`btn btn-${color} text-uppercase d-flex align-items-center github-link`}
         rel="noreferrer"

@@ -15,7 +15,6 @@ import { FlexRow } from "components/profile/wallet-balance";
 
 import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "x-hooks/use-authentication";
-import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
 
@@ -29,7 +28,6 @@ export default function ConnectAccount() {
   const { t } = useTranslation(["common", "connect-account", "profile"]);
 
   const { joinAddressToUser } = useApi();
-  const { lastNetworkVisited } = useNetwork();
   const { state, dispatch } = useContext(AppStateContext);
   const {connectWallet, connectGithub, disconnectGithub, validateGhAndWallet} = useAuthentication();
 
@@ -61,7 +59,7 @@ export default function ConnectAccount() {
     if(previusRouter)
       return router.push(previusRouter);
 
-    const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
+    const redirectTo = state.Service?.network?.lastVisited ? `${state.Service?.network?.lastVisited}/profile` : "/networks";
 
     router.push(redirectTo);
   }
@@ -159,7 +157,7 @@ export default function ConnectAccount() {
                 />
               }
 
-              <div className="caption-small text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
+              <div className="caption-small text-light-gray text-center fs-smallest text-dark text-uppercase mt-4">
                 {t("misc.by-connecting")}{" "}
                 <a
                   href="https://www.bepro.network/terms"

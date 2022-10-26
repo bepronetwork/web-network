@@ -1,7 +1,5 @@
 import { useTranslation } from "next-i18next";
 
-import { useIssue } from "contexts/issue";
-
 import { pullRequest } from "interfaces/issue-data";
 import { DistribuitonPerUser } from "interfaces/proposal";
 
@@ -11,6 +9,8 @@ import GithubInfo from "./github-info";
 import ProposalProgress from "./proposal-progress";
 import PullRequestLabels from "./pull-request-labels";
 import Translation from "./translation";
+import {useContext} from "react";
+import {AppStateContext} from "../contexts/app-state";
 
 interface IProposalPRDetailsProps {
   currentPullRequest: pullRequest;
@@ -21,7 +21,7 @@ export default function ProposalPullRequestDetail({
   usersDistribution
 }: IProposalPRDetailsProps) {
   const { t } = useTranslation("pull-request");
-  const { activeIssue } = useIssue();
+  const { state } = useContext(AppStateContext);
 
   return (
     <div className="bg-shadow rounded-5 p-3 d-flex flex-column">
@@ -51,17 +51,17 @@ export default function ProposalPullRequestDetail({
         </div>
 
         <span className="caption-small">
-          {(activeIssue?.repository && (
+          {(state.currentBounty?.data?.repository && (
             <GithubInfo
               parent="list"
               variant="repository"
-              label={activeIssue?.repository?.githubPath}
+              label={state.currentBounty?.data?.repository?.githubPath}
             />
           )) ||
             ""}
         </span>
 
-        <span className="caption-small text-ligth-gray text-uppercase">
+        <span className="caption-small text-light-gray text-uppercase">
           <Translation label={"branch"} />
           <span className="text-primary">:{currentPullRequest?.branch}</span>
         </span>

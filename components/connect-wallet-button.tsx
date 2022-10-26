@@ -1,19 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
+import { useAuthentication } from "x-hooks/use-authentication";
+import { NetworkColors } from "interfaces/enums/network-colors";
+import { AppStateContext } from "../contexts/app-state";
+import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
+
 import Image from "next/image";
-
 import metamaskLogo from "assets/metamask.png";
-
 import Button from "components/button";
 import Modal from "components/modal";
-
-import { useAuthentication } from "x-hooks/use-authentication";
-import { useDAO } from "contexts/dao";
-
-import { NetworkColors } from "interfaces/enums/network-colors";
-import {AppStateContext} from "../contexts/app-state";
-import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({
   children = null,
@@ -102,7 +98,7 @@ export default function ConnectWalletButton({
           </div>
 
           <div className="small-info text-center text-uppercase mt-1 pt-1">
-            <span className="text-ligth-gray">{t("misc.by-connecting")} </span>
+            <span className="text-light-gray">{t("misc.by-connecting")} </span>
             <a
               href="https://www.bepro.network/terms"
               target="_blank"
@@ -112,7 +108,7 @@ export default function ConnectWalletButton({
               {t("misc.terms-and-conditions")}
             </a>{" "}
             <br />
-            <span className="text-ligth-gray">{t("misc.and")} </span>
+            <span className="text-light-gray">{t("misc.and")} </span>
             <a
               href="https://taikai.network/privacy"
               target="_blank"

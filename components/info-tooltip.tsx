@@ -32,7 +32,7 @@ export default function InfoTooltip({
           <InfoIconEmpty
             width={14}
             height={14}
-            color="colors-ligth-gray"
+            color="colors-light-gray"
             className="empty-info"
           />
         )}

@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { useRouter } from "next/router";
 
-import { useNetwork } from "contexts/network";
-import { useRepos } from "contexts/repos";
-
 import { IssueFilterBoxOption } from "interfaces/filters";
 import { RepoInfo } from "interfaces/repos-list";
+import {AppStateContext} from "../contexts/app-state";
 
 type FilterStateUpdater = (
   opts: IssueFilterBoxOption[],
@@ -24,10 +22,11 @@ export default function useFilters(): [
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
-  const { repoList } = useRepos();
+
+
+  const {state} = useContext(AppStateContext);
 
   const router = useRouter();
-  const { activeNetwork } = useNetwork();
 
   function getActiveFiltersOf(opts: IssueFilterBoxOption[]) {
     return opts
@@ -63,7 +62,10 @@ export default function useFilters(): [
                               (router.query?.repoId as string) === value.toString());
     }
 
-    setRepoFilters([makeFilterOption("All", "allrepos", !router.query?.repoId)].concat(repoList?.map(mapRepo)));
+    setRepoFilters([
+      makeFilterOption("All", "allrepos", !router.query?.repoId)]
+      .concat(state.Service?.network?.repos?.list?.map(mapRepo))
+    );
   }
 
   function loadFilters() {
@@ -88,7 +90,7 @@ export default function useFilters(): [
   }
 
   useEffect(loadFilters, [router.query]);
-  useEffect(loadRepos, [repoList]);
+  useEffect(loadRepos, [state.Service?.network?.repos?.list]);
 
   function updateOpt(opts: IssueFilterBoxOption[],
                      opt: IssueFilterBoxOption,
@@ -113,7 +115,7 @@ export default function useFilters(): [
       ...(router.query.sortBy ? { sortBy: router.query.sortBy } : { sortBy: undefined }),
       ...(router.query.order ? { order: router.query.order } : { order: undefined }),
       ...(router.query.search ? { search: router.query.search } : { search: undefined }),
-      network: activeNetwork.name,
+      network: state.Service?.network?.active.name,
       page: "1"
     };
 

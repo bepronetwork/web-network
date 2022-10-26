@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -7,9 +7,8 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useDAO } from "contexts/dao";
-
 import { Token } from "interfaces/token";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function ChangeTokenModal({
   show,
@@ -30,7 +29,7 @@ export default function ChangeTokenModal({
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
 
-  const { service: DAOService } = useDAO();
+  const {state} = useContext(AppStateContext);
 
   async function loadContract() {
     if (address.trim() === "") {
@@ -42,12 +41,12 @@ export default function ChangeTokenModal({
     try {
       setIsExecuting(true);
 
-      if (!DAOService.isAddress(address)) {
+      if (!state.Service?.active.isAddress(address)) {
         setIsValidAddress(false);
         return;
       } 
       
-      const token = await DAOService.getERC20TokenData(address)
+      const token = await state.Service?.active.getERC20TokenData(address)
       setName(token.name);
       setSymbol(token.symbol);
       setIsValidAddress(true);

@@ -38,7 +38,7 @@ export default function PaymentItem({
         </FlexRow>
       </FlexColumn>
 
-      <Button color="ligth-gray" onClick={() => handleItemClick(issue?.issueId)} outline>
+      <Button color="light-gray" onClick={() => handleItemClick(issue?.issueId)} outline>
         <span className="text-white text-nowrap">
           {labelBounty} #{issue?.issueId}
         </span>

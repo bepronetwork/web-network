@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import { useRepos } from "contexts/repos";
+import {AppStateContext} from "../contexts/app-state";
 
 import { trimString } from "helpers/string";
 
@@ -13,53 +13,36 @@ export default function BranchsDropdown({
   onSelected,
   value,
   disabled,
-  fromBountyCreation = false
 }: {
   repoId: string
   onSelected: (e: { value: string }) => void
   value?: { value: string, label: string }
   disabled?: boolean
-  fromBountyCreation?: boolean
 }) {
-  const { findBranch } = useRepos();
-  const [isFetching, setIsFetching] = useState<boolean>(false)
+
+  const {state} = useContext(AppStateContext);
+
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
 
-  function onChangeSelect(e: { value: string; label: string }) {
-    onSelected(e);
-    setOption(e);
+
+  function mapOptions() {
+    if (!state.Service?.network?.repos?.active?.branches?.length)
+      return;
+
+    setOptions(state.Service.network.repos.active.branches.map(({branch}) => ({value: branch, label: branch})));
+    setOption(options[0]);
+    onSelected(option);
   }
 
-  async function loadBranchsFromBackend() {
-    if (!repoId) return;
+  useEffect(() => { value?.label && setOption(value) }, [value]);
+  useEffect(mapOptions, [state.Service?.network?.repos?.active?.branches]);
 
-    setIsFetching(true)
-    
-    function mapRepo({ branch: value, branch: label }) {
-      return { value, label };
-    }
-    try {
-      const branchs = await findBranch(Number(repoId), fromBountyCreation);
-      const optionsBranchs = branchs.map(mapRepo)
-    
-      if (optionsBranchs?.length) {
-        setOptions(optionsBranchs);
-        const defaultOption = optionsBranchs.find(opt => opt.value === value.value) || optionsBranchs[0];
-        onChangeSelect(defaultOption)
-      }
-
-    } finally{
-      setIsFetching(false)
-    }
+  function onChangeSelect(e: { value: string }) {
+    onSelected(e)
+    setOption({value: e.value, label: e.value})
   }
-
-  useEffect(() => {
-    loadBranchsFromBackend();
-  }, [repoId]);
- 
-  useEffect(() => {if(value?.value.length && value?.value !== option?.value) setOption(value) }, [value]);
 
   return (
     <div>

@@ -38,9 +38,7 @@ export default function PageActions({
 }: PageActionsProps) {
   const { t } = useTranslation(["common", "pull-request", "bounty"]);
 
-  const {
-    query: { repoId, id }
-  } = useRouter();
+  const {query: { repoId,}} = useRouter();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
@@ -223,7 +221,6 @@ export default function PageActions({
     if (isWalletAndGHConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
       return (
         <GithubLink
-          repoId={String(repoId)}
           forcePath={state.currentBounty?.data?.repository?.githubPath}
           hrefPath="fork"
           color="primary"
@@ -333,7 +330,6 @@ export default function PageActions({
     if (isWalletAndGHConnected && !isBountyInDraft && hasOpenPullRequest)
       return(
         <GithubLink
-          repoId={String(repoId)}
           forcePath={state.currentBounty?.data?.repository?.githubPath}
           hrefPath={`pull?q=base:${state.currentBounty?.data?.branch}`}
           color="primary"
@@ -375,7 +371,6 @@ export default function PageActions({
               {!user?.login && wallet?.address && <ConnectGithub size="sm"/>}
 
               <GithubLink
-                repoId={String(repoId)}
                 onClick={!state.Service?.network?.repos?.active?.ghVisibility ? () => setShowGHModal(true) : null}
                 forcePath={state.currentBounty?.data?.repository?.githubPath}
                 hrefPath={`${(state.currentBounty?.data?.state?.toLowerCase() === "pull request" && "pull") ||
@@ -405,10 +400,8 @@ export default function PageActions({
 
       <UpdateBountyAmountModal
         show={showUpdateAmount}
-        repoId={repoId}
         transactionalAddress={state.currentBounty?.chainData?.transactional}
         bountyId={state.currentBounty?.chainData?.id}
-        ghId={state.currentBounty?.data?.githubId}
         handleClose={() => setShowUpdateAmount(false)}
       />
 

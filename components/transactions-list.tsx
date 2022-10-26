@@ -87,7 +87,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
   function emptyTransaction() {
     return (
       <div className="text-center">
-        <span className="caption-small text-ligth-gray text-uppercase fs-8 family-Medium">
+        <span className="caption-small text-light-gray text-uppercase fs-8 family-Medium">
           {t("transactions.no-transactions")}
         </span>
       </div>
@@ -108,7 +108,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
         { 
           transactions.length &&
           <Button 
-            textClass="text-ligth-gray" 
+            textClass="text-light-gray" 
             className="px-0 hover-primary" 
             onClick={clearTransactionsList} 
             transparent

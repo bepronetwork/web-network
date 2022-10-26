@@ -2,9 +2,6 @@ import DAO from "services/dao-service";
 import useApi from "x-hooks/use-api";
 import { useContext } from "react";
 import { useTranslation } from "next-i18next";
-import { useDAO } from "contexts/dao";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
 import { parseTransaction } from "helpers/transactions";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -13,17 +10,16 @@ import { TransactionCurrency } from "interfaces/transaction";
 import { NetworkParameters } from "types/dappkit";
 import {AppStateContext} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import {useBounty} from "./use-bounty";
 
 export default function useBepro() {
-  const { dispatch } = useContext(AppStateContext);
-  const { activeNetwork } = useNetwork();
-  const { networkIssue, activeIssue, updateIssue } = useIssue();
-  const { service: DAOService } = useDAO();
+  const { dispatch, state } = useContext(AppStateContext);
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
+  const {getDatabaseBounty, getChainBounty} = useBounty();
 
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
 
   const failTx = (err, tx, reject?) => {
 
@@ -40,7 +36,7 @@ export default function useBepro() {
     return new Promise(async (resolve, reject) => {
       const disputeTx = addTx([{ type: TransactionTypes.dispute }] as any);
       dispatch(disputeTx);
-      await DAOService.disputeProposal(+networkIssue?.id, +proposalscMergeId)
+      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalscMergeId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, disputeTx.payload[0])]))
           resolve?.(txInfo);
@@ -57,7 +53,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.updateConfigFees(closeFee, cancelFee)
+      await state.Service?.active.updateConfigFees(closeFee, cancelFee)
         .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]))
           resolve(txInfo);
@@ -75,7 +71,7 @@ export default function useBepro() {
       const closeIssueTx = addTx([{ type: TransactionTypes.closeIssue } as any]);
       dispatch(closeIssueTx);
       
-      await DAOService.closeBounty(+bountyId, +proposalscMergeId, tokenUri)
+      await state.Service?.active.closeBounty(+bountyId, +proposalscMergeId, tokenUri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0])]))
           resolve(txInfo);
@@ -92,7 +88,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.updateBountyAmount(bountyId, amount)
+      await state.Service?.active.updateBountyAmount(bountyId, amount)
       .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
         dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]))
         resolve(txInfo);
@@ -110,18 +106,19 @@ export default function useBepro() {
 
       let tx: { blockNumber: number; }
 
-      await DAOService.cancelBounty(networkIssue?.id, funding)
+      await state.Service?.active.cancelBounty(state.currentBounty?.chainData?.id, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty", 
                               "canceled", 
-                              activeNetwork.name, 
-                              { fromBlock: txInfo.blockNumber, id: networkIssue?.id });
+                              state.Service?.network?.active.name,
+                              { fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[networkIssue?.cid]) throw new Error('Failed');
+          if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0])]))
-          updateIssue(activeIssue.repository_id, activeIssue.githubId);
+          getDatabaseBounty(true);
+          getChainBounty(true);
         })
         .catch((err: { message: string; }) => {
           failTx(err, redeemTx, reject);
@@ -135,19 +132,19 @@ export default function useBepro() {
       dispatch(transaction);
       let tx: { blockNumber: number; }
 
-      await DAOService.hardCancel(networkIssue?.id)
+      await state.Service?.active.hardCancel(state.currentBounty?.chainData?.id)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty", 
                               "canceled", 
-                              activeNetwork.name, 
-                              { fromBlock: txInfo.blockNumber, id: networkIssue?.id });
+                              state.Service?.network?.active.name,
+                              { fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[networkIssue?.cid]) throw new Error('Failed');
+          if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0])]))
-          
-          updateIssue(activeIssue.repository_id, activeIssue.githubId);
+          getChainBounty(true);
+          getDatabaseBounty(true);
         })
         .catch((err: { message: string; }) => {
           failTx(err, transaction, reject);
@@ -165,7 +162,7 @@ export default function useBepro() {
       const tx = addTx([{ type: TransactionTypes.proposeMerge } as any]);
       dispatch(tx);
 
-      await DAOService
+      await state.Service?.active
         .createProposal(bountyId, pullRequestId, addresses, amounts)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]))
@@ -189,7 +186,7 @@ export default function useBepro() {
       const tx = addTx([{ type } as any]);
       dispatch(tx);
 
-      await DAOService.approveToken(tokenAddress, amount)
+      await state.Service?.active.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo)
           throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
@@ -211,7 +208,7 @@ export default function useBepro() {
       const tx = addTx([{ type: TransactionTypes.takeBackOracles, amount, currency } as any]);
       dispatch(tx);
 
-      await DAOService
+      await state.Service?.active
         .takeBackDelegation(delegationId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           if (!txInfo)
@@ -236,7 +233,7 @@ export default function useBepro() {
       const tx = addTx([{ type: TransactionTypes.createPullRequest } as any]);
       dispatch(tx);
 
-      await DAOService
+      await state.Service?.active
         .createPullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid)
         .then((txInfo: unknown) => {
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
@@ -253,7 +250,7 @@ export default function useBepro() {
       const tx = addTx([{ type: TransactionTypes.makePullRequestReady, } as any]);
       dispatch(tx);
 
-      await DAOService.setPullRequestReadyToReview(bountyId, pullRequestId)
+      await state.Service?.active.setPullRequestReadyToReview(bountyId, pullRequestId)
       .then((txInfo: unknown) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
         resolve(txInfo);
@@ -269,7 +266,7 @@ export default function useBepro() {
       const tx = addTx([{ type: TransactionTypes.cancelPullRequest, } as any]);
       dispatch(tx);
 
-      await DAOService.cancelPullRequest(bountyId, pullRequestId)
+      await state.Service?.active.cancelPullRequest(bountyId, pullRequestId)
       .then((txInfo: unknown) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
         resolve(txInfo);
@@ -285,7 +282,7 @@ export default function useBepro() {
       const tx = addTx([{ type: TransactionTypes.refuseProposal, } as any])
       dispatch(tx);
 
-      await DAOService.refuseProposal(bountyId, proposalId)
+      await state.Service?.active.refuseProposal(bountyId, proposalId)
       .then((txInfo: unknown) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
         resolve(txInfo);
@@ -302,7 +299,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.deployNetworkV2(networkToken)
+      await state.Service?.active.deployNetworkV2(networkToken)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
@@ -319,7 +316,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.setNFTTokenDispatcher(nftToken, networkAddress)
+      await state.Service?.active.setNFTTokenDispatcher(nftToken, networkAddress)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
@@ -336,7 +333,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.addNetworkToRegistry(networkAddress)
+      await state.Service?.active.addNetworkToRegistry(networkAddress)
         .then(txInfo => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
@@ -353,7 +350,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.deployBountyToken(name, symbol)
+      await state.Service?.active.deployBountyToken(name, symbol)
         .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
@@ -368,11 +365,11 @@ export default function useBepro() {
                                               value: number | string,
                                               networkAddress?: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      let service = DAOService;
+      let service = state.Service?.active;
 
-      if (networkAddress && networkAddress !== DAOService?.network?.contractAddress) {
+      if (networkAddress && networkAddress !== state.Service?.active?.network?.contractAddress) {
         service = new DAO({
-          web3Connection: DAOService.web3Connection,
+          web3Connection: state.Service?.active.web3Connection,
           skipWindowAssignment: true
         });
 
@@ -402,7 +399,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.fundBounty(bountyId, amount, tokenDecimals)
+      await state.Service?.active.fundBounty(bountyId, amount, tokenDecimals)
         .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
@@ -419,7 +416,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.retractFundBounty(bountyId, fundingId)
+      await state.Service?.active.retractFundBounty(bountyId, fundingId)
         .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
@@ -441,7 +438,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await DAOService.withdrawFundRewardBounty(bountyId, fundingId)
+      await state.Service?.active.withdrawFundRewardBounty(bountyId, fundingId)
         .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
           resolve(txInfo);
