@@ -16,7 +16,7 @@ import NothingFound from "components/nothing-found";
 import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import { changeLoadState } from "contexts/reducers/change-load";
 import { addToast } from "contexts/reducers/change-toaster";
 
@@ -43,7 +43,7 @@ export default function PullRequestPage() {
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
 
   const { getURLWithNetwork } = useNetwork();
   const { createReviewForPR, processEvent } = useApi();

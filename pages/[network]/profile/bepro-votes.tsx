@@ -21,12 +21,12 @@ import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import {AppStateContext} from "../../../contexts/app-state";
+import { useAppState } from "../../../contexts/app-state";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { updateWalletBalance } = useAuthentication();
 

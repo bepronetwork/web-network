@@ -11,7 +11,7 @@ import NothingFound from "components/nothing-found";
 import MyNetworkSettings from "components/profile/my-network-settings";
 import ProfileLayout from "components/profile/profile-layout";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import { changeLoadState } from "contexts/reducers/change-load";
 
 import { Network } from "interfaces/network";
@@ -25,7 +25,7 @@ export function MyNetwork() {
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
   
   const { searchNetworks } = useApi();
   const { setForcedNetwork } = useNetworkSettings()

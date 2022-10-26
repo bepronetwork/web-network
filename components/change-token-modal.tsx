@@ -9,7 +9,7 @@ import Modal from "components/modal";
 
 import { Token } from "interfaces/token";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 export default function ChangeTokenModal({
   show,
@@ -30,7 +30,7 @@ export default function ChangeTokenModal({
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   async function loadContract() {
     if (address.trim() === "") {

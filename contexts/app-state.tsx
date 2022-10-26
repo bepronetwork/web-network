@@ -1,4 +1,4 @@
-import {createContext, useEffect, useReducer} from "react";
+import {createContext, useContext, useEffect, useReducer} from "react";
 
 import {useRouter} from "next/router";
 import sanitizeHtml from "sanitize-html";
@@ -32,31 +32,43 @@ const appState: AppState = {
 
 export const AppStateContext = createContext(appState);
 
-export default function AppStateContextProvider({children}) {
+export function AppStateContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, appState.state);
-
   const {query: {authError}} = useRouter();
 
-  loadApplicationStateReducers(); // load reducers into app-state
-  useSettings(); // loads settings from database and dispatches its state
   useDao(); // populate `state.Settings`
   useNetwork(); // start network state
   useAuthentication(); // github-connection, wallet & balance
   useRepos(); // load repos and hook to the query?.repoId param to load active repo
+  useSettings(); // loads settings from database and dispatches its state
 
   function parseError() {
     if (!authError)
       return;
 
+    console.debug(`parsingError`, authError);
     dispatch(toastError(sanitizeHtml(authError, { allowedTags: [], allowedAttributes: {} })));
+  }
+
+  function start() {
+
+    loadApplicationStateReducers(); // load reducers into app-state
+    console.debug(`AppState Started`, new Date())
   }
 
   useEffect(parseError, [authError])
 
-  // debug
-  useEffect(() => { console.debug(`AppState Started`, new Date()) }, [])
+  useEffect(start, [])
 
   return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
     {children}
   </AppStateContext.Provider>
+}
+
+export function useAppState() {
+  const context = useContext(AppStateContext);
+  if (!context)
+    throw new Error(`useAppState not inside AppStateContext`);
+
+  return context;
 }

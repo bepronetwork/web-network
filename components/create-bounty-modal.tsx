@@ -38,7 +38,7 @@ import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 
@@ -99,7 +99,7 @@ export default function CreateBountyModal() {
       currentUser,
       show: { createBounty: showCreateBounty }
     },
-  } = useContext(AppStateContext);
+  } = useAppState();
   
 
   const [canAddCustomToken, setCanAddCustomToken] = 

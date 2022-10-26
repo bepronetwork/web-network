@@ -1,7 +1,7 @@
-import {useContext, useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 
-import {AppStateContext} from "../contexts/app-state";
-import {changeSettings} from "../contexts/reducers/change-settings";
+import { useAppState } from "../contexts/app-state";
+import {updateSettings} from "../contexts/reducers/change-settings";
 import {updateShowProp} from "../contexts/reducers/update-show-prop";
 import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
@@ -10,7 +10,7 @@ import useApi from "./use-api";
  * Loads settings with useEffect if not loaded previously
  */
 export function useSettings() {
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
 
   const {getSettings} = useApi();
 
@@ -22,16 +22,20 @@ export function useSettings() {
    * Reload settings on each session start
    */
   function loadSettings() {
+    console.debug(`loading Settings`, state.Settings);
     if (state.Settings)
       return;
 
+    console.debug(`loading storage Settings`, storage.value);
+
     if (storage.value) {
-      dispatch(changeSettings.update(storage.value));
+      console.debug(`dispatching storage`, storage.value);
+      dispatch(updateSettings(storage.value));
       return;
     }
 
     dispatch(updateShowProp({failedLoadSettings: false}));
-
+    dispatch(updateSettings({} as any));
     getSettings()
       .then(settings => {
         return {
@@ -44,8 +48,9 @@ export function useSettings() {
         }
       })
       .then(settings => {
+        console.log(`Got settings`, settings);
         storage.value = settings;
-        dispatch(changeSettings.update(settings));
+        dispatch(updateSettings(settings));
       })
       .catch(e => {
         console.error(`Failed to load settings from db`, e);
@@ -53,5 +58,8 @@ export function useSettings() {
       });
   }
 
-  useEffect(loadSettings, [state.Settings]);
+  useEffect(loadSettings, []);
+  useEffect(() => {
+    console.log(`updated settings`, state.Settings)
+  }, [state.Settings])
 }

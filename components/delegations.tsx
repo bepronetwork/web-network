@@ -9,7 +9,7 @@ import DelegationItem from "components/delegation-item";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import InfoTooltip from "./info-tooltip";
 import { FlexRow } from "./profile/wallet-balance";
 
@@ -22,7 +22,7 @@ export default function Delegations({
 } : DelegationsProps) {
   const { t } = useTranslation(["common", "profile", "my-oracles"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const walletDelegations = state.currentUser?.balance?.oracles?.delegations || [];
 
   const renderInfo = {

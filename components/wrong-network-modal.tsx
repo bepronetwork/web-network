@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 
 import Modal from "components/modal";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 
 import { NETWORKS } from "helpers/networks";
 
@@ -25,7 +25,7 @@ export default function WrongNetworkModal({
   const [error, setError] = useState<string>("");
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
 
-  const {state: { connectedChain, Settings: settings },} = useContext(AppStateContext);
+  const {state: { connectedChain, Settings: settings },} = useAppState();
 
   function showModal() {
     return (

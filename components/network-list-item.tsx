@@ -7,7 +7,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { Network } from "interfaces/network";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
@@ -19,7 +19,7 @@ export default function NetworkListItem({
   tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
-  const {state: {Settings: settings}} = useContext(AppStateContext);
+  const {state: {Settings: settings}} = useAppState();
 
   const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
   const isNotUndefined = value => value !== undefined;

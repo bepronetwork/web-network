@@ -9,14 +9,14 @@ import PageHero, { InfosHero } from "components/page-hero";
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import CardBecomeCouncil from "./card-become-council";
 
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();
   const { t } = useTranslation(["council"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { getTotalBounties } = useApi();
   const { getURLWithNetwork } = useNetwork();

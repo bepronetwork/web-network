@@ -17,7 +17,7 @@ import { getIssueState } from "helpers/handleTypeIssue";
 import { IssueBigNumberData } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 export default function IssueListItem({
   issue = null,
@@ -29,7 +29,7 @@ export default function IssueListItem({
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
   const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);

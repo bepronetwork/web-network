@@ -21,7 +21,7 @@ import { StepWrapperProps } from "interfaces/stepper";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import {AppStateContext} from "../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../contexts/app-state";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
@@ -34,7 +34,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { tokensLocked, updateTokenBalance } = useNetworkSettings();
   const {updateWalletBalance} = useAuthentication()

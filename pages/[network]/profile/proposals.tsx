@@ -9,13 +9,13 @@ import ProfileLayout from "components/profile/profile-layout";
 
 
 
-import {AppStateContext} from "../../../contexts/app-state";
+import { useAppState } from "../../../contexts/app-state";
 import {useNetwork} from "../../../x-hooks/use-network";
 
 export default function Proposals() {
   const { t } = useTranslation(["proposal", "bounty"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { getURLWithNetwork } = useNetwork();
 
   return(

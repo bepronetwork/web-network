@@ -18,7 +18,7 @@ import { getIssueState } from "helpers/handleTypeIssue";
 
 import { fundingBenefactor } from "interfaces/issue-data";
 
-import {AppStateContext} from "../../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../../contexts/app-state";
 import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
 export default function FundingSection() {
@@ -28,7 +28,7 @@ export default function FundingSection() {
   const [walletFunds, setWalletFunds] = useState<fundingBenefactor[]>();
   const [fundingToRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<fundingBenefactor>();
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const isConnected = !!state.currentUser?.walletAddress;
   const hasReward = state.currentBounty?.chainData?.rewardAmount?.gt(0);

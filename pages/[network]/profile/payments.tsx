@@ -21,7 +21,7 @@ import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../../../contexts/app-state";
+import { useAppState } from "../../../contexts/app-state";
 
 export default function Payments() {
   const { t } = useTranslation(["common", "profile"]);
@@ -45,7 +45,7 @@ export default function Payments() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { getPayments } = useApi();
 

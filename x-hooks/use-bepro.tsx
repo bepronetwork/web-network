@@ -15,12 +15,12 @@ import { NetworkParameters } from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {useBounty} from "./use-bounty";
 
 export default function useBepro() {
-  const { dispatch, state } = useContext(AppStateContext);
+  const { dispatch, state } = useAppState();
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();

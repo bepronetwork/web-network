@@ -18,7 +18,7 @@ import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
 import ScrollTopButton from "components/scroll-top-button";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { changeLoadState } from "contexts/reducers/change-load";
 
 
@@ -69,7 +69,7 @@ export default function ListIssues({
   const {
     dispatch,
     state: { loading }
-  } = useContext(AppStateContext);
+  } = useAppState();
 
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);
@@ -83,7 +83,7 @@ export default function ListIssues({
 
   const searchTimeout = useRef(null);
 
-  const {state: appState} = useContext(AppStateContext);
+  const {state: appState} = useAppState();
 
   const { searchIssues } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
@@ -328,7 +328,7 @@ export default function ListIssues({
       )) || <></>}
 
       {issuesPages.every((el) => el.issues?.length === 0) &&
-      !loading.isLoading ? (
+      !loading?.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {appState.currentUser?.walletAddress && (
@@ -345,7 +345,7 @@ export default function ListIssues({
       {(issuesPages.some((el) => el.issues?.length > 0) && (
         <InfiniteScroll
           handleNewPage={nextPage}
-          isLoading={loading.isLoading}
+          isLoading={loading?.isLoading}
           hasMore={hasMore}>
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (

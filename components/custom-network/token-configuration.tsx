@@ -16,7 +16,7 @@ import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../contexts/app-state";
 
 import { NetworkTokenConfig } from "./network-token-config";
 
@@ -30,7 +30,7 @@ export default function TokenConfiguration({
 } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { tokens, fields } = useNetworkSettings();
 
   const [networkTokenAddress, setNetworkTokenAddress] = useState("");

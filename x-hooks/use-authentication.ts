@@ -3,7 +3,7 @@ import {useContext, useEffect, useState} from "react";
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
-import {AppStateContext} from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import {
   changeCurrentUser,
   changeCurrentUserAccessToken,
@@ -26,7 +26,7 @@ import {useDao} from "./use-dao";
 
 export function useAuthentication() {
   const session = useSession();
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
   const {connect} = useDao();
 
   const {asPath, push} = useRouter();
@@ -52,6 +52,7 @@ export function useAuthentication() {
   }
 
   function connectWallet() {
+    console.debug(`Trying to connect wallet`, state.Service);
     if (!state.Service?.active)
       return;
 
@@ -93,7 +94,7 @@ export function useAuthentication() {
 
   function validateGhAndWallet() {
     if (!state.currentUser?.walletAddress || !(session?.data?.user as any)?.login) {
-      dispatch(changeCurrentUserMatch(undefined));
+      // dispatch(changeCurrentUserMatch(undefined));
       return;
     }
 

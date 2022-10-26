@@ -19,7 +19,7 @@ import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
 import useERC20 from "x-hooks/use-erc20";
 
-import {AppStateContext} from "../../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../../contexts/app-state";
 import { Amount, CaptionMedium, RowWithTwoColumns } from "./minimals";
 
 
@@ -28,7 +28,7 @@ export default function FundModal({
   onCloseClick,
 }) {
   const { t } = useTranslation(["common", "funding", "bounty"]);
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [rewardPreview, setRewardPreview] = useState("0");

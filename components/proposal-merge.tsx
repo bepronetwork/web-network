@@ -15,7 +15,7 @@ import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 
 interface amount {
@@ -66,7 +66,7 @@ export default function ProposalMerge({
       proposals: [defaultAmount],
     });
   
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const amountTotalConverted = BigNumber(handleConversion(amountTotal));
 

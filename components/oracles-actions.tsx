@@ -20,7 +20,7 @@ import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 
 import { formatNumberToNScale, formatStringToCurrency } from "helpers/formatNumber";
 
@@ -56,7 +56,7 @@ function OraclesActions({
 
   const networkTokenERC20 = useERC20();
 
-  const { state: { transactions, Service }} = useContext(AppStateContext);
+  const { state: { transactions, Service }} = useAppState();
 
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;

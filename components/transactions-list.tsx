@@ -21,7 +21,7 @@ import Button from "components/button";
 import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -35,7 +35,7 @@ interface TransactionListProps {
 }
 
 export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
-  const {dispatch, state: { transactions, currentUser }} = useContext(AppStateContext);
+  const {dispatch, state: { transactions, currentUser }} = useAppState();
   const { t } = useTranslation("common");
 
   const IconMaps = {

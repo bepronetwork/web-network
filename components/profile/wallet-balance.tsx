@@ -15,7 +15,7 @@ import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import {AppStateContext} from "../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../contexts/app-state";
 import TokenBalance, { TokenBalanceType } from "./token-balance";
 
 export const FlexRow = ({ children, className = "" }) => 
@@ -31,7 +31,7 @@ export default function WalletBalance() {
   const [totalAmount, setTotalAmount] = useState("0");
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const oracleToken = {
     symbol: t("$oracles",  { token: state.Service?.network?.active?.networkToken?.symbol }),

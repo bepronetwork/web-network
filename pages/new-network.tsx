@@ -17,7 +17,7 @@ import SelectRepositoriesStep from "components/custom-network/select-repositorie
 import TokenConfiguration from "components/custom-network/token-configuration";
 import Stepper from "components/stepper";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import { changeLoadState } from "contexts/reducers/change-load";
 import { addToast } from "contexts/reducers/change-toaster";
@@ -42,7 +42,7 @@ function NewNetwork() {
   const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
 
   const { createNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();

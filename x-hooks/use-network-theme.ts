@@ -9,12 +9,12 @@ import { ThemeColors } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 export default function useNetworkTheme() {
   const router = useRouter();
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
 
   const { getNetwork } = useApi();

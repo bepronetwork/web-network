@@ -9,7 +9,7 @@ import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -33,7 +33,7 @@ function OraclesDelegate({
 
   const {
     state: { transactions, Service }
-  } = useContext(AppStateContext);
+  } = useAppState();
 
   const networkTokenDecimals = Service?.network?.active?.networkToken?.decimals || 18;
   const networkTokenSymbol = Service?.network?.active?.networkToken?.symbol;

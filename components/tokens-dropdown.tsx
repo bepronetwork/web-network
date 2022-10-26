@@ -11,7 +11,7 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { Token } from "interfaces/token";
 
-import { AppStateContext } from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 
 
@@ -55,7 +55,7 @@ export default function TokensDropdown({
   const [options, setOptions] = useState<Option[]>();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const formatCreateLabel = (inputValue: string) =>
     canAddToken

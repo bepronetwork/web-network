@@ -7,12 +7,12 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import ListIssues from "components/list-issues";
 import ProfileLayout from "components/profile/profile-layout";
 
-import {AppStateContext} from "../../../contexts/app-state";
+import { useAppState } from "../../../contexts/app-state";
 
 export default function Bounties() {
   const { t } = useTranslation("bounty");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   return(
     <ProfileLayout>

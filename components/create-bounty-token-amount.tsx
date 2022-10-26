@@ -8,7 +8,7 @@ import ArrowRight from "assets/icons/arrow-right";
 
 import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import InputNumber from "./input-number";
 import TokensDropdown from "./tokens-dropdown";
 
@@ -29,7 +29,7 @@ export default function CreateBountyTokenAmount({
   decimals = 18
 }) {
   const { t } = useTranslation("bounty");
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const [inputError, setInputError] = useState("");
   

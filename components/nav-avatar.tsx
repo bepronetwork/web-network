@@ -16,7 +16,7 @@ import { truncateAddress } from "helpers/truncate-address";
 import { useAuthentication } from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 
 
@@ -29,7 +29,7 @@ export default function NavAvatar() {
 
   const [visible, setVisible] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
 
   const { getURLWithNetwork } = useNetwork();

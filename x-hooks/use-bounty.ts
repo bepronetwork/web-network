@@ -3,7 +3,7 @@ import {useContext, useEffect} from "react";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {
   changeCurrentBountyComments,
   changeCurrentBountyData,
@@ -21,7 +21,7 @@ import useOctokit from "./use-octokit";
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 
 export function useBounty() {
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
 
   const {query} = useRouter();
   const {getIssue} = useApi();

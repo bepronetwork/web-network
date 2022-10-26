@@ -4,12 +4,12 @@ import { useRouter } from "next/router";
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext} from "../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../contexts/app-state";
 
 export default function NetworkThemeInjector() {
   const { pathname } = useRouter();
   const [currentColors, setCurrentColors] = useState("");
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { colorsToCSS } = useNetworkTheme();
 

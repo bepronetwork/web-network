@@ -4,7 +4,7 @@ import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import ReactSelect from "components/react-select";
 
-import {AppStateContext} from "../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../contexts/app-state";
 
 export default function NetworksDropDown({
   networks,
@@ -12,7 +12,7 @@ export default function NetworksDropDown({
 }) {
   const [options, setOptions] = useState([]);
   const [selected, setSelected] = useState();
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   function onSelected(option) {
     setSelected(option.value);

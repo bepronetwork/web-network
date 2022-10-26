@@ -6,7 +6,7 @@ import Button from "components/button";
 import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { ProposalExtended } from "interfaces/bounty";
@@ -29,12 +29,12 @@ export default function NotMergeableModal({
 
   const {
     dispatch
-  } = useContext(AppStateContext);
+  } = useAppState();
 
   const [isVisible, setVisible] = useState(false);
   const [mergeState, setMergeState] = useState("");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { mergeClosedIssue } = useApi();
 

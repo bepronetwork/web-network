@@ -10,7 +10,7 @@ import GithubInfo from "components/github-info";
 
 import { Proposal } from "interfaces/proposal";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
@@ -22,7 +22,7 @@ interface ProposalHeroProps {
 export default function ProposalHero({
   proposal,
 }: ProposalHeroProps) {
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const router = useRouter();
   const { t } = useTranslation(["proposal", "common"]);
 

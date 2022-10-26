@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { pullRequest } from "interfaces/issue-data";
 import { DistribuitonPerUser } from "interfaces/proposal";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import Avatar from "./avatar";
 import DateLabel from "./date-label";
 import GithubInfo from "./github-info";
@@ -22,7 +22,7 @@ export default function ProposalPullRequestDetail({
   usersDistribution
 }: IProposalPRDetailsProps) {
   const { t } = useTranslation("pull-request");
-  const { state } = useContext(AppStateContext);
+  const { state } = useAppState();
 
   return (
     <div className="bg-shadow rounded-5 p-3 d-flex flex-column">

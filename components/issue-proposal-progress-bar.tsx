@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 
 import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 
-import { AppStateContext } from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 
 export default function IssueProposalProgressBar() {
@@ -22,7 +22,7 @@ export default function IssueProposalProgressBar() {
     t("bounty:steps.closed")
   ]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const isFinalized = !!state.currentBounty?.chainData?.closed;
   const isInValidation = !!state.currentBounty?.chainData?.isInValidation;

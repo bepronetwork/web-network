@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import {AppStateContext} from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 
 import { trimString } from "helpers/string";
 
@@ -13,7 +13,7 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
   value?: { label: string, value: { id: string, path: string } }
   disabled?: boolean;
 }) {
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const [options, setOptions] = useState<{ value: { id: string, path: string }; label: string }[]>();
   const [option, setOption] = useState<{ value: { id: string, path: string }; label: string }>()

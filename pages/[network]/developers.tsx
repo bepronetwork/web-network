@@ -11,13 +11,13 @@ import PageHero, { InfosHero } from "components/page-hero";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../../contexts/app-state";
+import { useAppState } from "../../contexts/app-state";
 
 
 export default function PageDevelopers() {
   const { t } = useTranslation(["common"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { getTotalUsers } = useApi();
 
 

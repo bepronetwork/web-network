@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { IssueFilterBoxOption } from "interfaces/filters";
 import { RepoInfo } from "interfaces/repos-list";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 type FilterStateUpdater = (
   opts: IssueFilterBoxOption[],
@@ -25,7 +25,7 @@ export default function useFilters(): [
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
 
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const router = useRouter();
 

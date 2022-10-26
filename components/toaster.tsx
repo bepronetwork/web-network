@@ -8,7 +8,7 @@ import Icon from "components/icon";
 
 import { removeToast } from "contexts/reducers/change-toaster";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {ToastNotification} from "../interfaces/toast-notification";
 
 enum IconMapper {
@@ -20,7 +20,7 @@ enum IconMapper {
 }
 
 export default function Toaster() {
-  const {state: { toaster }, dispatch} = useContext(AppStateContext);
+  const {state: { toaster }, dispatch} = useAppState();
 
   function onClose(i: ToastNotification) {
     dispatch(removeToast(i));

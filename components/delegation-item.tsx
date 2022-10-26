@@ -6,7 +6,7 @@ import OracleIcon from "assets/icons/oracle-icon";
 
 import Modal from "components/modal";
 
-import {AppStateContext} from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
@@ -37,7 +37,7 @@ export default function DelegationItem({
   const [show, setShow] = useState<boolean>(false);
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { handleTakeBack } = useBepro();
 

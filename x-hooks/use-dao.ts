@@ -1,6 +1,6 @@
 import {useContext, useEffect,} from "react";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
 import {toastError,} from "../contexts/reducers/change-toaster";
@@ -10,7 +10,7 @@ import DAO from "../services/dao-service";
  * Populate `state.Settings` and instantiates a DAOService
  */
 export function useDao() {
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
 
   /**
    * Enables the user/dapp to connect to the active DAOService
@@ -71,10 +71,9 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    if (!state.Settings || state.Service)
+    console.debug(`useDao start`, state.Settings, state.Service, !!(!state.Settings || state.Service?.active))
+    if (!state.Settings || state.Service?.active)
       return;
-
-    console.debug(`useDao start`);
 
     dispatch(changeStarting(true));
 
@@ -93,7 +92,7 @@ export function useDao() {
       })
   }
 
-  useEffect(start, [state.Settings, state.Service])
+  useEffect(start, [state.Settings, state.Service?.active])
 
   return {
     changeNetwork,

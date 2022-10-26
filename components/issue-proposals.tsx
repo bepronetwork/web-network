@@ -5,12 +5,12 @@ import { useTranslation } from "next-i18next";
 import NothingFound from "components/nothing-found";
 import ProposalItem from "components/proposal-item";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 export default function IssueProposals() {
   const { t } = useTranslation("proposal");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const hasProposals = !!state.currentBounty?.data?.mergeProposals?.length && !!state.currentBounty?.chainData?.proposals?.length;
 
