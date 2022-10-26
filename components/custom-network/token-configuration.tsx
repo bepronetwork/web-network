@@ -75,13 +75,11 @@ export default function TokenConfiguration({
   }, [DAOService, tokens?.settler]);
 
   useEffect(() => {
-    if(selectedRewardTokens?.length)
-      fields.allowedRewards.setter(selectedRewardTokens)
+    fields.allowedRewards.setter(selectedRewardTokens);
   }, [selectedRewardTokens])
 
   useEffect(() => {
-    if(selectedTransactionalTokens?.length)
-      fields.allowedTransactions.setter(selectedTransactionalTokens)
+    fields.allowedTransactions.setter(selectedTransactionalTokens);
   }, [selectedTransactionalTokens])
 
   useEffect(() => {
