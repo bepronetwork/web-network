@@ -104,7 +104,12 @@ export const IssueProvider: React.FC = function ({ children }) {
         console.log("Failed to get comments", error);
         return [];
       });
-      
+
+    const fundedAmount = BigNumber(issue.fundedAmount || 0)
+    const fundingAmount = BigNumber(issue.fundingAmount)
+    const fundedPercent =
+        BigNumber(fundedAmount.multipliedBy(100).toFixed(2, 1)).dividedBy(fundingAmount)
+
     const newActiveIssue = {
         ...issue,
         comments,
@@ -112,8 +117,12 @@ export const IssueProvider: React.FC = function ({ children }) {
           ({...mp, isMerged: issue.merged !== null && +mp.scMergeId === +issue.merged})),
         lastUpdated: +new Date(),
         amount: BigNumber(issue.amount),
-        fundingAmount: BigNumber(issue.fundingAmount),
-        fundedAmount: BigNumber(issue.fundedAmount)
+        fundingAmount,
+        fundedAmount,
+        fundingBenefactors: 
+          issue?.benefactors.map((benefactor) => 
+            ({...benefactor, amount: BigNumber(benefactor.amount)})),
+        fundedPercent
     } as IActiveIssue;
   
     setActiveIssue(newActiveIssue);
