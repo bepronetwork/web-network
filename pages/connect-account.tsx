@@ -13,7 +13,7 @@ import Button from "components/button";
 import { ConnectionButton } from "components/profile/connect-button";
 import { FlexRow } from "components/profile/wallet-balance";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import { changeLoadState } from "contexts/reducers/change-load";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
@@ -28,7 +28,7 @@ export default function ConnectAccount() {
   const { t } = useTranslation(["common", "connect-account", "profile"]);
 
   const { joinAddressToUser } = useApi();
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
   const {connectWallet, connectGithub, disconnectGithub, validateGhAndWallet} = useAuthentication();
 
   const { user: sessionUser } = (sessionData || {}) as CustomSession;

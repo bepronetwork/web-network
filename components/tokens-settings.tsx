@@ -9,7 +9,7 @@ import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
-import { AppStateContext } from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import Button from "./button";
 import MultipleTokensDropdown from "./multiple-tokens-dropdown";
 import { WarningSpan } from "./warning-span";
@@ -31,7 +31,7 @@ export default function TokensSettings({
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const [currentAllowedTokens, setCurrentAllowedTokens] = useState<{ transactional: string[]; reward: string[]; }>();
   const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>();

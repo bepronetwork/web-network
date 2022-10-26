@@ -10,12 +10,12 @@ import TransactionsList from "components/transactions-list";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { Transaction } from "interfaces/transaction";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {setTxList} from "../contexts/reducers/change-tx-list";
 import {WinStorage} from "../services/win-storage";
 
 export default function TransactionsStateIndicator() {
-  const {state: { transactions, currentUser }, dispatch} = useContext(AppStateContext);
+  const {state: { transactions, currentUser }, dispatch} = useAppState();
 
   const [loading, setLoading] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);

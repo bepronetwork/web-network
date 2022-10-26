@@ -25,7 +25,7 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
 import useOctokit from "x-hooks/use-octokit";
 
-import {AppStateContext} from "./app-state";
+import { useAppState } from "./app-state";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
@@ -43,7 +43,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
   const [isLoadingData, setIsLoadingData] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
   const { getUserRepositories } = useOctokit();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();

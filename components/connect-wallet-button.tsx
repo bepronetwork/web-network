@@ -12,7 +12,7 @@ import { NetworkColors } from "interfaces/enums/network-colors";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import { AppStateContext } from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({
@@ -22,14 +22,15 @@ export default function ConnectWalletButton({
 }) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
-  const {dispatch, state: { loading, connectedChain },} = useContext(AppStateContext);
+  const {dispatch, state: { loading, connectedChain },} = useAppState();
   const [showModal, setShowModal] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { connectWallet } = useAuthentication();
 
   async function handleLogin()  {
+    console.debug(`handleLogin`, state.Service)
     if(!window?.ethereum) {
       dispatch(changeShowWeb3(true))
       return;
@@ -66,7 +67,7 @@ export default function ConnectWalletButton({
 
 
   if (asModal) {
-    if (loading.isLoading) return <></>;
+    if (loading?.isLoading) return <></>;
 
     return (
       <Modal

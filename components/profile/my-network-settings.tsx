@@ -20,7 +20,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TokensSettings from "components/tokens-settings";
 import { WarningSpan } from "components/warning-span";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast, toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
@@ -56,7 +56,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const [errorBigImages, setErrorBigImages] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
 
   const { colorsToCSS } = useNetworkTheme();
   const { updateNetwork, processEvent } = useApi();

@@ -10,7 +10,7 @@ import NetworkListBar from "components/network-list-bar";
 import NetworkListItem from "components/network-list-item";
 import NothingFound from "components/nothing-found";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { changeLoadState } from "contexts/reducers/change-load";
 
 import { orderByProperty } from "helpers/array";
@@ -35,7 +35,7 @@ export default function NetworksList() {
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
   const { 
     setNumberOfNetworks, 
     setNumberOfBounties, 

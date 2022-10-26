@@ -12,7 +12,7 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
@@ -27,7 +27,7 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
   const router = useRouter();
   
   const { getURLWithNetwork } = useNetworkTheme()
-  const { state } = useContext(AppStateContext);
+  const { state } = useAppState();
 
   return (
     <div className="banner-shadow">

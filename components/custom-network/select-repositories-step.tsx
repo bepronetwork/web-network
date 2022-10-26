@@ -11,12 +11,12 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
 
-import {AppStateContext} from "../../contexts/app-state";
+import {AppStateContext, useAppState} from "../../contexts/app-state";
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { github, fields } = useNetworkSettings();
 
   function handleRepositoryCheck(fullName: string) {

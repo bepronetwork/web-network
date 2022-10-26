@@ -9,7 +9,7 @@ import GithubInfo from "components/github-info";
 import { getIssueState } from "helpers/handleTypeIssue";
 import { truncateAddress } from "helpers/truncate-address";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
@@ -18,7 +18,7 @@ import Translation from "./translation";
 
 export default function BountyHero() {
   const { t } = useTranslation(["bounty", "common"]);
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
 
   function renderPriceConversor() {

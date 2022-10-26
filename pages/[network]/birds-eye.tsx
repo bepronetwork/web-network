@@ -12,7 +12,7 @@ import { User } from "interfaces/api";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../../contexts/app-state";
+import { useAppState } from "../../contexts/app-state";
 
 interface PropsUserList extends Partial<User> {
    created_at: string; 
@@ -24,7 +24,7 @@ interface PropsUserList extends Partial<User> {
 export default function FalconPunchPage() {
   const [userList, setUserList] = useState<PropsUserList[]>([]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { getAllUsers } = useApi();
 

@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import {formatNumberToNScale} from "helpers/formatNumber";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import Translation from "./translation";
 
 export default function ProposalProgressBar({
@@ -16,7 +16,7 @@ export default function ProposalProgressBar({
 }) {
   const { t } = useTranslation("proposal");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const [issueState, setIssueState] = useState<string>("");
   const [issueColor, setIssueColor] = useState<string>("");

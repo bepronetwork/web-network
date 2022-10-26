@@ -11,7 +11,7 @@ import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import useOctokit from "x-hooks/use-octokit";
 
 import { ContextualSpan } from "./contextual-span";
@@ -41,7 +41,7 @@ export default function ProposalActionCard({
   const [isDisputing, setIsDisputing] = useState(false);
   const [allowMergeCommit, setAllowMergeCommit] = useState<boolean>();
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const bountyAmount = BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
 

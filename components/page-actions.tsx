@@ -14,7 +14,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { getIssueState } from "helpers/handleTypeIssue";
@@ -49,7 +49,7 @@ export default function PageActions({
 
   const [isCancelable, setIsCancelable] = useState(false);
 
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
   const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
   const { updateWalletBalance } = useAuthentication();
   const {getDatabaseBounty, getChainBounty} = useBounty();

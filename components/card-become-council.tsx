@@ -11,13 +11,13 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import Button from "./button";
 
 export default function CardBecomeCouncil() {
   const { t } = useTranslation("council");
   const [show, setShow] = useState<boolean>(true);
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { getURLWithNetwork } = useNetworkTheme();
 
   if (!show) return null;

@@ -21,7 +21,7 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useOctokit from "x-hooks/use-octokit";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import {useBounty} from "../x-hooks/use-bounty";
 
 
@@ -108,7 +108,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     useState<boolean>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { handleProposeMerge } = useBepro();
   const { getPullRequestParticipants } = useOctokit();

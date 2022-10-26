@@ -12,7 +12,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 interface IPriceConversiorModalProps{
   show: boolean;
@@ -33,7 +33,7 @@ export default function PriceConversorModal({
   const [errorCoinInfo, setErrorCoinInfo] = useState<boolean>(false);
   const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   async function handlerChange({value, label}){
     if (!state.Service?.network?.active?.networkToken?.address) return;

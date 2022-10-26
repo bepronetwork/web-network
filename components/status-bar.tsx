@@ -9,11 +9,11 @@ import { changeMicroServiceReady } from "contexts/reducers/change-service";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 
 export default function StatusBar() {
-  const {dispatch, state: { Service }} = useContext(AppStateContext);
+  const {dispatch, state: { Service }} = useAppState();
   const [ms, setMs] = useState(0);
   const { getHealth } = useApi();
   const { t } = useTranslation("common");
@@ -77,8 +77,7 @@ export default function StatusBar() {
           href="https://www.bepro.network/terms"
           target="_blank"
           className="ms-2 text-decoration-none text-primary"
-          rel="noreferrer"
-        >
+          rel="noreferrer">
           <Translation label="status.terms-and-conditions" />
         </a>
       </div>

@@ -4,7 +4,7 @@ import { setDefaults } from "react-i18next";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 
 import { parseTransaction } from "helpers/transactions";
 
@@ -28,7 +28,7 @@ export default function useERC20() {
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
   const txWindow = useTransactions();
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
   const { handleApproveToken } = useBepro();
 
 

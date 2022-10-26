@@ -12,7 +12,7 @@ import MobileNotSupported from "components/mobile-not-supported";
 
 import useNetwork from "x-hooks/use-network-theme";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 import Button from "./button";
 
@@ -22,7 +22,7 @@ export default function WebThreeDialog() {
   const {
     dispatch,
     state: {show: {web3Dialog: showWeb3Dialog}},
-  } = useContext(AppStateContext);
+  } = useAppState();
   const {t} = useTranslation("common");
 
   function handleClickTryAgain() {

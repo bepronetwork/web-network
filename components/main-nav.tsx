@@ -17,7 +17,7 @@ import TransactionsStateIndicator from "components/transactions-state-indicator"
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 
 
 import useApi from "x-hooks/use-api";
@@ -38,14 +38,14 @@ export default function MainNav() {
   const [showHelp, setShowHelp] = useState(false);
   const {
     dispatch
-  } = useContext(AppStateContext);
+  } = useAppState();
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
     icon: <PlusIcon /> 
   });
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
 

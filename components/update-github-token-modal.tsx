@@ -7,7 +7,7 @@ import { setCookie } from "nookies";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 export default function UpdateGithubTokenModal({
   redirectTo,
@@ -16,7 +16,7 @@ export default function UpdateGithubTokenModal({
   setVisible,
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   function handleClose() {
     setVisible?.(false);

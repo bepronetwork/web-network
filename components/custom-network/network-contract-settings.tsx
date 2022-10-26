@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
@@ -12,7 +12,7 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 
 export default function NetworkContractSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { fields, settings, LIMITS } = useNetworkSettings();
   

@@ -17,7 +17,7 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import {useBounty} from "../x-hooks/use-bounty";
 import Button from "./button";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
@@ -47,7 +47,7 @@ export default function ProposalItem({
   const [ isDisputable, setIsDisputable ] = useState(false); 
   const [ proposalState, setProposalState ] = useState<ProposalState>(DEFAULT_PROPOSAL_STATE);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { processEvent } = useApi();
 

@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { fundingBenefactor } from "interfaces/issue-data";
@@ -38,7 +38,7 @@ export default function RetractOrWithdrawModal({
   const { handleRetractFundBounty, handleWithdrawFundRewardBounty } = useBepro();
   const { getDatabaseBounty, getChainBounty } = useBounty();
 
-  const { dispatch, state } = useContext(AppStateContext);
+  const { dispatch, state } = useAppState();
 
   const tokenSymbol = state.currentBounty?.chainData?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;

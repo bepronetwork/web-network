@@ -7,7 +7,7 @@ import Button from "components/button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
-import { AppStateContext } from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import { toastError } from "contexts/reducers/change-toaster";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
@@ -29,7 +29,7 @@ export default function UpdateBountyAmountModal({
   const [isExecuting, setIsExecuting] = useState(false);
   const [newAmount, setNewAmount] = useState<BigNumber>();
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
 
   const {getDatabaseBounty} = useBounty();
   const { processEvent } = useApi();

@@ -15,14 +15,14 @@ import { truncateAddress } from "helpers/truncate-address";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import {AppStateContext} from "../../../contexts/app-state";
+import { useAppState } from "../../../contexts/app-state";
 
 export default function Profile() {
   const { t } = useTranslation("profile");
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { connectWallet, connectGithub, disconnectGithub } = useAuthentication();
 

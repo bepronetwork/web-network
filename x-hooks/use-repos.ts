@@ -2,7 +2,7 @@ import {useContext, useEffect} from "react";
 
 import {useRouter} from "next/router";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import {changeLoadState} from "../contexts/reducers/change-load";
 import {changeNetworkReposActive, changeNetworkReposList} from "../contexts/reducers/change-service";
 import {RepoInfo} from "../interfaces/repos-list";
@@ -11,7 +11,7 @@ import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 
 export function useRepos() {
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
 
   const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokit();
   const {getReposList} = useApi();

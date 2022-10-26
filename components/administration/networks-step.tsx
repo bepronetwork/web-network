@@ -9,7 +9,7 @@ import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import Step from "components/step";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/change-toaster";
 
@@ -35,7 +35,7 @@ export default function NetworksStep({
   const [ isNetworkGovernor, setIsNetworkGovernor ] = useState(false);
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
   const { searchNetworks, updateNetwork } = useApi();
 
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();

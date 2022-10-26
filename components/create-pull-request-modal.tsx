@@ -11,7 +11,7 @@ import ReactSelect from "components/react-select";
 
 import useOctokit from "x-hooks/use-octokit";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 interface props {
   show: boolean,
@@ -38,7 +38,7 @@ export default function CreatePullRequestModal({
   const [description, setDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { getRepositoryBranches, getUserRepositories } = useOctokit();
 

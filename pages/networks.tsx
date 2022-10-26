@@ -8,7 +8,7 @@ import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
 import PageHero, { InfosHero } from "components/page-hero";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 interface NetworkTokenLocked {
   name: string;
@@ -44,7 +44,7 @@ export const NetworksPageContext = createContext<NetworksPageProps>({
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const [totalConverted, setTotalConverted] = useState(0);
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);

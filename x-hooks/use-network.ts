@@ -3,7 +3,7 @@ import {useCallback, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
-import {AppStateContext} from "contexts/app-state";
+import { useAppState } from "contexts/app-state";
 import {changeActiveNetwork, changeNetworkLastVisited} from "contexts/reducers/change-service";
 
 import {WinStorage} from "services/win-storage";
@@ -13,7 +13,7 @@ import useApi from "./use-api";
 
 
 export function useNetwork() {
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();
   const {getNetwork} = useApi();

@@ -38,7 +38,7 @@ export class ChangeServiceNetworkProp<T = ServiceNetwork|Partial<ServiceNetwork>
 
   reducer(state: State, payload, subAction = 'network'): State {
     const transformed = {
-      ...state.Service,
+      ...state.Service || {},
       network: {
         ...state.Service.network,
         ...payload
@@ -57,7 +57,7 @@ export class ChangeServiceNetworkReposProp
 
   reducer(state: State, payload, subAction = 'repos'): State {
     const transformed = {
-      ...state.Service.network,
+      ...state.Service.network || {},
       repos: {
         ...state.Service.network.repos,
         ...payload

@@ -13,7 +13,7 @@ import { formatDate } from "helpers/formatDate";
 
 import { pullRequest } from "interfaces/issue-data";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 interface CreateReviewModalModalProps{
   show: boolean,
   isExecuting: boolean,
@@ -32,7 +32,7 @@ export default function CreateReviewModal({
 
   const [body, setBody] = useState("");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   function isButtonDisabled(): boolean {
     return body.trim() === "" || isExecuting;

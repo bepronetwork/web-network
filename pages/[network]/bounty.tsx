@@ -21,7 +21,7 @@ import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
-import {AppStateContext} from "../../contexts/app-state";
+import { useAppState } from "../../contexts/app-state";
 
 export default function PageIssue() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const { getUserRepositories } = useOctokit();
 

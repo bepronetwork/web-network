@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 import { trimString } from "helpers/string";
 
@@ -20,7 +20,7 @@ export default function BranchsDropdown({
   disabled?: boolean
 }) {
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const [option, setOption] = useState<{ value: string; label: string }>()

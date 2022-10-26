@@ -17,7 +17,7 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
-import {AppStateContext} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 
 export default function UnlockBeproModal({
   show = false,
@@ -31,7 +31,7 @@ export default function UnlockBeproModal({
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
 
 
   const { updateWalletBalance } = useAuthentication();

@@ -5,12 +5,12 @@ import { useTranslation } from "next-i18next";
 import NothingFound from "components/nothing-found";
 import PullRequestItem from "components/pull-request-item";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 
 export default function IssuePullRequests() {
   const { t } = useTranslation("pull-request");
 
-  const {state} = useContext(AppStateContext);
+  const {state} = useAppState();
   const hasPullRequests = !!state.currentBounty?.data?.pullRequests?.length;
 
   return (

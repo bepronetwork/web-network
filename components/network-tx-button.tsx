@@ -8,7 +8,7 @@ import Button from "components/button";
 import Icon from "components/icon";
 import Modal from "components/modal";
 
-import { AppStateContext } from "contexts/app-state";
+import {AppStateContext, useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
@@ -65,7 +65,7 @@ function networkTxButton({
   const [showModal, setShowModal] = useState(false);
   const [txSuccess,] = useState(false);
 
-  const { state, dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useAppState();
 
   const { processEvent } = useApi();
 

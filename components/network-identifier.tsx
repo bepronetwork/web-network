@@ -4,11 +4,11 @@ import Indicator from "components/indicator";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import {changeChain} from "../contexts/reducers/change-chain";
 
 export default function NetworkIdentifier() {
-  const {state, dispatch} = useContext(AppStateContext);
+  const {state, dispatch} = useAppState();
 
 
   useEffect(() => {
