@@ -35,7 +35,7 @@ export function ERC20Details({
   const [tokenAddress, setTokenAddress] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
   const [tokenTotalSupply, setTokenTotalSupply] = useState("");
-  
+
   const erc20 = useERC20();
   const { wallet } = useAuthentication();
 
@@ -53,28 +53,17 @@ export function ERC20Details({
     decimals: isDeployer ? "18" : erc20?.decimals?.toString(),
     totalSupply: isDeployer ? tokenTotalSupply : formatStringToCurrency(erc20?.totalSupply?.toFixed()),
   }
-      
+
   const isAddressFieldReadOnly = !!readOnly || isDeployer;
   const hasTotalSupplyError = naNOrZeroError(tokenInfo.totalSupply) && tokenInfo.totalSupply !== "" && isDeployer;
 
-  const handleNameChange = value => setTokenName(value);
-  const handleSymbolChange = value => setTokenSymbol(value);
   const handleTotalSupplyChange = ({ value }) => setTokenTotalSupply(value);
-  
 
   const isDeployBtnDisabled = isDeployer ? [
     tokenInfo.name.trim() === "",
     tokenInfo.symbol.trim() === "",
     !!naNOrZeroError(tokenInfo.totalSupply)
   ].some(c => c) : false;
-
-  function handleInputChange(e) {
-    const value = e.target.value;
-
-    setTokenAddress(value);
-
-    if (value.trim() === "") onChange("");
-  }
 
   function handleBlur() {
     erc20.setAddress(tokenAddress);
@@ -89,19 +78,23 @@ export function ERC20Details({
         setTokenAddress(contractAddress);
       })
       .catch(txError => {
-        console.log(txError)
+        console.log(txError);
       })
       .finally(() => setIsDeploying(false));
   }
 
   useEffect(() => {
-    setTokenAddress(address);
-    erc20.setAddress(address);
+    if (readOnly) {
+      setTokenAddress(address);
+      erc20.setAddress(address);
+    }
   }, [address]);
 
   useEffect(() => {
-    if (erc20?.address && erc20?.loadError === false)
+    if (erc20?.address && erc20?.loadError === false && erc20?.address !== address)
       onChange?.(erc20.address);
+    else
+      onChange?.("");
   }, [erc20?.address, erc20?.loadError]);
 
   return(
@@ -111,7 +104,7 @@ export function ERC20Details({
           label="Address"
           value={tokenAddress}
           readOnly={isAddressFieldReadOnly}
-          onChange={handleInputChange}
+          onChange={setTokenAddress}
           onBlur={handleBlur}
           error={ erc20?.loadError &&
             <>
@@ -131,20 +124,20 @@ export function ERC20Details({
         <FormGroup
           label="Name"
           value={tokenInfo.name}
-          readOnly={!isDeployer}
-          onChange={handleNameChange}
+          readOnly={!isDeployer || isDeploying}
+          onChange={setTokenName}
         />
 
         <FormGroup
           label="Symbol"
           value={tokenInfo.symbol}
-          readOnly={!isDeployer}
-          onChange={handleSymbolChange}
+          readOnly={!isDeployer || isDeploying}
+          onChange={setTokenSymbol}
         />
 
         <FormGroup
           label="Decimals"
-          value={tokenInfo.decimals.toString()}
+          value={tokenInfo.decimals}
           readOnly
         />
       </Row>
@@ -157,7 +150,7 @@ export function ERC20Details({
             <InputNumber
               onValueChange={handleTotalSupplyChange}
               value={tokenInfo.totalSupply}
-              readOnly={!isDeployer}
+              readOnly={!isDeployer || isDeploying}
               allowNegative={false}
               decimalScale={0}
               thousandSeparator

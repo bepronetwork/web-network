@@ -115,7 +115,6 @@ export default function TokenConfiguration({
       handleFinish={handleFinish}
       finishLabel={finishLabel}
     >
-      {console.log(tokens?.settler)}
       <NetworkTokenConfig
         onChange={fields.settlerToken.setter}
         beproTokenAddress={settings?.beproToken?.address}
