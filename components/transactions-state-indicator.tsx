@@ -15,7 +15,7 @@ import {setTxList} from "../contexts/reducers/change-tx-list";
 import {WinStorage} from "../services/win-storage";
 
 export default function TransactionsStateIndicator() {
-  const {state: { transactions, currentUser: { walletAddress } }, dispatch} = useContext(AppStateContext);
+  const {state: { transactions, currentUser }, dispatch} = useContext(AppStateContext);
 
   const [loading, setLoading] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
@@ -47,10 +47,10 @@ export default function TransactionsStateIndicator() {
   }
 
   function restoreTransactions() {
-    if (!walletAddress)
+    if (!currentUser?.walletAddress)
       return;
 
-    const storage = new WinStorage(`bepro.transaction:${walletAddress}`, 0);
+    const storage = new WinStorage(`bepro.transaction:${currentUser?.walletAddress}`, 0);
     if (!storage?.value || !storage?.value?.length)
       return;
 
@@ -65,7 +65,7 @@ export default function TransactionsStateIndicator() {
   }
 
   useEffect(updateLoadingState, [transactions]);
-  useEffect(restoreTransactions, [walletAddress]);
+  useEffect(restoreTransactions, [currentUser?.walletAddress]);
 
   const overlay = (
     <Popover id="transactions-indicator">
