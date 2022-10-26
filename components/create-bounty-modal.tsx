@@ -640,6 +640,7 @@ export default function CreateBountyModal() {
 
   useEffect(()=>{
     transactionalERC20.updateAllowanceAndBalance();
+    rewardERC20.updateAllowanceAndBalance();
   },[showCreateBounty])
 
   if (showCreateBounty && !wallet?.address)
