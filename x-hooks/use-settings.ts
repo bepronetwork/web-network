@@ -5,13 +5,13 @@ import {updateSettings} from "../contexts/reducers/change-settings";
 import {updateShowProp} from "../contexts/reducers/update-show-prop";
 import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
+import {SettingsType} from "../types/settings";
 
 /**
  * Loads settings with useEffect if not loaded previously
  */
 export function useSettings() {
   const {state, dispatch} = useAppState();
-
   const {getSettings} = useApi();
 
   const [storage,] =
@@ -30,13 +30,13 @@ export function useSettings() {
 
     if (storage.value) {
       console.debug(`dispatching storage`, storage.value);
-      dispatch(updateSettings(storage.value));
-      return;
+      // dispatch(updateSettings(storage.value));
+      return storage.value;
     }
 
     dispatch(updateShowProp({failedLoadSettings: false}));
     dispatch(updateSettings({} as any));
-    getSettings()
+    return getSettings()
       .then(settings => {
         return {
           ...settings,
@@ -50,7 +50,9 @@ export function useSettings() {
       .then(settings => {
         console.log(`Got settings`, settings);
         storage.value = settings;
-        dispatch(updateSettings(settings));
+        // setTmpSettings(settings)
+        //dispatch(updateSettings(settings));
+        return settings;
       })
       .catch(e => {
         console.error(`Failed to load settings from db`, e);
@@ -58,8 +60,7 @@ export function useSettings() {
       });
   }
 
-  useEffect(loadSettings, []);
-  useEffect(() => {
-    console.log(`updated settings`, state.Settings)
-  }, [state.Settings])
+  return {
+    loadSettings
+  }
 }
