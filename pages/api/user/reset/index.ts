@@ -1,9 +1,10 @@
-import { error as LogError } from "services/logging";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import { Sequelize, Op } from "sequelize";
 
 import models from "db/models";
+
+import { error as LogError } from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { address, githubLogin } = req.body;
