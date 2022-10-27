@@ -24,6 +24,7 @@ export interface IAuthenticationContext {
   user?: User;
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
+  isConnecting?:boolean;
   connectWallet: () => Promise<boolean>;
   disconnectWallet: () => void;
   connectGithub: () => void;
@@ -45,10 +46,12 @@ export const AuthenticationProvider = ({ children }) => {
   const [databaseUser, setDatabaseUser] = useState<UserApi>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
 
+  const [isConnecting, setIsConnecting] = useState<boolean>(false)
+
   const { getUserOf, getUserWith } = useApi();
   const { service: DAOService, connect } = useDAO();
 
-  const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
+  const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${window.location.host}` : "";
 
   const connectWallet = useCallback(async () => {
     try {
@@ -78,25 +81,37 @@ export const AuthenticationProvider = ({ children }) => {
     });
   }, []);
 
-  const disconnectGithub = useCallback(async () => {
+  const disconnectGithub = () => {
     return signOut({ redirect: false });
-  }, [user?.login, asPath, wallet?.address]);
+  }
   
-  const connectGithub = useCallback(async () => {
-    const user = await getUserOf(wallet?.address?.toLowerCase());
-
-    if (!user?.githubLogin && !asPath?.includes("connect-account")) {
-      await disconnectGithub();
+  const connectGithub = async () => {
+    try {
+      setIsConnecting(true)
       
-      return push("/connect-account");
+      if(!wallet?.address) return false
+
+      localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
+
+      const user = await getUserOf(wallet?.address?.toLowerCase());
+    
+      if (!user?.githubHandle && !asPath?.includes("connect-account")) {
+        return push("/connect-account");
+      }
+
+      sessionStorage.setItem("lastUrlBeforeGithubConnect", asPath);
+
+      await disconnectGithub();
+
+      signIn("github", {
+      callbackUrl: `${URL_BASE}/${asPath}`
+      }) .then(() => {
+        sessionStorage.setItem("currentWallet", wallet?.address || "");
+      })
+    } finally{
+      setIsConnecting(false)
     }
-
-    sessionStorage.setItem("lastUrlBeforeGithubConnect", asPath);
-
-    signIn("github", {
-      callbackUrl: `${URL_BASE}${asPath}`
-    });
-  }, [wallet?.address, asPath]);
+  }
 
   const updateWalletAddress = useCallback(async () => {
     const address = await DAOService.getAddress();
@@ -200,6 +215,7 @@ export const AuthenticationProvider = ({ children }) => {
       user,
       wallet,
       isGithubAndWalletMatched,
+      isConnecting,
       connectWallet,
       connectGithub,
       updateWalletBalance,
@@ -207,7 +223,7 @@ export const AuthenticationProvider = ({ children }) => {
       disconnectGithub,
       validateWalletAndGithub
   }),
-    [user, wallet, isGithubAndWalletMatched, DAOService]);
+    [user, wallet, isGithubAndWalletMatched, DAOService, connectGithub, asPath]);
 
   return (
     <AuthenticationContext.Provider value={memorized}>

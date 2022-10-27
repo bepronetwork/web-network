@@ -33,7 +33,8 @@ export default function ConnectAccount() {
   const { dispatch } = useContext(ApplicationContext);
   const { 
     wallet, 
-    isGithubAndWalletMatched, 
+    isGithubAndWalletMatched,
+    isConnecting,
     connectWallet, 
     connectGithub, 
     disconnectGithub,
@@ -124,6 +125,8 @@ export default function ConnectAccount() {
                     state={connectButtonState[String(isGithubAndWalletMatched)]}
                     credential={sessionUser?.login} 
                     connect={connectGithub}
+                    isLoading={isConnecting}
+                    isDisabled={!wallet?.address}
                   />
 
                   
