@@ -1,8 +1,6 @@
 ## 1. ETHEREUM NETWORK SETUP
 
-Be sure have [Metamask](https://metamask.io/download/) extensions installed.
-<br>
-
+Make sure you have the [Metamask](https://metamask.io/download/) extensions installed.
 Then fill in the ENV file with Ethereum EVM Network, for exemple using Kovan.
 <br>
 

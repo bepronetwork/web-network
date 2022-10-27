@@ -4,15 +4,9 @@ Ganache is a personal blockchain for rapid Ethereum and Corda distributed applic
 
 Read more about in [doc](https://trufflesuite.com/docs/ganache).
 
-<br/>
-
 ## 2. CONFIGURING GANACHE WORKSPACE.
 
-<br>
-
 Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickstart) before move on.
-
-<br>
 
 ### 2.1 STARTING GANACHE
 
@@ -26,7 +20,7 @@ Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickst
 > <img align="center" src="./assets/ganache-server.png" width="500"/>
 <br/>
 
-1. On Ganache Home, chose one wallet and copy the private key.
+3. On Ganache Home, chose one wallet and copy the private key.
 
 > <img align="center" src="./assets/ganache-home.png" width="500"/>
 <br/>
@@ -44,7 +38,7 @@ Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickst
 > <img align="center" src="./assets/metamask-add-wallet.png" width="500"/>
 <br/>
 
-1. Then, click on `Add network` and fill in with ganache info.
+2. Then click on `Add network` and fill in with ganache info.
 
 > <img align="center" src="./assets/metamask-btn-add.png" width="500"/>
 <br/>
@@ -52,10 +46,7 @@ Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickst
 > <img align="center" src="./assets/metamask-add-network.png" width="500"/>
 <br/>
 
-<br/>
-
 ## 3. UPDATE ENV FILE.
-<br>
 
 Don't forget update you .ENV file with ganache info.
 
