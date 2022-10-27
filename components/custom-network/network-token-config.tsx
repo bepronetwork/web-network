@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import { ERC20Details } from "components/custom-network/erc20-details";
 import TabbedNavigation from "components/tabbed-navigation";
 
@@ -7,6 +9,8 @@ export function NetworkTokenConfig({
   onChange,
   beproTokenAddress
 }) {
+  const { t } = useTranslation("custom-network");
+
   const [customTokenAddress, setCustomTokenAddress] = useState<string>();
   const [deployedTokenAddress, setDeployedTokenAddress] = useState<string>();
 
@@ -23,7 +27,7 @@ export function NetworkTokenConfig({
   const TABS = [
     {
       eventKey: "bepro",
-      title: "Use BEPRO token",
+      title: t("steps.token-configuration.tabs.use-bepro-token"),
       component: ( 
         <ERC20Details
           key="beproToken"
@@ -34,7 +38,7 @@ export function NetworkTokenConfig({
     },
     {
       eventKey: "custom",
-      title: "Use a custom token",
+      title: t("steps.token-configuration.tabs.use-custom-token"),
       component: ( 
         <ERC20Details
           key="customToken"
@@ -45,7 +49,7 @@ export function NetworkTokenConfig({
     },
     {
       eventKey: "deployed",
-      title: "Deploy new token",
+      title: t("steps.token-configuration.tabs.deploy-new-token"),
       component: ( 
         <ERC20Details
           key="deployedToken"
