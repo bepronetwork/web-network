@@ -177,8 +177,6 @@ export const IssueProvider: React.FC = function ({ children }) {
     const transactionalTokenData = await DAOService.getERC20TokenData(bounty.transactional);
     const rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
       await DAOService.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
-    const fundedAmount = bounty.funding.reduce((acc, benefactor) => benefactor.amount.plus(acc), BigNumber(0));
-    const fundedPercent = BigNumber(fundedAmount.multipliedBy(100).toFixed(2,1)).dividedBy(bounty.fundingAmount);
 
     setNetworkIssue({ 
       ...bounty, 
@@ -189,9 +187,7 @@ export const IssueProvider: React.FC = function ({ children }) {
       isInValidation,
       isFundingRequest: bounty.fundingAmount.gt(0),
       transactionalTokenData,
-      rewardTokenData,
-      fundedAmount,
-      fundedPercent
+      rewardTokenData
     });
     return { ...bounty, isDraft, networkProposals };
   }, [activeIssue, wallet?.address, DAOService?.network?.contractAddress]);
