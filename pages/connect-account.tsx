@@ -69,8 +69,9 @@ export default function ConnectAccount() {
   }
 
   function handleCancel() {
-    if (!isGithubAndWalletMatched) disconnectGithub();
-    redirectToProfile();
+    if (!isGithubAndWalletMatched)
+      disconnectGithub();
+    router.back();
   }
 
   async function joinAddressToGh() {
@@ -182,10 +183,10 @@ export default function ConnectAccount() {
                   {isButtonDisabled && (
                     <LockedIcon className="mr-1" width={14} height={14} />
                   )}
-                  {t("actions.done")}
+                  {t("actions.connect")}
                 </Button>
                 <Button color="dark-gray" onClick={handleCancel}>
-                  {t("actions.cancel")}
+                  {t("actions.back")}
                 </Button>
               </div>
             </div>
