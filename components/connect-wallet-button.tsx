@@ -14,6 +14,7 @@ import { useAuthentication } from "x-hooks/use-authentication";
 
 import {AppStateContext, useAppState} from "../contexts/app-state";
 import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
+import {changeChain} from "../contexts/reducers/change-chain";
 
 export default function ConnectWalletButton({
   children = null,
@@ -30,7 +31,6 @@ export default function ConnectWalletButton({
   const { connectWallet } = useAuthentication();
 
   async function handleLogin()  {
-    console.debug(`handleLogin`, state.Service)
     if(!window?.ethereum) {
       dispatch(changeShowWeb3(true))
       return;
@@ -42,8 +42,9 @@ export default function ConnectWalletButton({
     if (+state.connectedChain?.id === +state.Settings?.requiredChain?.id) {
       connectWallet();
     } else {
-      console.log(connectedChain, state.Settings?.requiredChain);
-      // dispatch(changeNetworkId(+connectedChain?.id));
+      console.log('no connected chain?', connectedChain, state.Settings?.requiredChain);
+
+      dispatch(changeChain.update({...state.connectedChain, id: state.Settings?.requiredChain?.id}));
       setShowModal(false);
     }
   }

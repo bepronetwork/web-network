@@ -60,11 +60,15 @@ export function useAuthentication() {
   }
 
   function updateWalletAddress() {
-    if (!state.Service?.active?.web3Connection?.Account?.address)
+    console.log(`should update wallet address`, state.Service?.active?.web3Connection);
+
+    if (!state.Service?.active?.web3Connection?.Account?.address || !state.currentUser?.connected)
       return;
 
     if (state.Service?.active?.web3Connection?.Account?.address === state.currentUser?.walletAddress)
       return;
+
+    console.log(`should update wallet address`)
 
     dispatch(changeCurrentUserWallet(state.Service?.active?.web3Connection?.Account?.address));
   }
@@ -162,7 +166,7 @@ export function useAuthentication() {
   }
 
   useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
-  useEffect(updateWalletAddress, [state.Service?.active]);
+  useEffect(updateWalletAddress, [state.Service?.active, state.currentUser?.connected]);
   useEffect(listenToAccountsChanged, [state.Service]);
   useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
   useEffect(updateCurrentUserLogin, [session?.data?.user])
