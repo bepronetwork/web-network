@@ -43,6 +43,7 @@ export function NetworkTokenConfig({
         <ERC20Details
           key="customToken"
           onChange={handleCustomTokenAddressChange}
+          adressPlaceholder={t("custom-network:steps.token-configuration.fields.address.placeholder")}
           address={customTokenAddress}
         />
       )
