@@ -147,7 +147,7 @@ export const NETWORKS: {
     id: "1313161554",
     name: "Aurora",
     key: "aurora",
-    currency: DEV,
+    currency: ETH,
     decimals: 18,
     explorerURL: "https://aurorascan.dev",
     rpcUrls: ["https://mainnet.aurora.dev"]
