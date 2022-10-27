@@ -12,6 +12,7 @@ import PageHero, { InfosHero } from "components/page-hero";
 import useApi from "x-hooks/use-api";
 
 import { useAppState } from "../../contexts/app-state";
+import {ERC20} from "@taikai/dappkit";
 
 
 export default function PageDevelopers() {
@@ -44,12 +45,18 @@ export default function PageDevelopers() {
   useEffect(() => {
     if (!state.Service?.active) return;
 
+    console.log(`developers`, state.Service)
+
     Promise.all([
       state.Service?.active.getClosedBounties().catch(() => 0),
       state.Service?.active.getOpenBounties().catch(() => 0),
       state.Service?.active.getTotalNetworkToken().catch(() => BigNumber(0)),
       getTotalUsers(),
-    ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
+      (state.Service?.network?.active?.networkToken as ERC20)?.symbol(),
+    ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
+
+      console.log(`SYMBOL`, symbol);
+
       setInfos([
         {
           value: inProgress,
@@ -62,7 +69,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork.toNumber(),
           label: t("heroes.bounties-in-network"),
-          currency: t("$oracles",{ token: state.Service?.network?.active?.networkToken?.symbol || t("misc.$token") })
+          currency: t("$oracles",{ token: symbol || t("misc.$token") })
         },
         {
           value: totalUsers,

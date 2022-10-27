@@ -38,3 +38,6 @@ export const changeCurrentUserMatch = (match: boolean | undefined) =>
 
 export const changeCurrentUserBalance = (balance: Balance | Partial<Balance>) =>
   changeCurrentUser.update({balance: balance as any as Balance});
+
+export const changeCurrentUserConnected = (connected: boolean) =>
+  changeCurrentUser.update({connected})

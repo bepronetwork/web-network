@@ -55,6 +55,7 @@ export interface CurrentUserState {
   balance?: Balance | null;
   login?: string;
   accessToken?: string;
+  connected?: boolean;
 }
 
 export interface CurrentBounty {

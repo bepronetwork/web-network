@@ -11,6 +11,7 @@ import {useNetwork} from "x-hooks/use-network";
 
 import {AppStateContext, useAppState} from "../contexts/app-state";
 import CardBecomeCouncil from "./card-become-council";
+import {ERC20} from "@taikai/dappkit";
 
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();
@@ -73,6 +74,19 @@ export default function CouncilLayout({ children }) {
     ]);
   }
 
+  const [networkTokenSymbol, setNetworkTokenSymbol] = useState();
+
+  useEffect(() => {
+    if (!state?.Service?.network?.active?.networkToken)
+      return;
+
+    console.log('useEffect setNetworkTokenSymbol', state?.Service?.network?.active?.networkToken);
+
+    (state?.Service?.network?.active?.networkToken as ERC20)
+      .symbol()
+      .then(setNetworkTokenSymbol)
+  }, [state?.Service?.network?.active])
+
   useEffect(() => {
     loadTotals();
   }, [state.Service?.active, state.Service?.network?.active]);
@@ -82,7 +96,7 @@ export default function CouncilLayout({ children }) {
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: state.Service?.network?.active?.networkToken?.symbol,
+          token: networkTokenSymbol,
         })}
         infos={infos}
       />

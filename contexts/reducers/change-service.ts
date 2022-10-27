@@ -20,12 +20,7 @@ export class ChangeServiceProp<T = ServiceState | Partial<ServiceState>, A = key
   }
 
   reducer(state: State, payload, subAction): State {
-    const transformed = {
-      ...state.Service || {} as any,
-      [subAction]: payload,
-    }
-
-    return super.reducer(state, transformed);
+    return super.reducer(state, Object.assign(state.Service || {}, {[subAction]: payload}) as T);
   }
 }
 
@@ -37,15 +32,7 @@ export class ChangeServiceNetworkProp<T = ServiceNetwork|Partial<ServiceNetwork>
   }
 
   reducer(state: State, payload, subAction = 'network'): State {
-    const transformed = {
-      ...state.Service || {},
-      network: {
-        ...state.Service.network,
-        ...payload
-      }
-    }
-
-    return super.reducer(state, transformed, subAction);
+    return super.reducer(state, Object.assign(state.Service?.network || {}, payload), subAction);
   }
 }
 
@@ -78,7 +65,7 @@ export const changeStarting = (starting: boolean) => changeServiceProp.update({s
 export const changeMicroServiceReady = (microReady: boolean) =>
   changeServiceProp.update({microReady}, 'microReady');
 
-export const changeActiveDAO = (active: DAO) => changeServiceProp.update({active}, 'active');
+export const changeActiveDAO = (active: DAO) => changeServiceProp.update(active, 'active');
 
 export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.update({lastVisited});
 

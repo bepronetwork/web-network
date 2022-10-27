@@ -18,13 +18,19 @@ export default function NetworkIdentifier() {
     window.ethereum.removeAllListeners(`chainChanged`);
 
     if (window.ethereum.isConnected()) {
+      console.debug(`was connected`);
       dispatch(changeChain.update({
         id: (+window.ethereum.chainId)?.toString(),
         name: state.Settings?.chainIds[(+window.ethereum.chainId)?.toString() || 'unknown']
       }))
     }
 
+    window.ethereum.on(`connected`, evt => {
+      console.debug(`Metamask connected`, evt);
+    });
+
     window.ethereum.on(`chainChanged`, evt => {
+      console.debug(`chainChanged`, evt);
       dispatch(changeChain.update({
         id: (+evt)?.toString(),
         name: state.Settings?.chainIds[(+evt)?.toString() || 'unknown']

@@ -1,10 +1,11 @@
-import {useContext, useEffect,} from "react";
+import {useContext, useEffect, useState,} from "react";
 
 import { useAppState } from "../contexts/app-state";
-import {changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
-import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
+import {changeCurrentUserConnected, changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
+import {changeActiveDAO, changeActiveNetwork, changeStarting} from "../contexts/reducers/change-service";
 import {toastError,} from "../contexts/reducers/change-toaster";
 import DAO from "../services/dao-service";
+import {Web3Connection} from "@taikai/dappkit";
 
 /**
  * Populate `state.Settings` and instantiates a DAOService
@@ -21,14 +22,14 @@ export function useDao() {
 
     state.Service.active
       .connect()
-      .then(connected => {
+      .then((connected) => {
         if (!connected) {
           dispatch(toastError('Failed to connect'));
-          console.log(`Failed to connect`, connected, state.Service);
+          console.log(`Failed to connect`, state.Service);
+          return;
         }
 
-        dispatch(changeActiveDAO(state.Service.active));
-        dispatch(changeCurrentUserWallet(state.Service.active.web3Connection.Account.address));
+        dispatch(changeCurrentUserConnected(true));
       });
   }
 
@@ -37,10 +38,10 @@ export function useDao() {
    * @param networkAddress
    */
   function changeNetwork(networkAddress: string) {
-    if (!state.Service || !state.Service?.active || !networkAddress)
+    if (!state.Service?.active || !networkAddress)
       return;
 
-    if (state.Service.network.active.networkAddress === networkAddress)
+    if (state.Service?.network?.active?.networkAddress === networkAddress)
       return;
 
     const service = state.Service.active;
@@ -54,9 +55,7 @@ export function useDao() {
             console.log(`Failed to load network`, networkAddress);
             return;
           }
-
-          window.DAOService = service;
-          dispatch(changeActiveDAO(service));
+          // dispatch(changeActiveDAO(service));
         })
         .catch(error => {
           console.error(`Error loading network`, error);
@@ -83,7 +82,20 @@ export function useDao() {
     const daoService = new DAO({web3Host, registryAddress});
 
     daoService.start()
-      .then(started => started ? changeNetwork(state.Settings.contracts.network) : false)
+      .then(started => {
+        if (started) {
+          return daoService.loadNetwork(state.Settings.contracts.network);
+        }
+
+        return false;
+      })
+      .then(loaded => {
+        if (loaded) {
+          window.DAOService = daoService;
+          dispatch(changeActiveDAO(daoService));
+          dispatch(changeActiveNetwork(loaded));
+        }
+      })
       .catch(error => {
         console.error(`Error starting daoService`, error);
       })
@@ -92,7 +104,9 @@ export function useDao() {
       })
   }
 
-  useEffect(start, [state.Settings, state.Service?.active])
+  useEffect(start, [state.Settings, state.Service?.active]);
+
+
 
   return {
     changeNetwork,
