@@ -8,7 +8,7 @@ export default function Stepper({ children}) {
   function handleClick(stepToGo: number) {
     const isEveryBeforeValidated = validatedSteps.slice(0, stepToGo).every(t=>t);
 
-    if (stepToGo <= activeStep || isEveryBeforeValidated) setActiveStep(stepToGo);
+    if (stepToGo <= activeStep || isEveryBeforeValidated || 1 === 1) setActiveStep(stepToGo);
   }
 
   useEffect(() => {

@@ -43,9 +43,9 @@ export function ERC20Details({
 
   const naNOrZeroError = value =>
     BigNumber(value).isNaN() ? 
-      "Please provide a valid number" :
+      t("custom-network:steps.token-configuration.errors.invalid-number") :
       BigNumber(value).lte(0) ? 
-        "Please provider a number greater than zero" : undefined;
+        t("custom-network:steps.token-configuration.errors.lower-than-zero") : undefined;
 
   const tokenInfo = {
     name: isDeployer ? tokenName : erc20?.name,
@@ -101,7 +101,7 @@ export function ERC20Details({
     <>
       <Row className="mt-2">
         <FormGroup
-          label="Address"
+          label={t("custom-network:steps.token-configuration.fields.address.label")}
           value={tokenAddress}
           readOnly={isAddressFieldReadOnly}
           onChange={setTokenAddress}
@@ -122,21 +122,21 @@ export function ERC20Details({
 
       <Row>
         <FormGroup
-          label="Name"
+          label={t("custom-network:steps.token-configuration.fields.name.label")}
           value={tokenInfo.name}
           readOnly={!isDeployer || isDeploying}
           onChange={setTokenName}
         />
 
         <FormGroup
-          label="Symbol"
+          label={t("custom-network:steps.token-configuration.fields.symbol.label")}
           value={tokenInfo.symbol}
           readOnly={!isDeployer || isDeploying}
           onChange={setTokenSymbol}
         />
 
         <FormGroup
-          label="Decimals"
+          label={t("custom-network:steps.token-configuration.fields.decimals.label")}
           value={tokenInfo.decimals}
           readOnly
         />
@@ -145,7 +145,9 @@ export function ERC20Details({
       <Row>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="caption-small">Total Supply</Form.Label>
+            <Form.Label className="caption-small">
+              {t("custom-network:steps.token-configuration.fields.total-supply.label")}
+            </Form.Label>
             
             <InputNumber
               onValueChange={handleTotalSupplyChange}
@@ -166,7 +168,7 @@ export function ERC20Details({
         </Col>
 
         <FormGroup
-          label="Your Balance"
+          label={t("custom-network:steps.token-configuration.fields.your-balance.label")}
           value={formatStringToCurrency(erc20?.balance?.toFixed())}
           readOnly
         />
@@ -181,7 +183,7 @@ export function ERC20Details({
               isLoading={isDeploying}
               onClick={handleDeploy}
             >
-              Deploy
+              {t("custom-network:steps.token-configuration.actions.deploy")}
             </Button>
           </Col>
         </Row>
