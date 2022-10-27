@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import IconOption from "components/icon-option";
 import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
+
+import { trimString } from "helpers/string";
 
 export default function BranchsDropdown({
   repoId,
@@ -21,39 +22,47 @@ export default function BranchsDropdown({
   fromBountyCreation?: boolean
 }) {
   const { findBranch } = useRepos();
+  const [isFetching, setIsFetching] = useState<boolean>(false)
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
 
+  function onChangeSelect(e: { value: string; label: string }) {
+    onSelected(e)
+    setOption({
+      value: e.value,
+      label: trimString(e.label)
+    })
+  }
+
   async function loadBranchsFromBackend() {
     if (!repoId) return;
 
+    setIsFetching(true)
+    
     function mapRepo({ branch: value, branch: label }) {
       return { value, label };
     }
+    try {
+      const branchs = await findBranch(Number(repoId), fromBountyCreation);
+      const optionsBranchs = branchs.map(mapRepo)
+    
+      if (optionsBranchs?.length) {
+        setOptions(optionsBranchs);
+        const defaultOption = optionsBranchs.find(opt => opt.value === value.value) || optionsBranchs[0];
+        onChangeSelect(defaultOption)
+      }
 
-    const branchs = await findBranch(Number(repoId), fromBountyCreation);
-    setOptions(branchs.map(mapRepo));
-
-    if (options?.length) {
-      setOption(options[0]);
-      onSelected(options[0]);
+    } finally{
+      setIsFetching(false)
     }
   }
 
   useEffect(() => {
     loadBranchsFromBackend();
   }, [repoId]);
-
-  useEffect(() => { value?.label && setOption(value) }, [value]);
-  
-  function onChangeSelect(e: { value: string }) {
-    onSelected(e)
-    setOption({
-      value: e.value,
-      label: e.value
-    })
-  }
+ 
+  useEffect(() => {if(value?.value.length && value?.value !== option?.value) setOption(value) }, [value]);
 
   return (
     <div>
@@ -62,14 +71,11 @@ export default function BranchsDropdown({
       </label>
       <ReactSelect
         key={`select_repo-${repoId}`}
-        isDisabled={disabled || !repoId || !options}
+        isDisabled={disabled || !repoId || !options?.length || isFetching}
         options={options}
         value={option}
         onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
-        components={{
-          Option: IconOption
-        }}
       />
     </div>
   );

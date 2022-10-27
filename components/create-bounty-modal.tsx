@@ -267,10 +267,7 @@ export default function CreateBountyModal() {
           <div className="row justify-content-center">
             <div className="col-md-6">
               <ReposDropdown
-                onSelected={(opt) => {
-                  setBranch(null)
-                  setRepository(opt.value);
-                }}
+                onSelected={(opt) => setRepository(opt.value)}
                 value={{
                   label: repository?.path,
                   value: repository,
