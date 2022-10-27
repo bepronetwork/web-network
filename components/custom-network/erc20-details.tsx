@@ -19,6 +19,7 @@ interface ERC20DetailsProps {
   address?: string;
   readOnly?: boolean;
   deployer?: boolean;
+  adressPlaceholder?: string;
   onChange?: (value: string) => void;
 }
 
@@ -26,6 +27,7 @@ export function ERC20Details({
   address,
   readOnly,
   deployer,
+  adressPlaceholder,
   onChange
 } : ERC20DetailsProps) {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -41,11 +43,12 @@ export function ERC20Details({
 
   const isDeployer = !!deployer;
 
-  const naNOrZeroError = value =>
+  const numberError = value =>
     BigNumber(value).isNaN() ? 
       t("custom-network:steps.token-configuration.errors.invalid-number") :
       BigNumber(value).lte(0) ? 
-        t("custom-network:steps.token-configuration.errors.lower-than-zero") : undefined;
+        t("custom-network:steps.token-configuration.errors.lower-than-zero") :
+        BigNumber(value).gt(2 ** 256 - 1) ? t("custom-network:steps.token-configuration.errors.uint-limit") : undefined;
 
   const tokenInfo = {
     name: isDeployer ? tokenName : erc20?.name,
@@ -55,14 +58,14 @@ export function ERC20Details({
   }
 
   const isAddressFieldReadOnly = !!readOnly || isDeployer;
-  const hasTotalSupplyError = naNOrZeroError(tokenInfo.totalSupply) && tokenInfo.totalSupply !== "" && isDeployer;
+  const hasTotalSupplyError = !!numberError(tokenInfo.totalSupply) && tokenInfo.totalSupply !== "" && isDeployer;
 
   const handleTotalSupplyChange = ({ value }) => setTokenTotalSupply(value);
 
   const isDeployBtnDisabled = isDeployer ? [
     tokenInfo.name.trim() === "",
     tokenInfo.symbol.trim() === "",
-    !!naNOrZeroError(tokenInfo.totalSupply)
+    !!numberError(tokenInfo.totalSupply)
   ].some(c => c) : false;
 
   function handleBlur() {
@@ -106,6 +109,7 @@ export function ERC20Details({
           readOnly={isAddressFieldReadOnly}
           onChange={setTokenAddress}
           onBlur={handleBlur}
+          placeholder={adressPlaceholder}
           error={ erc20?.loadError &&
             <>
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
@@ -155,13 +159,14 @@ export function ERC20Details({
               readOnly={!isDeployer || isDeploying}
               allowNegative={false}
               decimalScale={0}
+              error={hasTotalSupplyError}
               thousandSeparator
             />
 
             { hasTotalSupplyError &&
               <WarningSpan
                 type="danger"
-                text={naNOrZeroError(tokenInfo.totalSupply)}
+                text={numberError(tokenInfo.totalSupply)}
               />
             }
           </Form.Group>

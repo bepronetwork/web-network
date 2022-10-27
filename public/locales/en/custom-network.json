@@ -133,7 +133,8 @@
           "label": "Symbol"
         },
         "address": {
-          "label": "Address"
+          "label": "Address",
+          "placeholder": "ERC20 token address"
         },
         "decimals": {
           "label": "Decimals"
@@ -162,7 +163,8 @@
       },
       "errors": {
         "invalid-number": "Please provide a valid number",
-        "lower-than-zero": "Please provider a number greater than zero"
+        "lower-than-zero": "Please provider a number greater than zero",
+        "uint-limit": "Please provider a number lower than 2 ^ 256 - 1"
       }
     },
     "treasury": {
