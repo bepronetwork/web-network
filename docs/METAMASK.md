@@ -1,22 +1,30 @@
 ## 1. ETHEREUM NETWORK SETUP
 
-Configure the EVM network explorer, chain identification name and token, for exemple using Kovan.
+Be sure have [Metamask](https://metamask.io/download/) extensions installed.
+<br>
 
-Or emulate your own block chain using [Ganache](../docs/GANACHE.md), check Ganache  [doc]('https://trufflesuite.com/ganache/') for more.
+Then fill in the ENV file with Ethereum EVM Network, for exemple using Kovan.
+<br>
 
 ```text
 # .env
 
+# Create a new infura provider (or anyother web3 provider) and add the id here
+NEXT_PUBLIC_WEB3_CONNECTION=wss://kovan.infura.io/ws/v3/
+
+# MetaMask Network Configs
 NEXT_PUBLIC_NATIVE_TOKEN_NAME=ETH
 NEXT_PUBLIC_NEEDS_CHAIN_ID=42
 NEXT_PUBLIC_NEEDS_CHAIN_NAME=kovan
 NEXT_PUBLIC_BLOCKSCAN_LINK=kova.etherscan.com
 ```
 
+Or emulate your own block chain using [Ganache](../docs/GANACHE.md).
+
 ## 2. ADMIN WALLET
 
 The admin wallet is the address of the contracts governor, this person will be able
-manege the default network, also to access the `/administration` page where actions for manege default settings for `ERC20` and `Network` are available. Check Networks Manager [doc](../docs/NETWORK-MANAGER.md). for more
+to manage the default network, also to access the `/administration` page where actions for manage default settings for `ERC20` and `Network` are available. Check Networks Manager [doc](../docs/NETWORK-MANAGER.md) for more.
 
 ```text
 # .env
