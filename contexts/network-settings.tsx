@@ -328,7 +328,8 @@ export const NetworkSettingsProvider = ({ children }) => {
             hasIssues: false,
             userPermission:repo.viewerPermission,
             name: repo?.name,
-            fullName: repo?.nameWithOwner
+            fullName: repo?.nameWithOwner,
+            mergeCommitAllowed: repo.mergeCommitAllowed
           }));
         
       
