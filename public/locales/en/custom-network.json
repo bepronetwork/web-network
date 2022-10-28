@@ -161,10 +161,19 @@
       "actions": {
         "deploy": "Deploy"
       },
+      "messages": {
+        "token-deployed": {
+          "title": "Token Deployed",
+          "content": "Check token address in the form"
+        }
+      },
       "errors": {
         "invalid-number": "Please provide a valid number",
         "lower-than-zero": "Please provider a number greater than zero",
-        "uint-limit": "Please provider a number lower than 2 ^ 256 - 1"
+        "deploy": {
+          "title": "Failed do deploy",
+          "content": "Token supply exceeds Ethereum integer limit"
+        }
       }
     },
     "treasury": {
