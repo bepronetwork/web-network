@@ -25,7 +25,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     address,
     search,
     page,
-    pullRequester,
+    pullRequesterLogin,
+    pullRequesterAddress,
     proposer,
     networkName,
     repoPath
@@ -81,16 +82,38 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       whereCondition.createdAt = { [Op.gt]: fn(+new Date(), 1) };
     }
 
+    const pullRequester = () => {
+      if(pullRequesterLogin && pullRequesterAddress) return "both"
+      else if(pullRequesterLogin) return "login"
+      else if(pullRequesterAddress) return "address"
+      else return null
+    }             
+
+    const handlePrConditional = (method: "both" | "login" | "address") => {
+      if(method === "both") return {
+        [Op.or]: [
+          iLikeCondition("githubLogin", pullRequesterLogin),
+          iLikeCondition("userAddress", pullRequesterAddress),
+        ],
+      }
+
+      if(method === "login") return { githubLogin: pullRequesterLogin }
+      if(method === "address") return { userAddress: pullRequesterAddress }
+    }
+
     const include = [
     { association: "developers" },
     {
       association: "pullRequests",
-      required: !!pullRequester,
+      required: !!pullRequester(),
       where: {
         status: {
           [Op.not]: "canceled"
         },
-        ...(pullRequester ? { githubLogin: pullRequester } : {})
+        ...(pullRequester()
+          ? 
+          handlePrConditional(pullRequester())
+          : {}),
       }
     },
     { 
