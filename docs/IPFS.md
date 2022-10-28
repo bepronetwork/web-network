@@ -10,10 +10,9 @@ Update the .env with the IPFS values;
 ```text
 # .env
 
-NEXT_IPFS_HOST=ipfs.infura.io
-NEXT_IPFS_PORT=5001
 NEXT_IPFS_PROJECT_ID=yourIpfsProjectId
 NEXT_IPFS_PROJECT_SECRET=yourIpfsProjectSecret
-NEXT_PUBLIC_IPFS_BASE=https://ipfs.infura.io/ipfs
+NEXT_IPFS_UPLOAD_ENDPOINT=https://ipfs.infura.io:5001/api/v0
+NEXT_PUBLIC_IPFS_BASE=https://YOUR-GATWAY-SUBDOMAIN.infura-ipfs.io/ipfs
 ```
 
