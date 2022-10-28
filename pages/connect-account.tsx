@@ -126,7 +126,6 @@ export default function ConnectAccount() {
                     credential={sessionUser?.login} 
                     connect={connectGithub}
                     isLoading={isConnecting}
-                    isDisabled={!wallet?.address}
                   />
 
                   
