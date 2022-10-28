@@ -416,6 +416,22 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       </Row>
       <Row className="mt-4">
         <span className="caption-medium text-white mb-3">
+          {t("custom-network:network-info")}
+        </span>
+        <Col>
+          <label className="caption-small mb-2">
+            {t("custom-network:network-address")}
+          </label>
+          <input
+              type="text"
+              className="form-control"
+              value={network?.networkAddress}
+              disabled={true}
+            />
+        </Col>
+    </Row>
+      <Row className="mt-4">
+        <span className="caption-medium text-white mb-3">
           {t("custom-network:steps.network-settings.fields.fees.title")}
         </span>
         <Col>
