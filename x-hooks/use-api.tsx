@@ -68,7 +68,8 @@ export default function useApi() {
     address = "",
     creator = "",
     search = "",
-    pullRequester = "",
+    pullRequesterLogin = "",
+    pullRequesterAddress = "",
     proposer = "",
     networkName = DEFAULT_NETWORK_NAME
   }) {
@@ -82,7 +83,8 @@ export default function useApi() {
       order,
       creator,
       search,
-      pullRequester,
+      pullRequesterLogin,
+      pullRequesterAddress,
       proposer,
       networkName
     }).toString();
