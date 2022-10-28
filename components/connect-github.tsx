@@ -19,7 +19,7 @@ export default function ConnectGithub({size = 'md'}:IProps) {
 
   if(size === 'sm'){
     return (
-    <Button onClick={connectGithub} disabled={isConnecting || !wallet?.address} isLoading={isConnecting}> 
+    <Button onClick={connectGithub} disabled={isConnecting} isLoading={isConnecting}> 
       <GithubImage  /> 
       <span>{t("actions.connect")}</span>
     </Button>)
