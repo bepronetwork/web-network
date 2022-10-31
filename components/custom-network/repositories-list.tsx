@@ -80,11 +80,11 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   }: infoType) {
     return (
         <div className="d-flex ps-0">
-          <span className={`p-small ${type && `text-${type}`} ps-0 pe-2`}>
+          <span className={`p-small ${type && `text-${type}`} ps-0 pe-2 mt-1`}>
             {text}
           </span>
 
-      <RepositoryCheck
+          <RepositoryCheck
             key={type}
             label="example"
             active={false}
