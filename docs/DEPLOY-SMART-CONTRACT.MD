@@ -1,0 +1,56 @@
+## 1. DEPLOY SMART-CONTRACT
+
+Fill in the `governor` wallet private key and address.
+
+```
+# Deploy Contract
+DEPLOY_OWNER_ADDRESS=
+DEPLOY_PRIVATE_KEY=
+
+```
+
+Then it's able use a already contract deployed or deploy a new one, in this step pay attention because the **order to run database migrations** are differente in each option.
+
+### 1.1 Use Existing Contract
+
+1. Just update the .env file with respective addresses.
+
+```text
+# .env
+
+NEXT_PUBLIC_CONTRACT_ADDRESS=
+NEXT_PUBLIC_SETTLER_ADDRESS=
+NEXT_PUBLIC_TRANSACTION_ADDRESS=
+NEXT_PUBLIC_NETWORK_REGISTRY_ADDRESS=
+NEXT_PUBLIC_NFT_ADDRESS=
+NEXT_PUBLIC_NFT_URI=
+```
+
+2. Run migrations.
+
+```bash
+$ npm run migrate
+```
+
+### 1.2 Deploy New Contract
+
+Before run the script, it's able to configure some aspects for deploy, like `staging-accounts` visiting `./scripts/staging-accounts.js` or the default values and tokens, visiting `./scripts/deploy-v2.js`
+
+1. Run migrations.
+
+```bash
+$ npm run migrate
+```
+
+2. Make sure your database is running and run deploy script.
+
+```bash
+$ npm run deploy:local
+```
+
+if all goes well you should see this feedback.
+**It's not necessary update .env file in this case.**
+
+> <img align="center" src="./assets/deploy-success.png" width="500"/>
+
+
