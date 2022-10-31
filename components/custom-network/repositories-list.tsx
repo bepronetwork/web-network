@@ -42,8 +42,10 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
     setReposWithIssues(repositories.filter(repository => repository.hasIssues)
       .map((repository) => repository.fullName));
 
-    setReposUserNotAdmin(repositories.filter(repository => repository.userPermission !== "ADMIN")
-    .map((repository) => repository.fullName))
+    setReposUserNotAdmin(repositories
+          .filter((repository) =>
+              repository?.userPermission && repository.userPermission !== "ADMIN")
+          .map((repository) => repository.fullName));
 
   }, [repositories]);
 
