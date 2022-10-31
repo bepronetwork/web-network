@@ -199,7 +199,7 @@ export default function IssueProposalProgressBar() {
 
     if (isFinalized) step = 3 + addIsFunding;
     else if (isInValidation) step = 2 + addIsFunding;
-    else if (!isIssueinDraft) step = 1 + addIsFunding;
+    else if (!isIssueinDraft && (!isFundingRequest || isBountyFunded)) step = 1 + addIsFunding;
 
     if (isCanceled) stepColor = "danger";
     if (isFinalized) stepColor = "success";
