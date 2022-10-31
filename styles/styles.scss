@@ -139,8 +139,6 @@ li {
     &__control {
       border-color: transparent;
       background-color: $black;
-      // min-width: 210px;
-      min-width: max-content;
       min-height: 38px;
       box-shadow: none;
       border-radius: 8px;
@@ -191,6 +189,12 @@ li {
     }
     &__value {
       text-transform: uppercase;
+
+      &-container {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
     &__option {
       @extend .p;
