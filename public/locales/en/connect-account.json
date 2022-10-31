@@ -1,6 +1,6 @@
 {
   "connect-github-and-wallet": "Connect your GitHub account and MetaMask wallet",
-  "connect-to-use": "To access and use our network please connect your github account and web3 wallet",
+  "connect-to-use": "To access certain parts of the network we need you to connect your github account",
   "connected-accounts": "Connected accounts!",
   "warnings": {
     "already-connected": "These accounts are already connected",

@@ -5,14 +5,13 @@ import getConfig from "next/config";
 import { v4 as uuidv4 } from "uuid";
 const { serverRuntimeConfig } = getConfig()
 
-const host = serverRuntimeConfig?.infura?.host || "ipfs.infura.io";
-const port = serverRuntimeConfig?.infura?.port || "5001";
 const auth =
   "Basic " +
-  Buffer.from(serverRuntimeConfig?.infura?.projectId +
-    ":" +
+    Buffer.from(serverRuntimeConfig?.infura?.projectId +
+  ":" +
     serverRuntimeConfig?.infura?.projectSecret).toString("base64");
-const baseURL = `https://${host}:${port}/api/v0`;
+    
+const baseURL = serverRuntimeConfig?.infura?.uploadEndPoint || `https://ipfs.infura.io:5001/api/v0`;
 
 export async function add(file: Buffer | string | JSON | Record<string, unknown>,
                           pin = false,
