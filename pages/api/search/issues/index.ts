@@ -82,12 +82,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       whereCondition.createdAt = { [Op.gt]: fn(+new Date(), 1) };
     }
 
-    const pullRequester = () => {
-      if(pullRequesterLogin && pullRequesterAddress) return "both"
-      else if(pullRequesterLogin) return "login"
-      else if(pullRequesterAddress) return "address"
+    const pullRequesterType = (login: string | string[], address: string | string[]) => {
+      if(login && address) return "both"
+      else if(login) return "login"
+      else if(address) return "address"
       else return null
-    }             
+    }
+    
+    const pullRequester = pullRequesterType(pullRequesterLogin, pullRequesterAddress)
 
     const handlePrConditional = (method: "both" | "login" | "address") => {
       if(method === "both") return {
@@ -105,14 +107,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "developers" },
     {
       association: "pullRequests",
-      required: !!pullRequester(),
+      required: !!pullRequester,
       where: {
         status: {
           [Op.not]: "canceled"
         },
-        ...(pullRequester()
+        ...(pullRequester
           ? 
-          handlePrConditional(pullRequester())
+          handlePrConditional(pullRequester)
           : {}),
       }
     },
