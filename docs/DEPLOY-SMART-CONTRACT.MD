@@ -9,9 +9,9 @@ DEPLOY_PRIVATE_KEY=
 
 ```
 
-Then it's able use a already contract deployed or deploy a new one, in this step pay attention because the **order to run database migrations** are differente in each option.
+Then it's able use a already contract deployed or deploy a new one, in this step pay attention because the **order to run database migrations** is differente in each option.
 
-### 1.1 Use Existing Contract
+### Option A - Use Existing Contract
 
 1. Just update the .env file with respective addresses.
 
@@ -32,7 +32,7 @@ NEXT_PUBLIC_NFT_URI=
 $ npm run migrate
 ```
 
-### 1.2 Deploy New Contract
+### Option B - Deploy New Contract
 
 Before run the script, it's able to configure some aspects for deploy, like `staging-accounts` visiting `./scripts/staging-accounts.js` or the default values and tokens, visiting `./scripts/deploy-v2.js`
 
@@ -52,5 +52,3 @@ if all goes well you should see this feedback.
 **It's not necessary update .env file in this case.**
 
 > <img align="center" src="./assets/deploy-success.png" width="500"/>
-
-
