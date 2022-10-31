@@ -49,6 +49,7 @@ export default function FundModal({
     isExecuting,
     amountToFund?.isNaN(),
     amountToFund?.isZero(),
+    amountToFund === undefined,
     amountToFund?.plus(networkIssue?.fundedAmount).gt(networkIssue?.fundingAmount)
   ].some(c => c);
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;

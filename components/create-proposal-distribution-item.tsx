@@ -25,7 +25,7 @@ export default function CreateProposalDistributionItem({
 
   function handleValueChange(params: NumberFormatValues) {
     setValue(params.floatValue);
-    onChangeDistribution({ [githubHandle]: params.floatValue });
+    onChangeDistribution({ [githubHandle]: params.floatValue || 0 });
   }
   // Wasted logic.
   // todo: move within InputNumber itself.
@@ -39,7 +39,7 @@ export default function CreateProposalDistributionItem({
     }
 
     setValue(enhancedValue);
-    onChangeDistribution({ [githubHandle]: enhancedValue });
+    onChangeDistribution({ [githubHandle]: enhancedValue || 0 });
   }
 
   return (
