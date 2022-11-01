@@ -9,7 +9,7 @@ DEPLOY_PRIVATE_KEY=
 
 ```
 
-Then it's able use a already contract deployed or deploy a new one, in this step pay attention because the **order to run database migrations** is differente in each option.
+Then will be able to use an already deployed contract or deploy a new one, in this step pay attention because the **order to run database migrations** is differente in each option.
 
 ### Option A - Use Existing Contract
 
