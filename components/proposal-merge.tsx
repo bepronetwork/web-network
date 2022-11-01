@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import BountyDistributionItem from "components/bounty-distribution-item";
 import Button from "components/button";
 import Modal from "components/modal";
