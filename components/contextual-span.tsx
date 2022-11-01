@@ -10,12 +10,13 @@ interface ContextualSpanProps {
   children: ReactNode;
   context: "success" | "danger" | "warning" | "info";
   color?: string;
+  className?: string;
 }
 
-export function ContextualSpan({ children, context, color } : ContextualSpanProps) {
+export function ContextualSpan({ children, context, color, className = "" } : ContextualSpanProps) {
   const contextColor = color || context;
   const CLASSES = 
-    `p family-Regular font-weight-medium svg-${contextColor} text-${contextColor} border-radius-4`;
+    `p family-Regular font-weight-medium svg-${contextColor} text-${contextColor} border-radius-4 ${className}`;
 
   const Icon = (props: SVGProps<SVGSVGElement>) => {
     const icons = {
