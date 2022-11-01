@@ -4,7 +4,7 @@ Each user is be able to create other networks by visiting `/networkname/account/
 
 After created also be able to manege settings of you own networks by visiting `/networkname/profile/my-network`
 
-> <img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
+> <img align="center" src="./assets/network-settings-page.png" width="500"/>
 
 ## 2. HOW MANAGER DEFAULT SETTINGS NETWORK?
 
