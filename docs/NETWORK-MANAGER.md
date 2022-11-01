@@ -15,7 +15,7 @@ Only the contracts governor is able to access the `/administration` page. There 
 - Min and Max Ammount to be a Council Member.
 - Max dispute Percentage.
 
-Also it's possible change this settings before do the first deploy, at env file.
+It is also possible to change these settings in the env file before doing the first deploy.
 
 ```
 # .env
