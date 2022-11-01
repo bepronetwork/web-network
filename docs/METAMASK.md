@@ -7,7 +7,7 @@ Then fill in the ENV file with Ethereum EVM Network, for exemple using Kovan.
 ```text
 # .env
 
-# Create a new infura provider (or anyother web3 provider) and add the id here
+# Create a new infura provider (or any other web3 provider) and add the id here
 NEXT_PUBLIC_WEB3_CONNECTION=wss://kovan.infura.io/ws/v3/
 
 # MetaMask Network Configs
