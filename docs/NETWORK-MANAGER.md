@@ -12,7 +12,7 @@ Only the contracts governor is able to access the `/administration` page. There 
 
 - Default Network Name.
 - Min and Max time for dispute.
-- Min and Max Ammount to be a Council Member.
+- Min and Max Amount to be a Curator.
 - Max dispute Percentage.
 
 It is also possible to change these settings in the env file before doing the first deploy.
