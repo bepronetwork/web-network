@@ -34,7 +34,7 @@ $ npm run migrate
 
 ### Option B - Deploy New Contract
 
-Before run the script, it's able to configure some aspects for deploy, like `staging-accounts` visiting `./scripts/staging-accounts.js` or the default values and tokens, visiting `./scripts/deploy-v2.js`
+Before run the script, it's possible to configure some aspects for deploy, like `staging-accounts` visiting `./scripts/staging-accounts.js` or the default values and tokens, visiting `./scripts/deploy-v2.js`
 
 1. Run migrations.
 
