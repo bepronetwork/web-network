@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
@@ -39,13 +40,15 @@ export default function TokenConfiguration({
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>([]);
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] =
     useState<Token[]>();
+  const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
 
   const debounce = useRef(null)
 
-  const { tokens, fields } = useNetworkSettings();
+  const { tokens, fields, tokensLocked } = useNetworkSettings();
   const { service: DAOService } = useDAO();
   const { getTokens } = useApi();
   const { settings } = useSettings();
+  const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
 
   function handleShowModal() {
     setShowModalDeploy(true);
@@ -143,6 +146,15 @@ export default function TokenConfiguration({
         .catch((err) => console.log("error to get tokens database ->", err));
     }).catch((err) => console.log("error to get allowed tokens contract ->", err));
   }, [wallet?.address])
+
+  useEffect(() => {
+    if(!wallet?.address || !DAOService || !BigNumber(tokensLocked.needed).gt(0)) return
+
+    DAOService.getRegistryParameter("networkCreationFeePercentage").then(createFee => {
+      setCreateNetworkAmount(BigNumber(BigNumber(createFee).multipliedBy(tokensLocked.needed)).toFixed());
+    })
+
+  }, [wallet?.address, tokensLocked.needed])
   
   function handleEmptyTokens (tokens: Token[]) {
     if(tokens?.length === 0) return [settings?.beproToken]
@@ -232,6 +244,21 @@ export default function TokenConfiguration({
             />
           </>
       </div>
+      {validated && (
+        <>
+        <span className="p-small text-warning mb-2">
+          {t("custom-network:network-create-warning")}
+        </span>
+        <span className="p-small text-warning mb-4">
+        {t("custom-network:network-amount-to-create", {
+              amount: createNetworkAmount,
+              symbol: networkTokenSymbol,
+              totalAmount: tokensLocked.locked
+        })}
+        </span>
+        </>
+      )}
+
 
       <DeployERC20Modal 
         show={showModalDeploy}
