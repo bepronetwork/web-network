@@ -13,7 +13,7 @@ Then it's able use a already contract deployed or deploy a new one, in this step
 
 ### Option A - Use Existing Contract
 
-1. Just update the .env file with respective addresses.
+1. Just update the .env file with the respective addresses.
 
 ```text
 # .env
