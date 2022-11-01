@@ -22,7 +22,7 @@ Or emulate your own blockchain using [Ganache](../docs/GANACHE.md).
 ## 2. ADMIN WALLET
 
 The admin wallet is the address of the contracts governor, this person will be able
-to manage the default network, also to access the `/administration` page where actions for manage default settings for `ERC20` and `Network` are available. Check Networks Manager [doc](../docs/NETWORK-MANAGER.md) for more.
+to manage the default network, also to access the `/administration` page where actions to manage the default settings for `ERC20` and `Network` are available. Check Networks Manager [doc](../docs/NETWORK-MANAGER.md) for more.
 
 ```text
 # .env
