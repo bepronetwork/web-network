@@ -17,7 +17,7 @@ NEXT_PUBLIC_NEEDS_CHAIN_NAME=kovan
 NEXT_PUBLIC_BLOCKSCAN_LINK=kova.etherscan.com
 ```
 
-Or emulate your own block chain using [Ganache](../docs/GANACHE.md).
+Or emulate your own blockchain using [Ganache](../docs/GANACHE.md).
 
 ## 2. ADMIN WALLET
 
