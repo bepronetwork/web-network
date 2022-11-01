@@ -18,7 +18,7 @@ NEXT_PUBLIC_GH_USER=yourGithubUserLogin
 
 It's necessary configure the default branch and repository, for ocasion no have others repositories registred these. `master` is a default branch.
 
-This repository will be registered and available on only default network.
+This repository will be registered and available only for the default network.
 
 ```text
 # .env
