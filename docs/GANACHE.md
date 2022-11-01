@@ -15,7 +15,7 @@ Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickst
 > <img align="center" src="./assets/ganache-create-workspace.png" width="500"/>
 <br/>
 
-2. On the server tab, change the port number to `8545`. <br>*this step it's important for run deploy script successful.*
+2. On the server tab, change the port number to `8545`. <br>*this step is important to run the deploy script successfully.*
 
 > <img align="center" src="./assets/ganache-server.png" width="500"/>
 <br/>
