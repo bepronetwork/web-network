@@ -20,7 +20,7 @@ Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickst
 > <img align="center" src="./assets/ganache-server.png" width="500"/>
 <br/>
 
-3. On Ganache Home, chose one wallet and copy the private key.
+3. On Ganache Home, choose one wallet and copy the private key.
 
 > <img align="center" src="./assets/ganache-home.png" width="500"/>
 <br/>
