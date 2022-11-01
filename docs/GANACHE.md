@@ -48,7 +48,7 @@ Complete the Ganache [Quick Start](https://trufflesuite.com/docs/ganache/quickst
 
 ## 3. UPDATE ENV FILE.
 
-Don't forget update you .ENV file with ganache info.
+Don't forget to update your .ENV file with ganache info.
 
 ```text
 # .env
