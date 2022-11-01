@@ -16,7 +16,7 @@ NEXT_PUBLIC_GH_USER=yourGithubUserLogin
 
 ## 2. DEFAULT REPOSITORY/BRANCH
 
-It's necessary configure the default branch and repository, for ocasion no have others repositories registred these. `master` is a default branch.
+It's necessary to configure the default branch and repository, for ocassion of not have others repositories this will be registered. `master` is the default branch.
 
 This repository will be registered and available only for the default network.
 
