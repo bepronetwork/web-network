@@ -17,8 +17,8 @@ export default function RepositoryCheck({
   active = false,
   onClick
 }: GithubInfoProps) {
-  const XIcon = <CloseIcon width={8} height={8} />;
-  const isDisabled = usedByOtherNetwork || hasIssues || userPermission !== "ADMIN";
+  const XIcon = <CloseIcon width={8} height={8} className="opacity-75" />;
+  const isDisabled = usedByOtherNetwork || hasIssues || userPermission && userPermission !== "ADMIN";
   const isActive = active && !isDisabled;
 
   const ClassCondition = (condition, trueValue, falseValue = "") => condition && trueValue || falseValue;
@@ -30,7 +30,7 @@ export default function RepositoryCheck({
     ClassCondition(!isActive && !isDisabled, "bg-dark-gray"),
     ClassCondition(isDisabled && hasIssues, "bg-info"),
     ClassCondition(isDisabled && usedByOtherNetwork, "bg-danger"),
-    ClassCondition(isDisabled && userPermission !== "ADMIN", "bg-warning"),
+    ClassCondition(isDisabled && userPermission && userPermission !== "ADMIN", "bg-warning"),
     ClassCondition(isDisabled, "cursor-not-allowed", "cursor-pointer")
   ];
 
@@ -42,7 +42,6 @@ export default function RepositoryCheck({
 
   return (
     <div key={label} className={classes.join(" ")} onClick={handleClick}>
-      {(active || isDisabled) && XIcon}
       <span>{label}</span>
       {(active || isDisabled) && XIcon}
     </div>
