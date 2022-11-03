@@ -8,8 +8,8 @@ import RepositoryCheck from "components/custom-network/repository-check";
 import useApi from "x-hooks/use-api";
 
 interface infoType {
-  length?: number;
-  type: "warning" | "info" | "danger";
+  visible?: boolean;
+  type: "warning" | "info" | "danger" | "primary" | "success";
   text: string
 }
 
@@ -25,24 +25,32 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
 
   const renderInfos: infoType[] = [
     {
-      length: existingRepos.length,
+      visible: !!existingRepos.length,
       text: t("steps.repositories.used-by-other-network"),
       type: "danger"
     },
     {
-      length: reposWithIssues.length,
+      visible: !!reposWithIssues.length,
       text: t("steps.repositories.has-bounties"),
       type: "info"
     },
     {
-      length: reposUserNotAdmin.length,
-      text: t("steps.repositories.user-permission-not-admin"),
+      visible: !!reposUserNotAdmin.length,
+      text: t("steps.repositories.user-permission-not-admin", { count: reposUserNotAdmin.length }),
       type: "warning"
     },
     {
-      length: withoutMergeCommitPerm.length,
-      text: t("steps.repositories.no-merge-commit-permission"),
+      visible: !!withoutMergeCommitPerm.length,
+      text: t("steps.repositories.no-merge-commit-permission", { 
+        count: withoutMergeCommitPerm.length,
+        repos: withoutMergeCommitPerm.join(", ")
+      }),
       type: "primary"
+    },
+    {
+      visible: !!repositories?.length && !repositories?.some(({ checked }) => checked),
+      text: t("steps.repositories.no-repositories-selected"),
+      type: "danger"
     }
   ]
 
@@ -57,7 +65,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
 
     onClick(repository.fullName);
 
-    updateReposWithoutMergeCommitPerm()
+    updateReposWithoutMergeCommitPerm();
   }
 
   useEffect(() => {
@@ -94,15 +102,15 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
     type
   }: infoType) {
     return (
-        <div className="d-flex ps-0">
+        <div className="d-flex flex-row gap-4" key={type}>
           <ContextualSpan context={type}>
-            {t("steps.repositories.used-by-other-network")}
+            {text}
           </ContextualSpan>
 
           <RepositoryCheck
             key={type}
             label="example"
-            active={false}
+            active={true}
             userPermission={type === "warning" ? "READ" : null}
             hasIssues={type === "info" ? true : false}
             usedByOtherNetwork={type === "danger" ? true : false}
@@ -121,7 +129,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
 
       {repositories.map((repository) => (
         <RepositoryCheck
-          key={repository.name}
+          key={repository.fullName}
           label={repository.name}
           active={repository.checked}
           userPermission={repository.userPermission}
@@ -131,13 +139,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         />
       ))}
 
-        {renderInfos.map(item => (
-          item.length ? renderInfo({
-            text: item.text,
-            type: item.type,
-          })
-         : "" 
-        ))}
+      {renderInfos.filter(({ visible }) => visible).map(renderInfo)}
     </div>
   );
 }

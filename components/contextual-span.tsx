@@ -8,7 +8,7 @@ import WarningIcon from "assets/icons/warning-icon";
 
 interface ContextualSpanProps {
   children: ReactNode;
-  context: "success" | "danger" | "warning" | "info";
+  context: "success" | "danger" | "warning" | "info" | "primary";
   color?: string;
   className?: string;
 }
@@ -23,7 +23,8 @@ export function ContextualSpan({ children, context, color, className = "" } : Co
       success: SuccessIcon,
       danger: CloseIcon,
       warning: WarningIcon,
-      info: InfoIconEmpty
+      info: InfoIconEmpty,
+      primary: WarningIcon
     };
 
     return icons[context](props);
