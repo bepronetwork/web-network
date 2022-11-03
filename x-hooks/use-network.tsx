@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useState} from "react";
 
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
@@ -14,9 +14,11 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "./use-api";
 
-
+export const NetworkContext = createContext(null)
+export const NetworkProvider = ({children}) => <NetworkContext.Provider value={null} children={children} />
 
 export function useNetwork() {
+  useContext(NetworkContext);
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();
@@ -37,13 +39,15 @@ export function useNetwork() {
       state.Service?.network?.active?.name ||
       state.Settings?.defaultNetworkConfig?.name;
 
+    dispatch(changeNetworkLastVisited(networkName));
+
     if (!networkName || (storage.value && networkName && storage.value === networkName))
       return;
 
     console.debug(`Updating active network`, networkName);
 
     storage.value = networkName;
-    dispatch(changeNetworkLastVisited(networkName));
+
     const storageParams = new WinStorage(`bepro.network:${networkName}`, 3600, `sessionStorage`);
     if (storageParams.value && !forceUpdate)
       return;

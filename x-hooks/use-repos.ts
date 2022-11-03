@@ -50,7 +50,7 @@ export function useRepos() {
   }
 
   function updateActiveRepo() {
-    if (!query?.repoId || state.Service?.network?.repos?.active?.id?.toString() === query?.repoId)
+    if (!query?.repoId || !state.Service?.network?.repos || state.Service?.network?.repos?.active?.id?.toString() === query?.repoId)
       return;
 
     const findRepoId = (repo: RepoInfo) => repo.id.toString() === query.repoId;

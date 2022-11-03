@@ -16,6 +16,7 @@ import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
 import {IssueData} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
+import {changeSpinners} from "../contexts/reducers/change-spinners";
 
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
@@ -42,13 +43,19 @@ export function useBounty() {
     if (!state.Service?.network?.active || (!query?.id || !query.repoId))
       return;
 
-    if (!force && isCurrentBountyCached())
+    console.debug(`Loading bounty information`, state.spinners?.bountyDatabase);
+
+    if (!force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
       return;
 
-    console.debug(`Loading bounty information`);
+    console.debug(`GET ISSUE`, state.Service)
+
+    dispatch(changeSpinners.update({bountyDatabase: true}))
 
     getIssue(+query.repoId, +query.id, state.Service.network.active.name)
       .then((bounty: IssueData) => {
+
+        console.debug(`GOT ISSUE`);
 
         const bigNumbers = {
           amount: BigNumber(bounty.amount),
@@ -67,20 +74,21 @@ export function useBounty() {
       })
       .then(comments => {
         dispatch(changeCurrentBountyComments(comments));
+        dispatch(changeSpinners.update({bountyDatabase: false}))
       });
 
   }
 
   function getChainBounty(force = false) {
-    if (!state.Service?.active || !state.Service?.network || !state.currentBounty?.data?.contractId)
+    if (!state.Service?.active || !state.Service?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
 
     if (!force && isCurrentBountyCached())
       return;
 
-    const {getBounty, isBountyInDraftChain} = state.Service.active;
+    dispatch(changeSpinners.update({bountyChain: true}))
 
-    getBounty(state.currentBounty.data.contractId)
+    state.Service.active.getBounty(state.currentBounty.data.contractId)
       .then(bounty => {
 
         const pullRequestsMapper = (pullRequest) => ({
@@ -97,7 +105,7 @@ export function useBounty() {
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
 
-        isBountyInDraftChain(bounty.creationDate)
+        state.Service.active.isBountyInDraftChain(bounty.creationDate)
           .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));
 
         bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.network)
@@ -105,6 +113,7 @@ export function useBounty() {
           .then(value => {
             dispatch(changeCurrentBountyDataIsFinished(value !== 0));
             dispatch(changeCurrentBountyDataIsInValidation([2, 3].includes(value)))
+            dispatch(changeSpinners.update({bountyChain: false}))
           });
 
       });
