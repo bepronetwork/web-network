@@ -137,7 +137,7 @@ export default function Payments() {
           <FlexColumn className="col-auto">
             <FlexRow className="align-items-center justify-content-between gap-1">
               <label className="text-uppercase caption-small">
-                Latest
+                {t("misc.latest")}
               </label>
               <ReactSelect
                 options={defaultOptions}

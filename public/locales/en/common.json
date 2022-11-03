@@ -183,7 +183,8 @@
     "total": "Total",
     "clear": "Clear",
     "wallet": "Wallet",
-    "unkown": "Unknown"
+    "unkown": "Unknown",
+    "latest": "Latest"
   },
   "modals": {
     "help-modal": {
