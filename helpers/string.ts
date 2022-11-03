@@ -61,5 +61,3 @@ export const highlightText = (str: string, className?: string) => {
   }'>$1</span>`;
   return str.replaceAll(regex, subst);
 };
-
-export const trimString = (string: string, at = 15) => string.length > at ? string.substring(0, at) + '...' : string;
