@@ -33,57 +33,54 @@ export default function WalletBalance() {
 
   const {state} = useAppState();
 
-  const oracleToken = {
-    symbol: t("$oracles",  { token: state.Service?.network?.active?.networkToken?.symbol }),
-    name: t("profile:oracle-name-placeholder"),
-    icon: <OracleIcon />
-  };
-
+  const [oracleToken, setOracleToken] = useState(null);
   const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber(0);
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber(0);
 
-  useEffect(() => {
-    let beproToken = undefined;
+  function loadBalances() {
+    if (!state.Settings?.beproToken)
+      return;
 
-    if (state.Settings?.beproToken) {
-      beproToken = {
-        ...state.Settings.beproToken,
-        icon: <BeProBlue width={24} height={24} />,
-        balance: "0"
-      };
-  
-      setTokens([beproToken]);
-    }
+    setTokens([{...state.Settings.beproToken, icon: <BeProBlue width={24} height={24} />, balance: "0"}])
 
-    if (!state.Service?.active || !state.Service?.network?.active?.networkToken || !state.currentUser?.balance || !state.Settings?.beproToken) return;
+    console.log(`fetching balance?`, state?.Service?.network?.active?.networkToken)
+
+    if (!state.currentUser?.walletAddress || !state.Service?.active || !(state.Service?.network?.active.networkToken as any)?.contractAddress)
+      return;
+
+    const {networkToken} = state.Service?.network?.active;
 
     Promise.all([
-      state.Service?.active.getTokenBalance(beproToken.address, state.currentUser.walletAddress),
-      state.Service?.active.getTokenBalance(state.Service?.network?.active.networkToken.address, state.currentUser.walletAddress),
-      getCoinInfoByContract(beproToken.address).catch(console.log),
-      getCoinInfoByContract(state.Service?.network?.active.networkToken.address).catch(console.log)
-    ])
-    .then(([beproBalance, settlerBalance, beproInfo, settlerInfo]) => {
-      const tmpTokens: TokenBalanceType[] = [{ 
-        ...beproToken, 
-        ...beproInfo,
-        balance: beproBalance 
-      }];
+      state.Service.active.getTokenBalance(state.Settings.beproToken.address, state.currentUser.walletAddress)
+        .then(balance => {
+          const [token] = tokens;
+          token.balance = balance;
+          return token
+        }),
+      state.Settings.beproToken.address === (state.Service?.network?.active.networkToken as any).contractAddress ? Promise.resolve(null) :
+      state.Service.active.getTokenBalance((state.Service?.network?.active.networkToken as any).contractAddress, state.currentUser.walletAddress)
+        .then(balance =>
+          (networkToken.name as any as () => Promise<string>)()
+            .then(name => (networkToken.symbol as any as () => Promise<string>)()
+              .then(symbol => ({name, symbol, balance, icon: <TokenIconPlaceholder />}))))
+    ]).then(tokens => {
 
-      const settler = { 
-        ...state.Service?.network?.active.networkToken,
-        ...settlerInfo, 
-        balance: settlerBalance,
-        icon: (settlerInfo as TokenInfo)?.icon || <TokenIconPlaceholder />
-      };
+      Promise.all([(networkToken.name as any)(), (networkToken.symbol as any)()])
+        .then(([name, symbol]) => {
+          setOracleToken({
+            symbol: t("$oracles",  { token: symbol }),
+            name: name,
+            icon: <OracleIcon />
+          })
+        })
 
-      if (state.Service?.network?.active.networkToken.address !== beproToken.address)
-        tmpTokens.push(settler);
+      setTokens(tokens.filter(v => !!v));
+    })
 
-      setTokens(tmpTokens);
-    });
+  }
 
-  }, [state.Service?.active, state.Service?.network?.active?.networkToken, state.currentUser?.balance, state.Settings]);
+  useEffect(loadBalances, [state.currentUser, state.Settings, state.Service?.active, (state.Service?.network?.active?.networkToken as any)?.contractAddress])
+
 
   useEffect(() => {
     if (!tokens.length) return;
@@ -123,7 +120,7 @@ export default function WalletBalance() {
 
       <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
         <span className="h4 family-Regular text-white font-weight-medium">
-          {t("$oracles",  { token: state.Service?.network?.active?.networkToken?.symbol })}
+          {oracleToken?.symbol}
         </span>
 
         <FlexRow className="align-items-center">
@@ -132,7 +129,7 @@ export default function WalletBalance() {
             <span className="mr-2">{formatStringToCurrency(oraclesLocked?.plus(oraclesDelegatedToMe)?.toFixed())}</span>
             <InfoTooltip 
               description={t("profile:tips.total-oracles", {
-                tokenName: state.Service?.network?.active?.networkToken?.name || oracleToken.name
+                tokenName: oracleToken?.name
               })}
               secondaryIcon
             />
@@ -141,9 +138,9 @@ export default function WalletBalance() {
       </FlexRow>
 
       <TokenBalance
-        icon={oracleToken.icon} 
-        symbol={oracleToken.symbol}
-        name={`${t("misc.locked")} ${state.Service?.network?.active?.networkToken?.name || oracleToken.name}`}
+        icon={oracleToken?.icon}
+        symbol={oracleToken?.symbol}
+        name={`${t("misc.locked")} ${tokens[1]?.name || oracleToken?.name}`}
         balance={oraclesLocked}
         type="oracle"
       />
