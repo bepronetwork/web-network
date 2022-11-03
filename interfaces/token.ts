@@ -9,6 +9,7 @@ export interface Token {
   currentValue?: number | string;
   tokenInfo?: TokenInfo;
   balance?: string | BigNumber;
+  totalSupply?: BigNumber;
   decimals?: number;
   isTransactional?: boolean;
 }

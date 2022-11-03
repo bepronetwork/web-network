@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import BountyDistributionItem from "components/bounty-distribution-item";
 import Button from "components/button";
 import Modal from "components/modal";
@@ -127,13 +125,13 @@ export default function ProposalMerge({
         className="flex-grow-1"
         textClass="text-uppercase text-white"
         onClick={() => setShow(true)}
-        disabled={canMerge}
+        disabled={!canMerge || isMerging}
         isLoading={isMerging}
+        withLockIcon={!canMerge || isMerging}
       >
-        {(canMerge && !isMerging) && <LockedIcon width={12} height={12} className="mr-1" />}
-
         <span>{t("actions.merge")}</span>
       </Button>
+
       <Modal
         show={show}
         title={t("proposal:merge-modal.title")}
@@ -152,10 +150,11 @@ export default function ProposalMerge({
             <Button
               className="btn-block w-100"
               onClick={handleMerge}
-              disabled={canMerge}
+              disabled={!canMerge}
             >
               <span>{t("proposal:merge-modal.confirm-merge")}</span>
             </Button>
+            
             <Button
               color="dark-gray"
               className="w-100"

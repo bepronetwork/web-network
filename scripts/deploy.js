@@ -92,7 +92,10 @@ const networks = {
   },
   aurelius: {
     url: 'https://eth-aurelius.taikai.network:8080',
-  }
+  },
+  aurora: {
+    url: 'https://mainnet.aurora.dev',
+  },   
 }
 
 async function main() {

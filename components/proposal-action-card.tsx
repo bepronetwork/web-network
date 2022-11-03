@@ -3,6 +3,10 @@ import React, { useEffect, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
+import Button from "components/button";
+import ProposalMerge from "components/proposal-merge";
+import ProposalProgressBar from "components/proposal-progress-bar";
+
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
@@ -14,10 +18,9 @@ import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
-import Button from "./button";
-import ProposalMerge from "./proposal-merge";
-import ProposalProgressBar from "./proposal-progress-bar";
+import useOctokit from "x-hooks/use-octokit";
 
+import { ContextualSpan } from "./contextual-span";
 
 interface IProposalActionCardProps {
   proposal: Proposal;
@@ -40,11 +43,13 @@ export default function ProposalActionCard({
   
   const [isMerging, setIsMerging] = useState(false);
   const [isRefusing, setIsRefusing] = useState(false);
-  const [isDisputing, setIsDisputing] = useState(false);
   const [chaintime, setChainTime] = useState<number>();
+  const [isDisputing, setIsDisputing] = useState(false);
+  const [allowMergeCommit, setAllowMergeCommit] = useState<boolean>();
 
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
+  const { getRepository } = useOctokit();
   const { service: DAOService } = useDAO();
   const { networkIssue, activeIssue } = useIssue();
 
@@ -82,7 +87,8 @@ export default function ProposalActionCard({
     !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
     !isMerging,
     !isRefusing,
-    !isDisputing
+    !isDisputing,
+    allowMergeCommit === true
   ].every(v => v);
 
   function handleRefuse() {
@@ -105,6 +111,13 @@ export default function ProposalActionCard({
       DAOService.getTimeChain().then(setChainTime);
   }, [DAOService]);
 
+  useEffect(() => {
+    if (activeIssue?.repository?.githubPath)
+      getRepository(activeIssue?.repository?.githubPath)
+        .then(({ mergeCommitAllowed }) => setAllowMergeCommit(mergeCommitAllowed))
+        .catch(console.debug);
+  }, [activeIssue]);
+
   return (
     <div className="col-md-6">
       <div className="bg-shadow rounded-5 p-3">
@@ -125,7 +138,6 @@ export default function ProposalActionCard({
           )}
           
           <div className="d-flex flex-row justify-content-between mt-3">
-
             <ProposalMerge 
               amountTotal={bountyAmount} 
               tokenSymbol={activeIssue?.token?.symbol} 
@@ -133,7 +145,7 @@ export default function ProposalActionCard({
               isMerging={isMerging}
               idBounty={activeIssue?.id} 
               onClickMerge={handleMerge}
-              canMerge={!canMerge()}
+              canMerge={canMerge()}
             />
 
             {!isSuccess() && !isDisable() && (
@@ -164,6 +176,14 @@ export default function ProposalActionCard({
               </Button>
             )}
           </div>
+
+          { allowMergeCommit === false &&
+            <div className="row mt-2">
+              <ContextualSpan context="warning">
+                {t("pull-request:errors.merge-commit")}
+              </ContextualSpan>
+            </div>
+          }
         </div>
       </div>
     </div>

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import Badge from "components/badge";
 import Button from "components/button";
 import IconOption from "components/icon-option";
@@ -184,15 +182,12 @@ export default function CreatePullRequestModal({
             className="mr-2"
             disabled={isButtonDisabled() || isCreating}
             onClick={handleConfirm}
+            withLockIcon={isButtonDisabled()}
+            isLoading={isCreating}
           >
-            {isButtonDisabled() && <LockedIcon className="me-2" />}
             <span>{t("pull-request:actions.create.title")}</span>
-            {isCreating ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
           </Button>
+
           <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
             {t("actions.cancel")}
           </Button>

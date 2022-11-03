@@ -1,9 +1,10 @@
-import { error as LogError } from "services/logging";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import { Op } from "sequelize";
 
 import models from "db/models";
+
+import { error as LogError } from "services/logging";
 
 enum Actions {
   REGISTER = "register",

@@ -6,8 +6,6 @@ import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
 
-import { trimString } from "helpers/string";
-
 export default function ReposDropdown({ onSelected, value, disabled }: {
   onSelected: (e: { value: { id: string; path: string; } }) => void,
   value?: { label: string, value: { id: string, path: string } }
@@ -20,11 +18,11 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
   const { t } = useTranslation("common");
 
   function onChangeSelect(e: { value: { id: string; path: string } }) {
-    onSelected(e)
+    onSelected(e);
     setOption({
       value: e.value,
-      label: trimString(e.value.path)
-    })
+      label: e.value.path
+    });
   }
 
   function loadReposFromBackend() {

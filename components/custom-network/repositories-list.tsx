@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import { ContextualSpan } from "components/contextual-span";
 import RepositoryCheck from "components/custom-network/repository-check";
 
 import useApi from "x-hooks/use-api";
 
 interface infoType {
-  length?: number;
-  type: "warning" | "info" | "danger";
+  visible?: boolean;
+  type: "warning" | "info" | "danger" | "primary" | "success";
   text: string
 }
 
@@ -18,36 +19,57 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   const [existingRepos, setExistingRepos] = useState([]);
   const [reposWithIssues, setReposWithIssues] = useState([]);
   const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
+  const [withoutMergeCommitPerm, setWithoutMergeCommitPerm] = useState([]);
 
   const { searchRepositories } = useApi();
 
   const renderInfos: infoType[] = [
     {
-      length: existingRepos.length,
+      visible: !!existingRepos.length,
       text: t("steps.repositories.used-by-other-network"),
       type: "danger"
     },
     {
-      length: reposWithIssues.length,
+      visible: !!reposWithIssues.length,
       text: t("steps.repositories.has-bounties"),
       type: "info"
     },
     {
-      length: reposUserNotAdmin.length,
-      text: t("steps.repositories.user-permission-not-admin"),
+      visible: !!reposUserNotAdmin.length,
+      text: t("steps.repositories.user-permission-not-admin", { count: reposUserNotAdmin.length }),
       type: "warning"
+    },
+    {
+      visible: !!withoutMergeCommitPerm.length,
+      text: t("steps.repositories.no-merge-commit-permission", { 
+        count: withoutMergeCommitPerm.length,
+        repos: withoutMergeCommitPerm.join(", ")
+      }),
+      type: "warning"
+    },
+    {
+      visible: !!repositories?.length && !repositories?.some(({ checked }) => checked),
+      text: t("steps.repositories.no-repositories-selected"),
+      type: "danger"
     }
   ]
 
 
+  function updateReposWithoutMergeCommitPerm() {
+    setWithoutMergeCommitPerm(repositories.filter(repository => repository.checked && !repository.mergeCommitAllowed)
+      .map((repository) => repository.fullName));
+  }
+  
   function handleClick(repository) {
     if (reposWithIssues.includes(repository.fullName)) return;
 
     onClick(repository.fullName);
+
+    updateReposWithoutMergeCommitPerm();
   }
 
   useEffect(() => {
-    if (!repositories.length) return;
+    if (!repositories?.length) return ;
 
     const paths = repositories
       .filter((repository) => !repository.isSaved)
@@ -72,6 +94,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
               repository?.userPermission && repository.userPermission !== "ADMIN")
           .map((repository) => repository.fullName));
 
+    updateReposWithoutMergeCommitPerm();
   }, [repositories]);
 
   function renderInfo({
@@ -79,25 +102,14 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
     type
   }: infoType) {
     return (
-        <div className="d-flex ps-0">
-          <span className={`p-small ${type && `text-${type}`} ps-0 pe-2 mt-1`}>
-            {text}
-          </span>
-
-          <RepositoryCheck
-            key={type}
-            label="example"
-            active={false}
-            userPermission={type === "warning" ? "READ" : null}
-            hasIssues={type === "info" ? true : false}
-            usedByOtherNetwork={type === "danger" ? true : false}
-          />
-       </div>
+      <ContextualSpan context={type} key={text}>
+        {text}
+      </ContextualSpan>
     );
   }
 
   return (
-    <div className="row mx-0 justify-content-start repositories-list">
+    <div className="row mx-0 justify-content-start repositories-list mb-2">
       { withLabel && 
         <span className="caption-small text-gray px-0">
           {t("steps.repositories.label")}
@@ -106,23 +118,18 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
 
       {repositories.map((repository) => (
         <RepositoryCheck
-          key={repository.name}
+          key={repository.fullName}
           label={repository.name}
           active={repository.checked}
           userPermission={repository.userPermission}
           hasIssues={reposWithIssues.includes(repository.fullName)}
+          mergeCommitAllowed={repository.mergeCommitAllowed}
           onClick={() => handleClick(repository)}
           usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
         />
       ))}
 
-        {renderInfos.map(item => (
-          item.length ? renderInfo({
-            text: item.text,
-            type: item.type,
-          })
-         : "" 
-        ))}
+      {renderInfos.filter(({ visible }) => visible).map(renderInfo)}
     </div>
   );
 }
