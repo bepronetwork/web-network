@@ -133,24 +133,23 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
-    console.log(`updating wallet balance?`)
     if (!force && (balance.value || !state.currentUser?.walletAddress))
       return;
 
     const update = (k: keyof Balance) => (b) => {
-      console.log(`K`, k, `B`, b);
       const newState = Object.assign(state.currentUser.balance || {}, {[k]: b});
       dispatch(changeCurrentUserBalance(newState));
       balance.value = newState;
     }
 
     const updateNetwork = (k: keyof Network) => (v) =>
-      dispatch(changeActiveNetwork({...state.Service.network.active, [k]: v}));
+      dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, {[k]: v})));
 
     dispatch(changeSpinners.update({balance: true}))
 
     Promise.all([
-      state.Service.active.getOraclesOf(state.currentUser.walletAddress).then(update('oracles')),
+      state.Service.active.getOraclesResume(state.currentUser.walletAddress).then(update('oracles')),
+
       state.Service.active.getBalance('settler', state.currentUser.walletAddress).then(update('bepro')),
       state.Service.active.getBalance('eth', state.currentUser.walletAddress).then(update('eth')),
       state.Service.active.getBalance('staked', state.currentUser.walletAddress).then(update('staked')),
