@@ -132,17 +132,9 @@ export default function PageIssue() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  query,
-  locale
-}) => {
-  const { id, repoId, network } = query;
-  const { getIssue } = useApi();
-  const currentIssue = await getIssue(repoId as string, id as string, network as string);
-
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      currentIssue,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

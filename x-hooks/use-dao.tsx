@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState,} from "react";
+import {createContext, useContext, useEffect, useState,} from "react";
 
 import { useAppState } from "../contexts/app-state";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
@@ -10,7 +10,11 @@ import {Web3Connection} from "@taikai/dappkit";
 /**
  * Populate `state.Settings` and instantiates a DAOService
  */
+export const DAOContext = createContext(null);
+export const DAOProvider = ({children}) => <DAOContext.Provider value={null} children={children} />;
+
 export function useDao() {
+  useContext(DAOContext);
   const {state, dispatch} = useAppState();
 
   /**
@@ -70,11 +74,13 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    console.debug(`useDao start`, state.Settings, state.Service, !!(!state.Settings || state.Service?.active))
-    if (!state.Settings || state.Service?.active)
+    console.debug(` ${new Date()} useDao start`, state.Settings, !state.Settings || !!state.Service?.active || !!state.Service?.starting, !!state.Service?.active, !!state.Service?.starting)
+    if (!state.Settings || !!state.Service?.active || !!state.Service?.starting)
       return;
 
     dispatch(changeStarting(true));
+
+    console.debug(`useDao starting`);
 
     const {urls: {web3Provider: web3Host}, contracts: {networkRegistry: registryAddress}} =
       state.Settings;
@@ -104,12 +110,11 @@ export function useDao() {
       })
   }
 
-  useEffect(start, [state.Settings, state.Service?.active]);
-
-
+  useEffect(start, [state.Settings]);
 
   return {
     changeNetwork,
     connect,
+    start,
   };
 }

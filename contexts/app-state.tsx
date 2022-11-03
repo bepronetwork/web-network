@@ -4,9 +4,9 @@ import {useRouter} from "next/router";
 import sanitizeHtml from "sanitize-html";
 
 import {AppState} from "../interfaces/application-state";
-import {useAuthentication} from "../x-hooks/use-authentication";
-import {useDao} from "../x-hooks/use-dao";
-import {useNetwork} from "../x-hooks/use-network";
+import {AuthProvider, useAuthentication} from "../x-hooks/use-authentication";
+import {DAOProvider, useDao} from "../x-hooks/use-dao";
+import {NetworkProvider, useNetwork} from "../x-hooks/use-network";
 import {useRepos} from "../x-hooks/use-repos";
 import {useSettings} from "../x-hooks/use-settings";
 import loadApplicationStateReducers from "./reducers";
@@ -67,7 +67,13 @@ export function AppStateContextProvider({children}) {
   useEffect(start, [])
 
   return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
-    {children}
+    <DAOProvider>
+      <NetworkProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </NetworkProvider>
+    </DAOProvider>
   </AppStateContext.Provider>
 }
 

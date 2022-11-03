@@ -8,6 +8,8 @@ interface Spinners {
   bountyState: boolean;
   balance: boolean;
   wallet: boolean;
+  bountyChain: boolean;
+  bountyDatabase: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {

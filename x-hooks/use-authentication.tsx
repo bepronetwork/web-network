@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
@@ -24,7 +24,11 @@ import {changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change
 import useApi from "./use-api";
 import {useDao} from "./use-dao";
 
+export const AuthContext = createContext(null);
+export const AuthProvider = ({children}) => <AuthContext.Provider value={null} children={children} />
+
 export function useAuthentication() {
+  useContext(AuthContext);
   const session = useSession();
   const {state, dispatch} = useAppState();
   const {connect} = useDao();
