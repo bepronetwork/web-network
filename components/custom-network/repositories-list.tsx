@@ -6,6 +6,12 @@ import RepositoryCheck from "components/custom-network/repository-check";
 
 import useApi from "x-hooks/use-api";
 
+interface infoType {
+  length?: number;
+  type: "warning" | "info" | "danger";
+  text: string
+}
+
 export default function RepositoriesList({ withLabel = true, repositories, onClick }) {
   const { t } = useTranslation("custom-network");
 
@@ -14,6 +20,25 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
 
   const { searchRepositories } = useApi();
+
+  const renderInfos: infoType[] = [
+    {
+      length: existingRepos.length,
+      text: t("steps.repositories.used-by-other-network"),
+      type: "danger"
+    },
+    {
+      length: reposWithIssues.length,
+      text: t("steps.repositories.has-bounties"),
+      type: "info"
+    },
+    {
+      length: reposUserNotAdmin.length,
+      text: t("steps.repositories.user-permission-not-admin"),
+      type: "warning"
+    }
+  ]
+
 
   function handleClick(repository) {
     if (reposWithIssues.includes(repository.fullName)) return;
@@ -42,10 +67,34 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
     setReposWithIssues(repositories.filter(repository => repository.hasIssues)
       .map((repository) => repository.fullName));
 
-    setReposUserNotAdmin(repositories.filter(repository => repository.userPermission !== "ADMIN")
-    .map((repository) => repository.fullName))
+    setReposUserNotAdmin(repositories
+          .filter((repository) =>
+              repository?.userPermission && repository.userPermission !== "ADMIN")
+          .map((repository) => repository.fullName));
 
   }, [repositories]);
+
+  function renderInfo({
+    text,
+    type
+  }: infoType) {
+    return (
+        <div className="d-flex ps-0">
+          <span className={`p-small ${type && `text-${type}`} ps-0 pe-2 mt-1`}>
+            {text}
+          </span>
+
+          <RepositoryCheck
+            key={type}
+            label="example"
+            active={false}
+            userPermission={type === "warning" ? "READ" : null}
+            hasIssues={type === "info" ? true : false}
+            usedByOtherNetwork={type === "danger" ? true : false}
+          />
+       </div>
+    );
+  }
 
   return (
     <div className="row mx-0 justify-content-start repositories-list">
@@ -67,29 +116,13 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         />
       ))}
 
-      {existingRepos.length ? (
-        <span className="p-small text-danger px-0">
-          {t("steps.repositories.used-by-other-network")}
-        </span>
-      ) : (
-        ""
-      )}
-
-      {reposWithIssues.length ? (
-        <span className="p-small text-info px-0">
-          {t("steps.repositories.has-bounties")}
-        </span>
-      ) : (
-        ""
-      )}
-      
-      {reposUserNotAdmin.length ? (
-        <span className="p-small text-warning px-0">
-          {t("steps.repositories.user-permission-not-admin")}
-        </span>
-      ) : (
-        ""
-      )}
+        {renderInfos.map(item => (
+          item.length ? renderInfo({
+            text: item.text,
+            type: item.type,
+          })
+         : "" 
+        ))}
     </div>
   );
 }
