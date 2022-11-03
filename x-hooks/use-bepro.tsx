@@ -26,7 +26,7 @@ export default function useBepro() {
   const { processEvent } = useApi();
   const {getDatabaseBounty, getChainBounty} = useBounty();
 
-  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
 
   const failTx = (err, tx, reject?) => {
 

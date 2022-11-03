@@ -114,7 +114,7 @@ export default function ProposalProgressBar({
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
             /{formatNumberToNScale(state.currentUser?.balance?.staked?.toNumber() || 0)}{" "}
-            <Translation label="$oracles" params={{ token: state.Service?.network?.active?.networkToken?.symbol }}/>{" "}
+            <Translation label="$oracles" params={{ token: state.Service?.network?.networkToken?.symbol }}/>{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>
         </div>

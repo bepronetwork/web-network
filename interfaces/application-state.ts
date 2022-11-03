@@ -14,6 +14,7 @@ import {Network} from "./network";
 import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
 import {ToastNotification} from "./toast-notification";
 import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
+import {Token} from "./token";
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];
@@ -34,6 +35,7 @@ export interface ServiceNetwork {
   lastVisited: string;
   active: Network | null;
   repos: ServiceNetworkRepos | null;
+  networkToken: Token
 }
 
 export interface ServiceState {

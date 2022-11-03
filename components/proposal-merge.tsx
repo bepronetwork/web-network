@@ -82,7 +82,7 @@ export default function ProposalMerge({
   }
 
   async function  getCoinInfo() { 
-    await getCoinInfoByContract(state.Service?.network?.active?.networkToken?.address).then((tokenInfo) => {
+    await getCoinInfoByContract(state.Service?.network?.networkToken?.address).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
     }).catch(error => console.log("getCoinInfo", error));
   }
@@ -116,7 +116,7 @@ export default function ProposalMerge({
     state.Service?.network?.active?.treasury,
     state.Service?.network?.active?.mergeCreatorFeeShare,
     state.Service?.network?.active?.proposerFeeShare,
-    state.Service?.network?.active?.networkToken?.address
+    state.Service?.network?.networkToken?.address
   ]);
 
   return (
