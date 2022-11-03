@@ -18,6 +18,7 @@ export default function loadApplicationStateReducers() {
 
   [
     changeLoad,
+    changeCurrentUser,
     changeChain,
     changeTxList,
     changeToaster,
@@ -25,7 +26,6 @@ export default function loadApplicationStateReducers() {
     changeServiceProp,
     changeNetwork,
     changeRepos,
-    changeCurrentUser,
     changeCurrentBounty,
     changeSpinners,
     changeSettings,
