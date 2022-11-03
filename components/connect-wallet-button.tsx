@@ -16,11 +16,7 @@ import {AppStateContext, useAppState} from "../contexts/app-state";
 import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
 import {changeChain} from "../contexts/reducers/change-chain";
 
-export default function ConnectWalletButton({
-  children = null,
-  asModal = false,
-  forceLogin = false,
-}) {
+export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
   const {dispatch, state: { loading, connectedChain },} = useAppState();

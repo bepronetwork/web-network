@@ -20,7 +20,7 @@ import {Network} from "interfaces/network";
 import {WinStorage} from "services/win-storage";
 
 import {changeActiveNetwork} from "../contexts/reducers/change-service";
-import {changeSpinners} from "../contexts/reducers/change-spinners";
+import {changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change-spinners";
 import useApi from "./use-api";
 import {useDao} from "./use-dao";
 
@@ -45,14 +45,13 @@ export function useAuthentication() {
     if (!state.currentUser?.walletAddress)
       return;
 
-    dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
-    signOut({
-      callbackUrl: `${URL_BASE}/${state.Service.network.lastVisited}`
-    });
+    signOut({callbackUrl: `${URL_BASE}/${state.Service.network.lastVisited}`})
+      .then(() => {
+        dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
+      });
   }
 
   function connectWallet() {
-    console.debug(`Trying to connect wallet`, state.Service);
     if (!state.Service?.active)
       return;
 
@@ -60,17 +59,26 @@ export function useAuthentication() {
   }
 
   function updateWalletAddress() {
-    console.log(`should update wallet address`, state.Service?.active?.web3Connection);
-
-    if (!state.Service?.active?.web3Connection?.Account?.address || !state.currentUser?.connected)
+    if (state.spinners?.wallet)
       return;
 
-    if (state.Service?.active?.web3Connection?.Account?.address === state.currentUser?.walletAddress)
+    if (!state.currentUser?.connected)
       return;
 
-    console.log(`should update wallet address`)
+    dispatch(changeWalletSpinnerTo(true));
 
-    dispatch(changeCurrentUserWallet(state.Service?.active?.web3Connection?.Account?.address));
+    state.Service.active.getAddress()
+      .then(address => {
+        if (address !== state.currentUser?.walletAddress)
+          dispatch(changeCurrentUserWallet(address))
+      })
+      .catch(e => {
+        console.error(`Error getting address`, e);
+      })
+      .finally(() => {
+        dispatch(changeWalletSpinnerTo(false));
+      })
+
   }
 
   function connectGithub() {
@@ -125,11 +133,13 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
+    console.log(`updating wallet balance?`)
     if (!force && (balance.value || !state.currentUser?.walletAddress))
       return;
 
     const update = (k: keyof Balance) => (b) => {
-      const newState = {...(state.currentUser.balance || {}), [k]: b};
+      console.log(`K`, k, `B`, b);
+      const newState = Object.assign(state.currentUser.balance || {}, {[k]: b});
       dispatch(changeCurrentUserBalance(newState));
       balance.value = newState;
     }
@@ -151,6 +161,7 @@ export function useAuthentication() {
     ])
       .finally(() => {
         dispatch(changeSpinners.update({balance: false}));
+        console.log(`should have updated state`, state.currentUser.balance)
       })
   }
 
@@ -166,7 +177,7 @@ export function useAuthentication() {
   }
 
   useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
-  useEffect(updateWalletAddress, [state.Service?.active, state.currentUser?.connected]);
+  useEffect(updateWalletAddress, [state.currentUser]);
   useEffect(listenToAccountsChanged, [state.Service]);
   useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
   useEffect(updateCurrentUserLogin, [session?.data?.user])

@@ -7,6 +7,7 @@ interface Spinners {
   pullRequests: boolean;
   bountyState: boolean;
   balance: boolean;
+  wallet: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {
@@ -34,3 +35,6 @@ export const changeSpinnerPullRequests = (pullRequests: boolean) =>
 
 export const changeSpinnerBountyState = (bountyState: boolean) =>
   changeSpinners.update({bountyState});
+
+export const changeWalletSpinnerTo = (wallet: boolean) =>
+  changeSpinners.update({wallet});
