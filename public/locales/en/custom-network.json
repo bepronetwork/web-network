@@ -116,6 +116,11 @@
     },
     "token-configuration": {
       "title": "Token Configuration",
+      "tabs": {
+        "use-bepro-token": "Use BEPRO Token",
+        "use-custom-token": "Use Custom Token",
+        "deploy-new-token": "Deploy New Token"
+      },
       "fields": {
         "tokens-dropdown": {
           "label": "Network Token address",
@@ -128,14 +133,24 @@
           "label": "Symbol"
         },
         "address": {
-          "label": "Address"
+          "label": "Address",
+          "placeholder": "ERC20 token address"
+        },
+        "decimals": {
+          "label": "Decimals"
+        },
+        "total-supply": {
+          "label": "Total Supply"
+        },
+        "your-balance": {
+          "label": "Your Balance"
         },
         "nft-token": {
           "label": "NFT Token Address",
           "error": {
             "pre": "Please provide a valid",
-            "mid": "BountyToken",
-            "post": "address."
+            "mid": "ERC20",
+            "post": "token address"
           }
         },
         "nft-token-uri": {
@@ -144,7 +159,21 @@
         }
       },
       "actions": {
-        "deploy-new-token": "Deploy New Token"
+        "deploy": "Deploy"
+      },
+      "messages": {
+        "token-deployed": {
+          "title": "Token Deployed",
+          "content": "Check token address in the form"
+        }
+      },
+      "errors": {
+        "invalid-number": "Please provide a valid number",
+        "lower-than-zero": "Please provider a number greater than zero",
+        "deploy": {
+          "title": "Failed do deploy",
+          "content": "Token supply exceeds Ethereum integer limit"
+        }
       }
     },
     "treasury": {

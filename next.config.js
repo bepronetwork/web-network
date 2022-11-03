@@ -35,8 +35,7 @@ const serverRuntimeConfig = {
     url: process.env.NEXT_ELASTIC_SEARCH_URL
   },
   infura: {
-    host: process.env.NEXT_IPFS_HOST,
-    port: process.env.NEXT_IPFS_PORT,
+    uploadEndPoint: process.env.NEXT_IPFS_UPLOAD_ENDPOINT,
     projectId: process.env.NEXT_IPFS_PROJECT_ID,
     projectSecret: process.env.NEXT_IPFS_PROJECT_SECRET
   },

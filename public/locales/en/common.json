@@ -326,7 +326,8 @@
       "pending": "Pending",
       "processing": "Processing",
       "rejected": "Rejected",
-      "completed": "Completed"
+      "completed": "Completed",
+      "failed": "Failed"
     },
     "types": {
       "unkown": "Unknown",

@@ -1,4 +1,3 @@
-import { error as LogError } from "services/logging";
 import { ProposalDetail } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import { withCors } from "middleware";
@@ -12,6 +11,7 @@ import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
+import { error as LogError } from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try{

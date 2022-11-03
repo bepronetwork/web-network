@@ -1,4 +1,3 @@
-import { error as LogError } from 'services/logging';
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -11,6 +10,7 @@ import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
+import { error as LogError } from 'services/logging';
 
 const { serverRuntimeConfig } = getConfig();
 
