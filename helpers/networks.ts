@@ -142,5 +142,14 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://eth-aurelius.taikai.network:8080"]
+  },
+  "0x4e454152": {
+    id: "1313161554",
+    name: "Aurora",
+    key: "aurora",
+    currency: ETH,
+    decimals: 18,
+    explorerURL: "https://aurorascan.dev",
+    rpcUrls: ["https://mainnet.aurora.dev"]
   }
 };

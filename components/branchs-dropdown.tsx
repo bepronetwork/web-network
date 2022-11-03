@@ -6,8 +6,6 @@ import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
 
-import { trimString } from "helpers/string";
-
 export default function BranchsDropdown({
   repoId,
   onSelected,
@@ -28,11 +26,8 @@ export default function BranchsDropdown({
   const { t } = useTranslation("common");
 
   function onChangeSelect(e: { value: string; label: string }) {
-    onSelected(e)
-    setOption({
-      value: e.value,
-      label: trimString(e.label)
-    })
+    onSelected(e);
+    setOption(e);
   }
 
   async function loadBranchsFromBackend() {

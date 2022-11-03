@@ -114,10 +114,19 @@
       "label": "Repositories",
       "used-by-other-network": "The highlighted repositories are already being used by another network.",
       "has-bounties": "The highlighted repositories already have bounties and can't be removed.",
-      "user-permission-not-admin": "Your permission level on this repository does not allow giving access"
+      "no-repositories-selected": "No repositories selected. At least one repository is required.",
+      "user-permission-not-admin_one": "Your permission level on this repository does not allow giving access.",
+      "user-permission-not-admin_other": "Your permission level on these repositories does not allow giving access.",
+      "no-merge-commit-permission_one": "Repository {{repos}} don't support \"merge commits\" merge type. Please, allow that in the repository settings.", 
+      "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings." 
     },
     "token-configuration": {
       "title": "Token Configuration",
+      "tabs": {
+        "use-bepro-token": "Use BEPRO Token",
+        "use-custom-token": "Use Custom Token",
+        "deploy-new-token": "Deploy New Token"
+      },
       "fields": {
         "tokens-dropdown": {
           "label": "Network Token address",
@@ -130,14 +139,24 @@
           "label": "Symbol"
         },
         "address": {
-          "label": "Address"
+          "label": "Address",
+          "placeholder": "ERC20 token address"
+        },
+        "decimals": {
+          "label": "Decimals"
+        },
+        "total-supply": {
+          "label": "Total Supply"
+        },
+        "your-balance": {
+          "label": "Your Balance"
         },
         "nft-token": {
           "label": "NFT Token Address",
           "error": {
             "pre": "Please provide a valid",
-            "mid": "BountyToken",
-            "post": "address."
+            "mid": "ERC20",
+            "post": "token address"
           }
         },
         "nft-token-uri": {
@@ -146,7 +165,21 @@
         }
       },
       "actions": {
-        "deploy-new-token": "Deploy New Token"
+        "deploy": "Deploy"
+      },
+      "messages": {
+        "token-deployed": {
+          "title": "Token Deployed",
+          "content": "Check token address in the form"
+        }
+      },
+      "errors": {
+        "invalid-number": "Please provide a valid number",
+        "lower-than-zero": "Please provider a number greater than zero",
+        "deploy": {
+          "title": "Failed do deploy",
+          "content": "Token supply exceeds Ethereum integer limit"
+        }
       }
     },
     "treasury": {

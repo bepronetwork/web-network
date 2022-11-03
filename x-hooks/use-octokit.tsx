@@ -168,7 +168,8 @@ export default function useOctokit() {
       isArchived: boolean;
       isInOrganization: boolean;
       owner: string;
-      viewerPermission: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE"
+      viewerPermission: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
+      mergeCommitAllowed: boolean;
     }>(item => {
       return getPropertyRecursively<GraphQlQueryResponseData>("nodes", item?.["user"]?.repositories)
         ?.map(el => ({
