@@ -45,7 +45,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         count: withoutMergeCommitPerm.length,
         repos: withoutMergeCommitPerm.join(", ")
       }),
-      type: "primary"
+      type: "warning"
     },
     {
       visible: !!repositories?.length && !repositories?.some(({ checked }) => checked),
@@ -102,20 +102,9 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
     type
   }: infoType) {
     return (
-        <div className="d-flex flex-row gap-4" key={type}>
-          <ContextualSpan context={type}>
-            {text}
-          </ContextualSpan>
-
-          <RepositoryCheck
-            key={type}
-            label="example"
-            active={true}
-            userPermission={type === "warning" ? "READ" : null}
-            hasIssues={type === "info" ? true : false}
-            usedByOtherNetwork={type === "danger" ? true : false}
-          />
-       </div>
+      <ContextualSpan context={type} key={text}>
+        {text}
+      </ContextualSpan>
     );
   }
 
@@ -134,6 +123,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
           active={repository.checked}
           userPermission={repository.userPermission}
           hasIssues={reposWithIssues.includes(repository.fullName)}
+          mergeCommitAllowed={repository.mergeCommitAllowed}
           onClick={() => handleClick(repository)}
           usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
         />
