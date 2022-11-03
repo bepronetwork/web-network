@@ -1,4 +1,3 @@
-import { error as LogError } from "services/logging";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
@@ -6,6 +5,8 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 import paginate from "helpers/paginate";
+
+import { error as LogError } from "services/logging";
 
 
 async function post(req: NextApiRequest, res: NextApiResponse) {

@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
+
 import {error} from "services/logging";
 
 const { serverRuntimeConfig: { authSecret, github: { token: botToken } } } = getConfig();
