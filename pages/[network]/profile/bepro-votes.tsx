@@ -30,7 +30,7 @@ export default function BeproVotes() {
   const { updateWalletBalance } = useAuthentication();
 
   const oracleToken = {
-    symbol: t("$oracles",   { token: state.Service?.network?.active?.networkToken?.symbol }),
+    symbol: t("$oracles",   { token: state.Service?.network?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -45,7 +45,7 @@ export default function BeproVotes() {
       <Col xs={10}>
         <FlexRow className="mb-3 justify-content-between align-items-center">
           <span className="h4 family-Regular text-white font-weight-medium">
-            {t("$oracles",   { token: state.Service?.network?.active?.networkToken?.symbol })}
+            {t("$oracles",   { token: state.Service?.network?.networkToken?.symbol })}
           </span>
 
           <FlexRow className="align-items-center">
@@ -57,7 +57,7 @@ export default function BeproVotes() {
 
               <InfoTooltip
                 description={t("profile:tips.total-oracles", {
-                  tokenName: state.Service?.network?.active?.networkToken?.name || oracleToken.name
+                  tokenName: state.Service?.network?.networkToken?.name || oracleToken.name
                 })}
                 secondaryIcon
               />
@@ -68,7 +68,7 @@ export default function BeproVotes() {
         <TokenBalance
           icon={oracleToken.icon} 
           symbol={oracleToken.symbol}
-          name={`${t("misc.locked")} ${state.Service?.network?.active?.networkToken?.name || oracleToken.name}`}
+          name={`${t("misc.locked")} ${state.Service?.network?.networkToken?.name || oracleToken.name}`}
           overSymbol={t("bepro-votes")}
           balance={oraclesLocked}
           type="oracle"

@@ -43,9 +43,9 @@ export default function WalletBalance() {
 
     setTokens([{...state.Settings.beproToken, icon: <BeProBlue width={24} height={24} />, balance: "0"}])
 
-    console.log(`fetching balance?`, state?.Service?.network?.active?.networkToken)
+    console.log(`fetching balance?`, state?.Service?.network?.networkToken)
 
-    if (!state.currentUser?.walletAddress || !state.Service?.active || !(state.Service?.network?.active.networkToken as any)?.contractAddress)
+    if (!state.currentUser?.walletAddress || !state.Service?.active || !(state.Service?.network?.networkToken as any)?.contractAddress)
       return;
 
     const {networkToken} = state.Service?.network?.active;
@@ -57,8 +57,8 @@ export default function WalletBalance() {
           token.balance = balance;
           return token
         }),
-      state.Settings.beproToken.address === (state.Service?.network?.active.networkToken as any).contractAddress ? Promise.resolve(null) :
-      state.Service.active.getTokenBalance((state.Service?.network?.active.networkToken as any).contractAddress, state.currentUser.walletAddress)
+      state.Settings.beproToken.address === (state.Service?.network?.networkToken as any).contractAddress ? Promise.resolve(null) :
+      state.Service.active.getTokenBalance((state.Service?.network?.networkToken as any).contractAddress, state.currentUser.walletAddress)
         .then(balance =>
           (networkToken.name as any as () => Promise<string>)()
             .then(name => (networkToken.symbol as any as () => Promise<string>)()
@@ -79,7 +79,7 @@ export default function WalletBalance() {
 
   }
 
-  useEffect(loadBalances, [state.currentUser, state.Settings, state.Service?.active, (state.Service?.network?.active?.networkToken as any)?.contractAddress])
+  useEffect(loadBalances, [state.currentUser, state.Settings, state.Service?.active, (state.Service?.network?.networkToken as any)?.contractAddress])
 
 
   useEffect(() => {

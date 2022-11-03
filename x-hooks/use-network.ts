@@ -4,7 +4,11 @@ import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
 import { useAppState } from "contexts/app-state";
-import {changeActiveNetwork, changeNetworkLastVisited} from "contexts/reducers/change-service";
+import {
+  changeActiveNetwork,
+  changeActiveNetworkToken,
+  changeNetworkLastVisited
+} from "contexts/reducers/change-service";
 
 import {WinStorage} from "services/win-storage";
 
@@ -76,7 +80,26 @@ export function useNetwork() {
     };
   }
 
+  function loadNetworkToken() {
+    if (!state.Service?.active || !state?.Service?.network?.active)
+      return;
+
+    const activeNetwork: any = state.Service.network?.active?.networkToken;
+
+    Promise.all([activeNetwork.name(), activeNetwork.symbol(),])
+      .then(([name, symbol]) => {
+        dispatch(changeActiveNetworkToken({
+          name,
+          symbol,
+          decimals: activeNetwork.decimals,
+          address: activeNetwork.contractAddress
+        }))
+      });
+  }
+
   useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
+  useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active])
+
 
   return {
     updateActiveNetwork,

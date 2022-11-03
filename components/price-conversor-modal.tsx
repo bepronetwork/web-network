@@ -36,10 +36,10 @@ export default function PriceConversorModal({
   const {state} = useAppState();
 
   async function handlerChange({value, label}){
-    if (!state.Service?.network?.active?.networkToken?.address) return;
+    if (!state.Service?.network?.networkToken?.address) return;
 
     const data = 
-      await getCoinInfoByContract(state.Service?.network?.active.networkToken.address)
+      await getCoinInfoByContract(state.Service?.network?.networkToken.address)
         .catch((err) => {
           if(err) setErrorCoinInfo(true)
           return ({ prices: { [value]: 0 } })
@@ -104,7 +104,7 @@ export default function PriceConversorModal({
           <InputNumber
             className="caption-large"
             symbol={
-              state.Service?.network?.active?.networkToken?.symbol || t("common:misc.$token")
+              state.Service?.network?.networkToken?.symbol || t("common:misc.$token")
             }
             value={currentValue}
             onValueChange={(e) => setValue(e.floatValue)}

@@ -28,7 +28,7 @@ export default function Delegations({
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
-      description: t("my-oracles:descriptions.oracles-delegated-to-me", { token: state.Service?.network?.active?.networkToken?.symbol }),
+      description: t("my-oracles:descriptions.oracles-delegated-to-me", { token: state.Service?.network?.networkToken?.symbol }),
       total: undefined,
       delegations: [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
     },
@@ -37,18 +37,18 @@ export default function Delegations({
       total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) =>
         delegation.amount.plus(acc), BigNumber(0)).toFixed()),
       description: 
-             t("my-oracles:descriptions.oracles-delegated-to-others", { token: state.Service?.network?.active?.networkToken?.symbol }),
+             t("my-oracles:descriptions.oracles-delegated-to-others", { token: state.Service?.network?.networkToken?.symbol }),
       delegations: state.currentUser?.balance?.oracles?.delegations || []
     }
   };
 
   const oracleToken = {
-    symbol: t("$oracles", { token: state.Service?.network?.active?.networkToken?.symbol }),
+    symbol: t("$oracles", { token: state.Service?.network?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
 
-  const networkTokenName = state.Service?.network?.active?.networkToken?.name || oracleToken.name;
+  const networkTokenName = state.Service?.network?.networkToken?.name || oracleToken.name;
 
   return (
     <div className="mb-3">

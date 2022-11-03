@@ -24,7 +24,7 @@ export default function NetworkContractSettings() {
   const handlePercentageForDisputeChange = 
     value => fields.parameter.setter({ label: "percentageNeededForDispute", value });
 
-  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
 
   const parameterInputs = [
     { 

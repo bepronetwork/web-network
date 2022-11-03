@@ -74,19 +74,6 @@ export default function CouncilLayout({ children }) {
     ]);
   }
 
-  const [networkTokenSymbol, setNetworkTokenSymbol] = useState();
-
-  useEffect(() => {
-    if (!state?.Service?.network?.active?.networkToken)
-      return;
-
-    console.log('useEffect setNetworkTokenSymbol', state?.Service?.network?.active?.networkToken);
-
-    (state?.Service?.network?.active?.networkToken as ERC20)
-      .symbol()
-      .then(setNetworkTokenSymbol)
-  }, [state?.Service?.network?.active])
-
   useEffect(() => {
     loadTotals();
   }, [state.Service?.active, state.Service?.network?.active]);
@@ -96,7 +83,7 @@ export default function CouncilLayout({ children }) {
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: networkTokenSymbol,
+          token: state.Service?.network?.networkToken.symbol,
         })}
         infos={infos}
       />

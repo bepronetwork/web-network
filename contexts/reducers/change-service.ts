@@ -11,6 +11,7 @@ import {Network} from "../../interfaces/network";
 import {ForksList, ReposList} from "../../interfaces/repos-list";
 import DAO from "../../services/dao-service";
 import {SimpleAction} from "./reducer";
+import {Token} from "../../interfaces/token";
 
 export class ChangeServiceProp<T = ServiceState | Partial<ServiceState>, A = keyof ServiceState>
   extends SimpleAction<T, A> {
@@ -70,6 +71,7 @@ export const changeActiveDAO = (active: DAO) => changeServiceProp.update(active,
 export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.update({lastVisited});
 
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
+export const changeActiveNetworkToken = (networkToken: Token) => changeNetwork.update({networkToken});
 
 export const changeNetworkReposList = (list: ReposList) => changeRepos.update({list});
 
