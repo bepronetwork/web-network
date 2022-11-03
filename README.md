@@ -80,7 +80,7 @@ The last step to configure the network is complete. learn more about in [link](.
 
 ## 5. Contributing
 
-See [CONTRIBUTING.md](https://github.com/bepronetwork/web-network/CONTRIBUTING.md) for our guide to contributing to web-network.
+See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for our guide to contributing to web-network.
 
 ## 6. Join the community
 
