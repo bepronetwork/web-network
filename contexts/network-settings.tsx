@@ -142,7 +142,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     const githubValidate = [
         Fields.repository.validator(newState.github?.repositories),
-        newState.github?.botPermission,
+        isCreating && newState.github?.botPermission || true,
     ].every(condition => condition);
     
     newState.settings = handlerValidateSettings(newState.settings)
@@ -328,7 +328,8 @@ export const NetworkSettingsProvider = ({ children }) => {
             hasIssues: false,
             userPermission:repo.viewerPermission,
             name: repo?.name,
-            fullName: repo?.nameWithOwner
+            fullName: repo?.nameWithOwner,
+            mergeCommitAllowed: repo.mergeCommitAllowed
           }));
         
       
@@ -340,7 +341,9 @@ export const NetworkSettingsProvider = ({ children }) => {
               isSaved: true,
               name: repo.githubPath.split("/")[1],
               fullName: repo.githubPath,
-              hasIssues: await repositoryHasIssues(repo.githubPath)
+              hasIssues: await repositoryHasIssues(repo.githubPath),
+              mergeCommitAllowed: 
+                filtered.find(({ fullName }) => fullName === repo.githubPath)?.mergeCommitAllowed || false
             }))))
         repositories.push(...repositoryAlreadyExists)
       }

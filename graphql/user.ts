@@ -16,6 +16,7 @@ export const Repositories =
             login
           }
           viewerPermission
+          mergeCommitAllowed
         }
       }
     }

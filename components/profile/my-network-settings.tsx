@@ -463,7 +463,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         <NetworkContractSettings />
       </Row>
 
-      {(settings?.validated && !network?.isClosed && !networkNeedRegistration) &&
+      {(settings?.validated && github?.validated && !network?.isClosed && !networkNeedRegistration) &&
         <Row className="mt-1 mb-5">
           <Col>
             <Button onClick={handleSubmit} disabled={isUpdating}>
