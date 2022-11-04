@@ -12,7 +12,7 @@ import useNetworkTheme from "x-hooks/use-network";
 export default function PullRequests() {
   const { t } = useTranslation(["pull-request", "bounty"]);
 
-  const { user } = useAuthentication();
+  const { user, wallet} = useAuthentication();
   const { getURLWithNetwork } = useNetworkTheme();
 
   return(
@@ -22,7 +22,8 @@ export default function PullRequests() {
       <ListIssues
         redirect={getURLWithNetwork("/developers")}
         buttonMessage={t('bounty:label_other')}
-        pullRequester={user?.login || "not-connected"}
+        pullRequesterAddress={wallet?.address || null}
+        pullRequesterLogin={user?.login || null}
         emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
       />
     </ProfileLayout>
