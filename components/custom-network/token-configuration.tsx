@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import { Divider } from "components/divider";
@@ -34,12 +35,14 @@ export default function TokenConfiguration({
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>([]);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
-  
+  const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
+    
   const { getTokens } = useApi();
   const { settings } = useSettings();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
-  const { tokens, fields } = useNetworkSettings();
+  const { tokens, fields, tokensLocked } = useNetworkSettings();
+  const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
 
   function addTransactionalToken(newToken: Token) {
     setAllowedTransactionalTokens([
@@ -96,6 +99,15 @@ export default function TokenConfiguration({
           .catch((err) => console.log("error to get tokens database ->", err));
       }).catch((err) => console.log("error to get allowed tokens contract ->", err));
   }, [wallet?.address])
+
+  useEffect(() => {
+    if(!wallet?.address || !DAOService || !BigNumber(tokensLocked.needed).gt(0)) return
+
+    DAOService.getRegistryParameter("networkCreationFeePercentage").then(createFee => {
+      setCreateNetworkAmount(BigNumber(BigNumber(createFee).multipliedBy(tokensLocked.needed)).toFixed());
+    })
+
+  }, [wallet?.address, tokensLocked.needed])
   
   function handleEmptyTokens (tokens: Token[]) {
     if(tokens?.length === 0) return [settings?.beproToken];
@@ -138,7 +150,22 @@ export default function TokenConfiguration({
         canAddToken={false}
         selectedTokens={selectedRewardTokens}
         changeSelectedTokens={changeSelectedRewardTokens}
+
       />
+     {validated && (
+        <>
+        <span className="p-small text-warning mb-2">
+          {t("custom-network:network-create-warning")}
+        </span>
+        <span className="p-small text-warning mb-4">
+        {t("custom-network:network-amount-to-create", {
+              amount: createNetworkAmount,
+              symbol: networkTokenSymbol,
+              totalAmount: tokensLocked.locked
+        })}
+        </span>
+        </>
+      )} 
     </Step>
   );
 }
