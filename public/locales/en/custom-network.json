@@ -23,6 +23,8 @@
     "config-fees": "Config Fees",
     "save-fees-config": "Save fees config"
   },
+  "network-info": "Network info",
+  "network-address": "Network Address",
   "add-tokens": "Add Tokens",
   "remove-tokens": "Remove Tokens",
   "hero": {
