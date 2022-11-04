@@ -64,6 +64,11 @@ export default function ConnectAccount() {
   </FlexRow>;
 
   function redirectToProfile() {
+    const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
+    
+    if(previusRouter)
+      return router.push(previusRouter);
+    
     const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
 
     router.push(redirectTo);
@@ -72,6 +77,12 @@ export default function ConnectAccount() {
   function handleCancel() {
     if (!isGithubAndWalletMatched)
       disconnectGithub();
+
+    const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
+    
+    if(previusRouter)
+      return router.push(previusRouter)
+
     router.back();
   }
 

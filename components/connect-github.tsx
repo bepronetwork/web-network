@@ -20,7 +20,7 @@ export default function ConnectGithub({size = 'md'}:IProps) {
   if(size === 'sm'){
     return (
     <Button onClick={connectGithub} disabled={isConnecting} isLoading={isConnecting}> 
-      <GithubImage  /> 
+      <GithubImage  opacity={1} /> 
       <span>{t("actions.connect")}</span>
     </Button>)
   }

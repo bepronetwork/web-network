@@ -223,7 +223,7 @@ export default function PullRequestPage() {
                         onClick={handleShowModal}
                         disabled={isCreatingReview || isCancelling || isMakingReady || !user?.login }
                         isLoading={isCreatingReview}
-                        withLockIcon={isCancelling || isMakingReady}
+                        withLockIcon={isCancelling || isMakingReady || !user?.login}
                         
                       >
                         {t("actions.make-a-review")}
