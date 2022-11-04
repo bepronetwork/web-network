@@ -69,13 +69,7 @@ export function AppStateContextProvider({children}) {
   useEffect(start, [])
 
   return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
-    <DAOProvider>
-      <NetworkProvider>
-        <AuthProvider>
           {children}
-        </AuthProvider>
-      </NetworkProvider>
-    </DAOProvider>
   </AppStateContext.Provider>
 }
 

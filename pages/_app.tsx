@@ -11,6 +11,8 @@ import WebThreeDialog from "components/web3-dialog";
 import RootProviders from "contexts";
 
 import "../styles/styles.scss";
+import CreateBountyModal from "../components/create-bounty-modal";
+import React from "react";
 
 function App({
   Component,
@@ -22,13 +24,15 @@ function App({
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <RootProviders>
-          <WebThreeDialog />
-          <MainNav />
-          <div id="root-container">
-          <Component {...pageProps} />
-          </div>
-
-          <StatusBar />
+          <>
+            <WebThreeDialog />
+            <MainNav />
+            <div id="root-container">
+              <Component {...pageProps} />
+            </div>
+            <CreateBountyModal/>
+            <StatusBar />
+          </>
         </RootProviders>
       </SessionProvider>
     </>

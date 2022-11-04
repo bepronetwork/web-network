@@ -10,11 +10,13 @@ import {Web3Connection} from "@taikai/dappkit";
 /**
  * Populate `state.Settings` and instantiates a DAOService
  */
-export const DAOContext = createContext(null);
-export const DAOProvider = ({children}) => <DAOContext.Provider value={null} children={children} />;
+export const DAOContext = createContext({});
+export const DAOProvider = ({children}) => <DAOContext.Provider value={{}} children={children} />;
 
 export function useDao() {
-  useContext(DAOContext);
+  if (!useContext(DAOContext))
+    throw new Error(`useDao() must have provider`);
+
   const {state, dispatch} = useAppState();
 
   /**

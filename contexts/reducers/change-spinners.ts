@@ -10,6 +10,7 @@ interface Spinners {
   wallet: boolean;
   bountyChain: boolean;
   bountyDatabase: boolean;
+  matching: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {

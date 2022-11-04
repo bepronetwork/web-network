@@ -18,7 +18,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
     const token = await getToken({req});
 
     const githubLogin = token.login;
-    const address = req.headers.wallet?.toString().toLowerCase();
+    const address = req.body.wallet?.toString().toLowerCase();
 
     const user = await models.user.findOne({ 
       where: { 

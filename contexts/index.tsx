@@ -3,13 +3,21 @@ import React from "react";
 import CreateBountyModal from "components/create-bounty-modal";
 
 import {AppStateContextProvider} from "./app-state";
+import {DAOProvider} from "../x-hooks/use-dao";
+import {NetworkProvider} from "../x-hooks/use-network";
+import {AuthProvider} from "../x-hooks/use-authentication";
 
-const RootProviders: React.FC = ({ children }) => {
+const RootProviders: React.FC = ({children}) => {
   return (
 
     <AppStateContextProvider>
-      <CreateBountyModal/>
-      {children}
+      <DAOProvider>
+        <NetworkProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </NetworkProvider>
+      </DAOProvider>
     </AppStateContextProvider>
 
   );
