@@ -24,11 +24,14 @@ import {changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change
 import useApi from "./use-api";
 import {useDao} from "./use-dao";
 
-export const AuthContext = createContext(null);
-export const AuthProvider = ({children}) => <AuthContext.Provider value={null} children={children} />
+export const AuthContext = createContext({});
+export const AuthProvider = ({children}) => <AuthContext.Provider value={{}} children={children} />
 
 export function useAuthentication() {
-  useContext(AuthContext);
+
+  if (!useContext(AuthContext))
+    throw new Error(`useAuthentication() must use AuthProvider`);
+
   const session = useSession();
   const {state, dispatch} = useAppState();
   const {connect} = useDao();
@@ -42,10 +45,11 @@ export function useAuthentication() {
   const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
   function disconnectGithub() {
-    signOut({redirect: false});
+    return signOut({redirect: false});
   }
 
   function disconnectWallet() {
+
     if (!state.currentUser?.walletAddress)
       return;
 
@@ -69,6 +73,8 @@ export function useAuthentication() {
     if (!state.currentUser?.connected)
       return;
 
+    console.log(`updating wallet`)
+
     dispatch(changeWalletSpinnerTo(true));
 
     state.Service.active.getAddress()
@@ -86,44 +92,49 @@ export function useAuthentication() {
   }
 
   function connectGithub() {
-    if (!state.Service?.active?.web3Connection?.Account?.address)
+    console.debug(`connectGithub`, state.currentUser)
+
+    if (!state.currentUser?.walletAddress)
       return;
 
-    getUserOf(state.Service.active.web3Connection.Account.address)
+    getUserOf(state.currentUser?.walletAddress)
       .then((user) => {
-        if (!user.githubLogin && !asPath.includes(`connect-account`)) {
-          disconnectGithub();
+        if (!user?.githubLogin && !asPath.includes(`connect-account`)) {
+          disconnectGithub()
           push(`/connect-account`);
           return false;
         }
         return true;
       })
-      .then(_signIn => {
-        if (!_signIn)
+      .then(signedIn => {
+        if (!signedIn)
           return;
 
         lastUrl.value = asPath;
 
-        return _signIn ? signIn('github', {callbackUrl: `${URL_BASE}${asPath}`}) : null;
+        return signedIn ? signIn('github', {callbackUrl: `${URL_BASE}${asPath}`}) : null;
       })
   }
 
   function validateGhAndWallet() {
-    if (!state.currentUser?.walletAddress || !(session?.data?.user as any)?.login) {
-      // dispatch(changeCurrentUserMatch(undefined));
+    if (!state.currentUser?.walletAddress || !(session?.data?.user as any)?.login || state.spinners?.matching)
       return;
-    }
+
+    dispatch(changeSpinners.update({matching: true}));
 
     const userLogin = (session.data.user as any).login;
-    const walletAddress = state.currentUser.walletAddress
+    const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
     getUserWith(userLogin)
       .then(user => {
-        if (!user.githubLogin)
+        if (!user.githubLogin && state.currentUser?.match !== undefined)
           dispatch(changeCurrentUserMatch(undefined));
         else if (user.githubLogin && userLogin)
           dispatch(changeCurrentUserMatch(userLogin === user.githubLogin &&
             (walletAddress ? walletAddress === user.address : true)));
+      })
+      .finally(() => {
+        dispatch(changeSpinners.update({matching: false}));
       })
   }
 
@@ -169,8 +180,8 @@ export function useAuthentication() {
   }
 
   function updateCurrentUserLogin() {
-    if (!session?.data?.user ||
-      state.currentUser.login === (session.data.user as any).login ||
+    if (!session?.data?.user || !state.currentUser?.login ||
+      state.currentUser.login === (session.data?.user as any)?.login ||
       (session.data?.user as any).accessToken !== state.currentUser?.accessToken)
       return;
 
@@ -179,11 +190,13 @@ export function useAuthentication() {
     dispatch(changeCurrentUserAccessToken((session.data.user as any).accessToken));
   }
 
-  useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
-  useEffect(updateWalletAddress, [state.currentUser]);
-  useEffect(listenToAccountsChanged, [state.Service]);
-  useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
-  useEffect(updateCurrentUserLogin, [session?.data?.user])
+  // if (useContext(AuthContext)) {
+    useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
+    useEffect(updateWalletAddress, [state.currentUser]);
+    useEffect(listenToAccountsChanged, [state.Service]);
+    useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
+    useEffect(updateCurrentUserLogin, [session?.data?.user]);
+  // }
 
   return {
     connectWallet,

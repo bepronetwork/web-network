@@ -23,8 +23,8 @@ import {AppStateContext, useAppState} from "contexts/app-state";
 import useApi from "x-hooks/use-api";
 
 import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
-import {useNetwork} from "../x-hooks/use-network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+import useNetworkTheme from "../x-hooks/use-network-theme";
 
 interface MyNetworkLink {
   href: string;
@@ -36,9 +36,7 @@ export default function MainNav() {
   const { pathname } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
-  const {
-    dispatch
-  } = useAppState();
+  const {dispatch} = useAppState();
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
@@ -47,7 +45,7 @@ export default function MainNav() {
 
   const {state} = useAppState();
   const { searchNetworks } = useApi();
-  const { getURLWithNetwork } = useNetwork();
+  const { getURLWithNetwork } = useNetworkTheme();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
   const isBeproNetwork = [

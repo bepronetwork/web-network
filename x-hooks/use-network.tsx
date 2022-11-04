@@ -14,11 +14,13 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "./use-api";
 
-export const NetworkContext = createContext(null)
-export const NetworkProvider = ({children}) => <NetworkContext.Provider value={null} children={children} />
+export const NetworkContext = createContext({})
+export const NetworkProvider = ({children}) => <NetworkContext.Provider value={{}} children={children} />
 
 export function useNetwork() {
-  useContext(NetworkContext);
+  if (!useContext(NetworkContext))
+    throw new Error(`useNetwork() must have provider`);
+
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();

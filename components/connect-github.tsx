@@ -24,8 +24,7 @@ export default function ConnectGithub({size = 'md'}:IProps) {
             </span>
             <button
               className="btn btn-primary text-uppercase"
-              onClick={() => connectGithub()}
-            >
+              onClick={() => connectGithub()}>
               {t("actions.connect")}
             </button>
           </div>
