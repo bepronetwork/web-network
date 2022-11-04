@@ -3,7 +3,9 @@
 </h2>
 
 <h3 align="center">
-  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner. learn more <a href="https://bepronetwork.medium.com/what-is-bepro-network-6ec4054d2020">about</a>.
+  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner.
+  <br>
+  Learn more <a href="https://bepronetwork.medium.com/what-is-bepro-network-6ec4054d2020">about</a>.
 </h3>
 
 <p align="center">
@@ -17,10 +19,10 @@
 ---
 
 <h3 align="center">
-  We are delighted to announce the release of <a href="https://app.bepro.network/">Bepro Network's v2 </a> protocol. Try it.
+  We are delighted to announce the release of <a href="https://app.bepro.network/">Bepro Network's v2 </a> protocol and we would invite to try it.
 </h3>
 
-# Documentation
+---
 
 ## 1. Prerequisites
 
@@ -44,14 +46,6 @@ Create database:
 $ docker-compose up -d
 ```
 
-Run migrations:
-
-```bash
-$ npm run migrate
-```
-<br>
-
-
 ## 3. Environment Configuration
 
 Create a new .env file based on the default example.
@@ -60,69 +54,33 @@ Create a new .env file based on the default example.
 $ cp .env.exemple .env
 ```
 
-*`* These steps are mandatory`*
+_`* These steps are mandatory`_
 
 - `*` [MetaMask Setup](./docs/METAMASK.md)
+- [Ganache](./docs/GANACHE.md)
 - `*` [Authentication Setup](./docs/AUTHENTICATION.md)
 - `*` [Github Gateway](./docs/GITHUB-GATEWAY.md)
-- `*` [Past Events MicroService](https://github.com/taikai/webnetwork-events)
 - `*` [IPFS/Infura Host](./docs/IPFS.md)
-- [Ganache](./docs/GANACHE.md)
-
-<br>
+- `*` [Past Events MicroService](https://github.com/taikai/webnetwork-events)
+- `*` [Deploy Smart Contract](./docs/DEPLOY-SMART-CONTRACT.md)
 
 ## 4. Running
 
 After having completed the [Environment Configuration](#3-environment-configuration) step, the project is ready to be started.
 
-start project with:
+Run to start:
 
 ```bash
 $ npm run dev
 ```
-<br>
-
-### Connecting Github and Metamask.
-
-with the project running, browse to the project url, and connect the wallet.
-<br/>
-
-><img align="center" src="./docs/assets/connecting-metamask.png" width="500"/>
-
-<br>
-
-Next, connect with github.
-<br/>
-
-><img align="center" src="./docs/assets/connecting-account.png" width="500"/>
-
-<br>
-
-if no errors are shown, you should see this page
-<br/>
-
-><img align="center" src="./docs/assets/connected-account.png" width="500"/>
-
-<br>
-
-<br>
 
 ### Network Configuration
 
-The last step to configure the network is complete. learn more [link](./docs/NETWORK-MANAGER.md).
-
-
-<br/>
-
-><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
-
-<br>
+The last step to configure the network is complete. learn more about in [link](./docs/NETWORK-MANAGER.md).
 
 ## 5. Contributing
 
-See [CONTRIBUTING.md](https://github.com/bepro/webapp/CONTRIBUTING.md) for our guide to contributing to web-network.
-
-<br>
+See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for our guide to contributing to web-network.
 
 ## 6. Join the community
 
@@ -130,6 +88,3 @@ See [CONTRIBUTING.md](https://github.com/bepro/webapp/CONTRIBUTING.md) for our g
 - [Telegram](https://t.me/betprotocol)
 - [Medium](https://bepronetwork.medium.com)
 - [WebSite](https://www.bepro.network)
-
-<br/>
-
