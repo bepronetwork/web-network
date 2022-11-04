@@ -28,10 +28,11 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
 import {changeCurrentBountyComments} from "../../contexts/reducers/change-current-bounty";
-import {useBounty} from "../../x-hooks/use-bounty";
+import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 import {useNetwork} from "../../x-hooks/use-network";
 
 export default function PullRequestPage() {
+  useBounty();
   const router = useRouter();
 
   const { t } = useTranslation(["common", "pull-request"]);
@@ -196,7 +197,7 @@ export default function PullRequestPage() {
   }, [review, pullRequest, state.currentUser]);
 
   return (
-    <>
+    <BountyProvider>
       <PullRequestHero currentPullRequest={pullRequest} />
 
       <CustomContainer>
@@ -298,7 +299,7 @@ export default function PullRequestPage() {
       />
 
       <ConnectWalletButton asModal={true} />
-    </>
+    </BountyProvider>
   );
 }
 

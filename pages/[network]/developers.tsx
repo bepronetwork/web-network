@@ -13,9 +13,11 @@ import useApi from "x-hooks/use-api";
 
 import { useAppState } from "../../contexts/app-state";
 import {ERC20} from "@taikai/dappkit";
+import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 
 
 export default function PageDevelopers() {
+  useBounty();
   const { t } = useTranslation(["common"]);
 
   const {state} = useAppState();
@@ -80,7 +82,7 @@ export default function PageDevelopers() {
   }, [state.Service?.active, state.Service?.network?.active]);
 
   return (
-    <>
+    <BountyProvider>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
@@ -88,7 +90,7 @@ export default function PageDevelopers() {
       />
     
       <ListIssues />
-    </>
+    </BountyProvider>
   );
 }
 

@@ -1,5 +1,3 @@
-import { useContext } from "react";
-
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { useTranslation } from "next-i18next";
 
@@ -17,14 +15,13 @@ import useApi from "x-hooks/use-api";
 
 import { useAppState } from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {useBounty} from "./use-bounty";
 
 export default function useBepro() {
   const { dispatch, state } = useAppState();
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
-  const {getDatabaseBounty, getChainBounty} = useBounty();
+  // const {getDatabaseBounty, getChainBounty} = useBounty();
 
   const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
 
@@ -124,8 +121,9 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0])]))
-          getDatabaseBounty(true);
-          getChainBounty(true);
+          // todo should force these two after action, but we can't have it here or it will fall outside of context
+          // getDatabaseBounty(true);
+          // getChainBounty(true);
         })
         .catch((err: { message: string; }) => {
           failTx(err, redeemTx, reject);
@@ -150,8 +148,8 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0])]))
-          getChainBounty(true);
-          getDatabaseBounty(true);
+          // getChainBounty(true);
+          // getDatabaseBounty(true);
         })
         .catch((err: { message: string; }) => {
           failTx(err, transaction, reject);

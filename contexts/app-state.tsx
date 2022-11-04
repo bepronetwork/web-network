@@ -54,16 +54,18 @@ export function AppStateContextProvider({children}) {
   }
 
   function start() {
+    console.debug(`AppState first effect`, new Date());
 
     loadApplicationStateReducers(); // load reducers into app-state
-    loadSettings().then(s => dispatch(updateSettings(s)));
+    loadSettings()
+      .then(s => dispatch(updateSettings(s)))
+      .finally(() => {
+        console.debug(`AppState Settings loaded`, new Date());
+      });
 
-
-    console.debug(`AppState Started`, new Date())
   }
 
   useEffect(parseError, [authError])
-
   useEffect(start, [])
 
   return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
