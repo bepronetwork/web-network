@@ -14,7 +14,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { getIssueState } from "helpers/handleTypeIssue";
@@ -24,9 +24,9 @@ import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 
 import ConnectGithub from "./connect-github";
-import Modal from "./modal";
 import {useBounty} from "../x-hooks/use-bounty";
 import Modal from "./modal";
+import {BountyProvider} from "../x-hooks/use-bounty";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -52,7 +52,7 @@ export default function PageActions({
   const {state, dispatch} = useAppState();
   const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
   const { updateWalletBalance } = useAuthentication();
-  const {getDatabaseBounty, getChainBounty} = useBounty();
+  // const {getDatabaseBounty, getChainBounty} = useBounty();
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
@@ -87,8 +87,11 @@ export default function PageActions({
 
 
   async function updateBountyData() {
-    getDatabaseBounty(true);
-    getChainBounty(true);
+    // todo this must be done by the actor so it wont fall out of context
+    // getDatabaseBounty(true);
+    // getChainBounty(true);
+
+    return null;
   }
 
   async function handleRedeem() {
@@ -385,26 +388,30 @@ export default function PageActions({
         </div>
       </div>
 
-      <CreatePullRequestModal
-        show={showPRModal}
-        title={state.currentBounty?.data?.title}
-        description={state.currentBounty?.data?.body}
-        onConfirm={handlePullrequest}
-        repo={
-          (state.currentUser?.login &&
-            state.currentBounty?.data?.repository?.githubPath) &&
-          state.currentBounty?.data?.repository?.githubPath ||
-          ""
-        }
-        onCloseClick={() => setShowPRModal(false)}
-      />
+      <BountyProvider>
+        <>
+          <CreatePullRequestModal
+            show={showPRModal}
+            title={state.currentBounty?.data?.title}
+            description={state.currentBounty?.data?.body}
+            onConfirm={handlePullrequest}
+            repo={
+              (state.currentUser?.login &&
+                state.currentBounty?.data?.repository?.githubPath) &&
+              state.currentBounty?.data?.repository?.githubPath ||
+              ""
+            }
+            onCloseClick={() => setShowPRModal(false)}
+          />
 
-      <UpdateBountyAmountModal
-        show={showUpdateAmount}
-        transactionalAddress={state.currentBounty?.chainData?.transactional}
-        bountyId={state.currentBounty?.chainData?.id}
-        handleClose={() => setShowUpdateAmount(false)}
-      />
+          <UpdateBountyAmountModal
+            show={showUpdateAmount}
+            transactionalAddress={state.currentBounty?.chainData?.transactional}
+            bountyId={state.currentBounty?.chainData?.id}
+            handleClose={() => setShowUpdateAmount(false)}
+          />
+        </>
+      </BountyProvider>
 
       <Modal
         title={t("modals.gh-access.title")}

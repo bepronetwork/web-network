@@ -22,8 +22,10 @@ import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
 import { useAppState } from "../../contexts/app-state";
+import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 
 export default function PageIssue() {
+  useBounty();
   const router = useRouter();
   const { t } = useTranslation("bounty");
 
@@ -82,7 +84,7 @@ export default function PageIssue() {
   }, [ state.currentUser?.login, state.currentUser?.walletAddress, id, state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   return (
-    <>
+    <BountyProvider>
       <BountyHero />
 
       { state.currentBounty?.chainData?.isFundingRequest && <FundingSection /> }
@@ -128,7 +130,7 @@ export default function PageIssue() {
         repo={state.currentBounty?.data?.repository?.githubPath}
         issueId={id}
       />
-    </>
+    </BountyProvider>
   );
 }
 

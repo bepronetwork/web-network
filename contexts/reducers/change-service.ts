@@ -1,4 +1,5 @@
 import {
+  NetworkTimes,
   ServiceNetwork,
   ServiceNetworkRepos,
   ServiceNetworkReposActive,
@@ -72,6 +73,7 @@ export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.u
 
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
 export const changeActiveNetworkToken = (networkToken: Token) => changeNetwork.update({networkToken});
+export const changeActiveNetworkTimes = (times: NetworkTimes) => changeNetwork.update({times});
 
 export const changeNetworkReposList = (list: ReposList) => changeRepos.update({list});
 

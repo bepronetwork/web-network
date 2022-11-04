@@ -13,7 +13,6 @@ export default function IssueProposalProgressBar() {
 
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
-  const [draftTime, setDraftTime] = useState(0);
   const [steps, setSteps] = useState<string[]>([
     t("bounty:steps.draft"),
     t("bounty:steps.funding"),
@@ -50,7 +49,7 @@ export default function IssueProposalProgressBar() {
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
 
-    const isHigher = creationDate && (new Date() > addSeconds(creationDate, draftTime));
+    const isHigher = creationDate && (new Date() > addSeconds(creationDate, +state.Service?.network?.times?.draftTime));
 
     const item = (date, toAdd = 0) => ({
       Warning: {
@@ -78,10 +77,10 @@ export default function IssueProposalProgressBar() {
     };
 
     if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest) 
-      currentValue = item(addSeconds(creationDate, draftTime)).Started;
+      currentValue = item(addSeconds(creationDate, +state.Service?.network?.times?.draftTime)).Started;
 
     if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
-      currentValue = item(creationDate, draftTime).Warning;
+      currentValue = item(creationDate, +state.Service?.network?.times?.draftTime).Warning;
     
     if (
         index === currentStep &&
@@ -95,7 +94,7 @@ export default function IssueProposalProgressBar() {
             end: new Date(fundedDate),
         });
         const startedFundedDate = add(creationDate, intervalFunded)
-        const startedDraftDate = addSeconds(creationDate, draftTime)
+        const startedDraftDate = addSeconds(creationDate, +state.Service?.network?.times?.draftTime)
 
         if(compareAsc(startedDraftDate, startedFundedDate) === 1){
           currentValue = item(startedDraftDate).Started
@@ -167,10 +166,6 @@ export default function IssueProposalProgressBar() {
       </Fragment>
     );
   }
-
-  useEffect(() => {
-    if (state.Service?.network?.active?.draftTime) setDraftTime(state.Service?.network?.active?.draftTime);
-  }, [state.Service?.network?.active?.draftTime, state.Service?.network?.active?.disputableTime]);
 
   useEffect(() => {
     const isFundingStep = !!steps.find(name => name === t("bounty:steps.funding"))

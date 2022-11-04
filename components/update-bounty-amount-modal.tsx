@@ -16,8 +16,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 
-import {useBounty} from "../x-hooks/use-bounty";
-
 export default function UpdateBountyAmountModal({
   show,
   transactionalAddress,
@@ -31,7 +29,7 @@ export default function UpdateBountyAmountModal({
 
   const { state, dispatch } = useAppState();
 
-  const {getDatabaseBounty} = useBounty();
+  // const {getDatabaseBounty} = useBounty();
   const { processEvent } = useApi();
   const transactionalERC20 = useERC20();
 
@@ -72,7 +70,7 @@ export default function UpdateBountyAmountModal({
         });
       })
       .then(() => {
-        getDatabaseBounty(true);
+        // getDatabaseBounty(true);
         resetValues();
         handleClose();
       })

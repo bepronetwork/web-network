@@ -1,9 +1,9 @@
-import {useContext, useEffect} from "react";
+import {createContext, useContext, useEffect} from "react";
 
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
-import { useAppState } from "../contexts/app-state";
+import {AppStateContext, useAppState} from "../contexts/app-state";
 import {
   changeCurrentBountyComments,
   changeCurrentBountyData,
@@ -21,7 +21,13 @@ import {changeSpinners} from "../contexts/reducers/change-spinners";
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 
+export const BountyContext = createContext({});
+export const BountyProvider = ({children}) => <BountyContext.Provider value={null} children={children} />
+
 export function useBounty() {
+  if (!useContext(BountyContext))
+    throw new Error(`useBounty not inside BountyContext`);
+
   const {state, dispatch} = useAppState();
 
   const {query} = useRouter();
@@ -183,6 +189,10 @@ export function useBounty() {
 
   useEffect(getDatabaseBounty, [state.Service?.network?.active, query?.id, query?.repoId]);
   useEffect(getChainBounty, [state.Service?.active, state.Service?.network, state.currentBounty?.data?.contractId])
+
+  useEffect(() => {
+    console.log(`useBounty() started`);
+  }, [])
 
   return {
     getExtendedProposalsForCurrentBounty,

@@ -5,7 +5,7 @@ import {UrlObject} from "url";
 
 import { useAppState } from "contexts/app-state";
 import {
-  changeActiveNetwork,
+  changeActiveNetwork, changeActiveNetworkTimes,
   changeActiveNetworkToken,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
@@ -88,21 +88,34 @@ export function useNetwork() {
     if (!state.Service?.active || !state?.Service?.network?.active)
       return;
 
-    const activeNetwork: any = state.Service.network?.active?.networkToken;
+    const activeNetworkToken: any = state.Service.network?.active?.networkToken;
 
-    Promise.all([activeNetwork.name(), activeNetwork.symbol(),])
+    Promise.all([activeNetworkToken.name(), activeNetworkToken.symbol(),])
       .then(([name, symbol]) => {
         dispatch(changeActiveNetworkToken({
           name,
           symbol,
-          decimals: activeNetwork.decimals,
-          address: activeNetwork.contractAddress
+          decimals: activeNetworkToken.decimals,
+          address: activeNetworkToken.contractAddress
         }))
       });
   }
 
+  function loadNetworkTimes() {
+    if (!state.Service?.active || !state?.Service?.network?.active)
+      return;
+
+    const network: any = state.Service.network.active;
+
+    Promise.all([network.draftTime(), network.disputableTime()])
+      .then(([draftTime, disputableTime]) => {
+        dispatch(changeActiveNetworkTimes({draftTime, disputableTime}));
+      })
+  }
+
   useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
   useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active])
+  useEffect(loadNetworkTimes, [state.Service?.active, state?.Service?.network?.active])
 
 
   return {

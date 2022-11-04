@@ -31,11 +31,17 @@ export interface ServiceNetworkRepos {
   active: ServiceNetworkReposActive | null;
 }
 
+export interface NetworkTimes {
+  disputableTime: string|number;
+  draftTime: string|number;
+}
+
 export interface ServiceNetwork {
   lastVisited: string;
   active: Network | null;
   repos: ServiceNetworkRepos | null;
-  networkToken: Token
+  networkToken: Token;
+  times: NetworkTimes;
 }
 
 export interface ServiceState {
