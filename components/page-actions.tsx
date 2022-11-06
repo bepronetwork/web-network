@@ -381,7 +381,7 @@ export default function PageActions({
 
               {renderViewPullRequestLink()}
               
-              {!user?.login && <ConnectGithub size="sm"/>}
+              {!user?.login && wallet?.address && <ConnectGithub size="sm"/>}
 
               <GithubLink
                 repoId={String(repoId)}

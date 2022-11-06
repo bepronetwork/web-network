@@ -88,17 +88,15 @@ export const AuthenticationProvider = ({ children }) => {
   const connectGithub = async () => {
     try {
 
-      if (!asPath?.includes("connect-account")) {
-        return push("/connect-account");
-      }
-      
       setIsConnecting(true)
       
+      const user = await getUserOf(wallet?.address?.toLowerCase());
 
-      localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
-
-
-      sessionStorage.setItem("lastUrlBeforeGithubConnect", asPath);
+      if (!user?.githubLogin && !asPath?.includes("connect-account")) {
+        sessionStorage.setItem("lastUrlBeforeGithubConnect", asPath);
+        await disconnectGithub();
+        return push("/connect-account");
+      }
 
       await disconnectGithub();
 
