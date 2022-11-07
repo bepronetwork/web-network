@@ -4,18 +4,18 @@ Each user is be able to create other networks by visiting `/networkname/account/
 
 After created also be able to manege settings of you own networks by visiting `/networkname/profile/my-network`
 
-
+> <img align="center" src="./assets/network-settings-page.png" width="500"/>
 
 ## 2. HOW MANAGER DEFAULT SETTINGS NETWORK?
 
 Only the contracts governor is able to access the `/administration` page. There is possible to change the default settings for ERC20 and Network contracts for new network deployed.
 
- -  Default Network Name.
- -  Min and Max time for dispute.
- -  Min and Max Ammount to be a Council Member.
- -  Max dispute Percentage.
+- Default Network Name.
+- Min and Max time for dispute.
+- Min and Max Amount to be a Curator.
+- Max dispute Percentage.
 
-Also it's possible change this settings before do the first deploy, at env file.
+It is also possible to change these settings in the env file before doing the first deploy.
 
 ```
 # .env

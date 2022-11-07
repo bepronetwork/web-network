@@ -11,7 +11,7 @@ import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
-import { BenefactorExtended } from "interfaces/bounty";
+import { fundingBenefactor } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -21,7 +21,7 @@ import { Amount, RowWithTwoColumns } from "./minimals";
 interface RetractOrWithdrawModalProps {
   show?: boolean;
   onCloseClick: () => void;
-  funding: BenefactorExtended;
+  funding: fundingBenefactor;
 }
 
 export default function RetractOrWithdrawModal({
@@ -42,7 +42,7 @@ export default function RetractOrWithdrawModal({
   const tokenSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
   const retractOrWithdrawAmount = networkIssue?.closed ? 
-    funding?.amount?.dividedBy(networkIssue?.fundingAmount).multipliedBy(networkIssue?.rewardAmount)?.toFixed() : 
+    funding?.amount?.dividedBy(activeIssue?.fundingAmount).multipliedBy(networkIssue?.rewardAmount)?.toFixed() : 
     funding?.amount?.toFixed();
 
   function handleRetractOrWithdraw() {
@@ -50,7 +50,7 @@ export default function RetractOrWithdrawModal({
 
     setIsExecuting(true);
     if(networkIssue?.closed){
-      handleWithdrawFundRewardBounty(networkIssue?.id, funding.id, retractOrWithdrawAmount, rewardTokenSymbol)
+      handleWithdrawFundRewardBounty(networkIssue?.id, funding.contractId, retractOrWithdrawAmount, rewardTokenSymbol)
       .then(() => {
         onCloseClick();
         getNetworkIssue();
@@ -65,7 +65,7 @@ export default function RetractOrWithdrawModal({
       })
       .finally(() => setIsExecuting(false));
     } else {
-      handleRetractFundBounty(networkIssue?.id, funding.id)
+      handleRetractFundBounty(networkIssue?.id, funding.contractId)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         

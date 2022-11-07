@@ -20,6 +20,10 @@ class PullRequest extends Model {
           type: DataTypes.STRING,
           allowNull: true
         },
+        userAddress: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
         status: {
           type: DataTypes.STRING,
           allowNull: true

@@ -23,7 +23,7 @@ const serverRuntimeConfig = {
   github: {
     clientId: process.env.NEXT_GH_CLIENT_ID,
     secret: process.env.NEXT_GH_SECRET,
-    token: process.env.NEXT_PUBLIC_GH_TOKEN,
+    token: process.env.NEXT_GH_TOKEN,
     mainBranch: process.env.NEXT_GH_MAINBRANCH,
     owner: process.env.NEXT_GH_OWNER,
     repository: process.env.NEXT_GH_REPO,
@@ -35,8 +35,7 @@ const serverRuntimeConfig = {
     url: process.env.NEXT_ELASTIC_SEARCH_URL
   },
   infura: {
-    host: process.env.NEXT_IPFS_HOST,
-    port: process.env.NEXT_IPFS_PORT,
+    uploadEndPoint: process.env.NEXT_IPFS_UPLOAD_ENDPOINT,
     projectId: process.env.NEXT_IPFS_PROJECT_ID,
     projectSecret: process.env.NEXT_IPFS_PROJECT_SECRET
   },

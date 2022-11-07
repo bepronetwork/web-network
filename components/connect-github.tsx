@@ -1,37 +1,28 @@
-import { signIn, signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 
 import GithubImage from "components/github-image";
 
 import { useAuthentication } from "contexts/authentication";
 
-import useApi from "x-hooks/use-api";
 
-export default function ConnectGithub() {
+import Button from "./button";
+
+interface IProps{
+  size?: 'md' | 'sm';
+}
+
+export default function ConnectGithub({size = 'md'}:IProps) {
   const { t } = useTranslation("common");
 
-  const { push, asPath } = useRouter();
-
-  const { getUserOf } = useApi();
-  const { wallet } = useAuthentication();
+  const { wallet, connectGithub, isConnecting } = useAuthentication();
 
 
-  async function clickSignIn() {
-    localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
-
-    const user = await getUserOf(wallet?.address?.toLowerCase());
-
-    if (!user?.githubHandle) return push("/connect-account");
-
-    await signOut({ redirect: false });
-
-    signIn("github", {callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`})
-      .then(() => {
-        sessionStorage.setItem("currentWallet", wallet?.address || "");
-      })
-      .catch(e => console.error(e));
-
+  if(size === 'sm'){
+    return (
+    <Button onClick={connectGithub} disabled={isConnecting} isLoading={isConnecting}> 
+      <GithubImage  opacity={1} /> 
+      <span>{t("actions.connect")}</span>
+    </Button>)
   }
 
   return (
@@ -43,12 +34,15 @@ export default function ConnectGithub() {
             <span className="caption-small mx-3">
               {t("actions.connect-github")}
             </span>
-            <button
-              className="btn btn-primary text-uppercase"
-              onClick={() => clickSignIn()}
-            >
-              {t("actions.connect")}
-            </button>
+            <span className="d-inline-block">
+              <Button
+                className="d-inline btn btn-primary text-uppercase"
+                disabled={isConnecting || !wallet?.address}
+                onClick={connectGithub}
+              >
+                {t("actions.connect")}
+              </Button>
+            </span>
           </div>
         </div>
       </div>

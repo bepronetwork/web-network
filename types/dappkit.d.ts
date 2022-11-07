@@ -10,6 +10,16 @@ export type NetworkParameters = "councilAmount" |
   "cancelableTime" |
   "treasury";
 
+export type RegistryParameters = "networkCreationFeePercentage" | 
+  "lockAmountForNetworkCreation" | 
+  "totalLockedAmount" | 
+  "closeFeePercentage" | 
+  "cancelFeePercentage" | 
+  "treasury" |
+  "erc20" |
+  "MAX_LOCK_PERCENTAGE_FEE" |
+  "DIVISOR" 
+
 export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles";
 
 export type Events = "created" | 

@@ -47,7 +47,8 @@ interface ListIssuesProps {
   filterState?: IssueState;
   emptyMessage?: string;
   buttonMessage?: string;
-  pullRequester?: string;
+  pullRequesterLogin?: string;
+  pullRequesterAddress?: string;
   proposer?: string;
 }
 
@@ -61,7 +62,8 @@ export default function ListIssues({
   filterState,
   emptyMessage,
   buttonMessage,
-  pullRequester,
+  pullRequesterLogin,
+  pullRequesterAddress,
   proposer,
   redirect
 }: ListIssuesProps) {
@@ -157,7 +159,8 @@ export default function ListIssues({
       sortBy,
       order,
       creator,
-      pullRequester,
+      pullRequesterLogin,
+      pullRequesterAddress,
       proposer,
       networkName: activeNetwork?.name
     })

@@ -33,7 +33,8 @@ export default function ConnectAccount() {
   const { dispatch } = useContext(ApplicationContext);
   const { 
     wallet, 
-    isGithubAndWalletMatched, 
+    isGithubAndWalletMatched,
+    isConnecting,
     connectWallet, 
     connectGithub, 
     disconnectGithub,
@@ -63,14 +64,26 @@ export default function ConnectAccount() {
   </FlexRow>;
 
   function redirectToProfile() {
+    const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
+    
+    if(previusRouter)
+      return router.push(previusRouter);
+    
     const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
 
     router.push(redirectTo);
   }
 
   function handleCancel() {
-    if (!isGithubAndWalletMatched) disconnectGithub();
-    redirectToProfile();
+    if (!isGithubAndWalletMatched)
+      disconnectGithub();
+
+    const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
+    
+    if(previusRouter)
+      return router.push(previusRouter)
+      
+    router.back();
   }
 
   async function joinAddressToGh() {
@@ -124,6 +137,7 @@ export default function ConnectAccount() {
                     state={connectButtonState[String(isGithubAndWalletMatched)]}
                     credential={sessionUser?.login} 
                     connect={connectGithub}
+                    isLoading={isConnecting}
                   />
 
                   
@@ -182,10 +196,10 @@ export default function ConnectAccount() {
                   {isButtonDisabled && (
                     <LockedIcon className="mr-1" width={14} height={14} />
                   )}
-                  {t("actions.done")}
+                  {t("actions.connect")}
                 </Button>
                 <Button color="dark-gray" onClick={handleCancel}>
-                  {t("actions.cancel")}
+                  {t("actions.back")}
                 </Button>
               </div>
             </div>

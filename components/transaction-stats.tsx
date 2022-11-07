@@ -22,7 +22,7 @@ export default function TransactionStats({
   const StatusMap = {
     [TransactionStatus.pending]: t("transactions.stats.pending"),
     [TransactionStatus.processing]: t("transactions.stats.processing"),
-    [TransactionStatus.failed]: t("transactions.stats.rejected"),
+    [TransactionStatus.failed]: t("transactions.stats.failed"),
     [TransactionStatus.rejected]: t("transactions.stats.rejected"),
     [TransactionStatus.completed]: t("transactions.stats.completed")
   };
