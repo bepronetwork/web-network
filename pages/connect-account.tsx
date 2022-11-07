@@ -82,7 +82,7 @@ export default function ConnectAccount() {
     
     if(previusRouter)
       return router.push(previusRouter)
-
+      
     router.back();
   }
 

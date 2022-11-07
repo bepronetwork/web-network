@@ -6,6 +6,8 @@ import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
 
+import { trimString } from "helpers/string";
+
 export default function BranchsDropdown({
   repoId,
   onSelected,

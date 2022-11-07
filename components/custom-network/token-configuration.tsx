@@ -36,11 +36,12 @@ export default function TokenConfiguration({
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
   const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
-    
+
   const { getTokens } = useApi();
   const { settings } = useSettings();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
+
   const { tokens, fields, tokensLocked } = useNetworkSettings();
   const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
 
@@ -150,7 +151,6 @@ export default function TokenConfiguration({
         canAddToken={false}
         selectedTokens={selectedRewardTokens}
         changeSelectedTokens={changeSelectedRewardTokens}
-
       />
      {validated && (
         <>
