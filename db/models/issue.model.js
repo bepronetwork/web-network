@@ -59,6 +59,11 @@ class Issue extends Model {
       sourceKey: "id",
       as: "mergeProposals"
     });
+    this.hasMany(models.benefactor, {
+      foreignKey: "issueId",
+      sourceKey: "id",
+      as: "benefactors"
+    });
     this.belongsTo(models.repositories, {
       foreignKey: "repository_id",
       sourceKey: "id",

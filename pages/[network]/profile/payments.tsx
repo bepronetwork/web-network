@@ -1,5 +1,4 @@
 import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
-import { Col } from "react-bootstrap";
 
 import { format, subDays } from "date-fns";
 import { GetServerSideProps } from "next";
@@ -11,6 +10,7 @@ import ArrowRight from "assets/icons/arrow-right";
 import NothingFound from "components/nothing-found";
 import PaymentsList from "components/profile/payments-list";
 import ProfileLayout from "components/profile/profile-layout";
+import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
 import ReactSelect from "components/react-select";
 
 import { useAuthentication } from "contexts/authentication";
@@ -103,67 +103,90 @@ export default function Payments() {
 
   return (
     <ProfileLayout>
-      <Col xs={10}>
-        <div className="d-flex flex-row align-items-center justify-content-between gap-2 mb-4">
-          <h4 className="text-white">{t("main-nav.nav-avatar.payments")}</h4>
-          <ReactSelect
-            options={defaultOptions}
-            value={option}
-            onChange={onChangeSelect}
+      <FlexColumn className="col-10">
+        <FlexRow className="align-items-center justify-content-between gap-2 mb-2">
+          <FlexColumn>
+            <h4 className="text-white">{t("main-nav.nav-avatar.payments")}</h4>
+          </FlexColumn>
+
+          <FlexColumn>
+            <FlexRow className="align-items-center">
+              {hasNoConvertedToken ? (
+                  <span className="caption-small text-danger">
+                    {t("currencies.error-convert-all-to-euro")}
+                  </span>
+                ) : (
+                  <>
+                    <span className="caption-medium text-white mr-2">
+                      {t("labels.recivedintotal")}
+                    </span>
+                    <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
+                      <span className="text-white">
+                        {formatNumberToCurrency(totalEuro)}
+                      </span>
+
+                      <span className="text-gray ml-1">{t("currencies.euro")}</span>
+                    </div>
+                  </>
+                )}
+            </FlexRow>
+          </FlexColumn>
+        </FlexRow>
+
+        <FlexRow className="align-items-center gap-2 mb-4">
+          <FlexColumn className="col-auto">
+            <FlexRow className="align-items-center justify-content-between gap-1">
+              <label className="text-uppercase caption-small">
+                {t("misc.latest")}
+              </label>
+              <ReactSelect
+                options={defaultOptions}
+                value={option}
+                onChange={onChangeSelect}
+              />
+            </FlexRow>
+          </FlexColumn>
+          
+          <label className="text-uppercase caption-small">
+            {t("profile:payments.period")}
+          </label>
+
+          <input
+            type="date"
+            key="startDate"
+            className="form-control"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onChangeDate(e, setStartDate)
+            }
+            value={startDate}
+            max={endDate}
           />
-            <label className="mt-2 ms-2 text-uppercase caption-small">
-              {t("profile:payments.period")}
-            </label>
+          <span>
+            <ArrowRight height="10px" width="10px" />
+          </span>
 
-            <input
-              type="date"
-              key="startDate"
-              className="form-control ms-2"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                onChangeDate(e, setStartDate)
-              }
-              value={startDate}
-              max={endDate}
-            />
-            <span>
-              <ArrowRight height="10px" width="10px" />
-            </span>
+          <input
+            type="date"
+            key="endDate"
+            className="form-control"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onChangeDate(e, setEndDate)
+            }
+            value={endDate}
+            max={format(new Date(), "yyyy-MM-dd").toString()}
+          />
+        </FlexRow>
 
-            <input
-              type="date"
-              key="endDate"
-              className="form-control"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                onChangeDate(e, setEndDate)
-              }
-              value={endDate}
-              max={format(new Date(), "yyyy-MM-dd").toString()}
-            />
-          {hasNoConvertedToken ? (
-            <span className="caption-small text-danger">
-              {t("currencies.error-convert-all-to-euro")}
-            </span>
-          ) : (
-            <>
-              <span className="caption-medium text-white mr-2">
-                {t("labels.recivedintotal")}
-              </span>
-              <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
-                <span className="text-white">
-                  {formatNumberToCurrency(totalEuro)}
-                </span>
-
-                <span className="text-gray ml-1">{t("currencies.euro")}</span>
-              </div>
-            </>
-          )}
-        </div>
-        {payments?.length > 0 ? (
-          <PaymentsList payments={payments} />
-        ) : (
-          <NothingFound description={t("filters.no-records-found")} />
-        )}
-      </Col>
+        <FlexRow className="justify-content-center">
+          <FlexColumn>
+            {payments?.length > 0 ? (
+              <PaymentsList payments={payments} />
+            ) : (
+              <NothingFound description={t("filters.no-records-found")} />
+            )}
+          </FlexColumn>
+        </FlexRow>
+      </FlexColumn>
     </ProfileLayout>
   );
 }

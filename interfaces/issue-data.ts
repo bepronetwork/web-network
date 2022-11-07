@@ -49,6 +49,7 @@ export interface IssueData {
   token?: Token;
   working: string[];
   fundedAt?: Date;
+  fundingBenefactors?: fundingBenefactor[];
 }
 
 export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
@@ -113,4 +114,12 @@ export interface INetworkIssue {
   isDraft: boolean;
   tokensStaked: number;
   networkProposals: INetworkProposal[];
+}
+
+export interface fundingBenefactor {
+  amount: BigNumber;
+  address: string;
+  contractId: number;
+  issueId: number;
+  isWithdrawn?: boolean
 }

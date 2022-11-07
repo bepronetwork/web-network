@@ -14,7 +14,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
     { association: "mergeProposals" },
     { association: "repository" },
-    { association: "token" }
+    { association: "token" },
+    { association: "benefactors" }
   ];
 
   const network = await models.network.findOne({

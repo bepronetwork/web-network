@@ -3,6 +3,7 @@ export const Repository =
     repository(name: $repo, owner: $owner) {
       nameWithOwner
       visibility
+      mergeCommitAllowed
     }
   }`;
 

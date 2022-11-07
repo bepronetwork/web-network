@@ -9,6 +9,8 @@
   "tvl": "TVL",
   "tvl-description": "Total Value Locked",
   "network-settings": "Network Settings",
+  "network-create-warning": "A fee of amount will be taken when the network is created.",
+  "network-amount-to-create": "{{amount}} {{symbol}} will be taken from this {{totalAmount}} {{symbol}} locked when you create the network",
   "dispute-time": "Dispute time",
   "percentage-for-dispute": "Percentage for dispute",
   "redeem-time": "Draft time",
@@ -23,6 +25,8 @@
     "config-fees": "Config Fees",
     "save-fees-config": "Save fees config"
   },
+  "network-info": "Network info",
+  "network-address": "Network Address",
   "add-tokens": "Add Tokens",
   "remove-tokens": "Remove Tokens",
   "hero": {
@@ -112,7 +116,11 @@
       "label": "Repositories",
       "used-by-other-network": "The highlighted repositories are already being used by another network.",
       "has-bounties": "The highlighted repositories already have bounties and can't be removed.",
-      "user-permission-not-admin": "Your permission level on this repository does not allow giving access"
+      "no-repositories-selected": "No repositories selected. At least one repository is required.",
+      "user-permission-not-admin_one": "Your permission level on this repository does not allow giving access.",
+      "user-permission-not-admin_other": "Your permission level on these repositories does not allow giving access.",
+      "no-merge-commit-permission_one": "Repository {{repos}} don't support \"merge commits\" merge type. Please, allow that in the repository settings.", 
+      "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings." 
     },
     "token-configuration": {
       "title": "Token Configuration",

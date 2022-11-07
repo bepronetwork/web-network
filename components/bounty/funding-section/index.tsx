@@ -19,7 +19,7 @@ import { useIssue } from "contexts/issue";
 
 import { getIssueState } from "helpers/handleTypeIssue";
 
-import { BenefactorExtended } from "interfaces/bounty";
+import { fundingBenefactor } from "interfaces/issue-data";
 
 import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
@@ -27,8 +27,8 @@ export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);
 
   const [showFundModal, setShowFundModal] = useState(false);
-  const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
-  const [fundingtoRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<BenefactorExtended>();
+  const [walletFunds, setWalletFunds] = useState<fundingBenefactor[]>();
+  const [fundingtoRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<fundingBenefactor>();
 
   const { wallet } = useAuthentication();
   const { networkIssue, activeIssue } = useIssue();
@@ -44,7 +44,7 @@ export default function FundingSection() {
   const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
   
   const futureRewards = 
-    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toFixed();
+    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(activeIssue?.fundingAmount).toFixed();
   
   const isCanceled = getIssueState({
     state: activeIssue?.state,
@@ -57,15 +57,19 @@ export default function FundingSection() {
   const handleCloseRetractOrWithdrawModal = () => setFundingToRetractOrWithdraw(undefined);
 
   useEffect(() => {
-    if (!wallet?.address || !networkIssue) return;
+    if (!wallet?.address || !activeIssue) return;
 
-    const funds =
-      networkIssue.funding
-        .map((fund, index) => ({ ...fund, id: index }))
-        .filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() && fund.amount.gt(0));
+    const funds = activeIssue.fundingBenefactors
+                    .filter(fund => fund.address.toLowerCase() === wallet.address.toLowerCase())
+                    .map((fund) => ({
+                      ...fund,
+                      isWithdrawn: !!networkIssue?.funding.find((networkFund, key) =>
+                          key === fund.contractId &&
+                          networkFund.amount.isEqualTo(0))
+                    }));
 
     setWalletFunds(funds);
-  }, [wallet, networkIssue]);
+  }, [wallet, activeIssue, networkIssue]);
 
   if (isBountyFunded && !walletFunds?.length) return <></>;
 
@@ -100,10 +104,10 @@ export default function FundingSection() {
           />
 
           <FundingProgress
-            fundedAmount={networkIssue?.fundedAmount?.toFixed()}
-            fundingAmount={networkIssue?.fundingAmount?.toFixed()}
+            fundedAmount={activeIssue?.fundedAmount?.toFixed()}
+            fundingAmount={activeIssue?.fundingAmount?.toFixed()}
             fundingTokenSymbol={transactionalSymbol}
-            fundedPercent={networkIssue?.fundedPercent?.toFixed(2, 1)}
+            fundedPercent={activeIssue?.fundedPercent?.toFixed()}
           />
 
           { hasReward &&
@@ -170,7 +174,7 @@ export default function FundingSection() {
                   {walletFunds?.map(fund => 
                   <>
                     <RowWithTwoColumns 
-                      key={`fund-${fund.id}`}
+                      key={`fund-${fund.contractId}`}
                       className="p-2 bg-shadow border-radius-8"
                       col1={
                         <>
@@ -188,8 +192,8 @@ export default function FundingSection() {
                                 <Amount
                                   amount={
                                     fund.amount
-                                      .dividedBy(networkIssue.fundingAmount)
-                                      .multipliedBy(networkIssue.rewardAmount)
+                                      .dividedBy(activeIssue?.fundingAmount || 0)
+                                      .multipliedBy(networkIssue?.rewardAmount)
                                       .toFixed()
                                   }
                                   symbol={rewardTokenSymbol}
@@ -201,7 +205,7 @@ export default function FundingSection() {
                       </>
                       }
                       col2={
-                          (isBountyInDraft || isBountyClosed && hasReward) && (
+                          (isBountyInDraft || isBountyClosed && hasReward && !fund.isWithdrawn) && (
                             <Button
                             textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
                             transparent

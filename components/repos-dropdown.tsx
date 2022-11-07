@@ -20,11 +20,11 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
   const { t } = useTranslation("common");
 
   function onChangeSelect(e: { value: { id: string; path: string } }) {
-    onSelected(e)
+    onSelected(e);
     setOption({
       value: e.value,
-      label: trimString(e.value.path)
-    })
+      label: e.value.path
+    });
   }
 
   function loadReposFromBackend() {

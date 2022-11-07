@@ -27,6 +27,7 @@ import { getIssueState } from "helpers/handleTypeIssue";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
+import ConnectGithub from "./connect-github";
 import Modal from "./modal";
 
 interface PageActionsProps {
@@ -379,6 +380,8 @@ export default function PageActions({
               {renderCreateProposalButton()}
 
               {renderViewPullRequestLink()}
+              
+              {!user?.login && wallet?.address && <ConnectGithub size="sm"/>}
 
               <GithubLink
                 repoId={String(repoId)}

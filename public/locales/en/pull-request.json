@@ -54,6 +54,7 @@
     "no-reviews-found": "No reviews found",
     "merge-conflicts": "Pull request has merge conflicts and can't be merged",
     "you-dont-have-pull-requests": "You don't have any Pull Requests. Find a Bounty to work on.",
-    "pull-request-participants": "Failed to get participants"
+    "pull-request-participants": "Failed to get participants",
+    "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the network governor."
   }
 }

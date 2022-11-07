@@ -18,7 +18,7 @@ import { BountyExtended } from "interfaces/bounty";
 import { OraclesResumeExtended } from "interfaces/oracles-state";
 import { Token } from "interfaces/token";
 
-import { NetworkParameters } from "types/dappkit";
+import { NetworkParameters, RegistryParameters } from "types/dappkit";
 
 interface DAOServiceProps {
   skipWindowAssignment?: boolean;
@@ -212,6 +212,12 @@ export default class DAO {
 
   async getNetworkParameter(parameter: NetworkParameters): Promise<string | number> {
     return this.network[parameter]();
+  }
+
+  async getRegistryParameter(parameter: RegistryParameters): Promise<string | number> {
+    if (!this.registry) await this.loadRegistry();
+    
+    return this.registry[parameter]();
   }
 
   async setNetworkParameter(parameter: NetworkParameters, value: number | string): Promise<TransactionReceipt> {    

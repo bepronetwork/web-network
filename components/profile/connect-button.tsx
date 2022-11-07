@@ -15,6 +15,8 @@ interface ConnectionButtonProps {
   credential: string;
   variant?: "profile" | "connect-account";
   state?: "success" | "danger";
+  isLoading?: boolean,
+  isDisabled?: boolean,
   connect: () => void;
 }
 
@@ -23,6 +25,8 @@ function ConnectionButton({
   credential,
   variant = "profile",
   state,
+  isLoading = false,
+  isDisabled = false,
   connect
 } : ConnectionButtonProps) {
   const { t } = useTranslation(["profile", "common"]);
@@ -61,7 +65,8 @@ function ConnectionButton({
     "border",
     `border-${state || COLORS[variant]}`,
     "border-radius-8",
-    ...credential ? [] : ["justify-content-center", "cursor-pointer", "border-primary-hover"]
+    ...credential ? [] : ["justify-content-center", "cursor-pointer", "border-primary-hover"],
+    ...(isDisabled || isLoading)?  ["pe-none", "trans"] : [],
   ];
 
   const handleConnect = () => credential ? undefined : connect();
@@ -74,7 +79,7 @@ function ConnectionButton({
           
             {ICONS[type]}
             <span className="ml-2 caption-large text-white font-weight-medium flex-grow-1">{CREDENTIALS[type]}</span>
-          
+            {isLoading  && (<span className="spinner-border spinner-border-xs ml-1" />)}
           {STATE_ICON[state]}
       </div>
     </div>
