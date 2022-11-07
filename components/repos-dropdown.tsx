@@ -29,14 +29,14 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
 
   function setOptionMapper() {
     if (!state.Service?.network?.repos?.list) return;
-    setIsFetching(true)
+    // setIsFetching(true)
 
     function mapRepo({ id: value, githubPath: label }) {
       return { value: { id: value, path: label }, label };
     }
 
     setOptions(state.Service?.network?.repos?.list.map(mapRepo));
-    setIsFetching(false)
+    // setIsFetching(false)
   }
 
   useEffect(setOptionMapper, [state.Service?.network?.repos?.list]);
@@ -52,7 +52,7 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
         value={option}
         onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
-        isDisabled={disabled || isFetching || !options?.length}
+        isDisabled={disabled || !options?.length}
       />
     </div>
   );

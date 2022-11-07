@@ -127,7 +127,7 @@ export default function ConnectAccount() {
                     state={connectButtonState[String(state.currentUser?.match)]}
                     credential={sessionUser?.login} 
                     connect={connectGithub}
-                    isLoading={isConnecting}
+                    // isLoading={isConnecting}
                   />
 
                   

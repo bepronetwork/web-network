@@ -44,7 +44,7 @@ export default function FundModal({
     isExecuting,
     amountToFund?.isNaN(),
     amountToFund?.isZero(),
-    amountToFund?.plus(state.currentBounty?.chainData?.fundedAmount).gt(state.currentBounty?.chainData?.fundingAmount)
+    amountToFund?.plus(state.currentBounty?.chainData?.fundedAmount).gt(state.currentBounty?.chainData?.fundingAmount),
     amountToFund === undefined
   ].some(c => c);
   const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;

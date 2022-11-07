@@ -51,7 +51,7 @@ export default function BranchsDropdown({
       </label>
       <ReactSelect
         key={`select_repo-${repoId}`}
-        isDisabled={disabled || !repoId || !options?.length || isFetching}
+        isDisabled={disabled || !repoId || !options?.length}
         options={options}
         value={option}
         onChange={onChangeSelect}

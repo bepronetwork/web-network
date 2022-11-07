@@ -9,13 +9,12 @@ import { FormGroup } from "components/form-group";
 import InputNumber from "components/input-number";
 import { WarningSpan } from "components/warning-span";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
+import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
 import useERC20 from "x-hooks/use-erc20";
+import {useAppState} from "../../contexts/app-state";
 
 interface ERC20DetailsProps {
   address?: string;
@@ -41,8 +40,7 @@ export function ERC20Details({
   const [tokenTotalSupply, setTokenTotalSupply] = useState("");
 
   const erc20 = useERC20();
-  const { wallet } = useAuthentication();
-  const { dispatch } = useContext(ApplicationContext);
+  const { state, dispatch } = useAppState();
 
   const isDeployer = !!deployer;
 
@@ -77,7 +75,7 @@ export function ERC20Details({
   function handleDeploy() {
     setIsDeploying(true);
 
-    erc20.deploy(tokenName, tokenSymbol, tokenTotalSupply, wallet?.address)
+    erc20.deploy(tokenName, tokenSymbol, tokenTotalSupply, state.currentUser?.walletAddress)
       .then(({ contractAddress }) => {
         erc20.setAddress(contractAddress);
         setTokenAddress(contractAddress);
