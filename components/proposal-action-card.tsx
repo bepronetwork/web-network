@@ -42,6 +42,7 @@ export default function ProposalActionCard({
   const [allowMergeCommit, setAllowMergeCommit] = useState<boolean>();
 
   const {state} = useAppState();
+  const {getRepository} = useOctokit();
 
   const bountyAmount = BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
 
@@ -102,11 +103,11 @@ export default function ProposalActionCard({
   }, [state.Service?.active]);
 
   useEffect(() => {
-    if (activeIssue?.repository?.githubPath)
-      getRepository(activeIssue?.repository?.githubPath)
+    if (state.currentBounty?.data?.repository?.githubPath)
+      getRepository(state.currentBounty?.data?.repository?.githubPath)
         .then(({ mergeCommitAllowed }) => setAllowMergeCommit(mergeCommitAllowed))
         .catch(console.debug);
-  }, [activeIssue]);
+  }, [state?.currentBounty?.data]);
 
   return (
     <div className="col-md-6">

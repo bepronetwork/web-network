@@ -27,6 +27,7 @@ import ConnectGithub from "./connect-github";
 import {useBounty} from "../x-hooks/use-bounty";
 import Modal from "./modal";
 import {BountyProvider} from "../x-hooks/use-bounty";
+import {useSession} from "next-auth/react";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -40,6 +41,7 @@ export default function PageActions({
   const { t } = useTranslation(["common", "pull-request", "bounty"]);
 
   const {query: { repoId,}} = useRouter();
+  const session = useSession();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
@@ -372,7 +374,7 @@ export default function PageActions({
 
               {renderViewPullRequestLink()}
 
-              {!user?.login && wallet?.address && <ConnectGithub size="sm"/>}
+              {!(session?.data?.user as any)?.login && state.currentUser?.walletAddress && <ConnectGithub size="sm"/>}
 
               <GithubLink
                 onClick={!state.Service?.network?.repos?.active?.ghVisibility ? () => setShowGHModal(true) : null}

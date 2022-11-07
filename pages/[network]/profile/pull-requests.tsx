@@ -1,5 +1,3 @@
-import {useContext} from "react";
-
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -25,7 +23,7 @@ export default function PullRequests() {
       <ListIssues
         redirect={getURLWithNetwork("/developers")}
         buttonMessage={t('bounty:label_other')}
-        pullRequesterAddress={wallet?.address || null}
+        pullRequesterAddress={state.currentUser.walletAddress || null}
         pullRequesterLogin={state.currentUser?.login || null}
         emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
       />

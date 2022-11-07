@@ -219,11 +219,9 @@ export default function PullRequestPage() {
                       <Button
                         className="read-only-button text-nowrap"
                         onClick={handleShowModal}
-                        disabled={isCreatingReview || isCancelling || isMakingReady || !user?.login }
+                        disabled={isCreatingReview || isCancelling || isMakingReady || !state.currentUser?.handle }
                         isLoading={isCreatingReview}
-                        withLockIcon={isCancelling || isMakingReady || !user?.login}
-                        
-                      >
+                        withLockIcon={isCancelling || isMakingReady || !state.currentUser?.handle}>
                         {t("actions.make-a-review")}
                       </Button>
                     </ReadOnlyButtonWrapper>

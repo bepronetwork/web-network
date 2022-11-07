@@ -56,10 +56,10 @@ export default function FundingSection() {
   useEffect(() => {
     if (!state.currentUser?.walletAddress || !state.currentBounty?.chainData) return;
 
-    const funds =
+    const funds: any[] =
       state.currentBounty?.chainData.funding
         .map((fund, index) => ({ ...fund, id: index }))
-        .filter(fund => fund.benefactor.toLowerCase() === state.currentUser.walletAddress.toLowerCase() && fund.amount.gt(0));
+        .filter(fund => fund.benefactor.toLowerCase() === state.currentUser.walletAddress.toLowerCase() && fund.amount.gt(0)) || [];
 
     setWalletFunds(funds);
   }, [state.currentUser, state.currentBounty?.chainData]);

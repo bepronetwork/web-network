@@ -15,7 +15,6 @@ import useBepro from "x-hooks/use-bepro";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {MetamaskErrors} from "../interfaces/enums/Errors";
-import useTransactions from "x-hooks/useTransactions";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
@@ -27,11 +26,8 @@ export default function useERC20() {
   const [allowance, setAllowance] = useState(BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
-  const txWindow = useTransactions();
   const { state, dispatch } = useAppState();
   const { handleApproveToken } = useBepro();
-
-
 
   const logData = { 
     wallet: state.currentUser?.walletAddress,
