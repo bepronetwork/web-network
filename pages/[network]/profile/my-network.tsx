@@ -9,6 +9,8 @@ import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
 import MyNetworkSettings from "components/profile/my-network-settings";
 import ProfileLayout from "components/profile/profile-layout";
+import RegistryGovernorSettings from "components/profile/registry-governor-settings";
+import TabbedNavigation from "components/tabbed-navigation";
 
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
@@ -18,6 +20,9 @@ import {Network} from "interfaces/network";
 import useApi from "x-hooks/use-api";
 
 import {NetworkSettingsProvider, useNetworkSettings} from "../../../contexts/network-settings";
+
+export const ContainerTab = ({ children }) => 
+  <div className="px-2 pt-2 border border-dark-gray container-my-network">{children}</div>;
 
 export function MyNetwork() {
   const {t} = useTranslation(["common", "custom-network"]);
@@ -29,6 +34,29 @@ export function MyNetwork() {
   const { searchNetworks } = useApi();
   const { setForcedNetwork } = useNetworkSettings()
   const defaultNetworkName = state.Settings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
+
+  const [isGovernorRegistry, setIsGovernorRegistry] = useState(false);
+  
+  const TABS = [
+    {
+      eventKey: "my-network",
+      title: "Network",
+      component: (
+        <ContainerTab>
+          <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
+        </ContainerTab>
+        )
+    },
+    isGovernorRegistry ? {
+      eventKey: "registry",
+      title: "Registry",
+      component: (
+        <ContainerTab>
+          <RegistryGovernorSettings />
+        </ContainerTab>
+        )
+    } : null
+  ];
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
@@ -55,7 +83,13 @@ export function MyNetwork() {
 
     updateEditingNetwork();
   }, [state.currentUser?.walletAddress]);
-  
+
+  useEffect(() => {
+    if(!state.Service?.active || !state.currentUser?.walletAddress) return;
+
+    state.Service?.active.isRegistryGovernor(state.currentUser?.walletAddress).then(setIsGovernorRegistry)
+  }, [state.currentUser?.walletAddress])
+
   return(
     <ProfileLayout>
       { !myNetwork && 
@@ -74,7 +108,11 @@ export function MyNetwork() {
         </Col>
       ||
         <Col xs={10}>
-          <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
+          <TabbedNavigation
+            className="my-network-tabs border border-dark-gray"
+            defaultActiveKey="my-network"
+            tabs={TABS.filter(v => v !== null)}
+          />
         </Col>
       }
     </ProfileLayout>
