@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useState, useContext } from "react";
-import { setDefaults } from "react-i18next";
+import {useCallback, useEffect, useState} from "react";
 
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { parseTransaction } from "helpers/transactions";
+import {parseTransaction} from "helpers/transactions";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useBepro from "x-hooks/use-bepro";
 
@@ -90,7 +89,7 @@ export default function useERC20() {
 
       await state.Service?.active.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          updateTx([parseTransaction(txInfo, transaction.payload[0])])
+          updateTx([parseTransaction(txInfo, transaction.payload[0] as any)])
           resolve(txInfo);
         })
         .catch((err) => {

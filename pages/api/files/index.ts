@@ -1,7 +1,7 @@
 import formidable from "formidable";
 import fs from "fs";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 
 import IpfsStorage from "services/ipfs-service";
 

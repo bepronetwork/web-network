@@ -1,24 +1,24 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
-import { useAppState } from "contexts/app-state";
-import { toastError } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {toastError} from "contexts/reducers/change-toaster";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 
 export default function UpdateBountyAmountModal({
-  show,
-  transactionalAddress,
+                                                  show,
+                                                  transactionalAddress,
   handleClose = undefined,
   bountyId,
 }) {

@@ -1,17 +1,17 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import Link from "next/link";
 
 import ArrowRight from "assets/icons/arrow-right";
 import CloseIcon from "assets/icons/close-icon";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import Button from "./button";
 
 export default function CardBecomeCouncil() {

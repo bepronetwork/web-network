@@ -1,13 +1,9 @@
-import {
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { FormCheck } from "react-bootstrap";
-import { NumberFormatValues } from "react-number-format";
+import {useEffect, useState,} from "react";
+import {FormCheck} from "react-bootstrap";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import router from "next/router";
 
 import BranchsDropdown from "components/branchs-dropdown";
@@ -16,29 +12,29 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import CreateBountyDetails from "components/create-bounty-details";
 import CreateBountyProgress from "components/create-bounty-progress";
 import CreateBountyTokenAmount from "components/create-bounty-token-amount";
-import { IFilesProps } from "components/drag-and-drop";
+import {IFilesProps} from "components/drag-and-drop";
 import GithubInfo from "components/github-info";
-import Modal from "components/modal"; 
+import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
-import { toastError, toastWarning } from "contexts/reducers/change-toaster";
+import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 
-import { parseTransaction } from "helpers/transactions";
+import {parseTransaction} from "helpers/transactions";
 
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Token } from "interfaces/token";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
+import {Token} from "interfaces/token";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 

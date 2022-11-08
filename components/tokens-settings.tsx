@@ -1,18 +1,18 @@
-import {useContext, useEffect, useState} from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
+import {handleAllowedTokensDatabase} from "helpers/handleAllowedTokens";
 
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import Button from "./button";
 import MultipleTokensDropdown from "./multiple-tokens-dropdown";
-import { WarningSpan } from "./warning-span";
+import {WarningSpan} from "./warning-span";
 
 export default function TokensSettings({
   isGovernorRegistry = false,

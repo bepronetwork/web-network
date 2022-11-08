@@ -1,31 +1,31 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
-import { Defaults } from "@taikai/dappkit";
+import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
-import { isSameSet } from "helpers/array";
-import { isColorsSimilar } from "helpers/colors";
-import { 
-  DEFAULT_CANCEL_FEE, 
-  DEFAULT_CLOSE_FEE, 
-  DEFAULT_COUNCIL_AMOUNT, 
-  DEFAULT_DISPUTE_TIME, 
-  DEFAULT_DRAFT_TIME, 
-  DEFAULT_PERCENTAGE_FOR_DISPUTE 
+import {isSameSet} from "helpers/array";
+import {isColorsSimilar} from "helpers/colors";
+import {
+  DEFAULT_CANCEL_FEE,
+  DEFAULT_CLOSE_FEE,
+  DEFAULT_COUNCIL_AMOUNT,
+  DEFAULT_DISPUTE_TIME,
+  DEFAULT_DRAFT_TIME,
+  DEFAULT_PERCENTAGE_FOR_DISPUTE
 } from "helpers/contants";
-import { DefaultNetworkSettings } from "helpers/custom-network";
+import {DefaultNetworkSettings} from "helpers/custom-network";
 
-import { Color, Network, NetworkSettings, Theme } from "interfaces/network";
+import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 
 import DAO from "services/dao-service";
-import { WinStorage } from "services/win-storage";
+import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
 import useOctokit from "x-hooks/use-octokit";
 
-import { useAppState } from "./app-state";
+import {useAppState} from "./app-state";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
@@ -58,13 +58,15 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
-  const network = useMemo(() => forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
+  const network =
+    useMemo(() =>
+      forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
 
-  function handlerValidateSettings(settings){
+  function handlerValidateSettings(settings) {
     //Treasury
     if (state.Service?.active) {
-      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
-      settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
+      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" ||
+        settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
       const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
 

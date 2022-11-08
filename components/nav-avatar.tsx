@@ -1,8 +1,8 @@
-import {useContext, useState} from "react";
-import { OverlayTrigger, Popover } from "react-bootstrap";
+import {useState} from "react";
+import {OverlayTrigger, Popover} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
@@ -11,16 +11,12 @@ import Avatar from "components/avatar";
 import Button from "components/button";
 import Identicon from "components/identicon";
 
-import { truncateAddress } from "helpers/truncate-address";
+import {truncateAddress} from "helpers/truncate-address";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
-
-
-
-
+import {useAppState} from "../contexts/app-state";
 
 
 export default function NavAvatar() {

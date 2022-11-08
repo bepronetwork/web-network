@@ -1,31 +1,29 @@
-import { useContext } from "react";
-
-import { GetServerSideProps } from "next";
-import { useSession } from "next-auth/react";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
+import {GetServerSideProps} from "next";
+import {useSession} from "next-auth/react";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
-import { ConnectionButton } from "components/profile/connect-button";
-import { FlexRow } from "components/profile/wallet-balance";
+import {ConnectionButton} from "components/profile/connect-button";
+import {FlexRow} from "components/profile/wallet-balance";
 
-import { useAppState } from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { CustomSession } from "interfaces/custom-session";
+import {CustomSession} from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
 export default function ConnectAccount() {
   const router = useRouter();
-  const { data: sessionData } = useSession();
-  const { t } = useTranslation(["common", "connect-account", "profile"]);
+  const {data: sessionData} = useSession();
+  const {t} = useTranslation(["common", "connect-account", "profile"]);
 
   const { joinAddressToUser } = useApi();
   const { state, dispatch } = useAppState();

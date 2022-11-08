@@ -1,9 +1,9 @@
-import { Col, Row } from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import OracleIcon from "assets/icons/oracle-icon";
 
@@ -13,14 +13,14 @@ import OraclesActions from "components/oracles-actions";
 import OraclesDelegate from "components/oracles-delegate";
 import ProfileLayout from "components/profile/profile-layout";
 import TokenBalance from "components/profile/token-balance";
-import { FlexRow } from "components/profile/wallet-balance";
+import {FlexRow} from "components/profile/wallet-balance";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
-import { useAppState } from "../../../contexts/app-state";
+import {useAppState} from "../../../contexts/app-state";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);

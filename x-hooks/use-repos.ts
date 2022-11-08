@@ -1,8 +1,8 @@
-import {useContext, useEffect} from "react";
+import {useEffect} from "react";
 
 import {useRouter} from "next/router";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {changeLoadState} from "../contexts/reducers/change-load";
 import {changeNetworkReposActive, changeNetworkReposList} from "../contexts/reducers/change-service";
 import {RepoInfo} from "../interfaces/repos-list";

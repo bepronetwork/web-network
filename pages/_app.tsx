@@ -1,7 +1,9 @@
-import { GetServerSideProps } from "next";
-import { SessionProvider } from "next-auth/react";
-import { appWithTranslation } from "next-i18next";
-import { AppProps } from "next/app";
+import React from "react";
+
+import {GetServerSideProps} from "next";
+import {SessionProvider} from "next-auth/react";
+import {appWithTranslation} from "next-i18next";
+import {AppProps} from "next/app";
 
 import MainNav from "components/main-nav";
 import Seo from "components/seo";
@@ -12,7 +14,7 @@ import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import CreateBountyModal from "../components/create-bounty-modal";
-import React from "react";
+
 
 function App({
   Component,

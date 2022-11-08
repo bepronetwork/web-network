@@ -1,10 +1,10 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext, useAppState} from "../../contexts/app-state";
+import {useAppState} from "../../contexts/app-state";
 
 export default function NetworkThemeInjector() {
   const { pathname } = useRouter();

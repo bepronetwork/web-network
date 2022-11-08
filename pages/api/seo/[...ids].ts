@@ -1,11 +1,11 @@
 import axios from "axios";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op } from "sequelize";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {

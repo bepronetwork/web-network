@@ -1,11 +1,11 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
-import { IssueFilterBoxOption } from "interfaces/filters";
-import { RepoInfo } from "interfaces/repos-list";
+import {IssueFilterBoxOption} from "interfaces/filters";
+import {RepoInfo} from "interfaces/repos-list";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 type FilterStateUpdater = (
   opts: IssueFilterBoxOption[],

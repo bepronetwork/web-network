@@ -1,15 +1,15 @@
-import {useContext, useState} from "react";
+import {useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function ChangeTokenModal({
   show,

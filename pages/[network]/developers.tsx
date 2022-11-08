@@ -1,18 +1,18 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
+import {ERC20} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSideProps } from "next/types";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next/types";
 
 
 import ListIssues from "components/list-issues";
-import PageHero, { InfosHero } from "components/page-hero";
+import PageHero, {InfosHero} from "components/page-hero";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../../contexts/app-state";
-import {ERC20} from "@taikai/dappkit";
+import {useAppState} from "../../contexts/app-state";
 import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 
 

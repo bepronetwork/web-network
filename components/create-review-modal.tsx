@@ -1,6 +1,6 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -9,20 +9,22 @@ import Button from "components/button";
 import GithubInfo from "components/github-info";
 import Modal from "components/modal";
 
-import { formatDate } from "helpers/formatDate";
+import {formatDate} from "helpers/formatDate";
 
-import { pullRequest } from "interfaces/issue-data";
+import {pullRequest} from "interfaces/issue-data";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
-interface CreateReviewModalModalProps{
+import {useAppState} from "../contexts/app-state";
+
+interface CreateReviewModalModalProps {
   show: boolean,
   isExecuting: boolean,
-  onConfirm: (body: string)=> void,
+  onConfirm: (body: string) => void,
   onCloseClick: () => void,
   pullRequest: pullRequest
 }
+
 export default function CreateReviewModal({
-  show = false,
+                                            show = false,
   isExecuting = false,
   onConfirm,
   onCloseClick,

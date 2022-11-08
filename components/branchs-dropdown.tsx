@@ -1,12 +1,11 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
-import { trimString } from "helpers/string";
 
 export default function BranchsDropdown({
   repoId,

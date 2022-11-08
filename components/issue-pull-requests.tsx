@@ -1,11 +1,11 @@
-import React, {useContext} from "react";
+import React from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import NothingFound from "components/nothing-found";
 import PullRequestItem from "components/pull-request-item";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function IssuePullRequests() {
   const { t } = useTranslation("pull-request");

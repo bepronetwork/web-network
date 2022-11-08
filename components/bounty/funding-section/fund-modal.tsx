@@ -1,33 +1,33 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import Button from "components/button";
 import InputWithBalance from "components/input-with-balance";
 import Modal from "components/modal";
 
-import { toastError, toastSuccess} from "contexts/reducers/change-toaster";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import {formatNumberToCurrency} from "helpers/formatNumber";
 
-import { MetamaskErrors } from "interfaces/enums/Errors";
+import {MetamaskErrors} from "interfaces/enums/Errors";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
 import useERC20 from "x-hooks/use-erc20";
 
-import {AppStateContext, useAppState} from "../../../contexts/app-state";
-import { Amount, CaptionMedium, RowWithTwoColumns } from "./minimals";
+import {useAppState} from "../../../contexts/app-state";
+import {Amount, CaptionMedium, RowWithTwoColumns} from "./minimals";
 
 
 export default function FundModal({
-  show = false,
-  onCloseClick,
-}) {
-  const { t } = useTranslation(["common", "funding", "bounty"]);
+                                    show = false,
+                                    onCloseClick,
+                                  }) {
+  const {t} = useTranslation(["common", "funding", "bounty"]);
   const {state, dispatch} = useAppState();
 
   const [isExecuting, setIsExecuting] = useState(false);

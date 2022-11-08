@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import CenterArrows from "assets/icons/center-arrows";
 import ChatBubbles from "assets/icons/chat-bubbles";
@@ -21,12 +21,12 @@ import Button from "components/button";
 import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Transaction } from "interfaces/transaction";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
+import {Transaction} from "interfaces/transaction";
 
 import {updateTx} from "../contexts/reducers/change-tx-list";
 
@@ -35,8 +35,8 @@ interface TransactionListProps {
 }
 
 export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
-  const {dispatch, state: { transactions, currentUser }} = useAppState();
-  const { t } = useTranslation("common");
+  const {dispatch, state: {transactions, currentUser}} = useAppState();
+  const {t} = useTranslation("common");
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,

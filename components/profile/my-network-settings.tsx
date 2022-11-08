@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
@@ -18,24 +18,24 @@ import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TokensSettings from "components/tokens-settings";
-import { WarningSpan } from "components/warning-span";
+import {WarningSpan} from "components/warning-span";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
-import { addToast, toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
+import {addToast, toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { psReadAsText } from "helpers/file-reader";
-import { formatDate } from "helpers/formatDate";
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import {psReadAsText} from "helpers/file-reader";
+import {formatDate} from "helpers/formatDate";
+import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { Network } from "interfaces/network";
-import { Token } from "interfaces/token";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {Network} from "interfaces/network";
+import {Token} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
 import RegistryGovernorSettings from "./registry-governor-settings";

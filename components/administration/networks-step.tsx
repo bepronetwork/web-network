@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import {useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
 
 import NetworksDropDown from "components/administration/networks-dropdown";
@@ -9,23 +9,23 @@ import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import Step from "components/step";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { psReadAsText } from "helpers/file-reader";
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import {psReadAsText} from "helpers/file-reader";
+import {formatNumberToCurrency} from "helpers/formatNumber";
+import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig: { urls: { homeURL }} } = getConfig();
+const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
 export default function NetworksStep({
-    step,
-    currentStep,
-    handleChangeStep,
+                                       step,
+                                       currentStep,
+                                       handleChangeStep,
     networks
 }) {
   const { t } = useTranslation(["common", "custom-network"]);

@@ -1,7 +1,7 @@
-import {useContext, useRef, useState} from "react";
+import {useRef, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
@@ -11,13 +11,13 @@ import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function UnlockBeproModal({
   show = false,

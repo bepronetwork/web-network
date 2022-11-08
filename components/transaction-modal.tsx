@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { format } from "date-fns";
-import { useTranslation } from "next-i18next";
+import {format} from "date-fns";
+import {useTranslation} from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 import CopyIcon from "assets/icons/copy";
@@ -13,22 +13,22 @@ import InternalLink from "components/internal-link";
 import Modal from "components/modal";
 import TransactionStats from "components/transaction-stats";
 
-import { useAppState } from "contexts/app-state";
-import { toastInfo } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {toastInfo} from "contexts/reducers/change-toaster";
 
-import { CopyValue } from "helpers/copy-value";
-import { formatStringToCurrency } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
+import {CopyValue} from "helpers/copy-value";
+import {formatStringToCurrency} from "helpers/formatNumber";
+import {truncateAddress} from "helpers/truncate-address";
 
-import { BlockTransaction, Transaction } from "interfaces/transaction";
+import {BlockTransaction, Transaction} from "interfaces/transaction";
 
 import {useNetwork} from "../x-hooks/use-network";
 
 
 export default function TransactionModal({
-  transaction = null,
-  onCloseClick,
-}: {
+                                           transaction = null,
+                                           onCloseClick,
+                                         }: {
   transaction: Transaction;
   onCloseClick: () => void;
 }) {

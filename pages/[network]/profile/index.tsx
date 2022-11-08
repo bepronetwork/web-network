@@ -1,21 +1,21 @@
-import {useContext, useState} from "react";
+import {useState} from "react";
 
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
 import Button from "components/button";
-import { ConnectionButton } from "components/profile/connect-button";
+import {ConnectionButton} from "components/profile/connect-button";
 import ProfileLayout from "components/profile/profile-layout";
-import { RemoveGithubAccount } from "components/profile/remove-github-modal";
+import {RemoveGithubAccount} from "components/profile/remove-github-modal";
 
-import { truncateAddress } from "helpers/truncate-address";
+import {truncateAddress} from "helpers/truncate-address";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
-import { useAppState } from "../../../contexts/app-state";
+import {useAppState} from "../../../contexts/app-state";
 
 export default function Profile() {
   const { t } = useTranslation("profile");

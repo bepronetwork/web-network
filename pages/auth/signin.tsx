@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import {useEffect} from "react";
 
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { GetServerSideProps } from "next/types";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
 
 export default function SignIn() {
   const router = useRouter();
-  
+
   useEffect(() => {
     if (router?.query?.error)
       router.replace(sessionStorage.getItem("lastUrlBeforeGithubConnect") || "/");

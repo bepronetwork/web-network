@@ -1,30 +1,30 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
-import { NumberFormatValues } from "react-number-format";
+import {ChangeEvent, useEffect, useState} from "react";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import InputNumber from "components/input-number";
 import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { Wallet } from "interfaces/authentication";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {Wallet} from "interfaces/authentication";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 interface OraclesDelegateProps {
   wallet: Wallet;
 }
 
 function OraclesDelegate({
-  wallet
-} : OraclesDelegateProps) {
-  const { t } = useTranslation(["common", "my-oracles"]);
+                           wallet
+                         }: OraclesDelegateProps) {
+  const {t} = useTranslation(["common", "my-oracles"]);
 
   const [error, setError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();

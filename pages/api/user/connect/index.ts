@@ -1,10 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
-import { Op } from "sequelize";
+import {NextApiRequest, NextApiResponse} from "next";
+import {getToken} from "next-auth/jwt";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
-import { error as LogError } from "services/logging";
+import {error as LogError} from "services/logging";
 
 enum Actions {
   REGISTER = "register",
@@ -51,7 +51,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json("Success");
   } catch (error) {
-    LogError(`Failed to ${action} user`, { req, error });
+    LogError(`Failed to ${action || "no action"} user`, { req, error });
     return res.status(500).json(error);
   }
 }

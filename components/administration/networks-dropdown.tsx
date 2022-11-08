@@ -1,10 +1,10 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import ReactSelect from "components/react-select";
 
-import {AppStateContext, useAppState} from "../../contexts/app-state";
+import {useAppState} from "../../contexts/app-state";
 
 export default function NetworksDropDown({
   networks,

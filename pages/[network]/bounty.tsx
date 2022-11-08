@@ -1,9 +1,9 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { GetServerSideProps } from "next/types";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
 
 import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
@@ -16,12 +16,11 @@ import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
 import TabbedNavigation from "components/tabbed-navigation";
 
-import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
+import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
-import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
-import { useAppState } from "../../contexts/app-state";
+import {useAppState} from "../../contexts/app-state";
 import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 
 export default function PageIssue() {

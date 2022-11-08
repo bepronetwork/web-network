@@ -1,12 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import { useAppState } from "contexts/app-state";
-
-import { trimString } from "helpers/string";
+import {useAppState} from "contexts/app-state";
 
 export default function ReposDropdown({ onSelected, value, disabled }: {
   onSelected: (e: { value: { id: string; path: string; } }) => void,

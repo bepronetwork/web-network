@@ -1,7 +1,7 @@
-import { ReactElement, ReactNode, useContext, useEffect, useState } from "react";
+import {ReactElement, ReactNode, useEffect, useState} from "react";
 
-import { Defaults } from "@taikai/dappkit";
-import { useRouter } from "next/router";
+import {Defaults} from "@taikai/dappkit";
+import {useRouter} from "next/router";
 
 import BeproLogoBlue from "assets/icons/bepro-logo-blue";
 import HelpIcon from "assets/icons/help-icon";
@@ -17,14 +17,14 @@ import TransactionsStateIndicator from "components/transactions-state-indicator"
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
 
 import useApi from "x-hooks/use-api";
 
 import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import useNetworkTheme from "../x-hooks/use-network-theme";
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface MyNetworkLink {
   href: string;

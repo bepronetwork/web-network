@@ -1,17 +1,15 @@
-import {useContext,} from "react";
-
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import OracleIcon from "assets/icons/oracle-icon";
 
 import DelegationItem from "components/delegation-item";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import InfoTooltip from "./info-tooltip";
-import { FlexRow } from "./profile/wallet-balance";
+import {FlexRow} from "./profile/wallet-balance";
 
 interface DelegationsProps {
   type?: "toMe" | "toOthers";

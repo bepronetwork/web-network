@@ -1,22 +1,22 @@
-import { useContext, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import {useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
 import Modal from "components/modal";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { fundingBenefactor } from "interfaces/issue-data";
+import {fundingBenefactor} from "interfaces/issue-data";
 
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import { useBounty } from "x-hooks/use-bounty";
+import {useBounty} from "x-hooks/use-bounty";
 
-import { Amount, RowWithTwoColumns } from "./minimals";
+import {Amount, RowWithTwoColumns} from "./minimals";
 
 
 interface RetractOrWithdrawModalProps {

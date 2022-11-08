@@ -1,14 +1,14 @@
-import {useContext, useState} from "react";
-import { NumberFormatValues } from "react-number-format";
+import {useState} from "react";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 
-import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
+import {handleTokenToEurConversion} from "helpers/handleTokenToEurConversion";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import InputNumber from "./input-number";
 import TokensDropdown from "./tokens-dropdown";
 

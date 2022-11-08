@@ -1,15 +1,14 @@
-import {useContext} from "react";
-import { isMobile } from "react-device-detect";
+import {isMobile} from "react-device-detect";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Avatar from "components/avatar";
 import GithubInfo from "components/github-info";
 
-import { getIssueState } from "helpers/handleTypeIssue";
-import { truncateAddress } from "helpers/truncate-address";
+import {getIssueState} from "helpers/handleTypeIssue";
+import {truncateAddress} from "helpers/truncate-address";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
@@ -17,7 +16,7 @@ import PriceConversor from "./price-conversor";
 import Translation from "./translation";
 
 export default function BountyHero() {
-  const { t } = useTranslation(["bounty", "common"]);
+  const {t} = useTranslation(["bounty", "common"]);
   const {state} = useAppState();
 
 

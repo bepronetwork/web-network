@@ -1,27 +1,27 @@
-import {ChangeEvent, SetStateAction, useContext, useEffect, useState} from "react";
+import {ChangeEvent, SetStateAction, useEffect, useState} from "react";
 
-import { format, subDays } from "date-fns";
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {format, subDays} from "date-fns";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import ArrowRight from "assets/icons/arrow-right";
 
 import NothingFound from "components/nothing-found";
 import PaymentsList from "components/profile/payments-list";
 import ProfileLayout from "components/profile/profile-layout";
-import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
+import {FlexColumn, FlexRow} from "components/profile/wallet-balance";
 import ReactSelect from "components/react-select";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import {formatNumberToCurrency} from "helpers/formatNumber";
 
-import { Payment } from "interfaces/payments";
+import {Payment} from "interfaces/payments";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../../../contexts/app-state";
+import {useAppState} from "../../../contexts/app-state";
 
 export default function Payments() {
   const { t } = useTranslation(["common", "profile"]);

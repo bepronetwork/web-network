@@ -1,17 +1,17 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
 import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { addToast } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { ProposalExtended } from "interfaces/bounty";
-import { pullRequest } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
+import {ProposalExtended} from "interfaces/bounty";
+import {pullRequest} from "interfaces/issue-data";
+import {Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 
@@ -20,8 +20,9 @@ interface MergeableModalProps {
   pullRequest: pullRequest;
   networkProposal: ProposalExtended;
 }
+
 export default function NotMergeableModal({
-  proposal,
+                                            proposal,
   pullRequest,
   networkProposal
 }: MergeableModalProps) {

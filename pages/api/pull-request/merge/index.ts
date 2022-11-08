@@ -1,18 +1,18 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import { Op } from "sequelize";
+import {Octokit} from "octokit";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
 
-import { GraphQlResponse } from "types/octokit";
+import {GraphQlResponse} from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 

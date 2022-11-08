@@ -1,28 +1,27 @@
-import React, {useContext} from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { isMobile } from "react-device-detect";
+import React from "react";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
+import {isMobile} from "react-device-detect";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import BountyStatusInfo from "components/bounty-status-info";
 import Identicon from "components/identicon";
 import Translation from "components/translation";
 
-import { formatDate } from "helpers/formatDate";
-import { formatNumberToNScale } from "helpers/formatNumber";
-import { getIssueState } from "helpers/handleTypeIssue";
+import {formatDate} from "helpers/formatDate";
+import {formatNumberToNScale} from "helpers/formatNumber";
+import {getIssueState} from "helpers/handleTypeIssue";
 
-import { IssueBigNumberData } from "interfaces/issue-data";
-import { IssueState } from "interfaces/issue-data";
+import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function IssueListItem({
-  issue = null,
-  xClick,
-}: {
+                                        issue = null,
+                                        xClick,
+                                      }: {
   issue?: IssueBigNumberData;
   xClick?: () => void;
 }) {

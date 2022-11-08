@@ -1,18 +1,18 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import router from "next/router";
 
 import NetworksStep from "components/administration/networks-step";
 import ConnectWalletButton from "components/connect-wallet-button";
 import Stepper from "components/stepper";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function AdministrationPage() {
   const [networks, setNetworks] = useState<Network[]>([]);

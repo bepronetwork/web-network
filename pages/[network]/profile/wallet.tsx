@@ -1,17 +1,17 @@
-import { Col, Row } from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import ProfileLayout from "components/profile/profile-layout";
 import WalletBalance from "components/profile/wallet-balance";
 
 export default function Wallet() {
-  return(
+  return (
     <ProfileLayout>
       <Col xs={10}>
         <Row className="mb-3">
-          <WalletBalance />
+          <WalletBalance/>
         </Row>
       </Col>
     </ProfileLayout>

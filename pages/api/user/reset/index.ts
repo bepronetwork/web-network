@@ -1,16 +1,17 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
-import { Sequelize, Op } from "sequelize";
+import {NextApiRequest, NextApiResponse} from "next";
+import {getToken} from "next-auth/jwt";
+import {Op, Sequelize} from "sequelize";
 
 import models from "db/models";
 
-import { error as LogError } from "services/logging";
+import {error as LogError} from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { address, githubLogin } = req.body;
+  const {address, githubLogin} = req.body;
 
   try {
-    const user = await models.user.findOne({ where: {
+    const user = await models.user.findOne({
+      where: {
       address: address.toLowerCase(),
       githubLogin: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("githubLogin")), "=", githubLogin.toLowerCase())
     } });

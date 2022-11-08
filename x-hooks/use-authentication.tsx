@@ -3,7 +3,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 import {
   changeCurrentUser,
   changeCurrentUserAccessToken,
@@ -191,11 +191,11 @@ export function useAuthentication() {
   }
 
   // if (useContext(AuthContext)) {
-    useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
-    useEffect(updateWalletAddress, [state.currentUser]);
-    useEffect(listenToAccountsChanged, [state.Service]);
-    useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
-    useEffect(updateCurrentUserLogin, [session?.data?.user]);
+  useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
+  useEffect(updateWalletAddress, [state.currentUser]);
+  useEffect(listenToAccountsChanged, [state.Service]);
+  useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
+  useEffect(updateCurrentUserLogin, [session?.data?.user]);
   // }
 
   return {

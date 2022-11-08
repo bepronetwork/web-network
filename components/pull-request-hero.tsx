@@ -1,18 +1,16 @@
-import {useContext} from "react";
-
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import ArrowLeft from "assets/icons/arrow-left";
 
 import Avatar from "components/avatar";
 import GithubInfo from "components/github-info";
 
-import { pullRequest } from "interfaces/issue-data";
+import {pullRequest} from "interfaces/issue-data";
 
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";

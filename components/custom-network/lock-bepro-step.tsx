@@ -1,8 +1,8 @@
-import {useContext, useEffect, useState} from "react";
-import { ProgressBar } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {ProgressBar} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
@@ -13,15 +13,15 @@ import InputNumber from "components/input-number";
 import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
-import { useNetworkSettings } from "contexts/network-settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
+import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 
-import { StepWrapperProps } from "interfaces/stepper";
+import {StepWrapperProps} from "interfaces/stepper";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
-import {AppStateContext, useAppState} from "../../contexts/app-state";
+import {useAppState} from "../../contexts/app-state";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
@@ -88,13 +88,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     setIsUnlocking(true);
 
     state.Service?.active.unlockFromRegistry()
-      .then(() => 
-        Promise.all([
-          updateWalletBalance(),
-          updateAllowance(),
-          updateTokenBalance(),
-          setAmount(BigNumber(0))
-        ]))
+      .then(() => {
+        updateWalletBalance();
+        updateAllowance();
+        setAmount(BigNumber(0));
+        return updateTokenBalance();
+      })
       .catch((error) => {
         console.log("Failed to Unlock", error);
       })

@@ -37,7 +37,7 @@ export const changeCurrentUserMatch = (match: boolean | undefined) =>
   changeCurrentUser.update({match});
 
 export const changeCurrentUserBalance = (balance: Balance | Partial<Balance>) =>
-  changeCurrentUser.update({balance: balance as any as Balance});
+  changeCurrentUser.update({balance: balance as unknown as Balance});
 
 export const changeCurrentUserConnected = (connected: boolean) =>
   changeCurrentUser.update({connected})

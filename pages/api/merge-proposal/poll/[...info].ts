@@ -1,7 +1,7 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 
-import { Bus } from "helpers/bus";
+import {Bus} from "helpers/bus";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -9,7 +9,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   } = req.query;
   return new Promise((resolve) => {
     console.log("Listening ",
-                `mergeProposal:created:${login}:${scId}:${ghPrId}`);
+      `mergeProposal:created:${login}:${scId}:${ghPrId}`);
     Bus.once(`mergeProposal:created:${login}:${scId}:${ghPrId}`, (merge) =>
       resolve(res.json(merge)));
   });
