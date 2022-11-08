@@ -33,8 +33,11 @@ export default function TransactionsStateIndicator() {
   }
 
   function updateLoadingState() {
-    if (!transactions.length)
+    if (!transactions.length) {
+      setLoading(false);
       return;
+    }
+
     const loading = transactions.some(({ status }) => status === TransactionStatus.pending);
 
     setLoading(loading);
