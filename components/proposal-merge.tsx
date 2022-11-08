@@ -1,21 +1,21 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import BountyDistributionItem from "components/bounty-distribution-item";
 import Button from "components/button";
 import Modal from "components/modal";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { ProposalExtended } from "interfaces/bounty";
-import { TokenInfo } from "interfaces/token";
+import {ProposalExtended} from "interfaces/bounty";
+import {TokenInfo} from "interfaces/token";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 
 interface amount {

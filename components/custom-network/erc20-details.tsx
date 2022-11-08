@@ -1,19 +1,20 @@
-import { useState, useEffect, useContext } from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Form, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
-import { FormGroup } from "components/form-group";
+import {FormGroup} from "components/form-group";
 import InputNumber from "components/input-number";
-import { WarningSpan } from "components/warning-span";
+import {WarningSpan} from "components/warning-span";
 
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
 import useERC20 from "x-hooks/use-erc20";
+
 import {useAppState} from "../../contexts/app-state";
 
 interface ERC20DetailsProps {

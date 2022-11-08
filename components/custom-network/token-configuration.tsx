@@ -1,50 +1,43 @@
-import {useContext, useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { Divider } from "components/divider";
+import {Divider} from "components/divider";
 import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import Step from "components/step";
 
-import { useNetworkSettings } from "contexts/network-settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
+import {handleAllowedTokensDatabase} from "helpers/handleAllowedTokens";
 
-import { StepWrapperProps } from "interfaces/stepper";
-import { Token } from "interfaces/token";
+import {StepWrapperProps} from "interfaces/stepper";
+import {Token} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
-import {AppStateContext, useAppState} from "../../contexts/app-state";
-
-import { NetworkTokenConfig } from "./network-token-config";
+import {useAppState} from "../../contexts/app-state";
+import {NetworkTokenConfig} from "./network-token-config";
 
 export default function TokenConfiguration({
-  activeStep, 
-  index, 
-  validated, 
-  handleClick, 
-  finishLabel, 
-  handleFinish
-} : StepWrapperProps) {
-  const { t } = useTranslation(["common", "custom-network"]);
+                                             activeStep,
+                                             index,
+                                             validated,
+                                             handleClick,
+                                             finishLabel,
+                                             handleFinish
+                                           }: StepWrapperProps) {
+  const {t} = useTranslation(["common", "custom-network"]);
 
   const {state} = useAppState();
 
-  const [networkTokenAddress, setNetworkTokenAddress] = useState("");
-  const [networkTokenError, setNetworkTokenError] = useState(false);
-  const [networkToken, setNetworkToken] = useState<Token>(undefined);
-  const [showModalDeploy, setShowModalDeploy] = useState(false);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>([]);
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>([]);
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
   const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
 
-  const debounce = useRef(null)
-
-  const { getTokens } = useApi();
+  const {getTokens} = useApi();
 
 
   const { tokens, fields, tokensLocked } = useNetworkSettings();
@@ -70,26 +63,6 @@ export default function TokenConfiguration({
 
   function changeSelectedRewardTokens(newToken: Token[]) {
     setSelectedRewardTokens(newToken);
-  }
-
-  function handleNetworkTokenChange(e) {
-    setNetworkTokenAddress(e.target.value)
-  }
-
-  async function validateNetworkAddress(address) {
-    setNetworkTokenError(false);
-    if (address?.trim() === "" || !state.Service?.active) return undefined;
-
-    try {
-      await state.Service?.active.getERC20TokenData(address)
-      .then(setNetworkToken)
-    } catch(error) {
-      setNetworkTokenError(true);
-      setNetworkToken({ address: "", name: "", symbol: ""})
-      return false;
-    }
-
-    return true;
   }
 
   // LoadData from context

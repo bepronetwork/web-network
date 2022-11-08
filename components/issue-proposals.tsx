@@ -1,11 +1,11 @@
-import React, {useContext} from "react";
+import React from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import NothingFound from "components/nothing-found";
 import ProposalItem from "components/proposal-item";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function IssueProposals() {
   const { t } = useTranslation("proposal");

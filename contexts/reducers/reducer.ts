@@ -35,4 +35,4 @@ export class SimpleAction<T = any, A = any> extends SimpleActor<T> implements Ac
 }
 
 export type XReducerAction<T> = { id: AppStateReduceId, payload: T };
-export type XReducer<T> = Actor<T> & Action<T>;
+export type XReducer<T = any> = Actor<T> & Action<T>;

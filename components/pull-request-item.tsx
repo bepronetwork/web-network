@@ -1,8 +1,8 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { PullRequest } from "@taikai/dappkit";
+import {PullRequest} from "@taikai/dappkit";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -12,15 +12,15 @@ import PullRequestLabels from "components/pull-request-labels";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 
-import { getTimeDifferenceInWords } from "helpers/formatDate";
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {getTimeDifferenceInWords} from "helpers/formatDate";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import { pullRequest } from "interfaces/issue-data";
+import {pullRequest} from "interfaces/issue-data";
 
 
 import useOctokit from "x-hooks/use-octokit";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {useNetwork} from "../x-hooks/use-network";
 
 interface PullRequestItem {

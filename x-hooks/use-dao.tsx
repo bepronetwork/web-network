@@ -1,17 +1,16 @@
-import {createContext, useContext, useEffect, useState,} from "react";
+import {createContext, useContext, useEffect,} from "react";
 
-import { useAppState } from "../contexts/app-state";
-import {changeCurrentUserConnected, changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
+import {useAppState} from "../contexts/app-state";
+import {changeCurrentUserConnected} from "../contexts/reducers/change-current-user";
 import {changeActiveDAO, changeActiveNetwork, changeStarting} from "../contexts/reducers/change-service";
 import {toastError,} from "../contexts/reducers/change-toaster";
 import DAO from "../services/dao-service";
-import {Web3Connection} from "@taikai/dappkit";
 
 /**
  * Populate `state.Settings` and instantiates a DAOService
  */
 export const DAOContext = createContext({});
-export const DAOProvider = ({children}) => <DAOContext.Provider value={{}} children={children} />;
+export const DAOProvider = ({children}) => <DAOContext.Provider value={{}} children={children}/>;
 
 export function useDao() {
   if (!useContext(DAOContext))

@@ -1,6 +1,6 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import TransactionIcon from "assets/icons/transaction";
 
@@ -8,11 +8,11 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 interface IPriceConversiorModalProps{
   show: boolean;

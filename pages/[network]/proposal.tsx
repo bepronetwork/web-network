@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { ProposalDetail } from "@taikai/dappkit";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { GetServerSideProps } from "next/types";
+import {ProposalDetail} from "@taikai/dappkit";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
 
 import ConnectWalletButton from "components/connect-wallet-button";
 import CustomContainer from "components/custom-container";
@@ -14,14 +14,14 @@ import ProposalHero from "components/proposal-hero";
 import ProposalListAddresses from "components/proposal-list-addresses";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 
-import { useAppState } from "contexts/app-state";
-import { addToast } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {addToast} from "contexts/reducers/change-toaster";
 
 
-import { ProposalExtended } from "interfaces/bounty";
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { pullRequest } from "interfaces/issue-data";
-import {Proposal, DistribuitonPerUser} from "interfaces/proposal";
+import {ProposalExtended} from "interfaces/bounty";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {pullRequest} from "interfaces/issue-data";
+import {DistribuitonPerUser, Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -31,7 +31,7 @@ import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 export default function PageProposal() {
   useBounty();
   const router = useRouter();
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   const { dispatch, state } = useAppState();
   

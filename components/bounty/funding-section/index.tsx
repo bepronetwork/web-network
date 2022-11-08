@@ -1,24 +1,24 @@
-import {useContext, useEffect, useState} from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 
 import FundModal from "components/bounty/funding-section/fund-modal";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
-import { Amount, CaptionLarge, CaptionMedium, RowWithTwoColumns } from "components/bounty/funding-section/minimals";
+import {Amount, CaptionLarge, CaptionMedium, RowWithTwoColumns} from "components/bounty/funding-section/minimals";
 import Button from "components/button";
 import Collapsable from "components/collapsable";
 import ConnectWalletButton from "components/connect-wallet-button";
 import CustomContainer from "components/custom-container";
 
-import { getIssueState } from "helpers/handleTypeIssue";
+import {getIssueState} from "helpers/handleTypeIssue";
 
-import { fundingBenefactor } from "interfaces/issue-data";
+import {fundingBenefactor} from "interfaces/issue-data";
 
-import {AppStateContext, useAppState} from "../../../contexts/app-state";
+import {useAppState} from "../../../contexts/app-state";
 import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
 export default function FundingSection() {

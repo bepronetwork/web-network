@@ -1,6 +1,6 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Badge from "components/badge";
 import Button from "components/button";
@@ -11,7 +11,7 @@ import ReactSelect from "components/react-select";
 
 import useOctokit from "x-hooks/use-octokit";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 interface props {
   show: boolean,

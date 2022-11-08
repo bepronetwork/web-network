@@ -1,7 +1,7 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import BeProBlue from "assets/icons/bepro-blue";
 import OracleIcon from "assets/icons/oracle-icon";
@@ -9,23 +9,19 @@ import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 import InfoTooltip from "components/info-tooltip";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { TokenInfo } from "interfaces/token";
+import {useAppState} from "../../contexts/app-state";
+import TokenBalance, {TokenBalanceType} from "./token-balance";
 
-import { getCoinInfoByContract } from "services/coingecko";
-
-import {AppStateContext, useAppState} from "../../contexts/app-state";
-import TokenBalance, { TokenBalanceType } from "./token-balance";
-
-export const FlexRow = ({ children, className = "" }) => 
+export const FlexRow = ({children, className = ""}) =>
   <div className={`d-flex flex-row ${className}`}>{children}</div>;
-  
-export const FlexColumn = ({ children, className = "" }) => 
+
+export const FlexColumn = ({children, className = ""}) =>
   <div className={`d-flex flex-column ${className}`}>{children}</div>;
 
 export default function WalletBalance() {
-  const { t } = useTranslation(["common", "profile"]);
+  const {t} = useTranslation(["common", "profile"]);
   
   const [tokens, setTokens] = useState<TokenBalanceType[]>([]);
   const [totalAmount, setTotalAmount] = useState("0");

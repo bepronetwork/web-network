@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FormControl, InputGroup } from "react-bootstrap";
-import { isMobile } from "react-device-detect";
+import React, {useEffect, useRef, useState} from "react";
+import {FormControl, InputGroup} from "react-bootstrap";
+import {isMobile} from "react-device-detect";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import { UrlObject } from "url";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
+import {UrlObject} from "url";
 
 import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
@@ -18,11 +18,11 @@ import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
 import ScrollTopButton from "components/scroll-top-button";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
 
 
-import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
+import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
@@ -128,15 +128,11 @@ export default function ListIssues({
   }
 
   function hasFilter(): boolean {
-    if (state || time || repoId || search) return true;
-
-    return false;
+    return !!(state || time || repoId || search);
   }
 
   function showClearButton(): boolean {
-    if (search.trim() !== "") return true;
-
-    return false;
+    return search.trim() !== "";
   }
 
   function handleClearSearch(): void {

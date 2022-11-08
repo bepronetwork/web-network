@@ -1,23 +1,22 @@
-import { subHours, subMonths, subWeeks, subYears } from "date-fns";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op, WhereOptions } from "sequelize";
-import { Sequelize } from "sequelize";
+import {subHours, subMonths, subWeeks, subYears} from "date-fns";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op, Sequelize, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
-import { searchPatternInText } from "helpers/string";
+import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
+import {searchPatternInText} from "helpers/string";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
-const iLikeCondition = (key, value) => ({ [key]: { [Op.iLike]: value } });
+const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  try{
-    const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };
+  try {
+    const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
     const {
-    state,
+      state,
     issueId,
     repoId,
     time,

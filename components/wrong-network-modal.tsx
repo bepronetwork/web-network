@@ -1,15 +1,15 @@
-import { useContext, useState } from "react";
-import { Spinner } from "react-bootstrap";
+import {useState} from "react";
+import {Spinner} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Modal from "components/modal";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { NETWORKS } from "helpers/networks";
+import {NETWORKS} from "helpers/networks";
 
-import { NetworkColors } from "interfaces/enums/network-colors";
+import {NetworkColors} from "interfaces/enums/network-colors";
 
 import Button from "./button";
 

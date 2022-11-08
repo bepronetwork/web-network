@@ -1,14 +1,14 @@
-import React, { useContext } from "react";
-import { Toast, ToastContainer } from "react-bootstrap";
+import React from "react";
+import {Toast, ToastContainer} from "react-bootstrap";
 
 import BeproSmallLogo from "assets/icons/bepro-small-logo";
 
 import Icon from "components/icon";
 
 
-import { removeToast } from "contexts/reducers/change-toaster";
+import {removeToast} from "contexts/reducers/change-toaster";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {ToastNotification} from "../interfaces/toast-notification";
 
 enum IconMapper {

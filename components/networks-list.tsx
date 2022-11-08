@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 
 import CustomContainer from "components/custom-container";
@@ -10,16 +10,16 @@ import NetworkListBar from "components/network-list-bar";
 import NetworkListItem from "components/network-list-item";
 import NothingFound from "components/nothing-found";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
 
-import { orderByProperty } from "helpers/array";
+import {orderByProperty} from "helpers/array";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
-import { NetworksPageContext } from "pages/networks";
+import {NetworksPageContext} from "pages/networks";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";

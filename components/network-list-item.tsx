@@ -1,13 +1,12 @@
-import {useContext} from "react";
-
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
+
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
@@ -15,8 +14,8 @@ interface NetworkListItemProps {
 }
 
 export default function NetworkListItem({
-  network,
-  tokenSymbolDefault,
+                                          network,
+                                          tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
   const {state: {Settings: settings}} = useAppState();

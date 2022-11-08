@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { PullRequest } from "@taikai/dappkit";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { GetServerSideProps } from "next/types";
+import {PullRequest} from "@taikai/dappkit";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
 
 import Button from "components/button";
 import Comment from "components/comment";
@@ -16,13 +16,13 @@ import NothingFound from "components/nothing-found";
 import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { useAppState } from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
-import { addToast } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
+import {addToast} from "contexts/reducers/change-toaster";
 
 
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { pullRequest } from "interfaces/issue-data";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";

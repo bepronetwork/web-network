@@ -1,20 +1,18 @@
 import {Dispatch} from "react";
 
-import BigNumber from "bignumber.js";
-
 import {XReducerAction} from "../contexts/reducers/reducer";
 import DAO from "../services/dao-service";
 import {SettingsType} from "../types/settings";
 import {Balance} from "./balance-state";
 import {BountyExtended} from "./bounty";
 import {BranchesList, BranchInfo} from "./branches-list";
-import {IssueBigNumberData, IssueData, IssueDataComment} from "./issue-data";
+import {IssueBigNumberData, IssueDataComment} from "./issue-data";
 import {LoadingState} from "./loading-state";
 import {Network} from "./network";
 import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
 import {ToastNotification} from "./toast-notification";
-import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
 import {Token} from "./token";
+import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];

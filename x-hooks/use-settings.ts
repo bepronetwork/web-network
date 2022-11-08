@@ -1,11 +1,10 @@
-import { useEffect, useState} from "react";
+import {useState} from "react";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {updateSettings} from "../contexts/reducers/change-settings";
 import {updateShowProp} from "../contexts/reducers/update-show-prop";
 import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
-import {SettingsType} from "../types/settings";
 
 /**
  * Loads settings with useEffect if not loaded previously

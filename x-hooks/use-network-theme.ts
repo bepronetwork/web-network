@@ -1,33 +1,18 @@
-import {useContext} from "react";
+import {useRouter} from "next/router";
+import {UrlObject} from "url";
 
-import { useRouter } from "next/router";
-import { UrlObject } from "url";
+import {hexadecimalToRGB} from "helpers/colors";
 
-import { hexadecimalToRGB } from "helpers/colors";
-
-import { ThemeColors } from "interfaces/network";
+import {ThemeColors} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 export default function useNetworkTheme() {
   const router = useRouter();
 
   const {state} = useAppState();
-
-
-  const { getNetwork } = useApi();
-
-  async function networkExists(networkName: string) {
-    try {
-      await getNetwork({name: networkName});
-
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
 
   function DefaultTheme(): ThemeColors {
     return {

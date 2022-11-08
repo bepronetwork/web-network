@@ -1,15 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import NetworkIdentifier from "components/network-identifier";
 import Translation from "components/translation";
 
-import { changeMicroServiceReady } from "contexts/reducers/change-service";
+import {changeMicroServiceReady} from "contexts/reducers/change-service";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 
 export default function StatusBar() {

@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { Defaults } from "@taikai/dappkit";
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
+import {Defaults} from "@taikai/dappkit";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
 
 import AlreadyHasNetworkModal from "components/already-has-network-modal";
 import ConnectWalletButton from "components/connect-wallet-button";
@@ -17,18 +17,18 @@ import SelectRepositoriesStep from "components/custom-network/select-repositorie
 import TokenConfiguration from "components/custom-network/token-configuration";
 import Stepper from "components/stepper";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
-import { changeLoadState } from "contexts/reducers/change-load";
-import { addToast } from "contexts/reducers/change-toaster";
+import {changeLoadState} from "contexts/reducers/change-load";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { 
-  DEFAULT_COUNCIL_AMOUNT, 
-  DEFAULT_DISPUTE_TIME, 
-  DEFAULT_DRAFT_TIME, 
-  DEFAULT_PERCENTAGE_FOR_DISPUTE 
+import {
+  DEFAULT_COUNCIL_AMOUNT,
+  DEFAULT_DISPUTE_TIME,
+  DEFAULT_DRAFT_TIME,
+  DEFAULT_PERCENTAGE_FOR_DISPUTE
 } from "helpers/contants";
-import { psReadAsText } from "helpers/file-reader";
+import {psReadAsText} from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";

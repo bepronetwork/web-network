@@ -1,14 +1,14 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
-import PageHero, { InfosHero } from "components/page-hero";
+import PageHero, {InfosHero} from "components/page-hero";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 interface NetworkTokenLocked {
   name: string;

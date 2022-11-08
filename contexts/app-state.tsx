@@ -4,15 +4,15 @@ import {useRouter} from "next/router";
 import sanitizeHtml from "sanitize-html";
 
 import {AppState} from "../interfaces/application-state";
-import {AuthProvider, useAuthentication} from "../x-hooks/use-authentication";
-import {DAOProvider, useDao} from "../x-hooks/use-dao";
-import {NetworkProvider, useNetwork} from "../x-hooks/use-network";
+import {useAuthentication} from "../x-hooks/use-authentication";
+import {useDao} from "../x-hooks/use-dao";
+import {useNetwork} from "../x-hooks/use-network";
 import {useRepos} from "../x-hooks/use-repos";
 import {useSettings} from "../x-hooks/use-settings";
 import loadApplicationStateReducers from "./reducers";
+import {updateSettings} from "./reducers/change-settings";
 import {toastError} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
-import {updateSettings} from "./reducers/change-settings";
 
 
 const appState: AppState = {
@@ -68,8 +68,8 @@ export function AppStateContextProvider({children}) {
   useEffect(parseError, [authError])
   useEffect(start, [])
 
-  return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
-          {children}
+  return <AppStateContext.Provider value={{state, dispatch: dispatch as unknown as any}}>
+    {children}
   </AppStateContext.Provider>
 }
 

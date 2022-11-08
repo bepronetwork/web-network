@@ -1,27 +1,26 @@
+import {useEffect, useState} from "react";
+import {Col} from "react-bootstrap";
 
-import { useContext, useEffect, useState } from "react";
-import { Col } from "react-bootstrap";
-
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
 import MyNetworkSettings from "components/profile/my-network-settings";
 import ProfileLayout from "components/profile/profile-layout";
 
-import { useAppState } from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
 import {NetworkSettingsProvider, useNetworkSettings} from "../../../contexts/network-settings";
 
 export function MyNetwork() {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const {t} = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 

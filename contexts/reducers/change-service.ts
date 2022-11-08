@@ -10,9 +10,9 @@ import {BranchesList} from "../../interfaces/branches-list";
 import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
 import {Network} from "../../interfaces/network";
 import {ForksList, ReposList} from "../../interfaces/repos-list";
+import {Token} from "../../interfaces/token";
 import DAO from "../../services/dao-service";
 import {SimpleAction} from "./reducer";
-import {Token} from "../../interfaces/token";
 
 export class ChangeServiceProp<T = ServiceState | Partial<ServiceState>, A = keyof ServiceState>
   extends SimpleAction<T, A> {

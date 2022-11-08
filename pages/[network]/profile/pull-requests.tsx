@@ -1,17 +1,16 @@
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import ListIssues from "components/list-issues";
 import ProfileLayout from "components/profile/profile-layout";
 
 
-
-import { useAppState } from "../../../contexts/app-state";
+import {useAppState} from "../../../contexts/app-state";
 import {useNetwork} from "../../../x-hooks/use-network";
 
 export default function PullRequests() {
-  const { t } = useTranslation(["pull-request", "bounty"]);
+  const {t} = useTranslation(["pull-request", "bounty"]);
 
   const {state} = useAppState();
   const { getURLWithNetwork } = useNetwork();

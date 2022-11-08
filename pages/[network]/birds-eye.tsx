@@ -1,18 +1,18 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import router from "next/router";
-import { Octokit } from "octokit";
+import {Octokit} from "octokit";
 
 import ConnectWalletButton from "components/connect-wallet-button";
 
-import { User } from "interfaces/api";
+import {User} from "interfaces/api";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../../contexts/app-state";
+import {useAppState} from "../../contexts/app-state";
 
 interface PropsUserList extends Partial<User> {
    created_at: string; 

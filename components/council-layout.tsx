@@ -1,17 +1,16 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import InternalLink from "components/internal-link";
-import PageHero, { InfosHero } from "components/page-hero";
+import PageHero, {InfosHero} from "components/page-hero";
 
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import CardBecomeCouncil from "./card-become-council";
-import {ERC20} from "@taikai/dappkit";
 
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();

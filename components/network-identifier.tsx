@@ -1,10 +1,10 @@
-import { useContext, useEffect } from "react";
+import {useEffect} from "react";
 
 import Indicator from "components/indicator";
 
-import { NetworkColors } from "interfaces/enums/network-colors";
+import {NetworkColors} from "interfaces/enums/network-colors";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {changeChain} from "../contexts/reducers/change-chain";
 
 export default function NetworkIdentifier() {

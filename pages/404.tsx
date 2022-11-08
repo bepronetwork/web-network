@@ -1,6 +1,6 @@
-import { GetStaticProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetStaticProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import NotFoundIcon from "assets/icons/not-found-icon";
 
@@ -8,7 +8,7 @@ import InternalLink from "components/internal-link";
 
 
 export default function NotFound() {
-  const { t } = useTranslation("common");
+  const {t} = useTranslation("common");
 
   return (
     <>

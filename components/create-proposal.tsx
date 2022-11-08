@@ -1,7 +1,7 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import clsx from "clsx";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -15,13 +15,13 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import sumObj from "helpers/sumObj";
 
-import { pullRequest } from "interfaces/issue-data";
+import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useOctokit from "x-hooks/use-octokit";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {useBounty} from "../x-hooks/use-bounty";
 
 

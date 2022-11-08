@@ -1,10 +1,10 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import {formatNumberToNScale} from "helpers/formatNumber";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import Translation from "./translation";
 
 export default function ProposalProgressBar({

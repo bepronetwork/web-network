@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from "uuid";
 
 import {State} from "../../interfaces/application-state";
 import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
@@ -7,7 +7,7 @@ import {TransactionTypes} from "../../interfaces/enums/transaction-types";
 import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "../../interfaces/transaction";
 import {SimpleAction} from "./reducer";
 
-type Tx = (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction);
+type Tx = Partial<(SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)>;
 type TxList = Tx[];
 
 enum SubActions {add, remove, update, change}

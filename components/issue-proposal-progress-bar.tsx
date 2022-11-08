@@ -1,15 +1,15 @@
-import { Fragment, useContext, useEffect, useState } from "react";
+import {Fragment, useEffect, useState} from "react";
 
-import { add, addSeconds, compareAsc, intervalToDuration } from "date-fns";
-import { useTranslation } from "next-i18next";
+import {add, addSeconds, compareAsc, intervalToDuration} from "date-fns";
+import {useTranslation} from "next-i18next";
 
-import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
+import {formatDate, getTimeDifferenceInWords} from "helpers/formatDate";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 
 
 export default function IssueProposalProgressBar() {
-  const { t } = useTranslation(["common", "bounty"]);
+  const {t} = useTranslation(["common", "bounty"]);
 
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();

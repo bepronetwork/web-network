@@ -1,20 +1,22 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
+
+import BigNumber from "bignumber.js";
+import {useTranslation} from "next-i18next";
+
 import Button from "components/button";
 import ProposalMerge from "components/proposal-merge";
 import ProposalProgressBar from "components/proposal-progress-bar";
-import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
 
-import { isProposalDisputable } from "helpers/proposal";
+import {isProposalDisputable} from "helpers/proposal";
 
-import { ProposalExtended } from "interfaces/bounty";
-import { pullRequest } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
+import {ProposalExtended} from "interfaces/bounty";
+import {pullRequest} from "interfaces/issue-data";
+import {Proposal} from "interfaces/proposal";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
 import useOctokit from "x-hooks/use-octokit";
 
-import { ContextualSpan } from "./contextual-span";
+import {useAppState} from "../contexts/app-state";
+import {ContextualSpan} from "./contextual-span";
 
 interface IProposalActionCardProps {
   proposal: Proposal;

@@ -1,7 +1,6 @@
+import React, {useEffect, useState} from "react";
 
-import React, {useContext, useEffect, useState} from "react";
-
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import Link from "next/link";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -9,15 +8,15 @@ import LockedIcon from "assets/icons/locked-icon";
 import PercentageProgressBar from "components/percentage-progress-bar";
 import ProposalProgressSmall from "components/proposal-progress-small";
 
-import { isProposalDisputable } from "helpers/proposal";
+import {isProposalDisputable} from "helpers/proposal";
 
-import { Proposal } from "interfaces/proposal";
+import {Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {useBounty} from "../x-hooks/use-bounty";
 import Button from "./button";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";

@@ -1,17 +1,16 @@
-import {useContext} from "react";
-import { FormCheck } from "react-bootstrap";
+import {FormCheck} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
-import { useNetworkSettings } from "contexts/network-settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { StepWrapperProps } from "interfaces/stepper";
+import {StepWrapperProps} from "interfaces/stepper";
 
-import {AppStateContext, useAppState} from "../../contexts/app-state";
+import {useAppState} from "../../contexts/app-state";
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");

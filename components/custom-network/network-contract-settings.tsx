@@ -1,20 +1,18 @@
-import { useContext } from "react";
-
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import {formatNumberToCurrency} from "helpers/formatNumber";
 
 
 export default function NetworkContractSettings() {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const {t} = useTranslation(["common", "custom-network"]);
   const {state} = useAppState();
 
-  const { fields, settings, LIMITS } = useNetworkSettings();
+  const {fields, settings, LIMITS} = useNetworkSettings();
   
   const handleDraftTimeChange = value => fields.parameter.setter({ label: "draftTime", value });
   const handleDisputeTimeChange = 

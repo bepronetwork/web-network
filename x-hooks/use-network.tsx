@@ -1,11 +1,12 @@
-import {createContext, useCallback, useContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 import {
-  changeActiveNetwork, changeActiveNetworkTimes,
+  changeActiveNetwork,
+  changeActiveNetworkTimes,
   changeActiveNetworkToken,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";

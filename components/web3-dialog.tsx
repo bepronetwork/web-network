@@ -1,4 +1,4 @@
-import {useContext, useEffect} from "react";
+import {useEffect} from "react";
 import {Modal} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
 
@@ -12,7 +12,7 @@ import MobileNotSupported from "components/mobile-not-supported";
 
 import useNetwork from "x-hooks/use-network-theme";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 import Button from "./button";
 

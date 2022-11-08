@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import Image from "next/image";
 
 import metamaskLogo from "assets/metamask.png";
@@ -8,13 +8,13 @@ import metamaskLogo from "assets/metamask.png";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { NetworkColors } from "interfaces/enums/network-colors";
+import {NetworkColors} from "interfaces/enums/network-colors";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
-import {AppStateContext, useAppState} from "../contexts/app-state";
-import { changeShowWeb3 } from "../contexts/reducers/update-show-prop";
+import {useAppState} from "../contexts/app-state";
 import {changeChain} from "../contexts/reducers/change-chain";
+import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);

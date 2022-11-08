@@ -1,18 +1,17 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import Creatable from "react-select/creatable";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import DoneIcon from "assets/icons/done-icon";
 
 import ChangeTokenModal from "components/change-token-modal";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import {formatNumberToCurrency} from "helpers/formatNumber";
 
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
-import { useAppState } from "../contexts/app-state";
-
+import {useAppState} from "../contexts/app-state";
 
 
 interface TokensDropdownProps {

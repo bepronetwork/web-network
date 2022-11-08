@@ -1,15 +1,9 @@
-import React, {
-  Fragment,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react";
-import { Spinner } from "react-bootstrap";
-import { NumberFormatValues } from "react-number-format";
+import React, {Fragment, useEffect, useRef, useState} from "react";
+import {Spinner} from "react-bootstrap";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -20,13 +14,13 @@ import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import {AppStateContext, useAppState} from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { formatNumberToNScale, formatStringToCurrency } from "helpers/formatNumber";
+import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 
-import { Wallet } from "interfaces/authentication";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {Wallet} from "interfaces/authentication";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useERC20 from "x-hooks/use-erc20";
 
@@ -36,7 +30,7 @@ interface OraclesActionsProps {
 }
 
 function OraclesActions({
-  wallet,
+                          wallet,
   updateWalletBalance
 } : OraclesActionsProps) {
   const { t } = useTranslation(["common", "my-oracles"]);

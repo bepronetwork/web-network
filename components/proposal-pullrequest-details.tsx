@@ -1,11 +1,9 @@
-import {useContext} from "react";
+import {useTranslation} from "next-i18next";
 
-import { useTranslation } from "next-i18next";
+import {pullRequest} from "interfaces/issue-data";
+import {DistribuitonPerUser} from "interfaces/proposal";
 
-import { pullRequest } from "interfaces/issue-data";
-import { DistribuitonPerUser } from "interfaces/proposal";
-
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import Avatar from "./avatar";
 import DateLabel from "./date-label";
 import GithubInfo from "./github-info";
