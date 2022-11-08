@@ -133,6 +133,7 @@ export function useAuthentication() {
         else if (user.githubLogin && userLogin)
           dispatch(changeCurrentUserMatch(userLogin === user.githubLogin &&
             (walletAddress ? walletAddress === user.address : true)));
+
       })
       .finally(() => {
         dispatch(changeSpinners.update({matching: false}));
@@ -181,9 +182,8 @@ export function useAuthentication() {
   }
 
   function updateCurrentUserLogin() {
-    if (!session?.data?.user || !state.currentUser?.login ||
-      state.currentUser.login === (session.data?.user as any)?.login ||
-      (session.data?.user as any).accessToken !== state.currentUser?.accessToken)
+    if (!session?.data?.user || state.currentUser?.login === (session.data?.user as any)?.login ||
+      (session.data?.user as any).accessToken === state.currentUser?.accessToken)
       return;
 
     dispatch(changeCurrentUserHandle(session.data.user.name));
