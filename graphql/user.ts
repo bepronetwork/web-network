@@ -17,6 +17,10 @@ export const Repositories =
           }
           viewerPermission
           mergeCommitAllowed
+          parent {
+            nameWithOwner
+            name
+          }
         }
       }
     }

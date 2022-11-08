@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
 
-import BigNumber from "bignumber.js";
-import {useSession} from "next-auth/react";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -40,7 +38,6 @@ export default function PageActions({
   const {t} = useTranslation(["common", "pull-request", "bounty"]);
 
   const {query: {repoId,}} = useRouter();
-  const session = useSession();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
@@ -57,15 +54,17 @@ export default function PageActions({
   const {createPrePullRequest, cancelPrePullRequest, startWorking, processEvent} = useApi();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
-
+  
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
   const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isWalletAndGHConnected = isWalletConnected && !!state.currentUser?.login;
-  const isFundingRequest = state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
+  const isGithubConnected = !!state.currentUser?.login;
+  const isFundingRequest = 
+    state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
   const isWorkingOnBounty = !!state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login);
-  const isBountyOpen = state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false;
+  const isBountyOpen = 
+    state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false;
   const issueState = getIssueState({
     state: state.currentBounty?.data?.state,
     amount: state.currentBounty?.data?.amount,
@@ -75,16 +74,16 @@ export default function PageActions({
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
-    state.currentUser?.walletAddress &&
+    isWalletConnected &&
     state.currentBounty?.chainData?.creator &&
     state.currentBounty?.chainData?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
 
   const hasPullRequests =
     !!state.currentBounty?.data?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
 
-  const hasOpenPullRequest =
-    !!state.currentBounty?.data?.pullRequests?.find(pullRequest => pullRequest?.githubLogin === state.currentUser?.login &&
-      pullRequest?.status !== "canceled");
+  const hasOpenPullRequest = 
+    !!state.currentBounty?.data?.pullRequests?.find(pullRequest => 
+      pullRequest?.githubLogin === state.currentUser?.login && pullRequest?.status !== "canceled");
 
 
   async function updateBountyData() {
@@ -100,7 +99,7 @@ export default function PageActions({
     state: state.currentBounty?.data?.state,
     amount: state.currentBounty?.data?.amount,
     fundingAmount: state.currentBounty?.data?.fundingAmount
-  }) === "funding")
+    }) === "funding")
       .then(() => {
         updateWalletBalance(true);
         updateBountyData();
@@ -142,18 +141,18 @@ export default function PageActions({
       branch,
       wallet: state.currentUser.walletAddress
     }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
-        pullRequestPayload = {
-          repoId,
-          issueGithubId: issueGithubID,
-          bountyId,
-          issueCid: originCID,
-          pullRequestGithubId: cid,
-          customNetworkName: state.Service?.network?.active.name,
-          creator: userRepo.split("/")[0],
-          userBranch,
-          userRepo,
-          wallet: state.currentUser.walletAddress
-        };
+      pullRequestPayload = {
+        repoId,
+        issueGithubId: issueGithubID,
+        bountyId,
+        issueCid: originCID,
+        pullRequestGithubId: cid,
+        customNetworkName: state.Service?.network?.active.name,
+        creator: userRepo.split("/")[0],
+        userBranch,
+        userRepo,
+        wallet: state.currentUser.walletAddress
+      };
 
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
@@ -227,7 +226,7 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (state.currentUser?.login && !state.currentBounty?.chainData?.isDraft && !state.currentBounty?.chainData?.isFinished && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && !isRepoForked)
+    if (isGithubConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
       return (
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
@@ -239,19 +238,13 @@ export default function PageActions({
   }
 
   function renderStartWorkingButton() {
-
-    console.log(`RENDER START WORKING`, state.currentUser, state.currentBounty);
-
-    if (state.currentUser?.login &&
-      !state.currentBounty?.chainData?.isDraft &&
-      state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false &&
-      !state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login) &&
-      isRepoForked &&
-      ["proposal", "open", "ready"].some(value => value === getIssueState({
-        state: state.currentBounty?.data?.state,
-        amount: state.currentBounty?.data?.amount,
-        fundingAmount: state.currentBounty?.data?.fundingAmount
-      })))
+    if (isWalletConnected && 
+        isGithubConnected &&
+        !isBountyInDraft &&
+        isBountyOpen &&
+        !isWorkingOnBounty &&
+        isRepoForked &&
+        isStateToWorking)
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -270,17 +263,18 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (state.currentUser?.login &&
-      state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false &&
-      !state.currentBounty?.chainData?.isDraft &&
-      state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login) &&
-      isRepoForked)
+    if (isWalletConnected && 
+        isGithubConnected &&
+        isBountyOpen &&
+        !isBountyInDraft &&
+        isWorkingOnBounty &&
+        isRepoForked)
       return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
             onClick={() => setShowPRModal(true)}
-            disabled={!state.currentUser?.login || !state.currentUser?.walletAddress}
+            disabled={!state.currentUser?.login || !isWalletConnected}
           >
             <Translation ns="pull-request" label="actions.create.title"/>
           </Button>
@@ -304,12 +298,9 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
+    const isDraftOrNotFunded = isFundingRequest ? !isBountyFunded : isBountyInDraft;
 
-    const isDraftOrNotFunded = state.currentBounty?.data?.fundingAmount.isGreaterThan(BigNumber(0))
-      ? !isBountyFunded
-      : state.currentBounty?.chainData?.isDraft;
-
-    if (state.currentUser?.walletAddress && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && isBountyOwner && isDraftOrNotFunded)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded)
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -323,7 +314,7 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (state.currentUser?.walletAddress && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && isBountyOwner && state.currentBounty?.chainData?.isDraft && !state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0))
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest)
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -337,7 +328,7 @@ export default function PageActions({
   }
 
   function renderCreateProposalButton() {
-    if (state.currentUser?.walletAddress && state.Service?.network?.active?.isCouncil && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && state.currentBounty?.chainData?.isFinished && hasPullRequests)
+    if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
       return (
         <NewProposal amountTotal={state.currentBounty?.chainData?.tokenAmount}
                      pullRequests={state.currentBounty?.data?.pullRequests}/>
@@ -345,7 +336,10 @@ export default function PageActions({
   }
 
   function renderViewPullRequestLink() {
-    if (state.currentUser?.login && !state.currentBounty?.chainData?.isDraft && hasOpenPullRequest)
+    if (isWalletConnected && 
+        isGithubConnected &&
+        !isBountyInDraft &&
+        hasOpenPullRequest)
       return (
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
@@ -387,7 +381,7 @@ export default function PageActions({
 
               {renderViewPullRequestLink()}
 
-              {!(session?.data?.user as any)?.login && state.currentUser?.walletAddress && <ConnectGithub size="sm"/>}
+              {!isGithubConnected && isWalletConnected && <ConnectGithub size="sm"/>}
 
               <GithubLink
                 onClick={!state.Service?.network?.repos?.active?.ghVisibility ? () => setShowGHModal(true) : null}
