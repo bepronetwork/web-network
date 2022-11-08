@@ -50,19 +50,17 @@ export function useBounty() {
 
     console.log(`getDatabaseBounty()`, force);
 
-    if (!state.Service?.network?.active || (!query?.id || !query.repoId))
+    if (!state.Service?.active || (!query?.id || !query.repoId))
       return;
 
-    console.debug(`Loading bounty information`, state.spinners?.bountyDatabase);
-
-    if (!force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
+    if (force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
       return;
 
     console.debug(`GET ISSUE`, state.Service)
 
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
-    getIssue(+query.repoId, +query.id, state.Service.network.active.name)
+    getIssue(+query.repoId, +query.id, state.Service.network.lastVisited)
       .then((bounty: IssueData) => {
 
         console.debug(`GOT ISSUE`);
@@ -92,7 +90,7 @@ export function useBounty() {
 
   function getChainBounty(force = false) {
     console.log(`getChainBounty`, state)
-    if (!state.Service?.active || !state.Service?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
+    if (!state.Service?.active || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
 
     console.log(`getChainBounty is not cached`, state.currentBounty)
