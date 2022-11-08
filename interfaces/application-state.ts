@@ -16,7 +16,7 @@ import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction}
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];
-  branches?: BranchInfo[];
+  branches?: string[];
   ghVisibility?: boolean;
   githubPath: string;
   id: number;

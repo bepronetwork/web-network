@@ -81,6 +81,7 @@ export function useAuthentication() {
       .then(address => {
         if (address !== state.currentUser?.walletAddress)
           dispatch(changeCurrentUserWallet(address))
+        sessionStorage.setItem(`currentWallet`, address);
       })
       .catch(e => {
         console.error(`Error getting address`, e);

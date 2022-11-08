@@ -37,6 +37,8 @@ import {useNetwork} from "x-hooks/use-network";
 import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
+import {changeNetworkReposActive} from "../contexts/reducers/change-service";
+import {useRepos} from "../x-hooks/use-repos";
 
 interface BountyPayload {
   title: string;
@@ -85,6 +87,7 @@ export default function CreateBountyModal() {
   const { handleApproveToken } = useBepro();
   const { getURLWithNetwork } = useNetwork();
   const { createPreBounty, processEvent } = useApi();
+  const {updateActiveRepo} = useRepos();
 
   const {
     dispatch,
@@ -255,7 +258,12 @@ export default function CreateBountyModal() {
           <div className="row justify-content-center">
             <div className="col-md-6">
               <ReposDropdown
-                onSelected={(opt) => setRepository(opt.value)}
+                onSelected={(opt) => {
+                  console.log(opt)
+                  updateActiveRepo(opt.value.id);
+                  // dispatch(changeNetworkReposActive(Service?.network?.repos?.list?.find(r => r.githubPath === opt.value.path)));
+                  setRepository(opt.value)
+                }}
                 value={{
                   label: repository?.path,
                   value: repository,

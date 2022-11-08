@@ -30,9 +30,11 @@ export default function BranchsDropdown({
     if (!state.Service?.network?.repos?.active?.branches?.length)
       return;
 
-    setOptions(state.Service.network.repos.active.branches.map(({branch}) => ({value: branch, label: branch})));
-    setOption(options[0]);
-    onSelected(option);
+    const _options = state.Service.network.repos.active.branches.map((branch: string) => ({value: branch, label: branch}));
+    setOptions(_options);
+    setOption(_options[0]);
+
+    onSelected(_options[0]);
   }
 
   useEffect(() => { value?.label && setOption(value) }, [value]);
