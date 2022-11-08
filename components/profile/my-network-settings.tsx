@@ -38,8 +38,6 @@ import useBepro from "x-hooks/use-bepro";
 import {useNetwork} from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import RegistryGovernorSettings from "./registry-governor-settings";
-
 interface MyNetworkSettingsProps {
   network: Network;
   updateEditingNetwork: () => void
@@ -52,7 +50,6 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   const [isClosing, setIsClosing] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [isGovernorRegistry, setIsGovernorRegistry] = useState(false);
   const [errorBigImages, setErrorBigImages] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -262,12 +259,6 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   }, [details?.fullLogo, details?.iconLogo])
 
-  useEffect(() => {
-    if(!state.Service?.active || !state.currentUser?.walletAddress) return;
-
-    state.Service?.active.isRegistryGovernor(state.currentUser?.walletAddress).then(setIsGovernorRegistry)
-  }, [state.currentUser])
-
   function setCurrentSelectedTokens({transactional, reward}: {
     transactional: Token[],
     reward: Token[]
@@ -279,8 +270,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   return (
     <ReadOnlyButtonWrapper>
       { isCurrentNetwork && <style>{colorsToCSS(settings?.theme?.colors)}</style> }
-      {isGovernorRegistry && <RegistryGovernorSettings />}
-      { networkNeedRegistration &&
+      { networkNeedRegistration && 
         <Row className="bg-warning-opac-25 py-2 border border-warning border-radius-4 align-items-center mb-2">
           <Col xs="auto">
             <InfoIconEmpty width={12} height={12} />
