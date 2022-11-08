@@ -168,7 +168,7 @@ export function useBounty() {
 
   function getExtendedPullRequestsForCurrentBounty() {
     if (!state.currentBounty?.data || !state.currentBounty?.data?.pullRequests?.length)
-      return;
+      return Promise.resolve([]);
 
     const bounty = state.currentBounty.data;
 
