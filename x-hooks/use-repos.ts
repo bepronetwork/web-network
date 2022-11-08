@@ -1,5 +1,3 @@
-import {useEffect} from "react";
-
 import {useRouter} from "next/router";
 
 import {useAppState} from "../contexts/app-state";
@@ -50,18 +48,20 @@ export function useRepos() {
       })
   }
 
-  function updateActiveRepo() {
-    if (!query?.repoId || !state.Service?.network?.repos || state.Service?.network?.repos?.active?.id?.toString() === query?.repoId)
+  function updateActiveRepo(id = null) {
+    if (!( id || query?.repoId) || !state.Service?.network?.repos || state.Service?.network?.repos?.active?.id?.toString() === (id || query?.repoId))
       return;
 
-    const findRepoId = (repo: RepoInfo) => repo.id.toString() === query.repoId;
+    const findRepoId = (repo: RepoInfo) => repo.id.toString() === (id || query.repoId).toString();
     const activeRepo = state.Service.network.repos.list.find(findRepoId);
 
     if (!activeRepo)
-      throw new Error(`No repo found for ${query.repoId}`);
+      throw new Error(`No repo found for ${id || query.repoId}`);
 
     getRepository(activeRepo?.githubPath)
       .then(info => {
+        console.log(`INFO`, info);
+
         if (!info)
           return []
 
@@ -80,7 +80,7 @@ export function useRepos() {
 
   }
 
-  useEffect(updateActiveRepo, [query?.repoId, state.Service?.network?.active]);
+  // useEffect(updateActiveRepo, [query?.repoId, state.Service?.network?.active]);
 
-  return {loadRepos}
+  return {loadRepos, updateActiveRepo}
 }
