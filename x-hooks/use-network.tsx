@@ -7,7 +7,7 @@ import {useAppState} from "contexts/app-state";
 import {
   changeActiveNetwork,
   changeActiveNetworkTimes,
-  changeActiveNetworkToken,
+  changeActiveNetworkToken, changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
@@ -25,7 +25,7 @@ export function useNetwork() {
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();
-  const {getNetwork} = useApi();
+  const {getNetwork, getTokens} = useApi();
 
 
   function clearNetworkFromStorage() {
@@ -88,7 +88,7 @@ export function useNetwork() {
   }
 
   function loadNetworkToken() {
-    if (!state.Service?.active || !state?.Service?.network?.active)
+    if (!state.Service?.active || !state?.Service?.network?.active || state.Service?.network?.networkToken)
       return;
 
     const activeNetworkToken: any = state.Service.network?.active?.networkToken;
@@ -102,6 +102,17 @@ export function useNetwork() {
           address: activeNetworkToken.contractAddress
         }))
       });
+
+    getTokens().then(tokens => {
+      const transactional = [];
+      const reward = [];
+
+      for (const token of tokens)
+        (token.isTransactional ? transactional : reward).push(token);
+
+      dispatch(changeAllowedTokens(transactional, reward));
+    })
+
   }
 
   function loadNetworkTimes() {

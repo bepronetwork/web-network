@@ -40,6 +40,7 @@ export interface ServiceNetwork {
   repos: ServiceNetworkRepos | null;
   networkToken: Token;
   times: NetworkTimes;
+  tokens: {transactional: Token[]; reward: Token[];} | null;
 }
 
 export interface ServiceState {

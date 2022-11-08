@@ -96,12 +96,6 @@ export default function CreateBountyModal() {
       show: { createBounty: showCreateBounty }
     },
   } = useAppState();
-  
-
-  const [canAddCustomToken, setCanAddCustomToken] = 
-  useState<boolean>(Service?.network?.active?.networkAddress === Settings?.contracts?.network
-    ? Settings?.defaultNetworkConfig?.allowCustomTokens
-    : !!Service?.network?.active?.allowCustomTokens)
 
   const steps = [
     t("bounty:steps.details"),
@@ -183,7 +177,7 @@ export default function CreateBountyModal() {
         customTokens={fieldParams[type].tokens}
         userAddress={currentUser?.walletAddress}
         defaultToken={review && fieldParams[type].default}
-        canAddCustomToken={canAddCustomToken}
+        canAddCustomToken={Service?.network?.active?.allowCustomTokens}
         addToken={addToken}
         decimals={fieldParams[type].decimals}
         issueAmount={fieldParams[type].amount}
@@ -321,7 +315,7 @@ export default function CreateBountyModal() {
   }
 
   async function addToken(newToken: Token) {
-    await getCoinInfoByContract(newToken?.address)
+    await getCoinInfoByContract(newToken?.address, newToken.symbol)
       .then((tokenInfo) => {
         setCustomTokens([...customTokens, { ...newToken, tokenInfo }]);
       })
@@ -406,7 +400,7 @@ export default function CreateBountyModal() {
   async function getTokenInfo(tmpTokens: Token[]) {
     await Promise.all(tmpTokens.map(async (token) => {
       if (token?.address) {
-        const Info = await getCoinInfoByContract(token.address).then((tokenInfo) => tokenInfo);
+        const Info = await getCoinInfoByContract(token.address, token.symbol).then((tokenInfo) => tokenInfo);
         return { ...token, tokenInfo: Info };
       } else {
         return token;
@@ -530,7 +524,7 @@ export default function CreateBountyModal() {
       });
 
       if (networkBounty?.error !== true) {
-        updateTx([parseTransaction(networkBounty, transactionToast.payload[0])])
+        updateTx([parseTransaction(networkBounty, transactionToast.payload[0] as any)])
 
         const createdBounty = await processEvent("bounty",
                                                  "created",
@@ -597,20 +591,16 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!Settings?.contracts?.settlerToken || Service?.network?.active?.tokens === undefined) return;
-    if (!Service?.network?.active.tokens.length && Settings.contracts.settlerToken) {
-      const beproToken = {
-        address: Settings.contracts.settlerToken,
-        name: "Bepro Network",
-        symbol: "BEPRO"
-      };
-
-      getTokenInfo([beproToken])
-      setCanAddCustomToken(true)
+    if (!Service?.network?.tokens)
       return;
-    }
-    setCanAddCustomToken(false)
-    getTokenInfo(Service?.network?.active.tokens);
+
+    const {transactional, reward} = Service?.network.tokens;
+
+    if (transactional.length + reward.length === customTokens.length)
+      return;
+
+    setCustomTokens([...transactional, ...reward]);
+
   }, [Service?.network?.active?.tokens, Settings]);
 
   useEffect(()=>{

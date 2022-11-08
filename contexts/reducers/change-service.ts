@@ -75,6 +75,9 @@ export const changeActiveNetwork = (active: Network) => changeNetwork.update({ac
 export const changeActiveNetworkToken = (networkToken: Token) => changeNetwork.update({networkToken});
 export const changeActiveNetworkTimes = (times: NetworkTimes) => changeNetwork.update({times});
 
+export const changeAllowedTokens = (transactional: Token[], reward: Token[]) =>
+  changeNetwork.update({tokens: {transactional, reward}})
+
 export const changeNetworkReposList = (list: ReposList) => changeRepos.update({list});
 
 export const changeNetworkReposForks = (forks: ForksList) => changeRepos.update({forks});
