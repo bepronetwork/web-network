@@ -88,7 +88,7 @@ export function useNetwork() {
   }
 
   function loadNetworkToken() {
-    if (!state.Service?.active || !state?.Service?.network?.active || state.Service?.network?.networkToken)
+    if (!state.Service?.active || !state?.Service?.network?.active?.networkToken || state.Service?.network?.networkToken)
       return;
 
     const activeNetworkToken: any = state.Service.network?.active?.networkToken;
@@ -120,10 +120,10 @@ export function useNetwork() {
   }
 
   function loadNetworkTimes() {
-    if (!state.Service?.active || !state?.Service?.network?.active)
+    if (!state?.Service?.active?.network)
       return;
 
-    const network: any = state.Service.network.active;
+    const network: any = state.Service.active?.network;
 
     Promise.all([network.draftTime(), network.disputableTime()])
       .then(([draftTime, disputableTime]) => {
@@ -133,7 +133,7 @@ export function useNetwork() {
 
   useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
   useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active])
-  useEffect(loadNetworkTimes, [state.Service?.active, state?.Service?.network?.active])
+  useEffect(loadNetworkTimes, [state.Service?.active?.network])
   useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active])
 
 

@@ -192,7 +192,7 @@ export function useAuthentication() {
   }
 
   // if (useContext(AuthContext)) {
-  useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
+  useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser?.walletAddress]);
   useEffect(updateWalletAddress, [state.currentUser]);
   useEffect(listenToAccountsChanged, [state.Service]);
   useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
