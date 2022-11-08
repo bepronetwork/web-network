@@ -50,7 +50,7 @@ export function useBounty() {
 
     console.log(`getDatabaseBounty()`, force);
 
-    if (!state.Service?.active || (!query?.id || !query.repoId))
+    if (!state.Service?.network?.active || !query?.id || !query.repoId)
       return;
 
     if (force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
