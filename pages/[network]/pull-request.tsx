@@ -32,7 +32,7 @@ import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 import {useNetwork} from "../../x-hooks/use-network";
 
 export default function PullRequestPage() {
-  useBounty();
+  const {getExtendedPullRequestsForCurrentBounty} = useBounty();
   const router = useRouter();
 
   const { t } = useTranslation(["common", "pull-request"]);
@@ -183,13 +183,20 @@ export default function PullRequestPage() {
 
     dispatch(changeLoadState(true));
 
-    const currentPR = state.currentBounty?.data.pullRequests.find((pr) => +pr.githubId === +prId);
-    const currentNetworkPR = state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
+    getExtendedPullRequestsForCurrentBounty().then(r => console.log(`RESULT`, r));
 
-    setPullRequest(currentPR);
-    setNetworkPullRequest(currentNetworkPR);
+    getExtendedPullRequestsForCurrentBounty()
+      .then(prs => prs.find((pr) => +pr.githubId === +prId))
+      .then(currentPR => {
+        const currentNetworkPR = state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
 
-    dispatch(changeLoadState(false));
+        setPullRequest(currentPR);
+        setNetworkPullRequest(currentNetworkPR);
+      })
+      .finally(() => {
+        dispatch(changeLoadState(false))
+      });
+
   }, [state.currentBounty?.data, state.currentBounty?.chainData, prId]);
 
   useEffect(() => {
