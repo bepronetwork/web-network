@@ -47,8 +47,6 @@ export default function PageDevelopers() {
   useEffect(() => {
     if (!state.Service?.active) return;
 
-    console.log(`developers`, state.Service)
-
     Promise.all([
       state.Service?.active.getClosedBounties().catch(() => 0),
       state.Service?.active.getOpenBounties().catch(() => 0),
@@ -56,8 +54,6 @@ export default function PageDevelopers() {
       getTotalUsers(),
       (state.Service?.network?.active?.networkToken as ERC20)?.symbol(),
     ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
-
-      console.log(`SYMBOL`, symbol);
 
       setInfos([
         {

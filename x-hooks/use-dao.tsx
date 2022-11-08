@@ -75,7 +75,7 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    console.debug(` ${new Date()} useDao start`, state.Settings, !state.Settings || !!state.Service?.active || !!state.Service?.starting, !!state.Service?.active, !!state.Service?.starting)
+    console.debug(`${new Date()} useDao start`, state.Settings, !state.Settings || !!state.Service?.active || !!state.Service?.starting, !!state.Service?.active, !!state.Service?.starting)
     if (!state.Settings || !!state.Service?.active || !!state.Service?.starting)
       return;
 
@@ -108,6 +108,7 @@ export function useDao() {
       })
       .finally(() => {
         dispatch(changeStarting(false));
+        console.log(`useDao start finished`);
       })
   }
 

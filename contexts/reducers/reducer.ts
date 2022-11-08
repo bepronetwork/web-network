@@ -17,7 +17,6 @@ export class SimpleActor<P = any, A = any> implements Actor<P, A> {
   constructor(readonly id) {}
 
   update(payload: P, subAction?: A) {
-    console.log(`UPDATE ${this.id}`, payload, subAction);
     return {id: this.id, payload, subAction};
   }
 }
@@ -29,7 +28,7 @@ export class SimpleAction<T = any, A = any> extends SimpleActor<T> implements Ac
   }
 
   reducer(state: State, payload: T, subAction?: A): State {
-    console.debug(`UPDATING ${this.id} ${this.stateKey} ${subAction || `subAction=undefined`}`, payload);
+    console.debug(`UPDATING ${this.id} ${this.stateKey} ${subAction || `subAction=undefined`}`, payload, state);
     return {...state, [this.stateKey]: payload};
   }
 }
