@@ -180,6 +180,9 @@ function OraclesActions({
 
   function approveSettlerToken() {
     setIsApproving(true);
+
+    console.log(`APPROVE`);
+
     networkTokenERC20.approve(tokenAmount)
      .finally(() => setIsApproving(false));
   }
@@ -211,9 +214,9 @@ function OraclesActions({
     networkTokenERC20.allowance.isLessThan(tokenAmount) && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
-    if (Service?.network?.networkToken?.address)
-      networkTokenERC20.setAddress(Service?.network?.networkToken.address);
-  }, [Service?.network?.networkToken?.address]);
+    if (Service?.active?.network?.networkToken?.contractAddress)
+      networkTokenERC20.setAddress(Service?.active?.network?.networkToken?.contractAddress);
+  }, [Service?.active?.network?.networkToken?.contractAddress]);
 
   return (
     <>

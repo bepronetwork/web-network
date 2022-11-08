@@ -46,11 +46,11 @@ export default function useERC20() {
       .catch(error => console.debug("useERC20:getAllowance", logData, error));
   }, [state.currentUser?.walletAddress, state.Service?.active, address]);
 
-  const approve = useCallback((amount: string) => {
+  function approve(amount: string) {
     if (!state.currentUser?.walletAddress || !state.Service?.active || !address || !amount) return;
 
     return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
-  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
+  }
 
   function setDefaults() {
     setName("");
