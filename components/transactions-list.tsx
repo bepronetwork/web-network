@@ -28,7 +28,7 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Transaction} from "interfaces/transaction";
 
-import {updateTx} from "../contexts/reducers/change-tx-list";
+import {setTxList, updateTx} from "../contexts/reducers/change-tx-list";
 
 interface TransactionListProps {
   onActiveTransactionChange: (transaction: Transaction) => void
@@ -98,7 +98,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
   function clearTransactionsList() {
     localStorage.setItem(`bepro.transactions:${currentUser?.walletAddress?.toLowerCase()}`, "[]");
 
-    dispatch(updateTx([]));
+    dispatch(setTxList([]));
   }
 
   return (
