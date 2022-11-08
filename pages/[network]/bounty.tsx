@@ -70,9 +70,6 @@ export default function PageIssue() {
   }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   useEffect(() => {
-
-    console.log(`load forked`, !(!state.currentUser?.login || !state.Service?.network?.repos?.active), state?.Service?.network)
-
     if (!state.currentUser?.login || !state.Service?.network?.repos?.active) return;
 
     getUserRepositories(state.currentUser?.login)
@@ -80,16 +77,22 @@ export default function PageIssue() {
 
         console.log(`REPOS`, repos);
 
+        const isFork = repo => repo.isFork ? 
+          repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
+
         const isForked = 
-          !!repos.find(repo => (repo.isFork && repo.nameWithOwner === `${state.currentUser.login}/${state.Service?.network?.repos?.active.name}`)
-                                || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
+          !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
 
         setIsRepoForked(isForked);
       })
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
       });
-  }, [ state.currentUser?.login, state.currentUser?.walletAddress, id, state.currentBounty?.data, state.Service?.network?.repos?.active ]);
+  }, [state.currentUser?.login,
+      state.currentUser?.walletAddress,
+      id,
+      state.currentBounty?.data,
+      state.Service?.network?.repos?.active]);
 
   return (
     <BountyProvider>

@@ -170,6 +170,10 @@ export default function useOctokit() {
       owner: string;
       viewerPermission: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
       mergeCommitAllowed: boolean;
+      parent?: {
+        name: string;
+        nameWithOwner: string;
+      }
     }>(item => {
       return getPropertyRecursively<GraphQlQueryResponseData>("nodes", item?.["user"]?.repositories)
         ?.map(el => ({
