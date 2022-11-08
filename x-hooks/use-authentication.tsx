@@ -160,7 +160,7 @@ export function useAuthentication() {
     }
 
     const updateNetwork = (k: keyof Network) => (v) =>
-      dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, {[k]: v})));
+      dispatch(changeActiveNetwork(Object.assign(state.Service.network.active || {} as any, {[k]: v})));
 
     dispatch(changeSpinners.update({balance: true}))
 
