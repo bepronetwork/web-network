@@ -100,7 +100,7 @@ export function useDao() {
         if (loaded) {
           window.DAOService = daoService;
           dispatch(changeActiveDAO(daoService));
-          dispatch(changeActiveNetwork(loaded));
+          //dispatch(changeActiveNetwork(loaded));
         }
       })
       .catch(error => {
