@@ -22,6 +22,7 @@ import useOctokit from "x-hooks/use-octokit";
 
 import {useAppState} from "../../contexts/app-state";
 import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
+import {useRepos} from "../../x-hooks/use-repos";
 
 export default function PageIssue() {
   useBounty();
@@ -34,8 +35,10 @@ export default function PageIssue() {
   const {state} = useAppState();
 
   const { getUserRepositories } = useOctokit();
+  const {updateActiveRepo} = useRepos()
 
-  const { id } = router.query;
+  const { id, repoId } = router.query;
+  updateActiveRepo(repoId);
 
   const proposalsCount = state.currentBounty?.chainData?.proposals?.length || 0;
   const pullRequestsCount = state.currentBounty?.chainData?.pullRequests?.length || 0;
@@ -67,10 +70,16 @@ export default function PageIssue() {
   }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   useEffect(() => {
+
+    console.log(`load forked`, !(!state.currentUser?.login || !state.Service?.network?.repos?.active), state?.Service?.network)
+
     if (!state.currentUser?.login || !state.Service?.network?.repos?.active) return;
 
     getUserRepositories(state.currentUser?.login)
       .then((repos) => {
+
+        console.log(`REPOS`, repos);
+
         const isForked = 
           !!repos.find(repo => (repo.isFork && repo.nameWithOwner === `${state.currentUser.login}/${state.Service?.network?.repos?.active.name}`)
                                 || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);

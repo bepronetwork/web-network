@@ -13,7 +13,7 @@ import loadApplicationStateReducers from "./reducers";
 import {updateSettings} from "./reducers/change-settings";
 import {toastError} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
-import {changeNetworkReposList} from "./reducers/change-service";
+import {changeNetworkReposActive, changeNetworkReposList} from "./reducers/change-service";
 
 
 const appState: AppState = {
@@ -36,9 +36,9 @@ export const AppStateContext = createContext(appState);
 
 export function AppStateContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, appState.state);
-  const {query: {authError, repoId}} = useRouter();
+  const {query: {authError,}} = useRouter();
   const {loadSettings} = useSettings();
-  const {loadRepos, updateActiveRepo} = useRepos();
+  const {loadRepos,} = useRepos();
 
   function parseError() {
     if (!authError)
@@ -73,7 +73,6 @@ export function AppStateContextProvider({children}) {
   useEffect(parseError, [authError])
   useEffect(start, [])
   useEffect(_loadRepos, [state?.Service?.network?.lastVisited])
-  useEffect(updateActiveRepo, [repoId, state.Service?.network?.active]);
 
   // useSettings(); // loads settings from database and dispatches its state
   useDao(); // populate `state.Settings`

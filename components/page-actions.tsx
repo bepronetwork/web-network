@@ -24,7 +24,7 @@ import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 
-import {BountyProvider} from "../x-hooks/use-bounty";
+import {BountyProvider, useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
 import Modal from "./modal";
 
@@ -53,7 +53,7 @@ export default function PageActions({
   const {state, dispatch} = useAppState();
   const {handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest} = useBepro();
   const {updateWalletBalance} = useAuthentication();
-  // const {getDatabaseBounty, getChainBounty} = useBounty();
+  const {getDatabaseBounty, getChainBounty} = useBounty();
   const {createPrePullRequest, cancelPrePullRequest, startWorking, processEvent} = useApi();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
@@ -89,14 +89,18 @@ export default function PageActions({
 
   async function updateBountyData() {
     // todo this must be done by the actor so it wont fall out of context
-    // getDatabaseBounty(true);
-    // getChainBounty(true);
+    getDatabaseBounty(true);
+    getChainBounty(true);
 
     return null;
   }
 
   async function handleRedeem() {
-    handleReedemIssue(issueState === "funding")
+    handleReedemIssue(getIssueState({
+    state: state.currentBounty?.data?.state,
+    amount: state.currentBounty?.data?.amount,
+    fundingAmount: state.currentBounty?.data?.fundingAmount
+  }) === "funding")
       .then(() => {
         updateWalletBalance(true);
         updateBountyData();
@@ -223,7 +227,7 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (isWalletAndGHConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+    if (state.currentUser?.login && !state.currentBounty?.chainData?.isDraft && !state.currentBounty?.chainData?.isFinished && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && !isRepoForked)
       return (
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
@@ -235,12 +239,19 @@ export default function PageActions({
   }
 
   function renderStartWorkingButton() {
-    if (isWalletAndGHConnected &&
-      !isBountyInDraft &&
-      isBountyOpen &&
-      !isWorkingOnBounty &&
+
+    console.log(`RENDER START WORKING`, state.currentUser, state.currentBounty);
+
+    if (state.currentUser?.login &&
+      !state.currentBounty?.chainData?.isDraft &&
+      state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false &&
+      !state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login) &&
       isRepoForked &&
-      isStateToWorking)
+      ["proposal", "open", "ready"].some(value => value === getIssueState({
+        state: state.currentBounty?.data?.state,
+        amount: state.currentBounty?.data?.amount,
+        fundingAmount: state.currentBounty?.data?.fundingAmount
+      })))
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -259,10 +270,10 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (isWalletAndGHConnected &&
-      isBountyOpen &&
-      !isBountyInDraft &&
-      isWorkingOnBounty &&
+    if (state.currentUser?.login &&
+      state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false &&
+      !state.currentBounty?.chainData?.isDraft &&
+      state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login) &&
       isRepoForked)
       return (
         <ReadOnlyButtonWrapper>
@@ -293,11 +304,12 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
+
     const isDraftOrNotFunded = state.currentBounty?.data?.fundingAmount.isGreaterThan(BigNumber(0))
       ? !isBountyFunded
-      : isBountyInDraft;
+      : state.currentBounty?.chainData?.isDraft;
 
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded)
+    if (state.currentUser?.walletAddress && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && isBountyOwner && isDraftOrNotFunded)
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -311,7 +323,7 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest)
+    if (state.currentUser?.walletAddress && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && isBountyOwner && state.currentBounty?.chainData?.isDraft && !state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0))
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -325,7 +337,7 @@ export default function PageActions({
   }
 
   function renderCreateProposalButton() {
-    if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
+    if (state.currentUser?.walletAddress && state.Service?.network?.active?.isCouncil && state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false && state.currentBounty?.chainData?.isFinished && hasPullRequests)
       return (
         <NewProposal amountTotal={state.currentBounty?.chainData?.tokenAmount}
                      pullRequests={state.currentBounty?.data?.pullRequests}/>
@@ -333,7 +345,7 @@ export default function PageActions({
   }
 
   function renderViewPullRequestLink() {
-    if (isWalletAndGHConnected && !isBountyInDraft && hasOpenPullRequest)
+    if (state.currentUser?.login && !state.currentBounty?.chainData?.isDraft && hasOpenPullRequest)
       return (
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}

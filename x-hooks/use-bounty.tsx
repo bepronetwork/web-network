@@ -20,9 +20,10 @@ import useOctokit from "./use-octokit";
 
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
+const _context = {};
 
-export const BountyContext = createContext({});
-export const BountyProvider = ({children}) => <BountyContext.Provider value={null} children={children} />
+export const BountyContext = createContext(_context);
+export const BountyProvider = ({children}) => <BountyContext.Provider value={_context} children={children} />
 
 export function useBounty() {
   if (!useContext(BountyContext))
@@ -46,6 +47,9 @@ export function useBounty() {
   }
 
   function getDatabaseBounty(force = false) {
+
+    console.log(`getDatabaseBounty()`, force);
+
     if (!state.Service?.network?.active || (!query?.id || !query.repoId))
       return;
 
@@ -76,6 +80,7 @@ export function useBounty() {
 
         const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
         dispatch(changeCurrentBountyData({...bounty, mergeProposals, ...bigNumbers}));
+        console.log(`GOT ISSUE DATA`, {...bounty, mergeProposals, ...bigNumbers});
         return getIssueOrPullRequestComments(bounty.repository.githubPath, +bounty.githubId);
       })
       .then(comments => {
@@ -86,11 +91,11 @@ export function useBounty() {
   }
 
   function getChainBounty(force = false) {
+    console.log(`getChainBounty`, state)
     if (!state.Service?.active || !state.Service?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
 
-    if (!force && isCurrentBountyCached())
-      return;
+    console.log(`getChainBounty is not cached`, state.currentBounty)
 
     dispatch(changeSpinners.update({bountyChain: true}))
 
@@ -110,6 +115,9 @@ export function useBounty() {
         // todo: missing tokenInformation
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
+
+        console.log(`getChainBounty got data`, bounty);
+
 
         state.Service.active.isBountyInDraftChain(bounty.creationDate)
           .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));

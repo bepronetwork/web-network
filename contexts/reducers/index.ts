@@ -1,5 +1,5 @@
 import {changeChain} from "./change-chain";
-import {changeCurrentBounty} from "./change-current-bounty";
+import {changeCurrentBounty, changeCurrentBountyDataChain} from "./change-current-bounty";
 import {changeCurrentUser} from "./change-current-user";
 import {changeLoad} from "./change-load";
 import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
@@ -27,6 +27,7 @@ export default function loadApplicationStateReducers() {
     changeNetwork,
     changeRepos,
     changeCurrentBounty,
+    changeCurrentBountyDataChain,
     changeSpinners,
     changeSettings,
   ].forEach(addReducer);
