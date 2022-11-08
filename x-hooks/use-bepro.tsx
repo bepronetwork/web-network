@@ -5,7 +5,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { TransactionCurrency } from "interfaces/transaction";
+import {SimpleBlockTransactionPayload, TransactionCurrency} from "interfaces/transaction";
 
 import DAO from "services/dao-service";
 
@@ -38,15 +38,15 @@ export default function useBepro() {
 
   async function handlerDisputeProposal(proposalscMergeId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
-      const disputeTx = addTx([{ type: TransactionTypes.dispute }] as any);
-      dispatch(disputeTx);
+      const disputeTxAction = addTx([{ type: TransactionTypes.dispute }] as any);
+      dispatch(disputeTxAction);
       await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalscMergeId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-          dispatch(updateTx([parseTransaction(txInfo, disputeTx.payload[0])]))
+          dispatch(updateTx([parseTransaction(txInfo, disputeTxAction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve?.(txInfo);
         })
         .catch((err: { message: string; }) => {
-          failTx(err, disputeTx, reject);
+          failTx(err, disputeTxAction, reject);
         });
     });
   }
@@ -59,7 +59,7 @@ export default function useBepro() {
 
       await state.Service?.active.updateConfigFees(closeFee, cancelFee)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]))
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -77,7 +77,7 @@ export default function useBepro() {
       
       await state.Service?.active.closeBounty(+bountyId, +proposalscMergeId, tokenUri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-          dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0])]))
+          dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -94,7 +94,7 @@ export default function useBepro() {
 
       await state.Service?.active.updateBountyAmount(bountyId, amount)
       .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-        dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]))
+        dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]))
         resolve(txInfo);
       })
       .catch((err: { message: string; }) => {
@@ -120,7 +120,7 @@ export default function useBepro() {
         })
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
-          dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0])]))
+          dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
           // todo should force these two after action, but we can't have it here or it will fall outside of context
           // getDatabaseBounty(true);
           // getChainBounty(true);
@@ -147,7 +147,7 @@ export default function useBepro() {
         })
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
-          dispatch(updateTx([parseTransaction(tx, transaction.payload[0])]))
+          dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
           // getChainBounty(true);
           // getDatabaseBounty(true);
         })
@@ -170,7 +170,7 @@ export default function useBepro() {
       await state.Service?.active
         .createProposal(bountyId, pullRequestId, addresses, amounts)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-          dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]))
+          dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -191,12 +191,16 @@ export default function useBepro() {
       const tx = addTx([{ type } as any]);
       dispatch(tx);
 
+      console.log(`TX`, tx.payload);
+
       await state.Service?.active.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo)
           throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
 
-        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]))
+        console.log(`TXINFO`, txInfo, tx.payload);
+
+        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
         resolve(txInfo);
       })
         .catch((err) => {
@@ -218,7 +222,7 @@ export default function useBepro() {
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           if (!txInfo)
             throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
-          dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]))
+          dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -241,7 +245,7 @@ export default function useBepro() {
       await state.Service?.active
         .createPullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid)
         .then((txInfo: unknown) => {
-          dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((error: { message: string; }) => {
@@ -257,7 +261,7 @@ export default function useBepro() {
 
       await state.Service?.active.setPullRequestReadyToReview(bountyId, pullRequestId)
       .then((txInfo: unknown) => {
-        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
+        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })
       .catch((error: { message: string; }) => {
@@ -273,7 +277,7 @@ export default function useBepro() {
 
       await state.Service?.active.cancelPullRequest(bountyId, pullRequestId)
       .then((txInfo: unknown) => {
-        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
+        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })
       .catch((error: { message: string; }) => {
@@ -289,7 +293,7 @@ export default function useBepro() {
 
       await state.Service?.active.refuseProposal(bountyId, proposalId)
       .then((txInfo: unknown) => {
-        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0])]));
+        dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })
       .catch((error: { message: string; }) => {
@@ -306,7 +310,7 @@ export default function useBepro() {
 
       await state.Service?.active.deployNetworkV2(networkToken)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -323,7 +327,7 @@ export default function useBepro() {
 
       await state.Service?.active.setNFTTokenDispatcher(nftToken, networkAddress)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -340,7 +344,7 @@ export default function useBepro() {
 
       await state.Service?.active.addNetworkToRegistry(networkAddress)
         .then(txInfo => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch(err => {
@@ -357,7 +361,7 @@ export default function useBepro() {
 
       await state.Service?.active.deployBountyToken(name, symbol)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -389,7 +393,7 @@ export default function useBepro() {
 
       await service.setNetworkParameter(parameter, value)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -406,7 +410,7 @@ export default function useBepro() {
 
       await state.Service?.active.fundBounty(bountyId, amount, tokenDecimals)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -423,7 +427,7 @@ export default function useBepro() {
 
       await state.Service?.active.retractFundBounty(bountyId, fundingId)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -445,7 +449,7 @@ export default function useBepro() {
 
       await state.Service?.active.withdrawFundRewardBounty(bountyId, fundingId)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0])]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
