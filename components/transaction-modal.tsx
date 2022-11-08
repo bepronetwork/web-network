@@ -54,21 +54,21 @@ export default function TransactionModal({
     setDetails([
       makeDetail(t("transactions.amount"),
                  <>
-          <span>{formatStringToCurrency(BigNumber(blockTransaction.amount).toFixed())}</span>{" "}
+          <span>{formatStringToCurrency(BigNumber(blockTransaction?.amount).toFixed())}</span>{" "}
           <span
             className={`${
-              blockTransaction.currency.toLowerCase() === "oracles"
+              blockTransaction?.currency?.toLowerCase() === "oracles"
                 ? "text-purple"
                 : "text-primary"
             }`}
           >
-            {blockTransaction.currency}
+            {blockTransaction?.currency}
           </span>{" "}
         </>),
       makeDetail(t("transactions.confirmations"),
-                 [blockTransaction.confirmations, 23].join("/")),
+                 [blockTransaction?.confirmations, 23].join("/")),
       makeDetail(t("transactions.date"),
-                 format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a"))
+                 format(new Date(blockTransaction?.date), "MMMM dd yyyy hh:mm:ss a"))
     ]);
   }
 
