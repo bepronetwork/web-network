@@ -16,13 +16,13 @@ import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
 import TabbedNavigation from "components/tabbed-navigation";
 
+import {useAppState} from "contexts/app-state";
+
 import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
+import {BountyProvider, useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
-
-import {useAppState} from "../../contexts/app-state";
-import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
-import {useRepos} from "../../x-hooks/use-repos";
+import {useRepos} from "x-hooks/use-repos";
 
 export default function PageIssue() {
   useBounty();
