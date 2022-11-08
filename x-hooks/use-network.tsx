@@ -102,6 +102,11 @@ export function useNetwork() {
           address: activeNetworkToken.contractAddress
         }))
       });
+  }
+
+  function loadNetworkAllowedTokens() {
+    if (!state.Service?.active || !state?.Service?.network?.active)
+      return;
 
     getTokens().then(tokens => {
       const transactional = [];
@@ -112,7 +117,6 @@ export function useNetwork() {
 
       dispatch(changeAllowedTokens(transactional, reward));
     })
-
   }
 
   function loadNetworkTimes() {
@@ -130,6 +134,7 @@ export function useNetwork() {
   useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
   useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active])
   useEffect(loadNetworkTimes, [state.Service?.active, state?.Service?.network?.active])
+  useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active])
 
 
   return {

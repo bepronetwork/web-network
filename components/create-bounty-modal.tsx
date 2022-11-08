@@ -191,6 +191,7 @@ export default function CreateBountyModal() {
   }
 
   function renderCurrentSection() {
+
     if (currentSection === 0) {
       return renderDetails();
     }
@@ -397,23 +398,6 @@ export default function CreateBountyModal() {
     setFiles([]);
   }
 
-  async function getTokenInfo(tmpTokens: Token[]) {
-    await Promise.all(tmpTokens.map(async (token) => {
-      if (token?.address) {
-        const Info = await getCoinInfoByContract(token.address, token.symbol).then((tokenInfo) => tokenInfo);
-        return { ...token, tokenInfo: Info };
-      } else {
-        return token;
-      }
-    }))
-      .then((tokens) => {
-        setCustomTokens(tokens);
-      })
-      .catch(() => {
-        setCustomTokens(tmpTokens);
-      });
-  }
-
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
   async function allowCreateIssue() {
@@ -591,7 +575,7 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!Service?.network?.tokens)
+    if (!Service?.network?.tokens || !showCreateBounty)
       return;
 
     const {transactional, reward} = Service?.network.tokens;
@@ -601,7 +585,7 @@ export default function CreateBountyModal() {
 
     setCustomTokens([...transactional, ...reward]);
 
-  }, [Service?.network?.active?.tokens, Settings]);
+  }, [Service?.network?.active?.tokens, showCreateBounty]);
 
   useEffect(()=>{
     transactionalERC20.updateAllowanceAndBalance();

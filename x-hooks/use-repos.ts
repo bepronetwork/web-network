@@ -17,13 +17,13 @@ export function useRepos() {
   const {getReposList} = useApi();
   const {query} = useRouter();
 
-  function loadRepos(force = false) {
-    if (!state.Service?.network?.active)
+  function loadRepos(force = false, name: string) {
+    if (!name)
       return;
 
     console.debug(`Load repos start`);
 
-    const key = `bepro.network:repos:${state.Service.network.active.name}`
+    const key = `bepro.network:repos:${name}`
     const storage = new WinStorage(key, 3600, `sessionStorage`);
     if (storage.value && !force) {
       dispatch(changeNetworkReposList(storage.value));
@@ -34,7 +34,7 @@ export function useRepos() {
 
     dispatch(changeLoadState(true));
 
-    getReposList(force, state.Service.network.active.name)
+    return getReposList(force, state.Service?.network?.lastVisited)
       .then(repos => {
         if (!repos) {
           console.error(`No repos found for`, state.Service.network.active.name);
@@ -44,8 +44,9 @@ export function useRepos() {
         console.debug(`Loaded repos`, repos);
 
         storage.value = repos;
-        dispatch(changeNetworkReposList(repos));
-        dispatch(changeLoadState(false));
+        // dispatch(changeNetworkReposList(repos));
+        // dispatch(changeLoadState(false));
+        return repos;
       })
   }
 
@@ -79,6 +80,7 @@ export function useRepos() {
 
   }
 
-  useEffect(loadRepos, [state.Service?.network?.active]);
   useEffect(updateActiveRepo, [query?.repoId, state.Service?.network?.active]);
+
+  return {loadRepos}
 }

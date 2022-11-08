@@ -17,7 +17,7 @@ export const addReducer = <T = any>(reducer: XReducer<T>) => {
 
 
 export const mainReducer = (state: State, actor: { id, payload, subAction }) => {
-  console.debug('REDUCE', actor.id, state);
+  // console.debug(`REDUCE ${actor.id}`, state);
 
   const action = Actions.find(({id: id}) => id === actor.id);
   if (!action)

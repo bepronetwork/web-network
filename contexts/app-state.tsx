@@ -13,6 +13,7 @@ import loadApplicationStateReducers from "./reducers";
 import {updateSettings} from "./reducers/change-settings";
 import {toastError} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
+import {changeNetworkReposList} from "./reducers/change-service";
 
 
 const appState: AppState = {
@@ -37,13 +38,7 @@ export function AppStateContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, appState.state);
   const {query: {authError}} = useRouter();
   const {loadSettings} = useSettings();
-
-  // useSettings(); // loads settings from database and dispatches its state
-  useDao(); // populate `state.Settings`
-  useNetwork(); // start network state
-  useAuthentication(); // github-connection, wallet & balance
-  useRepos(); // load repos and hook to the query?.repoId param to load active repo
-
+  const {loadRepos} = useRepos()
 
   function parseError() {
     if (!authError)
@@ -65,8 +60,26 @@ export function AppStateContextProvider({children}) {
 
   }
 
+  function _loadRepos() {
+    console.log('WEIRD', state?.Service?.network?.lastVisited);
+
+    if (!state?.Service?.network?.lastVisited)
+      return;
+
+    loadRepos(true, state?.Service?.network?.lastVisited)
+      .then(repos => dispatch(changeNetworkReposList(repos)));
+  }
+
   useEffect(parseError, [authError])
   useEffect(start, [])
+  useEffect(_loadRepos, [state?.Service?.network?.lastVisited])
+
+  // useSettings(); // loads settings from database and dispatches its state
+  useDao(); // populate `state.Settings`
+  // useRepos(); // load repos and hook to the query?.repoId param to load active repo
+  useNetwork(); // start network state
+  useAuthentication(); // github-connection, wallet & balance
+
 
   return <AppStateContext.Provider value={{state, dispatch: dispatch as unknown as any}}>
     {children}
