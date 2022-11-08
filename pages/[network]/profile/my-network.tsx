@@ -63,7 +63,7 @@ export function MyNetwork() {
           <NothingFound description={t("custom-network:errors.not-found")}>
             <InternalLink
               href={
-                state.Service?.network?.active?.name.toLowerCase() === defaultNetworkName
+                state.Service?.network?.active?.name?.toLowerCase() === defaultNetworkName
                   ? "/new-network"
                   : "/networks"
               }
