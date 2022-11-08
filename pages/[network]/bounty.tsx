@@ -70,8 +70,14 @@ export default function PageIssue() {
   }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   useEffect(() => {
-    if (!state.currentUser?.login || !state.Service?.network?.repos?.active) return;
+    if (!state.currentUser?.login ||
+        !state.Service?.network?.repos?.active ||
+        !state.currentBounty?.data) 
+      return;
 
+    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
+      return setIsRepoForked(true);
+    
     getUserRepositories(state.currentUser?.login)
       .then((repos) => {
 
