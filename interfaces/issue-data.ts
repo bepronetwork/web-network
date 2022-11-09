@@ -49,13 +49,14 @@ export interface IssueData {
   token?: Token;
   working: string[];
   fundedAt?: Date;
-  fundingBenefactors?: fundingBenefactor[];
+  benefactors?: fundingBenefactor[];
 }
 
 export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
   amount: BigNumber;
   fundingAmount: BigNumber;
   fundedAmount: BigNumber;
+  fundedPercent: BigNumber;
 }
 
 export interface Repository {
