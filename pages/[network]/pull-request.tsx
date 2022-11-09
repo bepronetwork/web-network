@@ -251,8 +251,7 @@ export default function PullRequestPage() {
                         onClick={handleMakeReady}
                         disabled={isCreatingReview || isCancelling || isMakingReady}
                         isLoading={isMakingReady}
-                        withLockIcon={isCreatingReview || isCancelling}
-                      >
+                        withLockIcon={isCreatingReview || isCancelling}>
                         {t("pull-request:actions.make-ready.title")}
                       </Button>
                     </ReadOnlyButtonWrapper>

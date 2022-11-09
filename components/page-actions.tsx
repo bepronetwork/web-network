@@ -147,7 +147,7 @@ export default function PageActions({
         bountyId,
         issueCid: originCID,
         pullRequestGithubId: cid,
-        customNetworkName: state.Service?.network?.active.name,
+        customNetworkName: state.Service?.network?.lastVisited,
         creator: userRepo.split("/")[0],
         userBranch,
         userRepo,
@@ -157,7 +157,7 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
       .then(txInfo => {
-        return processEvent("pull-request", "created", state.Service?.network?.active?.name, {
+        return processEvent("pull-request", "created", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber
         });
       })
