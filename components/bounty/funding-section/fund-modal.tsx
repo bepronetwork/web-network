@@ -156,7 +156,7 @@ export default function FundModal({
           label={t("funding:modals.fund.fields.fund-amount.label")}
           value={amountToFund}
           onChange={handleSetAmountToFund}
-          symbol={state.currentBounty?.data?.token?.symbol}
+          symbol={state.currentBounty?.chainData?.transactionalTokenData?.symbol}
           balance={balance}
           decimals={state.currentBounty?.chainData?.transactionalTokenData?.decimals}
           max={BigNumber.minimum(amountNotFunded, balance)}
