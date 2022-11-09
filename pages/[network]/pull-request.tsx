@@ -30,6 +30,7 @@ import useBepro from "x-hooks/use-bepro";
 import {changeCurrentBountyComments} from "../../contexts/reducers/change-current-bounty";
 import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
 import {useNetwork} from "../../x-hooks/use-network";
+import {changeSpinners} from "../../contexts/reducers/change-spinners";
 
 export default function PullRequestPage() {
   const {getExtendedPullRequestsForCurrentBounty} = useBounty();
@@ -179,11 +180,11 @@ export default function PullRequestPage() {
   }
 
   useEffect(() => {
-    if (!state.currentBounty?.data || !state.currentBounty?.chainData || !prId) return;
+    if (!state.currentBounty?.data || !state.currentBounty?.chainData || !prId || state?.spinners?.pullRequests) return;
+
 
     dispatch(changeLoadState(true));
-
-    getExtendedPullRequestsForCurrentBounty().then(r => console.log(`RESULT`, r));
+    dispatch(changeSpinners.update({pullRequests: true}));
 
     getExtendedPullRequestsForCurrentBounty()
       .then(prs => prs.find((pr) => +pr.githubId === +prId))
@@ -192,9 +193,13 @@ export default function PullRequestPage() {
 
         setPullRequest(currentPR);
         setNetworkPullRequest(currentNetworkPR);
+
+        console.log(`GOT PR`, currentPR, currentNetworkPR);
+
       })
       .finally(() => {
         dispatch(changeLoadState(false))
+        dispatch(changeSpinners.update({pullRequests: false}));
       });
 
   }, [state.currentBounty?.data, state.currentBounty?.chainData, prId]);
