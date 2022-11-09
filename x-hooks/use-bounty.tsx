@@ -14,7 +14,7 @@ import {
 } from "../contexts/reducers/change-current-bounty";
 import {changeSpinners} from "../contexts/reducers/change-spinners";
 import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
-import {IssueData} from "../interfaces/issue-data";
+import {IssueData, pullRequest} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 
@@ -77,13 +77,32 @@ export function useBounty() {
         })
 
         const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
-        dispatch(changeCurrentBountyData({...bounty, mergeProposals, ...bigNumbers}));
-        console.log(`GOT ISSUE DATA`, {...bounty, mergeProposals, ...bigNumbers});
-        return getIssueOrPullRequestComments(bounty.repository.githubPath, +bounty.githubId);
+        const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
+
+        dispatch(changeCurrentBountyData(extendedBounty));
+        console.log(`GOT ISSUE DATA`, extendedBounty);
+        
+        return Promise.all([
+          getIssueOrPullRequestComments(bounty.repository.githubPath, +bounty.githubId),
+          extendedBounty
+        ]);
       })
-      .then(comments => {
+      .then(([comments, bounty]) => {
         dispatch(changeCurrentBountyComments(comments));
-        dispatch(changeSpinners.update({bountyDatabase: false}))
+        dispatch(changeSpinners.update({bountyDatabase: false}));
+        
+        return Promise.all([bounty, ...bounty.pullRequests.map(pullRequest =>
+          getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
+            .then(details => ({
+              ...pullRequest,
+              isMergeable: details.mergeable === "MERGEABLE",
+              merged: details.merged,
+              state: details.state
+            })))]);
+      })
+      .then(pullRequests => {
+        const extendedPrs = pullRequests.slice(1) as pullRequest[];
+        dispatch(changeCurrentBountyData({ ...pullRequests[0], pullRequests: extendedPrs }));
       });
 
   }

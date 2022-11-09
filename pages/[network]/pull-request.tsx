@@ -17,20 +17,18 @@ import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {useAppState} from "contexts/app-state";
+import {changeCurrentBountyComments} from "contexts/reducers/change-current-bounty";
 import {changeLoadState} from "contexts/reducers/change-load";
+import {changeSpinners} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
-
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-
-import {changeCurrentBountyComments} from "../../contexts/reducers/change-current-bounty";
-import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
-import {useNetwork} from "../../x-hooks/use-network";
-import {changeSpinners} from "../../contexts/reducers/change-spinners";
+import {BountyProvider, useBounty} from "x-hooks/use-bounty";
+import {useNetwork} from "x-hooks/use-network";
 
 export default function PullRequestPage() {
   const {getExtendedPullRequestsForCurrentBounty} = useBounty();
@@ -50,7 +48,7 @@ export default function PullRequestPage() {
   const {getURLWithNetwork} = useNetwork();
   const {createReviewForPR, processEvent} = useApi();
   const {handleMakePullRequestReady, handleCancelPullRequest} = useBepro();
-  const {getDatabaseBounty} = useBounty();
+  const {getDatabaseBounty, getChainBounty} = useBounty();
 
   const {prId, review} = router.query;
 
@@ -59,7 +57,8 @@ export default function PullRequestPage() {
   const isPullRequestReady = !!networkPullRequest?.ready;
   const isPullRequestCanceled = !!networkPullRequest?.canceled;
   const isPullRequestCancelable = !!networkPullRequest?.isCancelable;
-  const isPullRequestCreator = networkPullRequest?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+  const isPullRequestCreator = 
+    networkPullRequest?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
 
   function handleCreateReview(body) {
     if (!state.currentUser?.login) return;
@@ -113,7 +112,7 @@ export default function PullRequestPage() {
         return processEvent("pull-request", "ready", state.Service?.network?.lastVisited, {fromBlock});
       })
       .then(() => {
-        return getDatabaseBounty(true);
+        return Promise.all([getDatabaseBounty(true), getChainBounty()]);
       })
       .then(() => {
         setIsMakingReady(false);
@@ -189,7 +188,8 @@ export default function PullRequestPage() {
     getExtendedPullRequestsForCurrentBounty()
       .then(prs => prs.find((pr) => +pr.githubId === +prId))
       .then(currentPR => {
-        const currentNetworkPR = state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
+        const currentNetworkPR = 
+          state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
 
         setPullRequest(currentPR);
         setNetworkPullRequest(currentNetworkPR);
