@@ -86,10 +86,12 @@ export default function PageActions({
       pullRequest?.githubLogin === state.currentUser?.login && pullRequest?.status !== "canceled");
 
 
-  async function updateBountyData() {
+  async function updateBountyData(force = false, methods: "both" | "database" | "chain") {
     // todo this must be done by the actor so it wont fall out of context
-    getDatabaseBounty(true);
-    getChainBounty(true);
+
+    if(["both","database"].includes(methods)) getDatabaseBounty(force);
+    
+    if(["both","chain"].includes(methods)) getChainBounty(force);
   }
 
   async function handleRedeem() {
@@ -100,7 +102,7 @@ export default function PageActions({
     }) === "funding")
       .then(() => {
         updateWalletBalance(true);
-        updateBountyData();
+        updateBountyData(true, 'both');
       })
   }
 
@@ -109,7 +111,7 @@ export default function PageActions({
     handleHardCancelBounty()
       .then(() => {
         updateWalletBalance();
-        updateBountyData();
+        updateBountyData(true, 'both');
       });
   }
 
@@ -167,7 +169,7 @@ export default function PageActions({
           content: t("pull-request:actions.create.success")
         }));
 
-        return updateBountyData();
+        return updateBountyData(true, 'both');
       })
       .catch((err) => {
         if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
@@ -207,7 +209,7 @@ export default function PageActions({
         }));
 
         addNewComment(response.data);
-        return updateBountyData();
+        return updateBountyData(true, 'database');
       })
       .then(() => setIsExecuting(false))
       .catch((error) => {
