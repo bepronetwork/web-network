@@ -147,7 +147,7 @@ export default function FundModal({
         <FundingProgress
           fundedAmount={state.currentBounty?.data?.fundedAmount?.toFixed()}
           fundingAmount={state.currentBounty?.data?.fundingAmount?.toFixed()}
-          fundingTokenSymbol={state.currentBounty?.data?.token?.symbol}
+          fundingTokenSymbol={state.currentBounty?.chainData?.transactionalTokenData?.symbol}
           fundedPercent={state.currentBounty?.data?.fundedPercent?.toFixed()}
           amountToFund={amountToFund?.toFixed()}
         />
