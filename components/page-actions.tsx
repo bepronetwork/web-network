@@ -91,8 +91,6 @@ export default function PageActions({
     // todo this must be done by the actor so it wont fall out of context
     getDatabaseBounty(true);
     getChainBounty(true);
-
-    return null;
   }
 
   async function handleRedeem() {
@@ -100,11 +98,11 @@ export default function PageActions({
     state: state.currentBounty?.data?.state,
     amount: state.currentBounty?.data?.amount,
     fundingAmount: state.currentBounty?.data?.fundingAmount
-  }) === "funding")
+    }) === "funding")
       .then(() => {
         updateWalletBalance(true);
         updateBountyData();
-      });
+      })
   }
 
   async function handleHardCancel() {
@@ -142,7 +140,7 @@ export default function PageActions({
       branch,
       wallet: state.currentUser.walletAddress
     }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
-        pullRequestPayload = {
+      pullRequestPayload = {
           repoId,
           issueGithubId: issueGithubID,
           bountyId,
@@ -153,7 +151,7 @@ export default function PageActions({
           userBranch,
           userRepo,
           wallet: state.currentUser.walletAddress
-        };
+      };
 
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
@@ -210,7 +208,6 @@ export default function PageActions({
         }));
 
         addNewComment(response.data);
-
         return updateBountyData();
       })
       .then(() => setIsExecuting(false))
@@ -315,7 +312,7 @@ export default function PageActions({
           <Button
             className="read-only-button me-1"
             onClick={handleRedeem}
-          >
+          > 
             <Translation ns="common" label="actions.cancel"/>
           </Button>
         </ReadOnlyButtonWrapper>
