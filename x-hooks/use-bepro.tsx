@@ -121,6 +121,7 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
+          resolve(tx)
           // todo should force these two after action, but we can't have it here or it will fall outside of context
           // getDatabaseBounty(true);
           // getChainBounty(true);
