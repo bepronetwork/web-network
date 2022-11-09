@@ -82,7 +82,7 @@ export default function CouncilLayout({ children }) {
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: state.Service?.network?.networkToken.symbol,
+          token: state.Service?.network?.networkToken?.symbol,
         })}
         infos={infos}
       />

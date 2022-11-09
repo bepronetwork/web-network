@@ -173,12 +173,7 @@ function NewNetwork() {
       .finally(() => dispatch(changeLoadState(false)));
   }
 
-  useEffect(() => {
-    if (!state.Service?.network?.active) return;
-
-    if (state.Service?.network?.active.name.toLowerCase() !== defaultNetworkName)
-      router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
-  }, [state.Service?.network?.active]);
+  
 
   useEffect(() => {
     if (!state.Service?.active || !state.currentUser?.walletAddress) return;

@@ -92,10 +92,10 @@ export function useNetwork() {
   }
 
   function loadNetworkToken() {
-    if (!state.Service?.active || !state?.Service?.network?.active?.networkToken || state.Service?.network?.networkToken)
+    if (!state.Service?.active || state.Service?.network?.networkToken)
       return;
 
-    const activeNetworkToken: any = state.Service.network?.active?.networkToken;
+    const activeNetworkToken: any = state.Service?.active?.network?.networkToken;
 
     Promise.all([activeNetworkToken.name(), activeNetworkToken.symbol(),])
       .then(([name, symbol]) => {
