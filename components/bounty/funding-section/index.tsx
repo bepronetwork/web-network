@@ -101,10 +101,10 @@ export default function FundingSection() {
           />
 
           <FundingProgress
-            fundedAmount={state.currentBounty?.chainData?.fundedAmount?.toFixed()}
-            fundingAmount={state.currentBounty?.chainData?.fundingAmount?.toFixed()}
+            fundedAmount={state.currentBounty?.data?.fundedAmount?.toFixed()}
+            fundingAmount={state.currentBounty?.data?.fundingAmount?.toFixed()}
             fundingTokenSymbol={transactionalSymbol}
-            fundedPercent={state.currentBounty?.chainData?.fundedPercent?.toFixed(2, 1)}
+            fundedPercent={state.currentBounty?.data?.fundedPercent?.toFixed(2, 1)}
           />
 
           { hasReward &&
@@ -189,7 +189,7 @@ export default function FundingSection() {
                                 <Amount
                                   amount={
                                     fund.amount
-                                      .dividedBy(state.currentBounty?.chainData.fundingAmount)
+                                      .dividedBy(state.currentBounty?.data.fundingAmount)
                                       .multipliedBy(state.currentBounty?.chainData.rewardAmount)
                                       .toFixed()
                                   }
