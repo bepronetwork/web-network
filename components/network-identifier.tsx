@@ -12,7 +12,7 @@ export default function NetworkIdentifier() {
 
 
   useEffect(() => {
-    if (!window.ethereum)
+    if (!window.ethereum || !state.Settings?.chainIds)
       return;
 
     window.ethereum.removeAllListeners(`chainChanged`);
@@ -37,8 +37,7 @@ export default function NetworkIdentifier() {
       }))
     });
 
-  }, []);
-
+  }, [state.Settings?.chainIds]);
 
   return (
     (state.connectedChain?.name && (
