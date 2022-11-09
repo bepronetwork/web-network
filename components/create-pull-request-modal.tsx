@@ -69,58 +69,64 @@ export default function CreatePullRequestModal({
 
     // todo: add app-state for user-repositories ?
     getUserRepositories(state.currentUser.login)
-    .then(repositories => {
-      const filteredRepos = 
-        repositories.filter(repo => (repo.isFork && repo.nameWithOwner === `${state.currentUser.login}/${state.Service?.network?.repos?.active?.name}`)
-                                    || repo.nameWithOwner === state.Service?.network?.repos?.active?.githubPath);
-      
-      return Promise.all(filteredRepos
-        .map(async (repository) => ({ repository, branches:  await getRepositoryBranches(repository.nameWithOwner)})));
-    })
-    .then(reposWithBranches => reposWithBranches
-      .map(({ repository, branches }) => branches
-        .map(branch => { 
+      .then(repositories => {
+        const isFork = repo => repo.isFork ? 
+          repo.parent.nameWithOwner === state.Service?.network?.repos?.active?.githubPath : false;
 
-          const prExistsInActiveIssue =
-            state.currentBounty?.data.pullRequests
-              .some(({branch: b}) => b === `${repository.owner}:${branch}`);
+        const filteredRepos = 
+          repositories.filter(repo => isFork(repo) || 
+            repo.nameWithOwner === state.Service?.network?.repos?.active?.githubPath);
+        
+        return Promise.all(filteredRepos
+          .map(async (repository) => ({ 
+            repository, 
+            branches:  await getRepositoryBranches(repository.nameWithOwner)
+          })));
+      })
+      .then(reposWithBranches => reposWithBranches
+        .map(({ repository, branches }) => branches
+          .map(branch => { 
 
-          const isBaseBranch =
-            (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
-              state.currentBounty?.data.branch === branch) ;
-          
-          let postIcon = <></>
+            const prExistsInActiveIssue =
+              state.currentBounty?.data.pullRequests
+                .some(({branch: b}) => b === `${repository.owner}:${branch}`);
 
-          if(repository.isFork)
-            postIcon = <Badge
-              color={"primary-30"}
-              label={t("misc.fork")}
-            />
+            const isBaseBranch =
+              (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
+                state.currentBounty?.data.branch === branch) ;
+            
+            let postIcon = <></>
 
-
-          if (repository.isInOrganization)
-            postIcon =  <Badge 
-              color={"white-10"}
-              label={t("misc.organization")}
-            />
+            if(repository.isFork)
+              postIcon = <Badge
+                color={"primary-30"}
+                label={t("misc.fork")}
+              />
 
 
-          const disabledIcon = !prExistsInActiveIssue
-            ? <></>
-            : <Badge color={"danger"}
-                     label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
+            if (repository.isInOrganization)
+              postIcon =  <Badge 
+                color={"white-10"}
+                label={t("misc.organization")}
+              />
 
-          return {
-            value: `${repository.owner}:${branch}`, 
-            label: branch,
-            isDisabled: prExistsInActiveIssue || isBaseBranch,
-            disabledIcon,
-            postIcon,
-            isSelected: !!selectedBranch && branch === selectedBranch}
-        }))
-      .flatMap(branch => branch))
-    .then(setOptions)
-    .catch(console.log);
+
+            const disabledIcon = !prExistsInActiveIssue
+              ? <></>
+              : <Badge color={"danger"}
+                      label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
+
+            return {
+              value: `${repository.owner}:${branch}`, 
+              label: branch,
+              isDisabled: prExistsInActiveIssue || isBaseBranch,
+              disabledIcon,
+              postIcon,
+              isSelected: !!selectedBranch && branch === selectedBranch}
+          }))
+        .flatMap(branch => branch))
+      .then(setOptions)
+      .catch(console.log);
   }, [state.currentUser?.login, repo, show]);
 
   return (
