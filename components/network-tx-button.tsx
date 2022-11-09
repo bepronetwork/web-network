@@ -105,9 +105,10 @@ function networkTxButton({
           }));
 
           if (answer.blockNumber)
-            processEvent("oracles","changed", state.Service?.network?.lastVisited, {fromBlock:answer.blockNumber}).catch(console.debug);
+            processEvent("oracles","changed", state.Service?.network?.lastVisited, {fromBlock:answer.blockNumber})
+              .catch(console.debug);
 
-          updateTx([parseTransaction(answer, tmpTransaction.payload[0] as SimpleBlockTransactionPayload)])
+          dispatch(updateTx([parseTransaction(answer, tmpTransaction.payload[0] as SimpleBlockTransactionPayload)]));
         } else {
           onFail(answer.message);
           dispatch(addToast({

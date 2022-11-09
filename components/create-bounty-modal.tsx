@@ -515,7 +515,7 @@ export default function CreateBountyModal() {
       });
 
       if (networkBounty?.error !== true) {
-        updateTx([parseTransaction(networkBounty, transactionToast.payload[0] as any)])
+        dispatch(updateTx([parseTransaction(networkBounty, transactionToast.payload[0] as any)]));
 
         const createdBounty = await processEvent("bounty",
                                                  "created",
