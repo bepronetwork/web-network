@@ -28,7 +28,7 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Transaction} from "interfaces/transaction";
 
-import {setTxList, updateTx} from "../contexts/reducers/change-tx-list";
+import {setTxList,} from "../contexts/reducers/change-tx-list";
 
 interface TransactionListProps {
   onActiveTransactionChange: (transaction: Transaction) => void

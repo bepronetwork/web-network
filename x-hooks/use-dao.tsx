@@ -2,7 +2,8 @@ import {createContext, useContext, useEffect,} from "react";
 
 import {useAppState} from "../contexts/app-state";
 import {changeCurrentUserConnected} from "../contexts/reducers/change-current-user";
-import {changeActiveDAO, changeActiveNetwork, changeStarting} from "../contexts/reducers/change-service";
+import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
+import {changeSpinners} from "../contexts/reducers/change-spinners";
 import {toastError,} from "../contexts/reducers/change-toaster";
 import DAO from "../services/dao-service";
 
@@ -25,6 +26,8 @@ export function useDao() {
     if (!state.Service?.active)
       return;
 
+    dispatch(changeSpinners.update({connecting: true}))
+
     state.Service.active
       .connect()
       .then((connected) => {
@@ -35,6 +38,7 @@ export function useDao() {
         }
 
         dispatch(changeCurrentUserConnected(true));
+        dispatch(changeSpinners.update({connecting: false}))
       });
   }
 

@@ -4,6 +4,9 @@ import GithubImage from "components/github-image";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
+import {useAppState} from "../contexts/app-state";
+import Button from "./button";
+
 interface IProps{
   size?: 'md' | 'sm';
 }
@@ -11,7 +14,16 @@ interface IProps{
 export default function ConnectGithub({size = 'md'}:IProps) {
   const { t } = useTranslation("common");
   const { connectGithub } = useAuthentication();
+  const {state} = useAppState()
 
+
+  if(size === 'sm'){
+    return (
+    <Button onClick={connectGithub} disabled={state.spinners?.connecting} isLoading={state.spinners?.connecting}>
+      <GithubImage  opacity={1} />
+      <span>{t("actions.connect")}</span>
+    </Button>)
+  }
 
   return (
     <div className="container-fluid">
@@ -22,11 +34,14 @@ export default function ConnectGithub({size = 'md'}:IProps) {
             <span className="caption-small mx-3">
               {t("actions.connect-github")}
             </span>
-            <button
-              className="btn btn-primary text-uppercase"
-              onClick={() => connectGithub()}>
-              {t("actions.connect")}
-            </button>
+            <span className="d-inline-block">
+              <Button
+                className="d-inline btn btn-primary text-uppercase"
+                disabled={state.spinners?.connecting || !state.currentUser?.walletAddress}
+                onClick={connectGithub}>
+                {t("actions.connect")}
+              </Button>
+            </span>
           </div>
         </div>
       </div>
