@@ -36,8 +36,8 @@ export default function PullRequestPage() {
   const {getExtendedPullRequestsForCurrentBounty} = useBounty();
   const router = useRouter();
 
-  const { t } = useTranslation(["common", "pull-request"]);
-  
+  const {t} = useTranslation(["common", "pull-request"]);
+
   const [showModal, setShowModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isMakingReady, setIsMakingReady] = useState(false);
@@ -45,14 +45,14 @@ export default function PullRequestPage() {
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
 
-  const { state, dispatch } = useAppState();
+  const {state, dispatch} = useAppState();
 
-  const { getURLWithNetwork } = useNetwork();
-  const { createReviewForPR, processEvent } = useApi();
-  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
-  const { getDatabaseBounty } = useBounty();
+  const {getURLWithNetwork} = useNetwork();
+  const {createReviewForPR, processEvent} = useApi();
+  const {handleMakePullRequestReady, handleCancelPullRequest} = useBepro();
+  const {getDatabaseBounty} = useBounty();
 
-  const { prId, review } = router.query;
+  const {prId, review} = router.query;
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
@@ -76,9 +76,9 @@ export default function PullRequestPage() {
     })
       .then((response) => {
         dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("pull-request:actions.review.success"),
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.review.success"),
         }));
 
         setPullRequest({
@@ -92,9 +92,9 @@ export default function PullRequestPage() {
       })
       .catch(() => {
         dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("pull-request:actions.review.error"),
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("pull-request:actions.review.error"),
         }));
       })
       .finally(() => {
@@ -104,71 +104,71 @@ export default function PullRequestPage() {
 
   function handleMakeReady() {
     if (!state.currentBounty?.data || !pullRequest) return;
-    
+
     setIsMakingReady(true);
 
     handleMakePullRequestReady(state.currentBounty?.data.contractId, pullRequest.contractId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-      return processEvent("pull-request", "ready", state.Service?.network?.active?.name, { fromBlock });
-    })
-    .then(() => {
-      return getDatabaseBounty(true);
-    })
-    .then(() => {
-      setIsMakingReady(false);
-      dispatch(addToast({
-        type: "success",
-        title: t("actions.success"),
-        content: t("pull-request:actions.make-ready.success"),
-      }));
-    })
-    .catch(error => {
-      setIsMakingReady(false);
-      
-      if (error?.code === MetamaskErrors.UserRejected) return;
-      
-      dispatch(addToast({
+      .then(txInfo => {
+        const {blockNumber: fromBlock} = txInfo as { blockNumber: number };
+        return processEvent("pull-request", "ready", state.Service?.network?.lastVisited, {fromBlock});
+      })
+      .then(() => {
+        return getDatabaseBounty(true);
+      })
+      .then(() => {
+        setIsMakingReady(false);
+        dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.make-ready.success"),
+        }));
+      })
+      .catch(error => {
+        setIsMakingReady(false);
+
+        if (error?.code === MetamaskErrors.UserRejected) return;
+
+        dispatch(addToast({
           type: "danger",
           title: t("actions.failed"),
           content: t("pull-request:actions.make-ready.error"),
-      }));
-    });
+        }));
+      });
   }
 
   function handleCancel() {
     setIsCancelling(true);
 
     handleCancelPullRequest(state.currentBounty?.data?.contractId, pullRequest?.contractId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-      return processEvent("pull-request", "canceled", state.Service?.network?.active?.name, { fromBlock });
-    })
-    .then(() => {
-      getDatabaseBounty(true);
-      
-      dispatch(addToast({
-        type: "success",
-        title: t("actions.success"),
-        content: t("pull-request:actions.cancel.success"),
-      }));
+      .then(txInfo => {
+        const {blockNumber: fromBlock} = txInfo as { blockNumber: number };
+        return processEvent("pull-request", "canceled", state.Service?.network?.lastVisited, {fromBlock});
+      })
+      .then(() => {
+        getDatabaseBounty(true);
 
-      router.push(getURLWithNetwork('/bounty', {
-        id: state.currentBounty?.data.githubId,
-        repoId: state.currentBounty?.data.repository_id
-      }));
-    })
-    .catch(error => {
-      if (error?.code !== MetamaskErrors.UserRejected)
         dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.cancel.success"),
+        }));
+
+        router.push(getURLWithNetwork('/bounty', {
+          id: state.currentBounty?.data.githubId,
+          repoId: state.currentBounty?.data.repository_id
+        }));
+      })
+      .catch(error => {
+        if (error?.code !== MetamaskErrors.UserRejected)
+          dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("pull-request:actions.cancel.error"),
-        }));
-    })
-    .finally(() => {
-      setIsCancelling(false);
-    });
+          }));
+      })
+      .finally(() => {
+        setIsCancelling(false);
+      });
   }
 
   function handleShowModal() {
@@ -210,7 +210,7 @@ export default function PullRequestPage() {
 
   return (
     <BountyProvider>
-      <PullRequestHero currentPullRequest={pullRequest} />
+      <PullRequestHero currentPullRequest={pullRequest}/>
 
       <CustomContainer>
         <div className="mt-3">
@@ -226,55 +226,55 @@ export default function PullRequestPage() {
 
               <div className="col-4 gap-20 p-0 d-flex justify-content-end">
                 {/* Make Review Button */}
-                { (isWalletConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
-                    <ReadOnlyButtonWrapper>
-                      <Button
-                        className="read-only-button text-nowrap"
-                        onClick={handleShowModal}
-                        disabled={isCreatingReview || isCancelling || isMakingReady || !state.currentUser?.handle }
-                        isLoading={isCreatingReview}
-                        withLockIcon={isCancelling || isMakingReady || !state.currentUser?.handle}>
-                        {t("actions.make-a-review")}
-                      </Button>
-                    </ReadOnlyButtonWrapper>
+                {(isWalletConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
+                  <ReadOnlyButtonWrapper>
+                    <Button
+                      className="read-only-button text-nowrap"
+                      onClick={handleShowModal}
+                      disabled={isCreatingReview || isCancelling || isMakingReady || !state.currentUser?.handle}
+                      isLoading={isCreatingReview}
+                      withLockIcon={isCancelling || isMakingReady || !state.currentUser?.handle}>
+                      {t("actions.make-a-review")}
+                    </Button>
+                  </ReadOnlyButtonWrapper>
                 }
 
                 {/* Make Ready for Review Button */}
-                { ( isWalletConnected && 
-                    isPullRequestOpen && 
-                    !isPullRequestReady && 
-                    !isPullRequestCanceled && 
-                    isPullRequestCreator ) && (
-                    <ReadOnlyButtonWrapper>
-                      <Button
-                        className="read-only-button text-nowrap"
-                        onClick={handleMakeReady}
-                        disabled={isCreatingReview || isCancelling || isMakingReady}
-                        isLoading={isMakingReady}
-                        withLockIcon={isCreatingReview || isCancelling}>
-                        {t("pull-request:actions.make-ready.title")}
-                      </Button>
-                    </ReadOnlyButtonWrapper>
-                  )
+                {(isWalletConnected &&
+                  isPullRequestOpen &&
+                  !isPullRequestReady &&
+                  !isPullRequestCanceled &&
+                  isPullRequestCreator) && (
+                  <ReadOnlyButtonWrapper>
+                    <Button
+                      className="read-only-button text-nowrap"
+                      onClick={handleMakeReady}
+                      disabled={isCreatingReview || isCancelling || isMakingReady}
+                      isLoading={isMakingReady}
+                      withLockIcon={isCreatingReview || isCancelling}>
+                      {t("pull-request:actions.make-ready.title")}
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                )
                 }
 
                 {/* Cancel Button */}
-                { ( isWalletConnected &&
-                    !isPullRequestCanceled &&
-                    isPullRequestCancelable &&
-                    isPullRequestCreator ) && (
-                    <ReadOnlyButtonWrapper>
-                      <Button
-                        className="read-only-button text-nowrap"
-                        onClick={handleCancel}
-                        disabled={isCreatingReview || isCancelling || isMakingReady}
-                        isLoading={isCancelling}
-                        withLockIcon={isCreatingReview || isMakingReady}
-                      >
-                        {t("actions.cancel")}
-                      </Button>
-                    </ReadOnlyButtonWrapper>
-                  )
+                {(isWalletConnected &&
+                  !isPullRequestCanceled &&
+                  isPullRequestCancelable &&
+                  isPullRequestCreator) && (
+                  <ReadOnlyButtonWrapper>
+                    <Button
+                      className="read-only-button text-nowrap"
+                      onClick={handleCancel}
+                      disabled={isCreatingReview || isCancelling || isMakingReady}
+                      isLoading={isCancelling}
+                      withLockIcon={isCreatingReview || isMakingReady}
+                    >
+                      {t("actions.cancel")}
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                )
                 }
 
                 <GithubLink
@@ -284,12 +284,12 @@ export default function PullRequestPage() {
                 </GithubLink>
               </div>
             </div>
-            
+
             <div className="col-12 mt-4">
               {(pullRequest?.comments?.length > 0 &&
                 React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
-                    <Comment comment={comment} key={index} />
-                  )))) || (
+                  <Comment comment={comment} key={index}/>
+                )))) || (
                 <NothingFound
                   description={t("pull-request:errors.no-reviews-found")}
                 />
@@ -307,12 +307,12 @@ export default function PullRequestPage() {
         onCloseClick={handleCloseModal}
       />
 
-      <ConnectWalletButton asModal={true} />
+      <ConnectWalletButton asModal={true}/>
     </BountyProvider>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       ...(await serverSideTranslations(locale, [

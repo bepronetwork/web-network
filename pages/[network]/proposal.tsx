@@ -53,7 +53,7 @@ export default function PageProposal() {
         .then(txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-          return processEvent("bounty", "closed", state.Service?.network?.active?.name, { fromBlock } );
+          return processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } );
         })
         .then(() => {
           getChainBounty(true);
@@ -82,7 +82,7 @@ export default function PageProposal() {
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("proposal", "disputed", state.Service?.network?.active?.name, { fromBlock } );
+        return processEvent("proposal", "disputed", state.Service?.network?.lastVisited, { fromBlock } );
       })
       .then(() => {
         getDatabaseBounty(true);
@@ -106,7 +106,7 @@ export default function PageProposal() {
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "refused", state.Service?.network?.active?.name, { fromBlock } );
+      return processEvent("proposal", "refused", state.Service?.network?.lastVisited, { fromBlock } );
     })
     .then(() => {
       getDatabaseBounty(true);

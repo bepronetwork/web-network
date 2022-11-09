@@ -70,7 +70,7 @@ export default function RetractOrWithdrawModal({
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         
-        return processEvent("bounty", "funded", state.Service?.network?.active?.name, {
+        return processEvent("bounty", "funded", state.Service?.network?.lastVisited, {
           fromBlock
         });
       })
