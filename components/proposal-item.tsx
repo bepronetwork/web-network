@@ -83,7 +83,7 @@ export default function ProposalItem({
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("proposal", "disputed", state.Service?.network?.active?.name, { fromBlock });
+        return processEvent("proposal", "disputed", state.Service?.network?.lastVisited, { fromBlock });
       })
       .then(() => {
         getDatabaseBounty(true);

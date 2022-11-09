@@ -65,7 +65,7 @@ export default function UpdateBountyAmountModal({
 
     handleUpdateBountyAmount(bountyId, newAmount.toFixed())
       .then(txInfo => {
-        return processEvent("bounty", "updated", state.Service?.network?.active?.name, {
+        return processEvent("bounty", "updated", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         });
       })
