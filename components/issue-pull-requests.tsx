@@ -19,7 +19,9 @@ export default function IssuePullRequests() {
         React.Children.toArray(state.currentBounty?.data?.pullRequests?.map((pullRequest) => (
             <PullRequestItem
               pullRequest={pullRequest}
-              networkPullRequest={state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)}
+              networkPullRequest={
+                state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)
+              }
             />
           ))) || 
         <NothingFound description={t("errors.not-found")} />
