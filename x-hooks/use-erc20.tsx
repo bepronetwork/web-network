@@ -89,7 +89,7 @@ export default function useERC20() {
 
       await state.Service?.active.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          updateTx([parseTransaction(txInfo, transaction.payload[0] as any)])
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as any)]));
           resolve(txInfo);
         })
         .catch((err) => {
