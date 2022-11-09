@@ -103,7 +103,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleReedemIssue(funding = false): Promise<TransactionReceipt | Error> {
+  async function handleReedemIssue(funding = false): Promise<{ blockNumber: number; } | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTx([{ type: TransactionTypes.redeemIssue } as any]);
       dispatch(redeemTx);
@@ -114,8 +114,8 @@ export default function useBepro() {
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty",
-            "canceled",
-            state.Service?.network?.lastVisited,
+                              "canceled",
+                              state.Service?.network?.lastVisited,
             {fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id});
         })
         .then((canceledBounties) => {
