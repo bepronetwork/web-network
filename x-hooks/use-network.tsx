@@ -131,7 +131,10 @@ export function useNetwork() {
 
     Promise.all([network.draftTime(), network.disputableTime()])
       .then(([draftTime, disputableTime]) => {
-        dispatch(changeActiveNetworkTimes({draftTime, disputableTime}));
+        dispatch(changeActiveNetworkTimes({
+          draftTime: +draftTime / 1000, 
+          disputableTime: +disputableTime / 1000
+        }));
       })
   }
 
