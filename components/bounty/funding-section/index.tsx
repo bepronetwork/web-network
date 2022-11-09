@@ -35,13 +35,13 @@ export default function FundingSection() {
   const isBountyClosed = !!state.currentBounty?.chainData?.closed;
   const isBountyFunded = !!state.currentBounty?.chainData?.funded;
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
-  const transactionalSymbol = state.currentBounty?.chainData?.transactionalTokenData?.symbol;
+  const transactionalSymbol = state.currentBounty?.data?.token?.symbol;
   const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;
 
   const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
   
   const futureRewards = 
-    fundsGiven.multipliedBy(state.currentBounty?.chainData?.rewardAmount).dividedBy(state.currentBounty?.chainData?.fundingAmount).toFixed();
+    fundsGiven.multipliedBy(state.currentBounty?.chainData?.rewardAmount).dividedBy(state.currentBounty?.data?.fundingAmount).toFixed();
   
   const isCanceled = getIssueState({
     state: state.currentBounty?.data?.state,
@@ -54,15 +54,19 @@ export default function FundingSection() {
   const handleCloseRetractOrWithdrawModal = () => setFundingToRetractOrWithdraw(undefined);
 
   useEffect(() => {
-    if (!state.currentUser?.walletAddress || !state.currentBounty?.chainData) return;
-
-    const funds: any[] =
-      state.currentBounty?.chainData.funding
-        .map((fund, index) => ({ ...fund, id: index }))
-        .filter(fund => fund.benefactor.toLowerCase() === state.currentUser.walletAddress.toLowerCase() && fund.amount.gt(0)) || [];
+    if (!state.currentUser?.walletAddress || !state.currentBounty?.data) return;
+  
+    const funds = state.currentBounty?.data?.benefactors
+        .filter(fund => fund.address.toLowerCase() === state.currentUser.walletAddress.toLowerCase())
+        .map((fund) => ({
+          ...fund,
+          isWithdrawn: !!state.currentBounty?.chainData?.funding?.find((networkFund, key) =>
+              key === fund.contractId &&
+              networkFund.amount.isEqualTo(0))
+        }));
 
     setWalletFunds(funds);
-  }, [state.currentUser, state.currentBounty?.chainData]);
+  }, [state.currentUser, state.currentBounty?.data, state.currentBounty?.chainData]);
 
   if (isBountyFunded && !walletFunds?.length) return <></>;
 

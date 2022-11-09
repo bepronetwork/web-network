@@ -44,13 +44,13 @@ export default function FundModal({
     isExecuting,
     amountToFund?.isNaN(),
     amountToFund?.isZero(),
-    amountToFund?.plus(state.currentBounty?.chainData?.fundedAmount).gt(state.currentBounty?.chainData?.fundingAmount),
+    amountToFund?.plus(state.currentBounty?.data?.fundedAmount).gt(state.currentBounty?.data?.fundingAmount),
     amountToFund === undefined
   ].some(c => c);
   const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;
   const transactionalSymbol = state.currentBounty?.chainData?.transactionalTokenData?.symbol;
   const needsApproval = amountToFund?.gt(allowance);
-  const amountNotFunded = state.currentBounty?.chainData?.fundingAmount?.minus(state.currentBounty?.chainData?.fundedAmount) || BigNumber(0);
+  const amountNotFunded = state.currentBounty?.data?.fundingAmount?.minus(state.currentBounty?.data?.fundedAmount) || BigNumber(0);
 
   const ConfirmBtn = {
     label: needsApproval ? t("actions.approve") : t("funding:actions.fund-bounty"),
@@ -75,11 +75,11 @@ export default function FundModal({
   }
 
   function fundBounty() {
-    if (!state.currentBounty?.chainData?.id || !amountToFund) return;
+    if (!state.currentBounty?.data?.contractId || !amountToFund) return;
 
     setIsExecuting(true);
 
-    handleFundBounty(state.currentBounty?.chainData.id, amountToFund.toFixed(), transactionalSymbol, decimals)
+    handleFundBounty(state.currentBounty?.data.contractId, amountToFund.toFixed(), transactionalSymbol, decimals)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         
@@ -121,14 +121,14 @@ export default function FundModal({
   }
 
   useEffect(() => {
-    if (!state.currentBounty?.chainData?.fundingAmount || !state.currentBounty?.chainData?.rewardAmount) return;
+    if (!state.currentBounty?.data?.fundingAmount || !state.currentBounty?.chainData?.rewardAmount) return;
 
     if (amountToFund?.lte(amountNotFunded)) {
-      const preview = amountToFund.multipliedBy(state.currentBounty?.chainData.rewardAmount).dividedBy(state.currentBounty?.chainData.fundingAmount);
+      const preview = amountToFund.multipliedBy(state.currentBounty?.chainData.rewardAmount).dividedBy(state.currentBounty?.data.fundingAmount);
       setRewardPreview(preview.toFixed());
     } else
       setRewardPreview("0");
-  }, [state.currentBounty?.chainData?.fundingAmount, state.currentBounty?.chainData?.rewardAmount, amountToFund]);
+  }, [state.currentBounty?.data?.fundingAmount, state.currentBounty?.chainData?.rewardAmount, amountToFund]);
 
   useEffect(() => {
     if (state.currentBounty?.chainData?.transactionalTokenData?.address)
@@ -145,10 +145,10 @@ export default function FundModal({
     >
       <div className="mt-2 px-2 d-grid gap-4">
         <FundingProgress
-          fundedAmount={state.currentBounty?.chainData?.fundedAmount?.toFixed()}
-          fundingAmount={state.currentBounty?.chainData?.fundingAmount?.toFixed()}
+          fundedAmount={state.currentBounty?.data?.fundedAmount?.toFixed()}
+          fundingAmount={state.currentBounty?.data?.fundingAmount?.toFixed()}
           fundingTokenSymbol={state.currentBounty?.chainData?.transactionalTokenData?.symbol}
-          fundedPercent={state.currentBounty?.chainData?.fundedPercent?.toFixed()}
+          fundedPercent={state.currentBounty?.data?.fundedPercent?.toFixed()}
           amountToFund={amountToFund?.toFixed()}
         />
 
@@ -156,7 +156,7 @@ export default function FundModal({
           label={t("funding:modals.fund.fields.fund-amount.label")}
           value={amountToFund}
           onChange={handleSetAmountToFund}
-          symbol={state.currentBounty?.chainData?.transactionalTokenData?.symbol}
+          symbol={state.currentBounty?.data?.token?.symbol}
           balance={balance}
           decimals={state.currentBounty?.chainData?.transactionalTokenData?.decimals}
           max={BigNumber.minimum(amountNotFunded, balance)}
