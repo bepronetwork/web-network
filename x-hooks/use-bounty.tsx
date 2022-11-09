@@ -1,5 +1,6 @@
 import {createContext, useContext, useEffect} from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
@@ -17,6 +18,7 @@ import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
 import {IssueData} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
+
 
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
@@ -61,20 +63,28 @@ export function useBounty() {
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
     getIssue(+query.repoId, +query.id, state.Service.network.lastVisited)
-      .then((bounty: IssueData) => {
+      .then(async (bounty: IssueData) => {
 
         console.debug(`GOT ISSUE`);
 
+        const fundedAmount = BigNumber(bounty.fundedAmount || 0)
+        const fundingAmount = BigNumber(bounty.fundingAmount || 0)
+        const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(fundingAmount)
+
         const bigNumbers = {
           amount: BigNumber(bounty.amount),
-          fundingAmount: BigNumber(bounty.fundingAmount),
-          fundedAmount: BigNumber(bounty.fundedAmount)
+          fundingAmount,
+          fundedAmount,
+          fundedPercent
         }
 
         const mergeProposalMapper = (proposal) => ({
           ...proposal,
           isMerged: bounty.merged !== null && proposal.scMergeId === bounty.merged
         })
+
+        bounty.benefactors = bounty?.benefactors.map((benefactor) => 
+        ({...benefactor, amount: BigNumber(benefactor.amount)}))
 
         const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
         dispatch(changeCurrentBountyData({...bounty, mergeProposals, ...bigNumbers}));
@@ -98,7 +108,7 @@ export function useBounty() {
     dispatch(changeSpinners.update({bountyChain: true}))
 
     state.Service.active.getBounty(state.currentBounty.data.contractId)
-      .then(bounty => {
+      .then(async bounty => {
 
         const pullRequestsMapper = (pullRequest) => ({
           ...pullRequest,
@@ -109,8 +119,9 @@ export function useBounty() {
         bounty.fundedAmount = bounty.funding.reduce((p, c) => p.plus(c.amount), BigNumber(0))
         bounty.fundedPercent = bounty.fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount);
         bounty.isFundingRequest = bounty.fundingAmount.gt(0);
-
-        // todo: missing tokenInformation
+        bounty.transactionalTokenData = await state.Service.active.getERC20TokenData(bounty.transactional)
+        bounty.rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
+        await state.Service.active.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
 
