@@ -1,4 +1,5 @@
 import {
+  NetworkAmounts,
   NetworkTimes,
   ServiceNetwork,
   ServiceNetworkRepos,
@@ -67,6 +68,7 @@ export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.u
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
 export const changeActiveNetworkToken = (networkToken: Token) => changeNetwork.update({networkToken});
 export const changeActiveNetworkTimes = (times: NetworkTimes) => changeNetwork.update({times});
+export const changeActiveNetworkAmounts = (amounts: NetworkAmounts) => changeNetwork.update({amounts});
 
 export const changeAllowedTokens = (transactional: Token[], reward: Token[]) =>
   changeNetwork.update({tokens: {transactional, reward}})

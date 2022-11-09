@@ -34,12 +34,21 @@ export interface NetworkTimes {
   draftTime: string|number;
 }
 
+export interface NetworkAmounts {
+  councilAmount: string | number;
+  mergeCreatorFeeShare: string | number;
+  proposerFeeShare: string | number;
+  percentageNeededForDispute: string | number;
+  oracleExchangeRate: string | number;
+}
+
 export interface ServiceNetwork {
   lastVisited: string;
   active: Network | null;
   repos: ServiceNetworkRepos | null;
   networkToken: Token;
   times: NetworkTimes;
+  amounts: NetworkAmounts;
   tokens: {transactional: Token[]; reward: Token[];} | null;
 }
 
