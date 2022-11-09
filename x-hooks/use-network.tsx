@@ -6,6 +6,7 @@ import {UrlObject} from "url";
 import {useAppState} from "contexts/app-state";
 import {
   changeActiveNetwork,
+  changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
   changeActiveNetworkToken, changeAllowedTokens,
   changeNetworkLastVisited
@@ -138,10 +139,37 @@ export function useNetwork() {
       })
   }
 
+  function loadNetworkAmounts() {
+    if (!state?.Service?.active?.network)
+      return;
+
+    const network: any = state.Service.active?.network;
+
+    Promise.all([ network.councilAmount(), 
+                  network.mergeCreatorFeeShare(), 
+                  network.proposerFeeShare(), 
+                  network.percentageNeededForDispute(), 
+                  network.oracleExchangeRate() ])
+      .then(([councilAmount, 
+              mergeCreatorFeeShare, 
+              proposerFeeShare, 
+              percentageNeededForDispute, 
+              oracleExchangeRate]) => {
+        dispatch(changeActiveNetworkAmounts({
+          councilAmount: councilAmount.toString(),
+          oracleExchangeRate: +oracleExchangeRate,
+          mergeCreatorFeeShare: +mergeCreatorFeeShare,
+          proposerFeeShare: +proposerFeeShare,
+          percentageNeededForDispute: +percentageNeededForDispute
+        }));
+      })
+  }
+
   useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
-  useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active])
-  useEffect(loadNetworkTimes, [state.Service?.active?.network])
-  useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active])
+  useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active]);
+  useEffect(loadNetworkTimes, [state.Service?.active?.network]);
+  useEffect(loadNetworkAmounts, [state.Service?.active?.network]);
+  useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active]);
 
 
   return {

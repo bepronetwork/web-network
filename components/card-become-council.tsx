@@ -37,7 +37,7 @@ export default function CardBecomeCouncil() {
       <div className="text-gray pe-3 pb-2">
         {t("become-council-description-part-one")}{" "}
         <span className="amount-white-color">
-          {formatNumberToNScale(+state.Service?.network?.active?.councilAmount)}
+          {formatNumberToNScale(+state.Service?.network?.amounts?.councilAmount)}
         </span>{" "}
         <span className="text-primary">
           {state.Service?.network?.networkToken?.symbol}
