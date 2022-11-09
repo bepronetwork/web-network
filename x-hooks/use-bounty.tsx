@@ -53,7 +53,7 @@ export function useBounty() {
     if (!state.Service?.network?.active || !query?.id || !query.repoId)
       return;
 
-    if (force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
+    if (!force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
       return;
 
     console.debug(`GET ISSUE`, state.Service)
