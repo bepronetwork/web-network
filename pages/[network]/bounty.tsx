@@ -16,13 +16,13 @@ import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
 import TabbedNavigation from "components/tabbed-navigation";
 
+import {useAppState} from "contexts/app-state";
+
 import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
+import {BountyProvider, useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
-
-import {useAppState} from "../../contexts/app-state";
-import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
-import {useRepos} from "../../x-hooks/use-repos";
+import {useRepos} from "x-hooks/use-repos";
 
 export default function PageIssue() {
   useBounty();
@@ -70,26 +70,35 @@ export default function PageIssue() {
   }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   useEffect(() => {
+    if (!state.currentUser?.login ||
+        !state.Service?.network?.repos?.active ||
+        !state.currentBounty?.data) 
+      return;
 
-    console.log(`load forked`, !(!state.currentUser?.login || !state.Service?.network?.repos?.active), state?.Service?.network)
-
-    if (!state.currentUser?.login || !state.Service?.network?.repos?.active) return;
-
+    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
+      return setIsRepoForked(true);
+    
     getUserRepositories(state.currentUser?.login)
       .then((repos) => {
 
         console.log(`REPOS`, repos);
 
+        const isFork = repo => repo.isFork ? 
+          repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
+
         const isForked = 
-          !!repos.find(repo => (repo.isFork && repo.nameWithOwner === `${state.currentUser.login}/${state.Service?.network?.repos?.active.name}`)
-                                || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
+          !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
 
         setIsRepoForked(isForked);
       })
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
       });
-  }, [ state.currentUser?.login, state.currentUser?.walletAddress, id, state.currentBounty?.data, state.Service?.network?.repos?.active ]);
+  }, [state.currentUser?.login,
+      state.currentUser?.walletAddress,
+      id,
+      state.currentBounty?.data,
+      state.Service?.network?.repos?.active]);
 
   return (
     <BountyProvider>

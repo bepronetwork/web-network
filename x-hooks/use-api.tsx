@@ -191,10 +191,7 @@ export default function useApi() {
       });
   }
 
-  async function cancelPrePullRequest({ 
-    networkName = DEFAULT_NETWORK_NAME,
-    ...rest 
-  } : CancelPrePullRequestParams) {
+  async function cancelPrePullRequest({networkName = DEFAULT_NETWORK_NAME, ...rest} : CancelPrePullRequestParams) {
     return api
       .delete("/pull-request/", { data: { customNetworkName: networkName, ...rest } })
       .then(({ data }) => data)

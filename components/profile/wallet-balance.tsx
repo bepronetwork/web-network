@@ -44,7 +44,7 @@ export default function WalletBalance() {
     if (!state.currentUser?.walletAddress || !state.Service?.active || !(state.Service?.network?.networkToken as any)?.contractAddress)
       return;
 
-    const {networkToken} = state.Service?.network?.active;
+    const {networkToken} = state.Service?.network?.active || {};
 
     Promise.all([
       state.Service.active.getTokenBalance(state.Settings.beproToken.address, state.currentUser.walletAddress)

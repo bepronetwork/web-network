@@ -267,7 +267,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "created", state.Service?.network?.active?.name, { fromBlock });
+      return processEvent("proposal", "created", state.Service?.network?.lastVisited, { fromBlock });
     })
     .then(() => {
       handleClose();

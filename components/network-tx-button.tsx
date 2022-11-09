@@ -22,6 +22,7 @@ import {useAuthentication} from "x-hooks/use-authentication";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {MetamaskErrors} from "../interfaces/enums/Errors";
+import {SimpleBlockTransactionPayload} from "../interfaces/transaction";
 
 
 interface NetworkTxButtonParams {
@@ -104,9 +105,9 @@ function networkTxButton({
           }));
 
           if (answer.blockNumber)
-            processEvent("oracles","changed", state.Service?.network?.active.name, {fromBlock:answer.blockNumber}).catch(console.debug);
+            processEvent("oracles","changed", state.Service?.network?.lastVisited, {fromBlock:answer.blockNumber}).catch(console.debug);
 
-          updateTx([parseTransaction(answer, tmpTransaction.payload[0])])
+          updateTx([parseTransaction(answer, tmpTransaction.payload[0] as SimpleBlockTransactionPayload)])
         } else {
           onFail(answer.message);
           dispatch(addToast({

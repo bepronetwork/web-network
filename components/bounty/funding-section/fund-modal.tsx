@@ -83,7 +83,7 @@ export default function FundModal({
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         
-        return processEvent("bounty", "funded", state.Service?.network?.active?.name, {fromBlock});
+        return processEvent("bounty", "funded", state.Service?.network?.lastVisited, {fromBlock});
       })
       .then(() => {
         const amountFormatted = formatNumberToCurrency(amountToFund.toFixed());

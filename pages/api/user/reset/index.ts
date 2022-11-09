@@ -14,7 +14,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       where: {
       address: address.toLowerCase(),
       githubLogin: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("githubLogin")), "=", githubLogin.toLowerCase())
-    } });
+      } });
 
     if (!user) 
       return res.status(404).json("User not found");

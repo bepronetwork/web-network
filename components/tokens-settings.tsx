@@ -138,7 +138,7 @@ export default function TokensSettings({
     if (addTransactionalTokens.length > 0) {
       await state.Service?.active.addAllowedTokens(addTransactionalTokens, true)
       .then((txInfo) => {
-        processEvent("registry", "changed", state.Service?.network?.active?.name, {
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
@@ -155,7 +155,7 @@ export default function TokensSettings({
     if (removeTransactionalTokens.length > 0) {
       state.Service?.active.removeAllowedTokens(removeTransactionalTokens, true)
       .then((txInfo) => {
-        processEvent("registry", "changed", state.Service?.network?.active?.name, {
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
@@ -182,7 +182,7 @@ export default function TokensSettings({
     if (addRewardTokens.length > 0) {
       state.Service?.active.addAllowedTokens(addRewardTokens, false)
       .then((txInfo) => {
-        processEvent("registry", "changed", state.Service?.network?.active?.name, {
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
@@ -199,7 +199,7 @@ export default function TokensSettings({
     if (removeRewardTokens.length > 0) {
       state.Service?.active.removeAllowedTokens(removeRewardTokens, false)
       .then((txInfo) => {
-        processEvent("registry", "changed", state.Service?.network?.active?.name, {
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();

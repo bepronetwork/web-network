@@ -37,7 +37,6 @@ import {useNetwork} from "x-hooks/use-network";
 import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
-import {changeNetworkReposActive} from "../contexts/reducers/change-service";
 import {useRepos} from "../x-hooks/use-repos";
 
 interface BountyPayload {
@@ -586,7 +585,7 @@ export default function CreateBountyModal() {
     if (!Service?.network?.tokens || !showCreateBounty)
       return;
 
-    const {transactional, reward} = Service?.network.tokens;
+    const {transactional, reward} = Service?.network?.tokens || {};
 
     if (transactional.length + reward.length === customTokens.length)
       return;
