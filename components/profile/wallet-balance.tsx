@@ -41,10 +41,10 @@ export default function WalletBalance() {
 
     console.log(`fetching balance?`, state?.Service?.network?.networkToken)
 
-    if (!state.currentUser?.walletAddress || !state.Service?.active || !(state.Service?.network?.networkToken as any)?.contractAddress)
+    if (!state.currentUser?.walletAddress || !state.Service?.active || !state.Service?.network?.networkToken?.address)
       return;
 
-    const {networkToken} = state.Service?.network?.active || {};
+    const { networkToken } = state.Service?.network || {};
 
     Promise.all([
       state.Service.active.getTokenBalance(state.Settings.beproToken.address, state.currentUser.walletAddress)
@@ -53,29 +53,31 @@ export default function WalletBalance() {
           token.balance = balance;
           return token
         }),
-      state.Settings.beproToken.address === (state.Service?.network?.networkToken as any).contractAddress ? Promise.resolve(null) :
-      state.Service.active.getTokenBalance((state.Service?.network?.networkToken as any).contractAddress, state.currentUser.walletAddress)
+      state.Settings.beproToken.address === state.Service?.network?.networkToken?.address ? Promise.resolve(null) :
+      state.Service.active
+        .getTokenBalance(state.Service?.network?.networkToken?.address, state.currentUser.walletAddress)
         .then(balance =>
           (networkToken.name as any as () => Promise<string>)()
             .then(name => (networkToken.symbol as any as () => Promise<string>)()
               .then(symbol => ({name, symbol, balance, icon: <TokenIconPlaceholder />}))))
     ]).then(tokens => {
-
-      Promise.all([(networkToken.name as any)(), (networkToken.symbol as any)()])
-        .then(([name, symbol]) => {
-          setOracleToken({
-            symbol: t("$oracles",  { token: symbol }),
-            name: name,
-            icon: <OracleIcon />
-          })
-        })
+      setOracleToken({
+        symbol: t("$oracles",  { token: networkToken?.symbol }),
+        name: networkToken?.name,
+        icon: <OracleIcon />
+      })
 
       setTokens(tokens.filter(v => !!v));
     })
 
   }
 
-  useEffect(loadBalances, [state.currentUser, state.Settings, state.Service?.active, (state.Service?.network?.networkToken as any)?.contractAddress])
+  useEffect(loadBalances, [
+    state.currentUser, 
+    state.Settings, 
+    state.Service?.active, 
+    state.Service?.network?.networkToken?.address
+  ])
 
 
   useEffect(() => {
