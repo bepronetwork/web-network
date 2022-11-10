@@ -2,6 +2,7 @@ import {PullRequest} from "@taikai/dappkit";
 
 import {CurrentBounty, State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
+import { Token } from "interfaces/token";
 
 import {BenefactorExtended, BountyExtended, ProposalExtended} from "../../interfaces/bounty";
 import {IssueBigNumberData, IssueDataComment} from "../../interfaces/issue-data";
@@ -85,3 +86,9 @@ export const changeCurrentBountyDataPullRequests = (pullRequests: PullRequest[])
 
 export const changeCurrentBountyDataFunding = (funding: BenefactorExtended[]) =>
   changeCurrentBountyDataChain.update({funding});
+
+export const changeCurrentBountyDataTransactional = (transactionalTokenData: Token) =>
+  changeCurrentBountyDataChain.update({transactionalTokenData});  
+
+export const changeCurrentBountyDataReward = (rewardTokenData: Token) =>
+  changeCurrentBountyDataChain.update({rewardTokenData}); 
