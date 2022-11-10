@@ -94,11 +94,7 @@ export default function PageIssue() {
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
       });
-  }, [state.currentUser?.login,
-      state.currentUser?.walletAddress,
-      id,
-      state.currentBounty?.data,
-      state.Service?.network?.repos?.active]);
+  },[state.currentUser?.login, id, state.currentBounty?.data]);
 
   return (
     <BountyProvider>
