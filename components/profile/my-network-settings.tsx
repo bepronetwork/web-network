@@ -66,7 +66,10 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const { updateWalletBalance } = useAuthentication();
   const { details, fields, github, settings, tokens, forcedNetwork, isAbleToClosed } = useNetworkSettings();
 
-  const isCurrentNetwork = !!network && !!state.Service?.network?.active && network?.networkAddress === state.Service?.network?.active?.networkAddress;
+  const isCurrentNetwork = !!network && 
+    !!state.Service?.network?.active && 
+    network?.networkAddress === state.Service?.network?.active?.networkAddress;
+    
   const networkNeedRegistration = network?.isRegistered === false;
 
   const handleColorChange = value => fields.colors.setter(value);
@@ -95,7 +98,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       !state.currentUser?.login ||
       !state.currentUser?.walletAddress || !state.Service?.active ||
       !forcedNetwork ||
-      !state.Service?.network?.active?.isClosed ||
+      forcedNetwork?.isClosed ||
       errorBigImages
     )
       return;
