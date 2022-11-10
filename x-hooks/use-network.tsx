@@ -15,6 +15,7 @@ import {
 import {WinStorage} from "services/win-storage";
 
 import useApi from "./use-api";
+import { useDao } from "./use-dao";
 
 export const NetworkContext = createContext({})
 export const NetworkProvider = ({children}) => <NetworkContext.Provider value={{}} children={children} />
@@ -27,6 +28,7 @@ export function useNetwork() {
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();
   const {getNetwork, getTokens} = useApi();
+  const {changeNetwork} = useDao()
 
 
   function clearNetworkFromStorage() {
@@ -68,7 +70,8 @@ export function useNetwork() {
 
         storageParams.value = data;
         dispatch(changeActiveNetwork(data));
-
+        
+        changeNetwork(data.networkAddress)
         console.debug(`Updated active params`, data);
       })
       .catch(error => {

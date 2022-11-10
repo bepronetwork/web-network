@@ -75,7 +75,7 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [state.Service?.active, state.Service?.network?.active]);
+  }, [state.Service?.active?.network?.contractAddress, state.Service?.network]);
 
   return (
     <BountyProvider>
@@ -84,7 +84,6 @@ export default function PageDevelopers() {
         subtitle={t("heroes.bounties.subtitle")}
         infos={infos}
       />
-    
       <ListIssues />
     </BountyProvider>
   );
