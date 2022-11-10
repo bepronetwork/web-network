@@ -18,6 +18,8 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
   const { t } = useTranslation("common");
 
   function onChangeSelect(e: { value: { id: string; path: string } }) {
+    if(e?.value === option?.value) return
+    
     onSelected(e);
     setOption({
       value: e.value,
@@ -27,14 +29,12 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
 
   function setOptionMapper() {
     if (!state.Service?.network?.repos?.list) return;
-    // setIsFetching(true)
 
     function mapRepo({ id: value, githubPath: label }) {
       return { value: { id: value, path: label }, label };
     }
 
     setOptions(state.Service?.network?.repos?.list.map(mapRepo));
-    // setIsFetching(false)
   }
 
   useEffect(setOptionMapper, [state.Service?.network?.repos?.list]);

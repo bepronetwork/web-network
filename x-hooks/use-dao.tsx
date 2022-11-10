@@ -79,7 +79,7 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    if (!state.Settings || !!state.Service?.active || !!state.Service?.starting)
+    if (!state.Settings?.urls || !!state.Service?.active || !!state.Service?.starting)
       return;
 
     dispatch(changeStarting(true));
