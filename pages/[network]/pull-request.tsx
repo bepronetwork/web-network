@@ -53,6 +53,7 @@ export default function PullRequestPage() {
   const {prId, review} = router.query;
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
+  const isGithubConnected = !!state.currentUser?.login;
   const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
   const isPullRequestReady = !!networkPullRequest?.ready;
   const isPullRequestCanceled = !!networkPullRequest?.canceled;
@@ -231,9 +232,9 @@ export default function PullRequestPage() {
                     <Button
                       className="read-only-button text-nowrap"
                       onClick={handleShowModal}
-                      disabled={isCreatingReview || isCancelling || isMakingReady || !state.currentUser?.handle}
+                      disabled={isCreatingReview || isCancelling || isMakingReady || !isGithubConnected}
                       isLoading={isCreatingReview}
-                      withLockIcon={isCancelling || isMakingReady || !state.currentUser?.handle}>
+                      withLockIcon={isCancelling || isMakingReady || !isGithubConnected}>
                       {t("actions.make-a-review")}
                     </Button>
                   </ReadOnlyButtonWrapper>
