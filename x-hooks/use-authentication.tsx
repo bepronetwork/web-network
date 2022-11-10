@@ -72,9 +72,6 @@ export function useAuthentication() {
 
     if (!state.currentUser?.connected)
       return;
-
-    console.log(`updating wallet`)
-
     dispatch(changeWalletSpinnerTo(true));
 
     state.Service.active.getAddress()
