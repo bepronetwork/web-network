@@ -27,14 +27,14 @@ export function useRepos() {
     }
 
     dispatch(changeLoadState(true));
-
-    return getReposList(force, state.Service?.network?.lastVisited)
+    
+    return getReposList(force, name)
       .then(repos => {
         if (!repos) {
           console.error(`No repos found for`, state.Service.network.active.name);
           return;
         }
-
+        
         storage.value = repos;
         // dispatch(changeNetworkReposList(repos));
         // dispatch(changeLoadState(false));
