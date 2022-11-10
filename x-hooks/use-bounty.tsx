@@ -49,24 +49,16 @@ export function useBounty() {
   }
 
   function getDatabaseBounty(force = false) {
-
-    console.log(`getDatabaseBounty()`, force);
-
     if (!state.Service?.network?.active || !query?.id || !query.repoId)
       return;
 
     if (!force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
       return;
 
-    console.debug(`GET ISSUE`, state.Service)
-
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
     getIssue(+query.repoId, +query.id, state.Service.network.lastVisited)
       .then(async (bounty: IssueData) => {
-
-        console.debug(`GOT ISSUE`);
-
         const fundedAmount = BigNumber(bounty.fundedAmount || 0)
         const fundingAmount = BigNumber(bounty.fundingAmount || 0)
         const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(fundingAmount)
@@ -90,8 +82,7 @@ export function useBounty() {
         const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
 
         dispatch(changeCurrentBountyData(extendedBounty));
-        console.log(`GOT ISSUE DATA`, extendedBounty);
-        
+
         return Promise.all([
           getIssueOrPullRequestComments(bounty.repository.githubPath, +bounty.githubId),
           extendedBounty
@@ -118,11 +109,8 @@ export function useBounty() {
   }
 
   function getChainBounty(force = false) {
-    console.log(`getChainBounty`, state)
     if (!state.Service?.active || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
-
-    console.log(`getChainBounty is not cached`, state.currentBounty)
 
     dispatch(changeSpinners.update({bountyChain: true}))
 
@@ -143,9 +131,6 @@ export function useBounty() {
         await state.Service.active.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
-
-        console.log(`getChainBounty got data`, bounty);
-
 
         state.Service.active.isBountyInDraftChain(bounty.creationDate)
           .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));

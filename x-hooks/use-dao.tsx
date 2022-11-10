@@ -33,7 +33,7 @@ export function useDao() {
       .then((connected) => {
         if (!connected) {
           dispatch(toastError('Failed to connect'));
-          console.log(`Failed to connect`, state.Service);
+          console.error(`Failed to connect`, state.Service);
           return;
         }
 
@@ -61,7 +61,7 @@ export function useDao() {
         .loadNetwork(networkAddress)
         .then(started => {
           if (!started) {
-            console.log(`Failed to load network`, networkAddress);
+            console.error(`Failed to load network`, networkAddress);
             return;
           }
           // dispatch(changeActiveDAO(service));
@@ -79,13 +79,10 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    console.debug(`${new Date()} useDao start`, state.Settings, !state.Settings || !!state.Service?.active || !!state.Service?.starting, !!state.Service?.active, !!state.Service?.starting)
     if (!state.Settings || !!state.Service?.active || !!state.Service?.starting)
       return;
 
     dispatch(changeStarting(true));
-
-    console.debug(`useDao starting`);
 
     const {urls: {web3Provider: web3Host}, contracts: {networkRegistry: registryAddress}} =
       state.Settings;
@@ -112,7 +109,6 @@ export function useDao() {
       })
       .finally(() => {
         dispatch(changeStarting(false));
-        console.log(`useDao start finished`);
       })
   }
 

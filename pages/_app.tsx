@@ -14,6 +14,7 @@ import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import CreateBountyModal from "../components/create-bounty-modal";
+import Toaster from "../components/toaster";
 
 
 function App({
@@ -34,6 +35,7 @@ function App({
             </div>
             <CreateBountyModal/>
             <StatusBar />
+            <Toaster />
           </>
         </RootProviders>
       </SessionProvider>

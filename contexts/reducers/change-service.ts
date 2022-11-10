@@ -46,7 +46,6 @@ export class ChangeServiceNetworkReposProp
   }
 
   reducer(state: State, payload): State {
-    console.log(`REDUCING WITH`, payload, state);
     return super.reducer(state, Object.assign(state.Service.network || {}, {repos: {...state.Service?.network?.repos || {}, ...payload}}));
   }
 }
