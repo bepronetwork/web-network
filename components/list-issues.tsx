@@ -66,10 +66,7 @@ export default function ListIssues({
   proposer,
   redirect
 }: ListIssuesProps) {
-  const {
-    dispatch,
-    state: { loading }
-  } = useAppState();
+  const {dispatch, state: appState} = useAppState();
 
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);
@@ -82,8 +79,6 @@ export default function ListIssues({
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
 
   const searchTimeout = useRef(null);
-
-  const {state: appState} = useAppState();
 
   const { searchIssues } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
@@ -157,7 +152,7 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: appState.Service?.network?.active?.name
+      networkName: appState.Service?.network?.lastVisited
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -324,7 +319,7 @@ export default function ListIssues({
       )) || <></>}
 
       {issuesPages.every((el) => el.issues?.length === 0) &&
-      !loading?.isLoading ? (
+      !appState.loading?.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {appState.currentUser?.walletAddress && (
@@ -341,7 +336,7 @@ export default function ListIssues({
       {(issuesPages.some((el) => el.issues?.length > 0) && (
         <InfiniteScroll
           handleNewPage={nextPage}
-          isLoading={loading?.isLoading}
+          isLoading={appState.loading?.isLoading}
           hasMore={hasMore}>
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (
