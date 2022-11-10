@@ -38,8 +38,7 @@ export function useNetwork() {
   }
 
   function updateActiveNetwork(forceUpdate = false) {
-    const networkName =
-      query?.network?.toString() ||
+    const networkName = query?.network?.toString() ||
       state.Service?.network?.active?.name ||
       state.Settings?.defaultNetworkConfig?.name;
 
@@ -84,7 +83,7 @@ export function useNetwork() {
       pathname: `/[network]/${href}`.replace("//", "/"),
       query: {
         ..._query,
-        network: _query?.network ||
+        network:String(_query?.network)?.replaceAll(" ", "-") ||
           query?.network ||
           state.Settings?.defaultNetworkConfig?.name ||
           "bepro"
