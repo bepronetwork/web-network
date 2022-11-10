@@ -134,8 +134,8 @@ export function useBounty() {
         state.Service.active.getERC20TokenData(bounty.transactional)
           .then(token => dispatch(changeCurrentBountyDataTransactional(token)))
 
-        bounty.rewardToken !== Defaults.nativeZeroAddress && 
-           state.Service.active.getERC20TokenData(bounty.rewardToken)
+        if(bounty.rewardToken !== Defaults.nativeZeroAddress)
+          state.Service.active.getERC20TokenData(bounty.rewardToken)
               .then(token => dispatch(changeCurrentBountyDataReward(token)))
 
         state.Service.active.isBountyInDraftChain(bounty.creationDate)
