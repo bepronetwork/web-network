@@ -50,7 +50,7 @@ export function useDao() {
     if (!state.Service?.active || !networkAddress)
       return;
 
-    if (state.Service?.network?.active?.networkAddress === networkAddress)
+    if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
     const service = state.Service.active;
@@ -64,7 +64,7 @@ export function useDao() {
             console.error(`Failed to load network`, networkAddress);
             return;
           }
-          // dispatch(changeActiveDAO(service));
+          dispatch(changeActiveDAO(service));
         })
         .catch(error => {
           console.error(`Error loading network`, error);

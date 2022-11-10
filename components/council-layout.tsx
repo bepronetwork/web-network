@@ -75,7 +75,7 @@ export default function CouncilLayout({ children }) {
 
   useEffect(() => {
     loadTotals();
-  }, [state.Service?.active, state.Service?.network?.active]);
+  }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active]);
 
   return (
     <div>
