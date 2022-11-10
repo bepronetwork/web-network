@@ -168,7 +168,7 @@ export function useBounty() {
 
   function getExtendedProposalsForCurrentBounty(bounty: BountyExtended): Promise<ProposalExtended[]> {
     if (!state.currentBounty?.chainData || !state.Service?.active)
-      return Promise.resolve([]);
+      return Promise.reject([]);
 
     const dbBounty = state.currentBounty?.data;
     const wallet = state.currentUser?.walletAddress;
