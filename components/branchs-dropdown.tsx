@@ -14,7 +14,7 @@ export default function BranchsDropdown({
   disabled,
 }: {
   repoId: string
-  onSelected: (e: { value: string }) => void
+  onSelected: (e: { value: string, label: string }) => void
   value?: { value: string, label: string }
   disabled?: boolean
 }) {
@@ -27,21 +27,19 @@ export default function BranchsDropdown({
 
 
   function mapOptions() {
-    if (!state.Service?.network?.repos?.active?.branches?.length)
+    if (!state.Service?.network?.repos?.active?.branches?.length || !repoId)
       return;
 
     const _options = state.Service.network.repos.active.branches.map((branch: string) => ({value: branch, label: branch}));
     setOptions(_options);
-    setOption(_options[0]);
 
-    onSelected(_options[0]);
   }
 
-  useEffect(() => { value?.label && setOption(value) }, [value]);
-  useEffect(mapOptions, [state.Service?.network?.repos?.active?.branches]);
+  useEffect(() => { if(value?.value !== option?.value) setOption(value)}, [value]);
+  useEffect(mapOptions, [state.Service?.network?.repos?.active?.branches, repoId]);
 
   function onChangeSelect(e: { value: string }) {
-    onSelected(e)
+    onSelected({value: e.value, label: e.value})
     setOption({value: e.value, label: e.value})
   }
 

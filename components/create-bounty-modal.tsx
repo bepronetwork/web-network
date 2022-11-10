@@ -61,7 +61,7 @@ const ZeroNumberFormatValues = {
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
-  const [branch, setBranch] = useState("");
+  const [branch, setBranch] = useState<{ value: string, label: string } | undefined>();
   const [files, setFiles] = useState<IFilesProps[]>([]);
   const [rewardToken, setRewardToken] = useState<Token>();
   const [bountyTitle, setBountyTitle] = useState<string>("");
@@ -258,10 +258,9 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <ReposDropdown
                 onSelected={(opt) => {
-                  console.log(opt)
                   updateActiveRepo(opt.value.id);
-                  // dispatch(changeNetworkReposActive(Service?.network?.repos?.list?.find(r => r.githubPath === opt.value.path)));
                   setRepository(opt.value)
+                  setBranch(null)
                 }}
                 value={{
                   label: repository?.path,
@@ -272,11 +271,8 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <BranchsDropdown
                 repoId={repository?.id}
-                onSelected={(opt) => setBranch(opt.value)}
-                value={{
-                  label: branch,
-                  value: branch,
-                }}
+                onSelected={(opt) => setBranch(opt)}
+                value={branch}
               />
             </div>
           </div>
@@ -310,7 +306,7 @@ export default function CreateBountyModal() {
                   <GithubInfo
                     parent="list"
                     variant="repository"
-                    label={branch.length <= 20 ? branch : branch.slice(0,20)+"..."}
+                    label={branch.label.length <= 20 ? branch.label : branch.label.slice(0,20)+"..."}
                     simpleDisabled={true}
                   />
                 </div>
@@ -400,7 +396,7 @@ export default function CreateBountyModal() {
     setIssueAmount(ZeroNumberFormatValues);
     setRewardAmount(ZeroNumberFormatValues);
     setRepository(undefined);
-    setBranch("");
+    setBranch(null);
     setCurrentSection(0);
     setFiles([]);
   }
@@ -475,7 +471,7 @@ export default function CreateBountyModal() {
 
       const bountyPayload: BountyPayload = {
         cid,
-        branch,
+        branch: branch.value,
         repoPath: repository.path,
         transactional: transactionalToken.address,
         title: payload.title,
