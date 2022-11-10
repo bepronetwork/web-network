@@ -44,9 +44,12 @@ export function useNetwork() {
 
     dispatch(changeNetworkLastVisited(networkName));
 
-    if (!networkName || (storage.value && networkName && storage.value === networkName)) {
-      if (storage.value)
-        dispatch(changeActiveNetwork(storage.value));
+    const lastNetworkDataStorage = new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`);
+
+    if (!networkName || 
+        (storage.value && networkName && lastNetworkDataStorage.value && storage.value === networkName)) {
+      if (lastNetworkDataStorage.value)
+        dispatch(changeActiveNetwork(lastNetworkDataStorage.value));
 
       return;
     }
