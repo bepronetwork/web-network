@@ -12,7 +12,7 @@ import {useSettings} from "../x-hooks/use-settings";
 import loadApplicationStateReducers from "./reducers";
 import {changeNetworkReposList} from "./reducers/change-service";
 import {updateSettings} from "./reducers/change-settings";
-import {toastError} from "./reducers/change-toaster";
+import {toastError, toastSuccess} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
 
 
@@ -49,20 +49,14 @@ export function AppStateContextProvider({children}) {
   }
 
   function start() {
-    console.debug(`AppState first effect`, new Date());
-
     loadApplicationStateReducers(); // load reducers into app-state
     loadSettings()
-      .then(s => dispatch(updateSettings(s)))
-      .finally(() => {
-        console.debug(`AppState Settings loaded`, new Date());
-      });
+      .then(s => dispatch(updateSettings(s)));
 
+    dispatch(toastSuccess('hey oh'))
   }
 
   function _loadRepos() {
-    console.log('WEIRD', state?.Service?.network?.lastVisited);
-
     if (!state?.Service?.network?.lastVisited)
       return;
 

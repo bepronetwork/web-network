@@ -19,16 +19,12 @@ export function useRepos() {
     if (!name)
       return;
 
-    console.debug(`Load repos start`);
-
     const key = `bepro.network:repos:${name}`
     const storage = new WinStorage(key, 3600, `sessionStorage`);
     if (storage.value && !force) {
       dispatch(changeNetworkReposList(storage.value));
       return;
     }
-
-    console.debug(`Load repos no cache`);
 
     dispatch(changeLoadState(true));
 
@@ -38,8 +34,6 @@ export function useRepos() {
           console.error(`No repos found for`, state.Service.network.active.name);
           return;
         }
-
-        console.debug(`Loaded repos`, repos);
 
         storage.value = repos;
         // dispatch(changeNetworkReposList(repos));
@@ -60,8 +54,6 @@ export function useRepos() {
 
     getRepository(activeRepo?.githubPath)
       .then(info => {
-        console.log(`INFO`, info);
-
         if (!info)
           return []
 

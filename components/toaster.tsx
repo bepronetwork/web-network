@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Toast, ToastContainer} from "react-bootstrap";
 
 import BeproSmallLogo from "assets/icons/bepro-small-logo";
@@ -20,16 +20,20 @@ enum IconMapper {
 }
 
 export default function Toaster() {
-  const {state: { toaster }, dispatch} = useAppState();
+  const {state, dispatch} = useAppState();
 
   function onClose(i: ToastNotification) {
     dispatch(removeToast(i));
   }
 
+  useEffect(() => {
+    console.log(`CHANGED`, state.toaster);
+  }, [state.toaster])
+
   return (
     <>
       <ToastContainer>
-        {toaster.map((toast, i) => (
+        {state?.toaster.map((toast, i) => (
           <Toast
           delay={toast.delay || 3000}
             autohide={true}

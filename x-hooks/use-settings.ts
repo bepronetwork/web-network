@@ -21,14 +21,10 @@ export function useSettings() {
    * Reload settings on each session start
    */
   function loadSettings() {
-    console.debug(`loading Settings`, state.Settings);
     if (state.Settings)
       return;
 
-    console.debug(`loading storage Settings`, storage.value);
-
     if (storage.value) {
-      console.debug(`dispatching storage`, storage.value);
       // dispatch(updateSettings(storage.value));
       return storage.value;
     }
@@ -47,7 +43,6 @@ export function useSettings() {
         }
       })
       .then(settings => {
-        console.log(`Got settings`, settings);
         storage.value = settings;
         // setTmpSettings(settings)
         //dispatch(updateSettings(settings));
