@@ -12,6 +12,7 @@ import {
   changeCurrentBountyDataIsDraft,
   changeCurrentBountyDataIsFinished,
   changeCurrentBountyDataIsInValidation,
+  changeCurrentBountyDataProposals,
   changeCurrentBountyDataReward,
   changeCurrentBountyDataTransactional,
 } from "../contexts/reducers/change-current-bounty";
@@ -20,6 +21,8 @@ import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
 import {IssueData, pullRequest} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
+import { Proposal } from "interfaces/proposal";
+import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 
 
 
@@ -141,6 +144,9 @@ export function useBounty() {
         state.Service.active.isBountyInDraftChain(bounty.creationDate)
           .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));
 
+        getExtendedProposalsForCurrentBounty(bounty)
+          .then(proposals => dispatch(changeCurrentBountyDataProposals(proposals)))
+
         bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.network)
           .catch(() => -1)
           .then(value => {
@@ -160,30 +166,28 @@ export function useBounty() {
    *  are only called once, since they ignore cached information
    */
 
-  function getExtendedProposalsForCurrentBounty() {
+  function getExtendedProposalsForCurrentBounty(bounty: BountyExtended): Promise<ProposalExtended[]> {
     if (!state.currentBounty?.chainData || !state.Service?.active)
       return Promise.resolve([]);
 
-    const bounty = state.currentBounty.chainData;
-    const dbBounty = state.currentBounty.data;
+    const dbBounty = state.currentBounty?.data;
     const wallet = state.currentUser?.walletAddress;
 
     return Promise.all(bounty.proposals.map(proposal =>
-        (dbBounty.merged
-            ? Promise.resolve(+dbBounty.merged !== proposal.id)
+        (dbBounty?.merged
+            ? Promise.resolve(+dbBounty?.merged !== proposal.id)
             : state.Service.active.isProposalDisputed(+bounty.id, proposal.id)
         ).then(isDisputed =>
           !wallet
             ? ({...proposal, isDisputed})
             : state.Service.active.getDisputesOf(wallet, +bounty.id, +proposal.id)
-              .then(value => ({...proposal, isDisputed, canUserDispute: !value})))))
+              .then(value => ({...proposal, isDisputed, canUserDispute: !value.gt(0)})))))
       .then(proposals => {
-        // dispatch(changeCurrentBountyDataProposals(proposals));
-        return proposals;
+        return Promise.resolve(proposals)
       })
       .catch(e => {
         console.error(`Failed to get extended proposals`, e);
-        return;
+        return Promise.reject(e)
       });
   }
 

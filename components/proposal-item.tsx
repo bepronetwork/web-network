@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import Link from "next/link";
 
@@ -110,15 +111,17 @@ export default function ProposalItem({
   }, [isBountyClosed, isProposalDisputed, isProposalMerged, isProposalRefused]);
 
   useEffect(() => {
-    if (proposal?.createdAt && state.Service?.network?.active?.disputableTime && state.Service?.active)
+    if (proposal?.createdAt && state.Service?.network?.times?.disputableTime && state.Service?.active)
       state.Service?.active.getTimeChain()
         .then(chainTime => {
           const canDispute = 
-            isProposalDisputable(networkProposal?.creationDate, state.Service?.network?.active?.disputableTime, chainTime);
+            isProposalDisputable(networkProposal?.creationDate, 
+                                 BigNumber(state.Service?.network.times?.disputableTime).toNumber(), 
+                                 chainTime);
 
           setIsDisputable(canDispute && !isProposalDisputed);
         });
-  }, [state.Service?.active, proposal?.createdAt, state.Service?.network?.active?.disputableTime, isProposalDisputed]);
+  }, [state.Service?.active, proposal?.createdAt, state.Service?.network?.times?.disputableTime, isProposalDisputed]);
 
   if (state.currentBounty?.data?.mergeProposals?.length !== state.currentBounty?.chainData?.proposals?.length && !networkProposal)
     return (
