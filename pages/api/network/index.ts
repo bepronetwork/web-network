@@ -22,7 +22,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if(networkName){
     where = {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   } 
