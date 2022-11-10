@@ -12,6 +12,8 @@ import {
   changeCurrentBountyDataIsDraft,
   changeCurrentBountyDataIsFinished,
   changeCurrentBountyDataIsInValidation,
+  changeCurrentBountyDataReward,
+  changeCurrentBountyDataTransactional,
 } from "../contexts/reducers/change-current-bounty";
 import {changeSpinners} from "../contexts/reducers/change-spinners";
 import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
@@ -115,7 +117,7 @@ export function useBounty() {
     dispatch(changeSpinners.update({bountyChain: true}))
 
     state.Service.active.getBounty(state.currentBounty.data.contractId)
-      .then(async bounty => {
+      .then(bounty => {
 
         const pullRequestsMapper = (pullRequest) => ({
           ...pullRequest,
@@ -126,11 +128,15 @@ export function useBounty() {
         bounty.fundedAmount = bounty.funding.reduce((p, c) => p.plus(c.amount), BigNumber(0))
         bounty.fundedPercent = bounty.fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount);
         bounty.isFundingRequest = bounty.fundingAmount.gt(0);
-        bounty.transactionalTokenData = await state.Service.active.getERC20TokenData(bounty.transactional)
-        bounty.rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
-        await state.Service.active.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
+
+        state.Service.active.getERC20TokenData(bounty.transactional)
+          .then(token => dispatch(changeCurrentBountyDataTransactional(token)))
+
+        bounty.rewardToken !== Defaults.nativeZeroAddress && 
+           state.Service.active.getERC20TokenData(bounty.rewardToken)
+              .then(token => dispatch(changeCurrentBountyDataReward(token)))
 
         state.Service.active.isBountyInDraftChain(bounty.creationDate)
           .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));
