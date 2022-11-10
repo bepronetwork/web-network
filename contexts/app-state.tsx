@@ -52,8 +52,6 @@ export function AppStateContextProvider({children}) {
     loadApplicationStateReducers(); // load reducers into app-state
     loadSettings()
       .then(s => dispatch(updateSettings(s)));
-
-    dispatch(toastSuccess('hey oh'))
   }
 
   function _loadRepos() {
