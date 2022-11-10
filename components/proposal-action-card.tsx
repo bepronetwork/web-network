@@ -50,7 +50,9 @@ export default function ProposalActionCard({
 
   const isDisable = () => [
     state.currentBounty?.chainData?.closed,
-    !isProposalDisputable(proposal?.createdAt, state.Service?.network?.active?.disputableTime, chaintime),
+    !isProposalDisputable(proposal?.createdAt, 
+                          BigNumber(state.Service?.network.times?.disputableTime).toNumber(), 
+                          chaintime),
     networkProposal?.isDisputed,
     networkProposal?.refusedByBountyOwner,
     !networkProposal?.canUserDispute,
@@ -77,7 +79,7 @@ export default function ProposalActionCard({
     !proposal?.isMerged,
     !networkProposal?.isDisputed,
     !networkProposal?.refusedByBountyOwner,
-    !isProposalDisputable(proposal?.createdAt, state.Service?.network?.active?.disputableTime),
+    !isProposalDisputable(proposal?.createdAt, BigNumber(state.Service?.network.times?.disputableTime).toNumber()),
     !isMerging,
     !isRefusing,
     !isDisputing,
