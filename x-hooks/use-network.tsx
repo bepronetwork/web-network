@@ -79,11 +79,13 @@ export function useNetwork() {
   }
 
   function getURLWithNetwork(href: string, _query = undefined): UrlObject {
+    const _network = _query?.network ? String(_query?.network)?.replaceAll(" ", "-") : undefined;
+
     return {
       pathname: `/[network]/${href}`.replace("//", "/"),
       query: {
         ..._query,
-        network:String(_query?.network)?.replaceAll(" ", "-") ||
+        network: _network ||
           query?.network ||
           state.Settings?.defaultNetworkConfig?.name ||
           "bepro"
