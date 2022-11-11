@@ -345,7 +345,7 @@ export default function CreateBountyModal() {
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
     const isRewardAmount =
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
-    if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
+    if ((currentSection === 0 && !bountyTitle) || !bountyDescription || !!files.find(f => f.hash === null))
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
     if (
