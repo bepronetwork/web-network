@@ -58,7 +58,7 @@ const ZeroNumberFormatValues = {
   floatValue: 0,
 };
 
-function CreateBounty() {
+export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
   const [branch, setBranch] = useState<{ value: string, label: string } | undefined>();
@@ -98,6 +98,9 @@ function CreateBounty() {
       show: { createBounty: showCreateBounty }
     },
   } = useAppState();
+
+  if(!showCreateBounty)
+    return <></>
 
   const steps = [
     t("bounty:steps.details"),
@@ -667,18 +670,4 @@ function CreateBounty() {
       </Modal>
     </>
   );
-}
-
-export default function CreateBountyModal(){
-  const {
-    state: {
-      show: { createBounty: showCreateBounty }
-    },
-  } = useAppState();
-  
-  if(!showCreateBounty)
-    return <></>
-  
-
-  return  <CreateBounty/>
 }
