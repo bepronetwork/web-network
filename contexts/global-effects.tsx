@@ -19,7 +19,7 @@ export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
   const {state} = useAppState();
-  const {query} = useRouter();
+  const {asPath, query} = useRouter();
   const session = useSession();
 
   const dao = useDao();
@@ -33,7 +33,12 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(repos.loadRepos, [state?.Service?.network?.lastVisited]);
 
   useEffect(auth.validateGhAndWallet, 
-    [(session?.data as CustomSession)?.user?.login, state.currentUser?.walletAddress]);
+            [(session?.data as CustomSession), 
+              state.currentUser?.walletAddress,
+              asPath.includes('developers'),
+              asPath.includes('bounty'),
+              asPath.includes('profile'),
+            ]);
   useEffect(auth.updateWalletAddress, [state.currentUser]);
   useEffect(auth.listenToAccountsChanged, [state.Service]);
   useEffect(auth.updateWalletBalance, [state.currentUser?.walletAddress]);

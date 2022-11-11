@@ -12,6 +12,7 @@ interface Spinners {
   bountyDatabase: boolean;
   matching: boolean;
   connecting: boolean;
+  connectingGH: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {
@@ -42,3 +43,9 @@ export const changeSpinnerBountyState = (bountyState: boolean) =>
 
 export const changeWalletSpinnerTo = (wallet: boolean) =>
   changeSpinners.update({wallet});
+
+export const changeConnecting = (connecting: boolean) =>
+  changeSpinners.update({connecting});
+
+export const changeConnectingGH = (connectingGH: boolean) =>
+  changeSpinners.update({connectingGH});

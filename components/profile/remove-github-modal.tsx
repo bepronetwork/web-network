@@ -40,9 +40,7 @@ function RemoveGithubAccount({
     setIsExecuting(true);
 
     resetUser(walletAddress, githubLogin)
-      .then(() => {
-        return disconnectGithub();
-      })
+      .then(disconnectGithub)
       .then(() => router.push("/connect-account"))
       .catch(error => {
         if (error?.response?.status === 409) {
