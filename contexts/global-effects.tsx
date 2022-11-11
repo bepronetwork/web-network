@@ -33,11 +33,11 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(repos.loadRepos, [state?.Service?.network?.lastVisited]);
 
   useEffect(auth.validateGhAndWallet, 
-            [(session?.data as CustomSession)?.user?.login, 
-             state.currentUser?.walletAddress,
-             asPath.includes('developers'),
-             asPath.includes('bounty'),
-             asPath.includes('profile'),
+            [(session?.data as CustomSession), 
+              state.currentUser?.walletAddress,
+              asPath.includes('developers'),
+              asPath.includes('bounty'),
+              asPath.includes('profile'),
             ]);
   useEffect(auth.updateWalletAddress, [state.currentUser]);
   useEffect(auth.listenToAccountsChanged, [state.Service]);

@@ -38,6 +38,10 @@ export function useAuthentication() {
   const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
   function disconnectGithub() {
+    dispatch(changeCurrentUserMatch(undefined));
+    dispatch(changeCurrentUserHandle(undefined));
+    dispatch(changeCurrentUserLogin(undefined));
+    dispatch(changeCurrentUserAccessToken((undefined)));
     return signOut({redirect: false});
   }
 
@@ -111,7 +115,7 @@ export function useAuthentication() {
 
   function validateGhAndWallet() {
     const sessionUser = (session?.data as CustomSession)?.user;
-
+    
     if (!state.currentUser?.walletAddress || !sessionUser?.login || state.spinners?.matching)
       return;
 
@@ -121,14 +125,12 @@ export function useAuthentication() {
     const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
     getUserWith(userLogin)
-      .then(user => {
+      .then(async(user) => {
         if (!user.githubLogin){
           dispatch(changeCurrentUserMatch(undefined));
 
           if(session.status === 'authenticated' && state.currentUser.login && !asPath.includes(`connect-account`)){
-            dispatch(changeCurrentUserHandle(undefined));
-            dispatch(changeCurrentUserLogin(undefined));
-            dispatch(changeCurrentUserAccessToken((undefined)));
+            await disconnectGithub()
           }
         }
         else if (user.githubLogin && userLogin)

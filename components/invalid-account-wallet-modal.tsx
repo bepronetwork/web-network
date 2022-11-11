@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
@@ -22,7 +23,7 @@ export default function InvalidAccountWalletModal() {
       matching
     }
   } } = useAppState();
-
+  const {asPath} = useRouter()
   const {data: sessionData} = useSession();
   const { user: sessionUser } = (sessionData || {}) as CustomSession;
 
@@ -30,6 +31,7 @@ export default function InvalidAccountWalletModal() {
                 sessionData?.user, 
                 currentUser?.connected,
                 currentUser?.walletAddress,
+                !asPath.includes(`connect-account`),
                 !matching
   ].every(condition=> condition)
 
