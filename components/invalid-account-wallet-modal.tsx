@@ -1,5 +1,7 @@
+import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
@@ -7,16 +9,37 @@ import metamaskLogo from "assets/metamask.png";
 import Avatar from "components/avatar";
 import Modal from "components/modal";
 
+import { useAppState } from "contexts/app-state";
+
 import { truncateAddress } from "helpers/truncate-address";
 
-export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
+import { CustomSession } from "interfaces/custom-session";
+
+export default function InvalidAccountWalletModal() {
   const { t } = useTranslation("common");
+  const { state:{
+    currentUser,
+    spinners:{
+      matching
+    }
+  } } = useAppState();
+  const {asPath} = useRouter()
+  const {data: sessionData} = useSession();
+  const { user: sessionUser } = (sessionData || {}) as CustomSession;
+
+  const show = [currentUser?.match === false, 
+                sessionData?.user, 
+                currentUser?.connected,
+                currentUser?.walletAddress,
+                !asPath.includes(`connect-account`),
+                !matching
+  ].every(condition=> condition)
 
   return (
     <Modal
       centerTitle
       size="lg"
-      show={isVisible}
+      show={show}
       title={t("modals.invalid-account-wallet.title")}>
       <div>
         <div className="d-flex justify-content-center mb-2 mx-2 text-center flex-column mb-4">
@@ -32,8 +55,8 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
                 border-danger d-flex justify-content-between p-3 align-items-center`}
             >
               <div>
-                <Avatar src={user?.image} userLogin={user?.login || "null"} />{" "}
-                <span className="ms-2">{user?.name || user?.login}</span>
+                <Avatar src={sessionUser?.image} userLogin={sessionUser?.login || "null"} />{" "}
+                <span className="ms-2">{sessionUser?.name || sessionUser?.login}</span>
               </div>
 
               <ErrorMarkIcon />
@@ -47,7 +70,7 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
               <div>
                 <Image src={metamaskLogo} width={15} height={15} />{" "}
                 <span className="ms-2">
-                  {wallet?.address && truncateAddress(wallet?.address)}
+                  {currentUser?.walletAddress && truncateAddress(currentUser?.walletAddress)}
                 </span>
               </div>
               <ErrorMarkIcon />

@@ -19,7 +19,7 @@ import { CustomSession } from "interfaces/custom-session";
 import {WinStorage} from "services/win-storage";
 
 import {changeActiveNetwork} from "../contexts/reducers/change-service";
-import {changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change-spinners";
+import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change-spinners";
 import useApi from "./use-api";
 import {useDao} from "./use-dao";
 
@@ -38,6 +38,10 @@ export function useAuthentication() {
   const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
   function disconnectGithub() {
+    dispatch(changeCurrentUserMatch(undefined));
+    dispatch(changeCurrentUserHandle(undefined));
+    dispatch(changeCurrentUserLogin(undefined));
+    dispatch(changeCurrentUserAccessToken((undefined)));
     return signOut({redirect: false});
   }
 
@@ -88,6 +92,8 @@ export function useAuthentication() {
     if (!state.currentUser?.walletAddress)
       return;
 
+    dispatch(changeConnectingGH(true));
+
     getUserOf(state.currentUser?.walletAddress)
       .then((user) => {
         if (!user?.githubLogin && !asPath.includes(`connect-account`)) {
@@ -104,12 +110,12 @@ export function useAuthentication() {
         lastUrl.value = asPath;
 
         return signedIn ? signIn('github', {callbackUrl: `${URL_BASE}${asPath}`}) : null;
-      })
+      }).finally(()=> dispatch(changeConnectingGH(false)))
   }
 
   function validateGhAndWallet() {
     const sessionUser = (session?.data as CustomSession)?.user;
-
+    
     if (!state.currentUser?.walletAddress || !sessionUser?.login || state.spinners?.matching)
       return;
 
@@ -119,9 +125,14 @@ export function useAuthentication() {
     const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
     getUserWith(userLogin)
-      .then(user => {
-        if (!user.githubLogin && state.currentUser?.match !== undefined)
+      .then(async(user) => {
+        if (!user.githubLogin){
           dispatch(changeCurrentUserMatch(undefined));
+
+          if(session.status === 'authenticated' && state.currentUser.login && !asPath.includes(`connect-account`)){
+            await disconnectGithub()
+          }
+        }
         else if (user.githubLogin && userLogin)
           dispatch(changeCurrentUserMatch(userLogin === user.githubLogin &&
             (walletAddress ? walletAddress === user.address : true)));
@@ -133,7 +144,7 @@ export function useAuthentication() {
   }
 
   function listenToAccountsChanged() {
-    if (!state.Service || window?.ethereum?.listenerCount(`accountsChanged`) > 0)
+    if (!state.Service)
       return;
 
     window.ethereum.on(`accountsChanged`, () => {
