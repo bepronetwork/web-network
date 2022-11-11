@@ -17,15 +17,20 @@ import { CustomSession } from "interfaces/custom-session";
 export default function InvalidAccountWalletModal() {
   const { t } = useTranslation("common");
   const { state:{
-    currentUser
+    currentUser,
+    spinners:{
+      matching
+    }
   } } = useAppState();
 
   const {data: sessionData} = useSession();
   const { user: sessionUser } = (sessionData || {}) as CustomSession;
 
-  const show = [!currentUser?.match, 
+  const show = [currentUser?.match === false, 
                 sessionData?.user, 
-                currentUser?.connected
+                currentUser?.connected,
+                currentUser?.walletAddress,
+                !matching
   ].every(condition=> condition)
 
   return (
