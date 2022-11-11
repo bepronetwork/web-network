@@ -30,6 +30,10 @@ export default function CreatePullRequestModal({
   title: prTitle = "",
   description: prDescription = ""
 }: props) {
+
+  if(!show)
+    return <></>
+
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [title, setTitle] = useState("");

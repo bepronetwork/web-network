@@ -99,6 +99,9 @@ export default function CreateBountyModal() {
     },
   } = useAppState();
 
+  if(!showCreateBounty)
+    return <></>
+
   const steps = [
     t("bounty:steps.details"),
     t("bounty:steps.bounty"),
@@ -306,7 +309,7 @@ export default function CreateBountyModal() {
                   <GithubInfo
                     parent="list"
                     variant="repository"
-                    label={branch.label.length <= 20 ? branch.label : branch.label.slice(0,20)+"..."}
+                    label={branch?.label?.length <= 20 ? branch?.label : branch?.label.slice(0,20)+"..."}
                     simpleDisabled={true}
                   />
                 </div>

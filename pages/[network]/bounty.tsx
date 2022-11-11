@@ -61,6 +61,28 @@ export default function PageIssue() {
     }
   ];
 
+  function checkForks(){
+    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
+      return setIsRepoForked(true);
+  
+    getUserRepositories(state.currentUser?.login)
+    .then((repos) => {
+
+      console.log(`REPOS`, repos);
+
+      const isFork = repo => repo.isFork ? 
+        repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
+
+      const isForked = 
+        !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
+
+      setIsRepoForked(isForked);
+    })
+    .catch((e) => {
+      console.log("Failed to get users repositories: ", e);
+    });
+  }
+
   function addNewComment(comment) {
     setCommentsIssue([...commentsIssue, comment]);
   }
@@ -74,27 +96,8 @@ export default function PageIssue() {
         !state.Service?.network?.repos?.active ||
         !state.currentBounty?.data) 
       return;
-
-    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
-      return setIsRepoForked(true);
-    
-    getUserRepositories(state.currentUser?.login)
-      .then((repos) => {
-
-        console.log(`REPOS`, repos);
-
-        const isFork = repo => repo.isFork ? 
-          repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
-
-        const isForked = 
-          !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
-
-        setIsRepoForked(isForked);
-      })
-      .catch((e) => {
-        console.log("Failed to get users repositories: ", e);
-      });
-  },[state.currentUser?.login, id, state.currentBounty?.data]);
+    checkForks();
+  },[]);
 
   return (
     <BountyProvider>
