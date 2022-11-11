@@ -22,7 +22,7 @@ interface props {
   description: string;
 }
 
-function CreatePullRequest({
+export default function CreatePullRequestModal({
   show = false,
   onConfirm,
   onCloseClick,
@@ -30,6 +30,10 @@ function CreatePullRequest({
   title: prTitle = "",
   description: prDescription = ""
 }: props) {
+
+  if(!show)
+    return <></>
+
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [title, setTitle] = useState("");
@@ -199,10 +203,4 @@ function CreatePullRequest({
       </div>
     </Modal>
   );
-}
-export default function CreatePullRequestModal(props: props){
-  if(!props.show)
-    return <></>
-    
-  return <CreatePullRequest {...props}/>
 }
