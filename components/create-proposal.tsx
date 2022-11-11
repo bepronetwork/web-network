@@ -231,6 +231,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             if (!tmpParticipants.includes(participant))
               tmpParticipants.push(participant);
           });
+        console.log('1',{tmpParticipants})
 
         return Promise.all(tmpParticipants.map(async (login) => {
           const { address, githubLogin, githubHandle } = await getUserWith(login);
@@ -242,6 +243,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
         setCurrentGithubId(githubId);
         // setParticipants([])
+        console.log('2',{tmpParticipants})
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
