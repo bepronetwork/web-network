@@ -30,6 +30,10 @@ export default function Modal({
   isExecuting = false,
   ...params
 }: ModalProps) {
+
+  if (!params.show)
+    return <></>
+
   const modalTitle = `${kebabCase(key || title)}-modal`;
 
   function renderFooter() {

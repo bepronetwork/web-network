@@ -188,20 +188,15 @@ export function useAuthentication() {
     dispatch(changeCurrentUserAccessToken((session.data.user as any).accessToken));
   }
 
-  // if (useContext(AuthContext)) {
-  useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser?.walletAddress]);
-  useEffect(updateWalletAddress, [state.currentUser]);
-  useEffect(listenToAccountsChanged, [state.Service]);
-  useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
-  useEffect(updateCurrentUserLogin, [session?.data?.user]);
-  // }
-
   return {
     connectWallet,
     disconnectWallet,
     disconnectGithub,
     connectGithub,
     updateWalletBalance,
-    validateGhAndWallet
+    updateWalletAddress,
+    validateGhAndWallet,
+    listenToAccountsChanged,
+    updateCurrentUserLogin
   }
 }

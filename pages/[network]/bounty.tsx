@@ -20,9 +20,10 @@ import {useAppState} from "contexts/app-state";
 
 import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
-import {BountyProvider, useBounty} from "x-hooks/use-bounty";
+import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
 import {useRepos} from "x-hooks/use-repos";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PageIssue() {
   useBounty();
@@ -100,7 +101,7 @@ export default function PageIssue() {
   },[]);
 
   return (
-    <BountyProvider>
+    <BountyEffectsProvider>
       <BountyHero />
 
       { state.currentBounty?.chainData?.isFundingRequest && <FundingSection /> }
@@ -146,7 +147,7 @@ export default function PageIssue() {
         repo={state.currentBounty?.data?.repository?.githubPath}
         issueId={id}
       />
-    </BountyProvider>
+    </BountyEffectsProvider>
   );
 }
 

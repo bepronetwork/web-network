@@ -15,7 +15,7 @@ export function useRepos() {
   const {getReposList} = useApi();
   const {query} = useRouter();
 
-  function loadRepos(force = false, name: string) {
+  function loadRepos(force = false, name = state?.Service?.network?.lastVisited) {
     if (!name)
       return;
 
@@ -28,17 +28,16 @@ export function useRepos() {
 
     dispatch(changeLoadState(true));
     
-    return getReposList(force, name)
+    getReposList(force, name)
       .then(repos => {
         if (!repos) {
-          console.error(`No repos found for`, state.Service.network.active.name);
+          console.error(`No repos found for`, name);
           return;
         }
         
         storage.value = repos;
-        // dispatch(changeNetworkReposList(repos));
-        // dispatch(changeLoadState(false));
-        return repos;
+        dispatch(changeNetworkReposList(repos));
+        dispatch(changeLoadState(false));
       })
   }
 
@@ -71,8 +70,6 @@ export function useRepos() {
       })
 
   }
-
-  // useEffect(updateActiveRepo, [query?.repoId, state.Service?.network?.active]);
 
   return {loadRepos, updateActiveRepo}
 }
