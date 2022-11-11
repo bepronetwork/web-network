@@ -14,8 +14,7 @@ import {
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 
-import {Balance} from "interfaces/balance-state";
-import {Network} from "interfaces/network";
+import { CustomSession } from "interfaces/custom-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -34,7 +33,7 @@ export function useAuthentication() {
   const {getUserOf, getUserWith} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
-  const [balance,] = useState(new WinStorage('lastUrlBeforeGHConnect', 1000, 'sessionStorage'));
+  const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
 
   const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
@@ -109,12 +108,14 @@ export function useAuthentication() {
   }
 
   function validateGhAndWallet() {
-    if (!state.currentUser?.walletAddress || !(session?.data?.user as any)?.login || state.spinners?.matching)
+    const sessionUser = (session?.data as CustomSession)?.user;
+
+    if (!state.currentUser?.walletAddress || !sessionUser?.login || state.spinners?.matching)
       return;
 
     dispatch(changeSpinners.update({matching: true}));
 
-    const userLogin = (session.data.user as any).login;
+    const userLogin = sessionUser.login;
     const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
     getUserWith(userLogin)
@@ -144,42 +145,48 @@ export function useAuthentication() {
     if (!force && (balance.value || !state.currentUser?.walletAddress))
       return;
 
-    const update = (k: keyof Balance) => (b) => {
-      const newState = Object.assign(state.currentUser.balance || {}, {[k]: b});
+    const update = newBalance => {
+      const newState = Object.assign(state.currentUser.balance || {}, newBalance);
       dispatch(changeCurrentUserBalance(newState));
       balance.value = newState;
     }
 
-    const updateNetwork = (k: keyof Network) => (v) =>
-      dispatch(changeActiveNetwork(Object.assign(state.Service.network.active || {} as any, {[k]: v})));
+    const updateNetwork = newParameters =>
+      dispatch(changeActiveNetwork(Object.assign(state.Service.network.active || {} as any, newParameters)));
 
     dispatch(changeSpinners.update({balance: true}))
 
     Promise.all([
-      state.Service.active.getOraclesResume(state.currentUser.walletAddress).then(update('oracles')),
+      state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
-      state.Service.active.getBalance('settler', state.currentUser.walletAddress).then(update('bepro')),
-      state.Service.active.getBalance('eth', state.currentUser.walletAddress).then(update('eth')),
-      state.Service.active.getBalance('staked', state.currentUser.walletAddress).then(update('staked')),
+      state.Service.active.getBalance('settler', state.currentUser.walletAddress),
+      state.Service.active.getBalance('eth', state.currentUser.walletAddress),
+      state.Service.active.getBalance('staked', state.currentUser.walletAddress),
 
       // not balance, but related to address, no need for a second useEffect()
-      state.Service.active.isCouncil(state.currentUser.walletAddress).then(updateNetwork('isCouncil')),
-      state.Service.active.isNetworkGovernor(state.currentUser.walletAddress).then(updateNetwork('isGovernor'))
+      state.Service.active.isCouncil(state.currentUser.walletAddress),
+      state.Service.active.isNetworkGovernor(state.currentUser.walletAddress)
     ])
+      .then(([oracles, bepro, eth, staked, isCouncil, isGovernor]) => {
+        update({oracles, bepro, eth, staked});
+        updateNetwork({isCouncil, isGovernor});
+      })
       .finally(() => {
         dispatch(changeSpinners.update({balance: false}));
-        console.log(`should have updated state`, state.currentUser.balance)
+        console.debug(`should have updated state`, state.currentUser.balance)
       })
   }
 
   function updateCurrentUserLogin() {
-    if (!session?.data?.user || state.currentUser?.login === (session.data?.user as any)?.login ||
-      (session.data?.user as any).accessToken === state.currentUser?.accessToken)
+    const sessionUser = (session?.data as CustomSession)?.user;
+
+    if (!sessionUser || state.currentUser?.login === sessionUser?.login ||
+      sessionUser.accessToken === state.currentUser?.accessToken)
       return;
 
     dispatch(changeCurrentUserHandle(session.data.user.name));
-    dispatch(changeCurrentUserLogin((session.data.user as any).login));
-    dispatch(changeCurrentUserAccessToken((session.data.user as any).accessToken));
+    dispatch(changeCurrentUserLogin(sessionUser.login));
+    dispatch(changeCurrentUserAccessToken((sessionUser.accessToken)));
   }
 
   return {
