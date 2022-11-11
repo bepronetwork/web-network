@@ -1,5 +1,3 @@
-import {createContext, useContext, useEffect,} from "react";
-
 import {useAppState} from "../contexts/app-state";
 import {changeCurrentUserConnected} from "../contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
@@ -7,15 +5,8 @@ import {changeSpinners} from "../contexts/reducers/change-spinners";
 import {toastError,} from "../contexts/reducers/change-toaster";
 import DAO from "../services/dao-service";
 
-/**
- * Populate `state.Settings` and instantiates a DAOService
- */
-export const DAOContext = createContext({});
-export const DAOProvider = ({children}) => <DAOContext.Provider value={{}} children={children}/>;
 
 export function useDao() {
-  if (!useContext(DAOContext))
-    throw new Error(`useDao() must have provider`);
 
   const {state, dispatch} = useAppState();
 
