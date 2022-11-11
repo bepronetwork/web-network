@@ -1,21 +1,18 @@
 import React from "react";
 
-import {AuthProvider} from "../x-hooks/use-authentication";
-import {DAOProvider} from "../x-hooks/use-dao";
-import {NetworkProvider} from "../x-hooks/use-network";
+import NetworkThemeInjector from "components/custom-network/network-theme-injector";
+
 import {AppStateContextProvider} from "./app-state";
+import {GlobalEffectsProvider} from "./global-effects";
 
 const RootProviders: React.FC = ({children}) => {
   return (
 
     <AppStateContextProvider>
-      <DAOProvider>
-        <NetworkProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </NetworkProvider>
-      </DAOProvider>
+      <GlobalEffectsProvider>
+        <NetworkThemeInjector />
+        {children}
+      </GlobalEffectsProvider>
     </AppStateContextProvider>
 
   );

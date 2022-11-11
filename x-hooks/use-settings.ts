@@ -25,13 +25,14 @@ export function useSettings() {
       return;
 
     if (storage.value) {
-      // dispatch(updateSettings(storage.value));
-      return storage.value;
+      dispatch(updateSettings(storage.value));
+      // return storage.value;
+      return;
     }
 
     dispatch(updateShowProp({failedLoadSettings: false}));
     dispatch(updateSettings({} as any));
-    return getSettings()
+    getSettings()
       .then(settings => {
         return {
           ...settings,
@@ -45,8 +46,8 @@ export function useSettings() {
       .then(settings => {
         storage.value = settings;
         // setTmpSettings(settings)
-        //dispatch(updateSettings(settings));
-        return settings;
+        dispatch(updateSettings(settings));
+        // return settings;
       })
       .catch(e => {
         console.error(`Failed to load settings from db`, e);

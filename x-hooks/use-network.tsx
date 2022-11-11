@@ -17,19 +17,14 @@ import {WinStorage} from "services/win-storage";
 import useApi from "./use-api";
 import { useDao } from "./use-dao";
 
-export const NetworkContext = createContext({})
-export const NetworkProvider = ({children}) => <NetworkContext.Provider value={{}} children={children} />
 
 export function useNetwork() {
-  if (!useContext(NetworkContext))
-    throw new Error(`useNetwork() must have provider`);
 
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();
   const {getNetwork, getTokens} = useApi();
   const {changeNetwork} = useDao()
-
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -46,9 +41,12 @@ export function useNetwork() {
 
     dispatch(changeNetworkLastVisited(networkName));
 
-    if (!networkName || (storage.value && networkName && storage.value === networkName)) {
-      if (storage.value)
-        dispatch(changeActiveNetwork(storage.value));
+    const lastNetworkDataStorage = new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`);
+
+    if (!networkName || 
+        (storage.value && networkName && lastNetworkDataStorage.value && storage.value === networkName)) {
+      if (lastNetworkDataStorage.value)
+        dispatch(changeActiveNetwork(lastNetworkDataStorage.value));
 
       return;
     }
@@ -169,17 +167,14 @@ export function useNetwork() {
       })
   }
 
-  useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
-  useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active]);
-  useEffect(loadNetworkTimes, [state.Service?.active?.network]);
-  useEffect(loadNetworkAmounts, [state.Service?.active?.network]);
-  useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active]);
-
-
   return {
     updateActiveNetwork,
     getURLWithNetwork,
     clearNetworkFromStorage,
+    loadNetworkToken,
+    loadNetworkTimes,
+    loadNetworkAmounts,
+    loadNetworkAllowedTokens
   }
 
 }

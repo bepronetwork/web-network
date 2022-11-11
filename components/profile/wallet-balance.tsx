@@ -37,9 +37,13 @@ export default function WalletBalance() {
     if (!state.Settings?.beproToken)
       return;
 
-    setTokens([{...state.Settings.beproToken, icon: <BeProBlue width={24} height={24} />, balance: "0"}])
 
-    console.log(`fetching balance?`, state?.Service?.network?.networkToken)
+    const tmpTokens = 
+      [{...state.Settings.beproToken, icon: <BeProBlue width={24} height={24} />, balance: BigNumber(0)}];
+
+    setTokens(tmpTokens);
+
+    console.debug(`fetching balance?`, state?.Service?.network?.networkToken)
 
     if (!state.currentUser?.walletAddress || !state.Service?.active || !state.Service?.network?.networkToken?.address)
       return;
@@ -49,7 +53,7 @@ export default function WalletBalance() {
     Promise.all([
       state.Service.active.getTokenBalance(state.Settings.beproToken.address, state.currentUser.walletAddress)
         .then(balance => {
-          const [token] = tokens;
+          const [token] = tmpTokens;
           token.balance = balance;
           return token
         }),

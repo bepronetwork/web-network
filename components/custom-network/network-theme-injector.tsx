@@ -22,7 +22,7 @@ export default function NetworkThemeInjector() {
       setCurrentColors(colorsToCSS());
     else
       setCurrentColors("");
-  }, [state.Service?.network?.active]);
+  }, [state.Service?.network?.active?.name, state.Settings?.defaultNetworkConfig?.name, pathname]);
 
   return (
     <>

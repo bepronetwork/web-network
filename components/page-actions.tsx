@@ -22,9 +22,10 @@ import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 
-import {BountyProvider, useBounty} from "../x-hooks/use-bounty";
+import {useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
 import Modal from "./modal";
+import {BountyEffectsProvider} from "../contexts/bounty-effects";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -396,7 +397,7 @@ export default function PageActions({
         </div>
       </div>
 
-      <BountyProvider>
+      <BountyEffectsProvider>
         <>
           <CreatePullRequestModal
             show={showPRModal}
@@ -419,7 +420,7 @@ export default function PageActions({
             handleClose={() => setShowUpdateAmount(false)}
           />
         </>
-      </BountyProvider>
+      </BountyEffectsProvider>
 
       <Modal
         title={t("modals.gh-access.title")}

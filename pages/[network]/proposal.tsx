@@ -26,7 +26,8 @@ import {DistribuitonPerUser, Proposal} from "interfaces/proposal";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
-import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
+import {useBounty} from "../../x-hooks/use-bounty";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PageProposal() {
   useBounty();
@@ -166,7 +167,7 @@ export default function PageProposal() {
   }, [router.query, state.currentBounty?.data, state.currentBounty?.chainData]);
 
   return (
-    <BountyProvider>
+    <BountyEffectsProvider>
       <ProposalHero proposal={proposal} />
 
       <CustomContainer>
@@ -196,7 +197,7 @@ export default function PageProposal() {
       />
 
       <ConnectWalletButton asModal={true} />
-    </BountyProvider>
+    </BountyEffectsProvider>
   );
 }
 

@@ -20,9 +20,10 @@ import {useAppState} from "contexts/app-state";
 
 import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
-import {BountyProvider, useBounty} from "x-hooks/use-bounty";
+import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
 import {useRepos} from "x-hooks/use-repos";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PageIssue() {
   useBounty();
@@ -61,6 +62,28 @@ export default function PageIssue() {
     }
   ];
 
+  function checkForks(){
+    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
+      return setIsRepoForked(true);
+  
+    getUserRepositories(state.currentUser?.login)
+    .then((repos) => {
+
+      console.log(`REPOS`, repos);
+
+      const isFork = repo => repo.isFork ? 
+        repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
+
+      const isForked = 
+        !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
+
+      setIsRepoForked(isForked);
+    })
+    .catch((e) => {
+      console.log("Failed to get users repositories: ", e);
+    });
+  }
+
   function addNewComment(comment) {
     setCommentsIssue([...commentsIssue, comment]);
   }
@@ -74,30 +97,11 @@ export default function PageIssue() {
         !state.Service?.network?.repos?.active ||
         !state.currentBounty?.data) 
       return;
-
-    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
-      return setIsRepoForked(true);
-    
-    getUserRepositories(state.currentUser?.login)
-      .then((repos) => {
-
-        console.log(`REPOS`, repos);
-
-        const isFork = repo => repo.isFork ? 
-          repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
-
-        const isForked = 
-          !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
-
-        setIsRepoForked(isForked);
-      })
-      .catch((e) => {
-        console.log("Failed to get users repositories: ", e);
-      });
-  },[state.currentUser?.login, id, state.currentBounty?.data]);
+    checkForks();
+  },[]);
 
   return (
-    <BountyProvider>
+    <BountyEffectsProvider>
       <BountyHero />
 
       { state.currentBounty?.chainData?.isFundingRequest && <FundingSection /> }
@@ -143,7 +147,7 @@ export default function PageIssue() {
         repo={state.currentBounty?.data?.repository?.githubPath}
         issueId={id}
       />
-    </BountyProvider>
+    </BountyEffectsProvider>
   );
 }
 
