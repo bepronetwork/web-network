@@ -22,7 +22,7 @@ interface props {
   description: string;
 }
 
-export default function CreatePullRequestModal({
+function CreatePullRequest({
   show = false,
   onConfirm,
   onCloseClick,
@@ -199,4 +199,10 @@ export default function CreatePullRequestModal({
       </div>
     </Modal>
   );
+}
+export default function CreatePullRequestModal(props: props){
+  if(!props.show)
+    return <></>
+    
+  return <CreatePullRequest {...props}/>
 }

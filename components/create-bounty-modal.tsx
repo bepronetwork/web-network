@@ -58,7 +58,7 @@ const ZeroNumberFormatValues = {
   floatValue: 0,
 };
 
-export default function CreateBountyModal() {
+function CreateBounty() {
   const { t } = useTranslation(["common", "bounty"]);
 
   const [branch, setBranch] = useState<{ value: string, label: string } | undefined>();
@@ -306,7 +306,7 @@ export default function CreateBountyModal() {
                   <GithubInfo
                     parent="list"
                     variant="repository"
-                    label={branch.label.length <= 20 ? branch.label : branch.label.slice(0,20)+"..."}
+                    label={branch?.label?.length <= 20 ? branch?.label : branch?.label.slice(0,20)+"..."}
                     simpleDisabled={true}
                   />
                 </div>
@@ -667,4 +667,18 @@ export default function CreateBountyModal() {
       </Modal>
     </>
   );
+}
+
+export default function CreateBountyModal(){
+  const {
+    state: {
+      show: { createBounty: showCreateBounty }
+    },
+  } = useAppState();
+  
+  if(!showCreateBounty)
+    return <></>
+  
+
+  return  <CreateBounty/>
 }
