@@ -19,7 +19,7 @@ export default function ConnectGithub({size = 'md'}:IProps) {
 
   if(size === 'sm'){
     return (
-    <Button onClick={connectGithub} disabled={state.spinners?.connecting} isLoading={state.spinners?.connecting}>
+    <Button onClick={connectGithub} disabled={state.spinners?.connectingGH} isLoading={state.spinners?.connectingGH}>
       <GithubImage  opacity={1} />
       <span>{t("actions.connect")}</span>
     </Button>)
@@ -37,7 +37,8 @@ export default function ConnectGithub({size = 'md'}:IProps) {
             <span className="d-inline-block">
               <Button
                 className="d-inline btn btn-primary text-uppercase"
-                disabled={state.spinners?.connecting || !state.currentUser?.walletAddress}
+                disabled={state.spinners?.connectingGH || !state.currentUser?.walletAddress}
+                isLoading={state.spinners?.connectingGH}
                 onClick={connectGithub}>
                 {t("actions.connect")}
               </Button>

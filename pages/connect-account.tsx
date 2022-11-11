@@ -125,9 +125,10 @@ export default function ConnectAccount() {
                     state={connectButtonState[String(state.currentUser?.match)]}
                     credential={sessionUser?.login} 
                     connect={connectGithub}
-                    // isLoading={isConnecting}
+                    isLoading={state.spinners?.connectingGH}
+                    isDisabled={!state.currentUser?.walletAddress}
                   />
-
+                  
                   
                 </div>
                 <div className="col-6">

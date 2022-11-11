@@ -19,7 +19,7 @@ import { CustomSession } from "interfaces/custom-session";
 import {WinStorage} from "services/win-storage";
 
 import {changeActiveNetwork} from "../contexts/reducers/change-service";
-import {changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change-spinners";
+import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change-spinners";
 import useApi from "./use-api";
 import {useDao} from "./use-dao";
 
@@ -88,6 +88,8 @@ export function useAuthentication() {
     if (!state.currentUser?.walletAddress)
       return;
 
+    dispatch(changeConnectingGH(true));
+
     getUserOf(state.currentUser?.walletAddress)
       .then((user) => {
         if (!user?.githubLogin && !asPath.includes(`connect-account`)) {
@@ -104,7 +106,7 @@ export function useAuthentication() {
         lastUrl.value = asPath;
 
         return signedIn ? signIn('github', {callbackUrl: `${URL_BASE}${asPath}`}) : null;
-      })
+      }).finally(()=> dispatch(changeConnectingGH(false)))
   }
 
   function validateGhAndWallet() {
