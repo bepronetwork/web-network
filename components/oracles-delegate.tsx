@@ -19,10 +19,12 @@ import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 interface OraclesDelegateProps {
   wallet: Wallet;
+  updateWalletBalance: () => void;
 }
 
 function OraclesDelegate({
-                           wallet
+                           wallet,
+                           updateWalletBalance
                          }: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
 
@@ -64,6 +66,7 @@ function OraclesDelegate({
   }
 
   function handleTransition() {
+    updateWalletBalance();
     handleChangeOracles({ floatValue: 0, formattedValue: "", value: "" });
     setDelegatedTo("");
     setError("");
@@ -85,10 +88,10 @@ function OraclesDelegate({
   const isAddressesEqual = () => wallet?.address && delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase();
 
   useEffect(() => {
-    if (!wallet?.balance) return;
+    if (!wallet?.balance?.oracles) return;
 
     setAvailableAmount(wallet?.balance?.oracles?.locked || BigNumber("0"));
-  }, [wallet?.balance]);
+  }, [wallet?.balance?.oracles?.locked]);
 
   return (
     <div className="col-md-6">
