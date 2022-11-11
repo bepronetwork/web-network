@@ -122,8 +122,15 @@ export function useAuthentication() {
 
     getUserWith(userLogin)
       .then(user => {
-        if (!user.githubLogin && state.currentUser?.match !== undefined)
+        if (!user.githubLogin){
           dispatch(changeCurrentUserMatch(undefined));
+
+          if(session.status === 'authenticated' && state.currentUser.login && !asPath.includes(`connect-account`)){
+            dispatch(changeCurrentUserHandle(undefined));
+            dispatch(changeCurrentUserLogin(undefined));
+            dispatch(changeCurrentUserAccessToken((undefined)));
+          }
+        }
         else if (user.githubLogin && userLogin)
           dispatch(changeCurrentUserMatch(userLogin === user.githubLogin &&
             (walletAddress ? walletAddress === user.address : true)));
