@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { ProgressBar } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {ProgressBar} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
@@ -13,14 +13,15 @@ import InputNumber from "components/input-number";
 import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetworkSettings } from "contexts/network-settings";
-import { useSettings } from "contexts/settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
+import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 
-import { StepWrapperProps } from "interfaces/stepper";
+import {StepWrapperProps} from "interfaces/stepper";
+
+import {useAuthentication} from "x-hooks/use-authentication";
+
+import {useAppState} from "../../contexts/app-state";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
@@ -33,17 +34,17 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
-  const { settings } = useSettings();
-  const { service: DAOService } = useDAO();
+  const {state} = useAppState();
+
   const { tokensLocked, updateTokenBalance } = useNetworkSettings();
-  const { user, wallet, updateWalletBalance } = useAuthentication();
-  
-  const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
+  const {updateWalletBalance} = useAuthentication()
+
+  const networkTokenSymbol = state.Settings?.beproToken?.symbol || t("misc.$token");
 
   const balance = {
-    beproAvailable: wallet?.balance?.bepro,
-    oraclesAvailable: wallet?.balance?.oracles?.locked?.minus(wallet?.balance?.oracles?.delegatedToOthers),
-    tokensLocked: wallet?.balance?.oracles?.locked?.toFixed(),
+    beproAvailable: state.currentUser?.balance?.bepro,
+    oraclesAvailable: state.currentUser?.balance?.oracles?.locked?.minus(state.currentUser?.balance?.oracles?.delegatedToOthers),
+    tokensLocked: state.currentUser?.balance?.oracles?.locked?.toFixed(),
   };
 
   const amountLocked = BigNumber(tokensLocked.locked);
@@ -66,35 +67,33 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const isUnlockBtnDisabled = lockedPercent?.isZero() || lockedPercent?.isNaN();
 
   async function handleLock() {
-    if (!DAOService || !amount) return;
+    if (!state.Service?.active || !amount) return;
 
     setIsLocking(true);
 
-    DAOService.lockInRegistry(amount.toFixed())
-      .then(() => 
-        Promise.all([
-          updateWalletBalance(),
-          updateAllowance(),
-          updateTokenBalance(),
-          setAmount(BigNumber(0))
-        ]))
+    state.Service?.active.lockInRegistry(amount.toFixed())
+      .then(() => {
+        updateWalletBalance();
+        updateAllowance();
+        setAmount(BigNumber(0));
+        return updateTokenBalance()
+      })
       .catch(console.log)
       .finally(() => setIsLocking(false));
   }
 
   async function handleUnLock() {
-    if (!DAOService) return;
+    if (!state.Service?.active) return;
 
     setIsUnlocking(true);
 
-    DAOService.unlockFromRegistry()
-      .then(() => 
-        Promise.all([
-          updateWalletBalance(),
-          updateAllowance(),
-          updateTokenBalance(),
-          setAmount(BigNumber(0))
-        ]))
+    state.Service?.active.unlockFromRegistry()
+      .then(() => {
+        updateWalletBalance();
+        updateAllowance();
+        setAmount(BigNumber(0));
+        return updateTokenBalance();
+      })
       .catch((error) => {
         console.log("Failed to Unlock", error);
       })
@@ -129,30 +128,30 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     setIsApproving(true)
 
-    DAOService.approveTokenInRegistry(amount?.toFixed())
+    state.Service?.active.approveTokenInRegistry(amount?.toFixed())
       .then(() => updateAllowance())
       .catch(console.log)
       .finally(()=> setIsApproving(false));
   }
 
   function updateAllowance() {
-    DAOService.getAllowance(settings?.contracts?.settlerToken, wallet.address, settings?.contracts?.networkRegistry)
+    state.Service?.active.getAllowance(state.Settings?.contracts?.settlerToken, state.currentUser.walletAddress, state.Settings?.contracts?.networkRegistry)
       .then(setSettlerAllowance).catch(() => BigNumber(0));
   }
 
   useEffect(() => {
-    if (DAOService && wallet?.address) updateAllowance();
-  }, [DAOService, wallet?.address]);
+    if (state.Service?.active && state.currentUser?.walletAddress) updateAllowance();
+  }, [state.Service?.active, state.currentUser?.walletAddress]);
 
   return (
     <Step
       title={t("custom-network:steps.lock.title", { currency: networkTokenSymbol })}
       index={index}
       activeStep={activeStep}
-      validated={validated && !!user?.login}
+      validated={validated && !!state.currentUser?.login}
       handleClick={handleClick}
     >
-      {(!user?.login ?
+      {(!state.currentUser?.login ?
         (
           <div className="pt-3">
             <ConnectGithub />
@@ -201,7 +200,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                         />
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
-                          <span className="text-ligth-gray">
+                          <span className="text-light-gray">
                             <span className="text-primary">{networkTokenSymbol}</span>{" "}
                             {t("misc.available")}
                           </span>
@@ -250,7 +249,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           onClick={handleShowUnlockModal}
                         >
                           <div className="d-flex justify-content-between px-0">
-                            <span className="text-ligth-gray">
+                            <span className="text-light-gray">
                               <span className="text-purple text-uppercase">
                                 {t("$oracles", { token: networkTokenSymbol })}
                               </span>{" "}
@@ -339,7 +338,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                   <Button
                     disabled={isUnlockBtnDisabled || isUnlocking || isApproving || isLocking }
-                    color="ligth-gray"
+                    color="light-gray"
                     onClick={handleUnLock}
                     isLoading={isUnlocking}
                     withLockIcon={!isUnlocking && isUnlockBtnDisabled}

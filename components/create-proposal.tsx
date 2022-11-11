@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import clsx from "clsx";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -13,18 +13,16 @@ import PullRequestLabels from "components/pull-request-labels";
 import ReactSelect from "components/react-select";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
-import { useRepos } from "contexts/repos";
-
 import sumObj from "helpers/sumObj";
 
-import { pullRequest } from "interfaces/issue-data";
+import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useOctokit from "x-hooks/use-octokit";
+
+import {useAppState} from "../contexts/app-state";
+import {useBounty} from "../x-hooks/use-bounty";
 
 
 interface participants {
@@ -73,7 +71,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
       <Avatar userLogin={data?.githubLogin} />
       <span
         className={`ml-1 text-nowrap ${
-          data.isDisable ? "text-ligth-gray" : "text-gray hover-primary"
+          data.isDisable ? "text-light-gray" : "text-gray hover-primary"
         }`}
       >
         {data?.label}
@@ -89,10 +87,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
   );
 }
 
-export default function NewProposal({
-  amountTotal,
-  pullRequests = []
-}) {
+export default function NewProposal({amountTotal, pullRequests = []}) {
   const { t } = useTranslation([
     "common",
     "bounty",
@@ -113,14 +108,13 @@ export default function NewProposal({
     useState<boolean>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
 
-  const { activeRepo } = useRepos();
-  const { wallet } = useAuthentication();
+  const {state} = useAppState();
 
   const { handleProposeMerge } = useBepro();
-  const { updateIssue, getNetworkIssue, activeIssue, networkIssue } = useIssue();
   const { getPullRequestParticipants } = useOctokit();
   const { getUserWith, processEvent } = useApi();
-  const { activeNetwork } = useNetwork();
+
+  const currentBounty = useBounty();
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => {
@@ -162,9 +156,9 @@ export default function NewProposal({
         }))
       };
 
-      const currentProposals = networkIssue?.proposals?.map((item) => {
+      const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
         return {
-          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> +mp.scMergeId === item.id)?.pullRequestId),
+          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp.scMergeId === item.id)?.pullRequestId),
           prAddressAmount: item.details.map(detail => ({
             amount: Number(detail.percentage),
             address: detail.recipient
@@ -225,9 +219,9 @@ export default function NewProposal({
   }
 
   function getParticipantsPullRequest(githubId: string) {
-    if (!activeRepo) return;
+    if (!state.Service?.network?.repos?.active) return;
     setIsLoadingParticipants(true)
-    getPullRequestParticipants(activeRepo.githubPath, +githubId)
+    getPullRequestParticipants(state.Service?.network?.repos?.active.githubPath, +githubId)
       .then((participants) => {
         const tmpParticipants = [...participants];
 
@@ -269,26 +263,22 @@ export default function NewProposal({
 
     setExecuting(true);
 
-    handleProposeMerge(+networkIssue.id, +currentPullRequest.contractId, prAddresses, prAmounts)
+    handleProposeMerge(+state.currentBounty?.chainData.id, +currentPullRequest.contractId, prAddresses, prAmounts)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
+      return processEvent("proposal", "created", state.Service?.network?.lastVisited, { fromBlock });
     })
     .then(() => {
-      return Promise.all([
-        updateIssue(activeIssue.repository.id, activeIssue.githubId),
-        getNetworkIssue()
-      ]);
-    })
-    .finally(() => {
       handleClose();
       setExecuting(false);
+      currentBounty.getDatabaseBounty(true);
+      currentBounty.getChainBounty(true);
     })
   }
 
   function handleClose() {
-    if (pullRequests.length && activeRepo)
+    if (pullRequests.length && state.Service?.network?.repos?.active)
       getParticipantsPullRequest(pullRequests[0]?.githubId);
     setCurrentGithubId(pullRequests[0]?.githubId);
 
@@ -310,13 +300,13 @@ export default function NewProposal({
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo) {
+    if (pullRequests.length && state.Service?.network?.repos?.active) {
       const defaultPr =
         pullRequests.find((el) => el.isMergeable) || pullRequests[0];
       setCurrentPullRequest(defaultPr);
       getParticipantsPullRequest(defaultPr?.githubId);
     }
-  }, [pullRequests, activeRepo]);
+  }, [pullRequests, state.Service?.network?.repos?.active]);
 
 
   function renderDistribution() {
@@ -400,13 +390,13 @@ export default function NewProposal({
         footer={<>
           <Button
             onClick={handleClickCreate}
-            disabled={!wallet?.address ||
+            disabled={!state.currentUser?.walletAddress ||
               participants.length === 0 ||
               !success ||
               executing ||
               cantBeMergeable()}
           >
-            {!wallet?.address ||
+            {!state.currentUser?.walletAddress ||
               participants.length === 0 ||
               executing ||
               (!success && (

@@ -1,45 +1,44 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
-import { NumberFormatValues } from "react-number-format";
+import {ChangeEvent, useEffect, useState} from "react";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import InputNumber from "components/input-number";
 import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { ApplicationContext } from "contexts/application";
-import { useNetwork } from "contexts/network";
+import {useAppState} from "contexts/app-state";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { Wallet } from "interfaces/authentication";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {Wallet} from "interfaces/authentication";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 interface OraclesDelegateProps {
   wallet: Wallet;
+  updateWalletBalance: () => void;
 }
 
 function OraclesDelegate({
-  wallet
-} : OraclesDelegateProps) {
-  const { t } = useTranslation(["common", "my-oracles"]);
+                           wallet,
+                           updateWalletBalance
+                         }: OraclesDelegateProps) {
+  const {t} = useTranslation(["common", "my-oracles"]);
 
   const [error, setError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [availableAmount, setAvailableAmount] = useState<BigNumber>();
 
-  const { activeNetwork } = useNetwork();
-
   const {
-    state: { myTransactions }
-  } = useContext(ApplicationContext);
+    state: { transactions, Service }
+  } = useAppState();
 
-  const networkTokenDecimals = activeNetwork?.networkToken?.decimals || 18;
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol;
+  const networkTokenDecimals = Service?.network?.networkToken?.decimals || 18;
+  const networkTokenSymbol = Service?.network?.networkToken?.symbol;
 
   function handleChangeOracles(params: NumberFormatValues) {
     if (params.value === "") return setTokenAmount("");
@@ -51,7 +50,7 @@ function OraclesDelegate({
     setTokenAmount(params.value);
   }
 
-  function setMaxAmmount() {
+  function setMaxAmount() {
     return setTokenAmount(availableAmount.toFixed());
   }
 
@@ -67,6 +66,7 @@ function OraclesDelegate({
   }
 
   function handleTransition() {
+    updateWalletBalance();
     handleChangeOracles({ floatValue: 0, formattedValue: "", value: "" });
     setDelegatedTo("");
     setError("");
@@ -80,7 +80,7 @@ function OraclesDelegate({
       isAddressesEqual(),
       BigNumber(tokenAmount).isZero(),
       BigNumber(tokenAmount).isNaN(),
-      myTransactions.find(({ status, type }) =>
+      transactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles)
     ].some((values) => values);
@@ -88,10 +88,10 @@ function OraclesDelegate({
   const isAddressesEqual = () => wallet?.address && delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase();
 
   useEffect(() => {
-    if (!wallet?.balance) return;
+    if (!wallet?.balance?.oracles) return;
 
     setAvailableAmount(wallet?.balance?.oracles?.locked || BigNumber("0"));
-  }, [wallet?.balance]);
+  }, [wallet?.balance?.oracles?.locked]);
 
   return (
     <div className="col-md-6">
@@ -120,7 +120,7 @@ function OraclesDelegate({
               {`${t("$oracles", { token: networkTokenSymbol })} ${t("misc.available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
-                onClick={setMaxAmmount}
+                onClick={setMaxAmount}
               >
                 {t("misc.max")}
               </span>

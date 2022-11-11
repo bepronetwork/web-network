@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { Defaults } from "@taikai/dappkit";
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
+import {Defaults} from "@taikai/dappkit";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
 
 import AlreadyHasNetworkModal from "components/already-has-network-modal";
 import ConnectWalletButton from "components/connect-wallet-button";
@@ -17,27 +17,22 @@ import SelectRepositoriesStep from "components/custom-network/select-repositorie
 import TokenConfiguration from "components/custom-network/token-configuration";
 import Stepper from "components/stepper";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-import { useNetworkSettings } from "contexts/network-settings";
-import { NetworkSettingsProvider } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/add-toast";
-import { changeLoadState } from "contexts/reducers/change-load-state";
-import { useSettings } from "contexts/settings";
+import {useAppState} from "contexts/app-state";
+import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
+import {changeLoadState} from "contexts/reducers/change-load";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { 
-  DEFAULT_COUNCIL_AMOUNT, 
-  DEFAULT_DISPUTE_TIME, 
-  DEFAULT_DRAFT_TIME, 
-  DEFAULT_PERCENTAGE_FOR_DISPUTE 
+import {
+  DEFAULT_COUNCIL_AMOUNT,
+  DEFAULT_DISPUTE_TIME,
+  DEFAULT_DRAFT_TIME,
+  DEFAULT_PERCENTAGE_FOR_DISPUTE
 } from "helpers/contants";
-import { psReadAsText } from "helpers/file-reader";
+import {psReadAsText} from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 function NewNetwork() {
   const router = useRouter();
@@ -47,19 +42,15 @@ function NewNetwork() {
   const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
 
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const { user, wallet } = useAuthentication();
-  const { settings: appSettings } = useSettings(); 
+  const { state, dispatch } = useAppState();
+
   const { createNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
-  const { dispatch } = useContext(ApplicationContext);
-
-  const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
+  const defaultNetworkName = state.Settings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
     
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
@@ -72,7 +63,7 @@ function NewNetwork() {
   ];
 
   async function handleCreateNetwork() {
-    if (!user?.login || !wallet?.address || !DAOService) return;
+    if (!state.currentUser?.login || !state.currentUser?.walletAddress || !state.Service?.active) return;
     setCreatingNetwork(0);
 
     const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
@@ -93,9 +84,9 @@ function NewNetwork() {
           .filter((repo) => repo?.userPermission === "ADMIN")
           .map(({ name, fullName }) => ({ name, fullName }))),
       botPermission: github.botPermission,
-      creator: wallet.address,
-      accessToken: user.accessToken,
-      githubLogin: user.login,
+      creator: state.currentUser.walletAddress,
+      accessToken: state.currentUser.accessToken,
+      githubLogin: state.currentUser.login,
       allowedTokens: tokens,
       networkAddress: deployedNetworkAddress
     };
@@ -151,7 +142,7 @@ function NewNetwork() {
       });
 
     setCreatingNetwork(6);
-    cleanStorage?.()
+    cleanStorage?.();
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
       .then(() => router.push(getURLWithNetwork("/", { network: payload.name })))
       .catch((error) => {
@@ -176,24 +167,19 @@ function NewNetwork() {
   function checkHasNetwork() {
     dispatch(changeLoadState(true));
     
-    DAOService.getNetworkAdressByCreator(wallet.address)
+    state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
       .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)));
   }
 
-  useEffect(() => {
-    if (!activeNetwork) return;
-
-    if (activeNetwork.name.toLowerCase() !== defaultNetworkName)
-      router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
-  }, [activeNetwork]);
+  
 
   useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
+    if (!state.Service?.active || !state.currentUser?.walletAddress) return;
 
     checkHasNetwork();
-  }, [DAOService, wallet]);
+  }, [state.Service?.active, state.currentUser]);
 
   return (
     <div>
@@ -228,11 +214,7 @@ function NewNetwork() {
   );
 }
 
-export default () => (
-  <NetworkSettingsProvider>
-  <NewNetwork/>
-  </NetworkSettingsProvider>
-  )
+export default () => <NetworkSettingsProvider><NewNetwork></NewNetwork></NetworkSettingsProvider>
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

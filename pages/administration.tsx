@@ -1,27 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import router from "next/router";
 
 import NetworksStep from "components/administration/networks-step";
 import ConnectWalletButton from "components/connect-wallet-button";
 import Stepper from "components/stepper";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { NetworkSettingsProvider } from "contexts/network-settings";
-
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-function AdministrationPage() {
+import {useAppState} from "../contexts/app-state";
+
+export default function AdministrationPage() {
   const [networks, setNetworks] = useState<Network[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
 
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
+  const { state } = useAppState();
 
   const {searchNetworks} = useApi();
 
@@ -31,21 +28,20 @@ function AdministrationPage() {
   }
 
   useEffect(() => {
-    if (!wallet?.address) return;
+    if (!state.Service?.network?.active) return;
 
-    DAOService.isRegistryGovernor(wallet.address).then(isGovernor => {
-      if (!isGovernor) 
-        router.push("/networks");
-      else
-        searchNetworks({})
-          .then(({ count, rows }) => {
-            if (count > 0) setNetworks(rows);
-          })
-          .catch((error) => {
-            console.log("Failed to retrieve networks list", error);
-          });
-    }).catch(error => console.log("Failed to verify governor", error));
-  }, [wallet?.address]);
+    if (!state.Service?.network?.active?.isGovernor)
+      router.push("/networks");
+    else
+      searchNetworks({})
+        .then(({ count, rows }) => {
+          if (count > 0) setNetworks(rows);
+        })
+        .catch((error) => {
+          console.log("Failed to retrieve networks list", error);
+        });
+
+  }, [state.Service?.network?.active]);
 
   return (
     <div className="container">
@@ -59,12 +55,6 @@ function AdministrationPage() {
     </div>
   );
 }
-
-export default () => (
-  <NetworkSettingsProvider>
-  <AdministrationPage/>
-  </NetworkSettingsProvider>
-  )
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

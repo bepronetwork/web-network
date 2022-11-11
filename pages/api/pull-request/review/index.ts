@@ -1,17 +1,17 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import { Op } from "sequelize";
+import {Octokit} from "octokit";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 import * as CommentsQueries from "graphql/comments";
 import * as PullRequestQueries from "graphql/pull-request";
 
-import { GraphQlResponse } from "types/octokit";
+import {GraphQlResponse} from "types/octokit";
 
-const { serverRuntimeConfig } = getConfig();
+const {serverRuntimeConfig} = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, githubLogin, body, networkName } = req.body;

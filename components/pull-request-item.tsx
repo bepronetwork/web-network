@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { PullRequest } from "@taikai/dappkit";
+import {PullRequest} from "@taikai/dappkit";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -12,16 +12,16 @@ import PullRequestLabels from "components/pull-request-labels";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
+import {getTimeDifferenceInWords} from "helpers/formatDate";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import { getTimeDifferenceInWords } from "helpers/formatDate";
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {pullRequest} from "interfaces/issue-data";
 
-import { pullRequest } from "interfaces/issue-data";
 
-import useNetwork from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
+
+import {useAppState} from "../contexts/app-state";
+import {useNetwork} from "../x-hooks/use-network";
 
 interface PullRequestItem {
   pullRequest: pullRequest;
@@ -35,9 +35,9 @@ export default function PullRequestItem({
   const router = useRouter();
 
   const [linesOfCode, setLinesOfCode] = useState(0);
-  
-  const { activeIssue } = useIssue();
-  const { user } = useAuthentication();
+
+  const {state} = useAppState();
+
   const { getURLWithNetwork } = useNetwork();
   const { getPullRequestLinesOfCode } = useOctokit();
 
@@ -45,8 +45,8 @@ export default function PullRequestItem({
 
   function handleReviewClick() {
     router.push(getURLWithNetwork("/pull-request", {
-        id: activeIssue?.githubId,
-        repoId: activeIssue?.repository_id,
+        id: state.currentBounty?.data?.githubId,
+        repoId: state.currentBounty?.data?.repository_id,
         prId: pullRequest?.githubId,
         review: true
     }));
@@ -54,15 +54,15 @@ export default function PullRequestItem({
 
   function canReview() {    
     return pullRequest?.state === "open" && 
-    !!user?.login && pullRequest?.status === "ready" && 
+    !!state.currentUser?.login && pullRequest?.status === "ready" &&
     !!networkPullRequest?.ready && 
     !networkPullRequest?.canceled;
   }
 
   useEffect(() => {
-    if (!pullRequest || !activeIssue) return;
+    if (!pullRequest || !state.currentBounty?.data) return;
 
-    getPullRequestLinesOfCode(activeIssue.repository.githubPath, +pullRequest.githubId)
+    getPullRequestLinesOfCode(state.currentBounty?.data.repository.githubPath, +pullRequest.githubId)
       .then(setLinesOfCode)
       .catch(error => console.log("Failed to get lines of code", error));
   }, [pullRequest]);
@@ -72,8 +72,8 @@ export default function PullRequestItem({
         <Link
           passHref
           href={getURLWithNetwork("/pull-request", {
-            id: activeIssue?.githubId,
-            repoId: activeIssue?.repository_id,
+            id: state.currentBounty?.data?.githubId,
+            repoId: state.currentBounty?.data?.repository_id,
             prId: pullRequest?.githubId
           })}
         >

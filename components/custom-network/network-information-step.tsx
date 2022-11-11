@@ -120,7 +120,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
           <p className="h3 text-white mb-3">
             {showTextOrDefault(nameInput, t("custom-network:steps.network-information.fields.name.default"))}
           </p>
-          <p className="caption-small text-ligth-gray mb-2">
+          <p className="caption-small text-light-gray mb-2">
             {t("custom-network:steps.network-information.fields.name.temporary")}
           </p>
           <p className="caption-small text-gray">

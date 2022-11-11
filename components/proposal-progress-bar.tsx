@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import {
-  formatNumberToNScale
-} from "helpers/formatNumber";
-
+import {useAppState} from "../contexts/app-state";
 import Translation from "./translation";
 
 export default function ProposalProgressBar({
@@ -19,13 +15,12 @@ export default function ProposalProgressBar({
   refused = false
 }) {
   const { t } = useTranslation("proposal");
-  
-  const { wallet } = useAuthentication();
+
+  const {state} = useAppState();
 
   const [issueState, setIssueState] = useState<string>("");
   const [issueColor, setIssueColor] = useState<string>("");
   const [percentage, setPercentage] = useState<number>(0);
-  const { activeNetwork } = useNetwork();
 
   const columns = [0, 1, 2, 3, 3];
 
@@ -65,7 +60,7 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
-    setPercentage(+toPercent(issueDisputeAmount, wallet?.balance?.staked?.toNumber()));
+    setPercentage(+toPercent(issueDisputeAmount, state.currentUser?.balance?.staked?.toNumber()));
   }
 
   function renderColumn(dotLabel, index) {
@@ -97,7 +92,7 @@ export default function ProposalProgressBar({
   }
 
   useEffect(loadDisputeState, [
-    wallet?.balance?.staked,
+    state.currentUser?.balance?.staked,
     issueDisputeAmount,
     isDisputed,
     isFinished,
@@ -118,8 +113,8 @@ export default function ProposalProgressBar({
             <span className={`text-${issueColor} text-uppercase`}>
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
-            /{formatNumberToNScale(wallet?.balance?.staked?.toNumber() || 0)}{" "}
-            <Translation label="$oracles" params={{ token: activeNetwork?.networkToken?.symbol }}/>{" "}
+            /{formatNumberToNScale(state.currentUser?.balance?.staked?.toNumber() || 0)}{" "}
+            <Translation label="$oracles" params={{ token: state.Service?.network?.networkToken?.symbol }}/>{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>
         </div>

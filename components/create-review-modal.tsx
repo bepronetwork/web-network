@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -9,21 +9,22 @@ import Button from "components/button";
 import GithubInfo from "components/github-info";
 import Modal from "components/modal";
 
-import { useIssue } from "contexts/issue";
-import { useRepos } from "contexts/repos";
+import {formatDate} from "helpers/formatDate";
 
-import { formatDate } from "helpers/formatDate";
+import {pullRequest} from "interfaces/issue-data";
 
-import { pullRequest } from "interfaces/issue-data";
-interface CreateReviewModalModalProps{
+import {useAppState} from "../contexts/app-state";
+
+interface CreateReviewModalModalProps {
   show: boolean,
   isExecuting: boolean,
-  onConfirm: (body: string)=> void,
+  onConfirm: (body: string) => void,
   onCloseClick: () => void,
   pullRequest: pullRequest
 }
+
 export default function CreateReviewModal({
-  show = false,
+                                            show = false,
   isExecuting = false,
   onConfirm,
   onCloseClick,
@@ -32,9 +33,8 @@ export default function CreateReviewModal({
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [body, setBody] = useState("");
-  
-  const { activeRepo } = useRepos();
-  const { activeIssue } = useIssue();
+
+  const {state} = useAppState();
 
   function isButtonDisabled(): boolean {
     return body.trim() === "" || isExecuting;
@@ -56,7 +56,7 @@ export default function CreateReviewModal({
       <div className="container">
         <div className="mb-2">
           <p className="caption-small trans mb-2">
-            #{activeIssue?.githubId} {activeIssue?.title}
+            #{state.currentBounty?.data?.githubId} {state.currentBounty?.data?.title}
           </p>
 
           <p className="h4 mb-2">
@@ -72,7 +72,7 @@ export default function CreateReviewModal({
             <GithubInfo
               parent="modal"
               variant="repository"
-              label={activeRepo?.githubPath?.split("/")[1]}
+              label={state.Service?.network?.repos?.active?.githubPath?.split("/")[1]}
             />
 
             <span className="caption-small text-gray ml-2 mr-2">

@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import CenterArrows from "assets/icons/center-arrows";
 import ChatBubbles from "assets/icons/chat-bubbles";
@@ -21,26 +21,22 @@ import Button from "components/button";
 import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { clearTransactions } from "contexts/reducers/clear-transactions";
+import {useAppState} from "contexts/app-state";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Transaction } from "interfaces/transaction";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
+import {Transaction} from "interfaces/transaction";
 
-export default function TransactionsList({
-  onActiveTransactionChange
-}: {
+import {setTxList,} from "../contexts/reducers/change-tx-list";
+
+interface TransactionListProps {
   onActiveTransactionChange: (transaction: Transaction) => void
-}) {
-  const {
-    dispatch,
-    state: { myTransactions }
-  } = useContext(ApplicationContext);
-  const { t } = useTranslation("common");
-  const { wallet } = useAuthentication();
+}
+
+export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
+  const {dispatch, state: {transactions, currentUser}} = useAppState();
+  const {t} = useTranslation("common");
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
@@ -92,7 +88,7 @@ export default function TransactionsList({
   function emptyTransaction() {
     return (
       <div className="text-center">
-        <span className="caption-small text-ligth-gray text-uppercase fs-8 family-Medium">
+        <span className="caption-small text-light-gray text-uppercase fs-8 family-Medium">
           {t("transactions.no-transactions")}
         </span>
       </div>
@@ -100,9 +96,9 @@ export default function TransactionsList({
   }
 
   function clearTransactionsList() {
-    localStorage.setItem(`bepro.transactions:${wallet?.address?.toLowerCase()}`, "[]");
+    localStorage.setItem(`bepro.transactions:${currentUser?.walletAddress?.toLowerCase()}`, "[]");
 
-    dispatch(clearTransactions());
+    dispatch(setTxList([]));
   }
 
   return (
@@ -111,9 +107,9 @@ export default function TransactionsList({
         <h4 className="h4 m-0 text-white">{t("transactions.title_other")}</h4>
 
         { 
-          myTransactions.length && 
+          transactions.length &&
           <Button 
-            textClass="text-ligth-gray" 
+            textClass="text-light-gray" 
             className="px-0 hover-primary" 
             onClick={clearTransactionsList} 
             transparent
@@ -123,8 +119,8 @@ export default function TransactionsList({
         }
       </div>
       <div className="overflow-auto tx-container mt-1 pt-2">
-        {(!myTransactions || !myTransactions.length) && emptyTransaction()}
-        {myTransactions.map(renderTransactionRow)}
+        {(!transactions || !transactions.length) && emptyTransaction()}
+        {transactions.map(renderTransactionRow)}
       </div>
     </div>
   );

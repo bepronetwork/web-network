@@ -6,7 +6,7 @@ export default function IconOption(props) {
   return(
     <Option {...props} className={
       `d-flex bg-none flex-row justify-content-between 
-      ${props.data.isDisabled ? 'bg-transparent-hover text-ligth-gray' : ''}
+      ${props.data.isDisabled ? 'bg-transparent-hover text-light-gray' : ''}
     `}>
       <span>
         {

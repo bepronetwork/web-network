@@ -1,7 +1,7 @@
-import { IncomingHttpHeaders } from "http2";
-import type { NextApiRequest } from "next";
-import { getToken } from "next-auth/jwt";
-import { NextResponse } from "next/server";
+import {IncomingHttpHeaders} from "http2";
+import type {NextApiRequest} from "next";
+import {getToken} from "next-auth/jwt";
+import {NextResponse} from "next/server";
 
 interface CustomHeader {
   get: (key: string) => string

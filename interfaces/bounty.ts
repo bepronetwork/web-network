@@ -13,6 +13,8 @@ export interface BountyExtended extends Bounty {
     rewardToken: string;
     rewardAmount: BigNumber;
     fundingAmount: BigNumber;
+    fundedAmount: BigNumber;
+    fundedPercent: BigNumber;
 
     closed: boolean;
     canceled: boolean;

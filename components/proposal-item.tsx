@@ -1,7 +1,7 @@
+import React, {useEffect, useState} from "react";
 
-import React, { useEffect, useState } from "react";
-
-import { useTranslation } from "next-i18next";
+import BigNumber from "bignumber.js";
+import {useTranslation} from "next-i18next";
 import Link from "next/link";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -9,19 +9,16 @@ import LockedIcon from "assets/icons/locked-icon";
 import PercentageProgressBar from "components/percentage-progress-bar";
 import ProposalProgressSmall from "components/proposal-progress-small";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
+import {isProposalDisputable} from "helpers/proposal";
 
-import { isProposalDisputable } from "helpers/proposal";
-
-import { Proposal } from "interfaces/proposal";
+import {Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
+import {useAppState} from "../contexts/app-state";
+import {useBounty} from "../x-hooks/use-bounty";
 import Button from "./button";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import Translation from "./translation";
@@ -50,19 +47,20 @@ export default function ProposalItem({
   const [ isDisputable, setIsDisputable ] = useState(false); 
   const [ proposalState, setProposalState ] = useState<ProposalState>(DEFAULT_PROPOSAL_STATE);
 
+  const {state} = useAppState();
+
   const { processEvent } = useApi();
-  const { wallet } = useAuthentication();
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
+
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
+  const {getDatabaseBounty, getChainBounty} = useBounty();
+
   
-  const networkProposal = networkIssue?.proposals?.[+proposal?.scMergeId];
-  const networkPullRequest = networkIssue?.pullRequests?.find(({ id: prId }) => +prId === +networkProposal?.prId);
+  const networkProposal = state.currentBounty?.chainData?.proposals?.[+proposal?.scMergeId];
+  const networkPullRequest = state.currentBounty?.chainData?.pullRequests?.find(({ id: prId }) => +prId === +networkProposal?.prId);
 
   const isProposalMerged = proposal.isMerged;
-  const isBountyClosed = !!networkIssue?.closed;
+  const isBountyClosed = !!state.currentBounty?.chainData?.closed;
   const isProposalDisputed = !!networkProposal?.isDisputed;
   const isDisputableByUser = !!networkProposal?.canUserDispute;
   const isProposalRefused = networkProposal?.refusedByBountyOwner;
@@ -73,8 +71,8 @@ export default function ProposalItem({
       !isDisputable,
       isProposalDisputed,
       !isDisputableByUser,
-      wallet?.balance?.oracles?.locked?.isZero(),
-      wallet?.balance?.oracles?.locked?.isNaN(),
+      state.currentUser?.balance?.oracles?.locked?.isZero(),
+      state.currentUser?.balance?.oracles?.locked?.isNaN(),
   ].some(v => v);
 
   async function handleDispute(event: React.MouseEvent<HTMLButtonElement>) {
@@ -86,11 +84,11 @@ export default function ProposalItem({
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock });
+        return processEvent("proposal", "disputed", state.Service?.network?.lastVisited, { fromBlock });
       })
       .then(() => {
-        getNetworkIssue()
-        updateIssue(activeIssue.repository_id, activeIssue.githubId);
+        getDatabaseBounty(true);
+        getChainBounty(true);
       });
   }
 
@@ -113,17 +111,19 @@ export default function ProposalItem({
   }, [isBountyClosed, isProposalDisputed, isProposalMerged, isProposalRefused]);
 
   useEffect(() => {
-    if (proposal?.createdAt && activeNetwork?.disputableTime && DAOService)
-      DAOService.getTimeChain()
+    if (proposal?.createdAt && state.Service?.network?.times?.disputableTime && state.Service?.active)
+      state.Service?.active.getTimeChain()
         .then(chainTime => {
           const canDispute = 
-            isProposalDisputable(networkProposal?.creationDate, activeNetwork?.disputableTime, chainTime);
+            isProposalDisputable(networkProposal?.creationDate, 
+                                 BigNumber(state.Service?.network.times?.disputableTime).toNumber(), 
+                                 chainTime);
 
           setIsDisputable(canDispute && !isProposalDisputed);
         });
-  }, [DAOService, proposal?.createdAt, activeNetwork?.disputableTime, isProposalDisputed]);
+  }, [state.Service?.active, proposal?.createdAt, state.Service?.network?.times?.disputableTime, isProposalDisputed]);
 
-  if (activeIssue?.mergeProposals?.length !== networkIssue?.proposals?.length && !networkProposal)
+  if (state.currentBounty?.data?.mergeProposals?.length !== state.currentBounty?.chainData?.proposals?.length && !networkProposal)
     return (
       <div className="content-list-item proposal my-1">
         <div className="d-flex justify-content-center">
@@ -137,8 +137,8 @@ export default function ProposalItem({
       passHref
       key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
       href={getURLWithNetwork("/proposal", {
-        id: activeIssue?.githubId,
-        repoId: activeIssue?.repository_id,
+        id: state.currentBounty?.data?.githubId,
+        repoId: state.currentBounty?.data?.repository_id,
         proposalId: proposal?.id
       })}
     >
@@ -172,7 +172,7 @@ export default function ProposalItem({
               <ProposalProgressSmall
                 pgClass={`${proposalState.contextColor}`}
                 value={networkProposal?.disputeWeight}
-                total={wallet?.balance?.staked}
+                total={state.currentUser?.balance?.staked}
                 textClass={`pb-2 text-${proposalState.contextColor}`}
               />
             </div>

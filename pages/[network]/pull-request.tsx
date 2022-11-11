@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { PullRequest } from "@taikai/dappkit";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { GetServerSideProps } from "next/types";
+import {PullRequest} from "@taikai/dappkit";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
 
 import Button from "components/button";
 import Comment from "components/comment";
@@ -16,26 +16,27 @@ import NothingFound from "components/nothing-found";
 import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
-import { addToast } from "contexts/reducers/add-toast";
-import { changeLoadState } from "contexts/reducers/change-load-state";
-import { useRepos } from "contexts/repos";
+import {useAppState} from "contexts/app-state";
+import {changeCurrentBountyComments} from "contexts/reducers/change-current-bounty";
+import {changeLoadState} from "contexts/reducers/change-load";
+import {changeSpinners} from "contexts/reducers/change-spinners";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { pullRequest } from "interfaces/issue-data";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network";
+import {useBounty} from "x-hooks/use-bounty";
+import {useNetwork} from "x-hooks/use-network";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PullRequestPage() {
+  const {getExtendedPullRequestsForCurrentBounty} = useBounty();
   const router = useRouter();
 
-  const { t } = useTranslation(["common", "pull-request"]);
-  
+  const {t} = useTranslation(["common", "pull-request"]);
+
   const [showModal, setShowModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isMakingReady, setIsMakingReady] = useState(false);
@@ -43,59 +44,58 @@ export default function PullRequestPage() {
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
 
-  const { dispatch } = useContext(ApplicationContext);
-  
-  const { activeRepo } = useRepos();
-  const { activeNetwork } = useNetwork();
-  const { wallet, user } = useAuthentication();
-  const { getURLWithNetwork } = useNetworkTheme();
-  const { createReviewForPR, processEvent } = useApi();
-  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
-  const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
-  
-  const { prId, review } = router.query;
+  const {state, dispatch} = useAppState();
 
-  const isWalletConnected = !!wallet?.address;
+  const {getURLWithNetwork} = useNetwork();
+  const {createReviewForPR, processEvent} = useApi();
+  const {handleMakePullRequestReady, handleCancelPullRequest} = useBepro();
+  const {getDatabaseBounty, getChainBounty} = useBounty();
+
+  const {prId, review} = router.query;
+
+  const isWalletConnected = !!state.currentUser?.walletAddress;
+  const isGithubConnected = !!state.currentUser?.login;
   const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
   const isPullRequestReady = !!networkPullRequest?.ready;
   const isPullRequestCanceled = !!networkPullRequest?.canceled;
   const isPullRequestCancelable = !!networkPullRequest?.isCancelable;
-  const isPullRequestCreator = networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
+  const isPullRequestCreator = 
+    networkPullRequest?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
 
   function handleCreateReview(body) {
-    if (!user?.login) return;
+    if (!state.currentUser?.login) return;
 
     setIsCreatingReview(true);
 
     createReviewForPR({
-      issueId: String(activeIssue?.issueId),
+      issueId: String(state.currentBounty?.data?.issueId),
       pullRequestId: String(prId),
-      githubLogin: user?.login,
+      githubLogin: state.currentUser?.login,
       body,
-      networkName: activeNetwork?.name,
-      wallet: wallet.address
+      networkName: state.Service?.network?.active?.name,
+      wallet: state.currentUser.walletAddress
     })
       .then((response) => {
         dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("pull-request:actions.review.success"),
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.review.success"),
         }));
 
         setPullRequest({
           ...pullRequest,
           comments: [...pullRequest.comments, response.data],
         });
-        
-        addNewComment(pullRequest?.id, response.data);
+
+        dispatch(changeCurrentBountyComments([...state.currentBounty?.comments || [], response.data]))
 
         setShowModal(false);
       })
       .catch(() => {
         dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("pull-request:actions.review.error"),
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("pull-request:actions.review.error"),
         }));
       })
       .finally(() => {
@@ -104,72 +104,72 @@ export default function PullRequestPage() {
   }
 
   function handleMakeReady() {
-    if (!activeIssue || !pullRequest) return;
-    
+    if (!state.currentBounty?.data || !pullRequest) return;
+
     setIsMakingReady(true);
 
-    handleMakePullRequestReady(activeIssue.contractId, pullRequest.contractId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-      return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
-    })
-    .then(() => {
-      return updateIssue(activeIssue.repository_id, activeIssue.githubId);
-    })
-    .then(() => {
-      setIsMakingReady(false);
-      dispatch(addToast({
-        type: "success",
-        title: t("actions.success"),
-        content: t("pull-request:actions.make-ready.success"),
-      }));
-    })
-    .catch(error => {
-      setIsMakingReady(false);
-      
-      if (error?.code === MetamaskErrors.UserRejected) return;
-      
-      dispatch(addToast({
+    handleMakePullRequestReady(state.currentBounty?.data.contractId, pullRequest.contractId)
+      .then(txInfo => {
+        const {blockNumber: fromBlock} = txInfo as { blockNumber: number };
+        return processEvent("pull-request", "ready", state.Service?.network?.lastVisited, {fromBlock});
+      })
+      .then(() => {
+        return Promise.all([getDatabaseBounty(true), getChainBounty()]);
+      })
+      .then(() => {
+        setIsMakingReady(false);
+        dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.make-ready.success"),
+        }));
+      })
+      .catch(error => {
+        setIsMakingReady(false);
+
+        if (error?.code === MetamaskErrors.UserRejected) return;
+
+        dispatch(addToast({
           type: "danger",
           title: t("actions.failed"),
           content: t("pull-request:actions.make-ready.error"),
-      }));
-    });
+        }));
+      });
   }
 
   function handleCancel() {
     setIsCancelling(true);
 
-    handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-      return processEvent("pull-request", "canceled", activeNetwork?.name, { fromBlock });
-    })
-    .then(() => {
-      updateIssue(activeIssue.repository_id, activeIssue.githubId);
-      
-      dispatch(addToast({
-        type: "success",
-        title: t("actions.success"),
-        content: t("pull-request:actions.cancel.success"),
-      }));
+    handleCancelPullRequest(state.currentBounty?.data?.contractId, pullRequest?.contractId)
+      .then(txInfo => {
+        const {blockNumber: fromBlock} = txInfo as { blockNumber: number };
+        return processEvent("pull-request", "canceled", state.Service?.network?.lastVisited, {fromBlock});
+      })
+      .then(() => {
+        getDatabaseBounty(true);
 
-      router.push(getURLWithNetwork('/bounty', {
-        id: activeIssue.githubId,
-        repoId: activeIssue.repository_id
-      }));
-    })
-    .catch(error => {
-      if (error?.code !== MetamaskErrors.UserRejected)
         dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.cancel.success"),
+        }));
+
+        router.push(getURLWithNetwork('/bounty', {
+          id: state.currentBounty?.data.githubId,
+          repoId: state.currentBounty?.data.repository_id
+        }));
+      })
+      .catch(error => {
+        if (error?.code !== MetamaskErrors.UserRejected)
+          dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("pull-request:actions.cancel.error"),
-        }));
-    })
-    .finally(() => {
-      setIsCancelling(false);
-    });
+          }));
+      })
+      .finally(() => {
+        setIsCancelling(false);
+      });
   }
 
   function handleShowModal() {
@@ -181,26 +181,38 @@ export default function PullRequestPage() {
   }
 
   useEffect(() => {
-    if (!activeIssue || !networkIssue || !prId) return;
+    if (!state.currentBounty?.data || !state.currentBounty?.chainData || !prId || state?.spinners?.pullRequests) return;
+
 
     dispatch(changeLoadState(true));
+    dispatch(changeSpinners.update({pullRequests: true}));
 
-    const currentPR = activeIssue.pullRequests.find((pr) => +pr.githubId === +prId);
-    const currentNetworkPR = networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
+    getExtendedPullRequestsForCurrentBounty()
+      .then(prs => prs.find((pr) => +pr.githubId === +prId))
+      .then(currentPR => {
+        const currentNetworkPR = 
+          state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
 
-    setPullRequest(currentPR);
-    setNetworkPullRequest(currentNetworkPR);
+        setPullRequest(currentPR);
+        setNetworkPullRequest(currentNetworkPR);
 
-    dispatch(changeLoadState(false));
-  }, [activeIssue, networkIssue, prId]);
+        console.log(`GOT PR`, currentPR, currentNetworkPR);
+
+      })
+      .finally(() => {
+        dispatch(changeLoadState(false))
+        dispatch(changeSpinners.update({pullRequests: false}));
+      });
+
+  }, [state.currentBounty?.data, state.currentBounty?.chainData, prId]);
 
   useEffect(() => {
-    if (review && pullRequest && user?.login) setShowModal(true);
-  }, [review, pullRequest, user]);
+    if (review && pullRequest && state.currentUser?.login) setShowModal(true);
+  }, [review, pullRequest, state.currentUser]);
 
   return (
-    <>
-      <PullRequestHero currentPullRequest={pullRequest} />
+    <BountyEffectsProvider>
+      <PullRequestHero currentPullRequest={pullRequest}/>
 
       <CustomContainer>
         <div className="mt-3">
@@ -216,75 +228,70 @@ export default function PullRequestPage() {
 
               <div className="col-4 gap-20 p-0 d-flex justify-content-end">
                 {/* Make Review Button */}
-                { (isWalletConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
-                    <ReadOnlyButtonWrapper>
-                      <Button
-                        className="read-only-button text-nowrap"
-                        onClick={handleShowModal}
-                        disabled={isCreatingReview || isCancelling || isMakingReady || !user?.login }
-                        isLoading={isCreatingReview}
-                        withLockIcon={isCancelling || isMakingReady || !user?.login}
-                        
-                      >
-                        {t("actions.make-a-review")}
-                      </Button>
-                    </ReadOnlyButtonWrapper>
+                {(isWalletConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
+                  <ReadOnlyButtonWrapper>
+                    <Button
+                      className="read-only-button text-nowrap"
+                      onClick={handleShowModal}
+                      disabled={isCreatingReview || isCancelling || isMakingReady || !isGithubConnected}
+                      isLoading={isCreatingReview}
+                      withLockIcon={isCancelling || isMakingReady || !isGithubConnected}>
+                      {t("actions.make-a-review")}
+                    </Button>
+                  </ReadOnlyButtonWrapper>
                 }
 
                 {/* Make Ready for Review Button */}
-                { ( isWalletConnected && 
-                    isPullRequestOpen && 
-                    !isPullRequestReady && 
-                    !isPullRequestCanceled && 
-                    isPullRequestCreator ) && (
-                    <ReadOnlyButtonWrapper>
-                      <Button
-                        className="read-only-button text-nowrap"
-                        onClick={handleMakeReady}
-                        disabled={isCreatingReview || isCancelling || isMakingReady}
-                        isLoading={isMakingReady}
-                        withLockIcon={isCreatingReview || isCancelling}
-                      >
-                        {t("pull-request:actions.make-ready.title")}
-                      </Button>
-                    </ReadOnlyButtonWrapper>
-                  )
+                {(isWalletConnected &&
+                  isPullRequestOpen &&
+                  !isPullRequestReady &&
+                  !isPullRequestCanceled &&
+                  isPullRequestCreator) && (
+                  <ReadOnlyButtonWrapper>
+                    <Button
+                      className="read-only-button text-nowrap"
+                      onClick={handleMakeReady}
+                      disabled={isCreatingReview || isCancelling || isMakingReady}
+                      isLoading={isMakingReady}
+                      withLockIcon={isCreatingReview || isCancelling}>
+                      {t("pull-request:actions.make-ready.title")}
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                )
                 }
 
                 {/* Cancel Button */}
-                { ( isWalletConnected &&
-                    !isPullRequestCanceled &&
-                    isPullRequestCancelable &&
-                    isPullRequestCreator ) && (
-                    <ReadOnlyButtonWrapper>
-                      <Button
-                        className="read-only-button text-nowrap"
-                        onClick={handleCancel}
-                        disabled={isCreatingReview || isCancelling || isMakingReady}
-                        isLoading={isCancelling}
-                        withLockIcon={isCreatingReview || isMakingReady}
-                      >
-                        {t("actions.cancel")}
-                      </Button>
-                    </ReadOnlyButtonWrapper>
-                  )
+                {(isWalletConnected &&
+                  !isPullRequestCanceled &&
+                  isPullRequestCancelable &&
+                  isPullRequestCreator) && (
+                  <ReadOnlyButtonWrapper>
+                    <Button
+                      className="read-only-button text-nowrap"
+                      onClick={handleCancel}
+                      disabled={isCreatingReview || isCancelling || isMakingReady}
+                      isLoading={isCancelling}
+                      withLockIcon={isCreatingReview || isMakingReady}
+                    >
+                      {t("actions.cancel")}
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                )
                 }
 
                 <GithubLink
-                  repoId={String(activeRepo?.id)}
-                  forcePath={activeRepo?.githubPath}
-                  hrefPath={`pull/${pullRequest?.githubId || ""}`}
-                >
+                  forcePath={state.Service?.network?.repos?.active?.githubPath}
+                  hrefPath={`pull/${pullRequest?.githubId || ""}`}>
                   {t("actions.view-on-github")}
                 </GithubLink>
               </div>
             </div>
-            
+
             <div className="col-12 mt-4">
               {(pullRequest?.comments?.length > 0 &&
                 React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
-                    <Comment comment={comment} key={index} />
-                  )))) || (
+                  <Comment comment={comment} key={index}/>
+                )))) || (
                 <NothingFound
                   description={t("pull-request:errors.no-reviews-found")}
                 />
@@ -302,12 +309,12 @@ export default function PullRequestPage() {
         onCloseClick={handleCloseModal}
       />
 
-      <ConnectWalletButton asModal={true} />
-    </>
+      <ConnectWalletButton asModal={true}/>
+    </BountyEffectsProvider>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       ...(await serverSideTranslations(locale, [

@@ -2,7 +2,7 @@ import { useTranslation } from "next-i18next";
 
 import InternalLink from "components/internal-link";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function ProfileSide() {
   const { t } = useTranslation("common");

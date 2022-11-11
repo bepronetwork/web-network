@@ -1,5 +1,5 @@
 import {withCors} from 'middleware';
-import { NextApiRequest, NextApiResponse } from "next";
+import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
 

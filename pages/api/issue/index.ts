@@ -1,16 +1,16 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import { Op } from "sequelize";
+import {Octokit} from "octokit";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import { GraphQlResponse } from "types/octokit";
+import {GraphQlResponse} from "types/octokit";
 
-const { serverRuntimeConfig } = getConfig();
+const {serverRuntimeConfig} = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -46,7 +46,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const repositoryGithubId = repositoryDetails.repository.id;
-  let draftLabelId = null;
+  let draftLabelId;
 
   if (!repositoryDetails.repository.labels.nodes.length) {
     const createdLabel = await githubAPI<GraphQlResponse>(RepositoryQueries.CreateLabel, {

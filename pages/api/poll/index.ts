@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import {NextApiRequest, NextApiResponse} from "next";
 
-import { Bus } from "helpers/bus";
+import {Bus} from "helpers/bus";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { eventName, ...rest } = req.body;

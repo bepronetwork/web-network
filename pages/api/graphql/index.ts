@@ -1,16 +1,16 @@
 // import { error as LogError } from "services/logging";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {getToken} from "next-auth/jwt";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
+import {Octokit} from "octokit";
 
 import {error} from "services/logging";
 
-const { serverRuntimeConfig: { authSecret, github: { token: botToken } } } = getConfig();
+const {serverRuntimeConfig: {authSecret, github: {token: botToken}}} = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { query, params, useBotToken } = req.body;
+  const {query, params, useBotToken} = req.body;
   
   const token = useBotToken ? undefined : await getToken({ req, secret: authSecret });
 

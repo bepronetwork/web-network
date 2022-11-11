@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import Creatable from "react-select/creatable";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import DoneIcon from "assets/icons/done-icon";
 
 import ChangeTokenModal from "components/change-token-modal";
 
-import { useDAO } from "contexts/dao";
+import {formatNumberToCurrency} from "helpers/formatNumber";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import {Token} from "interfaces/token";
 
-import { Token } from "interfaces/token";
+import {useAppState} from "../contexts/app-state";
+
 
 interface TokensDropdownProps {
   defaultToken?: Token;
@@ -53,7 +54,7 @@ export default function TokensDropdown({
   const [options, setOptions] = useState<Option[]>();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const { service: DAOService } = useDAO();
+  const {state} = useAppState();
 
   const formatCreateLabel = (inputValue: string) =>
     canAddToken
@@ -78,7 +79,7 @@ export default function TokensDropdown({
   async function handleAddOption(newToken: Token) {
     addToken(newToken);
     setToken(newToken);
-    await DAOService.getTokenBalance(newToken.address, userAddress)
+    await state.Service?.active.getTokenBalance(newToken.address, userAddress)
       .then((value) =>
         setOption(tokenToOption({ ...newToken, currentValue: value.toFixed() })))
       .catch(() => setOption(tokenToOption(newToken)));
@@ -87,7 +88,7 @@ export default function TokensDropdown({
   async function getBalanceTokens() {
     Promise.all(tokens?.map(async (token) => {
       if (token?.address && userAddress) {
-        const value = await DAOService.getTokenBalance(token.address, userAddress);
+        const value = await state.Service?.active.getTokenBalance(token.address, userAddress);
 
         return { ...token, currentValue: value.toFixed() };
       }

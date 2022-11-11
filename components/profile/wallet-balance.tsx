@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import BeProBlue from "assets/icons/bepro-blue";
 import OracleIcon from "assets/icons/oracle-icon";
@@ -9,88 +9,80 @@ import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 import InfoTooltip from "components/info-tooltip";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-import { useSettings } from "contexts/settings";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {useAppState} from "../../contexts/app-state";
+import TokenBalance, {TokenBalanceType} from "./token-balance";
 
-import { TokenInfo } from "interfaces/token";
-
-import { getCoinInfoByContract } from "services/coingecko";
-
-import TokenBalance, { TokenBalanceType } from "./token-balance";
-
-export const FlexRow = ({ children, className = "" }) => 
+export const FlexRow = ({children, className = ""}) =>
   <div className={`d-flex flex-row ${className}`}>{children}</div>;
-  
-export const FlexColumn = ({ children, className = "" }) => 
+
+export const FlexColumn = ({children, className = ""}) =>
   <div className={`d-flex flex-column ${className}`}>{children}</div>;
 
 export default function WalletBalance() {
-  const { t } = useTranslation(["common", "profile"]);
+  const {t} = useTranslation(["common", "profile"]);
   
   const [tokens, setTokens] = useState<TokenBalanceType[]>([]);
   const [totalAmount, setTotalAmount] = useState("0");
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
-  
-  const { settings } = useSettings();
-  const { activeNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
 
-  const oracleToken = {
-    symbol: t("$oracles",  { token: activeNetwork?.networkToken?.symbol }),
-    name: t("profile:oracle-name-placeholder"),
-    icon: <OracleIcon />
-  };
+  const {state} = useAppState();
 
-  const oraclesLocked = wallet?.balance?.oracles?.locked || BigNumber(0);
-  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || BigNumber(0);
+  const [oracleToken, setOracleToken] = useState(null);
+  const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber(0);
+  const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber(0);
 
-  useEffect(() => {
-    let beproToken = undefined;
+  function loadBalances() {
+    if (!state.Settings?.beproToken)
+      return;
 
-    if (settings?.beproToken) {
-      beproToken = {
-        ...settings.beproToken,
-        icon: <BeProBlue width={24} height={24} />,
-        balance: "0"
-      };
-  
-      setTokens([beproToken]);
-    }
 
-    if (!DAOService || !activeNetwork?.networkToken || !wallet?.balance || !settings?.beproToken) return;
+    const tmpTokens = 
+      [{...state.Settings.beproToken, icon: <BeProBlue width={24} height={24} />, balance: BigNumber(0)}];
+
+    setTokens(tmpTokens);
+
+    console.debug(`fetching balance?`, state?.Service?.network?.networkToken)
+
+    if (!state.currentUser?.walletAddress || !state.Service?.active || !state.Service?.network?.networkToken?.address)
+      return;
+
+    const { networkToken } = state.Service?.network || {};
 
     Promise.all([
-      DAOService.getTokenBalance(beproToken.address, wallet.address),
-      DAOService.getTokenBalance(activeNetwork.networkToken.address, wallet.address),
-      getCoinInfoByContract(beproToken.address).catch(console.log),
-      getCoinInfoByContract(activeNetwork.networkToken.address).catch(console.log)
-    ])
-    .then(([beproBalance, settlerBalance, beproInfo, settlerInfo]) => {
-      const tmpTokens: TokenBalanceType[] = [{ 
-        ...beproToken, 
-        ...beproInfo,
-        balance: beproBalance 
-      }];
+      state.Service.active.getTokenBalance(state.Settings.beproToken.address, state.currentUser.walletAddress)
+        .then(balance => {
+          const [token] = tmpTokens;
+          token.balance = balance;
+          return token
+        }),
+      state.Settings.beproToken.address === state.Service?.network?.networkToken?.address ? Promise.resolve(null) :
+      state.Service.active
+        .getTokenBalance(state.Service?.network?.networkToken?.address, state.currentUser.walletAddress)
+        .then(balance =>
+          (networkToken.name as any as () => Promise<string>)()
+            .then(name => (networkToken.symbol as any as () => Promise<string>)()
+              .then(symbol => ({name, symbol, balance, icon: <TokenIconPlaceholder />}))))
+    ]).then(tokens => {
+      setOracleToken({
+        symbol: t("$oracles",  { token: networkToken?.symbol }),
+        name: networkToken?.name,
+        icon: <OracleIcon />
+      })
 
-      const settler = { 
-        ...activeNetwork.networkToken, 
-        ...settlerInfo, 
-        balance: settlerBalance,
-        icon: (settlerInfo as TokenInfo)?.icon || <TokenIconPlaceholder />
-      };
+      setTokens(tokens.filter(v => !!v));
+    })
 
-      if (activeNetwork.networkToken.address !== beproToken.address)
-        tmpTokens.push(settler);
+  }
 
-      setTokens(tmpTokens);
-    });
+  useEffect(loadBalances, [
+    state.currentUser, 
+    state.Settings, 
+    state.Service?.active, 
+    state.Service?.network?.networkToken?.address
+  ])
 
-  }, [DAOService, activeNetwork?.networkToken, wallet?.balance, settings]);
 
   useEffect(() => {
     if (!tokens.length) return;
@@ -130,7 +122,7 @@ export default function WalletBalance() {
 
       <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
         <span className="h4 family-Regular text-white font-weight-medium">
-          {t("$oracles",  { token: activeNetwork?.networkToken?.symbol })}
+          {oracleToken?.symbol}
         </span>
 
         <FlexRow className="align-items-center">
@@ -139,7 +131,7 @@ export default function WalletBalance() {
             <span className="mr-2">{formatStringToCurrency(oraclesLocked?.plus(oraclesDelegatedToMe)?.toFixed())}</span>
             <InfoTooltip 
               description={t("profile:tips.total-oracles", {
-                tokenName: activeNetwork?.networkToken?.name || oracleToken.name
+                tokenName: oracleToken?.name
               })}
               secondaryIcon
             />
@@ -148,9 +140,9 @@ export default function WalletBalance() {
       </FlexRow>
 
       <TokenBalance
-        icon={oracleToken.icon} 
-        symbol={oracleToken.symbol}
-        name={`${t("misc.locked")} ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+        icon={oracleToken?.icon}
+        symbol={oracleToken?.symbol}
+        name={`${t("misc.locked")} ${tokens[1]?.name || oracleToken?.name}`}
         balance={oraclesLocked}
         type="oracle"
       />

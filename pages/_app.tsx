@@ -1,7 +1,9 @@
-import { GetServerSideProps } from "next";
-import { SessionProvider } from "next-auth/react";
-import { appWithTranslation } from "next-i18next";
-import { AppProps } from "next/app";
+import React from "react";
+
+import {GetServerSideProps} from "next";
+import {SessionProvider} from "next-auth/react";
+import {appWithTranslation} from "next-i18next";
+import {AppProps} from "next/app";
 
 import MainNav from "components/main-nav";
 import Seo from "components/seo";
@@ -11,6 +13,10 @@ import WebThreeDialog from "components/web3-dialog";
 import RootProviders from "contexts";
 
 import "../styles/styles.scss";
+import CreateBountyModal from "../components/create-bounty-modal";
+import Toaster from "../components/toaster";
+import Loading from "../components/loading";
+
 
 function App({
   Component,
@@ -22,13 +28,17 @@ function App({
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <RootProviders>
-          <WebThreeDialog />
-          <MainNav />
-          <div id="root-container">
-          <Component {...pageProps} />
-          </div>
-
-          <StatusBar />
+          <>
+            <WebThreeDialog />
+            <MainNav />
+            <div id="root-container">
+              <Component {...pageProps} />
+            </div>
+            <CreateBountyModal/>
+            <StatusBar />
+            <Toaster />
+            <Loading />
+          </>
         </RootProviders>
       </SessionProvider>
     </>

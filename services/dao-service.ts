@@ -64,7 +64,16 @@ export default class DAO {
 
       await network.loadContract();
 
-      if (!skipAssignment) this._network = network;
+      if (!skipAssignment)
+        this._network = network;
+
+      console.table({
+        networkAddress,
+        networkTokenAddress: network.networkToken?.contractAddress,
+        registryAddress: network.registry?.contractAddress,
+        nftAddress: network.nftToken?.contractAddress,
+      });
+
 
       return network;
     } catch (error) {
@@ -630,7 +639,7 @@ export default class DAO {
     return bountyToken.setDispatcher(dispatcher);
   }
 
-  isAddress(address: string): Promise<boolean> {
+  isAddress(address: string): boolean {
     return this.web3Connection.utils.isAddress(address);
   }
 
@@ -639,10 +648,15 @@ export default class DAO {
   }
 
   async isBountyInDraftChain(creationDateIssue: number): Promise<boolean> { 
-    const time = await this.getTimeChain();
-    const redeemTime = await this.network.draftTime();
+    try {
+      const time = await this.getTimeChain();
+      const redeemTime = await this.network.draftTime();
 
-    return (new Date(time) < new Date(creationDateIssue + redeemTime))
+      return (new Date(time) < new Date(creationDateIssue + redeemTime))
+    } catch (e) {
+      console.error(`Failed to calculate isDraft bounty`, e);
+      return null;
+    }
   }
 
   getCancelableTime(): Promise<number> {

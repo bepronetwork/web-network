@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { OverlayTrigger, Popover } from "react-bootstrap";
+import React, {useEffect, useState} from "react";
+import {OverlayTrigger, Popover} from "react-bootstrap";
 
 import TransactionIcon from "assets/icons/transaction";
 
@@ -7,36 +7,68 @@ import Button from "components/button";
 import TransactionModal from "components/transaction-modal";
 import TransactionsList from "components/transactions-list";
 
-import { ApplicationContext } from "contexts/application";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {Transaction} from "interfaces/transaction";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { Transaction } from "interfaces/transaction";
+import {useAppState} from "../contexts/app-state";
+import {setTxList} from "../contexts/reducers/change-tx-list";
+import {WinStorage} from "../services/win-storage";
 
 export default function TransactionsStateIndicator() {
-  const {
-    state: { myTransactions }
-  } = useContext(ApplicationContext);
+  const {state: {transactions, currentUser}, dispatch} = useAppState();
 
   const [loading, setLoading] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [activeTransaction, setActiveTransaction] =
-    useState<Transaction | null>(null);
+  const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null);
+
+  function parseBlock(tx, block) {
+    tx.addressFrom = block.from;
+    tx.addressTo = block.to;
+    tx.transactionHash = block.hash;
+    tx.blockHash = block.blockHash;
+    tx.confirmations = block.nonce;
+    tx.status = block.blockNumber ? TransactionStatus.completed : TransactionStatus.pending;
+
+    return tx;
+  }
 
   function updateLoadingState() {
-    const loading = myTransactions.some(({ status }) => status === TransactionStatus.pending);
+    if (!transactions.length) {
+      setLoading(false);
+      return;
+    }
+
+    const loading = transactions.some(({ status }) => status === TransactionStatus.pending);
 
     setLoading(loading);
     setShowOverlay(loading);
-
-    if (activeTransaction) {
-      const tx = myTransactions.find(({ id }) => id === activeTransaction.id);
-      setActiveTransaction(tx);
-    }
   }
 
   function onActiveTransactionChange(transaction: Transaction) {
-    setActiveTransaction(transaction)
+    setActiveTransaction(transaction);
+    setShowOverlay(!!transaction);
   }
+
+  function restoreTransactions() {
+    if (!currentUser?.walletAddress)
+      return;
+
+    const storage = new WinStorage(`bepro.transaction:${currentUser?.walletAddress}`, 0);
+    if (!storage?.value || !storage?.value?.length)
+      return;
+
+    const {eth: {getTransaction}} = (window as any).web3;
+
+    Promise.all(storage.value
+        .filter(tx => tx.status !== TransactionStatus.rejected && tx.transactionHash)
+        .map(tx =>
+          getTransaction(tx.transactionHash)
+            .then(block => parseBlock(tx, block))))
+      .then(txs => dispatch(setTxList(txs)))
+  }
+
+  useEffect(updateLoadingState, [transactions]);
+  useEffect(restoreTransactions, [currentUser?.walletAddress]);
 
   const overlay = (
     <Popover id="transactions-indicator">
@@ -46,8 +78,6 @@ export default function TransactionsStateIndicator() {
     </Popover>
   );
 
-  useEffect(updateLoadingState, [myTransactions]);
-
   return (
     <span>
       <OverlayTrigger
@@ -56,8 +86,7 @@ export default function TransactionsStateIndicator() {
         show={showOverlay}
         rootClose={true}
         onToggle={(next) => setShowOverlay(next)}
-        overlay={overlay}
-      >
+        overlay={overlay}>
         <div>
           <Button
             className="opacity-75 opacity-100-hover"
@@ -73,7 +102,7 @@ export default function TransactionsStateIndicator() {
       </OverlayTrigger>
       <TransactionModal
         transaction={activeTransaction}
-        onCloseClick={() => setActiveTransaction(null)}
+        onCloseClick={() => onActiveTransactionChange(null)}
       />
     </span>
   );

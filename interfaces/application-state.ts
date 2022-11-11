@@ -1,47 +1,104 @@
-import { LoadingState } from "./loading-state";
-import { OraclesState } from "./oracles-state";
-import { ToastNotification } from "./toast-notification";
-import {
-  BlockTransaction,
-  SimpleBlockTransactionPayload,
-  UpdateBlockTransaction
-} from "./transaction";
+import {Dispatch} from "react";
 
-export interface ApplicationState {
-  githubHandle: string;
-  metaMaskWallet: boolean;
-  loading: LoadingState;
-  beproInit: boolean;
-  beproStaked: number;
-  oracles: OraclesState;
-  myIssues: number[];
-  currentAddress: string;
-  toaster: ToastNotification[];
-  microServiceReady: boolean | null;
-  myTransactions: (
-    | SimpleBlockTransactionPayload
-    | BlockTransaction
-    | UpdateBlockTransaction
-  )[];
-  network: string;
-  networkId: number;
-  githubLogin: string;
+import {XReducerAction} from "../contexts/reducers/reducer";
+import DAO from "../services/dao-service";
+import {SettingsType} from "../types/settings";
+import {Balance} from "./balance-state";
+import {BountyExtended} from "./bounty";
+import {BranchesList, BranchInfo} from "./branches-list";
+import {IssueBigNumberData, IssueDataComment} from "./issue-data";
+import {LoadingState} from "./loading-state";
+import {Network} from "./network";
+import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
+import {ToastNotification} from "./toast-notification";
+import {Token} from "./token";
+import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
+
+export interface ServiceNetworkReposActive extends RepoInfo {
+  forks?: ForkInfo[];
+  branches?: string[];
+  ghVisibility?: boolean;
+  githubPath: string;
+  id: number;
+}
+
+export interface ServiceNetworkRepos {
+  list: ReposList;
+  forks: ForksList | null;
+  branches: BranchesList | null;
+  active: ServiceNetworkReposActive | null;
+}
+
+export interface NetworkTimes {
+  disputableTime: string|number;
+  draftTime: string|number;
+}
+
+export interface NetworkAmounts {
+  councilAmount: string | number;
+  mergeCreatorFeeShare: string | number;
+  proposerFeeShare: string | number;
+  percentageNeededForDispute: string | number;
+  oracleExchangeRate: string | number;
+}
+
+export interface ServiceNetwork {
+  lastVisited: string;
+  active: Network | null;
+  repos: ServiceNetworkRepos | null;
+  networkToken: Token;
+  times: NetworkTimes;
+  amounts: NetworkAmounts;
+  tokens: {transactional: Token[]; reward: Token[];} | null;
+}
+
+export interface ServiceState {
+  starting: boolean;
+  microReady: boolean | null;
+  active: DAO | null;
+  network: ServiceNetwork | null;
+}
+
+export interface ConnectedChain {
+  id: string;
+  name: string
+}
+
+export interface CurrentUserState {
+  handle: string;
+  walletAddress: string;
+  match?: boolean | undefined;
+  balance?: Balance | null;
+  login?: string;
   accessToken?: string;
-  isTransactionalTokenApproved?: boolean;
-  isSettlerTokenApproved?: boolean;
-  networksSummary?: NetworksSummary;
-  showCreateBounty?: boolean;
-  showWeb3Dialog?: boolean;
+  connected?: boolean;
 }
 
-export interface NetworksSummary {
-  bounties: number;
-  amountInNetwork: number;
-  amountDistributed: number;
+export interface CurrentBounty {
+  comments: IssueDataComment[];
+  lastUpdated: number;
+  data: IssueBigNumberData;
+  chainData: BountyExtended;
 }
 
-export interface ChangeNetworkSummaryProps {
-  label?: "bounties" | "amountInNetwork" | "amountDistributed";
-  amount?: number;
-  action?: "add" | "reset";
+export interface State {
+  Settings: SettingsType | null;
+  Service: ServiceState | null,
+  loading: LoadingState | null;
+  toaster: ToastNotification[];
+  transactions: (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
+  currentUser: CurrentUserState | null,
+  connectedChain: ConnectedChain | null,
+  currentBounty: CurrentBounty | null,
+  show: {
+    [key: string]: boolean;
+  }
+  spinners: {
+    [key: string]: boolean;
+  }
+}
+
+export interface AppState {
+  state: State,
+  dispatch: (action: XReducerAction<any>) => Dispatch<XReducerAction<any>>;
 }

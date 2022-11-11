@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import {useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
 
 import NetworksDropDown from "components/administration/networks-dropdown";
@@ -9,25 +9,23 @@ import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import Step from "components/step";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetworkSettings } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/add-toast";
-import { useSettings } from "contexts/settings";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { psReadAsText } from "helpers/file-reader";
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import {psReadAsText} from "helpers/file-reader";
+import {formatNumberToCurrency} from "helpers/formatNumber";
+import {getQueryableText, urlWithoutProtocol} from "helpers/string";
+
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig: { urls: { homeURL }} } = getConfig();
+const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
 export default function NetworksStep({
-    step,
-    currentStep,
-    handleChangeStep,
+                                       step,
+                                       currentStep,
+                                       handleChangeStep,
     networks
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -37,26 +35,24 @@ export default function NetworksStep({
   const [ isNetworkGovernor, setIsNetworkGovernor ] = useState(false);
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
-  const { settings: appSettings } = useSettings();
-  const { service: DAOService } = useDAO();
-  const { wallet, user } = useAuthentication();
+  const {state, dispatch} = useAppState();
   const { searchNetworks, updateNetwork } = useApi();
-  const { dispatch } = useContext(ApplicationContext);
+
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
-  const MAX_PERCENTAGE_FOR_DISPUTE = +appSettings?.networkParametersLimits?.disputePercentage?.max;
-  const MIN_DRAFT_TIME = +appSettings?.networkParametersLimits?.draftTime?.min;
-  const MAX_DRAFT_TIME = +appSettings?.networkParametersLimits?.draftTime?.max;
-  const MIN_DISPUTE_TIME = +appSettings?.networkParametersLimits?.disputableTime?.min;
-  const MAX_DISPUTE_TIME = +appSettings?.networkParametersLimits?.disputableTime?.max;
-  const MIN_COUNCIL_AMOUNT = +appSettings?.networkParametersLimits?.councilAmount?.min;
-  const MAX_COUNCIL_AMOUNT = +appSettings?.networkParametersLimits?.councilAmount?.max;
+  const MAX_PERCENTAGE_FOR_DISPUTE = +state.Settings?.networkParametersLimits?.disputePercentage?.max;
+  const MIN_DRAFT_TIME = +state.Settings?.networkParametersLimits?.draftTime?.min;
+  const MAX_DRAFT_TIME = +state.Settings?.networkParametersLimits?.draftTime?.max;
+  const MIN_DISPUTE_TIME = +state.Settings?.networkParametersLimits?.disputableTime?.min;
+  const MAX_DISPUTE_TIME = +state.Settings?.networkParametersLimits?.disputableTime?.max;
+  const MIN_COUNCIL_AMOUNT = +state.Settings?.networkParametersLimits?.councilAmount?.min;
+  const MAX_COUNCIL_AMOUNT = +state.Settings?.networkParametersLimits?.councilAmount?.max;
 
   const differentOrUndefined = (valueA, valueB) => valueA !== valueB ? valueA : undefined;
 
   const networkTokenSymbol = forcedNetwork?.networkToken?.symbol || t("misc.$token");
   const networkAlreadyLoaded = 
-    selectedNetworkAddress === DAOService?.network?.contractAddress && !!forcedNetwork?.councilAmount;
+    selectedNetworkAddress === state.Service?.active?.network?.contractAddress && !!forcedNetwork?.councilAmount;
   const nameInputClass = forcedNetwork?.name === details?.name?.value || details?.name?.validated === undefined ? "" : (
     details?.name?.validated && "is-valid" || "is-invalid"
   );
@@ -133,7 +129,7 @@ export default function NetworksStep({
   }
 
   async function handleLoad() {
-    if (networkAlreadyLoaded || !wallet) return;
+    if (networkAlreadyLoaded || !state.currentUser) return;
 
     try {
       setIsLoading(true);
@@ -141,21 +137,21 @@ export default function NetworksStep({
       const network = await searchNetworks({ networkAddress: selectedNetworkAddress })
         .then(({ rows }) => rows[0]);
 
-      if (network.networkAddress !== DAOService.network.contractAddress) 
-        await DAOService.loadNetwork(network.networkAddress);
+      if (network.networkAddress !== state.Service?.active.network.contractAddress)
+        await state.Service?.active.loadNetwork(network.networkAddress);
 
-      DAOService.isNetworkGovernor(wallet.address).then(setIsNetworkGovernor).catch(error => console.log(error));
+      state.Service?.active.isNetworkGovernor(state.currentUser.walletAddress).then(setIsNetworkGovernor).catch(error => console.log(error));
 
       await Promise.all([
-        DAOService.getNetworkParameter("councilAmount"),
-        DAOService.getNetworkParameter("disputableTime"),
-        DAOService.getNetworkParameter("draftTime"),
-        DAOService.getNetworkParameter("oracleExchangeRate"),
-        DAOService.getNetworkParameter("mergeCreatorFeeShare"),
-        DAOService.getNetworkParameter("proposerFeeShare"),
-        DAOService.getNetworkParameter("percentageNeededForDispute"),
-        DAOService.getTreasury(),
-        DAOService.getSettlerTokenData()
+        state.Service?.active.getNetworkParameter("councilAmount"),
+        state.Service?.active.getNetworkParameter("disputableTime"),
+        state.Service?.active.getNetworkParameter("draftTime"),
+        state.Service?.active.getNetworkParameter("oracleExchangeRate"),
+        state.Service?.active.getNetworkParameter("mergeCreatorFeeShare"),
+        state.Service?.active.getNetworkParameter("proposerFeeShare"),
+        state.Service?.active.getNetworkParameter("percentageNeededForDispute"),
+        state.Service?.active.getTreasury(),
+        state.Service?.active.getSettlerTokenData()
       ])
       .then(([councilAmount, 
               disputableTime, 
@@ -185,14 +181,14 @@ export default function NetworksStep({
   }
 
   async function handleSubmit() {
-    if (!wallet?.address || !user?.login || !forcedNetwork) return;
+    if (!state.currentUser?.walletAddress || !state.currentUser?.login || !forcedNetwork) return;
 
     setIsUpdatingNetwork(true);
 
     const json = {
-      githubLogin: user?.login,
+      githubLogin: state.currentUser?.login,
       override: true,
-      creator: wallet?.address,
+      creator: state.currentUser?.walletAddress,
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
@@ -230,17 +226,17 @@ export default function NetworksStep({
       });
 
     if (forcedNetwork.draftTime !== parameters.draftTime.value)
-      await DAOService.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
+      await state.Service?.active.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
 
     if (forcedNetwork.disputableTime !== parameters.disputableTime.value)
-      await DAOService.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
+      await state.Service?.active.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
 
     if (+forcedNetwork.councilAmount !== parameters.councilAmount.value)
-      await DAOService.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
+      await state.Service?.active.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
 
     if (forcedNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
-      await DAOService.setNetworkParameter("percentageNeededForDispute", 
-                                           parameters.percentageNeededForDispute.value).catch(console.log);
+      await state.Service?.active.setNetworkParameter("percentageNeededForDispute",
+                                                      parameters.percentageNeededForDispute.value).catch(console.log);
   }
  
   return (
@@ -309,7 +305,7 @@ export default function NetworksStep({
                   {showTextOrDefault(details?.name?.value, 
                                      t("custom-network:steps.network-information.fields.name.default"))}
                 </p>
-                <p className="caption-small text-ligth-gray mb-2">
+                <p className="caption-small text-light-gray mb-2">
                   {t("custom-network:steps.network-information.fields.name.temporary")}
                 </p>
                 <p className="caption-small text-gray">
@@ -376,7 +372,7 @@ export default function NetworksStep({
               <div className="row px-0 mt-3">
                 <div className="col-3">
                   <InputNumber
-                    classSymbol={"text-ligth-gray"}
+                    classSymbol={"text-light-gray"}
                     label={t("custom-network:dispute-time")}
                     symbol={t("misc.seconds")}
                     max={MAX_DISPUTE_TIME}
@@ -397,7 +393,7 @@ export default function NetworksStep({
 
                 <div className="col-3">
                   <InputNumber
-                    classSymbol={"text-ligth-gray"}
+                    classSymbol={"text-light-gray"}
                     label={t("custom-network:percentage-for-dispute")}
                     max={MAX_PERCENTAGE_FOR_DISPUTE}
                     description={t("custom-network:errors.percentage-for-dispute",
@@ -415,7 +411,7 @@ export default function NetworksStep({
 
                 <div className="col-3">
                   <InputNumber
-                    classSymbol={"text-ligth-gray"}
+                    classSymbol={"text-light-gray"}
                     label={t("custom-network:redeem-time")}
                     max={MAX_DRAFT_TIME}
                     description={t("custom-network:errors.redeem-time", {

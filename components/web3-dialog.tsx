@@ -1,53 +1,50 @@
-import { useContext, useEffect } from "react";
-import { Modal } from "react-bootstrap";
-import { isMobile } from "react-device-detect";
+import {useEffect} from "react";
+import {Modal} from "react-bootstrap";
+import {isMobile} from "react-device-detect";
 
-import { kebabCase } from "lodash";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {kebabCase} from "lodash";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import WebThreeUnavailable from "assets/web3-unavailable";
 
 import MobileNotSupported from "components/mobile-not-supported";
 
-import { ApplicationContext } from "contexts/application";
-import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
+import useNetwork from "x-hooks/use-network-theme";
 
-import useNetwork from "x-hooks/use-network";
-
+import {useAppState} from "../contexts/app-state";
+import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 import Button from "./button";
 
 export default function WebThreeDialog() {
   const router = useRouter();
-  const { getURLWithNetwork } = useNetwork();
+  const {getURLWithNetwork} = useNetwork();
   const {
     dispatch,
-    state: { showWeb3Dialog },
-  } = useContext(ApplicationContext);
-  const { t } = useTranslation("common");
+    state: {show: {web3Dialog: showWeb3Dialog}},
+  } = useAppState();
+  const {t} = useTranslation("common");
 
   function handleClickTryAgain() {
     window.location.reload();
   }
 
   useEffect(() => {
-    if (
-      ![
-        getURLWithNetwork("/").pathname,
-        getURLWithNetwork("/developers").pathname,
-        getURLWithNetwork("/curators").pathname,
-        getURLWithNetwork("/oracle").pathname,
-        getURLWithNetwork("/oracle/new-bounties").pathname,
-        getURLWithNetwork("/oracle/ready-to-merge").pathname,
-        "/[network]/bounty",
-        "/[network]",
-      ].includes(router.pathname)
-    )
-      dispatch(changeShowWeb3DialogState(!window?.ethereum));
+    if (![
+      getURLWithNetwork("/").pathname,
+      getURLWithNetwork("/developers").pathname,
+      getURLWithNetwork("/curators").pathname,
+      getURLWithNetwork("/oracle").pathname,
+      getURLWithNetwork("/oracle/new-bounties").pathname,
+      getURLWithNetwork("/oracle/ready-to-merge").pathname,
+      "/[network]/bounty",
+      "/[network]",
+    ].includes(router.pathname))
+      dispatch(changeShowWeb3(!window?.ethereum));
   }, [router.pathname]);
 
-  if(showWeb3Dialog && isMobile) return <MobileNotSupported />
-  
+  if (showWeb3Dialog && isMobile) return <MobileNotSupported/>
+
   if (showWeb3Dialog && !isMobile)
     return (
       <div className="container-fluid vw-100 vh-100 bg-image bg-main-image">
@@ -65,7 +62,7 @@ export default function WebThreeDialog() {
               {t("modals.web3-dialog.eth-not-available")}
             </p>
             <div className="d-flex flex-column align-items-center">
-              <WebThreeUnavailable />
+              <WebThreeUnavailable/>
               <p className="p mb-0 mt-4 text-center fs-small">
                 {t("modals.web3-dialog.message")}
               </p>

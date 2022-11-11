@@ -1,24 +1,29 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
+import {ERC20} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSideProps } from "next/types";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next/types";
+
 
 import ListIssues from "components/list-issues";
-import PageHero, { InfosHero } from "components/page-hero";
-
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
+import PageHero, {InfosHero} from "components/page-hero";
 
 import useApi from "x-hooks/use-api";
 
+import {useAppState} from "../../contexts/app-state";
+import {useBounty} from "../../x-hooks/use-bounty";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
+
+
 export default function PageDevelopers() {
+  useBounty();
   const { t } = useTranslation(["common"]);
 
+  const {state} = useAppState();
   const { getTotalUsers } = useApi();
-  const { service: DAOService } = useDAO();
-  const { activeNetwork } = useNetwork()
+
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -41,14 +46,16 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!DAOService) return;
+    if (!state.Service?.active) return;
 
     Promise.all([
-      DAOService.getClosedBounties().catch(() => 0),
-      DAOService.getOpenBounties().catch(() => 0),
-      DAOService.getTotalNetworkToken().catch(() => BigNumber(0)),
+      state.Service?.active.getClosedBounties().catch(() => 0),
+      state.Service?.active.getOpenBounties().catch(() => 0),
+      state.Service?.active.getTotalNetworkToken().catch(() => BigNumber(0)),
       getTotalUsers(),
-    ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
+      (state.Service?.network?.active?.networkToken as ERC20)?.symbol(),
+    ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
+
       setInfos([
         {
           value: inProgress,
@@ -61,7 +68,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork.toNumber(),
           label: t("heroes.bounties-in-network"),
-          currency: t("$oracles",{ token: activeNetwork?.networkToken?.symbol || t("misc.$token") })
+          currency: t("$oracles",{ token: symbol || t("misc.$token") })
         },
         {
           value: totalUsers,
@@ -69,18 +76,17 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [DAOService, activeNetwork]);
+  }, [state.Service?.active?.network?.contractAddress, state.Service?.network]);
 
   return (
-    <>
+    <BountyEffectsProvider>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
         infos={infos}
       />
-    
       <ListIssues />
-    </>
+    </BountyEffectsProvider>
   );
 }
 

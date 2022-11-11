@@ -2,9 +2,9 @@ import { useTranslation } from "next-i18next";
 
 import GithubImage from "components/github-image";
 
-import { useAuthentication } from "contexts/authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 
-
+import {useAppState} from "../contexts/app-state";
 import Button from "./button";
 
 interface IProps{
@@ -13,14 +13,14 @@ interface IProps{
 
 export default function ConnectGithub({size = 'md'}:IProps) {
   const { t } = useTranslation("common");
-
-  const { wallet, connectGithub, isConnecting } = useAuthentication();
+  const { connectGithub } = useAuthentication();
+  const {state} = useAppState()
 
 
   if(size === 'sm'){
     return (
-    <Button onClick={connectGithub} disabled={isConnecting} isLoading={isConnecting}> 
-      <GithubImage  opacity={1} /> 
+    <Button onClick={connectGithub} disabled={state.spinners?.connecting} isLoading={state.spinners?.connecting}>
+      <GithubImage  opacity={1} />
       <span>{t("actions.connect")}</span>
     </Button>)
   }
@@ -37,9 +37,8 @@ export default function ConnectGithub({size = 'md'}:IProps) {
             <span className="d-inline-block">
               <Button
                 className="d-inline btn btn-primary text-uppercase"
-                disabled={isConnecting || !wallet?.address}
-                onClick={connectGithub}
-              >
+                disabled={state.spinners?.connecting || !state.currentUser?.walletAddress}
+                onClick={connectGithub}>
                 {t("actions.connect")}
               </Button>
             </span>

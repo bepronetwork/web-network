@@ -1,6 +1,6 @@
-import { forwardRef, useContext, useEffect, useState, ReactChild } from "react";
+import {forwardRef, ReactChild, useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -8,23 +8,22 @@ import Button from "components/button";
 import Icon from "components/icon";
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-import { addToast } from "contexts/reducers/add-toast";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { updateTransaction } from "contexts/reducers/update-transaction";
+import {useAppState} from "contexts/app-state";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { parseTransaction } from "helpers/transactions";
+import {formatNumberToCurrency} from "helpers/formatNumber";
+import {parseTransaction} from "helpers/transactions";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BlockTransaction } from "interfaces/transaction";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useApi from "x-hooks/use-api";
-import useTransactions from "x-hooks/useTransactions";
+import {useAuthentication} from "x-hooks/use-authentication";
+
+import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import {MetamaskErrors} from "../interfaces/enums/Errors";
+import {SimpleBlockTransactionPayload} from "../interfaces/transaction";
+
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -66,35 +65,34 @@ function networkTxButton({
   const [showModal, setShowModal] = useState(false);
   const [txSuccess,] = useState(false);
 
-  const { dispatch } = useContext(ApplicationContext);
-  
-  const txWindow = useTransactions();
+  const { state, dispatch } = useAppState();
+
   const { processEvent } = useApi();
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const { wallet, updateWalletBalance } = useAuthentication();
+
+  const { updateWalletBalance } = useAuthentication();
 
   function checkForTxMethod() {
-    if (!DAOService || !wallet) return;
+    if (!state.Service?.active || !state.currentUser) return;
 
-    if (!txMethod || typeof DAOService.network[txMethod] !== "function")
+    if (!txMethod || typeof state.Service?.active.network[txMethod] !== "function")
       throw new Error("Wrong txMethod");
   }
 
   function makeTx() {
-    if (!DAOService || !wallet) return;
+    if (!state.Service?.active || !state.currentUser) return;
 
-    const tmpTransaction = addTransaction({
-        type: txType,
-        amount: txParams?.tokenAmount || "0",
-        currency: txCurrency || t("misc.$token")
-    }, activeNetwork);
+    const tmpTransaction = addTx([{
+      type: txType,
+      amount: txParams?.tokenAmount || "0",
+      currency: txCurrency || t("misc.$token")
+    } as unknown as any]);
+
     dispatch(tmpTransaction);
     
     const methodName = txMethod === 'delegateOracles' ? 'delegate' : txMethod;
     const currency = txCurrency || t("misc.$token");
     
-    DAOService.network[txMethod](txParams.tokenAmount, txParams.from)
+    state.Service?.active.network[txMethod](txParams.tokenAmount, txParams.from)
       .then(answer => {
         if (answer.status) {
           onSuccess && onSuccess();
@@ -106,11 +104,11 @@ function networkTxButton({
               `
           }));
 
-          if(answer.blockNumber) 
-            processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber}).catch(console.debug);
+          if (answer.blockNumber)
+            processEvent("oracles","changed", state.Service?.network?.lastVisited, {fromBlock:answer.blockNumber})
+              .catch(console.debug);
 
-          txWindow.updateItem(tmpTransaction.payload.id,
-                              parseTransaction(answer, tmpTransaction.payload));
+          dispatch(updateTx([parseTransaction(answer, tmpTransaction.payload[0] as SimpleBlockTransactionPayload)]));
         } else {
           onFail(answer.message);
           dispatch(addToast({
@@ -121,21 +119,18 @@ function networkTxButton({
         }
       })
       .catch((e) => {
+
+        dispatch(updateTx([{
+          ...tmpTransaction.payload[0],
+          status: e?.code === MetamaskErrors.UserRejected ? TransactionStatus.rejected : TransactionStatus.failed,
+        }]));
+
+        console.error(`Failed network-tx-button`, e);
+
         onFail(e.message);
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({
-              ...(tmpTransaction.payload as BlockTransaction),
-              remove: true
-          }));
-        else
-          dispatch(updateTransaction({
-              ...(tmpTransaction.payload as BlockTransaction),
-              status: TransactionStatus.failed
-          }));
-        console.error(e);
       })
       .finally(() => {
-        updateWalletBalance();
+        updateWalletBalance(true);
       });
   }
 
@@ -157,7 +152,7 @@ function networkTxButton({
     </Button>
   );
 
-  useEffect(checkForTxMethod, [DAOService, wallet]);
+  useEffect(checkForTxMethod, [state.Service?.active, state.currentUser]);
 
   return (
     <>

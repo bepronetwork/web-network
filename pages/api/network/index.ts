@@ -1,18 +1,18 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import Sequelize, { Op } from "sequelize";
+import {Octokit} from "octokit";
+import Sequelize, {Op} from "sequelize";
 
 import Database from "db/models";
 
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
-import { error as LogError } from 'services/logging';
+import {error as LogError} from 'services/logging';
 
-const { serverRuntimeConfig } = getConfig();
+const {serverRuntimeConfig} = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName, creator: creatorAddress } = req.query;
@@ -22,7 +22,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if(networkName){
     where = {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   } 

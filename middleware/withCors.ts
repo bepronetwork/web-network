@@ -1,6 +1,7 @@
-import { info, error } from 'services/logging';
 import Cors from 'cors'
 import getConfig from "next/config";
+
+import { info, error } from 'services/logging';
 
 const { publicRuntimeConfig } = getConfig();
 

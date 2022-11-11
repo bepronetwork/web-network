@@ -1,17 +1,17 @@
-import { ProposalDetail } from "@taikai/dappkit";
+import {ProposalDetail} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op } from "sequelize";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
-import { error as LogError } from "services/logging";
+import {error as LogError} from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try{

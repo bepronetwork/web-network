@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
+
 
 import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
@@ -9,23 +10,20 @@ import NetworkListBar from "components/network-list-bar";
 import NetworkListItem from "components/network-list-item";
 import NothingFound from "components/nothing-found";
 
-import { ApplicationContext } from "contexts/application";
-import { useDAO } from "contexts/dao";
-import { changeLoadState } from "contexts/reducers/change-load-state";
-import { useSettings } from "contexts/settings";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
 
-import { orderByProperty } from "helpers/array";
+import {orderByProperty} from "helpers/array";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
-import { NetworksPageContext } from "pages/networks";
+import {NetworksPageContext} from "pages/networks";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
-
+import {useNetwork} from "x-hooks/use-network";
 
 export default function NetworksList() {
   const router = useRouter();
@@ -33,14 +31,11 @@ export default function NetworksList() {
 
   const [order, setOrder] = useState(["name", "asc"]);
   const [networks, setNetworks] = useState<Network[]>([]);
-  
-  const { network } = useNetwork();
-  const { settings } = useSettings();
+
   const { searchNetworks } = useApi();
-  const { service: DAOService } = useDAO();
   const { getURLWithNetwork } = useNetwork();
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { state, dispatch } = useAppState();
   const { 
     setNumberOfNetworks, 
     setNumberOfBounties, 
@@ -99,12 +94,12 @@ export default function NetworksList() {
 
     setNotConvertedTokens(Object.fromEntries(notConvertedEntries));
 
-    if (!DAOService || networks?.every(network => network?.openBounties !== undefined)) return;
+    if (!state.Service?.active || networks?.every(network => network?.openBounties !== undefined)) return;
 
     Promise.all(networks.map(async (network: Network) => {
       const networkAddress = network?.networkAddress;
       const dao = new DAO({
-        web3Connection: DAOService.web3Connection,
+        web3Connection: state.Service?.active.web3Connection,
         skipWindowAssignment: true
       });
 
@@ -117,7 +112,7 @@ export default function NetworksList() {
         dao.getTotalBounties().catch(() => 0)
       ]);
 
-      const mainCurrency = settings?.currency?.defaultFiat || "eur";
+      const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
 
       const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
 
@@ -132,19 +127,19 @@ export default function NetworksList() {
       }
     }))
       .then(setNetworks)
-      .catch(error => console.log("Failed to load network data", error, network));
-  }, [networks, DAOService]);
+      .catch(error => console.log("Failed to load network data", error, state.Service?.network?.active));
+  }, [networks, state.Service?.active]);
 
   return (
     <CustomContainer>
       {(!networks.length && (
         <NothingFound description={t("custom-network:errors.not-found")}>
-          {network ? (
+          {state.Service?.network?.active ? (
             <InternalLink
               href="/new-network"
               label={String(t("actions.create-one"))}
               uppercase
-              blank={network.name !== settings?.defaultNetworkConfig?.name}
+              blank={state.Service?.network?.active.name !== state.Settings?.defaultNetworkConfig?.name}
             />
           ) : (
             ""

@@ -1,20 +1,18 @@
-import { useEffect, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
+import {handleAllowedTokensDatabase} from "helpers/handleAllowedTokens";
 
-import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
-
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
+import {useAppState} from "../contexts/app-state";
 import Button from "./button";
 import MultipleTokensDropdown from "./multiple-tokens-dropdown";
-import { WarningSpan } from "./warning-span";
+import {WarningSpan} from "./warning-span";
 
 export default function TokensSettings({
   isGovernorRegistry = false,
@@ -32,32 +30,26 @@ export default function TokensSettings({
   defaultSelectedTokens?: Token[];
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-  const { service: DAOService } = useDAO();
 
-  const [currentAllowedTokens, setCurrentAllowedTokens] = useState<{
-    transactional: string[];
-    reward: string[];
-  }>();
+  const {state} = useAppState();
+
+  const [currentAllowedTokens, setCurrentAllowedTokens] = useState<{ transactional: string[]; reward: string[]; }>();
   const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>();
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>();
-  const [selectedTransactionalTokens, setSelectedTransactionalTokens] =
-    useState<Token[]>();
-  const [transansactionLoading, setTransansactionLoading] =
-    useState<boolean>(false);
-  const [allowedTransactionalTokens, setAllowedTransactionalTokens] =
-    useState<Token[]>();
+  const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
+  const [transansactionLoading, setTransansactionLoading] = useState<boolean>(false);
+  const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const { getTokens, processEvent } = useApi();
-  const { activeNetwork } = useNetwork();
-  
+
   useEffect(() => {
-    if (!DAOService) return;
+    if (!state.Service?.active) return;
 
     if (isGovernorRegistry) {
       getAllowedTokensContract();
     }
 
     if (!isGovernorRegistry) {
-      DAOService.getAllowedTokens().then((allowedTokens) => {
+      state.Service?.active.getAllowedTokens().then((allowedTokens) => {
         getTokens()
           .then((tokens) => {
             const { transactional, reward } = handleAllowedTokensDatabase(allowedTokens, tokens)
@@ -86,31 +78,29 @@ export default function TokensSettings({
   }, [selectedRewardTokens, selectedTransactionalTokens]);
 
   async function getAllowedTokensContract() {
-    DAOService.getAllowedTokens().then(async (tokens) => {
+    state.Service?.active.getAllowedTokens().then(async (tokens) => {
 
       setCurrentAllowedTokens(tokens);
       if(tokens?.reward?.length === 0) setSelectedRewardTokens([])
       if(tokens?.transactional?.length === 0) setSelectedTransactionalTokens([])
 
       if (tokens?.transactional?.length > 0) {
-        await Promise.all(tokens?.transactional?.map(async (address) => {
-          const token = await DAOService.getERC20TokenData(address);
-          return token;
-        })).then((token) => {
-          setTransansactionLoading(false);
-          setAllowedTransactionalTokens(token);
-          setSelectedTransactionalTokens(token);
-        });
+        await Promise.all(tokens?.transactional?.map((address) =>
+            state.Service?.active.getERC20TokenData(address)))
+          .then((token) => {
+            setTransansactionLoading(false);
+            setAllowedTransactionalTokens(token);
+            setSelectedTransactionalTokens(token);
+          });
       }
 
       if (tokens?.reward?.length > 0) {
-        await Promise.all(tokens?.reward?.map(async (address) => {
-          const token = await DAOService.getERC20TokenData(address);
-          return token;
-        })).then((token) => {
-          setAllowedRewardTokens(token);
-          setSelectedRewardTokens(token);
-        });
+        await Promise.all(tokens?.reward?.map((address) =>
+            state.Service?.active.getERC20TokenData(address)))
+          .then((token) => {
+            setAllowedRewardTokens(token);
+            setSelectedRewardTokens(token);
+          });
       } 
     });
   }
@@ -146,9 +136,9 @@ export default function TokensSettings({
       .filter((v) => v);
 
     if (addTransactionalTokens.length > 0) {
-      await DAOService.addAllowedTokens(addTransactionalTokens, true)
+      await state.Service?.active.addAllowedTokens(addTransactionalTokens, true)
       .then((txInfo) => {
-        processEvent("registry", "changed", activeNetwork?.name, { 
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
@@ -163,9 +153,9 @@ export default function TokensSettings({
     }).filter(v => v)
 
     if (removeTransactionalTokens.length > 0) {
-      DAOService.removeAllowedTokens(removeTransactionalTokens, true)
+      state.Service?.active.removeAllowedTokens(removeTransactionalTokens, true)
       .then((txInfo) => {
-        processEvent("registry", "changed", activeNetwork?.name, { 
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
@@ -190,9 +180,9 @@ export default function TokensSettings({
     }).filter(v => v)
     
     if (addRewardTokens.length > 0) {
-      DAOService.addAllowedTokens(addRewardTokens, false)
+      state.Service?.active.addAllowedTokens(addRewardTokens, false)
       .then((txInfo) => {
-        processEvent("registry", "changed", activeNetwork?.name, { 
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
@@ -207,9 +197,9 @@ export default function TokensSettings({
     }).filter(v => v)
 
     if (removeRewardTokens.length > 0) {
-      DAOService.removeAllowedTokens(removeRewardTokens, false)
+      state.Service?.active.removeAllowedTokens(removeRewardTokens, false)
       .then((txInfo) => {
-        processEvent("registry", "changed", activeNetwork?.name, { 
+        processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();

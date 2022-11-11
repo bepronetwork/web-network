@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
-import { isMobile } from "react-device-detect";
+import React, {useEffect, useState} from "react";
+import {isMobile} from "react-device-detect";
 
-import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import Button from "components/button";
 import NewProposal from "components/create-proposal";
@@ -14,21 +13,19 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
-import { addToast } from "contexts/reducers/add-toast";
-import { useRepos } from "contexts/repos";
+import {useAppState} from "contexts/app-state";
+import {addToast} from "contexts/reducers/change-toaster";
 
-import { getIssueState } from "helpers/handleTypeIssue";
+import {getIssueState} from "helpers/handleTypeIssue";
 
 import useApi from "x-hooks/use-api";
+import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 
+import {useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
 import Modal from "./modal";
+import {BountyEffectsProvider} from "../contexts/bounty-effects";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -36,14 +33,12 @@ interface PageActionsProps {
 }
 
 export default function PageActions({
-  isRepoForked = false,
-  addNewComment
-}: PageActionsProps) {
-  const { t } = useTranslation(["common", "pull-request", "bounty"]);
+                                      isRepoForked = false,
+                                      addNewComment
+                                    }: PageActionsProps) {
+  const {t} = useTranslation(["common", "pull-request", "bounty"]);
 
-  const {
-    query: { repoId, id }
-  } = useRouter();
+  const {query: {repoId,}} = useRouter();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
@@ -53,86 +48,89 @@ export default function PageActions({
 
   const [isCancelable, setIsCancelable] = useState(false);
 
-  const {
-    dispatch
-  } = useContext(ApplicationContext);
+  const {state, dispatch} = useAppState();
+  const {handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest} = useBepro();
+  const {updateWalletBalance} = useAuthentication();
+  const {getDatabaseBounty, getChainBounty} = useBounty();
+  const {createPrePullRequest, cancelPrePullRequest, startWorking, processEvent} = useApi();
 
-  const { activeRepo } = useRepos();
-  const { activeNetwork } = useNetwork();
-  const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
-  const {service: DAOService} = useDAO()
-  const { wallet, user, updateWalletBalance } = useAuthentication();
-  const { networkIssue, activeIssue, getNetworkIssue, updateIssue } = useIssue();
-  const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
-
-  const issueGithubID = activeIssue?.githubId;
-
-  const isCouncilMember = !!wallet?.isCouncil;
-  const isBountyInDraft = !!networkIssue?.isDraft;
-  const isBountyFinished = !!networkIssue?.isFinished;
-  const isWalletConnected = !!wallet?.address;
-  const isWalletAndGHConnected = isWalletConnected && !!user?.login;
-  const isFundingRequest = networkIssue?.fundingAmount?.gt(0) || activeIssue?.fundingAmount?.gt(0);
-  const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
-  const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
+  const issueGithubID = state.currentBounty?.data?.githubId;
+  
+  const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
+  const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
+  const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
+  const isWalletConnected = !!state.currentUser?.walletAddress;
+  const isGithubConnected = !!state.currentUser?.login;
+  const isFundingRequest = 
+    state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
+  const isWorkingOnBounty = !!state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login);
+  const isBountyOpen = 
+    state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false;
   const issueState = getIssueState({
-    state: activeIssue?.state,
-    amount: activeIssue?.amount,
-    fundingAmount: activeIssue?.fundingAmount 
+    state: state.currentBounty?.data?.state,
+    amount: state.currentBounty?.data?.amount,
+    fundingAmount: state.currentBounty?.data?.fundingAmount
   })
-  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount)
+  const isBountyFunded = state.currentBounty?.data?.fundedAmount?.isEqualTo(state.currentBounty?.data?.fundingAmount)
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
-    wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
+    isWalletConnected &&
+    state.currentBounty?.chainData?.creator &&
+    state.currentBounty?.chainData?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
 
   const hasPullRequests =
-    !!activeIssue?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
+    !!state.currentBounty?.data?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
 
-  const hasOpenPullRequest =
-    !!activeIssue?.pullRequests?.find(pullRequest => pullRequest?.githubLogin === user?.login &&
-      pullRequest?.status !== "canceled");
+  const hasOpenPullRequest = 
+    !!state.currentBounty?.data?.pullRequests?.find(pullRequest => 
+      pullRequest?.githubLogin === state.currentUser?.login && pullRequest?.status !== "canceled");
 
 
-  async function updateBountyData() { 
-    return Promise.all([
-      updateIssue(`${repoId}`, `${id}`),
-      getNetworkIssue()
-    ]);
+  async function updateBountyData(force = false, methods: "both" | "database" | "chain") {
+    // todo this must be done by the actor so it wont fall out of context
+
+    if(["both","database"].includes(methods)) getDatabaseBounty(force);
+    
+    if(["both","chain"].includes(methods)) getChainBounty(force);
   }
 
   async function handleRedeem() {
-    handleReedemIssue(issueState === "funding")
+    handleReedemIssue(getIssueState({
+    state: state.currentBounty?.data?.state,
+    amount: state.currentBounty?.data?.amount,
+    fundingAmount: state.currentBounty?.data?.fundingAmount
+    }) === "funding")
       .then(() => {
-        updateWalletBalance();
-        updateBountyData();
-      });
+        updateWalletBalance(true);
+        updateBountyData(true, 'both');
+      })
   }
- 
+
   async function handleHardCancel() {
     setShowHardCancelModal(false)
     handleHardCancelBounty()
       .then(() => {
         updateWalletBalance();
-        updateBountyData();
+        updateBountyData(true, 'both');
       });
   }
 
-  useEffect(()=>{
-    if(DAOService && networkIssue)
-      (async()=>{
-        const cancelableTime = await DAOService.getCancelableTime();
-        const canceable = +new Date() >= +new Date(networkIssue.creationDate + cancelableTime) 
+  useEffect(() => {
+    if (state.Service?.active && state.currentBounty?.chainData)
+      (async () => {
+        const cancelableTime = await state.Service?.active.getCancelableTime();
+        const canceable = +new Date() >= +new Date(state.currentBounty?.chainData.creationDate + cancelableTime)
         setIsCancelable(canceable)
       })()
-  },[DAOService, networkIssue])
+  }, [state.Service?.active, state.currentBounty?.chainData])
 
   async function handlePullrequest({
-    title: prTitle,
-    description: prDescription,
-    branch
-  }): Promise<void> {
-    if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
+                                     title: prTitle,
+                                     description: prDescription,
+                                     branch
+                                   }): Promise<void> {
+    if (!state.Service?.network?.repos?.active?.ghVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
     await createPrePullRequest({
@@ -140,27 +138,27 @@ export default function PageActions({
       issueGithubID,
       title: prTitle,
       description: prDescription,
-      username: user?.login,
+      username: state.currentUser?.login,
       branch,
-      wallet: wallet.address
-    }).then(({ bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid }) => {
+      wallet: state.currentUser.walletAddress
+    }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
       pullRequestPayload = {
         repoId,
         issueGithubId: issueGithubID,
         bountyId,
         issueCid: originCID,
         pullRequestGithubId: cid,
-        customNetworkName: activeNetwork.name,
+        customNetworkName: state.Service?.network?.lastVisited,
         creator: userRepo.split("/")[0],
         userBranch,
         userRepo,
-        wallet: wallet.address
+        wallet: state.currentUser.walletAddress
       };
 
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
       .then(txInfo => {
-        return processEvent("pull-request", "created", activeNetwork?.name, {
+        return processEvent("pull-request", "created", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber
         });
       })
@@ -172,7 +170,7 @@ export default function PageActions({
           content: t("pull-request:actions.create.success")
         }));
 
-        return updateBountyData();
+        return updateBountyData(true, 'both');
       })
       .catch((err) => {
         if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
@@ -195,14 +193,14 @@ export default function PageActions({
   }
 
   async function handleStartWorking() {
-    if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
+    if (!state.Service?.network?.repos?.active?.ghVisibility) return setShowGHModal(true)
     setIsExecuting(true);
 
     startWorking({
-      issueId: networkIssue?.cid, 
-      githubLogin: user?.login, 
-      networkName: activeNetwork?.name, 
-      wallet: wallet.address
+      issueId: state.currentBounty?.chainData?.cid,
+      githubLogin: state.currentUser?.login,
+      networkName: state.Service?.network?.active?.name,
+      wallet: state.currentUser.walletAddress
     })
       .then((response) => {
         dispatch(addToast({
@@ -212,8 +210,7 @@ export default function PageActions({
         }));
 
         addNewComment(response.data);
-
-        return updateBountyData();
+        return updateBountyData(true, 'database');
       })
       .then(() => setIsExecuting(false))
       .catch((error) => {
@@ -229,26 +226,26 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (isWalletAndGHConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+    if (isGithubConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
       return (
         <GithubLink
-          repoId={String(repoId)}
-          forcePath={activeIssue?.repository?.githubPath}
+          forcePath={state.currentBounty?.data?.repository?.githubPath}
           hrefPath="fork"
           color="primary"
         >
-          <Translation label="actions.fork-repository" />
+          <Translation label="actions.fork-repository"/>
         </GithubLink>);
   }
 
   function renderStartWorkingButton() {
-    if (isWalletAndGHConnected && 
-        !isBountyInDraft && 
-        isBountyOpen && 
-        !isWorkingOnBounty && 
+    if (isWalletConnected && 
+        isGithubConnected &&
+        !isBountyInDraft &&
+        isBountyOpen &&
+        !isWorkingOnBounty &&
         isRepoForked &&
         isStateToWorking)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"
@@ -258,7 +255,7 @@ export default function PageActions({
             isLoading={isExecuting}
           >
             <span>
-              <Translation ns="bounty" label="actions.start-working.title" />
+              <Translation ns="bounty" label="actions.start-working.title"/>
             </span>
           </Button>
         </ReadOnlyButtonWrapper>
@@ -266,52 +263,51 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (isWalletAndGHConnected && 
-        isBountyOpen && 
-        !isBountyInDraft && 
-        isWorkingOnBounty && 
+    if (isWalletConnected && 
+        isGithubConnected &&
+        isBountyOpen &&
+        !isBountyInDraft &&
+        isWorkingOnBounty &&
         isRepoForked)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
             onClick={() => setShowPRModal(true)}
-            disabled={!user?.login || !wallet?.address}
+            disabled={!state.currentUser?.login || !isWalletConnected}
           >
-            <Translation ns="pull-request" label="actions.create.title" />
+            <Translation ns="pull-request" label="actions.create.title"/>
           </Button>
         </ReadOnlyButtonWrapper>
       );
   }
 
   function renderHardCancelButton() {
-    if (wallet?.isNetworkGovernor && isCancelable)
+    if (state.Service?.network?.active?.isGovernor && isCancelable)
       return (
         <ReadOnlyButtonWrapper>
           <Button
             color="danger"
             className="read-only-button me-1"
-            onClick={()=>setShowHardCancelModal(true)}
+            onClick={() => setShowHardCancelModal(true)}
           >
-            <Translation ns="common" label="actions.cancel" />
+            <Translation ns="common" label="actions.cancel"/>
           </Button>
         </ReadOnlyButtonWrapper>
       );
   }
 
   function renderCancelButton() {
-    const isDraftOrNotFunded = activeIssue?.fundingAmount.isGreaterThan(BigNumber(0))
-    ? !isBountyFunded
-    : isBountyInDraft;
-    
+    const isDraftOrNotFunded = isFundingRequest ? !isBountyFunded : isBountyInDraft;
+
     if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
             onClick={handleRedeem}
-          >
-            <Translation ns="common" label="actions.cancel" />
+          > 
+            <Translation ns="common" label="actions.cancel"/>
           </Button>
         </ReadOnlyButtonWrapper>
       );
@@ -319,13 +315,13 @@ export default function PageActions({
 
   function renderUpdateAmountButton() {
     if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
             onClick={() => setShowUpdateAmount(true)}
           >
-            <Translation ns="bounty" label="actions.update-amount" />
+            <Translation ns="bounty" label="actions.update-amount"/>
           </Button>
         </ReadOnlyButtonWrapper>
       );
@@ -333,21 +329,24 @@ export default function PageActions({
 
   function renderCreateProposalButton() {
     if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
-      return(
-        <NewProposal amountTotal={networkIssue?.tokenAmount} pullRequests={activeIssue?.pullRequests} />
+      return (
+        <NewProposal amountTotal={state.currentBounty?.chainData?.tokenAmount}
+                     pullRequests={state.currentBounty?.data?.pullRequests}/>
       );
   }
 
   function renderViewPullRequestLink() {
-    if (isWalletAndGHConnected && !isBountyInDraft && hasOpenPullRequest)
-      return(
+    if (isWalletConnected && 
+        isGithubConnected &&
+        !isBountyInDraft &&
+        hasOpenPullRequest)
+      return (
         <GithubLink
-          repoId={String(repoId)}
-          forcePath={activeIssue?.repository?.githubPath}
-          hrefPath={`pull?q=base:${activeIssue?.branch}`}
+          forcePath={state.currentBounty?.data?.repository?.githubPath}
+          hrefPath={`pull?q=base:${state.currentBounty?.data?.branch}`}
           color="primary"
         >
-          <Translation ns="pull-request" label="actions.view" />
+          <Translation ns="pull-request" label="actions.view"/>
         </GithubLink>
       );
   }
@@ -362,8 +361,9 @@ export default function PageActions({
             </h4>
 
             <div className="d-flex flex-row align-items-center gap-20">
-              {!isMobile && 
-              <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />}
+              {!isMobile &&
+                <ForksAvatars forks={state.Service?.network?.repos?.active?.forks || []}
+                              repositoryPath={state.currentBounty?.data?.repository?.githubPath}/>}
 
               {renderHardCancelButton()}
 
@@ -380,16 +380,15 @@ export default function PageActions({
               {renderCreateProposalButton()}
 
               {renderViewPullRequestLink()}
-              
-              {!user?.login && wallet?.address && <ConnectGithub size="sm"/>}
+
+              {!isGithubConnected && isWalletConnected && <ConnectGithub size="sm"/>}
 
               <GithubLink
-                repoId={String(repoId)}
-                onClick={!activeRepo?.hasGhVisibility ? () => setShowGHModal(true) : null}
-                forcePath={activeIssue?.repository?.githubPath}
-                hrefPath={`${(activeIssue?.state?.toLowerCase() === "pull request" && "pull") ||
-                  "issues"
-                  }/${issueGithubID || ""}`}
+                onClick={!state.Service?.network?.repos?.active?.ghVisibility ? () => setShowGHModal(true) : null}
+                forcePath={state.currentBounty?.data?.repository?.githubPath}
+                hrefPath={`${(state.currentBounty?.data?.state?.toLowerCase() === "pull request" && "pull") ||
+                "issues"
+                }/${issueGithubID || ""}`}
               >
                 {t("actions.view-on-github")}
               </GithubLink>
@@ -398,28 +397,30 @@ export default function PageActions({
         </div>
       </div>
 
-      <CreatePullRequestModal
-        show={showPRModal}
-        title={activeIssue?.title}
-        description={activeIssue?.body}
-        onConfirm={handlePullrequest}
-        repo={
-          (user?.login &&
-            activeIssue?.repository?.githubPath) &&
-          activeIssue?.repository?.githubPath ||
-          ""
-        }
-        onCloseClick={() => setShowPRModal(false)}
-      />
+      <BountyEffectsProvider>
+        <>
+          <CreatePullRequestModal
+            show={showPRModal}
+            title={state.currentBounty?.data?.title}
+            description={state.currentBounty?.data?.body}
+            onConfirm={handlePullrequest}
+            repo={
+              (state.currentUser?.login &&
+                state.currentBounty?.data?.repository?.githubPath) &&
+              state.currentBounty?.data?.repository?.githubPath ||
+              ""
+            }
+            onCloseClick={() => setShowPRModal(false)}
+          />
 
-      <UpdateBountyAmountModal
-        show={showUpdateAmount}
-        repoId={repoId}
-        transactionalAddress={networkIssue?.transactional}
-        bountyId={networkIssue?.id}
-        ghId={activeIssue?.githubId}
-        handleClose={() => setShowUpdateAmount(false)}
-      />
+          <UpdateBountyAmountModal
+            show={showUpdateAmount}
+            transactionalAddress={state.currentBounty?.chainData?.transactional}
+            bountyId={state.currentBounty?.chainData?.id}
+            handleClose={() => setShowUpdateAmount(false)}
+          />
+        </>
+      </BountyEffectsProvider>
 
       <Modal
         title={t("modals.gh-access.title")}
@@ -428,9 +429,9 @@ export default function PageActions({
         okLabel={t("actions.close")}
         onOkClick={() => setShowGHModal(false)}
       >
-        <h5 className="text-center"><Translation ns="common" label="modals.gh-access.content" /></h5>
+        <h5 className="text-center"><Translation ns="common" label="modals.gh-access.content"/></h5>
       </Modal>
-      
+
       <Modal
         title={t("modals.hard-cancel.title")}
         centerTitle
@@ -440,7 +441,7 @@ export default function PageActions({
         okLabel={t("actions.continue")}
         onOkClick={handleHardCancel}
       >
-        <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content" /></h5>
+        <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content"/></h5>
       </Modal>
     </div>
   );
