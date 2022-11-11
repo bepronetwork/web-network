@@ -241,7 +241,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         const tmpParticipants = participantsPr.filter(({ address }) => !!address);
         setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
         setCurrentGithubId(githubId);
-        setParticipants([])
+        // setParticipants([])
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
@@ -419,7 +419,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         </p>
         <ReactSelect
           id="pullRequestSelect"
-          isDisabled={participants.length === 0}
+          // isDisabled={participants.length === 0}
           components={{
             Option: SelectOptionComponent,
             ValueContainer: SelectValueComponent
