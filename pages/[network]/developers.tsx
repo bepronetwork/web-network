@@ -13,7 +13,8 @@ import PageHero, {InfosHero} from "components/page-hero";
 import useApi from "x-hooks/use-api";
 
 import {useAppState} from "../../contexts/app-state";
-import {BountyProvider, useBounty} from "../../x-hooks/use-bounty";
+import {useBounty} from "../../x-hooks/use-bounty";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 
 export default function PageDevelopers() {
@@ -78,14 +79,14 @@ export default function PageDevelopers() {
   }, [state.Service?.active?.network?.contractAddress, state.Service?.network]);
 
   return (
-    <BountyProvider>
+    <BountyEffectsProvider>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
         infos={infos}
       />
       <ListIssues />
-    </BountyProvider>
+    </BountyEffectsProvider>
   );
 }
 

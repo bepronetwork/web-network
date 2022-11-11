@@ -21,20 +21,16 @@ import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
 import {IssueData, pullRequest} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
-import { Proposal } from "interfaces/proposal";
+
 import { BountyExtended, ProposalExtended } from "interfaces/bounty";
-
-
+import {BountyEffectsContext} from "../contexts/bounty-effects";
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
-const _context = {};
-
-export const BountyContext = createContext(_context);
-export const BountyProvider = ({children}) => <BountyContext.Provider value={_context} children={children} />
 
 export function useBounty() {
-  if (!useContext(BountyContext))
-    throw new Error(`useBounty not inside BountyContext`);
+
+  if (!useContext(BountyEffectsContext))
+    throw new Error(`useBounty() depends on <BountyEffectsProvider />`)
 
   const {state, dispatch} = useAppState();
 
@@ -217,13 +213,6 @@ export function useBounty() {
         return;
       })
   }
-
-  useEffect(getDatabaseBounty, [state.Service?.network?.active, query?.id, query?.repoId]);
-  useEffect(getChainBounty, [state.Service?.active, state.Service?.network, state.currentBounty?.data?.contractId])
-
-  useEffect(() => {
-    console.log(`useBounty() started`);
-  }, [])
 
   return {
     getExtendedProposalsForCurrentBounty,

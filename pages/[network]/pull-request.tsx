@@ -27,8 +27,9 @@ import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import {BountyProvider, useBounty} from "x-hooks/use-bounty";
+import {useBounty} from "x-hooks/use-bounty";
 import {useNetwork} from "x-hooks/use-network";
+import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PullRequestPage() {
   const {getExtendedPullRequestsForCurrentBounty} = useBounty();
@@ -210,7 +211,7 @@ export default function PullRequestPage() {
   }, [review, pullRequest, state.currentUser]);
 
   return (
-    <BountyProvider>
+    <BountyEffectsProvider>
       <PullRequestHero currentPullRequest={pullRequest}/>
 
       <CustomContainer>
@@ -309,7 +310,7 @@ export default function PullRequestPage() {
       />
 
       <ConnectWalletButton asModal={true}/>
-    </BountyProvider>
+    </BountyEffectsProvider>
   );
 }
 

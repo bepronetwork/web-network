@@ -172,17 +172,21 @@ export function useNetwork() {
       })
   }
 
-  useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
-  useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active]);
-  useEffect(loadNetworkTimes, [state.Service?.active?.network]);
-  useEffect(loadNetworkAmounts, [state.Service?.active?.network]);
-  useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active]);
+  // useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
+  // useEffect(loadNetworkToken, [state.Service?.active, state?.Service?.network?.active]);
+  // useEffect(loadNetworkTimes, [state.Service?.active?.network]);
+  // useEffect(loadNetworkAmounts, [state.Service?.active?.network]);
+  // useEffect(loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active]);
 
 
   return {
     updateActiveNetwork,
     getURLWithNetwork,
     clearNetworkFromStorage,
+    loadNetworkToken,
+    loadNetworkTimes,
+    loadNetworkAmounts,
+    loadNetworkAllowedTokens
   }
 
 }

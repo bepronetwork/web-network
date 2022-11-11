@@ -79,6 +79,7 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
+    console.debug(`useDao() start`, !(!state.Settings?.urls || !!state.Service?.active || !!state.Service?.starting));
     if (!state.Settings?.urls || !!state.Service?.active || !!state.Service?.starting)
       return;
 
@@ -112,7 +113,6 @@ export function useDao() {
       })
   }
 
-  useEffect(start, [state.Settings]);
 
   return {
     changeNetwork,
