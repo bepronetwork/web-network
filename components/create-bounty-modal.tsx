@@ -99,9 +99,6 @@ export default function CreateBountyModal() {
     },
   } = useAppState();
 
-  if(!showCreateBounty)
-    return <></>
-
   const steps = [
     t("bounty:steps.details"),
     t("bounty:steps.bounty"),
@@ -543,33 +540,40 @@ export default function CreateBountyModal() {
   }
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     if (transactionalToken?.address) transactionalERC20.setAddress(transactionalToken.address);
   }, [transactionalToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
   }, [rewardToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     setIssueAmount(ZeroNumberFormatValues);
-  }, [transactionalToken]);
+  }, [transactionalToken, showCreateBounty]);
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     setRewardAmount(ZeroNumberFormatValues);
-  }, [rewardToken]);
+  }, [rewardToken, showCreateBounty]);
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     setProgressBar();
-  }, [currentSection]);
+  }, [currentSection, showCreateBounty]);
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     if(customTokens?.length === 1) {
       setTransactionalToken(customTokens[0])
       setRewardToken(customTokens[0])
     }
-  }, [customTokens]);
+  }, [customTokens, showCreateBounty]);
 
   useEffect(() => {
+    if(!showCreateBounty) return;
     let approved = true
 
     if (isBountyType)
@@ -594,9 +598,13 @@ export default function CreateBountyModal() {
   }, [Service?.network?.active?.tokens, showCreateBounty]);
 
   useEffect(()=>{
+    if(!showCreateBounty) return;
     transactionalERC20.updateAllowanceAndBalance();
     rewardERC20.updateAllowanceAndBalance();
   },[showCreateBounty])
+
+  if(!showCreateBounty)
+    return <></>
 
   if (showCreateBounty && !currentUser?.walletAddress)
     return <ConnectWalletButton asModal={true} />;
