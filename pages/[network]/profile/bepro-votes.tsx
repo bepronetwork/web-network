@@ -75,18 +75,24 @@ export default function BeproVotes() {
         />
 
         <Row className="mt-4 mb-4">
-          <OraclesActions wallet={{
-            address: state.currentUser?.walletAddress,
-            balance: state.currentUser?.balance,
-            isCouncil: state.Service?.network?.active?.isCouncil,
-            isNetworkGovernor: state.Service?.network?.active?.isGovernor}}
-                          updateWalletBalance={() => updateWalletBalance(true) } />
+          <OraclesActions 
+            wallet={{
+              address: state.currentUser?.walletAddress,
+              balance: state.currentUser?.balance,
+              isCouncil: state.Service?.network?.active?.isCouncil,
+              isNetworkGovernor: state.Service?.network?.active?.isGovernor
+            }}
+            updateWalletBalance={() => updateWalletBalance(true) }
+          />
 
-          <OraclesDelegate wallet={{
-            address: state.currentUser?.walletAddress,
-            balance: state.currentUser?.balance,
-            isCouncil: state.Service?.network?.active?.isCouncil,
-            isNetworkGovernor: state.Service?.network?.active?.isGovernor}} />
+          <OraclesDelegate 
+            wallet={{
+              address: state.currentUser?.walletAddress,
+              balance: state.currentUser?.balance,
+              isCouncil: state.Service?.network?.active?.isCouncil,
+              isNetworkGovernor: state.Service?.network?.active?.isGovernor
+            }}
+          />
         </Row>
 
         <Row>
