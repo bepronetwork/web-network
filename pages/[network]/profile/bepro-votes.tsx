@@ -92,6 +92,7 @@ export default function BeproVotes() {
               isCouncil: state.Service?.network?.active?.isCouncil,
               isNetworkGovernor: state.Service?.network?.active?.isGovernor
             }}
+            updateWalletBalance={() => updateWalletBalance(true) }
           />
         </Row>
 
