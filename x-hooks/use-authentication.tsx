@@ -133,7 +133,7 @@ export function useAuthentication() {
   }
 
   function listenToAccountsChanged() {
-    if (!state.Service || window?.ethereum?.listenerCount(`accountsChanged`) > 0)
+    if (!state.Service)
       return;
 
     window.ethereum.on(`accountsChanged`, () => {
