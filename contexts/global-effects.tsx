@@ -43,7 +43,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.listenToAccountsChanged, [state.Service]);
   useEffect(auth.updateWalletBalance, [state.currentUser?.walletAddress]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
-  useEffect(network.updateActiveNetwork, [query?.network, state.Settings, state.Service]);
+  useEffect(network.updateActiveNetwork, [state?.Service?.active?.network?.contractAddress, query?.network, state.Settings, state.Service]);
   useEffect(network.loadNetworkToken, [state?.Service?.active?.network]);
   useEffect(network.loadNetworkTimes, [state.Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [state.Service?.active?.network]);

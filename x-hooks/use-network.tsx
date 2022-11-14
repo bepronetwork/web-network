@@ -47,7 +47,6 @@ export function useNetwork() {
         (storage.value && networkName && lastNetworkDataStorage.value && storage.value === networkName)) {
       if (lastNetworkDataStorage.value)
         dispatch(changeActiveNetwork(lastNetworkDataStorage.value));
-
       return;
     }
 

@@ -194,10 +194,17 @@ function OraclesActions({
   }
 
   function getMaxAmmount(): string {
-    if (action === t("my-oracles:actions.lock.label")) 
-      return wallet?.balance?.bepro?.toFixed();
+    const amount = action === t("my-oracles:actions.lock.label")
+      ? wallet?.balance?.bepro?.toFixed()
+      : wallet?.balance?.oracles?.locked?.toFixed();
 
-    return wallet?.balance?.oracles?.locked?.toFixed();
+    if (!amount)
+      return '0';
+
+    if (amount?.split('.')?.[0]?.length > 18)
+      return formatNumberToNScale(amount);
+
+    return amount;
   }
 
   function setMaxAmmount() {

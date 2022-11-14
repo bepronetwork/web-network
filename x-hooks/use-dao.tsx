@@ -38,6 +38,7 @@ export function useDao() {
    * @param networkAddress
    */
   function changeNetwork(networkAddress: string) {
+    console.log(`state.Service?.active`, state.Service?.active);
     if (!state.Service?.active || !networkAddress)
       return;
 
@@ -51,11 +52,12 @@ export function useDao() {
     service
         .loadNetwork(networkAddress)
         .then(started => {
+          console.log(`loadNetwork`, started, service);
           if (!started) {
             console.error(`Failed to load network`, networkAddress);
             return;
           }
-          dispatch(changeActiveDAO(service));
+          dispatch(changeActiveDAO(Object.assign({},service)));
         })
         .catch(error => {
           console.error(`Error loading network`, error);
@@ -75,6 +77,8 @@ export function useDao() {
       return;
 
     dispatch(changeStarting(true));
+
+
 
     const {urls: {web3Provider: web3Host}, contracts: {networkRegistry: registryAddress}} =
       state.Settings;
