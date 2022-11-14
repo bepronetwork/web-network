@@ -49,19 +49,6 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
-
-    await queryInterface.insert(Network, "networks", {
-      creatorAddress:
-        `${process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS}`.toLowerCase(),
-      name: `${process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME}`,
-      description: `${process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME}`,
-      colors: null,
-      networkAddress: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}`,
-      logoIcon: "QmcyPAs2HX84bQmvuw4NiG1P4qoqSospmx9kaYhc9wvLS9",
-      fullLogo: "QmeeWrrxXvHxFGEJUAUHRFQJejgNtArP5Eya5kwecHZjR1",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("networks");
