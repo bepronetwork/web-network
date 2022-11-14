@@ -233,7 +233,7 @@ export default function TokensSettings({
             ? t("custom-network:config-tokens-registry")
             : t("custom-network:config-tokens")}
         </span>
-        <Col xs={8}>
+        <Col xs={7}>
           <MultipleTokensDropdown
             key="select-multi-transactional"
             label={t("select-multiple.allowed-transactional-tokens")}
@@ -246,20 +246,14 @@ export default function TokensSettings({
             isloading={transansactionLoading}
           />
         </Col>
+        <Col xs={4} className="mt-4 pt-1">{renderButtons(true)}</Col>
       </Row>
-      {isGovernorRegistry && (
-        <>
-          <Row>
-            <Col xs={6}>{renderButtons(true)}</Col>
-          </Row>
-          <div className="mb-3">
-            <WarningSpan
-              text={t("custom-network:steps.network-settings.fields.other-settings.warning-add-remove-allowed-tokens")}
-            />
-          </div>
-        </>
-      )}
-      <Row>
+      <div className="mb-3">
+        <WarningSpan
+          text={t("custom-network:steps.network-settings.fields.other-settings.warning-add-remove-allowed-tokens")}
+        />
+      </div>
+      <Row className="mb-2">
         <Col xs={8}>
           <MultipleTokensDropdown
             key="select-multi-reward"
@@ -272,12 +266,8 @@ export default function TokensSettings({
             changeSelectedTokens={changeSelectedRewardTokens}
           />
         </Col>
+        <Col xs={4} className="mt-4 pt-1">{renderButtons(false)}</Col>
       </Row>
-      {isGovernorRegistry && (
-        <Row className="mb-4">
-          <Col xs={6}>{renderButtons(false)}</Col>
-        </Row>
-      )}
     </>
   );
 }
