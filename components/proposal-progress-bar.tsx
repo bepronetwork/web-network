@@ -8,12 +8,13 @@ import {useAppState} from "../contexts/app-state";
 import Translation from "./translation";
 
 export default function ProposalProgressBar({
-  isDisputed = null,
-  issueDisputeAmount = 0,
-  isFinished = false,
-  isMerged = false,
-  refused = false
-}) {
+                                              isDisputed = null,
+                                              issueDisputeAmount = 0,
+                                              isFinished = false,
+                                              isMerged = false,
+                                              refused = false,
+                                              disputeMaxAmount = 0,
+                                            }) {
   const { t } = useTranslation("proposal");
 
   const {state} = useAppState();
@@ -21,6 +22,8 @@ export default function ProposalProgressBar({
   const [issueState, setIssueState] = useState<string>("");
   const [issueColor, setIssueColor] = useState<string>("");
   const [percentage, setPercentage] = useState<number>(0);
+
+  const [_columns, setColumns] = useState<number[]>([]);
 
   const columns = [0, 1, 2, 3, 3];
 
@@ -91,6 +94,14 @@ export default function ProposalProgressBar({
     );
   }
 
+  function createColumn() {
+    if (!disputeMaxAmount)
+      setColumns([0,1,2,3,3]);
+    else {
+      setColumns(Array(4).map((v,i) => i * disputeMaxAmount).concat(disputeMaxAmount))
+    }
+  }
+
   useEffect(loadDisputeState, [
     state.currentUser?.balance?.staked,
     issueDisputeAmount,
@@ -99,6 +110,8 @@ export default function ProposalProgressBar({
     refused,
     isMerged
   ]);
+
+  useEffect(createColumn, [disputeMaxAmount]);
 
   return (
     <>
@@ -125,9 +138,8 @@ export default function ProposalProgressBar({
             <div
               className={`progress-bar bg-${issueColor}`}
               role="progressbar"
-              style={{ width: `${toRepresentationPercent(percentage)}%` }}
-            >
-              {columns.map(renderColumn)}
+              style={{ width: `${toRepresentationPercent(percentage)}%` }}>
+              {_columns.map(renderColumn)}
             </div>
           </div>
         </div>
