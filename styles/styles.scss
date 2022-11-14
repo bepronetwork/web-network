@@ -181,6 +181,7 @@ li {
       border-radius: 8px;
       border: 1px solid $light-gray;
       background-color: $bg-shadow;
+      z-index: 4;
 
       &-list {
         padding-top: 0;
