@@ -1,7 +1,5 @@
 "use strict";
 
-const { Network } = require("../models/network.model");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("networks", {
