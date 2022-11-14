@@ -100,7 +100,7 @@ export default function ProposalProgressBar({
     else {
       const incrementor = +(disputeMaxAmount / 3).toFixed(2);
       const dynamicColumns = [...Array(4)].map((_, i) => +(i * incrementor).toFixed(2));
-      setColumns([0, ...dynamicColumns, disputeMaxAmount]);
+      setColumns([...dynamicColumns, disputeMaxAmount]);
     }
   }
 
