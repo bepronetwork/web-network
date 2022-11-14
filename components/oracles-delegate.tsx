@@ -63,7 +63,7 @@ function OraclesDelegate({
       clearTimeout(debounce.current)
     
       debounce.current = setTimeout(() => {
-        const isValid = Service.active.web3Connection.utils.isAddress(params.target.value)
+        const isValid = Service.active.isAddress(params.target.value)
         console.log(isValid)
         if(!isValid) setAddressError(t("my-oracles:errors.invalid-wallet"));
       }, 500)
