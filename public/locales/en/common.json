@@ -282,6 +282,7 @@
     }
   },
   "forms": {
+    "require": "Field is required",
     "select-placeholder": "Select...",
     "create-pull-request": {
       "title": {

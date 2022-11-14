@@ -144,8 +144,8 @@ export default function CreatePullRequestModal({
       <div className="container">
         <div>
           <div className="form-group">
-            <label className="caption-small mb-2 text-gray">
-              {t("forms.create-pull-request.title.label")}
+            <label className="caption-small mb-2 text-gray" title={t('forms.required')}>
+              {t("forms.create-pull-request.title.label")} *
             </label>
             <input
               value={title}
@@ -158,8 +158,8 @@ export default function CreatePullRequestModal({
         </div>
         <div>
           <div className="form-group">
-            <label className="caption-small mb-2 text-gray">
-              {t("forms.create-pull-request.description.label")}
+            <label className="caption-small mb-2 text-gray" title={t('forms.required')}>
+              {t("forms.create-pull-request.description.label")} *
             </label>
             <textarea
               value={description}
