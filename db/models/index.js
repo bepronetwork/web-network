@@ -14,6 +14,8 @@ import NetworkTokens from "./network-tokens.model";
 import UserPayments from "./user-payments";
 import Settings from "./settings.model";
 import Benefactors from './benefactor.model';
+import Curators from './curator-model'
+import Disputes from './dispute-model';
 
 const Database = { sequelize: null };
 
@@ -35,6 +37,8 @@ Database.networkTokens = NetworkTokens;
 Database.benefactor = Benefactors;
 Database.userPayments = UserPayments;
 Database.settings = Settings;
+Database.curator = Curators;
+Database.dispute = Disputes;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {
