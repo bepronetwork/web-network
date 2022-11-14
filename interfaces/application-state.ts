@@ -40,6 +40,7 @@ export interface NetworkAmounts {
   proposerFeeShare: string | number;
   percentageNeededForDispute: string | number;
   oracleExchangeRate: string | number;
+  closeFee: string | number;
 }
 
 export interface ServiceNetwork {

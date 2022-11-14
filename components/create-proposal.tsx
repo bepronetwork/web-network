@@ -24,6 +24,7 @@ import useOctokit from "x-hooks/use-octokit";
 
 import {useAppState} from "../contexts/app-state";
 import {useBounty} from "../x-hooks/use-bounty";
+import BigNumber from "bignumber.js";
 
 
 interface participants {
@@ -142,6 +143,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   function handleCheckDistrib(obj: object) {
     const currentAmount = sumObj(obj);
 
+    console.log(`handleCheckDistribution`, currentAmount);
+
     if (currentAmount === 100) {
       const { id } = pullRequests.find((data) => data.githubId === currentGithubId);
 
@@ -177,18 +180,31 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     }
 
     if (currentAmount === 100) {
-      participants.map((item) => {
-        const realValue = (amountTotal * obj[item.githubHandle]) / 100;
-        if (
-          amountTotal < participants.length &&
-          realValue < 1 &&
-          realValue !== 0 &&
-          realValue < amountTotal
-        ) {
+      const bountyAmount = BigNumber(amountTotal);
+      const proposerFeeShare = BigNumber(state.Service?.network?.amounts?.proposerFeeShare || 0);
+      const mergeCreator = BigNumber(state.Service?.network?.amounts?.mergeCreatorFeeShare || 0);
+      const closeFee = BigNumber(state.Service.network.amounts?.closeFee || 0);
+      const subtract =
+        [proposerFeeShare, mergeCreator, closeFee]
+          .reduce((p, c) => p.plus(c.multipliedBy(bountyAmount).dividedBy(100)), BigNumber(0));
+
+      const availableAmount = bountyAmount.minus(subtract);
+
+      for (let i = 0; i < participants.length; i++) {
+        const githubHandle = participants[i].githubHandle;
+        const proposalValue = BigNumber(obj[githubHandle]);
+
+        if (!obj[githubHandle])
+          continue;
+
+        const value = proposalValue.multipliedBy(availableAmount).dividedBy(100);
+
+        if (value.lt(1e-15)) {
           handleInputColor("error");
           setShowExceptionalMessage(true);
+          i = participants.length;
         }
-      });
+      }
     }
   }
 
