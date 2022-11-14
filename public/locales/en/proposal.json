@@ -17,7 +17,8 @@
     "distribution-must-be-100": "Distribution Must be 100%",
     "no-proposals-created": "There are no proposals created.",
     "distribution-cant-done": "This distribution can't be done try another one.",
-    "proposal-refused": "Proposal Refused"
+    "proposal-refused": "Proposal Refused",
+    "in-disputable-time": "{{time}} before proposal can be merged."
   },
   "errors": {
     "not-found": "No proposals found",
