@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import { components as RSComponents, ValueContainerProps } from "react-select";
+import { components as RSComponents, SingleValueProps } from "react-select";
 
 import clsx from "clsx";
 import {useTranslation} from "next-i18next";
@@ -40,14 +40,11 @@ interface SameProposal {
   }[];
 }
 
-function SelectValueComponent({children, ...rest }: ValueContainerProps<any>) {
-  const data = rest.getValue()[0];
+function SingleValue (props: SingleValueProps<any>) {
+  const data = props.getValue()[0];
   return (
-    <RSComponents.ValueContainer
-      className="d-flex "
-      {...rest}
-    >
-    <div className="react-select__single-value proposal__select-options d-flex align-items-center p-1">
+  <RSComponents.SingleValue {...props}>
+    <div className="d-flex align-items-center p-1">
       <Avatar userLogin={data?.githubLogin} />
       <span className="ml-1 text-nowrap">{data?.label}</span>
       <div className="ms-2">
@@ -58,13 +55,8 @@ function SelectValueComponent({children, ...rest }: ValueContainerProps<any>) {
         />
       </div>
       </div>
-      {/** 
-       * Children 1 is mandatory to works correctly.
-      */}
-      {children[1]}
-    </RSComponents.ValueContainer>
-  );
-}
+  </RSComponents.SingleValue>
+  )}
 
 function SelectOptionComponent({ innerProps, innerRef, data }) {
   return (
@@ -424,10 +416,10 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         </p>
         <ReactSelect
           id="pullRequestSelect"
-          // isDisabled={participants.length === 0}
+          isDisabled={participants.length === 0}
           components={{
             Option: SelectOptionComponent,
-            ValueContainer: SelectValueComponent
+            SingleValue
           }}
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
