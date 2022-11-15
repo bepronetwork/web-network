@@ -98,8 +98,10 @@ export default function ProposalProgressBar({
     if (!disputeMaxAmount)
       setColumns([0,1,2,3,3]);
     else {
-      const incrementor = +(disputeMaxAmount / 3).toString().match(new RegExp('^-?\d+(?:\.\d{0,2})?'))?.[0] || 0; // eslint-disable-line
-      const dynamicColumns = [...Array(4)].map((_, i) => +(i * incrementor).toFixed(2).toString());
+
+      const floorIt = (value, zeroes = 10**2) => Math.floor(value * zeroes) / zeroes;
+      const incrementor = floorIt(disputeMaxAmount / 3);
+      const dynamicColumns = [...Array(4)].map((_, i) => floorIt(i * incrementor));
       setColumns([...dynamicColumns, disputeMaxAmount]);
     }
   }
