@@ -67,28 +67,29 @@ export default function ProposalProgressBar({
   }
 
   function renderColumn(dotLabel, index) {
-    const dotClass = `rounded-circle ${
-      !percentage || dotLabel > percentage ? "empty-dot" : `bg-${issueColor}`
-    }`;
+    const isLastColumn = index + 1 === _columns.length;
+
+    const dotClass = [
+      `rounded-circle`,
+      !percentage || dotLabel > percentage ? `empty-dot` : `bg-${issueColor}`
+    ].join(` `);
+
+    const captionClass = [
+      `caption mt-4 ms-1`,
+      isLastColumn ? `text-${issueColor}` : "text-white"
+    ].join(` `)
+
     const style = { left: index === 0 ? "1%" : `${index * 20}%` };
     const dotStyle = { width: "10px", height: "10px" };
-    const isLastColumn = index + 1 === columns.length;
+
+    const label = `${isLastColumn && `>` || ``} ${dotLabel}%`;
 
     return (
-      <div
-        key={`ppb-${index}`}
-        className="position-absolute d-flex align-items-center flex-column"
-        style={style}
-      >
+      <div key={`ppb-${index}`}
+           className="position-absolute d-flex align-items-center flex-column"
+           style={style}>
         <div className={dotClass} style={dotStyle}>
-          <div
-            className={`caption ${
-              isLastColumn ? `text-${issueColor}` : "text-white"
-            } mt-4 ms-1`}
-          >
-            {isLastColumn ? ">" : ""}
-            {dotLabel}%
-          </div>
+          <div className={captionClass}>{label}</div>
         </div>
       </div>
     );
@@ -96,14 +97,12 @@ export default function ProposalProgressBar({
 
   function createColumn() {
     if (!disputeMaxAmount)
-      setColumns([0,1,2,3,3]);
-    else {
+      return;
 
-      const floorIt = (value, zeroes = 10**2) => Math.floor(value * zeroes) / zeroes;
-      const incrementor = floorIt(disputeMaxAmount / 3);
-      const dynamicColumns = [...Array(4)].map((_, i) => floorIt(i * incrementor));
-      setColumns([...dynamicColumns, disputeMaxAmount]);
-    }
+    const floorIt = (value, zeroes = 10**2) => Math.floor(value * zeroes) / zeroes;
+    const incrementor = floorIt(disputeMaxAmount / 3);
+    const dynamicColumns = [...Array(4)].map((_, i) => floorIt(i * incrementor));
+    setColumns([...dynamicColumns, disputeMaxAmount]);
   }
 
   useEffect(loadDisputeState, [
@@ -136,18 +135,21 @@ export default function ProposalProgressBar({
           </div>
         </div>
       </div>
-      <div className="row">
-        <div className="ms-2 col-12 position-relative">
-          <div className={`progress bg-${issueColor}`}>
-            <div
-              className={`progress-bar bg-${issueColor}`}
-              role="progressbar"
-              style={{ width: `${toRepresentationPercent(percentage)}%` }}>
-              {_columns.map(renderColumn)}
+      {!_columns.length
+        ? ''
+        : <div className="row">
+          <div className="ms-2 col-12 position-relative">
+            <div className={`progress bg-${issueColor}`}>
+              <div
+                className={`progress-bar bg-${issueColor}`}
+                role="progressbar"
+                style={{ width: `${toRepresentationPercent(percentage)}%` }}>
+                {_columns.map(renderColumn)}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
     </>
   );
 }
