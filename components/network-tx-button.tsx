@@ -71,6 +71,8 @@ function networkTxButton({
 
   const { updateWalletBalance } = useAuthentication();
 
+  const isDelegateMethod = txMethod === "delegateOracles" ? true : false
+
   function checkForTxMethod() {
     if (!state.Service?.active || !state.currentUser) return;
 
@@ -105,8 +107,10 @@ function networkTxButton({
           }));
 
           if (answer.blockNumber)
-            processEvent("oracles","changed", state.Service?.network?.lastVisited, {fromBlock:answer.blockNumber})
-              .catch(console.debug);
+            processEvent("oracles",
+                         isDelegateMethod ? "transfer" : "changed",
+                         state.Service?.network?.lastVisited,
+              { fromBlock: answer.blockNumber }).catch(console.debug);
 
           dispatch(updateTx([parseTransaction(answer, tmpTransaction.payload[0] as SimpleBlockTransactionPayload)]));
         } else {
