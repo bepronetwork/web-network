@@ -4,12 +4,11 @@ import axios from "axios";
 import { getSettingsFromSessionStorage } from "helpers/settings";
 
 import { TokenInfo } from "interfaces/token";
+import {WinStorage} from "./win-storage";
 
 const settings = getSettingsFromSessionStorage();
 
-const COINGECKO_API = axios.create({
-  baseURL: settings?.currency?.api || "https://api.coingecko.com/api/v3"
-});
+const COINGECKO_API = axios.create({baseURL: "https://api.coingecko.com/api/v3"});
 
 const DEFAULT_TOKEN = settings?.currency?.defaultToken || "bepro-network";
 
@@ -57,7 +56,31 @@ const getCoinInfoByContract = async (contractAddress: string, asset_platform = "
   return info;
 };
 
+function getCoinList() {
+  const storage = new WinStorage('coingecko-list', 3600 * 60 * 1000);
+  if (storage.value)
+    return storage.value;
+  else
+    return COINGECKO_API.get(`/coins/list?include_platform=false`).then(value => storage.value = value.data);
+}
+
+async function getCoinPrice(search: string) {
+  const coins = await getCoinList();
+  const coinEntry = coins.find(({symbol}) => symbol === search.toLowerCase());
+
+  if (!coinEntry)
+    return 0;
+
+  const price = await COINGECKO_API.get(`/simple/price?ids=digitalprice&vs_currencies=eur`);
+
+  if (!price[search.toLowerCase()])
+    return 0;
+
+  return price[search.toLowerCase()].eur;
+}
+
 export {
   getCurrencyByToken,
-  getCoinInfoByContract
+  getCoinInfoByContract,
+  getCoinPrice
 };

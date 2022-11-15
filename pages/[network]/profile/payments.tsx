@@ -17,7 +17,7 @@ import {formatNumberToCurrency} from "helpers/formatNumber";
 
 import {Payment} from "interfaces/payments";
 
-import {getCoinInfoByContract} from "services/coingecko";
+import {getCoinInfoByContract, getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
@@ -63,15 +63,6 @@ export default function Payments() {
     });
   }
 
-  async function getCoinPrice(tokenAddress) {
-    return getCoinInfoByContract(tokenAddress)
-      .then((tokenInfo) => tokenInfo.prices.eur)
-      .catch((error) => {
-        console.log(error);
-        return undefined;
-      });
-  }
-
   useEffect(() => {
     if (!state.currentUser?.walletAddress || !state.Service?.network?.active?.name) return;
 
@@ -84,7 +75,7 @@ export default function Payments() {
     Promise.all(payments.map(async (payment) => ({
         tokenAddress: payment.issue.token.address,
         value: payment.ammount,
-        price: await getCoinPrice(payment.issue.token.address),
+        price: await getCoinPrice(payment.issue.token.symbol),
     }))).then((tokens) => {
       const totalConverted = tokens.reduce((acc, token) => acc + token.value * (token.price || 0),
                                            0);
