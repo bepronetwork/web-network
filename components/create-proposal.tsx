@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import { components as RSComponents, ValueContainerProps } from "react-select";
 
 import clsx from "clsx";
 import {useTranslation} from "next-i18next";
@@ -39,15 +40,14 @@ interface SameProposal {
   }[];
 }
 
-function SelectValueComponent({ innerProps, innerRef, ...rest }) {
+function SelectValueComponent({children, ...rest }: ValueContainerProps<any>) {
   const data = rest.getValue()[0];
-
   return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="proposal__select-options d-flex align-items-center text-center p-small p-1"
+    <RSComponents.ValueContainer
+      className="d-flex "
+      {...rest}
     >
+    <div className="react-select__single-value proposal__select-options d-flex align-items-center p-1">
       <Avatar userLogin={data?.githubLogin} />
       <span className="ml-1 text-nowrap">{data?.label}</span>
       <div className="ms-2">
@@ -57,7 +57,12 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }) {
           isDraft={data.isDraft}
         />
       </div>
-    </div>
+      </div>
+      {/** 
+       * Children 1 is mandatory to works correctly.
+      */}
+      {children[1]}
+    </RSComponents.ValueContainer>
   );
 }
 
@@ -419,7 +424,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         </p>
         <ReactSelect
           id="pullRequestSelect"
-          isDisabled={participants.length === 0}
+          // isDisabled={participants.length === 0}
           components={{
             Option: SelectOptionComponent,
             ValueContainer: SelectValueComponent
@@ -448,6 +453,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
+          isSearchable={false}
         />
           {renderDistribution()}
       </Modal>
