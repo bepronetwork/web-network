@@ -18,13 +18,9 @@ class Disputes extends Model {
              key: "id"
           }
         },
-        curatorId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-             model: "curator",
-             key: "id"
-         }
+        address: {
+          type: DataTypes.STRING,
+          allowNull: false
         },
         proposalId: {
           type: DataTypes.INTEGER,
@@ -51,10 +47,6 @@ class Disputes extends Model {
     this.belongsTo(models.mergeProposal, {
       foreignKey: "proposalId",
       sourceKey: "id"
-    });
-    this.belongsTo(models.curator, {
-        foreignKey: "curatorId",
-        sourceKey: "id"
     });
     this.belongsTo(models.issue, {
         foreignKey: "issueId",
