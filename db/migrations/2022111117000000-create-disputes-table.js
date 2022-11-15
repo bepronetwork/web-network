@@ -17,13 +17,9 @@ module.exports = {
           key: "id"
         }
       },
-      curatorId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "curators",
-          key: "id"
-        }
+      address: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       proposalId: {
         type: Sequelize.INTEGER,
