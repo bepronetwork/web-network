@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import { components as RSComponents, SingleValueProps } from "react-select";
 import Creatable from "react-select/creatable";
 
 import {useTranslation} from "next-i18next";
@@ -165,46 +166,36 @@ export default function TokensDropdown({
       </div>
     );
   }
-
-  function SelectValueComponent(props) {
-    const { getValue } = props;
-    
-    if (!getValue()[0]) return <>{props.children}</>;
-
-    const { name, tokenInfo, currentValue, symbol } = getValue()[0].value;
-
-    const currentValueFormatted = formatNumberToCurrency(currentValue);
-
+  function SingleValue (props: SingleValueProps<any>) {
+    const data = props.getValue()[0]?.value
     return (
-      <>
-        {props.children[0] !== null ? (
-          <>
-            <div className="flex-grow-0 proposal__select-options d-flex align-items-center text-center p-small p-1">
-              {props.children[1]}
-              {tokenInfo?.icon && (
-                <img
-                  src={tokenInfo.icon}
-                  width={14}
-                  height={14}
-                  className="mx-2"
-                />
-              )}
-              <span className={`${tokenInfo ? "mt-1" : "mx-2"}`}>
-                {tokenInfo ? tokenInfo.name : name}
-              </span>
-            </div>
-            <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              { showCurrencyValue && 
-                `${currentValueFormatted} ${tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}`}
-            </div>
-          </>
-        ) : (
-          props.children[1]
-        )}
-      </>
-    );
-  }
-
+    <RSComponents.SingleValue {...props}>
+     <div className="
+      cursor-pointer d-inline-flex 
+      align-items-center justify-content-between 
+      text-center w-100
+     ">
+     <div className="flex-grow-0 proposal__select-options d-flex align-items-center text-center p-small p-1">
+            {data.tokenInfo?.icon && (
+              <img
+                src={data.tokenInfo.icon}
+                width={14}
+                height={14}
+                className="mx-2"
+              />
+            )}
+            <span className={`${data.tokenInfo ? "mt-1" : "mx-2"}`}>
+              {data.tokenInfo ? data.tokenInfo.name : data.name}
+            </span>
+        </div>
+      <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
+        { showCurrencyValue && 
+            `${formatNumberToCurrency(data?.currentValue)} ${data.tokenInfo?.symbol && data.currentValue ? data.tokenInfo?.symbol : data.symbol}`}
+      </div>
+     </div>
+    </RSComponents.SingleValue>
+    )}
+    
   return (
     <div className="form-group">
       <label className="caption-small mb-2">{label || t("misc.token")}</label>
@@ -219,7 +210,7 @@ export default function TokensDropdown({
         value={option}
         components={{
           Option: SelectOptionComponent,
-          ValueContainer: SelectValueComponent,
+          SingleValue
         }}
         isDisabled={disabled}
       />
