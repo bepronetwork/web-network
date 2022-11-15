@@ -28,6 +28,7 @@ import useBepro from "x-hooks/use-bepro";
 
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 import {useBounty} from "../../x-hooks/use-bounty";
+import {ProposalDisputes} from "../../components/proposal-disputes";
 
 export default function PageProposal() {
   useBounty();
@@ -188,6 +189,7 @@ export default function PageProposal() {
             onRefuse={handleRefuse}
           />
         </div>
+        <ProposalDisputes />
       </CustomContainer>
 
       <NotMergeableModal
