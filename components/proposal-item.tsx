@@ -173,6 +173,7 @@ export default function ProposalItem({
                 pgClass={`${proposalState.contextColor}`}
                 value={networkProposal?.disputeWeight}
                 total={state.currentUser?.balance?.staked}
+                percentageNeeded={+state.Service?.network?.amounts?.percentageNeededForDispute}
                 textClass={`pb-2 text-${proposalState.contextColor}`}
               />
             </div>

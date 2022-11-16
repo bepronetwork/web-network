@@ -25,14 +25,12 @@ export default function ProposalProgressBar({
 
   const [_columns, setColumns] = useState<number[]>([]);
 
-  const columns = [0, 1, 2, 3, 3];
-
   function toPercent(value = 0, total = 0, decimals = 2) {
     return ((value / total) * 100).toFixed(decimals);
   }
 
-  function toRepresentationPercent(value = 0, total = 5) {
-    return value > disputeMaxAmount ? 100 : (value * 100) / total;
+  function toRepresentationPercent(value = 0) {
+    return value > disputeMaxAmount ? 100 : ((value * 100) / disputeMaxAmount) / 2; // 0->2 (inclusive) dot
   }
 
   function getStateColor() {
@@ -63,6 +61,7 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
+    console.log(disputeMaxAmount);
     setPercentage(+toPercent(issueDisputeAmount, state.currentUser?.balance?.staked?.toNumber()));
   }
 

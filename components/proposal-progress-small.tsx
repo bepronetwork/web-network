@@ -8,6 +8,7 @@ interface Options {
   pgClass: string;
   value: BigNumber;
   total: BigNumber;
+  percentageNeeded: number;
   textClass: string;
 }
 
@@ -15,6 +16,7 @@ export default function ProposalProgressSmall({
   pgClass = "",
   value = BigNumber(0),
   total = BigNumber(0),
+  percentageNeeded = 0,
   textClass
 }: Options) {
   const dotStyle = { width: "10px", height: "10px" };
@@ -49,7 +51,7 @@ export default function ProposalProgressSmall({
           <div
             style={{ ...dotStyle, right: 0 }}
             className={`rounded-circle position-absolute ${
-              percent.gte(3) ? `bg-${pgClass}` : "empty-dot"
+              percent.gte(percentageNeeded) ? `bg-${pgClass}` : "empty-dot"
             }`}
           />
         </div>
