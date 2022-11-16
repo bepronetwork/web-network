@@ -7,6 +7,7 @@ import {RepoInfo} from "../interfaces/repos-list";
 import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
+import {changeSpinners} from "../contexts/reducers/change-spinners";
 
 export function useRepos() {
   const {state, dispatch} = useAppState();
@@ -16,8 +17,10 @@ export function useRepos() {
   const {query} = useRouter();
 
   function loadRepos(force = false, name = state?.Service?.network?.lastVisited) {
-    if (!name)
+    if (!name || state.spinners?.repos)
       return;
+
+    dispatch(changeSpinners.update({repos: true}));
 
     const key = `bepro.network:repos:${name}`
     const storage = new WinStorage(key, 3600, `sessionStorage`);
@@ -38,6 +41,7 @@ export function useRepos() {
         storage.value = repos;
         dispatch(changeNetworkReposList(repos));
         dispatch(changeLoadState(false));
+        dispatch(changeSpinners.update({repos: false}))
       })
   }
 
