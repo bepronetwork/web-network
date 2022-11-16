@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 
 import OracleIcon from "assets/icons/oracle-icon";
 
@@ -28,6 +29,8 @@ export default function BeproVotes() {
   const {state} = useAppState();
 
   const { updateWalletBalance } = useAuthentication();
+
+  const { curatorAddress } = useRouter().query
 
   const oracleToken = {
     symbol: t("$oracles",   { token: state.Service?.network?.networkToken?.symbol }),
@@ -93,6 +96,7 @@ export default function BeproVotes() {
               isNetworkGovernor: state.Service?.network?.active?.isGovernor
             }}
             updateWalletBalance={() => updateWalletBalance(true) }
+            defaultAddress={curatorAddress?.toString()}
           />
         </Row>
 
