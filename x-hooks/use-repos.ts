@@ -8,6 +8,8 @@ import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 import {changeSpinners} from "../contexts/reducers/change-spinners";
+import {usePrevious} from "@restart/hooks";
+import {useRef} from "react";
 
 export function useRepos() {
   const {state, dispatch} = useAppState();
@@ -15,22 +17,35 @@ export function useRepos() {
   const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokit();
   const {getReposList} = useApi();
   const {query} = useRouter();
+  const lastNameRef = useRef(state?.Service?.network?.lastVisited)
+  const prevName = usePrevious(lastNameRef);
 
   function loadRepos(force = false, name = state?.Service?.network?.lastVisited) {
-    if (!name || state.spinners?.repos)
+    if (!name || state.spinners?.repos || prevName.current === name)
       return;
 
+    console.log(prevName.current, prevName, name);
+
     dispatch(changeSpinners.update({repos: true}));
+
+    console.log(`GET REPOS`);
 
     const key = `bepro.network:repos:${name}`
     const storage = new WinStorage(key, 3600, `sessionStorage`);
     if (storage.value && !force) {
-      dispatch(changeNetworkReposList(storage.value));
+      console.log(`REPOS USE STORAGE`);
+      if (!state.Service?.network?.repos?.list) {
+        console.log(`REPOS USE STORAGE DISPATCHED`);
+        dispatch(changeNetworkReposList(storage.value));
+      }
+
       return;
     }
 
     dispatch(changeLoadState(true));
-    
+
+    console.log(`REPOS LOADING`)
+
     getReposList(force, name)
       .then(repos => {
         if (!repos) {
@@ -42,6 +57,7 @@ export function useRepos() {
         dispatch(changeNetworkReposList(repos));
         dispatch(changeLoadState(false));
         dispatch(changeSpinners.update({repos: false}))
+        console.log(`GOT REPOS LIST FROM SOURCE`);
       })
   }
 
