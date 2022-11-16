@@ -20,11 +20,11 @@ export function useSettings() {
    * Load settings on useSettings() start only if `state.Settings` is empty
    * Reload settings on each session start
    */
-  function loadSettings() {
-    if (state.Settings)
+  function loadSettings(force?: boolean) {
+    if (state.Settings && !force)
       return;
 
-    if (storage.value) {
+    if (storage.value && !force) {
       dispatch(updateSettings(storage.value));
       // return storage.value;
       return;

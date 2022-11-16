@@ -34,8 +34,6 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     case SubActions.add:
       transformed = [...state.transactions, ...payload.map(addMapper)];
 
-      console.log(`TRANSFORMED`, transformed);
-
       break;
 
     case SubActions.remove:
@@ -45,13 +43,8 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     case SubActions.update:
       transformed = [...state.transactions];
 
-      console.log(`UPDATE TX`, transformed);
-
       payload.forEach((tx) => {
-        const i = transformed.findIndex(t => {
-          console.log(`TX.id`, tx.id, `T.id`, t.id);
-          return t.id === tx.id
-        });
+        const i = transformed.findIndex(t => t.id === tx.id);
         if (i > -1)
           transformed.splice(i, 1, tx);
       });
@@ -62,11 +55,9 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
       break;
 
     default:
-      console.log(`Unknown subAction ${subAction}`);
+      console.debug(`Unknown subAction ${subAction}`);
       break;
     }
-
-    console.log(`BEFORE REDUCE`, transformed);
 
     return super.reducer(state, transformed);
   }

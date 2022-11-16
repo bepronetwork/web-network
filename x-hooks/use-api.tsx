@@ -529,6 +529,14 @@ export default function useApi() {
       });
   }
 
+  async function saveNetworkRegistry(wallet: string, registryAddress: string) {
+    return api.post("/setup/registry", { wallet, registryAddress })
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -569,6 +577,7 @@ export default function useApi() {
     resetUser,
     getSettings,
     getTokens,
-    createNFT
+    createNFT,
+    saveNetworkRegistry
   };
 }

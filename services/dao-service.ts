@@ -85,7 +85,7 @@ export default class DAO {
 
   async loadRegistry(skipAssignment?: boolean, registryAddress?: string): Promise<NetworkRegistry | boolean> {
     try {
-      if (!this.registryAddress || !registryAddress) 
+      if (!this.registryAddress && !registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
       const registry = new NetworkRegistry(this.web3Connection, registryAddress || this.registryAddress);
@@ -535,6 +535,26 @@ export default class DAO {
     await deployer.loadAbi();
 
     return deployer.deployJsonAbi(name, symbol, toSmartContractDecimals(cap, 18), ownerAddress);
+  }
+
+  async deployNetworkRegistry(erc20: string,
+                              lockAmountForNetworkCreation: string,
+                              treasury: string,
+                              lockFeePercentage: string,
+                              closeFee: string,
+                              cancelFee: string,
+                              bountyToken: string): Promise<TransactionReceipt> {
+    const deployer = new NetworkRegistry(this.web3Connection);
+
+    await deployer.loadAbi();
+
+    return deployer.deployJsonAbi(erc20,
+                                  lockAmountForNetworkCreation,
+                                  treasury,
+                                  lockFeePercentage,
+                                  closeFee,
+                                  cancelFee,
+                                  bountyToken);
   }
 
   async openBounty({

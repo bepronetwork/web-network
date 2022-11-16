@@ -38,6 +38,8 @@
   --bs-purple-rgb:#{toRGB($purple)};
   --bs-primary:#{$primary};
   --bs-primary-rgb:#{toRGB($primary)};
+  --bs-info:#{$info};
+  --bs-info-rgb:#{toRGB($info)};
   --bs-success:#{$success};
   --bs-success-rgb:#{toRGB($success)};
   --bs-warning:#{$warning};
@@ -1638,4 +1640,36 @@ input[type="color"] {
 
 .border-bottom-dashed {
   border-bottom: 1px dashed $white;
+}
+
+.bg {
+  &-primary {
+    &-25 {
+      background-color: rgba(var(--bs-primary-rgb), 0.25);
+    }
+  }
+
+  &-warning {
+    &-25 {
+      background-color: rgba(var(--bs-warning-rgb), 0.25);
+    }
+  }
+
+  &-success {
+    &-25 {
+      background-color: rgba(var(--bs-success-rgb), 0.25);
+    }
+  }
+
+  &-danger {
+    &-25 {
+      background-color: rgba(var(--bs-danger-rgb), 0.25);
+    }
+  }
+
+  &-info {
+    &-25 {
+      background-color: rgba(var(--bs-info-rgb), 0.25);
+    }
+  }
 }

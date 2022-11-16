@@ -327,6 +327,35 @@ export default function useBepro() {
     });
   }
 
+  async function handleDeployRegistry(erc20: string,
+                                      lockAmountForNetworkCreation: string,
+                                      treasury: string,
+                                      lockFeePercentage: string,
+                                      closeFee: string,
+                                      cancelFee: string,
+                                      bountyToken: string): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTx([{ type: TransactionTypes.deployNetworkRegistry } as any]);
+
+      dispatch(transaction);
+
+      await state.Service?.active.deployNetworkRegistry(erc20,
+                                                        lockAmountForNetworkCreation,
+                                                        treasury,
+                                                        lockFeePercentage,
+                                                        closeFee,
+                                                        cancelFee,
+                                                        bountyToken)
+        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          failTx(err, transaction, reject);
+        });
+    });
+  }
+
   async function handleSetDispatcher(nftToken: string, networkAddress: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{ type: TransactionTypes.setNFTDispatcher } as any]);
@@ -487,6 +516,7 @@ export default function useBepro() {
     handleFundBounty,
     handleRetractFundBounty,
     handleWithdrawFundRewardBounty,
-    handleFeeSettings
+    handleFeeSettings,
+    handleDeployRegistry
   };
 }
