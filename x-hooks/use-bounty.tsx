@@ -4,10 +4,8 @@ import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
-import { BountyExtended, ProposalExtended } from "interfaces/bounty";
-
-import {useAppState} from "../contexts/app-state";
-import {BountyEffectsContext} from "../contexts/bounty-effects";
+import {useAppState} from "contexts/app-state";
+import {BountyEffectsContext} from "contexts/bounty-effects";
 import {
   changeCurrentBountyComments,
   changeCurrentBountyData,
@@ -18,12 +16,16 @@ import {
   changeCurrentBountyDataProposals,
   changeCurrentBountyDataReward,
   changeCurrentBountyDataTransactional,
-} from "../contexts/reducers/change-current-bounty";
-import {changeSpinners} from "../contexts/reducers/change-spinners";
-import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
-import {IssueData, pullRequest} from "../interfaces/issue-data";
-import useApi from "./use-api";
-import useOctokit from "./use-octokit";
+} from "contexts/reducers/change-current-bounty";
+import {changeSpinners} from "contexts/reducers/change-spinners";
+
+import {bountyReadyPRsHasNoInvalidProposals} from "helpers/proposal";
+
+import { BountyExtended, ProposalExtended } from "interfaces/bounty";
+import {IssueData, pullRequest} from "interfaces/issue-data";
+
+import useApi from "x-hooks/use-api";
+import useOctokit from "x-hooks/use-octokit";
 
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min

@@ -32,7 +32,7 @@ export function ContextualSpan({ children, context, color, className = "" } : Co
 
   return(
     <Row className={CLASSES}>
-      <span className="px-0">
+      <span>
         <span className="mr-1">
           <Icon width={12} height={12} />
         </span>

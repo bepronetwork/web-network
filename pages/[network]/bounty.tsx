@@ -15,12 +15,12 @@ import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
 import PageActions from "components/page-actions";
 
 import {useAppState} from "contexts/app-state";
+import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
 import {useRepos} from "x-hooks/use-repos";
 
-import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PageIssue() {
   useBounty();

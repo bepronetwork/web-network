@@ -141,10 +141,11 @@ export default function useBepro() {
       await state.Service?.active.hardCancel(state.currentBounty?.chainData?.id)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
-          return processEvent("bounty",
-                              "canceled",
-                              state.Service?.network?.lastVisited,
-            {fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id});
+          
+          return processEvent("bounty", "canceled", state.Service?.network?.lastVisited, {
+            fromBlock: txInfo.blockNumber, 
+            id: state.currentBounty?.chainData?.id
+          });
         })
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
