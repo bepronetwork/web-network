@@ -88,7 +88,7 @@ export function useDao() {
     daoService.start()
       .then(started => {
         if (started) {
-          return daoService.loadNetwork(state.Settings.contracts.network);
+          return daoService.loadNetwork(state.Service?.network?.active?.networkAddress);
         }
 
         return false;

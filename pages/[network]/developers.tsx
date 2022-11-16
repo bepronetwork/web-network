@@ -46,7 +46,7 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!state.Service?.active) return;
+    if (!state.Service?.active || !state.Service?.active?.network) return;
 
     Promise.all([
       state.Service?.active.getClosedBounties().catch(() => 0),
