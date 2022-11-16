@@ -13,8 +13,8 @@ import PageHero, {InfosHero} from "components/page-hero";
 import useApi from "x-hooks/use-api";
 
 import {useAppState} from "../../contexts/app-state";
-import {useBounty} from "../../x-hooks/use-bounty";
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
+import {useBounty} from "../../x-hooks/use-bounty";
 
 
 export default function PageDevelopers() {

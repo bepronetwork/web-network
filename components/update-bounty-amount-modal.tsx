@@ -14,8 +14,8 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useERC20 from "x-hooks/use-erc20";
 import { useBounty } from "x-hooks/use-bounty";
+import useERC20 from "x-hooks/use-erc20";
 
 export default function UpdateBountyAmountModal({
                                                   show,

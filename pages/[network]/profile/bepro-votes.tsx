@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
@@ -21,7 +22,6 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 import {useAuthentication} from "x-hooks/use-authentication";
 
 import {useAppState} from "../../../contexts/app-state";
-import {useEffect} from "react";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);

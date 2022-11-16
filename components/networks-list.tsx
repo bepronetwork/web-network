@@ -101,30 +101,30 @@ export default function NetworksList() {
 
     dao.start()
       .then( _ => Promise.all(networks.map(async (network: Network) => {
-          const networkAddress = network?.networkAddress;
-          await dao.loadNetwork(networkAddress);
+        const networkAddress = network?.networkAddress;
+        await dao.loadNetwork(networkAddress);
 
-          const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+        const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
             dao.getSettlerTokenData().catch(() => undefined),
             dao.getTotalNetworkToken().catch(() => 0),
             dao.getOpenBounties().catch(() => 0),
             dao.getTotalBounties().catch(() => 0)
-          ]);
+        ]);
 
-          const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
+        const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
 
-          const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
+        const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
 
-          const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
+        const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
 
-          return { ...network,
-            openBounties,
-            totalBounties,
-            networkToken: settlerTokenData,
-            tokensLocked: totalSettlerLocked.toFixed(),
-            totalSettlerConverted: totalSettlerConverted.toFixed()
-          }
-        })))
+        return { ...network,
+                 openBounties,
+                 totalBounties,
+                 networkToken: settlerTokenData,
+                 tokensLocked: totalSettlerLocked.toFixed(),
+                 totalSettlerConverted: totalSettlerConverted.toFixed()
+        }
+      })))
       .then(setNetworks)
       .catch(error => console.log("Failed to load network data", error, state.Service?.network?.active));
 

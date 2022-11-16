@@ -29,6 +29,7 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
 import {useNetwork} from "x-hooks/use-network";
+
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PullRequestPage() {
