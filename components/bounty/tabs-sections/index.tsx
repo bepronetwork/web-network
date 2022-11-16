@@ -29,7 +29,7 @@ function TabSections(){
       eventKey: "pull-requests",
       title: t("pull-request:labelWithCount", { count: pullRequests.length || 0 }),
       description: t("description_pull-request"),
-      component:<ItemSections isProposal={false}data={pullRequests}/>
+      component: <ItemSections isProposal={false} data={pullRequests}/>
 
     }
   ];

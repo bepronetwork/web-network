@@ -12,14 +12,9 @@ import CustomContainer from "components/custom-container";
 import IssueComments from "components/issue-comments";
 import IssueDescription from "components/issue-description";
 import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
-import IssueProposals from "components/issue-proposals";
-import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
-import TabbedNavigation from "components/tabbed-navigation";
 
 import {useAppState} from "contexts/app-state";
-
-import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";

@@ -11,7 +11,8 @@ export type PRLabel =
   | "draft"
   | "accepted"
   | "disputed";
-interface IPRLabel {
+
+export interface IPRLabel {
   label?: PRLabel;
   className?: string;
   hero?: boolean;

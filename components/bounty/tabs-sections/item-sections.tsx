@@ -11,9 +11,11 @@ import Avatar from "components/avatar";
 import Button from "components/button";
 import NothingFound from "components/nothing-found";
 import ProposalProgressSmall from "components/proposal-progress-small";
-import PullRequestLabels,{PRLabel} from "components/pull-request-labels";
+import PullRequestLabels,{IPRLabel} from "components/pull-request-labels";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
+
+import { useAppState } from "contexts/app-state";
 
 import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
@@ -28,7 +30,7 @@ interface ItemProps {
 interface ItemRowProps {
   id: string | number,
   githubLogin: string,
-  status?: PRLabel[],
+  status?: IPRLabel[],
   children?: React.ReactNode;
   href?: UrlObject | string;
 }
@@ -51,7 +53,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
           </div>
           <div className="col-4 d-flex gap-2">
             {status?.length ? status.map((st) => (
-              <PullRequestLabels label={st}
+              <PullRequestLabels {...st}
               />
             )) : null}
           </div>
@@ -67,27 +69,46 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
 
 function ItemSections({ data, isProposal }: ItemProps) {
   const { t } = useTranslation(["proposal", "pullrequest"]);
+  const {state} = useAppState();
   const router = useRouter();
   const { getURLWithNetwork } = useNetwork();
 
   return (
-    <section className="content-wrapper border-top-0 p-20 d-flex flex-column gap-2">
+    <section className="content-wrapper border-top-0 p-20 d-flex flex-column gap-2 bg-gray-900">
       {
         data.length ?
           React.Children.toArray(data.map((item) => {
             const asProposal = isProposal || (item as Proposal).scMergeId
             const pathRedirect = isProposal ? '/proposal' : '/pull-request';
-            const redirect = getURLWithNetwork(pathRedirect, {})
+            const valueRedirect = {
+              id: state.currentBounty?.data?.githubId,
+              repoId: state.currentBounty?.data?.repository_id,
+            } as any
+            const status = []
+
+            if(!asProposal){
+              status.push({
+                merged: item?.merged,
+                isMergeable: item?.isMergeable,
+                isDraft: item?.status === "draft"
+              })
+              valueRedirect.prId = (item as pullRequest)?.githubId
+            } else {
+              valueRedirect.proposalId = item?.id
+            }
+
             return (
-              <ItemRow id={item?.id} href={redirect} githubLogin={item?.githubLogin} status={['merged']}>
+              <ItemRow 
+                id={item?.id} 
+                href={getURLWithNetwork(pathRedirect, valueRedirect)} 
+                githubLogin={item?.githubLogin} 
+                status={status}>
                 {asProposal ? (
                   <>
-                    <div className="d-flex align-items-center text-center">
+                    <div className="d-flex align-items-center text-center col-4">
                       <ProposalProgressSmall
-                        pgClass={`text-success`}
-                        value={BigNumber(0)}
-                        total={BigNumber(32144)}
-                        textClass={`pb-2 text-success`}
+                        value={BigNumber(960)}
+                        total={BigNumber(32000)}
                       />
                     </div>
                   </>
@@ -112,7 +133,10 @@ function ItemSections({ data, isProposal }: ItemProps) {
                     className="read-only-button"
                     onClick={(ev) => {
                       ev.preventDefault();
-                      router.push?.(pathRedirect, {})
+                      router.push?.(getURLWithNetwork(pathRedirect, {
+                        ...valueRedirect,
+                        review: true
+                      }))
                     }}
                   >
                     <span className="label-m text-white">
