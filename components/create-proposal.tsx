@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import { components as RSComponents, SingleValueProps } from "react-select";
 
 import clsx from "clsx";
 import {useTranslation} from "next-i18next";
@@ -39,15 +40,11 @@ interface SameProposal {
   }[];
 }
 
-function SelectValueComponent({ innerProps, innerRef, ...rest }) {
-  const data = rest.getValue()[0];
-
+function SingleValue (props: SingleValueProps<any>) {
+  const data = props.getValue()[0];
   return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="proposal__select-options d-flex align-items-center text-center p-small p-1"
-    >
+  <RSComponents.SingleValue {...props}>
+    <div className="d-flex align-items-center p-1">
       <Avatar userLogin={data?.githubLogin} />
       <span className="ml-1 text-nowrap">{data?.label}</span>
       <div className="ms-2">
@@ -57,9 +54,9 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }) {
           isDraft={data.isDraft}
         />
       </div>
-    </div>
-  );
-}
+      </div>
+  </RSComponents.SingleValue>
+  )}
 
 function SelectOptionComponent({ innerProps, innerRef, data }) {
   return (
@@ -422,7 +419,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           isDisabled={participants.length === 0}
           components={{
             Option: SelectOptionComponent,
-            ValueContainer: SelectValueComponent
+            SingleValue
           }}
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
@@ -448,6 +445,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
+          isSearchable={false}
         />
           {renderDistribution()}
       </Modal>

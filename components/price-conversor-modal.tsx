@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {components as RSComponents ,SingleValueProps } from "react-select";
 
 import {useTranslation} from "next-i18next";
 
@@ -60,21 +61,23 @@ export default function PriceConversorModal({
     
   },[])
 
-  function SelectValueComponent({ innerProps, innerRef, ...rest }) {
-    const data = rest.getValue()[0];
+  const SingleValue = ({
+    children,
+    ...props
+  }: SingleValueProps<any>) => {
+    console.log({props, children})
     return (
+    <RSComponents.SingleValue {...props} className="proposal__select__currency">
       <div
-        ref={innerRef}
-        {...innerProps}
-        className="proposal__select_currency cursor-pointer d-inline-flex 
-                   align-items-center flex-grow-1 justify-content-between 
-                   text-center caption-large text-white p-1"
+       className="cursor-pointer d-inline-flex 
+       align-items-center justify-content-between 
+       text-center caption-large text-white p-1 w-100"
       >
         <span>{formatNumberToNScale(currentPrice)}</span>
-        <span>{data?.value}</span>
+        <span>{children}</span>
       </div>
-    );
-  }
+    </RSComponents.SingleValue>
+    )};
   
   function SelectOptionComponent({ innerProps, innerRef, data }) {
     const current = currentCurrency?.value === data?.value
@@ -115,11 +118,11 @@ export default function PriceConversorModal({
         </div>
         <div>
           <ReactSelect
-            key="select_currency"
+            key="select__currency"
             isSearchable={false}
             components={{
               Option: SelectOptionComponent,
-              ValueContainer: SelectValueComponent,
+              SingleValue
             }}
             defaultValue={{
               value: options[0]?.value,

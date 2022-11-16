@@ -106,6 +106,7 @@ export default function useOctokit() {
       owner,
       id
     });
+    if(!response?.repository) return
 
     const { mergeable, merged, state } = response.repository.pullRequest;
 
