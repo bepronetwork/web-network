@@ -7,6 +7,8 @@ import {RepoInfo} from "../interfaces/repos-list";
 import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
+import {changeSpinners} from "../contexts/reducers/change-spinners";
+import {useState} from "react";
 
 export function useRepos() {
   const {state, dispatch} = useAppState();
@@ -15,19 +17,26 @@ export function useRepos() {
   const {getReposList} = useApi();
   const {query} = useRouter();
 
+  const [loadedActiveRepo, setActiveRepo] = useState(null);
+
   function loadRepos(force = false, name = state?.Service?.network?.lastVisited) {
-    if (!name)
+    if (!name || state.spinners?.repos)
       return;
+
+    dispatch(changeSpinners.update({repos: true}));
 
     const key = `bepro.network:repos:${name}`
     const storage = new WinStorage(key, 3600, `sessionStorage`);
     if (storage.value && !force) {
-      dispatch(changeNetworkReposList(storage.value));
+      if (!state.Service?.network?.repos?.list) {
+        dispatch(changeNetworkReposList(storage.value));
+      }
+
       return;
     }
 
     dispatch(changeLoadState(true));
-    
+
     getReposList(force, name)
       .then(repos => {
         if (!repos) {
@@ -38,15 +47,21 @@ export function useRepos() {
         storage.value = repos;
         dispatch(changeNetworkReposList(repos));
         dispatch(changeLoadState(false));
+        dispatch(changeSpinners.update({repos: false}))
       })
   }
 
   function updateActiveRepo(id = null) {
-    if (!( id || query?.repoId) || !state.Service?.network?.repos || state.Service?.network?.repos?.active?.id?.toString() === (id || query?.repoId))
+    if (!( id || query?.repoId) || !state.Service?.network?.repos || state.Service?.network?.repos?.active?.id?.toString() === (id || query?.repoId)?.toString())
       return;
 
     const findRepoId = (repo: RepoInfo) => repo.id.toString() === (id || query.repoId).toString();
     const activeRepo = state.Service.network.repos.list.find(findRepoId);
+
+    if (activeRepo.githubPath === loadedActiveRepo?.githubPath)
+      return;
+
+    setActiveRepo(activeRepo);
 
     if (!activeRepo)
       throw new Error(`No repo found for ${id || query.repoId}`);
@@ -63,6 +78,7 @@ export function useRepos() {
         ])
       })
       .then(([ghVisibility = false, branches = [], forks = []]) => {
+        console.log(`DISPATCH NEW INFO`);
         dispatch(changeNetworkReposActive({ghVisibility, ...activeRepo, branches, forks}))
       })
       .catch(error => {

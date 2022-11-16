@@ -84,6 +84,9 @@
   },
   "mobile-information": {},
   "select-a-repository": "escolha um repositório ",
+  "forms": {
+    "required": "Obrigatório"
+  },
   "status": {
     "network-problems": "problemas de rede ",
     "waiting": "à espera",
