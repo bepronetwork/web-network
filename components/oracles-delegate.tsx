@@ -20,18 +20,20 @@ import {TransactionTypes} from "interfaces/enums/transaction-types";
 interface OraclesDelegateProps {
   wallet: Wallet;
   updateWalletBalance: () => void;
+  defaultAddress?: string;
 }
 
 function OraclesDelegate({
                            wallet,
-                           updateWalletBalance
+                           updateWalletBalance,
+                           defaultAddress
                          }: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
   const debounce = useRef(null)
   const [error, setError] = useState<string>("");
   const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
-  const [delegatedTo, setDelegatedTo] = useState<string>("");
+  const [delegatedTo, setDelegatedTo] = useState<string>(defaultAddress || "");
   const [availableAmount, setAvailableAmount] = useState<BigNumber>();
 
   const {
