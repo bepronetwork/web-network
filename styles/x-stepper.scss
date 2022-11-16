@@ -27,4 +27,10 @@
       }
     }
   }
+
+  &.stepper-dark {
+    .step {
+      background-color: var(--bs-dark);
+    }
+  }
 }

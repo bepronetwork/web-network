@@ -1564,6 +1564,13 @@ input[type="color"] {
       }
     }
   }
+  &-info {
+    svg {  
+      path {
+        fill: var(--bs-info);
+      }
+    }
+  }
 }
 
 .nav-link-gradient {
