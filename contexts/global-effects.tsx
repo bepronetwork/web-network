@@ -35,9 +35,9 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.validateGhAndWallet,
             [(session?.data as CustomSession),
               state.currentUser?.walletAddress,
-              asPath.includes('developers'),
-              asPath.includes('bounty'),
-              asPath.includes('profile'),
+              // asPath.includes('developers'),
+              // asPath.includes('bounty'),
+              // asPath.includes('profile'),
             ]);
   useEffect(auth.updateWalletAddress, [state.currentUser]);
   useEffect(auth.listenToAccountsChanged, [state.Service]);

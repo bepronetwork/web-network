@@ -45,9 +45,11 @@ export function useNetwork() {
 
     if (!networkName || 
         (storage.value && networkName && lastNetworkDataStorage.value && storage.value === networkName)) {
-      if (lastNetworkDataStorage.value)
+      if (lastNetworkDataStorage.value) {
         dispatch(changeActiveNetwork(lastNetworkDataStorage.value));
-      return;
+        changeNetwork(lastNetworkDataStorage.value.networkAddress)
+        return;
+      }
     }
 
     console.debug(`Updating active network`, networkName);

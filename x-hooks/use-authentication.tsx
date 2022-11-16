@@ -69,6 +69,7 @@ export function useAuthentication() {
 
     if (!state.currentUser?.connected)
       return;
+
     dispatch(changeWalletSpinnerTo(true));
 
     state.Service.active.getAddress()

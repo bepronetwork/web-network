@@ -49,7 +49,7 @@ export function useDao() {
 
     dispatch(changeStarting(true));
 
-    service
+    state.Service.active
         .loadNetwork(networkAddress)
         .then(started => {
           console.log(`loadNetwork`, started, service);
@@ -57,7 +57,7 @@ export function useDao() {
             console.error(`Failed to load network`, networkAddress);
             return;
           }
-          dispatch(changeActiveDAO(Object.assign({},service)));
+          dispatch(changeActiveDAO(service));
         })
         .catch(error => {
           console.error(`Error loading network`, error);
