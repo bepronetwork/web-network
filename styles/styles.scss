@@ -177,7 +177,7 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
-      min-width: 210px;
+      // min-width: 210px;
       border-radius: 8px;
       border: 1px solid $light-gray;
       background-color: $bg-shadow;
@@ -1257,7 +1257,6 @@ textarea.form-control {
     text-transform: uppercase;
     letter-spacing: 0.1rem;
     font-size: 12px;
-    text-align: center;
   }
 }
 
