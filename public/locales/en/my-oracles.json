@@ -50,6 +50,7 @@
     "fill-required-fields": "Please fill all required fields.",
     "self-delegate": "You can't delegate bv{{token}} to your own address.",
     "approve-transactions": "Please approve {{currency}} Transactions First. Check it and try again.",
-    "no-delegates": "No delegations found"
+    "no-delegates": "No delegations found",
+    "invalid-wallet": "Wallet Address Invalid."
   }
 }

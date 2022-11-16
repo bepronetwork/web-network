@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
@@ -27,8 +27,9 @@ function OraclesDelegate({
                            updateWalletBalance
                          }: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
-
+  const debounce = useRef(null)
   const [error, setError] = useState<string>("");
+  const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [availableAmount, setAvailableAmount] = useState<BigNumber>();
@@ -55,8 +56,17 @@ function OraclesDelegate({
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
-    if (error) setError("");
+    if(addressError) setAddressError("")
     setDelegatedTo(params.target.value);
+
+    if(Service?.active?.web3Connection && params.target.value){
+      clearTimeout(debounce.current)
+    
+      debounce.current = setTimeout(() => {
+        const isValid = Service.active.isAddress(params.target.value)
+        if(!isValid) setAddressError(t("my-oracles:errors.invalid-wallet"));
+      }, 500)
+    }
   }
 
   function handleClickVerification() {
@@ -80,6 +90,8 @@ function OraclesDelegate({
       isAddressesEqual(),
       BigNumber(tokenAmount).isZero(),
       BigNumber(tokenAmount).isNaN(),
+      addressError,
+      error,
       transactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles)
@@ -138,19 +150,22 @@ function OraclesDelegate({
             onChange={handleChangeAddress}
             type="text"
             className={`form-control ${
-              (isAddressesEqual() && "is-invalid") || ""
+              ((isAddressesEqual() || addressError)&& "is-invalid") || ""
             }`}
             placeholder={t("my-oracles:fields.address.placeholder")}
           />
-          {(isAddressesEqual() && (
-            <small className="text-danger text-italic">
+          {isAddressesEqual() ? (
+            <small className="text-danger">
               {t("my-oracles:errors.self-delegate", { token: networkTokenSymbol })}
             </small>
-          )) ||
-            ""}
+          ) : null}
+          {addressError ? (
+            <small className="text-danger">
+              {addressError}
+            </small>
+          ) : null}
         </div>
 
-        {error && <p className="p-small text-danger mt-2">{error}</p>}
         <ReadOnlyButtonWrapper>
           <NetworkTxButton
             txMethod="delegateOracles"
