@@ -324,6 +324,13 @@ li {
   font-weight: 400;
 }
 
+.label-m{
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 71%;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss04' on;
+}
+
 .text-italic {
   font-style: italic !important;
 }
@@ -466,13 +473,17 @@ li {
   }
 
   .content-list-item {
-    margin-left: -$m * 2;
-    margin-right: -$m * 2;
-    padding: $m $m * 2;
-    background-color: $dark-gray;
-    &:last-child {
-      border-radius: 0 0 math.div($m, 2) math.div($m, 2);
-    }
+    display: flex;
+    flex-direction: row;
+
+    padding: 1.25rem;
+    // margin-left: -$m * 2;
+    // margin-right: -$m * 2;
+    // padding: $m $m * 2;
+    // background-color: $dark-gray;
+    // &:last-child {
+    //   border-radius: 0 0 math.div($m, 2) math.div($m, 2);
+    // }
   }
 
   .rounded.row {
@@ -480,16 +491,6 @@ li {
     margin-right: -$m * 2;
     padding-left: $m * 2;
     padding-right: $m * 2;
-  }
-}
-
-.proposal {
-  &:nth-child(even) {
-    background-color: $bg-shadow;
-  }
-
-  &:nth-child(odd) {
-    background-color: $dark-gray;
   }
 }
 

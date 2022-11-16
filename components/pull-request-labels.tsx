@@ -8,7 +8,9 @@ export type PRLabel =
   | "conflicts"
   | "merged"
   | "closed"
-  | "draft";
+  | "draft"
+  | "accepted"
+  | "disputed";
 interface IPRLabel {
   label?: PRLabel;
   className?: string;
@@ -35,16 +37,25 @@ function PullRequestLabels({
   function getColorLabel() {
     switch (state?.toLowerCase()) {
     case t("status.ready-to-merge").toLowerCase(): {
-      return "success";
+      return "info";
     }
     case t("status.broken-tests").toLowerCase(): {
-      return "warning";
+      return "orange-500";
     }
     case t("status.conflicts").toLowerCase(): {
       return "danger";
     }
     case t("status.closed").toLowerCase(): {
       return "danger";
+    }
+    case t("status.disputed").toLowerCase(): {
+      return "danger";
+    }
+    case t("status.merged").toLowerCase(): {
+      return "success";
+    }
+    case t("status.accepted").toLowerCase(): {
+      return "success";
     }
     default: {
       return hero || isDraft ? "white" : "primary";
@@ -53,6 +64,7 @@ function PullRequestLabels({
   }
 
   function getLabel(): PRLabel {
+    if(label) return label
     if (isDraft) return t("status.draft");
     if (merged) return t("status.merged");
     if (isMergeable) return t("status.ready-to-merge");
@@ -71,10 +83,8 @@ function PullRequestLabels({
   }
 
   useEffect(() => {
-    if (!label) {
-      setState(getLabel());
-    }
-  }, [merged, isMergeable]);
+    setState(getLabel());
+  }, [merged, isMergeable, label]);
 
   if (!state) return <></>;
 
