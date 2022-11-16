@@ -32,7 +32,7 @@ export default function ProposalProgressBar({
   }
 
   function toRepresentationPercent(value = 0, total = 5) {
-    return value > 3 ? 100 : (value * 100) / total;
+    return value > disputeMaxAmount ? 100 : (value * 100) / total;
   }
 
   function getStateColor() {
@@ -111,7 +111,7 @@ export default function ProposalProgressBar({
     isDisputed,
     isFinished,
     refused,
-    isMerged
+    isMerged,
   ]);
 
   useEffect(createColumn, [disputeMaxAmount]);
