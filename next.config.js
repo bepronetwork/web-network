@@ -13,6 +13,7 @@ const publicRuntimeConfig = {
   },
   defaultName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
   enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO
+  adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
 }
 
 // Will only be available on the server-side
