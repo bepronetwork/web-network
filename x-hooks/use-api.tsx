@@ -444,7 +444,8 @@ export default function useApi() {
     order = "DESC",
     search = "",
     isClosed = undefined,
-    isRegistered = undefined
+    isRegistered = undefined,
+    isDefault = undefined
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -455,7 +456,8 @@ export default function useApi() {
       order,
       search,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
-      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
+      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
+      ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {})
     }).toString();
 
     return api

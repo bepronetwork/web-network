@@ -61,8 +61,6 @@ export function ERC20Details({
   const isAddressFieldReadOnly = !!readOnly || isDeployer;
   const hasTotalSupplyError = !!numberError(tokenInfo.totalSupply) && tokenInfo.totalSupply !== "" && isDeployer;
 
-  const handleTotalSupplyChange = ({ value }) => setTokenTotalSupply(value);
-
   const isDeployBtnDisabled = isDeployer ? [
     tokenInfo.name.trim() === "",
     tokenInfo.symbol.trim() === "",
@@ -109,7 +107,7 @@ export function ERC20Details({
 
   return(
     <>
-      <Row className="mt-2">
+      <Row className="mt-2 mb-2">
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.address.label")}
           value={tokenAddress}
@@ -131,7 +129,7 @@ export function ERC20Details({
         />
       </Row>
 
-      <Row>
+      <Row className="mb-2">
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.name.label")}
           value={tokenInfo.name}
@@ -154,30 +152,15 @@ export function ERC20Details({
       </Row>
 
       <Row>
-        <Col>
-          <Form.Group className="form-group">
-            <Form.Label className="caption-small">
-              {t("custom-network:steps.token-configuration.fields.total-supply.label")}
-            </Form.Label>
-            
-            <InputNumber
-              onValueChange={handleTotalSupplyChange}
-              value={tokenInfo.totalSupply}
-              readOnly={!isDeployer || isDeploying}
-              allowNegative={false}
-              decimalScale={0}
-              error={hasTotalSupplyError}
-              thousandSeparator
-            />
-
-            { hasTotalSupplyError &&
-              <WarningSpan
-                type="danger"
-                text={numberError(tokenInfo.totalSupply)}
-              />
-            }
-          </Form.Group>
-        </Col>
+        <FormGroup
+          label={t("custom-network:steps.token-configuration.fields.total-supply.label")}
+          placeholder="0"
+          value={tokenInfo.totalSupply}
+          readOnly={!isDeployer || isDeploying}
+          onChange={setTokenTotalSupply}
+          variant="numberFormat"
+          error={hasTotalSupplyError && numberError(tokenInfo.totalSupply) || ""}
+        />
 
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.your-balance.label")}
@@ -187,7 +170,7 @@ export function ERC20Details({
       </Row>
 
       { isDeployer &&
-        <Row>
+        <Row className="mt-2">
           <Col>
             <Button
               disabled={isDeployBtnDisabled || isDeploying}

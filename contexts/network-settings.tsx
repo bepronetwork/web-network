@@ -29,7 +29,7 @@ import {useAppState} from "./app-state";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration", "/setup"];
 const TTL = 48 * 60 * 60 // 2 day
 const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
@@ -56,7 +56,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     councilAmount: state.Settings?.networkParametersLimits?.councilAmount
   };
 
-  const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
+  const isCreating = useMemo(() => ["/new-network", "setup"].includes(router.pathname), [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
   const network =
     useMemo(() =>

@@ -83,12 +83,12 @@ export default class DAO {
     return false;
   }
 
-  async loadRegistry(skipAssignment?: boolean): Promise<NetworkRegistry | boolean> {
+  async loadRegistry(skipAssignment?: boolean, registryAddress?: string): Promise<NetworkRegistry | boolean> {
     try {
-      if (!this.registryAddress) 
+      if (!this.registryAddress || !registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new NetworkRegistry(this.web3Connection, this.registryAddress);
+      const registry = new NetworkRegistry(this.web3Connection, registryAddress || this.registryAddress);
 
       await registry.loadContract();
 
@@ -96,7 +96,7 @@ export default class DAO {
 
       return registry;
     } catch (error) {
-      console.log("Error loading NetworkRegistry: ", error);
+      console.debug("Error loading NetworkRegistry: ", error);
     }
 
     return false;
@@ -116,6 +116,36 @@ export default class DAO {
     await token.loadContract();
 
     return token;
+  }
+
+  async isNetworkRegistry(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadRegistry(true, contractAddress));
+    } catch(e) {
+      console.debug("isNetworkRegistry", e);
+    }
+
+    return false;
+  }
+
+  async isERC20(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadERC20(contractAddress));
+    } catch(e) {
+      console.debug("isERC20", e);
+    }
+
+    return false;
+  }
+
+  async isBountyToken(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadBountyToken(contractAddress));
+    } catch(e) {
+      console.debug("isBountyToken", e);
+    }
+
+    return false;
   }
 
 
