@@ -21,6 +21,7 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 import {useAuthentication} from "x-hooks/use-authentication";
 
 import {useAppState} from "../../../contexts/app-state";
+import {useEffect} from "react";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
@@ -37,6 +38,8 @@ export default function BeproVotes() {
 
   const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber("0");
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber("0");
+
+  useEffect(() => { updateWalletBalance(true) }, []);
 
   return(
     
