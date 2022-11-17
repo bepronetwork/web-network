@@ -43,7 +43,6 @@ export interface NetworkAmounts {
   percentageNeededForDispute: string | number;
   oracleExchangeRate: string | number;
   treasury: TreasuryInfo;
-  closeFee: string | number;
 }
 
 export interface ServiceNetwork {

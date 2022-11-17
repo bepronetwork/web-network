@@ -168,8 +168,7 @@ export function useNetwork() {
           mergeCreatorFeeShare: +mergeCreatorFeeShare,
           proposerFeeShare: +proposerFeeShare,
           percentageNeededForDispute: +percentageNeededForDispute,
-          treasury: treasury,
-          closeFee: +treasury.closeFee
+          treasury: treasury
         }));
       })
   }
