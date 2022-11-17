@@ -56,7 +56,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     councilAmount: state.Settings?.networkParametersLimits?.councilAmount
   };
 
-  const isCreating = useMemo(() => ["/new-network", "setup"].includes(router.pathname), [router.pathname]);
+  const isCreating = useMemo(() => ["/new-network", "/setup"].includes(router.pathname), [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
   const network =
     useMemo(() =>
@@ -480,7 +480,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       !state.Service?.active,
       !state.currentUser?.walletAddress,
       !isCreating && !network?.name && !network?.councilAmount,
-      isCreating && !state.Settings?.beproToken?.address,
+      isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad
     ].some(c => c))
       return;
@@ -500,7 +500,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     forcedNetwork,
     needsToLoad,
     router.pathname,
-    state.Settings?.beproToken?.address
+    state.Service?.active?.registry?.token?.contractAddress
   ]);
 
   // NOTE -  Load Forced/User Network

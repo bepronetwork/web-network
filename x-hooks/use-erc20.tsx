@@ -19,6 +19,7 @@ export default function useERC20() {
   const [name, setName] = useState<string>();
   const [decimals, setDecimals] = useState(18);
   const [symbol, setSymbol] = useState<string>();
+  const [spender, setSpender] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [balance, setBalance] = useState(BigNumber(0));
   const [loadError, setLoadError] = useState<boolean>();
@@ -35,13 +36,17 @@ export default function useERC20() {
   };
 
   const updateAllowanceAndBalance = useCallback(() => {
-    if (!state.currentUser?.walletAddress || !state.Service?.active?.network?.contractAddress || !address) return;
+    if (!state.currentUser?.walletAddress ||
+        (!state.Service?.active?.network?.contractAddress && !spender) ||
+        !address) return;
 
     state.Service?.active.getTokenBalance(address, state.currentUser.walletAddress)
       .then(setBalance)
       .catch(error => console.debug("useERC20:getTokenBalance", logData, error));
 
-    state.Service?.active.getAllowance(address, state.currentUser.walletAddress, state.Service?.active.network.contractAddress)
+    state.Service?.active.getAllowance( address,
+                                        state.currentUser.walletAddress,
+                                        spender || state.Service?.active.network.contractAddress)
       .then(setAllowance)
       .catch(error => console.debug("useERC20:getAllowance", logData, error));
   }, [state.currentUser?.walletAddress, state.Service?.active, address]);
@@ -113,6 +118,7 @@ export default function useERC20() {
     totalSupply,
     approve,
     setAddress,
+    setSpender,
     deploy,
     updateAllowanceAndBalance
   };

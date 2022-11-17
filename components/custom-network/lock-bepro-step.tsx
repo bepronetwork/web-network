@@ -13,6 +13,7 @@ import InputNumber from "components/input-number";
 import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
+import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
@@ -20,8 +21,7 @@ import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber
 import {StepWrapperProps} from "interfaces/stepper";
 
 import {useAuthentication} from "x-hooks/use-authentication";
-
-import {useAppState} from "../../contexts/app-state";
+import useERC20 from "x-hooks/use-erc20";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
@@ -34,15 +34,15 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
-  const {state} = useAppState();
-
+  const { state } = useAppState();
+  const registryToken = useERC20();
+  const { updateWalletBalance } = useAuthentication();
   const { tokensLocked, updateTokenBalance } = useNetworkSettings();
-  const {updateWalletBalance} = useAuthentication()
 
-  const networkTokenSymbol = state.Settings?.beproToken?.symbol || t("misc.$token");
+  const registryTokenSymbol = registryToken.symbol || t("misc.$token");
 
   const balance = {
-    beproAvailable: state.currentUser?.balance?.bepro,
+    beproAvailable: registryToken.balance,
     oraclesAvailable: state.currentUser?.balance?.oracles?.locked?.minus(state.currentUser?.balance?.oracles?.delegatedToOthers),
     tokensLocked: state.currentUser?.balance?.oracles?.locked?.toFixed(),
   };
@@ -135,17 +135,39 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function updateAllowance() {
-    state.Service?.active.getAllowance(state.Settings?.contracts?.settlerToken, state.currentUser.walletAddress, state.Settings?.contracts?.networkRegistry)
+    if (!state.Service?.active ||
+        !state.currentUser?.walletAddress ||
+        !registryToken.address ||
+        !state.Settings?.contracts?.networkRegistry) return;
+    
+    const { address } = registryToken;
+    const { walletAddress} = state.currentUser;
+    const { networkRegistry } = state.Settings.contracts;
+
+    state.Service.active.getAllowance(address, walletAddress, networkRegistry)
       .then(setSettlerAllowance).catch(() => BigNumber(0));
   }
 
   useEffect(() => {
-    if (state.Service?.active && state.currentUser?.walletAddress) updateAllowance();
-  }, [state.Service?.active, state.currentUser?.walletAddress]);
+    updateAllowance();
+  }, [state.Service?.active,
+      state.currentUser?.walletAddress,
+      registryToken.address,
+      state.Settings?.contracts?.networkRegistry]);
+
+  useEffect(() => {
+    const tokenAddress = state.Service?.active?.registry?.token?.contractAddress;
+    const registryAddress = state.Settings?.contracts?.networkRegistry;
+
+    if (tokenAddress && registryAddress) {
+      registryToken.setAddress(tokenAddress);
+      registryToken.setSpender(registryAddress);
+    }
+  }, [state.Service?.active?.registry?.token?.contractAddress, state.Settings?.contracts?.networkRegistry]);
 
   return (
     <Step
-      title={t("custom-network:steps.lock.title", { currency: networkTokenSymbol })}
+      title={t("custom-network:steps.lock.title", { currency: registryTokenSymbol })}
       index={index}
       activeStep={activeStep}
       validated={validated && !!state.currentUser?.login}
@@ -162,7 +184,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
             <div className="row mb-4">
               <span className="caption-small text-gray">
                 {t("custom-network:steps.lock.you-need-to-lock",
-                  { creatorAmount: formatNumberToNScale(amountNeeded?.toNumber()), currency: networkTokenSymbol })}
+                  { creatorAmount: formatNumberToNScale(amountNeeded?.toNumber()), currency: registryTokenSymbol })}
               </span>
             </div>
 
@@ -172,7 +194,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <div className="col px-0">
                     <div className="row mb-2">
                       <label htmlFor="" className="caption-medium text-gray">
-                        <span className="text-primary">{networkTokenSymbol}</span>{" "}
+                        <span className="text-primary">{registryTokenSymbol}</span>{" "}
                         {t("transactions.amount")}
                       </label>
                     </div>
@@ -201,7 +223,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
                           <span className="text-light-gray">
-                            <span className="text-primary">{networkTokenSymbol}</span>{" "}
+                            <span className="text-primary">{registryTokenSymbol}</span>{" "}
                             {t("misc.available")}
                           </span>
 
@@ -235,10 +257,10 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                         <div className="row mt-4">
                           <p className="caption-small text-gray">
                             {t("transactions.types.unlock")}{" "}
-                            <span className="text-primary">{networkTokenSymbol}</span>{" "}
+                            <span className="text-primary">{registryTokenSymbol}</span>{" "}
                             {t("misc.by")} {t("misc.giving-away")}{" "}
                             <span className="text-purple">
-                              {t("$oracles", { token: networkTokenSymbol })}
+                              {t("$oracles", { token: registryTokenSymbol })}
                             </span>
                           </p>
                         </div>
@@ -251,7 +273,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           <div className="d-flex justify-content-between px-0">
                             <span className="text-light-gray">
                               <span className="text-purple text-uppercase">
-                                {t("$oracles", { token: networkTokenSymbol })}
+                                {t("$oracles", { token: registryTokenSymbol })}
                               </span>{" "}
                               {t("misc.available")}
                             </span>
@@ -271,7 +293,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
               <div className="col bg-dark-gray border-radius-8 p-3">
                 <p className="caption-medium text-gray mb-4">
-                  <span className="text-primary">{networkTokenSymbol}</span>{" "}
+                  <span className="text-primary">{registryTokenSymbol}</span>{" "}
                   {t("misc.locked")}
                 </p>
                 <div className="d-flex justify-content-between caption-large mb-3 amount-input">
@@ -331,7 +353,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       withLockIcon={!isLocking && isLockBtnDisabled}
                     >
                       <span>
-                        {t("transactions.types.lock")} {networkTokenSymbol}
+                        {t("transactions.types.lock")} {registryTokenSymbol}
                       </span>
                     </Button>
                   }
@@ -355,7 +377,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
       <UnlockBeproModal
         show={showUnlockBepro}
         onCloseClick={handleCloseUnlockModal}
-        networkTokenSymbol={networkTokenSymbol}
+        networkTokenSymbol={registryTokenSymbol}
       />
     </Step>
   );
