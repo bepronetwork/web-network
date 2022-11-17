@@ -21,7 +21,7 @@ interface CuratorListItemProps {
 export default function CuratorListItem({ curator }: CuratorListItemProps) {
   const { getURLWithNetwork } = useNetwork();
   const router = useRouter();
-    
+
   return (
     <div className="curator-list-item p-20 d-flex flex-row">
       <div className="col-2">
@@ -47,7 +47,7 @@ export default function CuratorListItem({ curator }: CuratorListItemProps) {
       </div>
 
       <div className="col-2 d-flex flex-row align-items-center justify-content-center">
-        <span className="caption-medium text-white">-</span>
+        <span className="caption-medium text-white">{curator?.disputes || 0}</span>
       </div>
 
       <div className="col-2 d-flex flex-row align-items-center justify-content-center">
