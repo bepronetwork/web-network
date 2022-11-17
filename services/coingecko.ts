@@ -5,8 +5,11 @@ import { getSettingsFromSessionStorage } from "helpers/settings";
 
 import { TokenInfo } from "interfaces/token";
 import {WinStorage} from "./win-storage";
+import getConfig from "next/config";
 
 const settings = getSettingsFromSessionStorage();
+
+const { publicRuntimeConfig } = getConfig();
 
 const COINGECKO_API = axios.create({baseURL: "https://api.coingecko.com/api/v3"});
 
@@ -36,25 +39,6 @@ const getCurrencyByToken = async (tokenId = DEFAULT_TOKEN, comparedToken?: strin
   }
 };
 
-/**
- * Get coin information from CoinGecko by its contract address
- */
-const getCoinInfoByContract = async (contractAddress: string, asset_platform = "ethereum"): Promise<TokenInfo> => {
-  const { data } = await COINGECKO_API.get(`/coins/${asset_platform}/contract/${contractAddress}`);
-
-  const currencies = 
-    DEFAULT_CURRENCIES.map(currency => ([ currency.value, data?.market_data?.current_price?.[currency.value]]));
-
-  const info: TokenInfo = {
-    name: data?.name,
-    symbol: data?.symbol,
-    address: contractAddress,
-    icon: data?.image?.thumb,
-    prices: Object.fromEntries(currencies)
-  };
-
-  return info;
-};
 
 function getCoinList() {
   const storage = new WinStorage('coingecko-list', 3600 * 60 * 1000);
@@ -64,7 +48,47 @@ function getCoinList() {
     return COINGECKO_API.get(`/coins/list?include_platform=false`).then(value => storage.value = value.data);
 }
 
+/**
+ * Get coin information from CoinGecko by its contract address
+ */
+const getCoinInfoByContract = async (search: string): Promise<TokenInfo> => {
+  if (!publicRuntimeConfig.enableCoinGecko)
+    return {prices: {}} as any; // eslint-disable-line
+
+  const storage = new WinStorage(`coingecko:${search}`);
+
+  if (storage.value)
+    return storage.value;
+
+  const coins = await getCoinList();
+  const coinEntry = coins.find(({symbol}) => symbol === search.toLowerCase());
+
+  if (!coinEntry)
+    return {prices: {}} as any; // eslint-disable-line
+
+  const { data } = await COINGECKO_API.get(`/coins/${coinEntry.id}`);
+
+  const currencies = 
+    DEFAULT_CURRENCIES.map(currency => ([ currency.value, data?.market_data?.current_price?.[currency.value]]));
+
+  const info: TokenInfo = {
+    name: data?.name,
+    symbol: data?.symbol,
+    address: coinEntry?.address,
+    icon: data?.image?.thumb,
+    prices: Object.fromEntries(currencies)
+  };
+
+  storage.value = info;
+
+  return info;
+};
+
+
 async function getCoinPrice(search: string) {
+  if (!publicRuntimeConfig.enableCoinGecko)
+    return 0;
+
   const coins = await getCoinList();
   const coinEntry = coins.find(({symbol}) => symbol === search.toLowerCase());
 

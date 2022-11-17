@@ -40,7 +40,7 @@ export default function PriceConversorModal({
     if (!state.Service?.network?.networkToken?.address) return;
 
     const data = 
-      await getCoinInfoByContract(state.Service?.network?.networkToken.address)
+      await getCoinInfoByContract(state.Service?.network?.networkToken.symbol)
         .catch((err) => {
           if(err) setErrorCoinInfo(true)
           return ({ prices: { [value]: 0 } })
