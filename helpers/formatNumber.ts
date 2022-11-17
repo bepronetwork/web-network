@@ -7,6 +7,9 @@ export const formatNumberToString = (number: number | string, decimals = 4) => {
 };
 
 export const formatNumberToNScale = (number: number | string) => {
+  if (!number)
+    return '0';
+
   const bigNumber = new BigNumber(number);
 
   if (bigNumber.lt(1e3))
