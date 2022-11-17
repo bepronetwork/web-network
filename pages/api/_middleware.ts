@@ -24,7 +24,8 @@ const whiteList = {
           "search/users/total", 
           "files",
           "nft",
-          "seo" ],
+          "seo",
+          "setup/registry" ],
   PUT: [ "network" ]
 };
 

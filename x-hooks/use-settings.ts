@@ -34,16 +34,6 @@ export function useSettings() {
     dispatch(updateSettings({} as any));
     getSettings()
       .then(settings => {
-        return {
-          ...settings,
-          beproToken: {
-            address: settings?.contracts?.settlerToken,
-            name: "Bepro Network",
-            symbol: "BEPRO"
-          }
-        }
-      })
-      .then(settings => {
         storage.value = settings;
         // setTmpSettings(settings)
         dispatch(updateSettings(settings));

@@ -87,7 +87,8 @@ function NewNetwork() {
       accessToken: state.currentUser.accessToken,
       githubLogin: state.currentUser.login,
       allowedTokens: tokens,
-      networkAddress: deployedNetworkAddress
+      networkAddress: deployedNetworkAddress,
+      isDefault: isSetupPage
     };
 
     const networkCreated = await createNetwork(payload)

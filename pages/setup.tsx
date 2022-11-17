@@ -22,7 +22,6 @@ const { publicRuntimeConfig: { adminWallet } } = getConfig();
 export default function SetupPage(){
   const { replace } = useRouter();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("registry");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
@@ -42,15 +41,13 @@ export default function SetupPage(){
   useEffect(() => {
     if (!isConnected || !isAdmin) return;
 
-    setIsLoading(true);
     searchNetworks({
       isDefault: true
     })
       .then(({ rows, count }) => {
         if (count > 0)
           setDefaultNetwork(rows[0]);
-      })
-      .finally( () => setIsLoading(false));
+      });
   }, [isConnected, isAdmin, currentUser?.walletAddress]);
 
   if (!isConnected)
@@ -70,7 +67,12 @@ export default function SetupPage(){
     {
       eventKey: "network",
       title: "Network",
-      component: (<NetworkSetup isVisible={activeTab === "network"} />)
+      component: (
+        <NetworkSetup 
+          isVisible={activeTab === "network"}
+          defaultNetwork={defaultNetwork}
+        />
+      )
     },
   ];
 

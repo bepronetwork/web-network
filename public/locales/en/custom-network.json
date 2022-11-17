@@ -125,7 +125,7 @@
     "token-configuration": {
       "title": "Token Configuration",
       "tabs": {
-        "use-bepro-token": "Use BEPRO Token",
+        "use-registry-token": "Use {{symbol}} Token",
         "use-custom-token": "Use Custom Token",
         "deploy-new-token": "Deploy New Token"
       },

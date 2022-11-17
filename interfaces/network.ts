@@ -92,6 +92,7 @@ export interface NetworkSettings {
   isLoadingData: boolean;
   forcedNetwork?: Network;
   isAbleToClosed?: boolean;
+  registryToken?: Token;
   setForcedNetwork?: (network: Network) => void;
   updateTokenBalance?: ()=> Promise<TokensLocked>
   cleanStorage?: () => void;

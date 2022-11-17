@@ -1,11 +1,16 @@
+import { ContextualSpan } from "components/contextual-span";
 import { NewNetworkStepper } from "components/custom-network/new-network-stepper";
+
+import { Network } from "interfaces/network";
 
 interface NetworkSetupProps { 
   isVisible?: boolean;
+  defaultNetwork?: Network;
 }
 
 export function NetworkSetup({
-  isVisible
+  isVisible,
+  defaultNetwork
 } : NetworkSetupProps) {
   
   if (!isVisible)
@@ -13,7 +18,12 @@ export function NetworkSetup({
 
   return(
     <div className="content-wrapper border-top-0 px-2 py-2">
-      <NewNetworkStepper />
+      { !!defaultNetwork &&
+        <ContextualSpan context="primary" isAlert>
+          <span>Default Network already saved, please visit {defaultNetwork.name} settings page.</span>
+        </ContextualSpan> ||
+        <NewNetworkStepper />
+      }
     </div>
   );
 }

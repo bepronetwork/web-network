@@ -39,8 +39,7 @@ export default function TokenConfiguration({
 
   const {getTokens} = useApi();
 
-
-  const { tokens, fields, tokensLocked } = useNetworkSettings();
+  const { tokens, fields, tokensLocked, registryToken } = useNetworkSettings();
   const networkTokenSymbol = state.Settings?.beproToken?.symbol || t("misc.$token");
 
   function addTransactionalToken(newToken: Token) {
@@ -84,7 +83,7 @@ export default function TokenConfiguration({
   }, [selectedTransactionalTokens])
 
   useEffect(() => {
-    if(!state.currentUser?.walletAddress || !state.Service?.active) return
+    if(!state.currentUser?.walletAddress || !state.Service?.active?.registryAddress) return;
     
     state.Service?.active.getAllowedTokens()
       .then((allowedTokens) => {
@@ -96,7 +95,7 @@ export default function TokenConfiguration({
           })
           .catch((err) => console.log("error to get tokens database ->", err));
       }).catch((err) => console.log("error to get allowed tokens contract ->", err));
-  }, [state.currentUser?.walletAddress])
+  }, [state.currentUser?.walletAddress, state.Service?.active?.registryAddress]);
 
   useEffect(() => {
     if(!state?.currentUser?.walletAddress || !state?.Service?.active || !BigNumber(tokensLocked.needed).gt(0)) return
@@ -125,7 +124,7 @@ export default function TokenConfiguration({
     >
       <NetworkTokenConfig
         onChange={fields.settlerToken.setter}
-        beproTokenAddress={state.Settings?.beproToken?.address}
+        registryToken={registryToken}
       />
 
       <Divider />

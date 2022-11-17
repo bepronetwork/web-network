@@ -6,7 +6,7 @@ import { FormGroup } from "components/form-group";
 import Modal from "components/modal";
 
 import { useAppState } from "contexts/app-state";
-import { toastError } from "contexts/reducers/change-toaster";
+import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
 
@@ -40,6 +40,7 @@ export function DeployBountyTokenModal({
 
       onChange(tx.contractAddress);
       handleClose();
+      dispatch(toastSuccess("Bounty Token deployed"));
     } catch (error) {
       if (error?.code !== MetamaskErrors.UserRejected)
         dispatch(toastError("Failed to deploy Bounty Token"));

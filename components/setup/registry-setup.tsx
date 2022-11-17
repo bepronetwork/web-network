@@ -119,9 +119,13 @@ export function RegistrySetup({
         const { contractAddress } = tx as TransactionReceipt;
         setRegistry(previous => ({ ...previous, value: contractAddress}));
 
+        Service?.active?.loadRegistry(false, contractAddress);
+
         return saveNetworkRegistry(currentUser?.walletAddress, contractAddress);
       })
-      .then(() => loadSettings(true))
+      .then(() => {
+        loadSettings(true);
+      })
       .then(() => dispatch(toastSuccess("See the Network Registry field", "Registry deployed")))
       .catch(error => {
         dispatch(toastError("Failed to deploy Network Registry"));

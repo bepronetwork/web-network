@@ -27,7 +27,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const publicSettings = (new Settings(settings)).raw() as SettingsType;
 
-    if (publicSettings?.contracts?.networkRegistry) return res.status(400).json("Registry already saved");
+    if (publicSettings?.contracts?.networkRegistry) 
+      return res.status(400).json("Environment already configured");
     if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
     if (!publicSettings?.defaultNetworkConfig?.adminWallet) return res.status(500).json("Missing admin wallet");
 
@@ -36,7 +37,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (wallet !== adminWallet) {
       Log("Unauthorized request", { req });
-      return res.status(401).json("Unauthorized");
+      return res.status(401).json("User must be admin");
     }
 
     const dao = new DAO({
@@ -55,7 +56,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const registryGovernor = await registry.governed._governor();
 
     if (registryGovernor !== wallet)
-      return res.status(401).json("Unauthorized");
+      return res.status(401).json("User must be registry governor");
 
     await Database.settings.create({
       key: "networkRegistry",
