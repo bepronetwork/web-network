@@ -13,6 +13,7 @@ interface Spinners {
   matching: boolean;
   connecting: boolean;
   connectingGH: boolean;
+  repos: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {

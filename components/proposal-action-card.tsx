@@ -17,6 +17,8 @@ import useOctokit from "x-hooks/use-octokit";
 
 import {useAppState} from "../contexts/app-state";
 import {ContextualSpan} from "./contextual-span";
+import {getTimeDifferenceInWords} from "../helpers/formatDate";
+import {addSeconds, formatDistance, sub, subSeconds} from "date-fns";
 
 interface IProposalActionCardProps {
   proposal: Proposal;
@@ -35,7 +37,7 @@ export default function ProposalActionCard({
   onDispute,
   onRefuse
 }: IProposalActionCardProps) {
-  const { t } = useTranslation(["common", "pull-request"]);
+  const { t } = useTranslation(["common", "pull-request", "proposal"]);
   
   const [isMerging, setIsMerging] = useState(false);
   const [isRefusing, setIsRefusing] = useState(false);
@@ -101,6 +103,22 @@ export default function ProposalActionCard({
     onMerge().finally(() => setIsMerging(false));
   }
 
+  const [missingDisputableTime, setMissingDisputableTime] = useState<string>('');
+  const [chainDisputable, setChainDisputable] = useState<boolean>(false);
+
+  function changeMissingDisputableTime() {
+    if (!chaintime || !state.Service?.network?.times?.disputableTime)
+      return;
+
+    const target = addSeconds(new Date(proposal?.createdAt), +state.Service?.network.times.disputableTime);
+    const missingTime = formatDistance(new Date(chaintime), target, {includeSeconds: true});
+
+    setMissingDisputableTime(missingTime);
+    setChainDisputable(+target - +new Date(chaintime) > 0);
+  }
+
+  useEffect(changeMissingDisputableTime, [proposal?.createdAt, chaintime, state.Service?.network?.times?.disputableTime]);
+
   useEffect(() => {
     if (state.Service?.active)
       state.Service?.active.getTimeChain().then(setChainTime);
@@ -119,6 +137,7 @@ export default function ProposalActionCard({
         <div className="mb-5">
           <ProposalProgressBar
             issueDisputeAmount={+networkProposal?.disputeWeight}
+            disputeMaxAmount={+state.Service?.network?.amounts?.percentageNeededForDispute || 0}
             isDisputed={networkProposal?.isDisputed}
             isFinished={state.currentBounty?.chainData?.closed}
             isMerged={proposal?.isMerged}
@@ -171,6 +190,15 @@ export default function ProposalActionCard({
               </Button>
             )}
           </div>
+
+          {
+            chainDisputable &&
+            <div className="row mt-2">
+              <ContextualSpan context="warning">
+                {t('proposal:messages.in-disputable-time', {time: missingDisputableTime})}
+              </ContextualSpan>
+            </div> || ""
+          }
 
           { allowMergeCommit === false &&
             <div className="row mt-2">

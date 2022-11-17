@@ -13,6 +13,7 @@ export default function IssueProposalProgressBar() {
 
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
+  const [chainTime, setChainTime] = useState<number>(+ new Date())
   const [steps, setSteps] = useState<string[]>([
     t("bounty:steps.draft"),
     t("bounty:steps.funding"),
@@ -22,7 +23,7 @@ export default function IssueProposalProgressBar() {
   ]);
 
   const {state} = useAppState();
-
+  const getChainTime = () => state.Service.active.getTimeChain().then(setChainTime).catch(console.log)
   const isFinalized = !!state.currentBounty?.chainData?.closed;
   const isInValidation = !!state.currentBounty?.chainData?.isInValidation;
   const isIssueinDraft = !!state.currentBounty?.chainData?.isDraft;
@@ -48,21 +49,21 @@ export default function IssueProposalProgressBar() {
 
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
-
-    const isHigher = creationDate && (new Date() > addSeconds(creationDate, +state.Service?.network?.times?.draftTime));
+    const isHigher = creationDate && 
+                    (new Date(chainTime) > addSeconds(creationDate, +state.Service?.network?.times?.draftTime));
 
     const item = (date, toAdd = 0) => ({
       Warning: {
         text: t("bounty:status.until-done", {
           distance: isHigher ? '0 seconds' 
-            : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date())
+            : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date(chainTime))
         }),
         color: "warning",
         bgColor: "warning-opac-25"
       },
       Started: {
         text: t("bounty:status.started-time", {
-          distance: getTimeDifferenceInWords(new Date(date), new Date())
+          distance: getTimeDifferenceInWords(new Date(date), new Date(chainTime))
         }),
         color: "light-gray"
       },
@@ -167,6 +168,7 @@ export default function IssueProposalProgressBar() {
     );
   }
 
+  useEffect(()=> {getChainTime()},[])
   useEffect(() => {
     const isFundingStep = !!steps.find(name => name === t("bounty:steps.funding"))
 

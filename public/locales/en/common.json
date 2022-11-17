@@ -283,6 +283,9 @@
     }
   },
   "forms": {
+    "is": {
+      "required": "Field is required"
+    },
     "select-placeholder": "Select...",
     "create-pull-request": {
       "title": {
