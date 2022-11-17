@@ -50,6 +50,7 @@ export interface IssueData {
   working: string[];
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
+  disputes?: {address: string; weight: number}[];
 }
 
 export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
