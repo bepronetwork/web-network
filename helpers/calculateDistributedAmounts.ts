@@ -6,8 +6,8 @@ const bigNumberPercentage =
 
 
 export default function calculateDistributedAmounts(treasury,
-                                                    mergerFee: number,
-                                                    proposerFee: number,
+                                                    mergerFee: number | string,
+                                                    proposerFee: number | string,
                                                     bountyAmount: BigNumber,
                                                     proposalPercents: number[]) {
   let treasuryAmount = BigNumber(0);
