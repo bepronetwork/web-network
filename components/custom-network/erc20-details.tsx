@@ -1,13 +1,11 @@
 import {useEffect, useState} from "react";
-import {Col, Form, Row} from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
 import {FormGroup} from "components/form-group";
-import InputNumber from "components/input-number";
-import {WarningSpan} from "components/warning-span";
 
 import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 

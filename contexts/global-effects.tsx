@@ -28,7 +28,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const network = useNetwork();
   const settings = useSettings();
 
-  useEffect(dao.start, [state.Settings])
+  useEffect(dao.start, [state.Settings]);
 
   useEffect(repos.loadRepos, [state?.Service?.network?.lastVisited]);
 
