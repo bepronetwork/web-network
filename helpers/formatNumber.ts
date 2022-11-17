@@ -21,7 +21,7 @@ export const formatNumberToNScale = (number: number | string, fixed = 2, spacer 
   const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(fixed)
   const unit = units[Math.floor(+zeroes / 3) - 1];
 
-  console.log(`NUMBER TO SCALE`, retNumber, zeroes, zeroesMod, unit, Math.floor(+zeroes / 3) - 1);
+  // console.log(`NUMBER TO SCALE`, retNumber, zeroes, zeroesMod, unit, Math.floor(+zeroes / 3) - 1);
 
   return `${retNumber}${spacer}${unit}`;
 };
