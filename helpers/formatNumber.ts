@@ -6,7 +6,7 @@ export const formatNumberToString = (number: number | string, decimals = 4) => {
     .replace(/\d(?=(\d{3})+\.)/g, "$&,");
 };
 
-export const formatNumberToNScale = (number: number | string) => {
+export const formatNumberToNScale = (number: number | string, fixed = 2, spacer = ` `) => {
   if (!number)
     return '0';
 
