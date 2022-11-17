@@ -155,7 +155,7 @@ export function useNetwork() {
         network.percentageNeededForDispute(),
         network.oracleExchangeRate(),
         network.treasuryInfo()
-      ])
+    ])
       .then(([councilAmount, 
               mergeCreatorFeeShare, 
               proposerFeeShare, 
