@@ -1,17 +1,12 @@
 
 import React from "react";
 
-import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { UrlObject } from "url";
 
-import Avatar from "components/avatar";
 import Button from "components/button";
 import NothingFound from "components/nothing-found";
 import ProposalProgressSmall from "components/proposal-progress-small";
-import PullRequestLabels,{IPRLabel} from "components/pull-request-labels";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 
@@ -22,49 +17,11 @@ import { Proposal } from "interfaces/proposal";
 
 import { useNetwork } from "x-hooks/use-network";
 
+import ItemRow from "./item-row";
+
 interface ItemProps {
   data: Proposal[] | pullRequest[],
   isProposal: boolean,
-}
-
-interface ItemRowProps {
-  id: string | number,
-  githubLogin: string,
-  status?: IPRLabel[],
-  children?: React.ReactNode;
-  href?: UrlObject | string;
-}
-
-function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
-  return (
-    <Link
-      passHref
-      key={`${githubLogin}-${id}`}
-      href={href || '#'}
-    >
-      <div className={`d-flex flex-row p-20 border-radius-8 bg-gray-850 align-items-center ${href ? "cursor-pointer" : ""}`}>
-        <div className="flex-grow-1 d-flex flex-row align-items-center gap-3">
-          <div className="col-1">
-            <span className="label-m text-gray-500">#{id}</span>
-          </div>
-          <div className="col-md-4 col-xl-3 d-flex align-items-center gap-2">
-            <Avatar userLogin={githubLogin} />
-            <span className="text-uppercase text-white caption">{githubLogin}</span>
-          </div>
-          <div className="col-4 d-flex gap-2">
-            {status?.length ? status.map((st) => (
-              <PullRequestLabels {...st}
-              />
-            )) : null}
-          </div>
-        </div>
-        <div className="flex-grow-1 d-flex flex-row gap-3 justify-content-end">
-          {children}
-        </div>
-      </div>
-    </Link>
-
-  )
 }
 
 function ItemSections({ data, isProposal }: ItemProps) {
