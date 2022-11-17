@@ -4,6 +4,7 @@ export interface Curator {
     disputedProposals?: number;
     tokensLocked?: string;
     networkId?: number;
+    disputes?: number;
     isCurrentlyCurator?: boolean
 }
 
@@ -14,5 +15,4 @@ export interface SearchCuratorParams {
     networkName?: string;
     sortBy?: string;
     order?: string;
-    search?: string;
   }
