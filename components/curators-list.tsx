@@ -14,7 +14,6 @@ import { Curator } from "interfaces/curators";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
-import useSearch from "x-hooks/use-search";
 
 import CuratorListBar from "./curator-list-bar";
 import CuratorListItem from "./curator-list-item";
@@ -28,8 +27,6 @@ interface CuratorsPages {
 
 export default function CuratorsList() {
   const { t } = useTranslation(["common", "council"]);
-
-  const { search } = useSearch();
 
   const [hasMore, setHasMore] = useState(false);
   const [truncatedData, setTruncatedData] = useState(false);
@@ -51,7 +48,6 @@ export default function CuratorsList() {
       networkName: state.Service?.network?.lastVisited,
       sortBy: "acceptedProposals",
       order: "asc",
-      search: search,
       page
     })
       .then(({ rows, pages, currentPage }) => {
