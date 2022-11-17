@@ -30,9 +30,10 @@ export default function CuratorListBar() {
     },
   ];
 
-  function renderListBarColumn({label, column}: {label: string, column: number}) {
+  function renderListBarColumn({label, column}: {label: string, column: number}, key: number) {
     return (
       <div
+        key={`${key}-${label}`}
         className={`col-${column} d-flex flex-row justify-content-center cursor-pointer align-items-center 
         text-light-gray text-gray-hover`}
       >
