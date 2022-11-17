@@ -71,7 +71,7 @@ function OraclesActions({
                token: Service?.network?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: new BigNumber(tokenAmount).gte(1e18) ? null : formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(tokenAmount),
         token: Service?.network?.networkToken?.symbol
       }),
       caption: (
@@ -103,7 +103,7 @@ function OraclesActions({
           token: Service?.network?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: new BigNumber(tokenAmount).gte(1e18) ? null : formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
         token: Service?.network?.networkToken?.symbol
       }),
