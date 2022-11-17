@@ -36,7 +36,7 @@ export default function PageDevelopers() {
     },
     {
       value: 0,
-      label: t("heroes.bounties-in-network"),
+      label: t("heroes.in-network"),
       currency: t("misc.$token")
     },
     {
@@ -56,6 +56,8 @@ export default function PageDevelopers() {
       (state.Service?.network?.active?.networkToken as ERC20)?.symbol(),
     ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
 
+      console.log(`onNetwork`, onNetwork.toString())
+
       setInfos([
         {
           value: inProgress,
@@ -67,7 +69,7 @@ export default function PageDevelopers() {
         },
         {
           value: onNetwork.toNumber(),
-          label: t("heroes.bounties-in-network"),
+          label: t("heroes.in-network"),
           currency: t("$oracles",{ token: symbol || t("misc.$token") })
         },
         {
