@@ -30,6 +30,11 @@ class Network extends Model {
         allowCustomTokens: {
           type: DataTypes.BOOLEAN,
           defaultValue: false
+        },
+        isDefault: {
+          type: DataTypes.BOOLEAN,
+          allowNull: true,
+          defaultValue: false
         }
     },
                {
