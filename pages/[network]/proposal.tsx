@@ -189,7 +189,7 @@ export default function PageProposal() {
             onRefuse={handleRefuse}
           />
         </div>
-        <ProposalDisputes />
+        <ProposalDisputes proposalId={proposal?.id} />
       </CustomContainer>
 
       <NotMergeableModal
