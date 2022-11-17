@@ -13,8 +13,8 @@ import PageHero, {InfosHero} from "components/page-hero";
 import useApi from "x-hooks/use-api";
 
 import {useAppState} from "../../contexts/app-state";
-import {useBounty} from "../../x-hooks/use-bounty";
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
+import {useBounty} from "../../x-hooks/use-bounty";
 
 
 export default function PageDevelopers() {
@@ -36,7 +36,7 @@ export default function PageDevelopers() {
     },
     {
       value: 0,
-      label: t("heroes.bounties-in-network"),
+      label: t("heroes.in-network"),
       currency: t("misc.$token")
     },
     {
@@ -46,7 +46,7 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!state.Service?.active) return;
+    if (!state.Service?.active || !state.Service?.active?.network) return;
 
     Promise.all([
       state.Service?.active.getClosedBounties().catch(() => 0),
@@ -55,6 +55,8 @@ export default function PageDevelopers() {
       getTotalUsers(),
       (state.Service?.network?.active?.networkToken as ERC20)?.symbol(),
     ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
+
+      console.log(`onNetwork`, onNetwork.toString())
 
       setInfos([
         {
@@ -67,7 +69,7 @@ export default function PageDevelopers() {
         },
         {
           value: onNetwork.toNumber(),
-          label: t("heroes.bounties-in-network"),
+          label: t("heroes.in-network"),
           currency: t("$oracles",{ token: symbol || t("misc.$token") })
         },
         {

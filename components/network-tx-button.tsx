@@ -72,7 +72,7 @@ function networkTxButton({
   const { updateWalletBalance } = useAuthentication();
 
   function checkForTxMethod() {
-    if (!state.Service?.active || !state.currentUser) return;
+    if (!state.Service?.active?.network || !state.currentUser) return;
 
     if (!txMethod || typeof state.Service?.active.network[txMethod] !== "function")
       throw new Error("Wrong txMethod");

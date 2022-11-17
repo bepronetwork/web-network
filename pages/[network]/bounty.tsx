@@ -23,6 +23,7 @@ import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
 import {useRepos} from "x-hooks/use-repos";
+
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 
 export default function PageIssue() {
