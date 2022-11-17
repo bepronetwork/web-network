@@ -8,6 +8,7 @@ interface Options {
   pgClass: string;
   value: BigNumber;
   total: BigNumber;
+  percentageNeeded: number;
   textClass: string;
 }
 
@@ -15,6 +16,7 @@ export default function ProposalProgressSmall({
   pgClass = "",
   value = BigNumber(0),
   total = BigNumber(0),
+  percentageNeeded = 0,
   textClass
 }: Options) {
   const dotStyle = { width: "10px", height: "10px" };
@@ -28,9 +30,9 @@ export default function ProposalProgressSmall({
   return (
     <div className="text-center position-relative d-inline-block col">
       <div className={"caption-small mb-1"}>
-        <span className={textClass}>{formatNumberToNScale(value.toFixed(0 , 1))}</span>
+        <span className={textClass}>{formatNumberToNScale(value.toFixed(), 0, '')}</span>
         <span>
-          /{formatNumberToNScale(total.toFixed(0, 1))} <Translation label={"oracles"} />
+          /{formatNumberToNScale(total.toFixed(), 0, '')} <Translation label={"oracles"} />
         </span>
       </div>
       <div className={"progress bg-gray w-100 mb-1"}>
@@ -49,7 +51,7 @@ export default function ProposalProgressSmall({
           <div
             style={{ ...dotStyle, right: 0 }}
             className={`rounded-circle position-absolute ${
-              percent.gte(3) ? `bg-${pgClass}` : "empty-dot"
+              percent.gte(percentageNeeded) ? `bg-${pgClass}` : "empty-dot"
             }`}
           />
         </div>

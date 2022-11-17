@@ -135,6 +135,9 @@ li {
 }
 
 .react-select {
+  &-container {
+    width: 100%;
+  }
   &-container & {
     &__control {
       border-color: transparent;

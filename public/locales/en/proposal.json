@@ -13,6 +13,7 @@
     "propose-distribution": "Propose Distribution"
   },
   "messages": {
+    "no-decimals-supported": "No decimals supported",
     "distribution-is-100": "Distribution is 100%",
     "distribution-must-be-100": "Distribution Must be 100%",
     "no-proposals-created": "There are no proposals created.",

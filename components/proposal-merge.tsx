@@ -82,13 +82,13 @@ export default function ProposalMerge({
   }
 
   async function  getCoinInfo() { 
-    await getCoinInfoByContract(state.Service?.network?.networkToken?.address).then((tokenInfo) => {
+    await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
     }).catch(error => console.log("getCoinInfo", error));
   }
 
   function handleConversion(value) {
-    return BigNumber(value).multipliedBy(coinInfo?.prices['eur']).toFixed(4);
+    return BigNumber(value).multipliedBy(coinInfo?.prices[state.Settings?.currency.defaultFiat]).toFixed(4);
   }
 
   function currentTokenSymbol() {
@@ -172,7 +172,7 @@ export default function ProposalMerge({
               percentage: distributedAmounts.treasuryAmount.percentage,
             })}
             percentage={distributedAmounts.treasuryAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
+            symbols={[currentTokenSymbol(), state.Settings?.currency.defaultFiat]}
             line={true}
             amounts={[distributedAmounts.treasuryAmount.value, 
                       handleConversion(distributedAmounts.treasuryAmount.value)]}
@@ -181,7 +181,7 @@ export default function ProposalMerge({
             name={t("proposal:merge-modal.proposal-merger")}
             description={t("proposal:merge-modal.proposal-merger-description")}
             percentage={distributedAmounts.mergerAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
+            symbols={[currentTokenSymbol(), state.Settings?.currency.defaultFiat]}
             line={true}
             amounts={[distributedAmounts.mergerAmount.value, 
                       handleConversion(distributedAmounts.mergerAmount.value)]}
@@ -190,7 +190,7 @@ export default function ProposalMerge({
             name={t("proposal:merge-modal.proposal-creator")}
             description={t("proposal:merge-modal.proposal-creator-description")}
             percentage={distributedAmounts.proposerAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
+            symbols={[currentTokenSymbol(), state.Settings?.currency.defaultFiat]}
             line={true}
             amounts={[distributedAmounts.proposerAmount.value, 
                       handleConversion(distributedAmounts.proposerAmount.value)]}
@@ -202,7 +202,7 @@ export default function ProposalMerge({
               })}
               description={t("proposal:merge-modal.contributor-description")}
               percentage={item.percentage}
-              symbols={[currentTokenSymbol(), 'eur']}
+              symbols={[currentTokenSymbol(), state.Settings?.currency.defaultFiat]}
               line={key !== ((distributedAmounts?.proposals?.length || 0 ) - 1)}
               amounts={[item.value, handleConversion(item.value)]}
               key={key}

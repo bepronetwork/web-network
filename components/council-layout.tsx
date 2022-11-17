@@ -38,7 +38,7 @@ export default function CouncilLayout({ children }) {
     },
     {
       value: 0,
-      label: t("common:heroes.bounties-in-network"),
+      label: t("common:heroes.in-network"),
       currency: "BEPRO",
     },
   ]);
@@ -92,7 +92,7 @@ export default function CouncilLayout({ children }) {
       },
       {
         value: onNetwork.toFixed(),
-        label: t("common:heroes.bounties-in-network"),
+        label: t("common:heroes.in-network"),
         currency: "BEPRO",
       },
     ]);

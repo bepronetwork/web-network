@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
@@ -40,6 +41,8 @@ export default function BeproVotes() {
 
   const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber("0");
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber("0");
+
+  useEffect(() => { updateWalletBalance(true) }, []);
 
   return(
     

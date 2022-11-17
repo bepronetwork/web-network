@@ -45,10 +45,11 @@ export function useNetwork() {
 
     if (!networkName || 
         (storage.value && networkName && lastNetworkDataStorage.value && storage.value === networkName)) {
-      if (lastNetworkDataStorage.value)
+      if (lastNetworkDataStorage.value) {
         dispatch(changeActiveNetwork(lastNetworkDataStorage.value));
-
-      return;
+        changeNetwork(lastNetworkDataStorage.value.networkAddress)
+        return;
+      }
     }
 
     console.debug(`Updating active network`, networkName);
@@ -147,12 +148,14 @@ export function useNetwork() {
 
     const network: any = state.Service.active?.network;
 
-    Promise.all([ network.councilAmount(), 
-                  network.mergeCreatorFeeShare(), 
-                  network.proposerFeeShare(), 
-                  network.percentageNeededForDispute(), 
-                  network.oracleExchangeRate(),
-                  state.Service.active?.getTreasury() ])
+    Promise.all([
+        network.councilAmount(),
+        network.mergeCreatorFeeShare(),
+        network.proposerFeeShare(),
+        network.percentageNeededForDispute(),
+        network.oracleExchangeRate(),
+        network.treasuryInfo()
+      ])
       .then(([councilAmount, 
               mergeCreatorFeeShare, 
               proposerFeeShare, 
