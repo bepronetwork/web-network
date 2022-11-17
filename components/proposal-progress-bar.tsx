@@ -30,7 +30,7 @@ export default function ProposalProgressBar({
   }
 
   function toRepresentationPercent(value = 0) {
-    return value > disputeMaxAmount ? 100 : ((value * 100) / disputeMaxAmount) / 2; // 0->2 (inclusive) dot
+    return value > disputeMaxAmount ? 100 : ((value * 110) / disputeMaxAmount) / 1.8; // trust.
   }
 
   function getStateColor() {

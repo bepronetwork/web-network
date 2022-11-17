@@ -6,21 +6,21 @@ export const formatNumberToString = (number: number | string, decimals = 4) => {
     .replace(/\d(?=(\d{3})+\.)/g, "$&,");
 };
 
-export const formatNumberToNScale = (number: number | string) => {
+export const formatNumberToNScale = (number: number | string, fixed = 2, spacer = ` `)  => {
   const bigNumber = new BigNumber(number);
 
   if (bigNumber.lt(1e3))
-    return bigNumber.toFixed(2)
+    return bigNumber.toFixed(fixed)
 
   const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp'];
   const zeroes = Math.floor(bigNumber.dividedBy(1.0e+1).toFixed(0).toString().length);
   const zeroesMod = zeroes % 3 // 3 = 000
-  const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(2)
+  const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(fixed)
   const unit = units[Math.floor(+zeroes / 3) - 1];
 
   // console.log(`NUMBER TO SCALE`, retNumber, zeroes, zeroesMod, unit, Math.floor(+zeroes / 3) - 1);
 
-  return `${retNumber} ${unit}`;
+  return `${retNumber}${spacer}${unit}`;
 };
 
 export const formatNumberToCurrency = (number: number | string, options = {}) =>

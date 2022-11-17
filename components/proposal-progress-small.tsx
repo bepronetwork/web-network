@@ -30,9 +30,9 @@ export default function ProposalProgressSmall({
   return (
     <div className="text-center position-relative d-inline-block col">
       <div className={"caption-small mb-1"}>
-        <span className={textClass}>{formatNumberToNScale(value.toFixed(0 , 1))}</span>
+        <span className={textClass}>{formatNumberToNScale(value.toFixed(), 0, '')}</span>
         <span>
-          /{formatNumberToNScale(total.toFixed(0, 1))} <Translation label={"oracles"} />
+          /{formatNumberToNScale(total.toFixed(), 0, '')} <Translation label={"oracles"} />
         </span>
       </div>
       <div className={"progress bg-gray w-100 mb-1"}>
