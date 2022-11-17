@@ -16,7 +16,7 @@ const COINGECKO_API = axios.create({baseURL: "https://api.coingecko.com/api/v3"}
 const DEFAULT_TOKEN = settings?.currency?.defaultToken || "bepro-network";
 
 const DEFAULT_CURRENCIES = settings?.currency?.conversionList || 
-  [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}];
+  [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}, {value: "btc", label: "BTC"}, {value: "eth", label: "ETH"}];
 
 /**
  * Get the price of a coin from CoinGecko by its currencyID
@@ -52,9 +52,6 @@ function getCoinList() {
  * Get coin information from CoinGecko by its contract address
  */
 const getCoinInfoByContract = async (search: string): Promise<TokenInfo> => {
-
-  console.log(publicRuntimeConfig)
-
   if (!publicRuntimeConfig.enableCoinGecko)
     return {prices: {}} as any; // eslint-disable-line
 
