@@ -118,8 +118,8 @@ function ItemSections({ data, isProposal }: ItemProps) {
                     <div className="d-flex align-items-center text-center col-4">
                       <ProposalProgressSmall
                         color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
-                        value={BigNumber(networkProposal?.disputeWeight)}
-                        total={BigNumber(state.currentUser?.balance?.staked)}
+                        value={networkProposal?.disputeWeight}
+                        total={state.currentUser?.balance?.staked}
                       />
                     </div>
                   </>
