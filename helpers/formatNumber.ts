@@ -13,17 +13,17 @@ export const formatNumberToNScale = (number: number | string) => {
   const bigNumber = new BigNumber(number);
 
   if (bigNumber.lt(1e3))
-    return bigNumber.toFixed(2)
+    return bigNumber.toFixed(fixed)
 
   const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod', 'Vg', 'Uvg', 'Dvg']; // eslint-disable-line
   const zeroes = Math.floor(bigNumber.dividedBy(1.0e+1).toFixed(0).toString().length);
   const zeroesMod = zeroes % 3 // 3 = 000
-  const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(2)
+  const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(fixed)
   const unit = units[Math.floor(+zeroes / 3) - 1];
 
   // console.log(`NUMBER TO SCALE`, retNumber, zeroes, zeroesMod, unit, Math.floor(+zeroes / 3) - 1);
 
-  return `${retNumber} ${unit ? unit : '>e70'}`;
+  return `${retNumber}${spacer}${unit}`;
 };
 
 export const formatNumberToCurrency = (number: number | string, options = {}) =>
