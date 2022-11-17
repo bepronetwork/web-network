@@ -113,7 +113,7 @@ export default function NetworksList() {
 
         const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
 
-        const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
+        const coinInfo = await getCoinInfoByContract(settlerTokenData?.symbol).catch(() => ({ prices: {} }));
 
         const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
 
