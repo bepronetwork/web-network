@@ -142,8 +142,8 @@ export default function useBepro() {
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty",
-            "canceled",
-            state.Service?.network?.lastVisited,
+                              "canceled",
+                              state.Service?.network?.lastVisited,
             {fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id});
         })
         .then((canceledBounties) => {

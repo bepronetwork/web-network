@@ -47,7 +47,7 @@
       "subtitle": "find a bounty that you want to work on, create a solution and get paid"
     },
     "bounties-closed": "Closed bounties",
-    "bounties-in-network": "In the Network",
+    "in-network": "In the Network",
     "protocol-members": "Protocol members",
     "my-account": "My account",
     "delegated-oracles": "Delegated bv{{token}}",

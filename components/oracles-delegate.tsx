@@ -11,7 +11,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {useAppState} from "contexts/app-state";
 
-import {formatStringToCurrency} from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Wallet} from "interfaces/authentication";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
@@ -128,7 +128,7 @@ function OraclesDelegate({
           allowNegative={false}
           helperText={
             <>
-              {formatStringToCurrency(availableAmount?.toFixed())}{" "}
+              {formatNumberToNScale(availableAmount?.toString() || 0, 2, '')}{" "}
               {`${t("$oracles", { token: networkTokenSymbol })} ${t("misc.available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"

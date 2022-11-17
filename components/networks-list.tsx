@@ -96,38 +96,67 @@ export default function NetworksList() {
 
     if (!state.Service?.active || networks?.every(network => network?.openBounties !== undefined)) return;
 
-    Promise.all(networks.map(async (network: Network) => {
-      const networkAddress = network?.networkAddress;
-      const dao = new DAO({
-        web3Connection: state.Service?.active.web3Connection,
-        skipWindowAssignment: true
-      });
+    const web3Host = state.Settings?.urls?.web3Provider;
+    const dao = new DAO({web3Host, skipWindowAssignment: true});
 
-      await dao.loadNetwork(networkAddress);
-      
-      const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
-        dao.getSettlerTokenData().catch(() => undefined),
-        dao.getTotalNetworkToken().catch(() => 0),
-        dao.getOpenBounties().catch(() => 0),
-        dao.getTotalBounties().catch(() => 0)
-      ]);
+    dao.start()
+      .then( _ => Promise.all(networks.map(async (network: Network) => {
+        const networkAddress = network?.networkAddress;
+        await dao.loadNetwork(networkAddress);
 
-      const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
+        const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+            dao.getSettlerTokenData().catch(() => undefined),
+            dao.getTotalNetworkToken().catch(() => 0),
+            dao.getOpenBounties().catch(() => 0),
+            dao.getTotalBounties().catch(() => 0)
+        ]);
 
-      const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
+        const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
 
-      const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
+        const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
 
-      return { ...network, 
-               openBounties, 
-               totalBounties, 
-               networkToken: settlerTokenData, 
-               tokensLocked: totalSettlerLocked.toFixed(),
-               totalSettlerConverted: totalSettlerConverted.toFixed()
-      }
-    }))
+        const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
+
+        return { ...network,
+                 openBounties,
+                 totalBounties,
+                 networkToken: settlerTokenData,
+                 tokensLocked: totalSettlerLocked.toFixed(),
+                 totalSettlerConverted: totalSettlerConverted.toFixed()
+        }
+      })))
       .then(setNetworks)
       .catch(error => console.log("Failed to load network data", error, state.Service?.network?.active));
+
+    // Promise.all(networks.map(async (network: Network) => {
+    //   const networkAddress = network?.networkAddress;
+    //
+    //
+    //   await dao.loadNetwork(networkAddress);
+    //
+    //   const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+    //     dao.getSettlerTokenData().catch(() => undefined),
+    //     dao.getTotalNetworkToken().catch(() => 0),
+    //     dao.getOpenBounties().catch(() => 0),
+    //     dao.getTotalBounties().catch(() => 0)
+    //   ]);
+    //
+    //   const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
+    //
+    //   const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
+    //
+    //   const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
+    //
+    //   return { ...network,
+    //            openBounties,
+    //            totalBounties,
+    //            networkToken: settlerTokenData,
+    //            tokensLocked: totalSettlerLocked.toFixed(),
+    //            totalSettlerConverted: totalSettlerConverted.toFixed()
+    //   }
+    // }))
+    //   .then(setNetworks)
+    //   .catch(error => console.log("Failed to load network data", error, state.Service?.network?.active));
   }, [networks, state.Service?.active]);
 
   return (
