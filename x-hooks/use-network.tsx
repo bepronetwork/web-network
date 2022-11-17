@@ -148,22 +148,26 @@ export function useNetwork() {
 
     const network: any = state.Service.active?.network;
 
-    Promise.all([ network.councilAmount(), 
-                  network.mergeCreatorFeeShare(), 
-                  network.proposerFeeShare(), 
-                  network.percentageNeededForDispute(), 
-                  network.oracleExchangeRate() ])
+    Promise.all([
+        network.councilAmount(),
+        network.mergeCreatorFeeShare(),
+        network.proposerFeeShare(),
+        network.percentageNeededForDispute(),
+        network.oracleExchangeRate(),
+        network.treasuryInfo()
+      ])
       .then(([councilAmount, 
               mergeCreatorFeeShare, 
               proposerFeeShare, 
               percentageNeededForDispute, 
-              oracleExchangeRate]) => {
+              oracleExchangeRate, {closeFee}]) => {
         dispatch(changeActiveNetworkAmounts({
           councilAmount: councilAmount.toString(),
           oracleExchangeRate: +oracleExchangeRate,
           mergeCreatorFeeShare: +mergeCreatorFeeShare,
           proposerFeeShare: +proposerFeeShare,
-          percentageNeededForDispute: +percentageNeededForDispute
+          percentageNeededForDispute: +percentageNeededForDispute,
+          closeFee: +closeFee
         }));
       })
   }
