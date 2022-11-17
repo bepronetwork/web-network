@@ -52,6 +52,9 @@ function getCoinList() {
  * Get coin information from CoinGecko by its contract address
  */
 const getCoinInfoByContract = async (search: string): Promise<TokenInfo> => {
+
+  console.log(publicRuntimeConfig)
+
   if (!publicRuntimeConfig.enableCoinGecko)
     return {prices: {}} as any; // eslint-disable-line
 

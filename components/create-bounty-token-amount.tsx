@@ -135,14 +135,14 @@ export default function CreateBountyTokenAmount({
             thousandSeparator
             label={" "}
             className="mt-3"
-            symbol={"EUR"}
+            symbol={state.Settings?.currency.defaultFiat}
             classSymbol="text-white-30 mt-3"
             allowNegative={false}
             disabled
             value={
               getCurrentCoin()?.tokenInfo
                 ? handleTokenToEurConversion(Number(issueAmount.value),
-                                             getCurrentCoin()?.tokenInfo?.prices["eur"])
+                                             getCurrentCoin()?.tokenInfo?.prices[state.Settings?.currency.defaultFiat.toLowerCase()])
                 : "0"
             }
             placeholder="-"
