@@ -55,7 +55,7 @@ const getCoinInfoByContract = async (search: string): Promise<TokenInfo> => {
   if (!publicRuntimeConfig.enableCoinGecko)
     return {prices: {}} as any; // eslint-disable-line
 
-  const storage = new WinStorage(`coingecko:${search}`);
+  const storage = new WinStorage(`coingecko:${search.toLowerCase()}`);
 
   if (storage.value)
     return storage.value;
@@ -85,9 +85,13 @@ const getCoinInfoByContract = async (search: string): Promise<TokenInfo> => {
 };
 
 
-async function getCoinPrice(search: string) {
+async function getCoinPrice(search: string, fiat = settings?.currency.defaultFiat) {
   if (!publicRuntimeConfig.enableCoinGecko)
     return 0;
+
+  const storage = new WinStorage(`coingecko:${search.toLowerCase()}`);
+  if (storage.value?.prices[fiat || 'eur'])
+    return storage.value.prices[fiat || 'eur'];
 
   const coins = await getCoinList();
   const coinEntry = coins.find(({symbol}) => symbol === search.toLowerCase());
@@ -95,12 +99,12 @@ async function getCoinPrice(search: string) {
   if (!coinEntry)
     return 0;
 
-  const price = await COINGECKO_API.get(`/simple/price?ids=digitalprice&vs_currencies=eur`);
+  const price = await COINGECKO_API.get(`/simple/price?ids=digitalprice&vs_currencies=${fiat || 'eur'}`);
 
   if (!price?.data?.digitalprice)
     return 0;
 
-  return price?.data?.digitalprice[settings?.currency.defaultFiat || 'eur'];
+  return price?.data?.digitalprice[fiat || 'eur'];
 }
 
 export {

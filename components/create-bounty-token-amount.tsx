@@ -87,7 +87,7 @@ export default function CreateBountyTokenAmount({
     if (!currentToken?.symbol || !publicRuntimeConfig?.enableCoinGecko)
       return;
 
-    getCoinPrice(currentToken?.symbol)
+    getCoinPrice(currentToken?.symbol, state?.Settings?.currency?.defaultFiat)
       .then(price => {
         setConvertedAmount(issueAmount.value * price);
       });
