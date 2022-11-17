@@ -43,7 +43,7 @@ export default function ProposalProgressSmall({
           <div
             style={{ ...dotStyle, right: 15}}
             className={`position-absolute ${
-              percent.gte(disputePercentage) ? `bg-${color}` : "empty-dot"
+              percent.gte(disputePercentage) ? `bg-${color}` : "bg-gray-700"
             }`}
           />
         </div>

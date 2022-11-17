@@ -707,20 +707,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border-radius: math.div($m, 6);
   background-color: rgba($white, 0.2);
 
-  .wrapper {
-    position: absolute;
-    height: math.div($m, 4);
-    background-color: #3e345b;
-  }
-
-  .wrapper-danger {
-    background-color: #895151;
-  }
-
-  .wrapper-success {
-    background-color: #4c8473;
-  }
-
   &.bg-purple {
     background-color: #3e345b !important;
     &.progress-bar {

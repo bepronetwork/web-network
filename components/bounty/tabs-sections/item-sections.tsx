@@ -39,7 +39,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
   return (
     <Link
       passHref
-      key={`${id}`}
+      key={`${githubLogin}-${id}`}
       href={href || '#'}
     >
       <div className={`d-flex flex-row p-20 border-radius-8 bg-gray-850 align-items-center ${href ? "cursor-pointer" : ""}`}>
@@ -47,7 +47,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
           <div className="col-1">
             <span className="label-m text-gray-500">#{id}</span>
           </div>
-          <div className="col-md-4 col-3 d-flex align-items-center gap-2">
+          <div className="col-md-4 col-xl-3 d-flex align-items-center gap-2">
             <Avatar userLogin={githubLogin} />
             <span className="text-uppercase text-white caption">{githubLogin}</span>
           </div>
@@ -86,6 +86,10 @@ function ItemSections({ data, isProposal }: ItemProps) {
             } as any
             const status = []
 
+            const networkProposal = state.currentBounty?.chainData?.proposals?.[+item?.scMergeId]
+            const isDisputed = !!networkProposal?.isDisputed;
+            const isMerged = item?.isMerged;
+
             if(!asProposal){
               status.push({
                 merged: item?.merged,
@@ -93,7 +97,13 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 isDraft: item?.status === "draft"
               })
               valueRedirect.prId = (item as pullRequest)?.githubId
-            } else {
+            } else if(networkProposal){
+              if(isDisputed || isMerged){
+                status.push({
+                  label: isDisputed ? 'disputed' : 'accepted'
+                })
+              }
+                
               valueRedirect.proposalId = item?.id
             }
 
@@ -103,25 +113,26 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin} 
                 status={status}>
-                {asProposal ? (
+                {(asProposal && networkProposal) ? (
                   <>
                     <div className="d-flex align-items-center text-center col-4">
                       <ProposalProgressSmall
-                        value={BigNumber(960)}
-                        total={BigNumber(32000)}
+                        color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
+                        value={BigNumber(networkProposal?.disputeWeight)}
+                        total={BigNumber(state.currentUser?.balance?.staked)}
                       />
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="d-flex align-items-center text-center">
-                      <span className="label-m text-white">{(item as pullRequest).reviewers.length || 0}</span>
+                      <span className="label-m text-white">{(item as pullRequest)?.reviewers?.length || 0}</span>
 
                       <span className="label-m text-uppercase text-gray-500 ml-1">
                         <Translation
                           ns="pull-request"
                           label="review"
-                          params={{ count: (item as pullRequest).reviewers.length || 0 }}
+                          params={{ count: (item as pullRequest)?.reviewers?.length || 0 }}
                         />
                       </span>
                     </div>
