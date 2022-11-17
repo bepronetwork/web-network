@@ -69,7 +69,6 @@ export function useAuthentication() {
 
     if (!state.currentUser?.connected)
       return;
-
     dispatch(changeWalletSpinnerTo(true));
 
     state.Service.active.getAddress()
@@ -154,6 +153,9 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
+    if (!state.Service?.active)
+      return;
+
     if (!force && (balance.value || !state.currentUser?.walletAddress))
       return;
 
