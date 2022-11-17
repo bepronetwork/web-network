@@ -1,10 +1,13 @@
-import {createContext, useContext, useEffect} from "react";
+import {useContext} from "react";
 
 import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
+import { BountyExtended, ProposalExtended } from "interfaces/bounty";
+
 import {useAppState} from "../contexts/app-state";
+import {BountyEffectsContext} from "../contexts/bounty-effects";
 import {
   changeCurrentBountyComments,
   changeCurrentBountyData,
@@ -22,8 +25,6 @@ import {IssueData, pullRequest} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 
-import { BountyExtended, ProposalExtended } from "interfaces/bounty";
-import {BountyEffectsContext} from "../contexts/bounty-effects";
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 
@@ -97,9 +98,9 @@ export function useBounty() {
           getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
             .then(details => ({
               ...pullRequest,
-              isMergeable: details.mergeable === "MERGEABLE",
-              merged: details.merged,
-              state: details.state
+              isMergeable: details?.mergeable === "MERGEABLE",
+              merged: details?.merged,
+              state: details?.state
             })))]);
       })
       .then(pullRequests => {

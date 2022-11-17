@@ -38,10 +38,10 @@ export default function ProposalProgressSmall({
         <div
           className={`progress-bar bg-${color}`}
           role="progressbar"
-          style={{ width: `${toRepresentationPercent(+percent, disputePercentage)}%` }}
+          style={{ width: `${toRepresentationPercent(+percent, disputePercentage) - 15}%` }}
         >
           <div
-            style={{ ...dotStyle, right: 15}}
+            style={{ ...dotStyle, right: 22}}
             className={`position-absolute ${
               percent.gte(disputePercentage) ? `bg-${color}` : "bg-gray-700"
             }`}
