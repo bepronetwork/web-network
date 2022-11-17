@@ -51,7 +51,6 @@ export default function CuratorsList() {
       page
     })
       .then(({ rows, pages, currentPage }) => {
-        console.log('rows', rows, pages, currentPage)
         if (currentPage > 1) {
           if (curatorsPage.find((el) => el.page === currentPage)) return;
 
