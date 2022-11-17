@@ -105,6 +105,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
+  const [showDecimalsError, setShowDecimalsError] = useState(false)
 
   const {state} = useAppState();
 
@@ -140,10 +141,16 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     });
   }
 
+
   function handleCheckDistrib(obj: object) {
     const currentAmount = sumObj(obj);
 
-    console.log(`handleCheckDistribution`, currentAmount);
+    setShowDecimalsError(false);
+
+    if (participants.some(p => obj[p.githubHandle]%1 > 0)) {
+      setShowDecimalsError(true);
+      return;
+    }
 
     if (currentAmount === 100) {
       const { id } = pullRequests.find((data) => data.githubId === currentGithubId);
@@ -298,6 +305,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     setShow(false);
     setDistrib({});
     handleInputColor("normal");
+    setShowDecimalsError(false);
   }
 
   function handleChangeSelect({ value, githubId }) {
@@ -356,32 +364,41 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             />
           ))}
         </ul>
-        <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-          {warning || cantBeMergeable() ? (
-            <p
-              className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
-                warning ? "warning" : "danger"
-              }`}
-            >
-              {t(`proposal:errors.${
+
+        {
+          showDecimalsError &&
+          <div className="d-flex caption-small text-uppercase mt-3 justify-content-end text-warning">
+            {t('proposal:messages.no-decimals-supported')}
+          </div>
+        }
+        {!showDecimalsError &&
+          <div className="d-flex" style={{justifyContent: "flex-end"}}>
+            {warning || cantBeMergeable() ? (
+              <p
+                className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
+                  warning ? "warning" : "danger"
+                }`}
+              >
+                {t(`proposal:errors.${
                   warning ? "distribution-already-exists" : "pr-cant-merged"
                 }`)}
-            </p>
-          ) : (
-            <p
-              className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase", {
-                "text-success": success,
-                "text-danger": error,
-              })}
-            >
-              {showExceptionalMessage && error
-                ? t("proposal:messages.distribution-cant-done")
-                : t(`proposal:messages.distribution-${
-                      success ? "is" : "must-be"
-                    }-100`)}
-            </p>
-          )}
-        </div>
+              </p>
+            ) : (
+              <p
+                className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase", {
+                  "text-success": success,
+                  "text-danger": error,
+                })}
+              >
+                {showExceptionalMessage && error
+                  ? t("proposal:messages.distribution-cant-done")
+                  : t(`proposal:messages.distribution-${
+                    success ? "is" : "must-be"
+                  }-100`)}
+              </p>
+            )}
+          </div>
+        }
       </>
     );
   }
