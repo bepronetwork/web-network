@@ -137,6 +137,7 @@ export default function ProposalActionCard({
         <div className="mb-5">
           <ProposalProgressBar
             issueDisputeAmount={+networkProposal?.disputeWeight}
+            disputeMaxAmount={+state.Service?.network?.amounts?.percentageNeededForDispute || 0}
             isDisputed={networkProposal?.isDisputed}
             isFinished={state.currentBounty?.chainData?.closed}
             isMerged={proposal?.isMerged}
