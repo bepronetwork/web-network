@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
+import {addSeconds, formatDistance, sub, subSeconds} from "date-fns";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
@@ -16,9 +17,8 @@ import {Proposal} from "interfaces/proposal";
 import useOctokit from "x-hooks/use-octokit";
 
 import {useAppState} from "../contexts/app-state";
-import {ContextualSpan} from "./contextual-span";
 import {getTimeDifferenceInWords} from "../helpers/formatDate";
-import {addSeconds, formatDistance, sub, subSeconds} from "date-fns";
+import {ContextualSpan} from "./contextual-span";
 
 interface IProposalActionCardProps {
   proposal: Proposal;
