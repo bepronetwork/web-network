@@ -3,14 +3,14 @@ import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
+import getConfig from "next/config";
 
 import ArrowRight from "assets/icons/arrow-right";
 
 import {useAppState} from "../contexts/app-state";
+import {getCoinPrice} from "../services/coingecko";
 import InputNumber from "./input-number";
 import TokensDropdown from "./tokens-dropdown";
-import {getCoinPrice} from "../services/coingecko";
-import getConfig from "next/config";
 
 
 export default function CreateBountyTokenAmount({

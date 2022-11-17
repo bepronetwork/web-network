@@ -16,7 +16,7 @@ export const formatNumberToNScale = (number: number | string, fixed = 2, spacer 
     return bigNumber.toFixed( number < 1 ? (+number.toString().split(`.`)?.[1]?.length || 2) : 2)
 
   const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod', 'Vg', 'Uvg', 'Dvg']; // eslint-disable-line
-  const zeroes = Math.floor(bigNumber.dividedBy(1.0e+1).toFixed(0).toString().length);
+  const zeroes = Math.floor(bigNumber.dividedBy(1.0e+1).toFixed(0).toString().length); // eslint-disable-line
   const zeroesMod = zeroes % 3 // 3 = 000
   const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(fixed)
   const unit = units[Math.floor(+zeroes / 3) - 1];

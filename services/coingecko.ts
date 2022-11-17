@@ -1,11 +1,12 @@
 
 import axios from "axios";
+import getConfig from "next/config";
 
 import { getSettingsFromSessionStorage } from "helpers/settings";
 
 import { TokenInfo } from "interfaces/token";
+
 import {WinStorage} from "./win-storage";
-import getConfig from "next/config";
 
 const settings = getSettingsFromSessionStorage();
 

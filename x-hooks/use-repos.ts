@@ -1,14 +1,15 @@
+import {useState} from "react";
+
 import {useRouter} from "next/router";
 
 import {useAppState} from "../contexts/app-state";
 import {changeLoadState} from "../contexts/reducers/change-load";
 import {changeNetworkReposActive, changeNetworkReposList} from "../contexts/reducers/change-service";
+import {changeSpinners} from "../contexts/reducers/change-spinners";
 import {RepoInfo} from "../interfaces/repos-list";
 import {WinStorage} from "../services/win-storage";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
-import {changeSpinners} from "../contexts/reducers/change-spinners";
-import {useState} from "react";
 
 export function useRepos() {
   const {state, dispatch} = useAppState();
