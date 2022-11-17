@@ -1,7 +1,7 @@
 export interface Proposal {
   createdAt: Date | number;
   githubLogin: string;
-  id: string;
+  id: number;
   isMerged?: boolean;
   issueId?: number;
   pullRequestId?: number;
