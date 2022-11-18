@@ -12,7 +12,7 @@ const publicRuntimeConfig = {
     ipfs: process.env.NEXT_PUBLIC_IPFS_BASE
   },
   defaultName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-  enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO
+  enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO,
   adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
 }
 
