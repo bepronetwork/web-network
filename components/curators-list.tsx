@@ -30,6 +30,7 @@ export default function CuratorsList() {
 
   const [hasMore, setHasMore] = useState(false);
   const [truncatedData, setTruncatedData] = useState(false);
+  const [isEmptyPage, setIsEmptyPage] = useState<boolean>();
   const [curatorsPage, setCuratorsPage] = useState<CuratorsPages[]>([]);
 
   const { page, nextPage, goToFirstPage } = usePage();
@@ -67,6 +68,7 @@ export default function CuratorsList() {
           setCuratorsPage([{ page: currentPage, curators: rows }]);
         }
 
+        setIsEmptyPage(rows.length > 0 ? false : true)
         setHasMore(currentPage < pages);
       })
       .catch((error) => {
@@ -91,7 +93,7 @@ export default function CuratorsList() {
   return (
     <CustomContainer>
       <CuratorListBar />
-      {(curatorsPage.some((el) => el?.curators?.length === 0) && (
+      {(isEmptyPage && (
         <NothingFound description={t("council:errors.not-found")} />
       )) || <></>}
 
@@ -106,7 +108,7 @@ export default function CuratorsList() {
         </div>
         )) || <></>}
       
-      {(curatorsPage.some((el) => el?.curators?.length > 0) && (
+      {((isEmptyPage === false) && (
         <InfiniteScroll
           handleNewPage={nextPage}
           isLoading={state.loading?.isLoading}
