@@ -20,7 +20,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const where = {
     ... networkName && {
       name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        [Op.iLike]: String(networkName).replaceAll("-", " ")
       }
     } || {},
     ... creatorAddress && {
