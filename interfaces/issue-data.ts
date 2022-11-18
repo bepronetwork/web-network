@@ -50,10 +50,10 @@ export interface IssueData {
   working: string[];
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
-  disputes?: disputes[];
+  disputes?: Disputes[];
 }
 
-export interface disputes {
+export interface Disputes {
   address: string;
   weight: number;
   issueId: number;
