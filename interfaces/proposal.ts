@@ -7,6 +7,7 @@ export interface Proposal {
   pullRequestId?: number;
   contractId?: number;
   creator?: string;
+  network_id: number;
 }
 
 export interface INetworkProposal {

@@ -81,6 +81,7 @@ export interface pullRequest {
   contractId?: number;
   userBranch?: string;
   userRepo?: string;
+  network_id: number;
 }
 
 export interface developer {
