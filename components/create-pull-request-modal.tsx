@@ -44,7 +44,7 @@ export default function CreatePullRequestModal({
 
   const {state} = useAppState();
 
-  const { getRepositoryBranches, getUserRepositories } = useOctokit();
+  const { getRepositoryBranches, getUserRepositories, getPullRequestList } = useOctokit();
 
   function onSelectedBranch(option) {
     setSelectedBranch(option.value);
@@ -84,16 +84,23 @@ export default function CreatePullRequestModal({
         return Promise.all(filteredRepos
           .map(async (repository) => ({ 
             repository, 
-            branches:  await getRepositoryBranches(repository.nameWithOwner)
+            branches:  await getRepositoryBranches(repository.nameWithOwner),
+            pullRequests: await getPullRequestList(repository.nameWithOwner)
           })));
       })
       .then(reposWithBranches => reposWithBranches
         .map(({ repository, branches }) => branches
-          .map(branch => { 
+          .map(branch => {
+            const ghOpenedPRs = reposWithBranches.flatMap(repos=> repos.pullRequests)
+            .filter((b)=> b.baseRefName === state.currentBounty?.data.branch)
+            
+            const prExistAtGh = 
+                  ghOpenedPRs
+                  .some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`)
 
             const prExistsInActiveIssue =
               state.currentBounty?.data.pullRequests
-                .some(({branch: b}) => b === `${repository.owner}:${branch}`);
+              .some(({branch: b}) => b === `${repository.owner}:${branch}`)
 
             const isBaseBranch =
               (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
@@ -115,15 +122,15 @@ export default function CreatePullRequestModal({
               />
 
 
-            const disabledIcon = !prExistsInActiveIssue
-              ? <></>
-              : <Badge color={"danger"}
-                      label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
+            const disabledIcon = (prExistsInActiveIssue || prExistAtGh)
+              ? <Badge color={"danger"}
+                      label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />
+              : <></>
 
             return {
               value: `${repository.owner}:${branch}`, 
               label: branch,
-              isDisabled: prExistsInActiveIssue || isBaseBranch,
+              isDisabled: prExistsInActiveIssue || prExistAtGh || isBaseBranch,
               disabledIcon,
               postIcon,
               isSelected: !!selectedBranch && branch === selectedBranch}
