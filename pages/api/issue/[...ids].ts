@@ -15,7 +15,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "mergeProposals" },
     { association: "repository" },
     { association: "token" },
-    { association: "benefactors" }
+    { association: "benefactors" },
+    { association: "disputes" }
   ];
 
   const network = await models.network.findOne({

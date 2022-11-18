@@ -1,24 +1,67 @@
-import {useAppState} from "../contexts/app-state";
-import {CaptionMedium} from "./bounty/funding-section/minimals";
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
-import {truncateAddress} from "../helpers/truncate-address";
 
-export function ProposalDisputes() {
+import ArrowRight from "assets/icons/arrow-right";
+
+import { formatNumberToNScale } from "helpers/formatNumber";
+
+import {useAppState} from "../contexts/app-state";
+import {truncateAddress} from "../helpers/truncate-address";
+import {CaptionMedium} from "./bounty/funding-section/minimals";
+
+
+export function ProposalDisputes({proposalId}: { proposalId: number}) {
   const {state} = useAppState();
   const { t } = useTranslation(["proposal", "common"]);
 
-  if (!state?.currentBounty || !state.currentBounty?.data?.disputes?.length)
-    return;
+  const disputes = state.currentBounty?.data?.disputes || []
 
-  function renderDisputeRow({address, weight}, i) {
-    const label = <span className="caption-medium text-gray">{truncateAddress(address)}</span>;
+  function percentage(value: string, decimals = 2) {
+    return BigNumber(value)
+      .dividedBy(state.currentUser?.balance?.staked?.toNumber())
+      .multipliedBy(100)
+      .toFixed(decimals);
+  }
 
-    return <>
-      <div key={address} className="bg-dark-gray px-3 py-3 d-flex justify-content-between mt-1">
-        <div className="col-md-6">{label}</div>
-        <div className="col-md-6">{weight} {t('$oracles', {token: state.Service?.network?.networkToken?.symbol})}</div>
-      </div>
-    </>
+  if (
+    !state?.currentBounty ||
+    !state.currentBounty?.data?.disputes?.length ||
+    !proposalId ||
+    !disputes.find(dispute => dispute.proposalId === proposalId)
+  )
+    return null;
+
+  function renderDisputeRow({ address, weight }, i) {
+    const label = (
+        <span className="caption-medium text-gray">
+          {truncateAddress(address)}
+        </span>
+      );
+  
+    return (
+        <>
+          <div
+            key={address}
+            className="bg-dark-gray px-3 py-3 d-flex justify-content-between mt-1"
+          >
+            <div className="col-md-5">{label}</div>
+            <div className="col-md-7 mt-1">
+              <div className="caption-medium">
+                <span className="text-gray">{percentage(weight)}%</span>
+                <ArrowRight className="text-gray mx-2" width={10} height={10} />
+                <span>
+                  {formatNumberToNScale(weight)}{" "}
+                  <span className="text-purple">
+                    {t("common:$oracles", {
+                      token: state.Service?.network?.networkToken?.symbol,
+                    })}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </>
+    );
   }
 
   return <>
@@ -29,7 +72,7 @@ export function ProposalDisputes() {
             <CaptionMedium text={t('proposal:disputes.title')} color="gray" />
           </div>
           <div className="overflow-auto">
-            {state.currentBounty?.data?.disputes?.map(renderDisputeRow)}
+            {disputes?.filter(v => v.proposalId === proposalId).map(renderDisputeRow)}
           </div>
         </div>
       </div>
