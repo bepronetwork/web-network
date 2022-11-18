@@ -34,7 +34,8 @@ class PullRequest extends Model {
         reviewers: {
           type: DataTypes.ARRAY(DataTypes.STRING),
           defaultValue: []
-        }
+        },
+        network_id: DataTypes.INTEGER,
     },
                {
         sequelize,
@@ -54,6 +55,11 @@ class PullRequest extends Model {
       foreignKey: "pullRequestId",
       sourceKey: "id",
       as: "merges"
+    });
+
+    this.belongsTo(models.network, {
+      foreignKey: "network_id",
+      sourceKey: "id"
     });
   }
 }
