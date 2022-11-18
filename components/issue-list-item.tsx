@@ -89,7 +89,7 @@ export default function IssueListItem({
                 isActive && "-40"
               }`}
             >
-              {formatNumberToNScale(bountyAmount)}{" "}
+              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount) || `< 0.000001`}{" "}
               <label
                 className={`caption-small text-uppercase ${
                   !isActive ? "text-primary" : "text-white-40"
