@@ -61,12 +61,12 @@ export function useBounty() {
 
     getIssue(+query.repoId, +query.id, state.Service.network.lastVisited)
       .then(async (bounty: IssueData) => {
-        const fundedAmount = BigNumber(bounty.fundedAmount || 0)
-        const fundingAmount = BigNumber(bounty.fundingAmount || 0)
+        const fundedAmount = BigNumber(bounty?.fundedAmount || 0)
+        const fundingAmount = BigNumber(bounty?.fundingAmount || 0)
         const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(fundingAmount)
 
         const bigNumbers = {
-          amount: BigNumber(bounty.amount),
+          amount: BigNumber(bounty?.amount),
           fundingAmount,
           fundedAmount,
           fundedPercent
@@ -77,8 +77,9 @@ export function useBounty() {
           isMerged: bounty.merged !== null && proposal.scMergeId === bounty.merged
         })
 
-        bounty.benefactors = bounty?.benefactors.map((benefactor) => 
-        ({...benefactor, amount: BigNumber(benefactor.amount)}))
+        if(bounty?.benefactors)
+          bounty.benefactors = bounty?.benefactors.map((benefactor) => 
+          ({...benefactor, amount: BigNumber(benefactor?.amount)}))
 
         const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
         const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};

@@ -20,14 +20,14 @@ function TabSections(){
     {
       isEmpty: !proposals?.length,
       eventKey: "proposals",
-      title: t("proposal:labelWithCount", { count: proposals.length || 0 }),
+      title: t("proposal:labelWithCount", { count: proposals?.length || 0 }),
       description: t("description_proposal"),
       component: <ItemSections isProposal data={proposals}/>
     },
     {
       isEmpty: !pullRequests?.length,
       eventKey: "pull-requests",
-      title: t("pull-request:labelWithCount", { count: pullRequests.length || 0 }),
+      title: t("pull-request:labelWithCount", { count: pullRequests?.length || 0 }),
       description: t("description_pull-request"),
       component: <ItemSections isProposal={false} data={pullRequests}/>
 
