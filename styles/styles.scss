@@ -30,8 +30,8 @@
   --bs-body-color-rgb:#{toRGB($white)};
   --bs-gray:#{$gray};
   --bs-gray-rgb:#{toRGB($gray)};
-  --bs-fail:#{$danger};
-  --bs-fail-rgb:#{toRGB($danger)};
+  --bs-danger:#{$danger};
+  --bs-danger-rgb:#{toRGB($danger)};
   --bs-shadow:#{$bg-shadow};
   --bs-shadow-rgb:#{toRGB($bg-shadow)};
   --bs-purple:#{$purple};
@@ -60,6 +60,10 @@ li {
 
 .cursor-not-allowed {
   cursor: not-allowed;
+}
+
+.text-purple {
+  color: var(--bs-purple);
 }
 
 .account-link-active {
@@ -1570,6 +1574,13 @@ input[type="color"] {
     svg {  
       path {
         fill: var(--bs-info);
+      }
+    }
+  }
+  &-purple {
+    svg {  
+      path {
+        fill: var(--bs-purple);
       }
     }
   }

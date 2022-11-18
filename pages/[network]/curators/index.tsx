@@ -5,7 +5,6 @@ import {GetServerSideProps} from "next/types";
 
 import ReadyToPropose from "./ready-to-propose";
 
-
 export default function PageCouncil() {
   return <ReadyToPropose/>
 }

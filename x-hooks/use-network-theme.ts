@@ -66,7 +66,7 @@ export default function useNetworkTheme() {
       }
       ${
         (colors.oracle &&
-          `--bs-oracle: ${colors.oracle}; --bs-oracle-rgb: ${hexadecimalToRGB(colors.oracle).join(",")};`) ||
+          `--bs-purple: ${colors.oracle}; --bs-purple-rgb: ${hexadecimalToRGB(colors.oracle).join(",")};`) ||
         ""
       }
       ${

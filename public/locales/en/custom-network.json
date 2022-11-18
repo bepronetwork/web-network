@@ -38,7 +38,7 @@
   },
   "network-list-bar": {
     "number-of-bounties": "Number of bounties",
-    "token-locked": "$TOKEN locked",
+    "token-locked": "TOKEN locked",
     "open-bounties": "Open bounties"
   },
   "steps": {

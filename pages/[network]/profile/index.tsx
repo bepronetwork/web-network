@@ -27,7 +27,8 @@ export default function Profile() {
   const { connectWallet, connectGithub, disconnectGithub } = useAuthentication();
 
   const isConnected = !!state.currentUser?.login && !!state.currentUser?.walletAddress;
-  const addressOrUsername = state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
+  const addressOrUsername = 
+    state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
   const handleClickDisconnect = () => setShowRemoveModal(true);
   const hideRemoveModal = () => setShowRemoveModal(false);
@@ -36,7 +37,12 @@ export default function Profile() {
     <ProfileLayout>
       <div className="row mb-5">
         <div className="col">
-          <AvatarOrIdenticon user={state.currentUser?.login} address={state.currentUser?.walletAddress} size="lg" withBorder />
+          <AvatarOrIdenticon 
+            user={state.currentUser?.login}
+            address={state.currentUser?.walletAddress}
+            size="lg"
+            withBorder
+          />
           
           <div className="d-flex flex-row mt-3 align-items-center">
             <h4 className="text-gray text-uppercase mr-2">{addressOrUsername}</h4>
