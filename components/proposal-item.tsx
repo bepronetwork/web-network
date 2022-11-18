@@ -56,7 +56,7 @@ export default function ProposalItem({
   const {getDatabaseBounty, getChainBounty} = useBounty();
 
   
-  const networkProposal = state.currentBounty?.chainData?.proposals?.[+proposal?.scMergeId];
+  const networkProposal = state.currentBounty?.chainData?.proposals?.[+proposal?.contractId];
   const networkPullRequest = state.currentBounty?.chainData?.pullRequests?.find(({ id: prId }) => +prId === +networkProposal?.prId);
 
   const isProposalMerged = proposal.isMerged;
@@ -80,7 +80,7 @@ export default function ProposalItem({
 
     if (!isDisputable || isBountyClosed) return;
 
-    handlerDisputeProposal(+proposal.scMergeId)
+    handlerDisputeProposal(+proposal?.contractId)
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -135,7 +135,7 @@ export default function ProposalItem({
   return (
     <Link
       passHref
-      key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
+      key={`${proposal?.pullRequestId}${proposal?.contractId}`}
       href={getURLWithNetwork("/proposal", {
         id: state.currentBounty?.data?.githubId,
         repoId: state.currentBounty?.data?.repository_id,

@@ -8,7 +8,6 @@ class MergeProposal extends Model {
    */
   static init(sequelize) {
     super.init({
-        scMergeId: DataTypes.STRING,
         issueId: DataTypes.INTEGER,
         pullRequestId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,

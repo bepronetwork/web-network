@@ -74,7 +74,7 @@ export function useBounty() {
 
         const mergeProposalMapper = (proposal) => ({
           ...proposal,
-          isMerged: bounty.merged !== null && proposal.scMergeId === bounty.merged
+          isMerged: bounty.merged !== null && proposal?.contractId === bounty.merged
         })
 
         bounty.benefactors = bounty?.benefactors.map((benefactor) => 
@@ -98,9 +98,9 @@ export function useBounty() {
           getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
             .then(details => ({
               ...pullRequest,
-              isMergeable: details.mergeable === "MERGEABLE",
-              merged: details.merged,
-              state: details.state
+              isMergeable: details?.mergeable === "MERGEABLE",
+              merged: details?.merged,
+              state: details?.state
             })))]);
       })
       .then(pullRequests => {
