@@ -61,15 +61,6 @@ module.exports = () => {
     publicRuntimeConfig,
     serverRuntimeConfig,
     webpack5: true,
-    async redirects() {
-      return [
-        {
-          source: "/",
-          destination: `/${publicRuntimeConfig.defaultName}`,
-          permanent: true
-        }
-      ];
-    },
     async headers() {
       return [
         {
