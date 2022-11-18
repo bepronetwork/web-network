@@ -7,7 +7,6 @@ import {useRouter} from "next/router";
 import AlreadyHasNetworkModal from "components/already-has-network-modal";
 import ConnectWalletButton from "components/connect-wallet-button";
 import CreatingNetworkLoader from "components/creating-network-loader";
-import CustomContainer from "components/custom-container";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
