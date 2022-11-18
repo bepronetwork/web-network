@@ -50,6 +50,7 @@ export interface ThemeColors {
   secondary: string;
   background: string;
   info: string;
+  dark: string;
 }
 
 export interface Color {

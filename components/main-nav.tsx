@@ -79,7 +79,7 @@ export default function MainNav() {
     <div className="nav-container">
       {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
       <div
-        className="main-nav d-flex flex-column justify-content-center bg-dark"
+        className="main-nav d-flex flex-column justify-content-center"
       >
         <div
           className={`d-flex flex-row align-items-center justify-content-between px-3 ${

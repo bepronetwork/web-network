@@ -48,6 +48,8 @@
   --bs-secondary-rgb:#{toRGB($secondary)};
   --bs-body-bg:#{$bg};
   --bs-body-bg-rgb:#{toRGB($bg)};
+  --bs-dark:#{$bg};
+  --bs-dark-rgb:#{toRGB($bg)};
 }
 
 //bootstrap-overrides
@@ -380,6 +382,7 @@ li {
 .main-nav {
   width: 100%;
   min-height: $navbar-height;
+  background-color: var(--bs-dark);
 
   .brand {
     padding: 0;
