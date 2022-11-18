@@ -15,25 +15,23 @@ import {error as LogError} from 'services/logging';
 const {serverRuntimeConfig} = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName, creator: creatorAddress } = req.query;
+  const { name: networkName, creator: creatorAddress, isDefault } = req.query;
 
-  let where = {}
-  
-  if(networkName){
-    where = {
+  const where = {
+    ... networkName && {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
-    }
-  } 
-
-  else if(creatorAddress){
-    where = {
+    } || {},
+    ... creatorAddress && {
       creatorAddress: {
         [Op.iLike]: String(creatorAddress)
       }
-    }
-  }
+    } || {},
+    ... isDefault && {
+      isDefault: isDefault === "true"
+    } || {}
+  };
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
