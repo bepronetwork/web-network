@@ -23,7 +23,7 @@ import TransactionType from "components/transaction-type";
 
 import {useAppState} from "contexts/app-state";
 
-import {formatStringToCurrency} from "helpers/formatNumber";
+import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Transaction} from "interfaces/transaction";
@@ -60,6 +60,15 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
   function renderTransactionRow(item: Transaction) {
     const className = "h-100 w-100 px-3 py-2 tx-row mt-2 cursor-pointer";
 
+    let amount;
+    const bnAmount = BigNumber(item.amount);
+
+    if (bnAmount.gt(1))
+      amount = formatNumberToNScale(bnAmount.toFixed());
+    else if (bnAmount.lt(0.000001))
+      amount = `less than 0.000001`;
+    else amount = bnAmount.toFixed();
+
     return (
       <div
         className={className}
@@ -72,7 +81,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
           <div className="ms-3 me-auto">
             {(item.amount > 0 && (
               <span className="caption-large text-white text-uppercase">
-                {formatStringToCurrency(BigNumber(item.amount).toFixed())} {item.currency}
+                {formatStringToCurrency(amount)} {item.currency}
               </span>
             )) ||
               ""}
