@@ -22,6 +22,7 @@ import {Wallet} from "interfaces/authentication";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
+import useApi from "x-hooks/use-api";
 import useERC20 from "x-hooks/use-erc20";
 
 interface OraclesActionsProps {
@@ -51,6 +52,8 @@ function OraclesActions({
   const networkTokenERC20 = useERC20();
 
   const { state: { transactions, Service }} = useAppState();
+
+  const { processEvent } = useApi();
 
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
@@ -155,6 +158,13 @@ function OraclesActions({
     setTokenAmount("");
     updateWalletBalance();
     networkTokenERC20.updateAllowanceAndBalance();
+  }
+
+  function handleProcessEvent(blockNumber) {
+    processEvent("oracles",
+                 "changed",
+                 Service?.network?.lastVisited,
+      { fromBlock: blockNumber }).catch(console.debug);
   }
 
   function handleChangeToken(params: NumberFormatValues) {
@@ -328,6 +338,7 @@ function OraclesActions({
             txMethod={action.toLowerCase()}
             txType={getTxType()}
             txCurrency={getCurrentLabel()}
+            handleEvent={handleProcessEvent}
             txParams={renderInfo?.params(wallet?.address)}
             buttonLabel=""
             modalTitle={renderInfo?.title}
