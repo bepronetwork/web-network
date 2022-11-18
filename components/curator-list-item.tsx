@@ -25,7 +25,7 @@ export default function CuratorListItem({ curator }: CuratorListItemProps) {
   return (
     <div className="curator-list-item p-20 d-flex flex-row">
       <div className="col-2">
-        <div className="d-flex flex-row align-items-center gap-20">
+        <div className="d-flex align-items-center gap-20">
           <Identicon size="sm" address={curator?.address} />
 
           <span className="caption-small text-white text-truncate">
@@ -34,28 +34,28 @@ export default function CuratorListItem({ curator }: CuratorListItemProps) {
         </div>
       </div>
 
-      <div className="col-2 d-flex flex-row align-items-center pe-4 justify-content-center">
+      <div className="col-2 d-flex align-items-center pe-4 justify-content-center">
         <span className="caption-medium text-white">
           {curator?.acceptedProposals || 0}
         </span>
       </div>
 
-      <div className="col-2 d-flex flex-row align-items-center pe-4 justify-content-center">
+      <div className="col-2 d-flex align-items-center pe-4 justify-content-center">
         <span className="caption-medium text-white">
           {curator?.disputedProposals || 0}
         </span>
       </div>
 
-      <div className="col-2 d-flex flex-row align-items-center justify-content-center">
+      <div className="col-2 d-flex align-items-center justify-content-center">
         <span className="caption-medium text-white">{curator?.disputes || 0}</span>
       </div>
 
-      <div className="col-2 d-flex flex-row align-items-center justify-content-center">
+      <div className="col-2 d-flex align-items-center justify-content-center">
         <span className="caption-medium text-white">
           {formatNumberToNScale(curator?.tokensLocked)}
         </span>
       </div>
-      <div className="col-2 d-flex flex-row align-items-center justify-content-center">
+      <div className="col-2 d-flex align-items-center justify-content-center">
         <Button
           onClick={() => CopyValue(curator?.address)}
           className="border-dark-gray mr-1 hover-blue"
