@@ -495,6 +495,23 @@ export default function useBepro() {
     });
   }
 
+  async function handleAddAllowedTokens(addresses: string[], isTransactional: boolean) {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTx([{ type: TransactionTypes.changeAllowedTokens } as any]);
+
+      dispatch(transaction);
+
+      await state.Service?.active.addAllowedTokens(addresses, isTransactional)
+        .then((txInfo: TransactionReceipt) => {
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          failTx(err, transaction, reject);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -517,6 +534,7 @@ export default function useBepro() {
     handleRetractFundBounty,
     handleWithdrawFundRewardBounty,
     handleFeeSettings,
-    handleDeployRegistry
+    handleDeployRegistry,
+    handleAddAllowedTokens
   };
 }

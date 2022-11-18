@@ -144,7 +144,7 @@ function NewNetwork() {
     setCreatingNetwork(6);
     cleanStorage?.();
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
-      .then(() => router.push(getURLWithNetwork("/", { network: payload.name })))
+      .then(() => router.push(getURLWithNetwork("/", { network: payload.name.toLowerCase().replaceAll(" ", "-") })))
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({

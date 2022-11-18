@@ -59,8 +59,6 @@ export default function MultipleTokensDropdown({
       : undefined;
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
-    const { symbol } = data.value;
-
     return (
       <div
         ref={innerRef}
@@ -72,7 +70,7 @@ export default function MultipleTokensDropdown({
         {data?.__isNew__ ? (
           <div className="mx-2">{formatCreateLabel(data?.value)}</div>
         ) : (
-          <span className="mx-2">{symbol}</span>
+          <span className="mx-2">{data?.value?.symbol}</span>
         )}
       </div>
     );

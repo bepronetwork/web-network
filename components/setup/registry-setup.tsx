@@ -6,6 +6,7 @@ import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-cor
 import Button from "components/button";
 import { ContextualSpan } from "components/contextual-span";
 import { FormGroup } from "components/form-group";
+import { CallToAction } from "components/setup/call-to-action";
 import { ContractField, ContractInput } from "components/setup/contract-input";
 import { DeployBountyTokenModal } from "components/setup/deploy-bounty-token-modal";
 import { DeployERC20Modal } from "components/setup/deploy-erc20-modal";
@@ -20,6 +21,11 @@ import { useSettings } from "x-hooks/use-settings";
 interface RegistrySetupProps { 
   isVisible?: boolean;
   registryAddress: string;
+}
+
+interface TokenAllowed {
+  transactional: boolean;
+  reward: boolean;
 }
 
 enum ModalKeys {
@@ -39,9 +45,11 @@ export function RegistrySetup({
   const [treasury, setTreasury] = useState("");
   const [erc20, setErc20] = useState(defaultContractField);
   const [visibleModal, setVisibleModal] = useState<string>();
+  const [isAllowingToken, setIsAllowingToken] = useState<string>();
   const [registry, setRegistry] = useState(defaultContractField);
   const [closeFeePercentage, setCloseFeePercentage] = useState("");
   const [cancelFeePercentage, setCancelFeePercentage] = useState("");
+  const [isErc20Allowed, setIsErc20Allowed] = useState<TokenAllowed>();
   const [bountyToken, setBountyToken] = useState(defaultContractField);
   const [isDeployingRegistry, setisDeployingRegistry] = useState(false);
   const [isSettingDispatcher, setIsSettingDisptacher] = useState(false);
@@ -50,9 +58,9 @@ export function RegistrySetup({
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState("");
 
   const { loadSettings } = useSettings();
-  const { saveNetworkRegistry } = useApi();
-  const { handleDeployRegistry, handleSetDispatcher } = useBepro();
+  const { saveNetworkRegistry, processEvent } = useApi();
   const { dispatch, state: { currentUser, Service } } = useAppState();
+  const { handleDeployRegistry, handleSetDispatcher, handleAddAllowedTokens } = useBepro();
 
   function isEmpty(value: string) {
     return value.trim() === "";
@@ -155,7 +163,9 @@ export function RegistrySetup({
           getParameterWithoutProxy("closeFeePercentage"),
           getParameterWithoutProxy("cancelFeePercentage"),
           loaded.bountyToken.dispatcher(),
-          loaded.divisor
+          loaded.divisor,
+          loaded.token.contractAddress,
+          loaded.getAllowedTokens()
         ])
       })
       .then(parameters => {
@@ -165,6 +175,11 @@ export function RegistrySetup({
         setCloseFeePercentage(parameters[3].toString());
         setCancelFeePercentage(parameters[4].toString());
         setBountyTokenDispatcher(parameters[5].toString());
+
+        const transactional = !!parameters[8].transactional.find(address => parameters[7] = address);
+        const reward = !!parameters[8].reward.find(address => parameters[7] = address);
+
+        setIsErc20Allowed({ transactional, reward });
       })
       .catch(console.debug);
   }
@@ -180,6 +195,30 @@ export function RegistrySetup({
         console.debug("Failed to set dispatcher", error);
       })
       .finally(() => setIsSettingDisptacher(false));
+  }
+
+  function allowToken(isTransactional: boolean) {
+    handleAddAllowedTokens([erc20.value], isTransactional)
+      .then(txInfo => Promise.all([
+        updateData(),
+        processEvent("registry", "changed", "", { fromBlock: (txInfo as { blockNumber: number }).blockNumber })
+      ]))
+      .then(() => dispatch(toastSuccess("Token allowed")))
+      .catch(error => {
+        dispatch(toastError("Failed to allow token"));
+        console.debug("Failed to allow token", error);
+      })
+      .finally(() => setIsAllowingToken(undefined));
+  }
+
+  function allowAsTransactional() {
+    setIsAllowingToken("transactional");
+    allowToken(true);
+  }
+
+  function allowAsReward() {
+    setIsAllowingToken("reward");
+    allowToken(false);
   }
 
   useEffect(() => {
@@ -201,22 +240,36 @@ export function RegistrySetup({
       }
 
       { needToSetDispatcher &&
-        <ContextualSpan
-          context="warning"
-          className="mb-3"
-          isAlert
-        >
-          <span className="col">The Bounty Token requires Network Registry to be set as dispatcher</span>
-          <Button
-            color="warning"
-            disabled={isSettingDispatcher || !needToSetDispatcher}
-            withLockIcon={!needToSetDispatcher}
-            isLoading={isSettingDispatcher}
-            onClick={setDispatcher}
-          >
-            Set Dispatcher
-          </Button>
-        </ContextualSpan>
+        <CallToAction
+          call="The Bounty Token requires Network Registry to be set as dispatcher"
+          action="Set Dispatcher"
+          onClick={setDispatcher}
+          color="warning"
+          disabled={!needToSetDispatcher}
+          executing={isSettingDispatcher}
+        />
+      }
+
+      { isErc20Allowed?.transactional === false &&
+        <CallToAction
+          call="For the Registry Token to be used in bounties it needs to be allowed"
+          action="Allow as Transactional"
+          onClick={allowAsTransactional}
+          color="warning"
+          disabled={!!isErc20Allowed?.transactional || !!isAllowingToken}
+          executing={isAllowingToken === "transactional"}
+        />
+      }
+
+      { isErc20Allowed?.reward === false &&
+        <CallToAction
+          call="For the Registry Token to be used as reward in funding requests it needs to be allowed"
+          action="Allow as Rewardal"
+          onClick={allowAsReward}
+          color="warning"
+          disabled={!!isErc20Allowed?.reward || !!isAllowingToken}
+          executing={isAllowingToken === "reward"}
+        />
       }
 
       <Row className="align-items-center mb-3">

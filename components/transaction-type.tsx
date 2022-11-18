@@ -39,6 +39,7 @@ export default function TransactionType({ type }) {
     [TransactionTypes.deployERC20Token]: t("transactions.types.deploy-erc20-token"),
     [TransactionTypes.configFees]: t("transactions.types.config-fees"),
     [TransactionTypes.deployNetworkRegistry]: "Deploy Network Registry",
+    [TransactionTypes.changeAllowedTokens]: "Change Allowed Tokens",
   };
 
   return (

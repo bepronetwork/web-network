@@ -30,5 +30,6 @@ export enum TransactionTypes {
   withdrawFundRewardBounty,  
   deployERC20Token,
   configFees,
-  deployNetworkRegistry
+  deployNetworkRegistry,
+  changeAllowedTokens
 }

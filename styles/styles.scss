@@ -66,6 +66,10 @@ li {
   color: var(--bs-purple);
 }
 
+.border-purple {
+  border-color: var(--bs-purple);
+}
+
 .account-link-active {
   border-bottom: 3px solid var(--bs-primary) !important;
   border-radius: 0;

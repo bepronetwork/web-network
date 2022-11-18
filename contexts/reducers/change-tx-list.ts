@@ -23,7 +23,6 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     const addMapper = (_tx) => ({
       status: TransactionStatus.pending,
       type: TransactionTypes.unknown,
-      date: +new Date(),
       amount: "0",
       currency: 'TOKEN',
       ..._tx,
@@ -65,7 +64,8 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
 
 export const changeTxList = new ChangeTxList();
 
-export const addTx = (tx: TxList) => changeTxList.update(tx.map(t => ({...t, id: uuidv4() })), SubActions.add);
+export const addTx = 
+  (tx: TxList) => changeTxList.update(tx.map(t => ({...t, id: uuidv4(), date: +new Date() })), SubActions.add);
 export const removeTx = (tx: TxList) => changeTxList.update(tx, SubActions.remove);
 export const updateTx = (tx: TxList) => changeTxList.update(tx, SubActions.update);
 export const setTxList = (tx: TxList) => changeTxList.update(tx, SubActions.change);

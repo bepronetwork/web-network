@@ -20,7 +20,7 @@ interface ContextualSpanProps {
 export function ContextualSpan({ children, context, color, className = "", isAlert } : ContextualSpanProps) {
   const contextColor = color || context;
   const CLASSES = clsx("p family-Regular font-weight-medium border-radius-4 align-items-center mx-0 px-1", 
-                       `svg-${contextColor} text-${contextColor} ${className}`,
+                       `text-${contextColor} ${className}`,
                        isAlert && `bg-${contextColor}-25 py-2 border border-${contextColor}`);
 
   const Icon = (props: SVGProps<SVGSVGElement>) => {
@@ -37,7 +37,7 @@ export function ContextualSpan({ children, context, color, className = "", isAle
 
   return(
     <FlexRow className={CLASSES}>
-      <span className="mr-1">
+      <span className={`mr-1 svg-${contextColor}`}>
         <Icon width={12} height={12} />
       </span>
       {children}
