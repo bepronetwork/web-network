@@ -11,7 +11,6 @@ class PullRequest extends Model {
         githubId: DataTypes.STRING,
         issueId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
-        branch: DataTypes.STRING,
         userRepo: {
           type: DataTypes.STRING,
           allowNull: true

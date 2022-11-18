@@ -68,7 +68,6 @@ export interface pullRequest {
   createdAt: Date;
   githubId: string;
   githubLogin: string;
-  branch: string;
   id: number;
   isMergeable: boolean;
   issueId: number;
