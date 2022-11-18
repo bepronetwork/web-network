@@ -15,7 +15,8 @@ module.exports = {
       await queryInterface.bulkUpdate("networks", {
         isDefault: true
       }, {
-        name: defaultNetworkName
+        name: defaultNetworkName,
+        colors: `{"primary":"#4250e4","secondary":"#fd8b2a","oracle":"#9669ed","text":"#ffffff","background":"#0d0f19","shadow":"#151720","gray":"#c4c7d3","success":"#35e0ad","danger":"#eb5757","warning":"#ee9240","info":"#87c7ec", "dark": "#0d0f19"}`
       });
   },
 
