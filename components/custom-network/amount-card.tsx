@@ -24,7 +24,7 @@ export default function AmountCard({
 
       <div className="d-flex flex-row align-items-center mt-3">
         <h4 className="family-Regular text-white">
-          {formatNumberToCurrency(amount)}
+          {formatNumberToNScale(amount)}
         </h4>
       </div>
     </div>
