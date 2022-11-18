@@ -90,37 +90,23 @@ export default function CuratorsList() {
 
   return (
     <CustomContainer>
-      {(truncatedData && (
-        <div className="row justify-content-center mb-3 pt-5">
-          <div className="d-flex col-6 align-items-center justify-content-center">
-            <span className="caption-small mr-1">
-              {t("errors.results-truncated")}
-            </span>
-            <Button onClick={goToFirstPage}>{t("actions.back-to-top")}</Button>
-          </div>
-        </div>
-      )) || <></>}
-      
-      {(curatorsPage.some((el) => el.curators?.length === 0) && (
-        <NothingFound description={t("council:errors.not-found")}>
-          {state.Service?.network?.active ? (
-            <InternalLink
-              href="/new-network"
-              label={String(t("actions.create-one"))}
-              uppercase
-              blank={
-                state.Service?.network?.active.name !==
-                state.Settings?.defaultNetworkConfig?.name
-              }
-            />
-          ) : (
-            ""
-          )}
-        </NothingFound>
+      <CuratorListBar />
+      {(curatorsPage.some((el) => el?.curators?.length === 0) && (
+        <NothingFound description={t("council:errors.not-found")} />
       )) || <></>}
 
-      <CuratorListBar />
-      {(curatorsPage.some((el) => el.curators?.length > 0) && (
+      {(truncatedData && (
+        <div className="row justify-content-center mb-3 pt-5">
+            <div className="d-flex col-6 align-items-center justify-content-center">
+              <span className="caption-small mr-1">
+                  {t("errors.results-truncated")}
+              </span>
+              <Button onClick={goToFirstPage}>{t("actions.back-to-top")}</Button>
+            </div>
+        </div>
+        )) || <></>}
+      
+      {(curatorsPage.some((el) => el?.curators?.length > 0) && (
         <InfiniteScroll
           handleNewPage={nextPage}
           isLoading={state.loading?.isLoading}
