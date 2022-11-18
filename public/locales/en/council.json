@@ -18,7 +18,8 @@
     "disputed-proposals": "Disputed Proposals",
     "disputes": "Disputes",
     "total-votes": "Total Votes",
-    "actions": "Actions"
+    "actions": "Actions",
+    "deletage-address": "Delegate to this address"
   },
   "errors": {
     "not-found": "Curators not found"
