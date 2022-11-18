@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Spinner } from "react-bootstrap";
 
 import Translation from "components/translation";
+
 import {useAppState} from "../contexts/app-state";
 
 export default function Loading() {

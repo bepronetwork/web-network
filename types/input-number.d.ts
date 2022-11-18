@@ -25,4 +25,5 @@ export interface InputNumber extends NumberFormatProps {
   setMaxValue?: () => void;
   errorMessage?: string;
   description?: string;
+  fullWidth?: boolean;
 }

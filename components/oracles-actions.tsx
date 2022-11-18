@@ -55,7 +55,7 @@ function OraclesActions({
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
 
-  const exceedsAvailable = value => BigNumber(value).gt(getMaxAmmount());
+  const exceedsAvailable = value => BigNumber(value).gt(getMaxAmount());
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
     !!transactions.find((transactions) =>
@@ -71,7 +71,7 @@ function OraclesActions({
                token: Service?.network?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: new BigNumber(tokenAmount).gte(1e18) ? null : formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(tokenAmount),
         token: Service?.network?.networkToken?.symbol
       }),
       caption: (
@@ -103,7 +103,7 @@ function OraclesActions({
           token: Service?.network?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: new BigNumber(tokenAmount).gte(1e18) ? null : formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
         token: Service?.network?.networkToken?.symbol
       }),
@@ -193,15 +193,22 @@ function OraclesActions({
       : t("$oracles", { token: Service?.network?.networkToken?.symbol });
   }
 
-  function getMaxAmmount(): string {
-    if (action === t("my-oracles:actions.lock.label")) 
-      return wallet?.balance?.bepro?.toFixed();
+  function getMaxAmount(trueValue = false): string {
+    const amount = action === t("my-oracles:actions.lock.label")
+      ? wallet?.balance?.bepro?.toFixed()
+      : wallet?.balance?.oracles?.locked?.toFixed();
 
-    return wallet?.balance?.oracles?.locked?.toFixed();
+    if (!amount)
+      return '0';
+
+    if (trueValue)
+      return amount;
+
+    return formatNumberToNScale(amount);
   }
 
-  function setMaxAmmount() {
-    return setTokenAmount(getMaxAmmount());
+  function setMaxAmount() {
+    return setTokenAmount(getMaxAmount(true));
   }
 
   function getTxType() {
@@ -257,9 +264,9 @@ function OraclesActions({
             decimalScale={networkTokenDecimals}
             helperText={
               <>
-                {formatStringToCurrency(getMaxAmmount())}{" "}
+                {formatStringToCurrency(getMaxAmount())}{" "}
                 {getCurrentLabel()} {t("misc.available")}
-                <span onClick={setMaxAmmount}
+                <span onClick={setMaxAmount}
                       className={`caption-small ml-1 cursor-pointer text-uppercase ${(
                         getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol }) 
                           ? "text-purple" 

@@ -25,6 +25,7 @@ export default function InputNumber({
   setMaxValue,
   description,
   allowNegative = false,
+  fullWidth = false,
   value,
   onValueChange,
   ...params
@@ -53,7 +54,7 @@ export default function InputNumber({
   useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
 
   return (
-    <Component {...(shouldBeWrapped && { className: "form-group" })}>
+    <Component {...(shouldBeWrapped && { className: `form-group ${fullWidth ? 'w-100' : ''}` })}>
       {label && typeof label === 'string' ? (
         <label
           className="caption-small mb-2 text-gray d-flex align-items-center"
