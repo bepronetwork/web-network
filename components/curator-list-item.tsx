@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import CopyIcon from "assets/icons/copy-icon";
 import DelegateIcon from "assets/icons/delegate-icon";
 
+import { useAppState } from "contexts/app-state";
+
 import { CopyValue } from "helpers/copy-value";
 import { formatNumberToNScale } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
@@ -20,6 +22,7 @@ interface CuratorListItemProps {
 
 export default function CuratorListItem({ curator }: CuratorListItemProps) {
   const { getURLWithNetwork } = useNetwork();
+  const { state } = useAppState();
   const router = useRouter();
 
   return (
@@ -65,19 +68,23 @@ export default function CuratorListItem({ curator }: CuratorListItemProps) {
         >
           <CopyIcon />
         </Button>
-        <Button
-          onClick={() => {
-            router.push(getURLWithNetwork("/profile/bepro-votes", {
-            curatorAddress: curator?.address
-            }));
-          }}
-          className="border-dark-gray mr-1 hover-blue"
-          applyTextColor={false}
-          transparent
-          rounded
-        >
-          <DelegateIcon />
-        </Button>
+
+        {state.currentUser?.walletAddress &&
+          state.currentUser?.walletAddress !== curator?.address && (
+            <Button
+              onClick={() => {
+                router.push(getURLWithNetwork("/profile/bepro-votes", {
+                    curatorAddress: curator?.address,
+                }));
+              }}
+              className="border-dark-gray mr-1 hover-blue"
+              applyTextColor={false}
+              transparent
+              rounded
+            >
+              <DelegateIcon />
+            </Button>
+          )}
       </div>
     </div>
   );
