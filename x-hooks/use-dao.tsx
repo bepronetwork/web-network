@@ -53,7 +53,6 @@ export function useDao() {
     state.Service.active
         .loadNetwork(networkAddress)
         .then(started => {
-          console.log(`loadNetwork`, started, service);
           if (!started) {
             console.error(`Failed to load network`, networkAddress);
             return;

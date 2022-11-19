@@ -324,8 +324,8 @@ export default class DAO {
 
     return {
       treasury: treasury?.treasury || Defaults.nativeZeroAddress,
-      closeFee: +(treasury?.closeFee || 0),
-      cancelFee: +(treasury?.cancelFee || 0)
+      closeFee: +(treasury?.closeFee || 0) * 1000000,
+      cancelFee: +(treasury?.cancelFee || 0) * 1000000
     };
   }
 
