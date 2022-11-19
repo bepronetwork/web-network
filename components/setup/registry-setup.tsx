@@ -230,6 +230,10 @@ export function RegistrySetup({
     updateData();
   }, [registryAddress, Service?.active]);
 
+  useEffect(() => {
+    if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);
+  }, [currentUser?.walletAddress]);
+
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">
       { hasRegistryAddress &&
