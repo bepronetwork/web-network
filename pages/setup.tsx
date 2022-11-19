@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, Row } from "react-bootstrap";
 
 import { GetServerSideProps } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
@@ -21,6 +22,7 @@ const { publicRuntimeConfig: { adminWallet } } = getConfig();
 
 export default function SetupPage(){
   const { replace } = useRouter();
+  const { t } = useTranslation("setup")
 
   const [activeTab, setActiveTab] = useState("registry");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
@@ -56,7 +58,7 @@ export default function SetupPage(){
   const tabs = [
     {
       eventKey: "registry",
-      title: "Registry",
+      title: t("registry.title"),
       component: (
         <RegistrySetup 
           registryAddress={networkRegistryAddress}
@@ -66,7 +68,7 @@ export default function SetupPage(){
     },
     {
       eventKey: "network",
-      title: "Network",
+      title: t("network.title"),
       component: (
         <NetworkSetup 
           isVisible={activeTab === "network"}
@@ -79,7 +81,7 @@ export default function SetupPage(){
   return(
     <Container>
       <Row className="text-center">
-        <h1>Environment Setup</h1>
+        <h1>{t("title")}</h1>
       </Row>
 
       {(isConnected && isAdmin) &&
@@ -104,7 +106,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "bounty",
         "custom-network",
         "connect-wallet-button",
-        "change-token-modal"
+        "change-token-modal",
+        "setup"
       ])),
     },
   };

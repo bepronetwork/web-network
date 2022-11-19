@@ -92,7 +92,7 @@ export default function CouncilLayout({ children }) {
       },
       {
         value: onNetwork.toFixed(),
-        label: t("heroes.bounties-in-network"),
+        label: t("heroes.in-network"),
         currency: state.Service?.network?.networkToken?.symbol,
       },
     ]);

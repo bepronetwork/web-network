@@ -1,6 +1,8 @@
 import { SetStateAction } from "react";
 import { Col } from "react-bootstrap";
 
+import { useTranslation } from "next-i18next";
+
 import Button from "components/button";
 import { ExternalLink } from "components/external-link";
 import { FormGroup } from "components/form-group";
@@ -36,10 +38,11 @@ export function ContractInput({
   validator,
   readOnly
 } : ContractInputProps) {
+  const { t } = useTranslation(["common", "setup"]);
   const { state: { Service } } = useAppState();
 
   function isInvalid(validated, name) {
-    return validated === false ? `Please provide a valid ${name} address` : undefined;
+    return validated === false ? t("setup:errors.invalid-contract-address", { contract: name }) : undefined;
   }
 
   function handleChange(value: string) {
@@ -65,7 +68,7 @@ export function ContractInput({
     <>
       <FormGroup
           label={contractName}
-          placeholder={`${contractName} contract address`}
+          placeholder={t("setup:fields.contract-field.placeholder", { contract: contractName })}
           value={field.value}
           onChange={handleChange}
           readOnly={readOnly}
@@ -73,7 +76,7 @@ export function ContractInput({
           error={isInvalid(field.validated, contractName)}
           hint={
             <ExternalLink
-              label={`View ${contractName} docs`}
+              label={t("setup:fields.contract-field.hint", { contract: contractName })}
               href={docsLink}
             />
           }

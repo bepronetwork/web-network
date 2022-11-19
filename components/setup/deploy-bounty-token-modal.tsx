@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Row } from "react-bootstrap";
 
+import { useTranslation } from "next-i18next";
+
 import Button from "components/button";
 import { FormGroup } from "components/form-group";
 import Modal from "components/modal";
@@ -17,12 +19,14 @@ export function DeployBountyTokenModal({
   handleHide,
   onChange
 }) {
+  const { t } = useTranslation("setup");
+
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const { handleDeployBountyToken } = useBepro();
   const { dispatch } = useAppState();
+  const { handleDeployBountyToken } = useBepro();
 
   const deployBtnDisabled = name.trim() === "" || symbol.trim() === "";
 
@@ -40,10 +44,10 @@ export function DeployBountyTokenModal({
 
       onChange(tx.contractAddress);
       handleClose();
-      dispatch(toastSuccess("Bounty Token deployed"));
+      dispatch(toastSuccess(t("modals.deploy-bounty-token.success.deploy")));
     } catch (error) {
       if (error?.code !== MetamaskErrors.UserRejected)
-        dispatch(toastError("Failed to deploy Bounty Token"));
+        dispatch(toastError(t("modals.deploy-bounty-token.errors.deploy")));
     } finally {
       setIsExecuting(false);
     }
@@ -53,19 +57,19 @@ export function DeployBountyTokenModal({
     <Modal
       show={show}
       onCloseClick={handleClose}
-      title="New Bounty Token"
+      title={t("modals.deploy-bounty-token.title")}
     >
       <Row className="mb-3">
         <FormGroup
-          label="Name"
-          placeholder="Token Name"
+          label={t("modals.deploy-bounty-token.fields.name.label")}
+          placeholder={t("modals.deploy-bounty-token.fields.name.placeholder")}
           value={name}
           onChange={setName}
         />
 
         <FormGroup
-          label="Symbol"
-          placeholder="Token Symbol"
+          label={t("modals.deploy-bounty-token.fields.symbol.label")}
+          placeholder={t("modals.deploy-bounty-token.fields.symbol.placeholder")}
           value={symbol}
           onChange={setSymbol}
         />
@@ -77,7 +81,7 @@ export function DeployBountyTokenModal({
         withLockIcon={deployBtnDisabled}
         disabled={deployBtnDisabled || isExecuting}
       >
-        <span>Deploy</span>
+        <span>{t("modals.deploy-bounty-token.actions.deploy")}</span>
       </Button>
     </Modal>
   );

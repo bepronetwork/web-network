@@ -1,3 +1,5 @@
+import { useTranslation } from "next-i18next";
+
 import { ERC20Details } from "components/custom-network/erc20-details";
 import Modal from "components/modal";
 
@@ -6,6 +8,8 @@ export function DeployERC20Modal({
   handleHide,
   onChange
 }) {
+  const { t } = useTranslation("setup");
+
   function handleChange(value: string) {
     if (value === "") return;
 
@@ -17,7 +21,7 @@ export function DeployERC20Modal({
     <Modal
       show={show}
       onCloseClick={handleHide}
-      title="New ERC20 Token"
+      title={t("modals.deploy-erc20.title")}
       size="lg"
     >
       <ERC20Details

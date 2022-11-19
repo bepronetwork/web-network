@@ -1,3 +1,5 @@
+import { useTranslation } from "next-i18next";
+
 import { ContextualSpan } from "components/contextual-span";
 import { NewNetworkStepper } from "components/custom-network/new-network-stepper";
 
@@ -12,6 +14,7 @@ export function NetworkSetup({
   isVisible,
   defaultNetwork
 } : NetworkSetupProps) {
+  const { t } = useTranslation("setup");
   
   if (!isVisible)
     return <></>;
@@ -20,7 +23,7 @@ export function NetworkSetup({
     <div className="content-wrapper border-top-0 px-2 py-2">
       { !!defaultNetwork &&
         <ContextualSpan context="primary" isAlert>
-          <span>Default Network already saved, please visit {defaultNetwork.name} settings page.</span>
+          <span>{t("network.errors.network-already-saved")}</span>
         </ContextualSpan> ||
         <NewNetworkStepper />
       }

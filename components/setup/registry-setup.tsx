@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
 import { ContextualSpan } from "components/contextual-span";
@@ -42,6 +43,8 @@ export function RegistrySetup({
   isVisible,
   registryAddress
 } : RegistrySetupProps) {
+  const { t } = useTranslation("setup");
+
   const [treasury, setTreasury] = useState("");
   const [erc20, setErc20] = useState(defaultContractField);
   const [visibleModal, setVisibleModal] = useState<string>();
@@ -86,7 +89,7 @@ export function RegistrySetup({
 
   function exceedsFeesLimitsError(fee) {
     if (+fee < 0 || +fee > 100)
-      return "Value must be between 0 and 100";
+      return t("registry.errors.exceeds-limit");
 
     return undefined;
   }
@@ -134,9 +137,9 @@ export function RegistrySetup({
       .then(() => {
         loadSettings(true);
       })
-      .then(() => dispatch(toastSuccess("See the Network Registry field", "Registry deployed")))
+      .then(() => dispatch(toastSuccess(t("registry.success.deploy.content"), t("registry.success.deploy.title"))))
       .catch(error => {
-        dispatch(toastError("Failed to deploy Network Registry"));
+        dispatch(toastError(t("registry.errors.deploy")));
         console.debug("Failed to deploy network registry", error);
       })
       .finally(() => setisDeployingRegistry(false));
@@ -189,9 +192,9 @@ export function RegistrySetup({
 
     handleSetDispatcher(bountyToken.value, registryAddress)
       .then(() => updateData())
-      .then(() => dispatch(toastSuccess("Dispatcher setted")))
+      .then(() => dispatch(toastSuccess(t("registry.success.dispatcher-setted"))))
       .catch(error => {
-        dispatch(toastError("Failed to set dispatcher"));
+        dispatch(toastError(t("registry.errors.dispatcher")));
         console.debug("Failed to set dispatcher", error);
       })
       .finally(() => setIsSettingDisptacher(false));
@@ -203,9 +206,9 @@ export function RegistrySetup({
         updateData(),
         processEvent("registry", "changed", "", { fromBlock: (txInfo as { blockNumber: number }).blockNumber })
       ]))
-      .then(() => dispatch(toastSuccess("Token allowed")))
+      .then(() => dispatch(toastSuccess(t("registry.success.allow"))))
       .catch(error => {
-        dispatch(toastError("Failed to allow token"));
+        dispatch(toastError(t("registry.errors.allow")));
         console.debug("Failed to allow token", error);
       })
       .finally(() => setIsAllowingToken(undefined));
@@ -235,14 +238,14 @@ export function RegistrySetup({
           className="mb-3"
           isAlert
         >
-          Network Registry already saved
+          {t("registry.errors.already-saved")}
         </ContextualSpan>
       }
 
       { needToSetDispatcher &&
         <CallToAction
-          call="The Bounty Token requires Network Registry to be set as dispatcher"
-          action="Set Dispatcher"
+          call={t("registry.cta.dispatcher.call")}
+          action={t("registry.cta.dispatcher.action")}
           onClick={setDispatcher}
           color="warning"
           disabled={!needToSetDispatcher}
@@ -252,8 +255,8 @@ export function RegistrySetup({
 
       { isErc20Allowed?.transactional === false &&
         <CallToAction
-          call="For the Registry Token to be used in bounties it needs to be allowed"
-          action="Allow as Transactional"
+          call={t("registry.cta.allow-transactional.call")}
+          action={t("registry.cta.allow-transactional.action")}
           onClick={allowAsTransactional}
           color="warning"
           disabled={!!isErc20Allowed?.transactional || !!isAllowingToken}
@@ -263,8 +266,8 @@ export function RegistrySetup({
 
       { isErc20Allowed?.reward === false &&
         <CallToAction
-          call="For the Registry Token to be used as reward in funding requests it needs to be allowed"
-          action="Allow as Rewardal"
+          call={t("registry.cta.allow-reward.call")}
+          action={t("registry.cta.allow-reward.action")}
           onClick={allowAsReward}
           color="warning"
           disabled={!!isErc20Allowed?.reward || !!isAllowingToken}
@@ -291,7 +294,7 @@ export function RegistrySetup({
           readOnly={hasRegistryAddress}
           action={{
             disabled: hasRegistryAddress,
-            label: "Deploy New ERC20 Token",
+            label: t("registry.actions.deploy-erc20"),
             executing: false,
             onClick: handleShowERC20Modal
           }}
@@ -308,7 +311,7 @@ export function RegistrySetup({
           readOnly={hasRegistryAddress}
           action={{
             disabled: hasRegistryAddress,
-            label: "Deploy New Bounty Token",
+            label: t("registry.actions.deploy-bounty-token"),
             executing: false,
             onClick: handleShowBountyTokenModal
           }}
@@ -317,9 +320,9 @@ export function RegistrySetup({
 
       <Row className="mb-3">
         <FormGroup
-          label="Treasury"
-          placeholder="Treasury wallet address"
-          description="Wallet that will receive the network registry fees"
+          label={t("registry.fields.treasury.label")}
+          placeholder={t("registry.fields.treasury.placeholder")}
+          description={t("registry.fields.treasury.description")}
           readOnly={hasRegistryAddress}
           value={treasury}
           onChange={setTreasury}
@@ -328,44 +331,44 @@ export function RegistrySetup({
 
       <Row className="mb-3">
         <FormGroup
-          label="Network Creation Amount"
+          label={t("registry.fields.network-creation-amount.label")}
           placeholder="0"
           value={lockAmountForNetworkCreation}
           onChange={setLockAmountForNetworkCreation}
           variant="numberFormat"
-          description="Amount needed to be locked on registry to register a network"
+          description={t("registry.fields.network-creation-amount.description")}
           readOnly={hasRegistryAddress}
         />
 
         <FormGroup
-          label="Network Creation Fee"
+          label={t("registry.fields.network-creation-fee.label")}
           placeholder="0"
           value={networkCreationFeePercentage}
           onChange={setNetworkCreationFeePercentage}
           variant="numberFormat"
-          description="Percentage of the network creation amount charged when a network is registered"
+          description={t("registry.fields.network-creation-fee.description")}
           error={exceedsFeesLimitsError(networkCreationFeePercentage)}
           readOnly={hasRegistryAddress}
         />
 
         <FormGroup
-          label="Close Bounty Fee"
+          label={t("registry.fields.close-bounty-fee.label")}
           placeholder="0"
           value={closeFeePercentage}
           onChange={setCloseFeePercentage}
           variant="numberFormat"
-          description="Percentage of the bounty amount charged when a bounty is closed"
+          description={t("registry.fields.close-bounty-fee.description")}
           error={exceedsFeesLimitsError(closeFeePercentage)}
           readOnly={hasRegistryAddress}
         />
 
         <FormGroup
-          label="Cancel Bounty Fee"
+          label={t("registry.fields.cancel-bounty-fee.label")}
           placeholder="0"
           value={cancelFeePercentage}
           onChange={setCancelFeePercentage}
           variant="numberFormat"
-          description="Percentage of the bounty amount charged when a canceled is closed"
+          description={t("registry.fields.cancel-bounty-fee.description")}
           error={exceedsFeesLimitsError(cancelFeePercentage)}
           readOnly={hasRegistryAddress}
         />
@@ -379,7 +382,7 @@ export function RegistrySetup({
             isLoading={isDeployingRegistry}
             onClick={deployRegistryContract}
           >
-            <span>Deploy Network Registry</span>
+            <span>{t("registry")}</span>
           </Button>
         </Col>
       </Row>
