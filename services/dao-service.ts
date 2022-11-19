@@ -77,7 +77,7 @@ export default class DAO {
 
       return network;
     } catch (error) {
-      console.log(`Error loading Network_v2 (${networkAddress}): `, error);
+      console.debug(`Error loading Network_v2 (${networkAddress}): `, error);
     }
 
     return false;
@@ -198,7 +198,7 @@ export default class DAO {
 
       return true;
     } catch (error) {
-      console.log("Error starting: ", error);
+      console.debug("Error starting: ", error);
     }
 
     return false;
@@ -212,7 +212,7 @@ export default class DAO {
 
       return true;
     } catch (error) {
-      console.log("Error logging in: ", error);
+      console.debug("Error logging in: ", error);
     }
 
     return false;
