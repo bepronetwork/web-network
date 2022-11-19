@@ -94,12 +94,12 @@ export function RegistrySetup({
     return undefined;
   }
 
-  function handleErc20Change(value: string) {
-    setErc20(previous => ({ ...previous, value}));
+  function handleErc20Change(value: string, validated?: boolean) {
+    setErc20(previous => ({ ...previous, value, validated }));
   }
 
-  function handleBountyTokenChange(value: string) {
-    setBountyToken(previous => ({ ...previous, value}));
+  function handleBountyTokenChange(value: string, validated?: boolean) {
+    setBountyToken(previous => ({ ...previous, value, validated}));
   }
 
   function handleShowERC20Modal() {
@@ -382,7 +382,7 @@ export function RegistrySetup({
             isLoading={isDeployingRegistry}
             onClick={deployRegistryContract}
           >
-            <span>{t("registry")}</span>
+            <span>{t("setup:registry.actions.deploy-registry")}</span>
           </Button>
         </Col>
       </Row>

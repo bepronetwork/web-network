@@ -68,7 +68,7 @@ export function ContractInput({
     <>
       <FormGroup
           label={contractName}
-          placeholder={t("setup:fields.contract-field.placeholder", { contract: contractName })}
+          placeholder={t("setup:registry.fields.contract-field.placeholder", { contract: contractName })}
           value={field.value}
           onChange={handleChange}
           readOnly={readOnly}
@@ -76,7 +76,7 @@ export function ContractInput({
           error={isInvalid(field.validated, contractName)}
           hint={
             <ExternalLink
-              label={t("setup:fields.contract-field.hint", { contract: contractName })}
+              label={t("setup:registry.fields.contract-field.hint", { contract: contractName })}
               href={docsLink}
             />
           }

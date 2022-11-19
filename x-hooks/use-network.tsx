@@ -21,7 +21,7 @@ export function useNetwork() {
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
 
   const {getNetwork, getTokens} = useApi();
-  const {query, push} = useRouter();
+  const {query, push, replace} = useRouter();
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -74,8 +74,10 @@ export function useNetwork() {
       })
       .catch(error => {
         console.error(`Failed to get network`, error);
-        
-        if (query?.network)
+
+        if (!networkName)
+          replace("/setup");
+        else
           push({pathname: `/networks`});
       });
 

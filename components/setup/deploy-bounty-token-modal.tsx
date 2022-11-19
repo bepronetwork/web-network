@@ -42,12 +42,12 @@ export function DeployBountyTokenModal({
 
       const tx = await handleDeployBountyToken(name, symbol);
 
-      onChange(tx.contractAddress);
+      onChange(tx.contractAddress, true);
       handleClose();
-      dispatch(toastSuccess(t("modals.deploy-bounty-token.success.deploy")));
+      dispatch(toastSuccess(t("registry.modals.deploy-bounty-token.success.deploy")));
     } catch (error) {
       if (error?.code !== MetamaskErrors.UserRejected)
-        dispatch(toastError(t("modals.deploy-bounty-token.errors.deploy")));
+        dispatch(toastError(t("registry.modals.deploy-bounty-token.errors.deploy")));
     } finally {
       setIsExecuting(false);
     }
@@ -57,19 +57,19 @@ export function DeployBountyTokenModal({
     <Modal
       show={show}
       onCloseClick={handleClose}
-      title={t("modals.deploy-bounty-token.title")}
+      title={t("registry.modals.deploy-bounty-token.title")}
     >
       <Row className="mb-3">
         <FormGroup
-          label={t("modals.deploy-bounty-token.fields.name.label")}
-          placeholder={t("modals.deploy-bounty-token.fields.name.placeholder")}
+          label={t("registry.modals.deploy-bounty-token.fields.name.label")}
+          placeholder={t("registry.modals.deploy-bounty-token.fields.name.placeholder")}
           value={name}
           onChange={setName}
         />
 
         <FormGroup
-          label={t("modals.deploy-bounty-token.fields.symbol.label")}
-          placeholder={t("modals.deploy-bounty-token.fields.symbol.placeholder")}
+          label={t("registry.modals.deploy-bounty-token.fields.symbol.label")}
+          placeholder={t("registry.modals.deploy-bounty-token.fields.symbol.placeholder")}
           value={symbol}
           onChange={setSymbol}
         />
@@ -81,7 +81,7 @@ export function DeployBountyTokenModal({
         withLockIcon={deployBtnDisabled}
         disabled={deployBtnDisabled || isExecuting}
       >
-        <span>{t("modals.deploy-bounty-token.actions.deploy")}</span>
+        <span>{t("registry.modals.deploy-bounty-token.actions.deploy")}</span>
       </Button>
     </Modal>
   );

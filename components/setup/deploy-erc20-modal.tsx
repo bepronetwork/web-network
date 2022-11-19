@@ -13,7 +13,7 @@ export function DeployERC20Modal({
   function handleChange(value: string) {
     if (value === "") return;
 
-    onChange(value);
+    onChange(value, true);
     handleHide();
   }
 
@@ -21,7 +21,7 @@ export function DeployERC20Modal({
     <Modal
       show={show}
       onCloseClick={handleHide}
-      title={t("modals.deploy-erc20.title")}
+      title={t("registry.modals.deploy-erc20.title")}
       size="lg"
     >
       <ERC20Details
