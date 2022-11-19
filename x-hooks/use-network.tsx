@@ -16,12 +16,14 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 
+const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
+
 export function useNetwork() {
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
 
   const {getNetwork, getTokens} = useApi();
-  const {query, push, replace} = useRouter();
+  const {pathname, query, push, replace} = useRouter();
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -75,9 +77,10 @@ export function useNetwork() {
       .catch(error => {
         console.error(`Failed to get network`, error);
 
-        if (!networkName)
+        if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
           replace("/setup");
-        else
+        
+        if(networkName)
           push({pathname: `/networks`});
       });
 
