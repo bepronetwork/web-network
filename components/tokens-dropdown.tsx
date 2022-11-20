@@ -98,33 +98,27 @@ export default function TokensDropdown({
         if (values[0]) {
           const tokensOptions = values.map(tokenToOption);
           setOptions(tokensOptions);
-          setOption(tokensOptions[0]);
-          setToken(values[0]);
         }
       })
-      .catch((err) => console.log("err token", err));
+      .catch((err) => console.debug("err token", err));
   }
 
   useEffect(() => {
     if (!tokens?.length) return;
     if (needsBalance) getBalanceTokens();
-    else {
-      const tokensOptions = tokens.map(tokenToOption);
-      setOptions(tokensOptions)
-      
-      //Set first token as default
-      if(tokensOptions?.[0]){
-        setOption(tokensOptions?.[0])
-        handleChange(tokensOptions?.[0])
-      }
-    }
-    if(tokens?.length === 1) setOption(tokenToOption(tokens[0]))
+    else setOptions(tokens.map(tokenToOption));
   }, [tokens]);
 
   useEffect(() => {
-    if(defaultToken || !token) return;
-    setOption(tokenToOption(token))
-  }, [token])
+    if(!!option || !options?.length) return;
+
+    const addressToFind = defaultToken && defaultToken.address || token?.address;
+
+    const defaultOption = 
+      addressToFind ? options.find(({ value: { address} }) => address === addressToFind) : options[0];
+
+    handleChange(defaultOption);
+  }, [token, options, defaultToken]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
     const { name, symbol, address, currentValue, tokenInfo } = data.value;

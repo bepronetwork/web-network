@@ -193,14 +193,10 @@ export default function useBepro() {
       const tx = addTx([{ type } as any]);
       dispatch(tx);
 
-      console.log(`TX`, tx.payload);
-
       await state.Service?.active.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo)
           throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
-
-        console.log(`TXINFO`, txInfo, tx.payload);
 
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
         resolve(txInfo);
