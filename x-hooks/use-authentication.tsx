@@ -155,7 +155,7 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
-    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service.active.network)
+    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service?.active?.network)
       return;
 
     const update = newBalance => {

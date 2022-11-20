@@ -41,6 +41,8 @@ export default function WalletBalance() {
 
     const { networkToken } = state.Service?.network || {};
 
+    console.log({networkToken})
+
     state.Service.active.loadRegistry()
       .then(registry => {
         if (!registry) return;
@@ -59,10 +61,7 @@ export default function WalletBalance() {
           registryTokenAddress === state.Service?.network?.networkToken?.address ? Promise.resolve(null) :
           state.Service.active
             .getTokenBalance(state.Service?.network?.networkToken?.address, state.currentUser.walletAddress)
-            .then(balance =>
-              (networkToken.name as any as () => Promise<string>)()
-                .then(name => (networkToken.symbol as any as () => Promise<string>)()
-                  .then(symbol => ({name, symbol, balance, icon: <TokenIconPlaceholder />}))))
+            .then(balance => ({ ...networkToken, balance, icon: <TokenIconPlaceholder />}))
         ]).then(tokens => {
           setOracleToken({
             symbol: t("$oracles",  { token: networkToken?.symbol }),
