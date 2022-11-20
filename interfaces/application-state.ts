@@ -53,6 +53,7 @@ export interface ServiceNetwork {
   times: NetworkTimes;
   amounts: NetworkAmounts;
   noDefaultNetwork?: boolean;
+  treasury?: string;
   tokens: {transactional: Token[]; reward: Token[];} | null;
 }
 
