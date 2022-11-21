@@ -73,9 +73,11 @@ export default function ProposalMerge({
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
 
-    const distributions = calculateDistributedAmounts(state.Service?.network?.amounts?.treasury,
-                                                      state.Service?.network?.amounts?.mergeCreatorFeeShare,
-                                                      state.Service?.network?.amounts?.proposerFeeShare,
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
+
+    const distributions = calculateDistributedAmounts(treasury,
+                                                      mergeCreatorFeeShare,
+                                                      proposerFeeShare,
                                                       amountTotal,
                                                       proposal.details.map(({ percentage }) => percentage));
     setDistributedAmounts(distributions);
@@ -84,7 +86,7 @@ export default function ProposalMerge({
   async function  getCoinInfo() { 
     await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
-    }).catch(error => console.log("getCoinInfo", error));
+    }).catch(error => console.debug("getCoinInfo", error));
   }
 
   function handleConversion(value) {
@@ -103,8 +105,7 @@ export default function ProposalMerge({
   useEffect(() => {
     if (
       !proposal ||
-      !state.Service?.network?.amounts?.mergeCreatorFeeShare ||
-      !state.Service?.network?.amounts?.treasury
+      !state.Service?.network?.amounts
     )
       return;
 
@@ -113,9 +114,7 @@ export default function ProposalMerge({
   }, [
     proposal,
     amountTotal,
-    state.Service?.network?.amounts?.treasury,
-    state.Service?.network?.amounts?.mergeCreatorFeeShare,
-    state.Service?.network?.amounts?.proposerFeeShare,
+    state.Service?.network?.amounts,
     state.Service?.network?.networkToken?.address
   ]);
 

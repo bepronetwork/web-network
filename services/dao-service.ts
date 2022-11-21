@@ -77,18 +77,18 @@ export default class DAO {
 
       return network;
     } catch (error) {
-      console.log(`Error loading Network_v2 (${networkAddress}): `, error);
+      console.debug(`Error loading Network_v2 (${networkAddress}): `, error);
     }
 
     return false;
   }
 
-  async loadRegistry(skipAssignment?: boolean): Promise<NetworkRegistry | boolean> {
+  async loadRegistry(skipAssignment?: boolean, registryAddress?: string): Promise<NetworkRegistry | boolean> {
     try {
-      if (!this.registryAddress) 
+      if (!this.registryAddress && !registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new NetworkRegistry(this.web3Connection, this.registryAddress);
+      const registry = new NetworkRegistry(this.web3Connection, registryAddress || this.registryAddress);
 
       await registry.loadContract();
 
@@ -96,7 +96,7 @@ export default class DAO {
 
       return registry;
     } catch (error) {
-      console.log("Error loading NetworkRegistry: ", error);
+      console.debug("Error loading NetworkRegistry: ", error);
     }
 
     return false;
@@ -116,6 +116,36 @@ export default class DAO {
     await token.loadContract();
 
     return token;
+  }
+
+  async isNetworkRegistry(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadRegistry(true, contractAddress));
+    } catch(e) {
+      console.debug("isNetworkRegistry", e);
+    }
+
+    return false;
+  }
+
+  async isERC20(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadERC20(contractAddress));
+    } catch(e) {
+      console.debug("isERC20", e);
+    }
+
+    return false;
+  }
+
+  async isBountyToken(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadBountyToken(contractAddress));
+    } catch(e) {
+      console.debug("isBountyToken", e);
+    }
+
+    return false;
   }
 
 
@@ -168,7 +198,7 @@ export default class DAO {
 
       return true;
     } catch (error) {
-      console.log("Error starting: ", error);
+      console.debug("Error starting: ", error);
     }
 
     return false;
@@ -182,7 +212,7 @@ export default class DAO {
 
       return true;
     } catch (error) {
-      console.log("Error logging in: ", error);
+      console.debug("Error logging in: ", error);
     }
 
     return false;
@@ -294,8 +324,8 @@ export default class DAO {
 
     return {
       treasury: treasury?.treasury || Defaults.nativeZeroAddress,
-      closeFee: +(treasury?.closeFee || 0),
-      cancelFee: +(treasury?.cancelFee || 0)
+      closeFee: +(treasury?.closeFee || 0) * 1000000,
+      cancelFee: +(treasury?.cancelFee || 0) * 1000000
     };
   }
 
@@ -505,6 +535,26 @@ export default class DAO {
     await deployer.loadAbi();
 
     return deployer.deployJsonAbi(name, symbol, toSmartContractDecimals(cap, 18), ownerAddress);
+  }
+
+  async deployNetworkRegistry(erc20: string,
+                              lockAmountForNetworkCreation: string,
+                              treasury: string,
+                              lockFeePercentage: string,
+                              closeFee: string,
+                              cancelFee: string,
+                              bountyToken: string): Promise<TransactionReceipt> {
+    const deployer = new NetworkRegistry(this.web3Connection);
+
+    await deployer.loadAbi();
+
+    return deployer.deployJsonAbi(erc20,
+                                  lockAmountForNetworkCreation,
+                                  treasury,
+                                  lockFeePercentage,
+                                  closeFee,
+                                  cancelFee,
+                                  bountyToken);
   }
 
   async openBounty({

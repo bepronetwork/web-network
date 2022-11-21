@@ -42,6 +42,12 @@ interface CreateBounty {
   repositoryId: string;
 }
 
+interface GetNetworkProps {
+  name?: string;
+  creator?: string;
+  isDefault?: boolean;
+}
+
 type FileUploadReturn = {
   hash: string;
   fileName: string;
@@ -410,11 +416,12 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork({ name, creator }: { name?: string, creator?: string }) {
-    const Params = {} as { name?: string, creator?: string }
-    if (name) Params.name = name
-
-    if (creator) Params.creator = creator
+  async function getNetwork({ name, creator, isDefault } : GetNetworkProps) {
+    const Params = {} as Omit<GetNetworkProps, "isDefault"> & { isDefault: string };
+    
+    if (name) Params.name = name;
+    if (creator) Params.creator = creator;
+    if (isDefault) Params.isDefault = isDefault.toString();
 
     const search = new URLSearchParams(Params).toString();
 
@@ -444,7 +451,8 @@ export default function useApi() {
     order = "DESC",
     search = "",
     isClosed = undefined,
-    isRegistered = undefined
+    isRegistered = undefined,
+    isDefault = undefined
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -455,7 +463,8 @@ export default function useApi() {
       order,
       search,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
-      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
+      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
+      ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {})
     }).toString();
 
     return api
@@ -527,6 +536,14 @@ export default function useApi() {
       });
   }
 
+  async function saveNetworkRegistry(wallet: string, registryAddress: string) {
+    return api.post("/setup/registry", { wallet, registryAddress })
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -567,6 +584,7 @@ export default function useApi() {
     resetUser,
     getSettings,
     getTokens,
-    createNFT
+    createNFT,
+    saveNetworkRegistry
   };
 }

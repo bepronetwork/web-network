@@ -78,7 +78,7 @@ function networkTxButton({
   }
 
   function makeTx() {
-    if (!state.Service?.active || !state.currentUser) return;
+    if (!state.Service?.active?.network || !state.currentUser) return;
 
     const tmpTransaction = addTx([{
       type: txType,

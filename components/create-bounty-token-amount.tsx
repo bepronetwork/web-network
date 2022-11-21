@@ -51,7 +51,7 @@ export default function CreateBountyTokenAmount({
       }))
     } else {
       setIssueAmount(values);
-      inputError && setInputError("")
+      if (inputError) setInputError("");
     }
   }
 

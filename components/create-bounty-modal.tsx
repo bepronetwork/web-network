@@ -550,12 +550,12 @@ export default function CreateBountyModal() {
   }, [rewardToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
-    if(!showCreateBounty) return;
+    if(!showCreateBounty || currentSection !== 1) return;
     setIssueAmount(ZeroNumberFormatValues);
   }, [transactionalToken, showCreateBounty]);
 
   useEffect(() => {
-    if(!showCreateBounty) return;
+    if(!showCreateBounty || currentSection !== 1) return;
     setRewardAmount(ZeroNumberFormatValues);
   }, [rewardToken, showCreateBounty]);
 
@@ -667,14 +667,12 @@ export default function CreateBountyModal() {
           </>
         }
       >
-        <>
-          <CreateBountyProgress
+        <CreateBountyProgress
             steps={steps}
             currentSection={currentSection}
             progressPercentage={progressPercentage}
           />
-          {renderCurrentSection()}
-        </>
+        {renderCurrentSection()}
       </Modal>
     </>
   );

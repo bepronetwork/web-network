@@ -53,11 +53,8 @@ export default function PageDevelopers() {
       state.Service?.active.getOpenBounties().catch(() => 0),
       state.Service?.active.getTotalNetworkToken().catch(() => BigNumber(0)),
       getTotalUsers(),
-      (state.Service?.network?.active?.networkToken as ERC20)?.symbol(),
+      (state.Service?.active?.network?.networkToken as ERC20)?.symbol(),
     ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
-
-      console.log(`onNetwork`, onNetwork.toString())
-
       setInfos([
         {
           value: inProgress,

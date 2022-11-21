@@ -136,7 +136,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active) return;
+    if (!appState.Service?.network?.active?.name) return;
 
     dispatch(changeLoadState(true));
 
@@ -152,7 +152,7 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: appState.Service?.network?.lastVisited
+      networkName: appState.Service?.network?.active?.name
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -212,7 +212,7 @@ export default function ListIssues({
     order,
     creator,
     proposer,
-    appState.Service?.network?.active
+    appState.Service?.network?.active?.name
   ]);
 
   useEffect(() => {

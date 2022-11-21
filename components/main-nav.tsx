@@ -3,8 +3,8 @@ import {ReactElement, ReactNode, useEffect, useState} from "react";
 import {Defaults} from "@taikai/dappkit";
 import {useRouter} from "next/router";
 
-import BeproLogoBlue from "assets/icons/bepro-logo-blue";
 import HelpIcon from "assets/icons/help-icon";
+import LogoPlaceholder from "assets/icons/logo-placeholder";
 import PlusIcon from "assets/icons/plus-icon";
 
 import Button from "components/button";
@@ -13,18 +13,16 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
 import NavAvatar from "components/nav-avatar";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import {useAppState} from "contexts/app-state";
-
+import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import useApi from "x-hooks/use-api";
-
-import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
-import useNetworkTheme from "../x-hooks/use-network-theme";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 interface MyNetworkLink {
   href: string;
@@ -48,11 +46,7 @@ export default function MainNav() {
   const { getURLWithNetwork } = useNetworkTheme();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
-  const isBeproNetwork = [
-    !state.Service?.network?.active?.name,
-    !state.Settings?.defaultNetworkConfig?.name,
-    state.Service?.network?.active?.name === state.Settings?.defaultNetworkConfig?.name
-  ].some(c => c);
+  const fullLogoUrl = state.Service?.network?.active?.fullLogo;
 
   useEffect(() => {
     if (!state.Service?.active || !state.currentUser?.walletAddress || !isNetworksPage) return;
@@ -85,8 +79,7 @@ export default function MainNav() {
     <div className="nav-container">
       {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
       <div
-        className={`main-nav d-flex flex-column justify-content-center
-          bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
+        className="main-nav d-flex flex-column justify-content-center"
       >
         <div
           className={`d-flex flex-row align-items-center justify-content-between px-3 ${
@@ -97,14 +90,14 @@ export default function MainNav() {
             <InternalLink
               href={getURLWithNetwork("/", { network: state.Service?.network?.active?.name })}
               icon={
-                !isBeproNetwork ? (
+                fullLogoUrl ? (
                   <img
-                    src={`${state.Settings?.urls?.ipfs}/${state.Service?.network?.active?.fullLogo}`}
+                    src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
                     width={104}
                     height={32}
                   />
                 ) : (
-                  <BeproLogoBlue />
+                  <LogoPlaceholder />
                 )
               }
               className="brand"
