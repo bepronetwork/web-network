@@ -27,6 +27,12 @@
       "cancel-bounty-fee": {
         "label": "Cancel Bounty Fee",
         "description": "Percentage of the bounty amount charged when a bounty is canceled"
+      },
+      "governance-token": {
+        "label": "Governance Token"
+      },
+      "nft-token": {
+        "label": "NFT Bounty Token"
       }
     },
     "cta": {

@@ -123,7 +123,7 @@
       "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings." 
     },
     "token-configuration": {
-      "title": "Token Configuration",
+      "title": "Governance Token",
       "tabs": {
         "use-registry-token": "Use {{symbol}} Token",
         "use-custom-token": "Use Custom Token",

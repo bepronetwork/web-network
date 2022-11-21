@@ -262,7 +262,7 @@ export function RegistrySetup({
           call={t("registry.cta.allow-transactional.call")}
           action={t("registry.cta.allow-transactional.action")}
           onClick={allowAsTransactional}
-          color="warning"
+          color="info"
           disabled={!!isErc20Allowed?.transactional || !!isAllowingToken}
           executing={isAllowingToken === "transactional"}
         />
@@ -273,7 +273,7 @@ export function RegistrySetup({
           call={t("registry.cta.allow-reward.call")}
           action={t("registry.cta.allow-reward.action")}
           onClick={allowAsReward}
-          color="warning"
+          color="info"
           disabled={!!isErc20Allowed?.reward || !!isAllowingToken}
           executing={isAllowingToken === "reward"}
         />
@@ -292,7 +292,7 @@ export function RegistrySetup({
         <ContractInput
           field={erc20}
           onChange={setErc20}
-          contractName="ERC20"
+          contractName={t("registry.fields.governance-token.label")}
           validator="isERC20"
           docsLink="https://sdk.dappkit.dev/classes/ERC20.html"
           readOnly={hasRegistryAddress}
@@ -309,7 +309,7 @@ export function RegistrySetup({
         <ContractInput
           field={bountyToken}
           onChange={setBountyToken}
-          contractName="Bounty Token"
+          contractName={t("registry.fields.nft-token.label")}
           validator="isBountyToken"
           docsLink="https://sdk.dappkit.dev/classes/BountyToken.html"
           readOnly={hasRegistryAddress}

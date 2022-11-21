@@ -6,6 +6,7 @@ const { updateSetting, updateTokens } = require("./settings/save-from-env");
 const Sequelize = require("sequelize");
 const DBConfig = require("../db/config");
 const NetworkModel = require("../db/models/network.model");
+const RepositoryModel = require("../db/models/repositories.model");
 
 const usage = `------------------------------------------------------------------------- 
   WebNetwork v2 Smart Contracts Deploy Script 🚀  
@@ -272,26 +273,11 @@ async function main() {
     });
 
     if (!argv.production) {
-      const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
-      NetworkModel.init(sequelize);
-
       await Promise.all([
         // updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
         // updateSetting("network", network.contractAddress, "contracts"),
         // updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
         updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
-        NetworkModel.findOrCreate({
-          where: {
-            name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || "bepro"
-          },
-          defaults: {
-            networkAddress: network.contractAddress,
-            creatorAddress: ownerAddress,
-            isDefault: true,
-            isRegistered: true,
-            description: "Network"
-          }
-        }),
         updateTokens({
           name: await networkToken.name(),
           symbol: await networkToken.symbol(),
@@ -317,6 +303,37 @@ async function main() {
           address: bountyTransactional.contractAddress
         })
       ]);
+
+      try {
+        const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
+        NetworkModel.init(sequelize);
+        RepositoryModel.init(sequelize);
+  
+        
+        const [networkDb] = await NetworkModel.findOrCreate({
+          where: {
+            name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || "bepro"
+          },
+          defaults: {
+            networkAddress: network.contractAddress,
+            creatorAddress: ownerAddress,
+            isDefault: true,
+            isRegistered: true,
+            description: "Network"
+          }
+        })
+
+        await RepositoryModel.findOrCreate({
+          where: {
+            githubPath: `${process.env.NEXT_GH_OWNER}/${process.env.NEXT_GH_REPO}`
+          },
+          defaults: {
+            network_id: networkDb.id
+          }
+        });
+      } catch (error) {
+        console.log("Failed to save default netwrk", error);
+      }
     } else {
       console.log('Skiping Database Save');
     }

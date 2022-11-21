@@ -23,7 +23,7 @@ export function NetworkSetup({
     <div className="content-wrapper border-top-0 px-2 py-2">
       { !!defaultNetwork &&
         <ContextualSpan context="primary" isAlert>
-          <span>{t("network.errors.network-already-saved")}</span>
+          <span>{t("network.errors.network-already-saved", { network: defaultNetwork?.name })}</span>
         </ContextualSpan> ||
         <NewNetworkStepper />
       }
