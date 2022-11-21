@@ -8,7 +8,8 @@ import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeActiveNetworkToken, changeActiveTreasury, changeAllowedTokens,
+  changeActiveNetworkToken, 
+  changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
@@ -166,17 +167,15 @@ export function useNetwork() {
               mergeCreatorFeeShare, 
               proposerFeeShare, 
               percentageNeededForDispute, 
-              oracleExchangeRate, {treasury, closeFee}]) => {
+              oracleExchangeRate, {treasury}]) => {
         dispatch(changeActiveNetworkAmounts({
           councilAmount: councilAmount.toString(),
           oracleExchangeRate: +oracleExchangeRate,
           mergeCreatorFeeShare: +mergeCreatorFeeShare,
           proposerFeeShare: +proposerFeeShare,
           percentageNeededForDispute: +percentageNeededForDispute,
-          treasury: treasury
+          treasury
         }));
-
-        dispatch(changeActiveTreasury(treasury));
       })
   }
 

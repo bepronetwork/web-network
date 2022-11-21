@@ -73,10 +73,9 @@ export default function ProposalMerge({
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
 
-    const { treasury } = state.Service.network;
-    const { closeFee, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
 
-    const distributions = calculateDistributedAmounts({ treasury, closeFee},
+    const distributions = calculateDistributedAmounts(treasury,
                                                       mergeCreatorFeeShare,
                                                       proposerFeeShare,
                                                       amountTotal,
