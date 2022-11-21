@@ -36,6 +36,7 @@ export interface Network {
   totalSettlerConverted?: string;
   isCouncil?: boolean;
   isGovernor?: boolean;
+  isDefault?: boolean;
 }
 
 export interface ThemeColors {
