@@ -319,7 +319,7 @@ export default function CreateBountyModal() {
   }
 
   async function addToken(newToken: Token) {
-    await getCoinInfoByContract(newToken?.address, newToken.symbol)
+    await getCoinInfoByContract(newToken?.symbol)
       .then((tokenInfo) => {
         setCustomTokens([...customTokens, { ...newToken, tokenInfo }]);
       })

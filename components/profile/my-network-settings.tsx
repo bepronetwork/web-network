@@ -82,7 +82,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     NetworkAmount(t("custom-network:oracles-staked", { symbol: forcedNetwork?.networkToken?.symbol }), 
                   t("custom-network:oracles-staked-description"),
                   forcedNetwork?.tokensLocked || 0),
-    NetworkAmount(t("custom-network:tvl"),  t("custom-network:tvl-description"), tvl)
+    NetworkAmount(t("custom-network:tvl"), t("custom-network:tvl-description"), tvl)
   ];
 
   const showTextOrDefault = (text: string, defaultText: string) => text?.trim() === "" ? defaultText : text;

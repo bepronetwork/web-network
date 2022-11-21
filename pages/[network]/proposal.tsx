@@ -26,8 +26,9 @@ import {DistribuitonPerUser, Proposal} from "interfaces/proposal";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
-import {useBounty} from "../../x-hooks/use-bounty";
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
+import {useBounty} from "../../x-hooks/use-bounty";
+import {ProposalDisputes} from "../../components/proposal-disputes";
 
 export default function PageProposal() {
   useBounty();
@@ -79,7 +80,7 @@ export default function PageProposal() {
   }
 
   async function disputeProposal() {
-    return handlerDisputeProposal(+proposal?.scMergeId)
+    return handlerDisputeProposal(+proposal?.contractId)
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -158,7 +159,7 @@ export default function PageProposal() {
     const { proposalId } = router.query;
 
     const mergeProposal = state.currentBounty?.data?.mergeProposals?.find((p) => +p.id === +proposalId);
-    const networkProposals = state.currentBounty?.chainData?.proposals?.[+mergeProposal?.scMergeId];
+    const networkProposals = state.currentBounty?.chainData?.proposals?.[+mergeProposal?.contractId];
     const pullRequest = state.currentBounty?.data?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 
     setProposal(mergeProposal);
@@ -188,6 +189,7 @@ export default function PageProposal() {
             onRefuse={handleRefuse}
           />
         </div>
+        <ProposalDisputes proposalId={proposal?.id} />
       </CustomContainer>
 
       <NotMergeableModal

@@ -16,9 +16,9 @@ import {error as LogError} from "services/logging";
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try{
     // eslint-disable-next-line max-len
-    const {issueContractId, proposalscMergeId, networkName} = req.body as {issueContractId: number, proposalscMergeId: number, networkName: string};
+    const {issueContractId, proposalContractId, networkName} = req.body as {issueContractId: number, proposalContractId: number, networkName: string};
   
-    if(!networkName || proposalscMergeId < 0 || issueContractId < 0)
+    if(!networkName || proposalContractId < 0 || issueContractId < 0)
       return res.status(400).json("Missing parameters");
   
     const settings = await models.settings.findAll({
@@ -64,12 +64,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if(networkBounty.canceled || networkBounty.closed)
       return res.status(404).json("Bounty has been closed or canceled");
 
-    const proposal = networkBounty.proposals.find(p=> p.id === +proposalscMergeId)
+    const proposal = networkBounty.proposals.find(p=> p.id === +proposalContractId)
     
     if(!proposal)
       return res.status(404).json("Proposal invalid");
 
-    if(proposal.refusedByBountyOwner || await network.isProposalDisputed(issueContractId, proposalscMergeId))
+    if(proposal.refusedByBountyOwner || await network.isProposalDisputed(issueContractId, proposalContractId))
       return res.status(404).json("proposal cannot be accepted");
 
     const pullRequest = networkBounty.pullRequests.find(pr=> pr.id === proposal.prId)

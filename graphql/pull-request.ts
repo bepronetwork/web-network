@@ -90,3 +90,21 @@ export const Merge =
     }
   }
 }`;
+export const PullRequests = `
+query Repository($repo: String!, $owner: String!) {
+  repository(name: $repo, owner: $owner) {
+    nameWithOwner
+    visibility
+    mergeCommitAllowed
+    pullRequests(first: 100, states: OPEN) {
+      nodes {
+        baseRefName
+        headRefName
+        headRepositoryOwner {
+          login
+        }
+      }
+    }
+  }
+}
+`

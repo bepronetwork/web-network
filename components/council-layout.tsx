@@ -38,10 +38,35 @@ export default function CouncilLayout({ children }) {
     },
     {
       value: 0,
-      label: t("common:heroes.bounties-in-network"),
+      label: t("common:heroes.in-network"),
       currency: "BEPRO",
     },
   ]);
+
+  const internalLinks = [
+    {
+      href: getURLWithNetwork("/curators/ready-to-propose"),
+      label: t("ready-to-propose"),
+      className:"mr-3 h3 p-0",
+      active:(asPath.endsWith("/curators") && true) || undefined,
+      nav: true,
+      transparent: true
+    },
+    {
+      href: getURLWithNetwork("/curators/ready-to-merge"),
+      label: t("ready-to-merge"),
+      className:"h3 p-0 me-3",
+      nav: true,
+      transparent: true
+    },
+    {
+      href: getURLWithNetwork("/curators/curators-list"),
+      label: t("council-list"),
+      className:"h3 p-0 ms-3",
+      nav: true,
+      transparent: true
+    },
+  ]
 
   async function loadTotals() {
     if (!state.Service?.active || !state.Service?.network?.active) return;
@@ -67,7 +92,7 @@ export default function CouncilLayout({ children }) {
       },
       {
         value: onNetwork.toFixed(),
-        label: t("common:heroes.bounties-in-network"),
+        label: t("common:heroes.in-network"),
         currency: "BEPRO",
       },
     ]);
@@ -89,22 +114,9 @@ export default function CouncilLayout({ children }) {
       <div className="container pt-3">
         <div className="row">
           <div className="d-flex justify-content-center">
-            <InternalLink
-              href={getURLWithNetwork("/curators/ready-to-propose")}
-              label={String(t("ready-to-propose"))}
-              className={"mr-3 h3 p-0"}
-              active={(asPath.endsWith("/curators") && true) || undefined}
-              nav
-              transparent
-            />
-
-            <InternalLink
-              href={getURLWithNetwork("/curators/ready-to-merge")}
-              label={String(t("ready-to-merge"))}
-              className={"h3 p-0"}
-              nav
-              transparent
-            />
+            {internalLinks.map((data, key) => (
+              <InternalLink key={key} {...data} />
+            ))}
           </div>
         </div>
       </div>

@@ -1,9 +1,11 @@
+import {useEffect} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
 import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 
 import OracleIcon from "assets/icons/oracle-icon";
 
@@ -29,6 +31,8 @@ export default function BeproVotes() {
 
   const { updateWalletBalance } = useAuthentication();
 
+  const { curatorAddress } = useRouter().query
+
   const oracleToken = {
     symbol: t("$oracles",   { token: state.Service?.network?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
@@ -37,6 +41,8 @@ export default function BeproVotes() {
 
   const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber("0");
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber("0");
+
+  useEffect(() => { updateWalletBalance(true) }, []);
 
   return(
     
@@ -93,6 +99,7 @@ export default function BeproVotes() {
               isNetworkGovernor: state.Service?.network?.active?.isGovernor
             }}
             updateWalletBalance={() => updateWalletBalance(true) }
+            defaultAddress={curatorAddress?.toString()}
           />
         </Row>
 

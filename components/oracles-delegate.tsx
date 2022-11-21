@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
@@ -11,31 +11,38 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {useAppState} from "contexts/app-state";
 
-import {formatStringToCurrency} from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Wallet} from "interfaces/authentication";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
+import useApi from "x-hooks/use-api";
+
 interface OraclesDelegateProps {
   wallet: Wallet;
   updateWalletBalance: () => void;
+  defaultAddress?: string;
 }
 
 function OraclesDelegate({
                            wallet,
-                           updateWalletBalance
+                           updateWalletBalance,
+                           defaultAddress
                          }: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
-
+  const debounce = useRef(null)
   const [error, setError] = useState<string>("");
+  const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
-  const [delegatedTo, setDelegatedTo] = useState<string>("");
+  const [delegatedTo, setDelegatedTo] = useState<string>(defaultAddress || "");
   const [availableAmount, setAvailableAmount] = useState<BigNumber>();
 
   const {
     state: { transactions, Service }
   } = useAppState();
+
+  const { processEvent } = useApi();
 
   const networkTokenDecimals = Service?.network?.networkToken?.decimals || 18;
   const networkTokenSymbol = Service?.network?.networkToken?.symbol;
@@ -55,8 +62,17 @@ function OraclesDelegate({
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
-    if (error) setError("");
+    if(addressError) setAddressError("")
     setDelegatedTo(params.target.value);
+
+    if(Service?.active?.web3Connection && params.target.value){
+      clearTimeout(debounce.current)
+    
+      debounce.current = setTimeout(() => {
+        const isValid = Service.active.isAddress(params.target.value)
+        if(!isValid) setAddressError(t("my-oracles:errors.invalid-wallet"));
+      }, 500)
+    }
   }
 
   function handleClickVerification() {
@@ -73,6 +89,13 @@ function OraclesDelegate({
 
   }
 
+  function handleProcessEvent(blockNumber) {
+    processEvent("oracles",
+                 "transfer",
+                 Service?.network?.lastVisited,
+      { fromBlock: blockNumber }).catch(console.debug);
+  }
+  
   const isButtonDisabled = (): boolean =>
     [
       wallet?.balance?.oracles?.locked?.lt(tokenAmount),
@@ -80,6 +103,8 @@ function OraclesDelegate({
       isAddressesEqual(),
       BigNumber(tokenAmount).isZero(),
       BigNumber(tokenAmount).isNaN(),
+      addressError,
+      error,
       transactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles)
@@ -116,7 +141,7 @@ function OraclesDelegate({
           allowNegative={false}
           helperText={
             <>
-              {formatStringToCurrency(availableAmount?.toFixed())}{" "}
+              {formatNumberToNScale(availableAmount?.toString() || 0, 2, '')}{" "}
               {`${t("$oracles", { token: networkTokenSymbol })} ${t("misc.available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
@@ -138,19 +163,22 @@ function OraclesDelegate({
             onChange={handleChangeAddress}
             type="text"
             className={`form-control ${
-              (isAddressesEqual() && "is-invalid") || ""
+              ((isAddressesEqual() || addressError)&& "is-invalid") || ""
             }`}
             placeholder={t("my-oracles:fields.address.placeholder")}
           />
-          {(isAddressesEqual() && (
-            <small className="text-danger text-italic">
+          {isAddressesEqual() ? (
+            <small className="text-danger">
               {t("my-oracles:errors.self-delegate", { token: networkTokenSymbol })}
             </small>
-          )) ||
-            ""}
+          ) : null}
+          {addressError ? (
+            <small className="text-danger">
+              {addressError}
+            </small>
+          ) : null}
         </div>
 
-        {error && <p className="p-small text-danger mt-2">{error}</p>}
         <ReadOnlyButtonWrapper>
           <NetworkTxButton
             txMethod="delegateOracles"
@@ -162,6 +190,7 @@ function OraclesDelegate({
             modalDescription={t("my-oracles:actions.delegate.delegate-to-address", 
                               { token: networkTokenSymbol })}
             onTxStart={handleClickVerification}
+            handleEvent={handleProcessEvent}
             onSuccess={handleTransition}
             onFail={setError}
             buttonLabel={t("my-oracles:actions.delegate.label")}

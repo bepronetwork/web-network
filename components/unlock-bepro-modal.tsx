@@ -15,6 +15,7 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
+import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 
 import {useAppState} from "../contexts/app-state";
@@ -33,6 +34,7 @@ export default function UnlockBeproModal({
 
   const {state} = useAppState();
 
+  const { processEvent } = useApi();
 
   const { updateWalletBalance } = useAuthentication();
 
@@ -66,6 +68,13 @@ export default function UnlockBeproModal({
 
   function handleChange({ value }) {
     setAmountToUnlock(BigNumber(value));
+  }
+
+  function handleProcessEvent(blockNumber) {
+    processEvent("oracles",
+                 "changed",
+                 state.Service?.network?.lastVisited,
+      { fromBlock: blockNumber }).catch(console.debug);
   }
 
   function handleUnlock() {
@@ -195,6 +204,7 @@ export default function UnlockBeproModal({
           tokenAmount: amountToUnlock?.toFixed(),
           from: state.currentUser?.walletAddress
         }}
+        handleEvent={handleProcessEvent}
         buttonLabel=""
         modalTitle={t("my-oracles:actions.unlock.title")}
         modalDescription={t("my-oracles:actions.unlock.description", { token: networkTokenSymbol })}
