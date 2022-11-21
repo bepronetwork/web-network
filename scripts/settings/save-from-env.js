@@ -108,7 +108,7 @@ const updateTokens = async ({
 
   const beproNetwork = await NetworkModel.findOne({
     where: {
-      name: "bepro"
+      name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || "bepro"
     }
   });
 
