@@ -248,5 +248,11 @@
     "updating-values": "Error updating network values",
     "updated-parameters": "Failed to update {{failed}} params",
     "network-not-registered": "This network has yet to be registered to be usable, please do so."
+  },
+  "tabs": {
+    "logo-and-colours": "Logo & Colours",
+    "repositories": "Repositories",
+    "governance": "Governance",
+    "registry": "Registry"
   }
 }
