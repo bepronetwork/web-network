@@ -42,7 +42,6 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             : t("custom-network:steps.network-settings.fields.fees.title")}
         </span>
         <Row className="mb-4">
-        {console.log('a', settings?.treasury)}
           <Col xs={8}>
             <TreasuryAddressField
               value={settings?.treasury?.address?.value}

@@ -20,7 +20,7 @@ export default function GovernanceSettings({
   address,
 }: GovernanceProps) {
   const { t } = useTranslation(["common", "custom-network"]);
-  console.log('tokens', tokens)
+
   return (
     <>
       <Row className="mt-4">
