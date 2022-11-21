@@ -4,15 +4,8 @@ import {useRouter} from "next/router";
 import sanitizeHtml from "sanitize-html";
 
 import {AppState} from "../interfaces/application-state";
-import {useAuthentication} from "../x-hooks/use-authentication";
-import {useDao} from "../x-hooks/use-dao";
-import {useNetwork} from "../x-hooks/use-network";
-import {useRepos} from "../x-hooks/use-repos";
-import {useSettings} from "../x-hooks/use-settings";
 import loadApplicationStateReducers from "./reducers";
-import {changeNetworkReposList} from "./reducers/change-service";
-import {updateSettings} from "./reducers/change-settings";
-import {toastError, toastSuccess} from "./reducers/change-toaster";
+import {toastError} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
 
 

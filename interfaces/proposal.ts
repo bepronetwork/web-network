@@ -5,9 +5,9 @@ export interface Proposal {
   isMerged?: boolean;
   issueId?: number;
   pullRequestId?: number;
-  scMergeId: string;
   contractId?: number;
   creator?: string;
+  network_id: number;
 }
 
 export interface INetworkProposal {

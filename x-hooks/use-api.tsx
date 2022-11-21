@@ -517,10 +517,10 @@ export default function useApi() {
   }
 
   async function createNFT(issueContractId: number,
-                           proposalscMergeId: number,
+                           proposalContractId: number,
                            networkName: string = DEFAULT_NETWORK_NAME,) {
     return api
-      .post("/nft", { issueContractId, proposalscMergeId, networkName })
+      .post("/nft", { issueContractId, proposalContractId, networkName })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;

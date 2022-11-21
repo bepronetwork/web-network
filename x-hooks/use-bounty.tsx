@@ -74,7 +74,7 @@ export function useBounty() {
 
         const mergeProposalMapper = (proposal) => ({
           ...proposal,
-          isMerged: bounty.merged !== null && proposal.scMergeId === bounty.merged
+          isMerged: bounty.merged !== null && proposal?.contractId === bounty.merged
         })
 
         if(bounty?.benefactors)
