@@ -98,6 +98,19 @@ export default function useOctokit() {
     return comments.filter(el => el) || [];
   }
 
+  async function getPullRequestList(repositoryPath:  string) {
+    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+
+    const response = await getAllPages(PullRequestQueries.PullRequests, {
+      repo,
+      owner,
+    });
+
+    const pullRequests = response?.flatMap((item: any)=> item?.repository?.pullRequests?.nodes || [])
+    
+    return pullRequests || [];
+  }
+
   async function getPullRequestDetails(repositoryPath:  string, id: number) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
@@ -192,6 +205,7 @@ export default function useOctokit() {
     getPullRequestLinesOfCode,
     getIssueOrPullRequestComments,
     getPullRequestDetails,
+    getPullRequestList,
     getRepository,
     getRepositoryForks,
     getRepositoryBranches,
