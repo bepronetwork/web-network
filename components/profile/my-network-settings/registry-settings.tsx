@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import Button from "components/button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
-import TokensSettings from "components/tokens-settings";
+import TokensSettings from "components/profile/my-network-settings/tokens-settings";
 import { WarningSpan } from "components/warning-span";
 
 import { useNetworkSettings } from "contexts/network-settings";
@@ -42,7 +42,8 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             : t("custom-network:steps.network-settings.fields.fees.title")}
         </span>
         <Row className="mb-4">
-          <Col xs={6}>
+        {console.log('a', settings?.treasury)}
+          <Col xs={8}>
             <TreasuryAddressField
               value={settings?.treasury?.address?.value}
               onChange={fields.treasury.setter}
