@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {useState} from "react";
 
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
@@ -8,23 +8,23 @@ import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeActiveNetworkToken, changeAllowedTokens,
+  changeActiveNetworkToken, 
+  changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
 import {WinStorage} from "services/win-storage";
 
-import useApi from "./use-api";
-import { useDao } from "./use-dao";
+import useApi from "x-hooks/use-api";
 
+const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
-
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
-  const {query, push} = useRouter();
+
   const {getNetwork, getTokens} = useApi();
-  const {changeNetwork} = useDao()
+  const {pathname, query, push, replace} = useRouter();
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -35,47 +35,54 @@ export function useNetwork() {
   }
 
   function updateActiveNetwork(forceUpdate = false) {
-    const networkName = query?.network?.toString() ||
-      state.Service?.network?.active?.name ||
-      state.Settings?.defaultNetworkConfig?.name;
+    const networkName = query?.network?.toString();
 
-    dispatch(changeNetworkLastVisited(networkName));
+    if (networkName) {
+      dispatch(changeNetworkLastVisited(networkName));
+      storage.value = networkName;
 
-    const lastNetworkDataStorage = new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`);
+      if (!forceUpdate) {
+        const cachedNetworkData = new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`);
 
-    if (!networkName || 
-        (storage.value && networkName && lastNetworkDataStorage.value && storage.value === networkName)) {
-      if (lastNetworkDataStorage.value) {
-        dispatch(changeActiveNetwork(lastNetworkDataStorage.value));
-        changeNetwork(lastNetworkDataStorage.value.networkAddress)
-        return;
+        if (storage.value === networkName) {
+          if (cachedNetworkData.value) {
+            dispatch(changeActiveNetwork(cachedNetworkData.value));
+
+            return;
+          }
+        } else 
+          storage.value = networkName;
       }
     }
 
     console.debug(`Updating active network`, networkName);
 
-    storage.value = networkName;
-
-    const storageParams = new WinStorage(`bepro.network:${networkName}`, 3600, `sessionStorage`);
-    if (storageParams.value && !forceUpdate)
-      return;
-
-    console.debug(`Update active params`)
-
-    getNetwork({name: networkName})
+    getNetwork({
+      ... networkName && {
+        name: networkName
+      } || {
+        isDefault: true
+      }
+    })
       .then(({data}) => {
         if (!data.isRegistered)
           throw new Error("Network not registered");
 
+        const storageParams = new WinStorage(`bepro.network:${networkName}`, 3600, `sessionStorage`);
+
         storageParams.value = data;
         dispatch(changeActiveNetwork(data));
         
-        changeNetwork(data.networkAddress)
         console.debug(`Updated active params`, data);
       })
       .catch(error => {
         console.error(`Failed to get network`, error);
-        push({pathname: `/networks`});
+
+        if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
+          replace("/setup");
+        
+        if(networkName)
+          push({pathname: `/networks`});
       });
 
   }
@@ -96,7 +103,7 @@ export function useNetwork() {
   }
 
   function loadNetworkToken() {
-    if (!state.Service?.active || state.Service?.network?.networkToken)
+    if (!state.Service?.active?.network || state.Service?.network?.networkToken)
       return;
 
     const activeNetworkToken: any = state.Service?.active?.network?.networkToken;
@@ -160,15 +167,14 @@ export function useNetwork() {
               mergeCreatorFeeShare, 
               proposerFeeShare, 
               percentageNeededForDispute, 
-              oracleExchangeRate,
-              treasury]) => {
+              oracleExchangeRate, {treasury}]) => {
         dispatch(changeActiveNetworkAmounts({
           councilAmount: councilAmount.toString(),
           oracleExchangeRate: +oracleExchangeRate,
           mergeCreatorFeeShare: +mergeCreatorFeeShare,
           proposerFeeShare: +proposerFeeShare,
           percentageNeededForDispute: +percentageNeededForDispute,
-          treasury: treasury
+          treasury
         }));
       })
   }

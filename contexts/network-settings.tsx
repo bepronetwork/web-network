@@ -4,6 +4,8 @@ import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
+import {useAppState} from "contexts/app-state";
+
 import {isSameSet} from "helpers/array";
 import {isColorsSimilar} from "helpers/colors";
 import {
@@ -17,6 +19,7 @@ import {
 import {DefaultNetworkSettings} from "helpers/custom-network";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
+import { Token } from "interfaces/token";
 
 import DAO from "services/dao-service";
 import {WinStorage} from "services/win-storage";
@@ -25,11 +28,9 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
 import useOctokit from "x-hooks/use-octokit";
 
-import {useAppState} from "./app-state";
-
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration", "/setup"];
 const TTL = 48 * 60 * 60 // 2 day
 const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
@@ -42,6 +43,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
   const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [registryToken, setRegistryToken] = useState<Token>();
 
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
@@ -56,7 +58,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     councilAmount: state.Settings?.networkParametersLimits?.councilAmount
   };
 
-  const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
+  const isCreating = useMemo(() => ["/new-network", "/setup"].includes(router.pathname), [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
   const network =
     useMemo(() =>
@@ -480,7 +482,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       !state.Service?.active,
       !state.currentUser?.walletAddress,
       !isCreating && !network?.name && !network?.councilAmount,
-      isCreating && !state.Settings?.beproToken?.address,
+      isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad
     ].some(c => c))
       return;
@@ -500,7 +502,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     forcedNetwork,
     needsToLoad,
     router.pathname,
-    state.Settings?.beproToken?.address
+    state.Service?.active?.registry?.token?.contractAddress
   ]);
 
   // NOTE -  Load Forced/User Network
@@ -534,6 +536,13 @@ export const NetworkSettingsProvider = ({ children }) => {
          })))
   },[forcedNetwork, state.Service?.active])
 
+  useEffect(() => {
+    if (state.Service?.active?.registry?.contractAddress)
+      state.Service.active.getERC20TokenData(state.Service.active.registry.token.contractAddress)
+        .then(setRegistryToken)
+        .catch(error => console.debug("Failed to load registry token", error));
+  }, [state.Service?.active?.registry?.contractAddress]);
+
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,
@@ -543,7 +552,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     LIMITS,
     cleanStorage,
     updateTokenBalance,
-    fields: Fields
+    fields: Fields,
+    registryToken
   }), [networkSettings, Fields, LIMITS, setForcedNetwork]);
 
   return (

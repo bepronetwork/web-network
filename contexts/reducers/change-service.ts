@@ -63,6 +63,7 @@ export const changeMicroServiceReady = (microReady: boolean) =>
 export const changeActiveDAO = (active: DAO) => changeServiceProp.update(active, 'active');
 
 export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.update({lastVisited});
+export const changeNoDefaultNetwork = (noDefaultNetwork: boolean) => changeNetwork.update({noDefaultNetwork});
 
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
 export const changeActiveNetworkToken = (networkToken: Token) => changeNetwork.update({networkToken});

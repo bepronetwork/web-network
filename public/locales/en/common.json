@@ -365,7 +365,9 @@
       "retract-fund": "Retract Bounty Fund",
       "withdraw-fund-reward-bounty": "Withdraw Reward Bounty Fund",
       "deploy-erc20-token": "Deploy ERC20 Token",
-      "config-fees": "Config Fees"
+      "config-fees": "Config Fees",
+      "deploy-registry": "Deploy Network Registry",
+      "change-allowed-tokens": "Change Allowed Tokens"
     }
   },
   "sort": {

@@ -1,15 +1,14 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Toast, ToastContainer} from "react-bootstrap";
 
 import BeproSmallLogo from "assets/icons/bepro-small-logo";
 
 import Icon from "components/icon";
 
-
+import {useAppState} from "contexts/app-state";
 import {removeToast} from "contexts/reducers/change-toaster";
 
-import {useAppState} from "../contexts/app-state";
-import {ToastNotification} from "../interfaces/toast-notification";
+import {ToastNotification} from "interfaces/toast-notification";
 
 enum IconMapper {
   info = "info",
@@ -25,10 +24,6 @@ export default function Toaster() {
   function onClose(i: ToastNotification) {
     dispatch(removeToast(i));
   }
-
-  useEffect(() => {
-    console.log(`CHANGED`, state.toaster);
-  }, [state.toaster])
 
   return (
     <>

@@ -27,6 +27,7 @@ export interface SearchNetworkParams {
   search?: string;
   isClosed?: boolean;
   isRegistered?: boolean;
+  isDefault?: boolean;
 }
 
 export interface CreatePrePullRequestParams extends RequestParams {

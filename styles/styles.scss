@@ -30,14 +30,16 @@
   --bs-body-color-rgb:#{toRGB($white)};
   --bs-gray:#{$gray};
   --bs-gray-rgb:#{toRGB($gray)};
-  --bs-fail:#{$danger};
-  --bs-fail-rgb:#{toRGB($danger)};
+  --bs-danger:#{$danger};
+  --bs-danger-rgb:#{toRGB($danger)};
   --bs-shadow:#{$bg-shadow};
   --bs-shadow-rgb:#{toRGB($bg-shadow)};
   --bs-purple:#{$purple};
   --bs-purple-rgb:#{toRGB($purple)};
   --bs-primary:#{$primary};
   --bs-primary-rgb:#{toRGB($primary)};
+  --bs-info:#{$info};
+  --bs-info-rgb:#{toRGB($info)};
   --bs-success:#{$success};
   --bs-success-rgb:#{toRGB($success)};
   --bs-warning:#{$warning};
@@ -46,6 +48,8 @@
   --bs-secondary-rgb:#{toRGB($secondary)};
   --bs-body-bg:#{$bg};
   --bs-body-bg-rgb:#{toRGB($bg)};
+  --bs-dark:#{$bg};
+  --bs-dark-rgb:#{toRGB($bg)};
 }
 
 //bootstrap-overrides
@@ -58,6 +62,14 @@ li {
 
 .cursor-not-allowed {
   cursor: not-allowed;
+}
+
+.text-purple {
+  color: var(--bs-purple);
+}
+
+.border-purple {
+  border-color: var(--bs-purple);
 }
 
 .account-link-active {
@@ -370,6 +382,7 @@ li {
 .main-nav {
   width: 100%;
   min-height: $navbar-height;
+  background-color: var(--bs-dark);
 
   .brand {
     padding: 0;
@@ -1607,6 +1620,20 @@ input[type="color"] {
       }
     }
   }
+  &-info {
+    svg {  
+      path {
+        fill: var(--bs-info);
+      }
+    }
+  }
+  &-purple {
+    svg {  
+      path {
+        fill: var(--bs-purple);
+      }
+    }
+  }
 }
 
 .nav-link-gradient {
@@ -1674,4 +1701,36 @@ input[type="color"] {
 
 .border-bottom-dashed {
   border-bottom: 1px dashed $white;
+}
+
+.bg {
+  &-primary {
+    &-25 {
+      background-color: rgba(var(--bs-primary-rgb), 0.25);
+    }
+  }
+
+  &-warning {
+    &-25 {
+      background-color: rgba(var(--bs-warning-rgb), 0.25);
+    }
+  }
+
+  &-success {
+    &-25 {
+      background-color: rgba(var(--bs-success-rgb), 0.25);
+    }
+  }
+
+  &-danger {
+    &-25 {
+      background-color: rgba(var(--bs-danger-rgb), 0.25);
+    }
+  }
+
+  &-info {
+    &-25 {
+      background-color: rgba(var(--bs-info-rgb), 0.25);
+    }
+  }
 }

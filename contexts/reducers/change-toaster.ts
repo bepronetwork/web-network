@@ -48,7 +48,7 @@ export const removeToast = (toast: ToastNotification) =>
   changeToaster.update([toast], SubActions.remove);
 export const toastError = (content: string, title = "Error", ...rest) =>
   changeToaster.update([{content, title, type: `danger`, ...rest}], SubActions.add)
-export const toastSuccess = (content: string, title = "success", ...rest) =>
+export const toastSuccess = (content: string, title = "Success", ...rest) =>
   changeToaster.update([{content, title, type: `success`, ...rest}], SubActions.add)
 export const toastInfo = (content: string, title = "Info", ...rest) =>
   changeToaster.update([{content, title, type: `info`, ...rest}], SubActions.add)

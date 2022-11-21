@@ -36,6 +36,7 @@ export interface Network {
   totalSettlerConverted?: string;
   isCouncil?: boolean;
   isGovernor?: boolean;
+  isDefault?: boolean;
 }
 
 export interface ThemeColors {
@@ -50,6 +51,7 @@ export interface ThemeColors {
   secondary: string;
   background: string;
   info: string;
+  dark: string;
 }
 
 export interface Color {
@@ -92,6 +94,7 @@ export interface NetworkSettings {
   isLoadingData: boolean;
   forcedNetwork?: Network;
   isAbleToClosed?: boolean;
+  registryToken?: Token;
   setForcedNetwork?: (network: Network) => void;
   updateTokenBalance?: ()=> Promise<TokensLocked>
   cleanStorage?: () => void;

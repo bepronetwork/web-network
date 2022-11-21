@@ -15,25 +15,23 @@ import {error as LogError} from 'services/logging';
 const {serverRuntimeConfig} = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName, creator: creatorAddress } = req.query;
+  const { name: networkName, creator: creatorAddress, isDefault } = req.query;
 
-  let where = {}
-  
-  if(networkName){
-    where = {
+  const where = {
+    ... networkName && {
       name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        [Op.iLike]: String(networkName).replaceAll("-", " ")
       }
-    }
-  } 
-
-  else if(creatorAddress){
-    where = {
+    } || {},
+    ... creatorAddress && {
       creatorAddress: {
         [Op.iLike]: String(creatorAddress)
       }
-    }
-  }
+    } || {},
+    ... isDefault && {
+      isDefault: isDefault === "true"
+    } || {}
+  };
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
@@ -62,7 +60,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
       githubLogin,
       allowedTokens,
-      networkAddress
+      networkAddress,
+      isDefault
     } = req.body;
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
@@ -72,7 +71,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         creatorAddress: creator,
         isClosed: false,
       }
-    })
+    });
 
     if(hasNetwork){
       return res.status(409).json("Already exists a network created for this wallet");
@@ -87,6 +86,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
     if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+    if (isDefault && creator !== publicSettings?.defaultNetworkConfig?.adminWallet)
+      return res.status(401).json("Unauthorized");
+
+    const defaultNetwork = await Database.network.findOne({
+        where: {
+          isDefault: true
+        }
+    });
+    
+    if (isDefault && defaultNetwork)
+      return res.status(409).json("Default Network already saved");
 
     // Contract Validations
     const DAOService = new DAO({ 
@@ -126,7 +136,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       colors: JSON.parse(colors),
       logoIcon: logoIconHash,
       fullLogo: fullLogoHash,
-      networkAddress
+      networkAddress,
+      isDefault: isDefault || false
     });
 
     const repos = JSON.parse(repositories);

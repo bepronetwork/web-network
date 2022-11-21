@@ -11,12 +11,12 @@ import Avatar from "components/avatar";
 import Button from "components/button";
 import Identicon from "components/identicon";
 
+import {useAppState} from "contexts/app-state";
+
 import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
-
-import {useAppState} from "../contexts/app-state";
 
 
 export default function NavAvatar() {
@@ -27,7 +27,6 @@ export default function NavAvatar() {
 
   const {state} = useAppState();
 
-
   const { getURLWithNetwork } = useNetwork();
   const { disconnectWallet } = useAuthentication();
 
@@ -35,7 +34,8 @@ export default function NavAvatar() {
     <Avatar userLogin={state.currentUser.login} className="border-primary" size="md" /> ||
     <Identicon address={state.currentUser?.walletAddress} />;
   
-  const username = state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
+  const username = 
+    state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
   function handleInternalLinkClick(href) {
     setVisible(false);

@@ -63,7 +63,7 @@ export default function NetworkListItem({
         <span
           className="caption-medium mr-2 text-blue"
         >
-          ${network?.networkToken?.symbol || tokenSymbolDefault}
+          {network?.networkToken?.symbol || tokenSymbolDefault}
         </span>
       </div>
     </div>

@@ -18,23 +18,22 @@ import TokenBalance from "components/profile/token-balance";
 import {FlexRow} from "components/profile/wallet-balance";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
+import {useAppState} from "contexts/app-state";
+
 import {formatStringToCurrency} from "helpers/formatNumber";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-import {useAppState} from "../../../contexts/app-state";
-
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
 
-  const {state} = useAppState();
-
+  const { state } = useAppState();
   const { updateWalletBalance } = useAuthentication();
 
   const { curatorAddress } = useRouter().query
 
   const oracleToken = {
-    symbol: t("$oracles",   { token: state.Service?.network?.networkToken?.symbol }),
+    symbol: t("$oracles", { token: state.Service?.network?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -45,7 +44,6 @@ export default function BeproVotes() {
   useEffect(() => { updateWalletBalance(true) }, []);
 
   return(
-    
     <ProfileLayout>
       <ReadOnlyButtonWrapper>
       <Col xs={10}>

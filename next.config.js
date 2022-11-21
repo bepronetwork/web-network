@@ -12,7 +12,8 @@ const publicRuntimeConfig = {
     ipfs: process.env.NEXT_PUBLIC_IPFS_BASE
   },
   defaultName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-  enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO
+  enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO,
+  adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
 }
 
 // Will only be available on the server-side
@@ -60,15 +61,6 @@ module.exports = () => {
     publicRuntimeConfig,
     serverRuntimeConfig,
     webpack5: true,
-    async redirects() {
-      return [
-        {
-          source: "/",
-          destination: `/${publicRuntimeConfig.defaultName}`,
-          permanent: true
-        }
-      ];
-    },
     async headers() {
       return [
         {

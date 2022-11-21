@@ -2,8 +2,9 @@ import {createContext, useEffect} from "react";
 
 import {useRouter} from "next/router";
 
-import {useBounty} from "../x-hooks/use-bounty";
-import {useAppState} from "./app-state";
+import {useAppState} from "contexts/app-state";
+
+import {useBounty} from "x-hooks/use-bounty";
 
 const _context = {};
 
@@ -16,7 +17,8 @@ export const BountyEffectsProvider = ({children}) => {
   const bounty = useBounty();
 
   useEffect(bounty.getDatabaseBounty, [state.Service?.network?.active, query?.id, query?.repoId]);
-  useEffect(bounty.getChainBounty, [state.Service?.active, state.Service?.network, state.currentBounty?.data?.contractId])
+  useEffect(bounty.getChainBounty, 
+    [state.Service?.active, state.Service?.network, state.currentBounty?.data?.contractId])
 
   return <BountyEffectsContext.Provider value={_context} children={children} />
 }
