@@ -36,11 +36,11 @@ export default function useBepro() {
     console.error("Tx error", err);
   }
 
-  async function handlerDisputeProposal(proposalscMergeId: number): Promise<TransactionReceipt | Error> {
+  async function handlerDisputeProposal(proposalContractId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const disputeTxAction = addTx([{ type: TransactionTypes.dispute }] as any);
       dispatch(disputeTxAction);
-      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalscMergeId)
+      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalContractId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, disputeTxAction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve?.(txInfo);
@@ -69,13 +69,13 @@ export default function useBepro() {
   }
 
   async function handleCloseIssue(bountyId: number,
-                                  proposalscMergeId: number, 
+                                  proposalContractId: number, 
                                   tokenUri: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTx([{ type: TransactionTypes.closeIssue } as any]);
       dispatch(closeIssueTx);
       
-      await state.Service?.active.closeBounty(+bountyId, +proposalscMergeId, tokenUri)
+      await state.Service?.active.closeBounty(+bountyId, +proposalContractId, tokenUri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);

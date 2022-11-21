@@ -7,18 +7,14 @@ import {GetServerSideProps} from "next/types";
 
 import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
+import TabSections from "components/bounty/tabs-sections";
 import CustomContainer from "components/custom-container";
 import IssueComments from "components/issue-comments";
 import IssueDescription from "components/issue-description";
 import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
-import IssueProposals from "components/issue-proposals";
-import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
-import TabbedNavigation from "components/tabbed-navigation";
 
 import {useAppState} from "contexts/app-state";
-
-import {TabbedNavigationItem} from "interfaces/tabbed-navigation";
 
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
@@ -29,7 +25,6 @@ import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 export default function PageIssue() {
   useBounty();
   const router = useRouter();
-  const { t } = useTranslation("bounty");
 
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
@@ -41,27 +36,6 @@ export default function PageIssue() {
 
   const { id, repoId } = router.query;
   updateActiveRepo(repoId);
-
-  const proposalsCount = state.currentBounty?.chainData?.proposals?.length || 0;
-  const pullRequestsCount = state.currentBounty?.chainData?.pullRequests?.length || 0;
-
-  const tabs: TabbedNavigationItem[] = [
-    {
-      isEmpty: !proposalsCount,
-      eventKey: "proposals",
-      title: t("proposal:labelWithCount", { count: proposalsCount }),
-      description: t("description_proposal"),
-      component: ( <IssueProposals key="tab-proposals" /> )
-    },
-    {
-      isEmpty: !pullRequestsCount,
-      eventKey: "pull-requests",
-      title: t("pull-request:labelWithCount", { count: pullRequestsCount }),
-      description: t("description_pull-request"),
-      component: ( <IssuePullRequests key="tab-pull-requests" /> )
-
-    }
-  ];
 
   function checkForks(){
     if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
@@ -105,21 +79,16 @@ export default function PageIssue() {
     <BountyEffectsProvider>
       <BountyHero />
 
-      { state.currentBounty?.chainData?.isFundingRequest && <FundingSection /> }
+      { state.currentBounty?.chainData?.isFundingRequest ? <FundingSection /> : null}
 
       <PageActions
         isRepoForked={isRepoForked}
         addNewComment={addNewComment}
       />
 
-      {((!!proposalsCount || !!pullRequestsCount) && state.currentUser?.walletAddress ) &&
-          <CustomContainer className="mb-4">
-            <TabbedNavigation
-              className="issue-tabs"
-              tabs={tabs}
-              collapsable
-            />
-          </CustomContainer>
+      {(state.currentUser?.walletAddress)
+        ? <TabSections/>
+        : null
       }
 
       { state.currentUser?.walletAddress ? (

@@ -62,7 +62,7 @@ export default function ProposalPullRequestDetail({
 
         <span className="caption-small text-light-gray text-uppercase">
           <Translation label={"branch"} />
-          <span className="text-primary">:{currentPullRequest?.branch}</span>
+          <span className="text-primary">:{currentPullRequest?.userBranch}</span>
         </span>
 
         {currentPullRequest?.createdAt && (

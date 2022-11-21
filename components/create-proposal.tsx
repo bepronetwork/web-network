@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import { components as RSComponents, SingleValueProps } from "react-select";
 
+import BigNumber from "bignumber.js";
 import clsx from "clsx";
 import {useTranslation} from "next-i18next";
 
@@ -24,7 +25,6 @@ import useOctokit from "x-hooks/use-octokit";
 
 import {useAppState} from "../contexts/app-state";
 import {useBounty} from "../x-hooks/use-bounty";
-import BigNumber from "bignumber.js";
 
 
 interface participants {
@@ -165,7 +165,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
       const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
         return {
-          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp.scMergeId === item.id)?.pullRequestId),
+          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
           prAddressAmount: item.details.map(detail => ({
             amount: Number(detail.percentage),
             address: detail.recipient

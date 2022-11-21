@@ -63,7 +63,7 @@ export default function NotMergeableModal({
     mergeClosedIssue({
       issueId: state.currentBounty?.data?.issueId,
       pullRequestId: pullRequest?.githubId,
-      mergeProposalId: proposal?.scMergeId,
+      mergeProposalId: proposal?.contractId,
       address: state.currentUser?.walletAddress, // todo: make sure what "address" and "wallet" mean
       networkName: state.Service?.network?.active?.name,
       wallet: state.currentUser?.walletAddress
