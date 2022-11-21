@@ -234,7 +234,7 @@ export default function MyNetworkSettings({
     setTabs([
       {
         eventKey: "logo-and-colours",
-        title: "Logo & Colours",
+        title: t("custom-network:tab.logo-and-colours"),
         component: (
           <NetworkContainer>
             <LogoAndColoursSettings 
@@ -248,7 +248,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "repositories",
-        title: "Repositories",
+        title: t("custom-network:tab.repositories"),
         component: (
           <NetworkContainer>
             <RepositoriesListSettings />
@@ -257,7 +257,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "governance",
-        title: "Governance",
+        title: t("custom-network:tab.governance"),
         component: (
           <NetworkContainer>
             <GovernanceSettings 
@@ -269,7 +269,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "registry",
-        title: "Registry",
+        title: t("custom-network:tab.registry"),
         component: (
           <NetworkContainer>
             <RegistrySettings isGovernorRegistry={isGovernorRegistry}/>
