@@ -17,26 +17,32 @@ import {Wallet} from "interfaces/authentication";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
+import useApi from "x-hooks/use-api";
+
 interface OraclesDelegateProps {
   wallet: Wallet;
   updateWalletBalance: () => void;
+  defaultAddress?: string;
 }
 
 function OraclesDelegate({
                            wallet,
-                           updateWalletBalance
+                           updateWalletBalance,
+                           defaultAddress
                          }: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
   const debounce = useRef(null)
   const [error, setError] = useState<string>("");
   const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
-  const [delegatedTo, setDelegatedTo] = useState<string>("");
+  const [delegatedTo, setDelegatedTo] = useState<string>(defaultAddress || "");
   const [availableAmount, setAvailableAmount] = useState<BigNumber>();
 
   const {
     state: { transactions, Service }
   } = useAppState();
+
+  const { processEvent } = useApi();
 
   const networkTokenDecimals = Service?.network?.networkToken?.decimals || 18;
   const networkTokenSymbol = Service?.network?.networkToken?.symbol;
@@ -83,6 +89,13 @@ function OraclesDelegate({
 
   }
 
+  function handleProcessEvent(blockNumber) {
+    processEvent("oracles",
+                 "transfer",
+                 Service?.network?.lastVisited,
+      { fromBlock: blockNumber }).catch(console.debug);
+  }
+  
   const isButtonDisabled = (): boolean =>
     [
       wallet?.balance?.oracles?.locked?.lt(tokenAmount),
@@ -177,6 +190,7 @@ function OraclesDelegate({
             modalDescription={t("my-oracles:actions.delegate.delegate-to-address", 
                               { token: networkTokenSymbol })}
             onTxStart={handleClickVerification}
+            handleEvent={handleProcessEvent}
             onSuccess={handleTransition}
             onFail={setError}
             buttonLabel={t("my-oracles:actions.delegate.label")}

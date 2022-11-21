@@ -64,6 +64,11 @@ class Issue extends Model {
       sourceKey: "id",
       as: "benefactors"
     });
+    this.hasMany(models.dispute, {
+      foreignKey: "issueId",
+      sourceKey: "id",
+      as: "disputes"
+    });
     this.belongsTo(models.repositories, {
       foreignKey: "repository_id",
       sourceKey: "id",

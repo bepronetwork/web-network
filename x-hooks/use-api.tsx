@@ -14,6 +14,7 @@ import {
   MergeClosedIssueParams,
   CreateReviewParams
 } from "interfaces/api";
+import { Curator, SearchCuratorParams } from "interfaces/curators";
 import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -24,6 +25,7 @@ import { Token } from "interfaces/token";
 import { api, eventsApi } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
+
 interface NewIssueParams {
   title: string;
   description: string;
@@ -467,6 +469,34 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
+  async function searchCurators({
+    page = "1",
+    address = "",
+    isCurrentlyCurator = undefined,
+    networkName = DEFAULT_NETWORK_NAME,
+    sortBy = "updatedAt",
+    order = "DESC"
+  }: SearchCuratorParams) {
+    const params = new URLSearchParams({
+      page,
+      address,
+      networkName,
+      sortBy,
+      order,
+      ...(isCurrentlyCurator !== undefined && { isCurrentlyCurator: isCurrentlyCurator.toString()} || {})
+    }).toString();
+
+    return api
+      .get<{
+        rows: Curator[];
+        count: number;
+        pages: number;
+        currentPage: number;
+      }>(`/search/curators/?${params}`)
+      .then(({ data }) => data)
+      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
+  }
+
   async function repositoryHasIssues(repoPath) {
     const search = new URLSearchParams({ repoPath }).toString();
 
@@ -527,6 +557,7 @@ export default function useApi() {
     searchIssues,
     searchNetworks,
     searchRepositories,
+    searchCurators,
     startWorking,
     updateNetwork,
     uploadFiles,
