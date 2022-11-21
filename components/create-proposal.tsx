@@ -190,7 +190,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       const bountyAmount = BigNumber(amountTotal);
       const proposerFeeShare = BigNumber(state.Service?.network?.amounts?.proposerFeeShare || 0);
       const mergeCreator = BigNumber(state.Service?.network?.amounts?.mergeCreatorFeeShare || 0);
-      const closeFee = BigNumber(state.Service.network.amounts?.closeFee || 0);
+      const closeFee = BigNumber(state.Service.network.amounts?.treasury?.closeFee || 0);
       const subtract =
         [proposerFeeShare, mergeCreator, closeFee]
           .reduce((p, c) => p.plus(c.multipliedBy(bountyAmount).dividedBy(100)), BigNumber(0));
