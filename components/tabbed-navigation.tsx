@@ -10,7 +10,7 @@ import {
 
 import ArrowDown from "assets/icons/arrow-down";
 import ArrowUp from "assets/icons/arrow-up";
-import InfoIcon from "assets/icons/info-icon";
+import InfoIconEmpty from "assets/icons/info-icon-empty";
 
 import Button from "components/button";
 
@@ -33,8 +33,8 @@ function renderDescription(description: string) {
   return (
     <>
       <OverlayTrigger placement="bottom" overlay={popover}>
-        <span className="text-white-10">
-          <InfoIcon width={14} height={14} color="text-white-10" />
+        <span className="text-gray-500">
+          <InfoIconEmpty width={14} height={14} color="text-gray-500" />
         </span>
       </OverlayTrigger>
     </>
@@ -65,7 +65,7 @@ export default function TabbedNavigation({
 
   useEffect(() => {
     if (!defaultActiveKey) setActiveKey(getDefaultActiveTab());
-  }, [tabs, defaultActiveKey]);
+  }, []);
 
   return (
     <Tab.Container defaultActiveKey={defaultActiveKey} activeKey={activeKey} onSelect={handleTransition}>

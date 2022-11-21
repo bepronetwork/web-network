@@ -47,6 +47,8 @@
     "conflicts": "Conflicts",
     "closed": "Closed",
     "broken-tests": "Broken tests",
+    "accepted": "Accepted",
+    "disputed": "Disputed",
     "needs-approval": "Pending approval"
   },
   "errors": {
