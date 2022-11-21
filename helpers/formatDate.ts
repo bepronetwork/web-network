@@ -12,5 +12,10 @@ export const formatDate = (date: number | string | Date, joiner = "/") => {
 };
 
 export const getTimeDifferenceInWords = (date: Date, dateToCompare: Date) => {
-  return formatDistanceStrict(date, dateToCompare);
+  try {
+    return formatDistanceStrict(date, dateToCompare);
+  } catch (e) {
+    console.error(e);
+    return `0`;
+  }
 };

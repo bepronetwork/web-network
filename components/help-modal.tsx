@@ -26,7 +26,7 @@ export default function HelpModal({ show = false, onCloseClick }: { show: boolea
     helpItem("modals.help-modal.api-documentation.title",
              "modals.help-modal.api-documentation.content",
              <PageIcon />,
-             "http://docs.bepro.network"),
+             "https://sdk.dappkit.dev/"),
     helpItem("modals.help-modal.live-chat.title",
              "modals.help-modal.live-chat.content",
              <ChatIcon />,

@@ -1,10 +1,13 @@
-import {createContext, useContext, useEffect} from "react";
+import {useContext} from "react";
 
 import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
+import { BountyExtended, ProposalExtended } from "interfaces/bounty";
+
 import {useAppState} from "../contexts/app-state";
+import {BountyEffectsContext} from "../contexts/bounty-effects";
 import {
   changeCurrentBountyComments,
   changeCurrentBountyData,
@@ -22,8 +25,6 @@ import {IssueData, pullRequest} from "../interfaces/issue-data";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 
-import { BountyExtended, ProposalExtended } from "interfaces/bounty";
-import {BountyEffectsContext} from "../contexts/bounty-effects";
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 
@@ -60,12 +61,12 @@ export function useBounty() {
 
     getIssue(+query.repoId, +query.id, state.Service.network.lastVisited)
       .then(async (bounty: IssueData) => {
-        const fundedAmount = BigNumber(bounty.fundedAmount || 0)
-        const fundingAmount = BigNumber(bounty.fundingAmount || 0)
+        const fundedAmount = BigNumber(bounty?.fundedAmount || 0)
+        const fundingAmount = BigNumber(bounty?.fundingAmount || 0)
         const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(fundingAmount)
 
         const bigNumbers = {
-          amount: BigNumber(bounty.amount),
+          amount: BigNumber(bounty?.amount),
           fundingAmount,
           fundedAmount,
           fundedPercent
@@ -73,11 +74,12 @@ export function useBounty() {
 
         const mergeProposalMapper = (proposal) => ({
           ...proposal,
-          isMerged: bounty.merged !== null && proposal.scMergeId === bounty.merged
+          isMerged: bounty.merged !== null && proposal?.contractId === bounty.merged
         })
 
-        bounty.benefactors = bounty?.benefactors.map((benefactor) => 
-        ({...benefactor, amount: BigNumber(benefactor.amount)}))
+        if(bounty?.benefactors)
+          bounty.benefactors = bounty?.benefactors.map((benefactor) => 
+          ({...benefactor, amount: BigNumber(benefactor?.amount)}))
 
         const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
         const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
@@ -97,9 +99,9 @@ export function useBounty() {
           getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
             .then(details => ({
               ...pullRequest,
-              isMergeable: details.mergeable === "MERGEABLE",
-              merged: details.merged,
-              state: details.state
+              isMergeable: details?.mergeable === "MERGEABLE",
+              merged: details?.merged,
+              state: details?.state
             })))]);
       })
       .then(pullRequests => {

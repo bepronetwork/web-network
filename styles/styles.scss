@@ -135,6 +135,9 @@ li {
 }
 
 .react-select {
+  &-container {
+    width: 100%;
+  }
   &-container & {
     &__control {
       border-color: transparent;
@@ -177,10 +180,11 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
-      min-width: 210px;
+      // min-width: 210px;
       border-radius: 8px;
       border: 1px solid $light-gray;
       background-color: $bg-shadow;
+      z-index: 4;
 
       &-list {
         padding-top: 0;
@@ -324,6 +328,13 @@ li {
   font-weight: 400;
 }
 
+.label-m{
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 71%;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss04' on;
+}
+
 .text-italic {
   font-style: italic !important;
 }
@@ -451,6 +462,18 @@ li {
   }
 }
 
+.curator-list-item {
+  background-color: $bg-shadow;
+  padding: $m * 2;
+  border-radius: math.div($m, 2);
+  transition: 0.8 ease-in-out;
+  margin-bottom: $m;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
 .content-wrapper {
   background-color: $bg-shadow;
   padding: $m * 2;
@@ -466,13 +489,17 @@ li {
   }
 
   .content-list-item {
-    margin-left: -$m * 2;
-    margin-right: -$m * 2;
-    padding: $m $m * 2;
-    background-color: $dark-gray;
-    &:last-child {
-      border-radius: 0 0 math.div($m, 2) math.div($m, 2);
-    }
+    display: flex;
+    flex-direction: row;
+
+    padding: 1.25rem;
+    // margin-left: -$m * 2;
+    // margin-right: -$m * 2;
+    // padding: $m $m * 2;
+    // background-color: $dark-gray;
+    // &:last-child {
+    //   border-radius: 0 0 math.div($m, 2) math.div($m, 2);
+    // }
   }
 
   .rounded.row {
@@ -480,16 +507,6 @@ li {
     margin-right: -$m * 2;
     padding-left: $m * 2;
     padding-right: $m * 2;
-  }
-}
-
-.proposal {
-  &:nth-child(even) {
-    background-color: $bg-shadow;
-  }
-
-  &:nth-child(odd) {
-    background-color: $dark-gray;
   }
 }
 
@@ -705,20 +722,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   height: math.div($m, 4);
   border-radius: math.div($m, 6);
   background-color: rgba($white, 0.2);
-
-  .wrapper {
-    position: absolute;
-    height: math.div($m, 4);
-    background-color: #3e345b;
-  }
-
-  .wrapper-danger {
-    background-color: #895151;
-  }
-
-  .wrapper-success {
-    background-color: #4c8473;
-  }
 
   &.bg-purple {
     background-color: #3e345b !important;
@@ -1299,7 +1302,6 @@ textarea.form-control {
     text-transform: uppercase;
     letter-spacing: 0.1rem;
     font-size: 12px;
-    text-align: center;
   }
 }
 

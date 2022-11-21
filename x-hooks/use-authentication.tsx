@@ -153,6 +153,9 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
+    if (!state.Service?.active)
+      return;
+
     if (!force && (balance.value || !state.currentUser?.walletAddress))
       return;
 

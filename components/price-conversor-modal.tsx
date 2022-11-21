@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {components as RSComponents ,SingleValueProps } from "react-select";
 
 import {useTranslation} from "next-i18next";
 
@@ -39,11 +40,14 @@ export default function PriceConversorModal({
     if (!state.Service?.network?.networkToken?.address) return;
 
     const data = 
-      await getCoinInfoByContract(state.Service?.network?.networkToken.address)
+      await getCoinInfoByContract(state.Service?.network?.networkToken.symbol)
         .catch((err) => {
           if(err) setErrorCoinInfo(true)
           return ({ prices: { [value]: 0 } })
         });
+
+    console.log(data, value);
+
     if(data.prices[value] > 0) setErrorCoinInfo(false)
     setCurrentCurrency({value, label});
     setCurrentPrice(data.prices[value]);
@@ -60,21 +64,18 @@ export default function PriceConversorModal({
     
   },[])
 
-  function SelectValueComponent({ innerProps, innerRef, ...rest }) {
-    const data = rest.getValue()[0];
+  const SingleValue = ({children, ...props}: SingleValueProps<any>) => {
+
     return (
+    <RSComponents.SingleValue {...props} className="proposal__select__currency">
       <div
-        ref={innerRef}
-        {...innerProps}
-        className="proposal__select_currency cursor-pointer d-inline-flex 
-                   align-items-center flex-grow-1 justify-content-between 
-                   text-center caption-large text-white p-1"
-      >
-        <span>{formatNumberToNScale(currentPrice)}</span>
-        <span>{data?.value}</span>
+       className="cursor-pointer d-inline-flex
+       align-items-center justify-content-between
+       text-center caption-large text-white p-1 w-100">
+        <span>{children}</span>
       </div>
-    );
-  }
+    </RSComponents.SingleValue>
+    )};
   
   function SelectOptionComponent({ innerProps, innerRef, data }) {
     const current = currentCurrency?.value === data?.value
@@ -97,15 +98,12 @@ export default function PriceConversorModal({
       show={show}
       title={"Converter"}
       titlePosition="center"
-      onCloseClick={onClose}
-    >
+      onCloseClick={onClose}>
       <div className="d-flex flex-row gap-2">
-        <div>
+        <div className="col">
           <InputNumber
             className="caption-large"
-            symbol={
-              state.Service?.network?.networkToken?.symbol || t("common:misc.$token")
-            }
+            symbol={state.Service?.network?.networkToken?.symbol || t("common:misc.$token")}
             value={currentValue}
             onValueChange={(e) => setValue(e.floatValue)}
           />
@@ -113,13 +111,13 @@ export default function PriceConversorModal({
         <div className="d-flex justify-center align-items-center bg-dark-gray circle-2 p-2">
           <TransactionIcon width={14} height={10} />
         </div>
-        <div>
+        <div className="col">
           <ReactSelect
-            key="select_currency"
+            key="select__currency"
             isSearchable={false}
             components={{
               Option: SelectOptionComponent,
-              ValueContainer: SelectValueComponent,
+              SingleValue
             }}
             defaultValue={{
               value: options[0]?.value,
@@ -134,6 +132,9 @@ export default function PriceConversorModal({
             </p>
           )}
         </div>
+      </div>
+      <div className="d-flex flex-row justify-content-center mt-4">
+        {formatNumberToNScale(currentPrice * currentValue)} {state.Service?.network?.networkToken?.symbol}
       </div>
     </Modal>
   );

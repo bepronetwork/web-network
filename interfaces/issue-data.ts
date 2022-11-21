@@ -50,6 +50,14 @@ export interface IssueData {
   working: string[];
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
+  disputes?: Disputes[];
+}
+
+export interface Disputes {
+  address: string;
+  weight: number;
+  issueId: number;
+  proposalId: number;
 }
 
 export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
@@ -68,7 +76,6 @@ export interface pullRequest {
   createdAt: Date;
   githubId: string;
   githubLogin: string;
-  branch: string;
   id: number;
   isMergeable: boolean;
   issueId: number;
@@ -82,6 +89,7 @@ export interface pullRequest {
   contractId?: number;
   userBranch?: string;
   userRepo?: string;
+  network_id: number;
 }
 
 export interface developer {

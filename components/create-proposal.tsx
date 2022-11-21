@@ -1,5 +1,7 @@
 import {useEffect, useState} from "react";
+import { components as RSComponents, SingleValueProps } from "react-select";
 
+import BigNumber from "bignumber.js";
 import clsx from "clsx";
 import {useTranslation} from "next-i18next";
 
@@ -39,15 +41,11 @@ interface SameProposal {
   }[];
 }
 
-function SelectValueComponent({ innerProps, innerRef, ...rest }) {
-  const data = rest.getValue()[0];
-
+function SingleValue (props: SingleValueProps<any>) {
+  const data = props.getValue()[0];
   return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="proposal__select-options d-flex align-items-center text-center p-small p-1"
-    >
+  <RSComponents.SingleValue {...props}>
+    <div className="d-flex align-items-center p-1">
       <Avatar userLogin={data?.githubLogin} />
       <span className="ml-1 text-nowrap">{data?.label}</span>
       <div className="ms-2">
@@ -57,9 +55,9 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }) {
           isDraft={data.isDraft}
         />
       </div>
-    </div>
-  );
-}
+      </div>
+  </RSComponents.SingleValue>
+  )}
 
 function SelectOptionComponent({ innerProps, innerRef, data }) {
   return (
@@ -107,6 +105,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
+  const [showDecimalsError, setShowDecimalsError] = useState(false)
 
   const {state} = useAppState();
 
@@ -142,8 +141,16 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     });
   }
 
+
   function handleCheckDistrib(obj: object) {
     const currentAmount = sumObj(obj);
+
+    setShowDecimalsError(false);
+
+    if (participants.some(p => obj[p.githubHandle]%1 > 0)) {
+      setShowDecimalsError(true);
+      return;
+    }
 
     if (currentAmount === 100) {
       const { id } = pullRequests.find((data) => data.githubId === currentGithubId);
@@ -158,7 +165,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
       const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
         return {
-          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp.scMergeId === item.id)?.pullRequestId),
+          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
           prAddressAmount: item.details.map(detail => ({
             amount: Number(detail.percentage),
             address: detail.recipient
@@ -180,18 +187,31 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     }
 
     if (currentAmount === 100) {
-      participants.map((item) => {
-        const realValue = (amountTotal * obj[item.githubHandle]) / 100;
-        if (
-          amountTotal < participants.length &&
-          realValue < 1 &&
-          realValue !== 0 &&
-          realValue < amountTotal
-        ) {
+      const bountyAmount = BigNumber(amountTotal);
+      const proposerFeeShare = BigNumber(state.Service?.network?.amounts?.proposerFeeShare || 0);
+      const mergeCreator = BigNumber(state.Service?.network?.amounts?.mergeCreatorFeeShare || 0);
+      const closeFee = BigNumber(state.Service.network.amounts?.treasury?.closeFee || 0);
+      const subtract =
+        [proposerFeeShare, mergeCreator, closeFee]
+          .reduce((p, c) => p.plus(c.multipliedBy(bountyAmount).dividedBy(100)), BigNumber(0));
+
+      const availableAmount = bountyAmount.minus(subtract);
+
+      for (let i = 0; i < participants.length; i++) {
+        const githubHandle = participants[i].githubHandle;
+        const proposalValue = BigNumber(obj[githubHandle]);
+
+        if (!obj[githubHandle])
+          continue;
+
+        const value = proposalValue.multipliedBy(availableAmount).dividedBy(100);
+
+        if (value.lt(1e-15)) {
           handleInputColor("error");
           setShowExceptionalMessage(true);
+          i = participants.length;
         }
-      });
+      }
     }
   }
 
@@ -285,6 +305,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     setShow(false);
     setDistrib({});
     handleInputColor("normal");
+    setShowDecimalsError(false);
   }
 
   function handleChangeSelect({ value, githubId }) {
@@ -343,32 +364,41 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             />
           ))}
         </ul>
-        <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-          {warning || cantBeMergeable() ? (
-            <p
-              className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
-                warning ? "warning" : "danger"
-              }`}
-            >
-              {t(`proposal:errors.${
+
+        {
+          showDecimalsError &&
+          <div className="d-flex caption-small text-uppercase mt-3 justify-content-end text-warning">
+            {t('proposal:messages.no-decimals-supported')}
+          </div>
+        }
+        {!showDecimalsError &&
+          <div className="d-flex" style={{justifyContent: "flex-end"}}>
+            {warning || cantBeMergeable() ? (
+              <p
+                className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
+                  warning ? "warning" : "danger"
+                }`}
+              >
+                {t(`proposal:errors.${
                   warning ? "distribution-already-exists" : "pr-cant-merged"
                 }`)}
-            </p>
-          ) : (
-            <p
-              className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase", {
-                "text-success": success,
-                "text-danger": error,
-              })}
-            >
-              {showExceptionalMessage && error
-                ? t("proposal:messages.distribution-cant-done")
-                : t(`proposal:messages.distribution-${
-                      success ? "is" : "must-be"
-                    }-100`)}
-            </p>
-          )}
-        </div>
+              </p>
+            ) : (
+              <p
+                className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase", {
+                  "text-success": success,
+                  "text-danger": error,
+                })}
+              >
+                {showExceptionalMessage && error
+                  ? t("proposal:messages.distribution-cant-done")
+                  : t(`proposal:messages.distribution-${
+                    success ? "is" : "must-be"
+                  }-100`)}
+              </p>
+            )}
+          </div>
+        }
       </>
     );
   }
@@ -422,7 +452,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           isDisabled={participants.length === 0}
           components={{
             Option: SelectOptionComponent,
-            ValueContainer: SelectValueComponent
+            SingleValue
           }}
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
@@ -448,6 +478,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
+          isSearchable={false}
         />
           {renderDistribution()}
       </Modal>
