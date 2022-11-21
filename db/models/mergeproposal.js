@@ -8,12 +8,12 @@ class MergeProposal extends Model {
    */
   static init(sequelize) {
     super.init({
-        scMergeId: DataTypes.STRING,
         issueId: DataTypes.INTEGER,
         pullRequestId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
         contractId: DataTypes.INTEGER,
         creator: DataTypes.STRING,
+        network_id: DataTypes.INTEGER,
     },
                {
         sequelize,
@@ -29,10 +29,16 @@ class MergeProposal extends Model {
       sourceKey: "id",
       as: "issue"
     });
+
     this.belongsTo(models.pullRequest, {
       foreignKey: "pullRequestId",
       sourceKey: "id",
       as: "pullRequest"
+    });
+    
+    this.belongsTo(models.network, {
+      foreignKey: "network_id",
+      sourceKey: "id"
     });
   }
 }

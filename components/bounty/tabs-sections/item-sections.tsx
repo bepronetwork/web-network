@@ -35,7 +35,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
       {
         data.length ?
           React.Children.toArray(data.map((item) => {
-            const asProposal = isProposal || (item as Proposal).scMergeId
+            const asProposal = isProposal || (item as Proposal)?.contractId
             const pathRedirect = isProposal ? '/proposal' : '/pull-request';
             const valueRedirect = {
               id: state.currentBounty?.data?.githubId,
@@ -43,7 +43,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
             } as any
             const status = []
 
-            const networkProposal = state.currentBounty?.chainData?.proposals?.[+item?.scMergeId]
+            const networkProposal = state.currentBounty?.chainData?.proposals?.[+item?.contractId]
             const isDisputed = !!networkProposal?.isDisputed;
             const isMerged = item?.isMerged;
 

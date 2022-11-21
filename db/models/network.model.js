@@ -48,6 +48,18 @@ class Network extends Model {
       sourceKey: "id"
     });
     this.belongsToMany(models.tokens, { through: 'network_tokens' });
+
+    this.hasMany(models.pullRequest, {
+      foreignKey: "network_id",
+      sourceKey: "id",
+      as: "pullRequests"
+    });
+    
+    this.hasMany(models.mergeProposal, {
+      foreignKey: "network_id",
+      sourceKey: "id",
+      as: "mergeProposals"
+    });
   }
 }
 
