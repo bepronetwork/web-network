@@ -1,4 +1,4 @@
-import { Col, Row } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 

@@ -1,12 +1,9 @@
-import { ReactElement } from "react";
 import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
 import NetworkContractSettings from "components/custom-network/network-contract-settings";
 import TokensSettings from "components/profile/my-network-settings/tokens-settings";
-
-import { useNetworkSettings } from "contexts/network-settings";
 
 import { Token } from "interfaces/token";
 

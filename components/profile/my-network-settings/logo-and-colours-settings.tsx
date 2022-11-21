@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -20,6 +20,7 @@ import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
@@ -28,8 +29,8 @@ import { useNetwork } from "x-hooks/use-network";
 
 interface Props {
   networkNeedRegistration: boolean;
-  network: any;
-  updateEditingNetwork: any;
+  network: Network;
+  updateEditingNetwork: () => void;
   errorBigImages: boolean
 }
 
