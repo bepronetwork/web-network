@@ -17,7 +17,6 @@ import {parseTransaction} from "helpers/transactions";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
-import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
@@ -37,6 +36,7 @@ interface NetworkTxButtonParams {
   modalTitle: string;
   modalDescription: string;
   buttonLabel?: string;
+  handleEvent?: (blockNumber) => void;
   children?: ReactChild | ReactChild[];
   disabled?: boolean;
   txType: TransactionTypes;
@@ -58,7 +58,8 @@ function networkTxButton({
     fullWidth = false,
     disabled = false,
     txType = TransactionTypes.unknown,
-    txCurrency
+    txCurrency,
+    handleEvent
   }: NetworkTxButtonParams, elementRef) {
   const { t } = useTranslation(["common"]);
 
@@ -66,8 +67,6 @@ function networkTxButton({
   const [txSuccess,] = useState(false);
 
   const { state, dispatch } = useAppState();
-
-  const { processEvent } = useApi();
 
   const { updateWalletBalance } = useAuthentication();
 
@@ -104,9 +103,8 @@ function networkTxButton({
               `
           }));
 
-          if (answer.blockNumber)
-            processEvent("oracles","changed", state.Service?.network?.lastVisited, {fromBlock:answer.blockNumber})
-              .catch(console.debug);
+          if(handleEvent && answer.blockNumber)
+            handleEvent(answer.blockNumber)
 
           dispatch(updateTx([parseTransaction(answer, tmpTransaction.payload[0] as SimpleBlockTransactionPayload)]));
         } else {

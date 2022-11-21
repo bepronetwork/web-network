@@ -1,11 +1,13 @@
 import {Dispatch} from "react";
 
+import { TreasuryInfo } from "@taikai/dappkit";
+
 import {XReducerAction} from "../contexts/reducers/reducer";
 import DAO from "../services/dao-service";
 import {SettingsType} from "../types/settings";
 import {Balance} from "./balance-state";
 import {BountyExtended} from "./bounty";
-import {BranchesList, BranchInfo} from "./branches-list";
+import {BranchesList} from "./branches-list";
 import {IssueBigNumberData, IssueDataComment} from "./issue-data";
 import {LoadingState} from "./loading-state";
 import {Network} from "./network";
@@ -40,7 +42,7 @@ export interface NetworkAmounts {
   proposerFeeShare: string | number;
   percentageNeededForDispute: string | number;
   oracleExchangeRate: string | number;
-  closeFee: string | number;
+  treasury: TreasuryInfo;
 }
 
 export interface ServiceNetwork {

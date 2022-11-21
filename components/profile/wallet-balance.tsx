@@ -61,8 +61,8 @@ export default function WalletBalance() {
       state.Service.active
         .getTokenBalance(state.Service?.network?.networkToken?.address, state.currentUser.walletAddress)
         .then(balance =>
-          (networkToken.name as any as () => Promise<string>)()
-            .then(name => (networkToken.symbol as any as () => Promise<string>)()
+          (networkToken?.name as any as () => Promise<string>)()
+            .then(name => (networkToken?.symbol as any as () => Promise<string>)()
               .then(symbol => ({name, symbol, balance, icon: <TokenIconPlaceholder />}))))
     ]).then(tokens => {
       setOracleToken({

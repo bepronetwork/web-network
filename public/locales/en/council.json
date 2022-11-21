@@ -10,5 +10,17 @@
   "become-council-description-part-two": "through your wallet.",
   "go-to-lock-unlock": "Go to Lock/Unlock",
   "ready-to-merge": "Ready to Merge",
-  "ready-to-propose": "Ready to Propose"
+  "ready-to-propose": "Ready to Propose",
+  "council-list": "Curators List",
+  "council-table": {
+    "address": "Address",
+    "closed-proposals": "Closed Proposals",
+    "disputed-proposals": "Disputed Proposals",
+    "disputes": "Disputes",
+    "total-votes": "Total Votes",
+    "actions": "Actions"
+  },
+  "errors": {
+    "not-found": "Curators not found"
+  }
 }

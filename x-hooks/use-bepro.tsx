@@ -36,11 +36,11 @@ export default function useBepro() {
     console.error("Tx error", err);
   }
 
-  async function handlerDisputeProposal(proposalscMergeId: number): Promise<TransactionReceipt | Error> {
+  async function handlerDisputeProposal(proposalContractId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const disputeTxAction = addTx([{ type: TransactionTypes.dispute }] as any);
       dispatch(disputeTxAction);
-      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalscMergeId)
+      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalContractId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, disputeTxAction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve?.(txInfo);
@@ -69,13 +69,13 @@ export default function useBepro() {
   }
 
   async function handleCloseIssue(bountyId: number,
-                                  proposalscMergeId: number, 
+                                  proposalContractId: number, 
                                   tokenUri: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTx([{ type: TransactionTypes.closeIssue } as any]);
       dispatch(closeIssueTx);
       
-      await state.Service?.active.closeBounty(+bountyId, +proposalscMergeId, tokenUri)
+      await state.Service?.active.closeBounty(+bountyId, +proposalContractId, tokenUri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
@@ -212,7 +212,7 @@ export default function useBepro() {
 
   async function handleTakeBack(delegationId: number,
                                 amount: string, 
-                                currency: TransactionCurrency): Promise<TransactionReceipt | Error> {
+                                currency: TransactionCurrency): Promise<{ blockNumber: number; } | Error> {
 
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{ type: TransactionTypes.takeBackOracles, amount, currency } as any]);
@@ -220,10 +220,16 @@ export default function useBepro() {
 
       await state.Service?.active
         .takeBackDelegation(delegationId)
-        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+        .then((txInfo: { blockNumber: number; }) => {
           if (!txInfo)
             throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
+
+          processEvent("oracles",
+                       "transfer",
+                       state.Service?.network?.lastVisited,
+                      { fromBlock: txInfo.blockNumber }).catch(console.debug);
+
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {

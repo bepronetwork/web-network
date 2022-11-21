@@ -100,7 +100,7 @@ export default function CreatePullRequestModal({
 
             const prExistsInActiveIssue =
               state.currentBounty?.data.pullRequests
-              .some(({branch: b}) => b === `${repository.owner}:${branch}`)
+                .some(({userBranch: b}) => b === `${repository.owner}:${branch}`);
 
             const isBaseBranch =
               (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
