@@ -14,12 +14,6 @@ module.exports = {
           allowNull: false,
           unique: true
         }
-      })
-      .then(() => {
-        if(process.env.NEXT_GH_OWNER && process.env.NEXT_GH_REPO)
-          queryInterface.insert(RepositoriesModel, "repositories", {
-            githubPath: `${process.env.NEXT_GH_OWNER}/${process.env.NEXT_GH_REPO}`
-          });
       });
   },
 

@@ -22,8 +22,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {BlockTransaction, Transaction} from "interfaces/transaction";
 
-import {useNetwork} from "../x-hooks/use-network";
-
+import {useNetwork} from "x-hooks/use-network";
 
 export default function TransactionModal({
                                            transaction = null,
@@ -54,7 +53,7 @@ export default function TransactionModal({
     setDetails([
       makeDetail(t("transactions.amount"),
                  <>
-          <span>{formatStringToCurrency(BigNumber(blockTransaction?.amount).toFixed())}</span>{" "}
+          <span>{formatStringToCurrency(BigNumber(blockTransaction?.amount || 0).toFixed())}</span>{" "}
           <span
             className={`${
               blockTransaction?.currency?.toLowerCase() === "oracles"

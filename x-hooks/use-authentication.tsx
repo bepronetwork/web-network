@@ -13,15 +13,15 @@ import {
   changeCurrentUserMatch,
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
+import {changeActiveNetwork} from "contexts/reducers/change-service";
+import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 
 import { CustomSession } from "interfaces/custom-session";
 
 import {WinStorage} from "services/win-storage";
 
-import {changeActiveNetwork} from "../contexts/reducers/change-service";
-import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "../contexts/reducers/change-spinners";
-import useApi from "./use-api";
-import {useDao} from "./use-dao";
+import useApi from "x-hooks/use-api";
+import {useDao} from "x-hooks/use-dao";
 
 export function useAuthentication() {
 
@@ -50,7 +50,9 @@ export function useAuthentication() {
     if (!state.currentUser?.walletAddress)
       return;
 
-    signOut({callbackUrl: `${URL_BASE}/${state.Service.network.lastVisited}`})
+    const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
+
+    signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})
       .then(() => {
         dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
       });
@@ -153,10 +155,7 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
-    if (!state.Service?.active)
-      return;
-
-    if (!force && (balance.value || !state.currentUser?.walletAddress))
+    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service?.active?.network)
       return;
 
     const update = newBalance => {

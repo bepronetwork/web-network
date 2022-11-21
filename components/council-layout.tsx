@@ -3,18 +3,18 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
+import CardBecomeCouncil from "components/card-become-council";
 import InternalLink from "components/internal-link";
 import PageHero, {InfosHero} from "components/page-hero";
+
+import {useAppState} from "contexts/app-state";
 
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
-import {useAppState} from "../contexts/app-state";
-import CardBecomeCouncil from "./card-become-council";
-
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();
-  const { t } = useTranslation(["council"]);
+  const { t } = useTranslation(["common", "council"]);
 
   const {state} = useAppState();
 
@@ -34,12 +34,12 @@ export default function CouncilLayout({ children }) {
     {
       value: 0,
       label: t("council:distributed-developers"),
-      currency: "BEPRO",
+      currency: t("misc.token"),
     },
     {
       value: 0,
-      label: t("common:heroes.in-network"),
-      currency: "BEPRO",
+      label: t("heroes.bounties-in-network"),
+      currency: t("misc.token"),
     },
   ]);
 
@@ -69,10 +69,10 @@ export default function CouncilLayout({ children }) {
   ]
 
   async function loadTotals() {
-    if (!state.Service?.active || !state.Service?.network?.active) return;
+    if (!state.Service?.active?.network || !state.Service?.network?.active?.name) return;
     
     const [totalBounties, onNetwork] = await Promise.all([
-      getTotalBounties("ready"),
+      getTotalBounties("ready", state.Service?.network?.active?.name),
       state.Service?.active.getTotalNetworkToken(),
     ]);
 
@@ -88,19 +88,19 @@ export default function CouncilLayout({ children }) {
       {
         value: 0,
         label: t("council:distributed-developers"),
-        currency: "BEPRO",
+        currency: state.Service?.network?.networkToken?.symbol,
       },
       {
         value: onNetwork.toFixed(),
-        label: t("common:heroes.in-network"),
-        currency: "BEPRO",
+        label: t("heroes.in-network"),
+        currency: state.Service?.network?.networkToken?.symbol,
       },
     ]);
   }
 
   useEffect(() => {
     loadTotals();
-  }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active]);
+  }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active?.name]);
 
   return (
     <div>

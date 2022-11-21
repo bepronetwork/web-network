@@ -1,13 +1,11 @@
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
+import {useAppState} from "contexts/app-state";
+
 import {hexadecimalToRGB} from "helpers/colors";
 
 import {ThemeColors} from "interfaces/network";
-
-import useApi from "x-hooks/use-api";
-
-import {useAppState} from "../contexts/app-state";
 
 export default function useNetworkTheme() {
   const router = useRouter();
@@ -26,7 +24,8 @@ export default function useNetworkTheme() {
       success: getComputedStyle(document.documentElement).getPropertyValue("--bs-success").trim(),
       danger: getComputedStyle(document.documentElement).getPropertyValue("--bs-danger").trim(),
       warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning").trim(),
-      info: getComputedStyle(document.documentElement).getPropertyValue("--bs-info").trim()
+      info: getComputedStyle(document.documentElement).getPropertyValue("--bs-info").trim(),
+      dark: getComputedStyle(document.documentElement).getPropertyValue("--bs-dark").trim(),
     };
   }
 
@@ -44,7 +43,8 @@ export default function useNetworkTheme() {
       success: overrideColors?.success || state.Service?.network?.active.colors?.success,
       danger: overrideColors?.danger || state.Service?.network?.active.colors?.danger,
       warning: overrideColors?.warning || state.Service?.network?.active.colors?.warning,
-      info: overrideColors?.info || state.Service?.network?.active.colors?.info
+      info: overrideColors?.info || state.Service?.network?.active.colors?.info,
+      dark: overrideColors?.dark || state.Service?.network?.active.colors?.dark,
     };
 
     return `:root {
@@ -66,7 +66,7 @@ export default function useNetworkTheme() {
       }
       ${
         (colors.oracle &&
-          `--bs-oracle: ${colors.oracle}; --bs-oracle-rgb: ${hexadecimalToRGB(colors.oracle).join(",")};`) ||
+          `--bs-purple: ${colors.oracle}; --bs-purple-rgb: ${hexadecimalToRGB(colors.oracle).join(",")};`) ||
         ""
       }
       ${
@@ -116,6 +116,13 @@ export default function useNetworkTheme() {
           `--bs-info: ${
             colors.info
           }; --bs-info-rgb: ${hexadecimalToRGB(colors.info).join(",")};`) ||
+        ""
+      }
+      ${
+        (colors.dark &&
+          `--bs-dark: ${
+            colors.dark
+          }; --bs-dark-rgb: ${hexadecimalToRGB(colors.dark).join(",")};`) ||
         ""
       }
     }`;

@@ -38,7 +38,7 @@
   },
   "network-list-bar": {
     "number-of-bounties": "Number of bounties",
-    "token-locked": "$TOKEN locked",
+    "token-locked": "TOKEN locked",
     "open-bounties": "Open bounties"
   },
   "steps": {
@@ -123,9 +123,9 @@
       "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings." 
     },
     "token-configuration": {
-      "title": "Token Configuration",
+      "title": "Governance Token",
       "tabs": {
-        "use-bepro-token": "Use BEPRO Token",
+        "use-registry-token": "Use {{symbol}} Token",
         "use-custom-token": "Use Custom Token",
         "deploy-new-token": "Deploy New Token"
       },
@@ -240,7 +240,7 @@
     "failed-to-close-network": "Failed to close network {{error}}",
     "invalid-format": "Invalid format",
     "images-too-big": "Your images are too big, maximum 1MB for both files combined",
-    "not-found": "You don't have a custom network created.",
+    "not-found": "No networks found",
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
     "percentage-for-dispute": "Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.",
     "redeem-time": "The time after a bounty creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",

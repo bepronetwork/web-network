@@ -141,10 +141,11 @@ export default function useBepro() {
       await state.Service?.active.hardCancel(state.currentBounty?.chainData?.id)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
-          return processEvent("bounty",
-                              "canceled",
-                              state.Service?.network?.lastVisited,
-            {fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id});
+          
+          return processEvent("bounty", "canceled", state.Service?.network?.lastVisited, {
+            fromBlock: txInfo.blockNumber, 
+            id: state.currentBounty?.chainData?.id
+          });
         })
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
@@ -192,14 +193,10 @@ export default function useBepro() {
       const tx = addTx([{ type } as any]);
       dispatch(tx);
 
-      console.log(`TX`, tx.payload);
-
       await state.Service?.active.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo)
           throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
-
-        console.log(`TXINFO`, txInfo, tx.payload);
 
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
         resolve(txInfo);
@@ -316,6 +313,35 @@ export default function useBepro() {
       dispatch(transaction);
 
       await state.Service?.active.deployNetworkV2(networkToken)
+        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          failTx(err, transaction, reject);
+        });
+    });
+  }
+
+  async function handleDeployRegistry(erc20: string,
+                                      lockAmountForNetworkCreation: string,
+                                      treasury: string,
+                                      lockFeePercentage: string,
+                                      closeFee: string,
+                                      cancelFee: string,
+                                      bountyToken: string): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTx([{ type: TransactionTypes.deployNetworkRegistry } as any]);
+
+      dispatch(transaction);
+
+      await state.Service?.active.deployNetworkRegistry(erc20,
+                                                        lockAmountForNetworkCreation,
+                                                        treasury,
+                                                        lockFeePercentage,
+                                                        closeFee,
+                                                        cancelFee,
+                                                        bountyToken)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
@@ -465,6 +491,23 @@ export default function useBepro() {
     });
   }
 
+  async function handleAddAllowedTokens(addresses: string[], isTransactional: boolean) {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTx([{ type: TransactionTypes.changeAllowedTokens } as any]);
+
+      dispatch(transaction);
+
+      await state.Service?.active.addAllowedTokens(addresses, isTransactional)
+        .then((txInfo: TransactionReceipt) => {
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          failTx(err, transaction, reject);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -486,6 +529,8 @@ export default function useBepro() {
     handleFundBounty,
     handleRetractFundBounty,
     handleWithdrawFundRewardBounty,
-    handleFeeSettings
+    handleFeeSettings,
+    handleDeployRegistry,
+    handleAddAllowedTokens
   };
 }

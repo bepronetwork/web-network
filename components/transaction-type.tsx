@@ -37,7 +37,9 @@ export default function TransactionType({ type }) {
     [TransactionTypes.retractFundBounty]: t("transactions.types.retract-fund"),
     [TransactionTypes.withdrawFundRewardBounty]: t("transactions.types.withdraw-fund-reward-bounty"),
     [TransactionTypes.deployERC20Token]: t("transactions.types.deploy-erc20-token"),
-    [TransactionTypes.configFees]: t("transactions.types.config-fees")
+    [TransactionTypes.configFees]: t("transactions.types.config-fees"),
+    [TransactionTypes.deployNetworkRegistry]: t("transactions.types.deploy-registry"),
+    [TransactionTypes.changeAllowedTokens]: t("transactions.types.change-allowed-tokens"),
   };
 
   return (

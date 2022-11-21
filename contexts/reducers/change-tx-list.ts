@@ -23,7 +23,6 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     const addMapper = (_tx) => ({
       status: TransactionStatus.pending,
       type: TransactionTypes.unknown,
-      date: +new Date(),
       amount: "0",
       currency: 'TOKEN',
       ..._tx,
@@ -34,8 +33,6 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     case SubActions.add:
       transformed = [...state.transactions, ...payload.map(addMapper)];
 
-      console.log(`TRANSFORMED`, transformed);
-
       break;
 
     case SubActions.remove:
@@ -45,13 +42,8 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     case SubActions.update:
       transformed = [...state.transactions];
 
-      console.log(`UPDATE TX`, transformed);
-
       payload.forEach((tx) => {
-        const i = transformed.findIndex(t => {
-          console.log(`TX.id`, tx.id, `T.id`, t.id);
-          return t.id === tx.id
-        });
+        const i = transformed.findIndex(t => t.id === tx.id);
         if (i > -1)
           transformed.splice(i, 1, tx);
       });
@@ -62,11 +54,9 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
       break;
 
     default:
-      console.log(`Unknown subAction ${subAction}`);
+      console.debug(`Unknown subAction ${subAction}`);
       break;
     }
-
-    console.log(`BEFORE REDUCE`, transformed);
 
     return super.reducer(state, transformed);
   }
@@ -74,7 +64,8 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
 
 export const changeTxList = new ChangeTxList();
 
-export const addTx = (tx: TxList) => changeTxList.update(tx.map(t => ({...t, id: uuidv4() })), SubActions.add);
+export const addTx = 
+  (tx: TxList) => changeTxList.update(tx.map(t => ({...t, id: uuidv4(), date: +new Date() })), SubActions.add);
 export const removeTx = (tx: TxList) => changeTxList.update(tx, SubActions.remove);
 export const updateTx = (tx: TxList) => changeTxList.update(tx, SubActions.update);
 export const setTxList = (tx: TxList) => changeTxList.update(tx, SubActions.change);
