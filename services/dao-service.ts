@@ -319,6 +319,16 @@ export default class DAO {
     return new BigNumber(disputes);
   }
 
+  async getTreasury(): Promise<TreasuryInfo> {
+    const treasury = await this.network.treasuryInfo();
+
+    return {
+      treasury: treasury?.treasury || Defaults.nativeZeroAddress,
+      closeFee: +(treasury?.closeFee || 0),
+      cancelFee: +(treasury?.cancelFee || 0)
+    };
+  }
+
   async getMergeCreatorFee(): Promise<number> {
     return this.network.mergeCreatorFeeShare();
   }
