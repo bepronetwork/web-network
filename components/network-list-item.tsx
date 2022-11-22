@@ -45,13 +45,13 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.totalBounties) ? formatNumberToNScale(network?.totalBounties) : <Spinner />}
+          {isNotUndefined(network?.totalBounties) ? formatNumberToNScale(network?.totalBounties, 0) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.openBounties) ? formatNumberToNScale(network?.openBounties) : <Spinner />}
+          {isNotUndefined(network?.openBounties) ? formatNumberToNScale(network?.openBounties, 0) : <Spinner />}
         </span>
       </div>
 
