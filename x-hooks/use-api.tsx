@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { head } from "lodash";
 
-import { getSettingsFromSessionStorage } from "helpers/settings";
+import { useAppState } from "contexts/app-state";
 
 import { 
   PastEventsParams, 
@@ -57,9 +57,9 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
-  const sessionStorageSettings = getSettingsFromSessionStorage();
-  const DEFAULT_NETWORK_NAME = sessionStorageSettings?.defaultNetworkConfig?.name || "bepro";
-
+  const  {state} = useAppState()
+  const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
+  
   api.interceptors.request.use(config => {
     config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
 
@@ -94,7 +94,7 @@ export default function useApi() {
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName
+      networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
       .get<{

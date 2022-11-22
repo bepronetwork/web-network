@@ -28,7 +28,7 @@ export function MyNetwork() {
   
   const { searchNetworks } = useApi();
   const { setForcedNetwork } = useNetworkSettings()
-  const defaultNetworkName = state.Settings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
+  const defaultNetworkName = state?.Service?.network?.active?.name?.toLowerCase();
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));

@@ -62,7 +62,7 @@ export function useRepos() {
     const findRepoId = (repo: RepoInfo) => repo.id.toString() === (id || query.repoId).toString();
     const activeRepo = state.Service.network.repos.list.find(findRepoId);
 
-    if (activeRepo.githubPath === loadedActiveRepo?.githubPath)
+    if (activeRepo?.githubPath === loadedActiveRepo?.githubPath)
       return;
 
     setActiveRepo(activeRepo);

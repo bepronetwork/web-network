@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { useTranslation } from "next-i18next";
 
 import CustomContainer from "components/custom-container";
@@ -12,9 +14,8 @@ import ItemSections from "./item-sections";
 function TabSections(){
   const { t } = useTranslation("bounty");
   const {state} = useAppState();
-  
-  const pullRequests = state.currentBounty?.data?.pullRequests;
-  const proposals = state.currentBounty?.data?.mergeProposals;
+  const [pullRequests, setPullRequests] = useState(state.currentBounty?.data?.pullRequests)
+  const [proposals, setProposals] = useState(state.currentBounty?.data?.mergeProposals)
 
   const tabs: TabbedNavigationItem[] = [
     {
@@ -33,6 +34,9 @@ function TabSections(){
 
     }
   ];
+
+  useEffect(()=> setPullRequests(state.currentBounty?.data?.pullRequests),[state.currentBounty?.data?.pullRequests])
+  useEffect(()=> setProposals(state.currentBounty?.data?.mergeProposals),[state.currentBounty?.data?.mergeProposals])
   
   if(!proposals?.length  && !pullRequests?.length)
     return <></>;
