@@ -47,7 +47,7 @@ function NewNetwork() {
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
-  const defaultNetworkName = state.Settings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
+  const defaultNetworkName = state?.Service?.network?.active?.name.toLowerCase();
   const isSetupPage = router?.pathname?.toString()?.includes("setup");
     
   const creationSteps = [
