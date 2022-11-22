@@ -94,7 +94,7 @@ export default function useApi() {
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName
+      networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
       .get<{
