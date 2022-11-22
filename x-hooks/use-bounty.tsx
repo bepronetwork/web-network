@@ -117,10 +117,10 @@ export function useBounty() {
 
     if (!state.Service?.active?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
+      
     dispatch(changeSpinners.update({bountyChain: true}))
     state.Service.active.getBounty(state.currentBounty.data.contractId)
       .then(bounty => {
-        if(!bounty?.id) return;
 
         if(!bounty?.id) return;
         
