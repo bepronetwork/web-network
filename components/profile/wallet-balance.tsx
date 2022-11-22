@@ -12,6 +12,7 @@ import InfoTooltip from "components/info-tooltip";
 import {formatStringToCurrency} from "helpers/formatNumber";
 
 import {useAppState} from "../../contexts/app-state";
+import {getCoinInfoByContract} from "../../services/coingecko";
 import TokenBalance, {TokenBalanceType} from "./token-balance";
 
 export const FlexRow = ({children, className = ""}) =>
@@ -41,8 +42,6 @@ export default function WalletBalance() {
 
     const { networkToken } = state.Service?.network || {};
 
-    console.log({networkToken})
-
     state.Service.active.loadRegistry()
       .then(registry => {
         if (!registry) return;
@@ -52,10 +51,13 @@ export default function WalletBalance() {
         Promise.all([
           state.Service.active.getTokenBalance(registryTokenAddress, state.currentUser.walletAddress)
             .then(async (balance) => {
+              const tokenData = await state.Service.active.getERC20TokenData(registryTokenAddress);
+              const tokenInformation = await getCoinInfoByContract(tokenData.symbol);
+
               return {
                 balance,
-                ... (await state.Service.active.getERC20TokenData(registryTokenAddress)),
-                icon: <BeProBlue width={24} height={24} />
+                ...tokenData,
+                icon: tokenInformation?.icon ? <img className="rounded-circle" src={tokenInformation?.icon as string} height="24px" width="24px" /> : <BeProBlue width={24} height={24} /> // eslint-disable-line
               }
             }),
           registryTokenAddress === state.Service?.network?.networkToken?.address ? Promise.resolve(null) :
