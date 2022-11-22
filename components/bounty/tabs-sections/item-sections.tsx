@@ -35,7 +35,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
       {
         data.length ?
           React.Children.toArray(data.map((item) => {
-            const asProposal = isProposal || (item as Proposal)?.contractId
+            console.log({item, isProposal})
             const pathRedirect = isProposal ? '/proposal' : '/pull-request';
             const valueRedirect = {
               id: state.currentBounty?.data?.githubId,
@@ -47,7 +47,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
             const isDisputed = !!networkProposal?.isDisputed;
             const isMerged = item?.isMerged;
 
-            if(!asProposal){
+            if(!isProposal){
               status.push({
                 merged: item?.merged,
                 isMergeable: item?.isMergeable,
@@ -70,7 +70,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin} 
                 status={status}>
-                {(asProposal && networkProposal) ? (
+                {(isProposal && networkProposal) ? (
                   <>
                     <div className="d-flex align-items-center text-center col-4">
                       <ProposalProgressSmall
@@ -108,7 +108,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                     }}
                   >
                     <span className="label-m text-white">
-                      <Translation label={asProposal ? "actions.view-proposal" : "actions.review"} />
+                      <Translation label={isProposal ? "actions.view-proposal" : "actions.review"} />
                     </span>
                   </Button>
                 </ReadOnlyButtonWrapper>

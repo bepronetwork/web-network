@@ -303,7 +303,7 @@ export default function PullRequestPage() {
       </CustomContainer>
 
       <CreateReviewModal
-        show={showModal}
+        show={showModal && isPullRequestReady}
         pullRequest={pullRequest}
         isExecuting={isCreatingReview}
         onConfirm={handleCreateReview}
