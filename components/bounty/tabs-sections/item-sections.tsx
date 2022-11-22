@@ -35,7 +35,6 @@ function ItemSections({ data, isProposal }: ItemProps) {
       {
         data.length ?
           React.Children.toArray(data.map((item) => {
-            console.log({item, isProposal})
             const pathRedirect = isProposal ? '/proposal' : '/pull-request';
             const valueRedirect = {
               id: state.currentBounty?.data?.githubId,
