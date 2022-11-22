@@ -234,7 +234,7 @@ export default function MyNetworkSettings({
     setTabs([
       {
         eventKey: "logo-and-colours",
-        title: t("custom-network:tab.logo-and-colours"),
+        title: t("custom-network:tabs.logo-and-colours"),
         component: (
           <NetworkContainer>
             <LogoAndColoursSettings 
@@ -248,7 +248,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "repositories",
-        title: t("custom-network:tab.repositories"),
+        title: t("custom-network:tabs.repositories"),
         component: (
           <NetworkContainer>
             <RepositoriesListSettings />
@@ -257,7 +257,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "governance",
-        title: t("custom-network:tab.governance"),
+        title: t("custom-network:tabs.governance"),
         component: (
           <NetworkContainer>
             <GovernanceSettings 
@@ -269,7 +269,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "registry",
-        title: t("custom-network:tab.registry"),
+        title: t("custom-network:tabs.registry"),
         component: (
           <NetworkContainer>
             <RegistrySettings isGovernorRegistry={isGovernorRegistry}/>
@@ -294,6 +294,10 @@ export default function MyNetworkSettings({
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
+      {console.log('data', settings?.validated,
+        github?.validated,
+        !network?.isClosed,
+        !networkNeedRegistration,)}
       {settings?.validated &&
         github?.validated &&
         !network?.isClosed &&
