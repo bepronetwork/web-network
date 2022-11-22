@@ -73,7 +73,10 @@ export default function PageIssue() {
         !state.currentBounty?.data) 
       return;
     checkForks();
-  },[state.currentUser?.login]);
+  },[state.currentUser?.login, 
+     state.currentBounty?.data?.working, 
+     state.Service?.network?.repos?.active 
+  ]);
 
   return (
     <BountyEffectsProvider>
