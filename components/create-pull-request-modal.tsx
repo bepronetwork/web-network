@@ -91,11 +91,8 @@ export default function CreatePullRequestModal({
       .then(reposWithBranches => reposWithBranches
         .map(({ repository, branches }) => branches
           .map(branch => {
-            const ghOpenedPRs = reposWithBranches.flatMap(repos=> repos.pullRequests)
-            .filter((b)=> b.baseRefName === state.currentBounty?.data.branch)
-            
             const prExistAtGh = 
-                  ghOpenedPRs
+                    reposWithBranches.flatMap(repos=> repos.pullRequests)
                   .some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`)
 
             const prExistsInActiveIssue =
