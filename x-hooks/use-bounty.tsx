@@ -89,7 +89,7 @@ export function useBounty() {
         dispatch(changeCurrentBountyData(extendedBounty));
 
         return Promise.all([
-          getIssueOrPullRequestComments(bounty?.repository?.githubPath, +bounty.githubId),
+          getIssueOrPullRequestComments(bounty?.repository?.githubPath, +bounty?.githubId),
           extendedBounty
         ]);
       })
