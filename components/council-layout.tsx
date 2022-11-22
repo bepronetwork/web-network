@@ -46,7 +46,7 @@ export default function CouncilLayout({ children }) {
   const internalLinks = [
     {
       href: getURLWithNetwork("/curators/ready-to-propose"),
-      label: t("ready-to-propose"),
+      label: t("council:ready-to-propose"),
       className:"mr-3 h3 p-0",
       active:(asPath.endsWith("/curators") && true) || undefined,
       nav: true,
@@ -54,14 +54,14 @@ export default function CouncilLayout({ children }) {
     },
     {
       href: getURLWithNetwork("/curators/ready-to-merge"),
-      label: t("ready-to-merge"),
+      label: t("council:ready-to-merge"),
       className:"h3 p-0 me-3",
       nav: true,
       transparent: true
     },
     {
       href: getURLWithNetwork("/curators/curators-list"),
-      label: t("council-list"),
+      label: t("council:council-list"),
       className:"h3 p-0 ms-3",
       nav: true,
       transparent: true
