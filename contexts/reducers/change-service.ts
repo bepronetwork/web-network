@@ -23,7 +23,7 @@ export class ChangeServiceProp<T = ServiceState | Partial<ServiceState>, A = key
   }
 
   reducer(state: State, payload, subAction): State {
-    return super.reducer(state, Object.assign(state.Service || {}, {[subAction]: payload}) as T);
+    return super.reducer(state, Object.assign(state.Service || {}, {[subAction]: payload}) as T); // eslint-disable-line
   }
 }
 
@@ -35,7 +35,7 @@ export class ChangeServiceNetworkProp<T = ServiceNetwork|Partial<ServiceNetwork>
   }
 
   reducer(state: State, payload, subAction = 'network'): State {
-    return super.reducer(state, Object.assign(state.Service?.network || {}, payload), subAction);
+    return super.reducer(state, Object.assign(state.Service?.network || {}, payload), subAction); // eslint-disable-line
   }
 }
 
