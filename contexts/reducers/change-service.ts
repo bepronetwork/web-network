@@ -46,7 +46,7 @@ export class ChangeServiceNetworkReposProp
   }
 
   reducer(state: State, payload): State {
-    return super.reducer(state, Object.assign(state.Service.network || {}, {repos: {...state.Service?.network?.repos || {}, ...payload}}));
+    return super.reducer(state, Object.assign(state.Service.network || {}, {repos: {...state.Service?.network?.repos || {}, ...payload}})); // eslint-disable-line
   }
 }
 
