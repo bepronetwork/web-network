@@ -28,7 +28,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
           </div>
           <div className="col-md-4 col-xl-3 d-flex align-items-center gap-2">
             <Avatar userLogin={githubLogin} />
-            <span className="text-uppercase text-white caption">
+            <span className="text-uppercase text-white caption text-truncate">
               {githubLogin}
             </span>
           </div>
