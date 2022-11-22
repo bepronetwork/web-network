@@ -30,6 +30,8 @@ module.exports = {
     let curatorsUpdated = 0;
 
     for (const network of networks) {
+      if(!network.address) return;
+
       const web3Connection = new Web3Connection({
         skipWindowAssignment: true,
         web3Host: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
