@@ -3,6 +3,7 @@ import React from "react";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+import {v4 as uuidv4} from "uuid";
 
 import Button from "components/button";
 import NothingFound from "components/nothing-found";
@@ -65,6 +66,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
 
             return (
               <ItemRow 
+                key={uuidv4()}
                 id={item?.id} 
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin} 
