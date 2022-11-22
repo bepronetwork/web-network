@@ -24,7 +24,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const customNetwork = await models.network.findOne({
       where: {
         name: {
-          [Op.iLike]: String(networkName)
+          [Op.iLike]: String(networkName).replaceAll(" ", "-")
         }
       }
     });
