@@ -420,7 +420,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         percentageNeededForDispute,
         isNetworkAbleToBeClosed,
       ] = await Promise.all([
-        service.getTreasury(),
+        service.network.treasuryInfo(),
         service.getNetworkParameter("councilAmount"),
         service.getNetworkParameter("disputableTime"),
         service.getNetworkParameter("draftTime"),
