@@ -291,17 +291,17 @@ export default class DAO {
   }
 
   async getBounty(id: number): Promise<BountyExtended> {
-    const bounty = await this.network.getBounty(id);
+    const bounty = await this.network?.getBounty(id);
 
     return {
       ...bounty,
-      tokenAmount: new BigNumber(bounty.tokenAmount),
-      rewardAmount: new BigNumber(bounty.rewardAmount),
-      fundingAmount: new BigNumber(bounty.fundingAmount),
+      tokenAmount: new BigNumber(bounty?.tokenAmount),
+      rewardAmount: new BigNumber(bounty?.rewardAmount),
+      fundingAmount: new BigNumber(bounty?.fundingAmount),
       proposals: 
-        bounty.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) })),
+        bounty?.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) })),
       funding: 
-        bounty.funding.map(funding => ({ ...funding, amount: new BigNumber(funding.amount) }))
+        bounty?.funding.map(funding => ({ ...funding, amount: new BigNumber(funding.amount) }))
     };
   }
 
@@ -710,6 +710,6 @@ export default class DAO {
   }
 
   getCancelableTime(): Promise<number> {
-    return this._network.cancelableTime();
+    return this._network?.cancelableTime();
   }
 }
