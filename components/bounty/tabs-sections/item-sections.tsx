@@ -60,7 +60,8 @@ function ItemSections({ data, isProposal }: ItemProps) {
                   label: isDisputed ? 'disputed' : 'accepted'
                 })
               }
-                
+              if(networkProposal.refusedByBountyOwner) status.push({ label: 'failed' })
+
               valueRedirect.proposalId = item?.id
             }
 

@@ -22,7 +22,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
           href ? "cursor-pointer" : ""
         }`}
       >
-        <div className="flex-grow-1 d-flex flex-row align-items-center gap-3">
+        <div className="col d-flex flex-row align-items-center gap-3">
           <div className="col-1">
             <span className="label-m text-gray-500">#{id}</span>
           </div>
@@ -38,7 +38,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
               : null}
           </div>
         </div>
-        <div className="flex-grow-1 d-flex flex-row gap-3 justify-content-end">
+        <div className="col d-flex flex-row gap-3 justify-content-end">
           {children}
         </div>
       </div>
