@@ -308,11 +308,12 @@ async function main() {
         const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
         NetworkModel.init(sequelize);
         RepositoryModel.init(sequelize);
-  
+        
+        if(!process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME) return;
         
         const [networkDb] = await NetworkModel.findOrCreate({
           where: {
-            name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || "bepro"
+            name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME
           },
           defaults: {
             networkAddress: network.contractAddress,
