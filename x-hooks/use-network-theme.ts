@@ -145,8 +145,7 @@ export default function useNetworkTheme() {
         ...query,
         network: query?.network || 
                  router?.query?.network || 
-                 state.Settings?.defaultNetworkConfig?.name ||
-                 "bepro"
+                 state?.Service?.network?.active?.name
       }
     };
   }
