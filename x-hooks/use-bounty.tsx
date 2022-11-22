@@ -172,14 +172,11 @@ export function useBounty() {
     if (!state.currentBounty?.chainData || !state.Service?.active)
       return Promise.reject([]);
 
-    const dbBounty = state.currentBounty?.data;
     const wallet = state.currentUser?.walletAddress;
 
     return Promise.all(bounty.proposals.map(proposal =>
-        (dbBounty?.merged
-            ? Promise.resolve(+dbBounty?.merged !== proposal.id)
-            : state.Service.active.isProposalDisputed(+bounty.id, proposal.id)
-        ).then(isDisputed =>
+        state.Service.active.isProposalDisputed(+bounty.id, proposal.id)
+        .then(isDisputed =>
           !wallet
             ? ({...proposal, isDisputed})
             : state.Service.active.getDisputesOf(wallet, +bounty.id, +proposal.id)
