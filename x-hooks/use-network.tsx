@@ -167,7 +167,7 @@ export function useNetwork() {
               mergeCreatorFeeShare, 
               proposerFeeShare, 
               percentageNeededForDispute, 
-              oracleExchangeRate, {treasury}]) => {
+              oracleExchangeRate, treasury]) => {
         dispatch(changeActiveNetworkAmounts({
           councilAmount: councilAmount.toString(),
           oracleExchangeRate: +oracleExchangeRate,
