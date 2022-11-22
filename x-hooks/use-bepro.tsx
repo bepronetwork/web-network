@@ -15,6 +15,9 @@ import useApi from "x-hooks/use-api";
 
 import { useAppState } from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import BigNumber from "bignumber.js";
+
+const DIVISOR = 1000000;
 
 export default function useBepro() {
   const { dispatch, state } = useAppState();
@@ -338,9 +341,9 @@ export default function useBepro() {
       await state.Service?.active.deployNetworkRegistry(erc20,
                                                         lockAmountForNetworkCreation,
                                                         treasury,
-                                                        lockFeePercentage,
-                                                        closeFee,
-                                                        cancelFee,
+                                                        BigNumber(lockFeePercentage).multipliedBy(DIVISOR).toString(),
+                                                        BigNumber(closeFee).multipliedBy(DIVISOR).toString(),
+                                                        BigNumber(cancelFee).multipliedBy(DIVISOR).toString(),
                                                         bountyToken)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
