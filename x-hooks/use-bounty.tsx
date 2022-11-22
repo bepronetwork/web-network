@@ -83,13 +83,13 @@ export function useBounty() {
           bounty.benefactors = bounty?.benefactors.map((benefactor) => 
           ({...benefactor, amount: BigNumber(benefactor?.amount)}))
 
-        const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
+        const mergeProposals = bounty?.mergeProposals.map(mergeProposalMapper);
         const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
 
         dispatch(changeCurrentBountyData(extendedBounty));
 
         return Promise.all([
-          getIssueOrPullRequestComments(bounty.repository.githubPath, +bounty.githubId),
+          getIssueOrPullRequestComments(bounty?.repository?.githubPath, +bounty.githubId),
           extendedBounty
         ]);
       })
@@ -126,10 +126,10 @@ export function useBounty() {
           isCancelable: !bounty.proposals.find(proposal => proposal.prId === pullRequest.id)
         });
 
-        bounty.pullRequests = bounty.pullRequests.filter(pr => !pr.canceled).map(pullRequestsMapper);
-        bounty.fundedAmount = bounty.funding.reduce((p, c) => p.plus(c.amount), BigNumber(0))
-        bounty.fundedPercent = bounty.fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount);
-        bounty.isFundingRequest = bounty.fundingAmount.gt(0);
+        bounty.pullRequests = bounty?.pullRequests?.filter(pr => !pr.canceled).map(pullRequestsMapper);
+        bounty.fundedAmount = bounty?.funding?.reduce((p, c) => p.plus(c.amount), BigNumber(0))
+        bounty.fundedPercent = bounty?.fundedAmount?.multipliedBy(100).dividedBy(bounty?.fundingAmount);
+        bounty.isFundingRequest = bounty?.fundingAmount.gt(0);
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
 

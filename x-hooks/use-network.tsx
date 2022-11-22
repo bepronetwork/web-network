@@ -68,7 +68,9 @@ export function useNetwork() {
         if (!data.isRegistered)
           throw new Error("Network not registered");
 
-        const storageParams = new WinStorage(`bepro.network:${networkName}`, 3600, `sessionStorage`);
+        const key = networkName || data?.name;
+
+        const storageParams = new WinStorage(`bepro.network:${key}`, 3600, `sessionStorage`);
 
         storageParams.value = data;
         dispatch(changeActiveNetwork(data));
@@ -96,8 +98,7 @@ export function useNetwork() {
         ..._query,
         network: _network ||
           query?.network ||
-          state.Settings?.defaultNetworkConfig?.name ||
-          "bepro"
+          state?.Service?.network?.active?.name
       }
     };
   }
