@@ -118,7 +118,6 @@ export function useBounty() {
       return;
 
     dispatch(changeSpinners.update({bountyChain: true}))
-
     state.Service.active.getBounty(state.currentBounty.data.contractId)
       .then(bounty => {
 
