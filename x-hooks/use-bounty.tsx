@@ -116,10 +116,10 @@ export function useBounty() {
   function getChainBounty(force = false) {
     if (!state.Service?.active || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
-
     dispatch(changeSpinners.update({bountyChain: true}))
     state.Service.active.getBounty(state.currentBounty.data.contractId)
       .then(bounty => {
+        if(!bounty?.id) return;
 
         const pullRequestsMapper = (pullRequest) => ({
           ...pullRequest,
@@ -132,7 +132,7 @@ export function useBounty() {
         bounty.isFundingRequest = bounty?.fundingAmount.gt(0);
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
-
+        console.log('bounty', bounty)
         state.Service.active.getERC20TokenData(bounty.transactional)
           .then(token => dispatch(changeCurrentBountyDataTransactional(token)))
 
