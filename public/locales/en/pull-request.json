@@ -49,6 +49,7 @@
     "broken-tests": "Broken tests",
     "accepted": "Accepted",
     "disputed": "Disputed",
+    "failed": "Failed",
     "needs-approval": "Pending approval"
   },
   "errors": {
