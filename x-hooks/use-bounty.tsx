@@ -114,13 +114,16 @@ export function useBounty() {
   }
 
   function getChainBounty(force = false) {
-    if (!state.Service?.active || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
+
+    if (!state.Service?.active?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
+      
     dispatch(changeSpinners.update({bountyChain: true}))
     state.Service.active.getBounty(state.currentBounty.data.contractId)
       .then(bounty => {
-        if(!bounty?.id) return;
 
+        if(!bounty?.id) return;
+        
         const pullRequestsMapper = (pullRequest) => ({
           ...pullRequest,
           isCancelable: !bounty.proposals.find(proposal => proposal.prId === pullRequest.id)
