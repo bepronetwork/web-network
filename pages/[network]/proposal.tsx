@@ -26,9 +26,9 @@ import {DistribuitonPerUser, Proposal} from "interfaces/proposal";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
+import {ProposalDisputes} from "../../components/proposal-disputes";
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 import {useBounty} from "../../x-hooks/use-bounty";
-import {ProposalDisputes} from "../../components/proposal-disputes";
 
 export default function PageProposal() {
   useBounty();

@@ -1,21 +1,21 @@
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
-import { useTranslation } from "next-i18next";
+import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import BigNumber from "bignumber.js";
+import {useTranslation} from "next-i18next";
 
-import { parseTransaction } from "helpers/transactions";
+import {parseTransaction} from "helpers/transactions";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {SimpleBlockTransactionPayload, TransactionCurrency} from "interfaces/transaction";
 
 import DAO from "services/dao-service";
 
-import { NetworkParameters } from "types/dappkit";
+import {NetworkParameters} from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
 
-import { useAppState } from "../contexts/app-state";
+import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import BigNumber from "bignumber.js";
 
 const DIVISOR = 1000000;
 
