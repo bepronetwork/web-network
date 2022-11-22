@@ -23,12 +23,12 @@ export class SimpleActor<P = any, A = any> implements Actor<P, A> {
 
 export class SimpleAction<T = any, A = any> extends SimpleActor<T> implements Action<T> {
   constructor(readonly id: AppStateReduceId, readonly stateKey: keyof State) {
-    console.debug(`CREATE`, id, AppStateReduceId[id], stateKey);
+    //console.debug(`CREATE`, id, AppStateReduceId[id], stateKey);
     super(id)
   }
 
   reducer(state: State, payload: T, subAction?: A): State {
-    console.debug(`UPDATING ${this.id} ${AppStateReduceId[this.id]} ${this.stateKey} ${subAction || `subAction=undefined`}`, {payload, state});
+    //console.debug(`UPDATING ${this.id} ${AppStateReduceId[this.id]} ${this.stateKey} ${subAction || `subAction=undefined`}`, {payload, state});
     return {...state, [this.stateKey]: payload};
   }
 }
