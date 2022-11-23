@@ -55,7 +55,6 @@ export default function PageActions({
   const {createPrePullRequest, cancelPrePullRequest, startWorking, processEvent} = useApi();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
-  
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
   const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;

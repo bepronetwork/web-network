@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { ContextualSpan } from "components/contextual-span";
+import {ContextualSpan} from "components/contextual-span";
 import RepositoryCheck from "components/custom-network/repository-check";
 
 import useApi from "x-hooks/use-api";
@@ -69,7 +69,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   }
 
   useEffect(() => {
-    if (!repositories?.length) return ;
+    if (!repositories?.length) return;
 
     const paths = repositories
       .filter((repository) => !repository.isSaved)
@@ -82,7 +82,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         networkName: ""
       })
         .then(({ rows }) => {
-          setExistingRepos(rows.map((repo) => repo.githubPath));
+          setExistingRepos(rows.map((repo) => repo.name));
         })
         .catch(console.log);
 
@@ -117,16 +117,18 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
       }
 
       {repositories.map((repository) => (
-        <RepositoryCheck
-          key={repository.fullName}
-          label={repository.name}
-          active={repository.checked}
-          userPermission={repository.userPermission}
-          hasIssues={reposWithIssues.includes(repository.fullName)}
-          mergeCommitAllowed={repository.mergeCommitAllowed}
-          onClick={() => handleClick(repository)}
-          usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
-        />
+        <>
+          <RepositoryCheck
+            key={repository.fullName}
+            label={repositories.filter(r => r.name === repository.name).length > 1 ? repository.fullName : repository.name}
+            active={repository.checked}
+            userPermission={repository.userPermission}
+            hasIssues={reposWithIssues.includes(repository.fullName)}
+            mergeCommitAllowed={repository.mergeCommitAllowed}
+            onClick={() => handleClick(repository)}
+            usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
+          />
+        </>
       ))}
 
       {renderInfos.filter(({ visible }) => visible).map(renderInfo)}

@@ -55,7 +55,7 @@ export function MyNetwork() {
 
     updateEditingNetwork();
   }, [state.currentUser?.walletAddress]);
-
+  
   return(
     <ProfileLayout>
       { !myNetwork && 
