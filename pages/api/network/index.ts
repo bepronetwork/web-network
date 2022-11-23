@@ -20,7 +20,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const where = {
     ... networkName && {
       name: {
-        [Op.iLike]: String(networkName).replaceAll("-", " ")
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     } || {},
     ... creatorAddress && {
@@ -49,7 +49,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
-      name,
+      name: _name,
       colors,
       creator,
       fullLogo,
@@ -63,6 +63,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       networkAddress,
       isDefault
     } = req.body;
+
+    const name = _name.replaceAll(" ", "-").toLowerCase()
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
@@ -131,7 +133,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const network = await Database.network.create({
       creatorAddress: creator,
-      name: name.toLowerCase(),
+      name: name,
       description,
       colors: JSON.parse(colors),
       logoIcon: logoIconHash,

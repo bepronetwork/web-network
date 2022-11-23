@@ -22,13 +22,13 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
           href ? "cursor-pointer" : ""
         }`}
       >
-        <div className="flex-grow-1 d-flex flex-row align-items-center gap-3">
+        <div className="col d-flex flex-row align-items-center gap-3">
           <div className="col-1">
             <span className="label-m text-gray-500">#{id}</span>
           </div>
           <div className="col-md-4 col-xl-3 d-flex align-items-center gap-2">
             <Avatar userLogin={githubLogin} />
-            <span className="text-uppercase text-white caption">
+            <span className="text-uppercase text-white caption text-truncate">
               {githubLogin}
             </span>
           </div>
@@ -38,7 +38,7 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
               : null}
           </div>
         </div>
-        <div className="flex-grow-1 d-flex flex-row gap-3 justify-content-end">
+        <div className="col d-flex flex-row gap-3 justify-content-end">
           {children}
         </div>
       </div>

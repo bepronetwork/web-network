@@ -76,20 +76,20 @@ export function useBounty() {
 
         const mergeProposalMapper = (proposal) => ({
           ...proposal,
-          isMerged: bounty.merged !== null && proposal?.contractId === bounty.merged
+          isMerged: bounty.merged !== null && +proposal?.contractId === +bounty.merged
         })
 
         if(bounty?.benefactors)
           bounty.benefactors = bounty?.benefactors.map((benefactor) => 
           ({...benefactor, amount: BigNumber(benefactor?.amount)}))
 
-        const mergeProposals = bounty.mergeProposals.map(mergeProposalMapper);
+        const mergeProposals = bounty?.mergeProposals.map(mergeProposalMapper);
         const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
 
         dispatch(changeCurrentBountyData(extendedBounty));
 
         return Promise.all([
-          getIssueOrPullRequestComments(bounty.repository.githubPath, +bounty.githubId),
+          getIssueOrPullRequestComments(bounty?.repository?.githubPath, +bounty?.githubId),
           extendedBounty
         ]);
       })
@@ -114,23 +114,25 @@ export function useBounty() {
   }
 
   function getChainBounty(force = false) {
-    if (!state.Service?.active || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
+
+    if (!state.Service?.active?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
       return;
 
     dispatch(changeSpinners.update({bountyChain: true}))
-
     state.Service.active.getBounty(state.currentBounty.data.contractId)
       .then(bounty => {
 
+        if(!bounty?.id) return;
+        
         const pullRequestsMapper = (pullRequest) => ({
           ...pullRequest,
           isCancelable: !bounty.proposals.find(proposal => proposal.prId === pullRequest.id)
         });
 
-        bounty.pullRequests = bounty.pullRequests.filter(pr => !pr.canceled).map(pullRequestsMapper);
-        bounty.fundedAmount = bounty.funding.reduce((p, c) => p.plus(c.amount), BigNumber(0))
-        bounty.fundedPercent = bounty.fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount);
-        bounty.isFundingRequest = bounty.fundingAmount.gt(0);
+        bounty.pullRequests = bounty?.pullRequests?.filter(pr => !pr.canceled).map(pullRequestsMapper);
+        bounty.fundedAmount = bounty?.funding?.reduce((p, c) => p.plus(c.amount), BigNumber(0))
+        bounty.fundedPercent = bounty?.fundedAmount?.multipliedBy(100).dividedBy(bounty?.fundingAmount);
+        bounty.isFundingRequest = bounty?.fundingAmount.gt(0);
 
         dispatch(changeCurrentBountyDataChain.update(bounty));
 
@@ -170,14 +172,11 @@ export function useBounty() {
     if (!state.currentBounty?.chainData || !state.Service?.active)
       return Promise.reject([]);
 
-    const dbBounty = state.currentBounty?.data;
     const wallet = state.currentUser?.walletAddress;
 
     return Promise.all(bounty.proposals.map(proposal =>
-        (dbBounty?.merged
-            ? Promise.resolve(+dbBounty?.merged !== proposal.id)
-            : state.Service.active.isProposalDisputed(+bounty.id, proposal.id)
-        ).then(isDisputed =>
+        state.Service.active.isProposalDisputed(+bounty.id, proposal.id)
+        .then(isDisputed =>
           !wallet
             ? ({...proposal, isDisputed})
             : state.Service.active.getDisputesOf(wallet, +bounty.id, +proposal.id)

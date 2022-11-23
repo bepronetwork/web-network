@@ -10,7 +10,8 @@ export type PRLabel =
   | "closed"
   | "draft"
   | "accepted"
-  | "disputed";
+  | "disputed"
+  | "failed";
 
 export interface IPRLabel {
   label?: PRLabel;
@@ -50,6 +51,9 @@ function PullRequestLabels({
       return "danger";
     }
     case t("status.disputed").toLowerCase(): {
+      return "danger";
+    }
+    case t("status.failed").toLowerCase(): {
       return "danger";
     }
     case t("status.merged").toLowerCase(): {

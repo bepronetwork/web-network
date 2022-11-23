@@ -10,7 +10,7 @@ async function getAllRepos(req, res) {
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   });
@@ -45,7 +45,7 @@ async function addNewRepo(req, res) {
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   });

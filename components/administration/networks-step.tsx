@@ -150,7 +150,7 @@ export default function NetworksStep({
         state.Service?.active.getNetworkParameter("mergeCreatorFeeShare"),
         state.Service?.active.getNetworkParameter("proposerFeeShare"),
         state.Service?.active.getNetworkParameter("percentageNeededForDispute"),
-        state.Service?.active.getTreasury(),
+        state.Service?.active.network?.treasuryInfo(),
         state.Service?.active.getSettlerTokenData()
       ])
       .then(([councilAmount, 
