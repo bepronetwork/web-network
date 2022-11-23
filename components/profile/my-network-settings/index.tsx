@@ -294,10 +294,6 @@ export default function MyNetworkSettings({
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
-      {console.log('data', settings?.validated,
-        github?.validated,
-        !network?.isClosed,
-        !networkNeedRegistration,)}
       {settings?.validated &&
         github?.validated &&
         !network?.isClosed &&
