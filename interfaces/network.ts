@@ -1,6 +1,6 @@
-import { TreasuryInfo } from "@taikai/dappkit";
+import {TreasuryInfo} from "@taikai/dappkit";
 
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
 export interface Network {
   id: number;
@@ -65,12 +65,14 @@ export interface Icon {
 }
 
 export interface Repository {
+  mergeCommitAllowed: boolean;
   userPermission?: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
   checked: boolean;
   name: string;
   fullName: string;
   isSaved?: boolean;
   hasIssues?: boolean;
+  label?: string;
 }
 
 export interface Theme {
