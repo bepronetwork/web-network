@@ -6,7 +6,6 @@ import {ContextualSpan} from "components/contextual-span";
 import RepositoryCheck from "components/custom-network/repository-check";
 
 import useApi from "x-hooks/use-api";
-import {Repository} from "../../interfaces/network";
 
 interface infoType {
   visible?: boolean;
@@ -21,7 +20,6 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   const [reposWithIssues, setReposWithIssues] = useState([]);
   const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
   const [withoutMergeCommitPerm, setWithoutMergeCommitPerm] = useState([]);
-  const [repoList, setRepoList] = useState<Repository[]>([])
 
   const { searchRepositories } = useApi();
 
@@ -71,8 +69,6 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   }
 
   useEffect(() => {
-    console.log(`repositories`, repositories);
-
     if (!repositories?.length) return;
 
     const paths = repositories
@@ -98,8 +94,6 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
               repository?.userPermission && repository.userPermission !== "ADMIN")
           .map((repository) => repository.fullName));
 
-    setRepoList(repositories.map(repo => ({...repo, label: repositories.filter(r => r.name === repo.name).length > 1 ? repo.fullName : repo.name})))
-
     updateReposWithoutMergeCommitPerm();
   }, [repositories]);
 
@@ -122,11 +116,11 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         </span>
       }
 
-      {repoList.map((repository) => (
+      {repositories.map((repository) => (
         <>
           <RepositoryCheck
             key={repository.fullName}
-            label={repository.label}
+            label={repositories.filter(r => r.name === repository.name).length > 1 ? repository.fullName : repository.name}
             active={repository.checked}
             userPermission={repository.userPermission}
             hasIssues={reposWithIssues.includes(repository.fullName)}
