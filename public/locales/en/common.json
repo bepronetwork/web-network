@@ -260,7 +260,7 @@
       "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
     },
     "wrong-network": {
-      "please-connect": "please, connect to the",
+      "please-connect": "please, connect to a supported network",
       "network": "network",
       "on-your-wallet": "on your metamask wallet",
       "change-network": "Change Network",
