@@ -1,29 +1,32 @@
 "use strict";
 
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("users_payments", {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("kyc-session", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         unique: true,
       },
-      address: {
+      user_id: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      ammount: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      issueId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      transactionHash: {
+      session_id: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      state: {
+        type: Sequelize.STRING,
+      },
+      steps: {
+        type: Sequelize.STRING,
+      },
+      validatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,
@@ -35,7 +38,8 @@ module.exports = {
       },
     });
   },
-  down: async (queryInterface) => {
-    await queryInterface.dropTable("users_payments");
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("kyc-session");
   },
 };
