@@ -1,29 +1,29 @@
 "use strict";
 
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("users_payments", {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("kyc-session-steps", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         unique: true,
       },
-      address: {
+      service: {
+        type: Sequelize.STRING,
+      },
+      // kycSession
+      step_id: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      ammount: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      issueId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      transactionHash: {
-        type: Sequelize.STRING,
+      state: {
+        type: Sequelize.STRING, //KYCSessionStep
         allowNull: true,
+      },
+      reason: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -35,7 +35,8 @@ module.exports = {
       },
     });
   },
-  down: async (queryInterface) => {
-    await queryInterface.dropTable("users_payments");
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("kyc-session-steps");
   },
 };
