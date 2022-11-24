@@ -1,6 +1,6 @@
 import {Dispatch} from "react";
 
-import { TreasuryInfo } from "@taikai/dappkit";
+import {TreasuryInfo} from "@taikai/dappkit";
 
 import {XReducerAction} from "../contexts/reducers/reducer";
 import DAO from "../services/dao-service";
@@ -15,6 +15,7 @@ import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
 import {ToastNotification} from "./toast-notification";
 import {Token} from "./token";
 import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
+import {SupportedChainData} from "./supported-chain-data";
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];
@@ -97,6 +98,7 @@ export interface State {
   currentUser: CurrentUserState | null,
   connectedChain: ConnectedChain | null,
   currentBounty: CurrentBounty | null,
+  supportedChains: SupportedChainData[],
   show: {
     [key: string]: boolean;
   }

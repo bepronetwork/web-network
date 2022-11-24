@@ -1,31 +1,33 @@
 import BigNumber from "bignumber.js";
-import { head } from "lodash";
+import {head} from "lodash";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { 
-  PastEventsParams, 
-  CreatePrePullRequestParams, 
-  SearchNetworkParams, 
-  User, 
-  CancelPrePullRequestParams, 
-  StartWorkingParams, 
-  PatchUserParams, 
+import {
+  CancelPrePullRequestParams,
+  CreatePrePullRequestParams,
+  CreateReviewParams,
   MergeClosedIssueParams,
-  CreateReviewParams
+  PastEventsParams,
+  PatchUserParams,
+  SearchNetworkParams,
+  StartWorkingParams,
+  User
 } from "interfaces/api";
-import { Curator, SearchCuratorParams } from "interfaces/curators";
-import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
-import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
-import { Network } from "interfaces/network";
-import { PaginatedData } from "interfaces/paginated-data";
-import { Proposal } from "interfaces/proposal";
-import { ReposList } from "interfaces/repos-list";
-import { Token } from "interfaces/token";
+import {Curator, SearchCuratorParams} from "interfaces/curators";
+import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
+import {LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
+import {Network} from "interfaces/network";
+import {PaginatedData} from "interfaces/paginated-data";
+import {Proposal} from "interfaces/proposal";
+import {ReposList} from "interfaces/repos-list";
+import {Token} from "interfaces/token";
 
-import { api, eventsApi } from "services/api";
+import {api, eventsApi} from "services/api";
 
-import { Entities, Events } from "types/dappkit";
+import {Entities, Events} from "types/dappkit";
+import {SupportedChainData} from "../interfaces/supported-chain-data";
+import {changeSupportedChains} from "../contexts/reducers/change-supported-chains";
 
 interface NewIssueParams {
   title: string;
@@ -448,7 +450,7 @@ export default function useApi() {
         throw error;
       });
   }
-  
+
   async function getNetworkTokens({
     networkName = DEFAULT_NETWORK_NAME
   }) {
@@ -541,7 +543,7 @@ export default function useApi() {
       sortBy,
       order
     }).toString();
-    
+
     return api
       .get<{
         rows: LeaderBoard[];
@@ -592,7 +594,24 @@ export default function useApi() {
       });
   }
 
+  async function getSupportedChains() {
+    if (state?.supportedChains.length)
+      return Promise.resolve(state?.supportedChains);
+
+    return api.get<SupportedChainData[]>(`/search/chains`)
+      .then(({data}) => data)
+      .then(data => {
+        changeSupportedChains(data);
+        return data;
+      })
+      .catch(e => {
+        console.error(`failed to fetch supported chains`, e);
+        return [];
+      })
+  }
+
   return {
+    getSupportedChains,
     createIssue,
     createNetwork,
     createPrePullRequest,

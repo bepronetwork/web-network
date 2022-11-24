@@ -8,7 +8,6 @@ import loadApplicationStateReducers from "./reducers";
 import {toastError} from "./reducers/change-toaster";
 import {mainReducer} from "./reducers/main";
 
-
 const appState: AppState = {
   state: {
     Settings: null,
@@ -21,6 +20,7 @@ const appState: AppState = {
     spinners: {},
     transactions: [],
     toaster: [],
+    supportedChains: []
   },
   dispatch: () => undefined
 };
