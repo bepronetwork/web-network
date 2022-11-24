@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export default function Stepper({ children}) {
+export default function Stepper({ dark = false, children }) {
   const [activeStep, setActiveStep] = useState(0);
   const [viewedSteps, setViewedSteps] = useState<number[]>([0]);
   const [validatedSteps, setValidatedSteps] = useState<boolean[]>([])
@@ -20,7 +20,7 @@ export default function Stepper({ children}) {
   return (
     <div className="row">
       <div className="col-12">
-        <div className="stepper">
+        <div className={`stepper ${dark && "stepper-dark" || ""}`}>
           {children.map((step, index) =>
            React.cloneElement(step, { 
                 key: `step-${index}`, 

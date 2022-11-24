@@ -1,11 +1,12 @@
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
 
-import { useSettings } from "contexts/settings";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {Network} from "interfaces/network";
 
-import { Network } from "interfaces/network";
+import {useAppState} from "../contexts/app-state";
+
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
@@ -13,11 +14,11 @@ interface NetworkListItemProps {
 }
 
 export default function NetworkListItem({
-  network,
-  tokenSymbolDefault,
+                                          network,
+                                          tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
-  const { settings } = useSettings();
+  const {state: {Settings: settings}} = useAppState();
 
   const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
   const isNotUndefined = value => value !== undefined;
@@ -44,13 +45,13 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.totalBounties) ? formatNumberToNScale(network?.totalBounties) : <Spinner />}
+          {isNotUndefined(network?.totalBounties) ? formatNumberToNScale(network?.totalBounties, 0) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.openBounties) ? formatNumberToNScale(network?.openBounties) : <Spinner />}
+          {isNotUndefined(network?.openBounties) ? formatNumberToNScale(network?.openBounties, 0) : <Spinner />}
         </span>
       </div>
 
@@ -62,7 +63,7 @@ export default function NetworkListItem({
         <span
           className="caption-medium mr-2 text-blue"
         >
-          ${network?.networkToken?.symbol || tokenSymbolDefault}
+          {network?.networkToken?.symbol || tokenSymbolDefault}
         </span>
       </div>
     </div>

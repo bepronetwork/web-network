@@ -1,39 +1,37 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import Sequelize, { Op } from "sequelize";
+import {Octokit} from "octokit";
+import Sequelize, {Op} from "sequelize";
 
 import Database from "db/models";
 
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
-import { error as LogError } from 'services/logging';
+import {error as LogError} from 'services/logging';
 
-const { serverRuntimeConfig } = getConfig();
+const {serverRuntimeConfig} = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName, creator: creatorAddress } = req.query;
+  const { name: networkName, creator: creatorAddress, isDefault } = req.query;
 
-  let where = {}
-  
-  if(networkName){
-    where = {
+  const where = {
+    ... networkName && {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
-    }
-  } 
-
-  else if(creatorAddress){
-    where = {
+    } || {},
+    ... creatorAddress && {
       creatorAddress: {
         [Op.iLike]: String(creatorAddress)
       }
-    }
-  }
+    } || {},
+    ... isDefault && {
+      isDefault: isDefault === "true"
+    } || {}
+  };
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
@@ -51,7 +49,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
-      name,
+      name: _name,
       colors,
       creator,
       fullLogo,
@@ -62,8 +60,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
       githubLogin,
       allowedTokens,
-      networkAddress
+      networkAddress,
+      isDefault
     } = req.body;
+
+    const name = _name.replaceAll(" ", "-").toLowerCase()
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
@@ -72,7 +73,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         creatorAddress: creator,
         isClosed: false,
       }
-    })
+    });
 
     if(hasNetwork){
       return res.status(409).json("Already exists a network created for this wallet");
@@ -87,6 +88,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
     if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+    if (isDefault && creator !== publicSettings?.defaultNetworkConfig?.adminWallet)
+      return res.status(401).json("Unauthorized");
+
+    const defaultNetwork = await Database.network.findOne({
+        where: {
+          isDefault: true
+        }
+    });
+    
+    if (isDefault && defaultNetwork)
+      return res.status(409).json("Default Network already saved");
 
     // Contract Validations
     const DAOService = new DAO({ 
@@ -121,12 +133,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const network = await Database.network.create({
       creatorAddress: creator,
-      name: name.toLowerCase(),
+      name: name,
       description,
       colors: JSON.parse(colors),
       logoIcon: logoIconHash,
       fullLogo: fullLogoHash,
-      networkAddress
+      networkAddress,
+      isDefault: isDefault || false
     });
 
     const repos = JSON.parse(repositories);

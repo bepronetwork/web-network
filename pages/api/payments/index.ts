@@ -1,17 +1,17 @@
-import { endOfDay, isAfter, parseISO, startOfDay } from "date-fns";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op } from "sequelize";
+import {endOfDay, isAfter, parseISO, startOfDay} from "date-fns";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { wallet, networkName, startDate, endDate  } = req.query;
-  
+  const {wallet, networkName, startDate, endDate} = req.query;
+
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   });

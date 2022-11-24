@@ -3,6 +3,10 @@ const { Web3Connection, ERC20, BountyToken, Network_v2, NetworkRegistry } = requ
 const { exit } = require("process");
 const stagingAccounts = require("./staging-accounts");
 const { updateSetting, updateTokens } = require("./settings/save-from-env");
+const Sequelize = require("sequelize");
+const DBConfig = require("../db/config");
+const NetworkModel = require("../db/models/network.model");
+const RepositoryModel = require("../db/models/repositories.model");
 
 const usage = `------------------------------------------------------------------------- 
   WebNetwork v2 Smart Contracts Deploy Script 🚀  
@@ -270,9 +274,9 @@ async function main() {
 
     if (!argv.production) {
       await Promise.all([
-        updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
-        updateSetting("network", network.contractAddress, "contracts"),
-        updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
+        // updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
+        // updateSetting("network", network.contractAddress, "contracts"),
+        // updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
         updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
         updateTokens({
           name: await networkToken.name(),
@@ -299,6 +303,38 @@ async function main() {
           address: bountyTransactional.contractAddress
         })
       ]);
+
+      try {
+        const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
+        NetworkModel.init(sequelize);
+        RepositoryModel.init(sequelize);
+        
+        if(!process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME) return;
+        
+        const [networkDb] = await NetworkModel.findOrCreate({
+          where: {
+            name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME
+          },
+          defaults: {
+            networkAddress: network.contractAddress,
+            creatorAddress: ownerAddress,
+            isDefault: true,
+            isRegistered: true,
+            description: "Network"
+          }
+        })
+
+        await RepositoryModel.findOrCreate({
+          where: {
+            githubPath: `${process.env.NEXT_GH_OWNER}/${process.env.NEXT_GH_REPO}`
+          },
+          defaults: {
+            network_id: networkDb.id
+          }
+        });
+      } catch (error) {
+        console.log("Failed to save default netwrk", error);
+      }
     } else {
       console.log('Skiping Database Save');
     }

@@ -6,14 +6,24 @@ export const formatNumberToString = (number: number | string, decimals = 4) => {
     .replace(/\d(?=(\d{3})+\.)/g, "$&,");
 };
 
-export const formatNumberToNScale = (number: number | string) => {
+export const formatNumberToNScale = (number: number | string, fixed = 2, spacer = ` `) => {
+  if (!number)
+    return '0';
+
   const bigNumber = new BigNumber(number);
 
-  if (bigNumber.lt(1e3)) return bigNumber.toFixed();
-  if (bigNumber.gte(1e3) && bigNumber.lt(1e6)) return bigNumber.dividedBy(1e3).toFixed(0, 1) + "K";
-  if (bigNumber.gte(1e6) && bigNumber.lt(1e9)) return bigNumber.dividedBy(1e6).toFixed(0, 1) + "M";
-  if (bigNumber.gte(1e9) && bigNumber.lt(1e12)) return bigNumber.dividedBy(1e9).toFixed(0, 1) + "B";
-  if (bigNumber.gte(1e12)) return bigNumber.dividedBy(1e12).toFixed(0, 1) + "T";
+  if (bigNumber.lt(1e3))
+    return bigNumber.toFixed( number < 1 ? (+number.toString().split(`.`)?.[1]?.length || 2) : fixed)
+
+  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod', 'Vg', 'Uvg', 'Dvg']; // eslint-disable-line
+  const zeroes = Math.floor(bigNumber.dividedBy(1.0e+1).toFixed(0).toString().length); // eslint-disable-line
+  const zeroesMod = zeroes % 3 // 3 = 000
+  const retNumber = Math.abs(+bigNumber.dividedBy(`1.0e+${zeroes-zeroesMod}`)).toFixed(fixed)
+  const unit = units[Math.floor(+zeroes / 3) - 1];
+
+  // console.log(`NUMBER TO SCALE`, retNumber, zeroes, zeroesMod, unit, Math.floor(+zeroes / 3) - 1);
+
+  return `${retNumber}${spacer}${unit}`;
 };
 
 export const formatNumberToCurrency = (number: number | string, options = {}) =>

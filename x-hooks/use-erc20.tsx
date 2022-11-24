@@ -1,65 +1,60 @@
-import { useCallback, useEffect, useState, useContext } from "react";
-import { setDefaults } from "react-i18next";
+import {useCallback, useEffect, useState} from "react";
 
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { updateTransaction } from "contexts/reducers/update-transaction";
+import {useAppState} from "contexts/app-state";
 
-import { parseTransaction } from "helpers/transactions";
+import {parseTransaction} from "helpers/transactions";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BlockTransaction } from "interfaces/transaction";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useBepro from "x-hooks/use-bepro";
-import useTransactions from "x-hooks/useTransactions";
+
+import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import {MetamaskErrors} from "../interfaces/enums/Errors";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
-  const [decimals, setDecimals] = useState(18); 
+  const [decimals, setDecimals] = useState(18);
   const [symbol, setSymbol] = useState<string>();
+  const [spender, setSpender] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [balance, setBalance] = useState(BigNumber(0));
   const [loadError, setLoadError] = useState<boolean>();
   const [allowance, setAllowance] = useState(BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
-  const txWindow = useTransactions();
-  const { activeNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
+  const { state, dispatch } = useAppState();
   const { handleApproveToken } = useBepro();
-  const { dispatch } = useContext(ApplicationContext);
 
   const logData = { 
-    wallet: wallet?.address, 
+    wallet: state.currentUser?.walletAddress,
     token: address, 
-    network: DAOService?.network?.contractAddress 
+    network: state.Service?.active?.network?.contractAddress
   };
 
   const updateAllowanceAndBalance = useCallback(() => {
-    if (!wallet?.address || !DAOService?.network?.contractAddress || !address) return;
+    if (!state.currentUser?.walletAddress || !address) return;
 
-    DAOService.getTokenBalance(address, wallet.address)
+    state.Service?.active.getTokenBalance(address, state.currentUser.walletAddress)
       .then(setBalance)
       .catch(error => console.debug("useERC20:getTokenBalance", logData, error));
 
-    DAOService.getAllowance(address, wallet.address, DAOService.network.contractAddress)
-      .then(setAllowance)
-      .catch(error => console.debug("useERC20:getAllowance", logData, error));
-  }, [wallet?.address, DAOService, address]);
+    const realSpender = spender || state.Service?.active?.network?.contractAddress;
 
-  const approve = useCallback((amount: string) => {
-    if (!wallet?.address || !DAOService || !address || !amount) return;
+    if (realSpender)
+      state.Service?.active.getAllowance(address, state.currentUser.walletAddress, realSpender)
+        .then(setAllowance)
+        .catch(error => console.debug("useERC20:getAllowance", logData, error));
+  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
+
+  function approve(amount: string) {
+    if (!state.currentUser?.walletAddress || !state.Service?.active || !address || !amount) return;
 
     return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
-  }, [wallet?.address, DAOService, address]);
+  }
 
   function setDefaults() {
     setName("");
@@ -73,50 +68,39 @@ export default function useERC20() {
   useEffect(() => {
     if (!address) setLoadError(undefined);
     if (!address && name) setDefaults();
-    if (!DAOService || !address) return;
-
-    DAOService.getERC20TokenData(address)
-      .then(({ name, symbol, decimals, totalSupply }) => {
-        setName(name);
-        setSymbol(symbol);
-        setDecimals(decimals);
-        setTotalSupply(totalSupply);
-        setLoadError(false);
-      })
-      .catch(error => {
-        setDefaults();
-        setLoadError(true);
-        console.debug("useERC20:getERC20TokenData", logData, error)
-      });
+    if (state.Service?.active && address)
+      state.Service?.active.getERC20TokenData(address)
+        .then(({ name, symbol, decimals, totalSupply }) => {
+          setName(name);
+          setSymbol(symbol);
+          setDecimals(decimals);
+          setTotalSupply(totalSupply);
+          setLoadError(false);
+        })
+        .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
         
     updateAllowanceAndBalance();
-  }, [wallet?.address, DAOService, address]);
+  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
 
-  async function deploy(name: string, 
-                        symbol: string, 
-                        cap: string, 
+  async function deploy(name: string,
+                        symbol: string,
+                        cap: string,
                         ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.deployERC20Token }, activeNetwork);
+      const transaction = addTx([{ type: TransactionTypes.deployERC20Token } as any]);
 
       dispatch(transaction);
 
-      await DAOService.deployERC20Token(name, symbol, cap, ownerAddress)
+      await state.Service?.active.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as any)]));
           resolve(txInfo);
         })
-        .catch((err: { message: string; }) => {
-          if (err?.message?.search("User denied") > -1)
-            dispatch(updateTransaction({
-              ...(transaction.payload as BlockTransaction),
-              status: TransactionStatus.rejected
-            }));
-          else
-            dispatch(updateTransaction({
-              ...(transaction.payload as BlockTransaction),
-              status: TransactionStatus.failed
-            }));
+        .catch((err) => {
+          dispatch(updateTx([{
+            ...transaction.payload[0],
+            status: err?.code === MetamaskErrors.UserRejected ? TransactionStatus.rejected : TransactionStatus.failed,
+          }]));
           reject(err);
         });
     });
@@ -133,6 +117,7 @@ export default function useERC20() {
     totalSupply,
     approve,
     setAddress,
+    setSpender,
     deploy,
     updateAllowanceAndBalance
   };

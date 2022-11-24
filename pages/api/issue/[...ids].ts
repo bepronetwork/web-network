@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op } from "sequelize";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
@@ -15,13 +15,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "mergeProposals" },
     { association: "repository" },
     { association: "token" },
-    { association: "benefactors" }
+    { association: "benefactors" },
+    { association: "disputes" }
   ];
 
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   });

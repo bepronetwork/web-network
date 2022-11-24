@@ -7,7 +7,7 @@ import TabbedNavigation from "components/tabbed-navigation";
 
 export function NetworkTokenConfig({
   onChange,
-  beproTokenAddress
+  registryToken
 }) {
   const { t } = useTranslation("custom-network");
 
@@ -27,11 +27,11 @@ export function NetworkTokenConfig({
   const TABS = [
     {
       eventKey: "bepro",
-      title: t("steps.token-configuration.tabs.use-bepro-token"),
+      title: t("steps.token-configuration.tabs.use-registry-token", { symbol: registryToken?.symbol }),
       component: ( 
         <ERC20Details
           key="beproToken"
-          address={beproTokenAddress}
+          address={registryToken?.address}
           readOnly
         />
       )
@@ -64,7 +64,7 @@ export function NetworkTokenConfig({
 
   function onTransition(newActiveKey: string) {
     const addressesByTab = {
-      "bepro": beproTokenAddress,
+      "bepro": registryToken?.address,
       "custom": customTokenAddress,
       "deployed": deployedTokenAddress
     };
@@ -73,8 +73,8 @@ export function NetworkTokenConfig({
   }
 
   useEffect(() => {
-    if (beproTokenAddress) onChange(beproTokenAddress);
-  }, [beproTokenAddress]);
+    if (registryToken?.address) onChange(registryToken?.address);
+  }, [registryToken?.address]);
 
   return(
     <>

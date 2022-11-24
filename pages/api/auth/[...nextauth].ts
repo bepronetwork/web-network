@@ -2,9 +2,9 @@ import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import getConfig from "next/config";
 
-const { serverRuntimeConfig } = getConfig();
-
 import models from "db/models";
+
+const {serverRuntimeConfig} = getConfig();
 
 export default NextAuth({
   providers: [

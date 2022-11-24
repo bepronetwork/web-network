@@ -1,6 +1,6 @@
-import { TreasuryInfo } from "@taikai/dappkit";
+import {TreasuryInfo} from "@taikai/dappkit";
 
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
 export interface Network {
   id: number;
@@ -34,6 +34,9 @@ export interface Network {
   treasury?: TreasuryInfo;
   isRegistered?: boolean;
   totalSettlerConverted?: string;
+  isCouncil?: boolean;
+  isGovernor?: boolean;
+  isDefault?: boolean;
 }
 
 export interface ThemeColors {
@@ -48,6 +51,7 @@ export interface ThemeColors {
   secondary: string;
   background: string;
   info: string;
+  dark: string;
 }
 
 export interface Color {
@@ -61,12 +65,14 @@ export interface Icon {
 }
 
 export interface Repository {
+  mergeCommitAllowed: boolean;
   userPermission?: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
   checked: boolean;
   name: string;
   fullName: string;
   isSaved?: boolean;
   hasIssues?: boolean;
+  label?: string;
 }
 
 export interface Theme {
@@ -90,6 +96,7 @@ export interface NetworkSettings {
   isLoadingData: boolean;
   forcedNetwork?: Network;
   isAbleToClosed?: boolean;
+  registryToken?: Token;
   setForcedNetwork?: (network: Network) => void;
   updateTokenBalance?: ()=> Promise<TokensLocked>
   cleanStorage?: () => void;

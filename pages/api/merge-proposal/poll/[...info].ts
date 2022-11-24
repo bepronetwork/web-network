@@ -1,7 +1,7 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 
-import { Bus } from "helpers/bus";
+import {Bus} from "helpers/bus";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {

@@ -1,15 +1,9 @@
-import React, {
-  Fragment,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react";
-import { Spinner } from "react-bootstrap";
-import { NumberFormatValues } from "react-number-format";
+import React, {Fragment, useEffect, useRef, useState} from "react";
+import {Spinner} from "react-bootstrap";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -20,15 +14,15 @@ import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { ApplicationContext } from "contexts/application";
-import { useNetwork } from "contexts/network";
+import {useAppState} from "contexts/app-state";
 
-import { formatNumberToNScale, formatStringToCurrency } from "helpers/formatNumber";
+import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 
-import { Wallet } from "interfaces/authentication";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {Wallet} from "interfaces/authentication";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 
+import useApi from "x-hooks/use-api";
 import useERC20 from "x-hooks/use-erc20";
 
 interface OraclesActionsProps {
@@ -37,7 +31,7 @@ interface OraclesActionsProps {
 }
 
 function OraclesActions({
-  wallet,
+                          wallet,
   updateWalletBalance
 } : OraclesActionsProps) {
   const { t } = useTranslation(["common", "my-oracles"]);
@@ -56,16 +50,18 @@ function OraclesActions({
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
   const networkTokenERC20 = useERC20();
-  const { activeNetwork } = useNetwork();
-  const { state: { myTransactions }} = useContext(ApplicationContext);
+
+  const { state: { transactions, Service }} = useAppState();
+
+  const { processEvent } = useApi();
 
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
 
-  const exceedsAvailable = value => BigNumber(value).gt(getMaxAmmount());
+  const exceedsAvailable = value => BigNumber(value).gt(getMaxAmount());
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
-    !!myTransactions.find((transactions) =>
+    !!transactions.find((transactions) =>
         transactions.type === type &&
         transactions.status === TransactionStatus.pending);
 
@@ -75,16 +71,16 @@ function OraclesActions({
       description: 
              t("my-oracles:actions.lock.description", { 
                currency: networkTokenSymbol, 
-               token: activeNetwork?.networkToken?.symbol 
+               token: Service?.network?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: new BigNumber(tokenAmount).gte(1e18) ? null : formatNumberToNScale(tokenAmount),
-        token: activeNetwork?.networkToken?.symbol 
+        amount: formatNumberToNScale(tokenAmount),
+        token: Service?.network?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-purple">
-                            {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                            {t("$oracles", { token: Service?.network?.networkToken?.symbol })}
                           </span>{" "}
           {t("misc.from")} <span className="text-primary">
             {networkTokenSymbol}
@@ -95,7 +91,7 @@ function OraclesActions({
         t("my-oracles:actions.lock.body", { 
           amount: formatNumberToNScale(tokenAmount), 
           currency: networkTokenSymbol,
-          token: activeNetwork?.networkToken?.symbol
+          token: Service?.network?.networkToken?.symbol
         }),
       params() {
         return { tokenAmount };
@@ -107,26 +103,26 @@ function OraclesActions({
       description: 
         t("my-oracles:actions.unlock.description", { 
           currency: networkTokenSymbol,
-          token: activeNetwork?.networkToken?.symbol
+          token: Service?.network?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: new BigNumber(tokenAmount).gte(1e18) ? null : formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
-        token: activeNetwork?.networkToken?.symbol
+        token: Service?.network?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-primary">
             { networkTokenSymbol}</span>{" "}
           {t("misc.from")} <span className="text-purple">
-                            {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                            {t("$oracles", { token: Service?.network?.networkToken?.symbol })}
                            </span>
         </>
       ),
       body: t("my-oracles:actions.unlock.body", { 
         amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
-        token: activeNetwork?.networkToken?.symbol
+        token: Service?.network?.networkToken?.symbol
       }),
       params(from: string) {
         return { tokenAmount, from };
@@ -142,7 +138,7 @@ function OraclesActions({
       BigNumber(tokenAmount).isNaN(),
       exceedsAvailable(tokenAmount),
       !tokenAmount,
-      myTransactions.find(({ status, type }) =>
+      transactions.find(({ status, type }) =>
           status === TransactionStatus.pending && type === getTxType())
     ].some((values) => values);
 
@@ -162,6 +158,13 @@ function OraclesActions({
     setTokenAmount("");
     updateWalletBalance();
     networkTokenERC20.updateAllowanceAndBalance();
+  }
+
+  function handleProcessEvent(blockNumber) {
+    processEvent("oracles",
+                 "changed",
+                 Service?.network?.lastVisited,
+      { fromBlock: blockNumber }).catch(console.debug);
   }
 
   function handleChangeToken(params: NumberFormatValues) {
@@ -187,6 +190,9 @@ function OraclesActions({
 
   function approveSettlerToken() {
     setIsApproving(true);
+
+    console.log(`APPROVE`);
+
     networkTokenERC20.approve(tokenAmount)
      .finally(() => setIsApproving(false));
   }
@@ -194,18 +200,25 @@ function OraclesActions({
   function getCurrentLabel() {
     return action === t("my-oracles:actions.lock.label")
       ? networkTokenSymbol
-      : t("$oracles", { token: activeNetwork?.networkToken?.symbol });
+      : t("$oracles", { token: Service?.network?.networkToken?.symbol });
   }
 
-  function getMaxAmmount(): string {
-    if (action === t("my-oracles:actions.lock.label")) 
-      return wallet?.balance?.bepro?.toFixed();
+  function getMaxAmount(trueValue = false): string {
+    const amount = action === t("my-oracles:actions.lock.label")
+      ? wallet?.balance?.bepro?.toFixed()
+      : wallet?.balance?.oracles?.locked?.toFixed();
 
-    return wallet?.balance?.oracles?.locked?.toFixed();
+    if (!amount)
+      return '0';
+
+    if (trueValue)
+      return amount;
+
+    return formatNumberToNScale(amount);
   }
 
-  function setMaxAmmount() {
-    return setTokenAmount(getMaxAmmount());
+  function setMaxAmount() {
+    return setTokenAmount(getMaxAmount(true));
   }
 
   function getTxType() {
@@ -218,9 +231,9 @@ function OraclesActions({
     networkTokenERC20.allowance.isLessThan(tokenAmount) && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
-    if (activeNetwork?.networkToken?.address) 
-      networkTokenERC20.setAddress(activeNetwork.networkToken.address);
-  }, [activeNetwork?.networkToken?.address]);
+    if (Service?.active?.network?.networkToken?.contractAddress)
+      networkTokenERC20.setAddress(Service?.active?.network?.networkToken?.contractAddress);
+  }, [Service?.active?.network?.networkToken?.contractAddress]);
 
   return (
     <>
@@ -243,7 +256,7 @@ function OraclesActions({
             })}
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${
-              getCurrentLabel() === t("$oracles", { token: activeNetwork?.networkToken?.symbol })
+              getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol })
                 ? "text-purple"
                 : "text-primary"
             }`}
@@ -261,16 +274,14 @@ function OraclesActions({
             decimalScale={networkTokenDecimals}
             helperText={
               <>
-                {formatStringToCurrency(getMaxAmmount())}{" "}
+                {formatStringToCurrency(getMaxAmount())}{" "}
                 {getCurrentLabel()} {t("misc.available")}
-                <span
-                  className={`caption-small ml-1 cursor-pointer text-uppercase ${`${
-                    getCurrentLabel() === t("$oracles", { token: activeNetwork?.networkToken?.symbol })
-                      ? "text-purple"
-                      : "text-primary"
-                  }`}`}
-                  onClick={setMaxAmmount}
-                >
+                <span onClick={setMaxAmount}
+                      className={`caption-small ml-1 cursor-pointer text-uppercase ${(
+                        getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol }) 
+                          ? "text-purple" 
+                          : "text-primary"
+                      )}`}>
                   {t("misc.max")}
                 </span>
                 {error && <p className="p-small my-2">{error}</p>}
@@ -327,6 +338,7 @@ function OraclesActions({
             txMethod={action.toLowerCase()}
             txType={getTxType()}
             txCurrency={getCurrentLabel()}
+            handleEvent={handleProcessEvent}
             txParams={renderInfo?.params(wallet?.address)}
             buttonLabel=""
             modalTitle={renderInfo?.title}

@@ -1,21 +1,19 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import NetworkIdentifier from "components/network-identifier";
 import Translation from "components/translation";
 
-import { ApplicationContext } from "contexts/application";
-import { changeMicroServiceReady } from "contexts/reducers/change-microservice-ready";
+import {changeMicroServiceReady} from "contexts/reducers/change-service";
 
 import useApi from "x-hooks/use-api";
 
+import {useAppState} from "../contexts/app-state";
+
 
 export default function StatusBar() {
-  const {
-    dispatch,
-    state: { microServiceReady }
-  } = useContext(ApplicationContext);
+  const {dispatch, state: { Service }} = useAppState();
   const [ms, setMs] = useState(0);
   const { getHealth } = useApi();
   const { t } = useTranslation("common");
@@ -32,8 +30,8 @@ export default function StatusBar() {
   function renderNetworkStatus() {
     let info;
 
-    if (microServiceReady === null) info = ["white-50", t("status.waiting")];
-    else if (microServiceReady === false)
+    if (Service === null || Service?.microReady === null) info = ["white-50", t("status.waiting")];
+    else if (Service?.microReady === false)
       info = ["danger", t("status.network-problems")];
     else
       info =
@@ -73,14 +71,13 @@ export default function StatusBar() {
         {renderNetworkStatus()}
       </div>
 
-      <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
+      <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-light-gray">
         <Translation label="status.tagline" />
         <a
           href="https://www.bepro.network/terms"
           target="_blank"
           className="ms-2 text-decoration-none text-primary"
-          rel="noreferrer"
-        >
+          rel="noreferrer">
           <Translation label="status.terms-and-conditions" />
         </a>
       </div>

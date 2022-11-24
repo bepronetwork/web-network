@@ -64,22 +64,31 @@ export default class DAO {
 
       await network.loadContract();
 
-      if (!skipAssignment) this._network = network;
+      if (!skipAssignment)
+        this._network = network;
+
+      console.table({
+        networkAddress,
+        networkTokenAddress: network.networkToken?.contractAddress,
+        registryAddress: network.registry?.contractAddress,
+        nftAddress: network.nftToken?.contractAddress,
+      });
+
 
       return network;
     } catch (error) {
-      console.log(`Error loading Network_v2 (${networkAddress}): `, error);
+      console.debug(`Error loading Network_v2 (${networkAddress}): `, error);
     }
 
     return false;
   }
 
-  async loadRegistry(skipAssignment?: boolean): Promise<NetworkRegistry | boolean> {
+  async loadRegistry(skipAssignment?: boolean, registryAddress?: string): Promise<NetworkRegistry | boolean> {
     try {
-      if (!this.registryAddress) 
+      if (!this.registryAddress && !registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new NetworkRegistry(this.web3Connection, this.registryAddress);
+      const registry = new NetworkRegistry(this.web3Connection, registryAddress || this.registryAddress);
 
       await registry.loadContract();
 
@@ -87,7 +96,7 @@ export default class DAO {
 
       return registry;
     } catch (error) {
-      console.log("Error loading NetworkRegistry: ", error);
+      console.debug("Error loading NetworkRegistry: ", error);
     }
 
     return false;
@@ -107,6 +116,36 @@ export default class DAO {
     await token.loadContract();
 
     return token;
+  }
+
+  async isNetworkRegistry(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadRegistry(true, contractAddress));
+    } catch(e) {
+      console.debug("isNetworkRegistry", e);
+    }
+
+    return false;
+  }
+
+  async isERC20(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadERC20(contractAddress));
+    } catch(e) {
+      console.debug("isERC20", e);
+    }
+
+    return false;
+  }
+
+  async isBountyToken(contractAddress: string): Promise<boolean> {
+    try {
+      return !!(await this.loadBountyToken(contractAddress));
+    } catch(e) {
+      console.debug("isBountyToken", e);
+    }
+
+    return false;
   }
 
 
@@ -159,7 +198,7 @@ export default class DAO {
 
       return true;
     } catch (error) {
-      console.log("Error starting: ", error);
+      console.debug("Error starting: ", error);
     }
 
     return false;
@@ -173,7 +212,7 @@ export default class DAO {
 
       return true;
     } catch (error) {
-      console.log("Error logging in: ", error);
+      console.debug("Error logging in: ", error);
     }
 
     return false;
@@ -252,17 +291,17 @@ export default class DAO {
   }
 
   async getBounty(id: number): Promise<BountyExtended> {
-    const bounty = await this.network.getBounty(id);
+    const bounty = await this.network?.getBounty(id);
 
     return {
       ...bounty,
-      tokenAmount: new BigNumber(bounty.tokenAmount),
-      rewardAmount: new BigNumber(bounty.rewardAmount),
-      fundingAmount: new BigNumber(bounty.fundingAmount),
+      tokenAmount: new BigNumber(bounty?.tokenAmount),
+      rewardAmount: new BigNumber(bounty?.rewardAmount),
+      fundingAmount: new BigNumber(bounty?.fundingAmount),
       proposals: 
-        bounty.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) })),
+        bounty?.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) })),
       funding: 
-        bounty.funding.map(funding => ({ ...funding, amount: new BigNumber(funding.amount) }))
+        bounty?.funding.map(funding => ({ ...funding, amount: new BigNumber(funding.amount) }))
     };
   }
 
@@ -498,6 +537,26 @@ export default class DAO {
     return deployer.deployJsonAbi(name, symbol, toSmartContractDecimals(cap, 18), ownerAddress);
   }
 
+  async deployNetworkRegistry(erc20: string,
+                              lockAmountForNetworkCreation: string,
+                              treasury: string,
+                              lockFeePercentage: string,
+                              closeFee: string,
+                              cancelFee: string,
+                              bountyToken: string): Promise<TransactionReceipt> {
+    const deployer = new NetworkRegistry(this.web3Connection);
+
+    await deployer.loadAbi();
+
+    return deployer.deployJsonAbi(erc20,
+                                  lockAmountForNetworkCreation,
+                                  treasury,
+                                  lockFeePercentage,
+                                  closeFee,
+                                  cancelFee,
+                                  bountyToken);
+  }
+
   async openBounty({
     cid,
     title,
@@ -630,7 +689,7 @@ export default class DAO {
     return bountyToken.setDispatcher(dispatcher);
   }
 
-  isAddress(address: string): Promise<boolean> {
+  isAddress(address: string): boolean {
     return this.web3Connection.utils.isAddress(address);
   }
 
@@ -639,13 +698,18 @@ export default class DAO {
   }
 
   async isBountyInDraftChain(creationDateIssue: number): Promise<boolean> { 
-    const time = await this.getTimeChain();
-    const redeemTime = await this.network.draftTime();
+    try {
+      const time = await this.getTimeChain();
+      const redeemTime = await this.network.draftTime();
 
-    return (new Date(time) < new Date(creationDateIssue + redeemTime))
+      return (new Date(time) < new Date(creationDateIssue + redeemTime))
+    } catch (e) {
+      console.error(`Failed to calculate isDraft bounty`, e);
+      return null;
+    }
   }
 
   getCancelableTime(): Promise<number> {
-    return this._network.cancelableTime();
+    return this._network?.cancelableTime();
   }
 }

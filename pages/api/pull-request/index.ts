@@ -1,8 +1,8 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import { Op } from "sequelize";
+import {Octokit} from "octokit";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
@@ -10,11 +10,11 @@ import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 
 import paginate from "helpers/paginate";
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
 
-import { GraphQlResponse } from "types/octokit";
+import {GraphQlResponse} from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -34,7 +34,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const network = await models.network.findOne({
       where: {
         name: {
-          [Op.iLike]: String(networkName)
+          [Op.iLike]: String(networkName).replaceAll(" ", "-")
         }
       }
     });
@@ -77,8 +77,19 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title,
     description: body,
     username,
-    branch
+    branch,
+    networkName
   } = req.body;
+
+  const customNetwork = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
+      }
+    }
+  });
+
+  if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid");
 
   const issue = await models.issue.findOne({
     where: { githubId, repository_id }
@@ -100,7 +111,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       githubId: `00`,
       githubLogin: username,
       branch,
-      status: "pending"
+      status: "pending",
+      network_id: customNetwork?.id,
     });
 
     return res.status(200).json({ 
@@ -139,7 +151,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       githubId: `${created.createPullRequest.pullRequest.number}`,
       githubLogin: username,
       branch,
-      status: "pending"
+      status: "pending",
+      network_id: customNetwork?.id,
     });
 
     return res.status(200).json({ 
@@ -199,7 +212,8 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
       githubId: String(pullRequestGithubId),
       githubLogin: creator,
       branch: userBranch,
-      status: "pending"
+      status: "pending",
+      network_id: customNetwork.id,
     }
   });
 

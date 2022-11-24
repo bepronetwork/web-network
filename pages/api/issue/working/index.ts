@@ -1,17 +1,17 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
-import { Op } from "sequelize";
+import {Octokit} from "octokit";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 import * as CommentsQueries from "graphql/comments";
 import * as IssueQueries from "graphql/issue";
 
-import { getPropertyRecursively } from "helpers/object";
+import {getPropertyRecursively} from "helpers/object";
 
-import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
+import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -22,7 +22,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     const network = await models.network.findOne({
       where: {
         name: {
-          [Op.iLike]: String(networkName)
+          [Op.iLike]: String(networkName).replaceAll(" ", "-")
         }
       }
     });

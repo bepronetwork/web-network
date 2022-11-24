@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { format } from "date-fns";
-import { useTranslation } from "next-i18next";
+import {format} from "date-fns";
+import {useTranslation} from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 import CopyIcon from "assets/icons/copy";
@@ -13,22 +13,21 @@ import InternalLink from "components/internal-link";
 import Modal from "components/modal";
 import TransactionStats from "components/transaction-stats";
 
-import { ApplicationContext } from "contexts/application";
-import { toastInfo } from "contexts/reducers/add-toast";
-import { useSettings } from "contexts/settings";
+import {useAppState} from "contexts/app-state";
+import {toastInfo} from "contexts/reducers/change-toaster";
 
-import { CopyValue } from "helpers/copy-value";
-import { formatStringToCurrency } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
+import {CopyValue} from "helpers/copy-value";
+import {formatStringToCurrency} from "helpers/formatNumber";
+import {truncateAddress} from "helpers/truncate-address";
 
-import { BlockTransaction, Transaction } from "interfaces/transaction";
+import {BlockTransaction, Transaction} from "interfaces/transaction";
 
-import useNetworkTheme from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 
 export default function TransactionModal({
-  transaction = null,
-  onCloseClick,
-}: {
+                                           transaction = null,
+                                           onCloseClick,
+                                         }: {
   transaction: Transaction;
   onCloseClick: () => void;
 }) {
@@ -38,10 +37,9 @@ export default function TransactionModal({
   const [addressTo, setAddressTo] = useState("...");
   const [addressFrom, setAddressFrom] = useState("...");
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { state, dispatch } = useAppState();
 
-  const { settings } = useSettings();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
 
   function updateAddresses() {
     if (!transaction) return;
@@ -55,21 +53,21 @@ export default function TransactionModal({
     setDetails([
       makeDetail(t("transactions.amount"),
                  <>
-          <span>{formatStringToCurrency(BigNumber(blockTransaction.amount).toFixed())}</span>{" "}
+          <span>{formatStringToCurrency(BigNumber(blockTransaction?.amount || 0).toFixed())}</span>{" "}
           <span
             className={`${
-              blockTransaction.currency.toLowerCase() === "oracles"
+              blockTransaction?.currency?.toLowerCase() === "oracles"
                 ? "text-purple"
                 : "text-primary"
             }`}
           >
-            {blockTransaction.currency}
+            {blockTransaction?.currency}
           </span>{" "}
         </>),
       makeDetail(t("transactions.confirmations"),
-                 [blockTransaction.confirmations, 23].join("/")),
+                 [blockTransaction?.confirmations, 23].join("/")),
       makeDetail(t("transactions.date"),
-                 format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a"))
+                 format(new Date(blockTransaction?.date), "MMMM dd yyyy hh:mm:ss a"))
     ]);
   }
 
@@ -101,7 +99,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `${settings?.urls?.blockScan}/${tx}`;
+    return `${state.Settings?.urls?.blockScan}/${tx}`;
   }
 
   return (
@@ -152,10 +150,10 @@ export default function TransactionModal({
         </div>
 
         <div className="caption-small d-flex flex-row mb-3">
-          <span className="text-ligth-gray">{t("misc.on")}</span>
+          <span className="text-light-gray">{t("misc.on")}</span>
           <InternalLink
             className={`${
-              transaction?.network?.name === settings?.defaultNetworkConfig?.name
+              transaction?.network?.name === state.Settings?.defaultNetworkConfig?.name
                 ? " text-primary "
                 : ""
             } p-0 ml-1`}

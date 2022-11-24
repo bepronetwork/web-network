@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Badge from "components/badge";
 import Button from "components/button";
@@ -9,11 +9,9 @@ import IconSingleValue from "components/icon-single-value";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-import { useRepos } from "contexts/repos";
-
 import useOctokit from "x-hooks/use-octokit";
+
+import {useAppState} from "../contexts/app-state";
 
 interface props {
   show: boolean,
@@ -32,6 +30,10 @@ export default function CreatePullRequestModal({
   title: prTitle = "",
   description: prDescription = ""
 }: props) {
+
+  if(!show)
+    return <></>
+
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [title, setTitle] = useState("");
@@ -40,11 +42,9 @@ export default function CreatePullRequestModal({
   const [description, setDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const { user } = useAuthentication();
-  const { activeRepo } = useRepos();
-  const { activeIssue } = useIssue()
+  const {state} = useAppState();
 
-  const { getRepositoryBranches, getUserRepositories } = useOctokit();
+  const { getRepositoryBranches, getUserRepositories, getPullRequestList } = useOctokit();
 
   function onSelectedBranch(option) {
     setSelectedBranch(option.value);
@@ -69,61 +69,73 @@ export default function CreatePullRequestModal({
 
   useEffect(setDefaults, [show]);
   useEffect(() => {
-    if (!user?.accessToken || !repo || !show) return;
+    if (!state.currentUser?.login || !repo || !show) return;
 
-    getUserRepositories(user.login)
-    .then(repositories => {
-      const filteredRepos = 
-        repositories.filter(repo => (repo.isFork && repo.nameWithOwner === `${user.login}/${activeRepo?.name}`) 
-                                    || repo.nameWithOwner === activeRepo?.githubPath);
-      
-      return Promise.all(filteredRepos
-        .map(async (repository) => ({ repository, branches:  await getRepositoryBranches(repository.nameWithOwner)})));
-    })
-    .then(reposWithBranches => reposWithBranches
-      .map(({ repository, branches }) => branches
-        .map(branch => { 
+    // todo: add app-state for user-repositories ?
+    getUserRepositories(state.currentUser.login)
+      .then(repositories => {
+        const isFork = repo => repo.isFork ? 
+          repo.parent.nameWithOwner === state.Service?.network?.repos?.active?.githubPath : false;
 
-          const prExistsInActiveIssue = 
-          activeIssue.pullRequests
-          .some(({branch: b}) => b === `${repository.owner}:${branch}`);
+        const filteredRepos = 
+          repositories.filter(repo => isFork(repo) || 
+            repo.nameWithOwner === state.Service?.network?.repos?.active?.githubPath);
+        
+        return Promise.all(filteredRepos
+          .map(async (repository) => ({ 
+            repository, 
+            branches:  await getRepositoryBranches(repository.nameWithOwner),
+            pullRequests: await getPullRequestList(repository.nameWithOwner)
+          })));
+      })
+      .then(reposWithBranches => reposWithBranches
+        .map(({ repository, branches }) => branches
+          .map(branch => {
+            const prExistAtGh = 
+                    reposWithBranches.flatMap(repos=> repos.pullRequests)
+                  .some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`)
 
-          const isBaseBranch = 
-          (activeIssue.repository.githubPath === repository.nameWithOwner 
-          && activeIssue.branch === branch) ;
-          
-          let postIcon = <></>
+            const prExistsInActiveIssue =
+              state.currentBounty?.data.pullRequests
+                .some(({userBranch: b}) => b === `${repository.owner}:${branch}`);
 
-          if(repository.isFork){
-            postIcon =  <Badge 
-              color={"primary-30"}
-              label={t("misc.fork")}
-            />
-          }
+            const isBaseBranch =
+              (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
+                state.currentBounty?.data.branch === branch) ;
+            
+            let postIcon = <></>
 
-          if(repository.isInOrganization){
-            postIcon =  <Badge 
-              color={"white-10"}
-              label={t("misc.organization")}
-            />
-          }
+            if(repository.isFork)
+              postIcon = <Badge
+                color={"primary-30"}
+                label={t("misc.fork")}
+              />
 
-          const disabledIcon = !prExistsInActiveIssue 
-          ? <></> 
-          : <Badge color={"danger"} label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
 
-          return {
-            value: `${repository.owner}:${branch}`, 
-            label: branch,
-            isDisabled: prExistsInActiveIssue || isBaseBranch,
-            disabledIcon,
-            postIcon,
-            isSelected: !!selectedBranch && branch === selectedBranch}
-        }))
-      .flatMap(branch => branch))
-    .then(setOptions)
-    .catch(console.log);
-  }, [user?.accessToken, repo, show]);
+            if (repository.isInOrganization)
+              postIcon =  <Badge 
+                color={"white-10"}
+                label={t("misc.organization")}
+              />
+
+
+            const disabledIcon = (prExistsInActiveIssue || prExistAtGh)
+              ? <Badge color={"danger"}
+                      label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />
+              : <></>
+
+            return {
+              value: `${repository.owner}:${branch}`, 
+              label: branch,
+              isDisabled: prExistsInActiveIssue || prExistAtGh || isBaseBranch,
+              disabledIcon,
+              postIcon,
+              isSelected: !!selectedBranch && branch === selectedBranch}
+          }))
+        .flatMap(branch => branch))
+      .then(setOptions)
+      .catch(console.log);
+  }, [state.currentUser?.login, repo, show]);
 
   return (
     <Modal
@@ -136,8 +148,8 @@ export default function CreatePullRequestModal({
       <div className="container">
         <div>
           <div className="form-group">
-            <label className="caption-small mb-2 text-gray">
-              {t("forms.create-pull-request.title.label")}
+            <label className="caption-small mb-2 text-gray" title={t("forms.is.required")}>
+              {t("forms.create-pull-request.title.label")} *
             </label>
             <input
               value={title}
@@ -150,8 +162,8 @@ export default function CreatePullRequestModal({
         </div>
         <div>
           <div className="form-group">
-            <label className="caption-small mb-2 text-gray">
-              {t("forms.create-pull-request.description.label")}
+            <label className="caption-small mb-2 text-gray" title={t("forms.is.required")}>
+              {t("forms.create-pull-request.description.label")} *
             </label>
             <textarea
               value={description}

@@ -2,10 +2,10 @@ import React from "react";
 
 import InfoIcon from "assets/icons/info-icon";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { highlightText } from "helpers/string";
+import {formatNumberToNScale} from "helpers/formatNumber";
+import {highlightText} from "helpers/string";
 
-import { Currency } from "interfaces/currency";
+import {Currency} from "interfaces/currency";
 
 import Button from "./button";
 import CustomContainer from "./custom-container";
@@ -32,7 +32,7 @@ function InfoComponent(info: InfosHero) {
         <div className="d-flex flex-row align-items-top">
           <span className="h4 text-white">
             { info.hasNotConvertedTokens && "~ "}
-            {formatNumberToCurrency(info.value)}
+            {formatNumberToNScale(info.value)}
           </span>
           
           <span className="caption-medium text-white-70 ml-1 mt-1">

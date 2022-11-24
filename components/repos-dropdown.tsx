@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import { useRepos } from "contexts/repos";
-
-import { trimString } from "helpers/string";
+import {useAppState} from "contexts/app-state";
 
 export default function ReposDropdown({ onSelected, value, disabled }: {
   onSelected: (e: { value: { id: string; path: string; } }) => void,
   value?: { label: string, value: { id: string, path: string } }
   disabled?: boolean;
 }) {
-  const { repoList } = useRepos();
-  const [isFetching, setIsFetching] = useState<boolean>(false)
+  const {state} = useAppState();
+
   const [options, setOptions] = useState<{ value: { id: string, path: string }; label: string }[]>();
   const [option, setOption] = useState<{ value: { id: string, path: string }; label: string }>()
   const { t } = useTranslation("common");
 
   function onChangeSelect(e: { value: { id: string; path: string } }) {
+    if(e?.value === option?.value) return
+    
     onSelected(e);
     setOption({
       value: e.value,
@@ -27,19 +27,17 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
     });
   }
 
-  function loadReposFromBackend() {
-    if (!repoList) return;
-    setIsFetching(true)
+  function setOptionMapper() {
+    if (!state.Service?.network?.repos?.list) return;
 
     function mapRepo({ id: value, githubPath: label }) {
       return { value: { id: value, path: label }, label };
     }
 
-    setOptions(repoList.map(mapRepo));
-    setIsFetching(false)
+    setOptions(state.Service?.network?.repos?.list.map(mapRepo));
   }
 
-  useEffect(loadReposFromBackend, [repoList]);
+  useEffect(setOptionMapper, [state.Service?.network?.repos?.list]);
   useEffect(() => { if(value?.value !== option?.value) setOption(value) }, [value]);
 
   return (
@@ -52,7 +50,7 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
         value={option}
         onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
-        isDisabled={disabled || isFetching || !options?.length}
+        isDisabled={disabled || !options?.length}
       />
     </div>
   );

@@ -1,0 +1,107 @@
+{
+  "title": "Environment Setup",
+  "registry": {
+    "title": "Registry",
+    "fields": {
+      "contract-field": {
+        "placeholder": "{{contract}} contract address",
+        "hint": "View {{contract}} docs"
+      },
+      "treasury": {
+        "label": "Treasury",
+        "placeholder": "Treasury wallet address",
+        "description": "Wallet that will receive the network registry fees"
+      },
+      "network-creation-amount": {
+        "label": "Network Creation Amount",
+        "description": "Amount needed to be locked on registry to register a network"
+      },
+      "network-creation-fee": {
+        "label": "Network Creation Fee",
+        "description": "Percentage of the network creation amount charged when a network is registered"
+      },
+      "close-bounty-fee": {
+        "label": "Close Bounty Fee",
+        "description": "Percentage of the bounty amount charged when a bounty is closed"
+      },
+      "cancel-bounty-fee": {
+        "label": "Cancel Bounty Fee",
+        "description": "Percentage of the bounty amount charged when a bounty is canceled"
+      },
+      "governance-token": {
+        "label": "Governance Token"
+      },
+      "nft-token": {
+        "label": "NFT Bounty Token"
+      }
+    },
+    "cta": {
+      "dispatcher": {
+        "call": "The Bounty Token requires Network Registry to be set as dispatcher",
+        "action": "Set dispatcher"
+      },
+      "allow-transactional": {
+        "call": "For the Registry Token to be used in bounties it needs to be allowed",
+        "action": "Allow as transactional"
+      },
+      "allow-reward": {
+        "call": "For the Registry Token to be used as reward in funding requests it needs to be allowed",
+        "action": "Allow as reward"
+      }
+    },
+    "modals": {
+      "deploy-bounty-token": {
+        "title": "New Bounty Token",
+        "fields": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Token Name"
+          },
+          "symbol": {
+            "label": "Symbol",
+            "placeholder": "Token Symbol"
+          }
+        },
+        "actions": {
+          "deploy": "Deploy"
+        },
+        "success": {
+          "deploy": "Bounty token deployed"
+        },
+        "errors": {
+          "deploy": "Failed to deploy bounty token"
+        }
+      },
+      "deploy-erc20": {
+        "title": "New ERC20 Token"
+      }
+    },
+    "actions": {
+      "deploy-registry": "Deploy Network Registry",
+      "deploy-erc20": "Deploy New ERC20 Token",
+      "deploy-bounty-token": "Deploy New Bounty Token"
+    },
+    "success": {
+      "deploy": {
+        "title": "Registry deployed",
+        "content": "See the Network Registry field"
+      },
+      "dispatcher-setted": "Dispatcher setted",
+      "allow": "Token allowed"
+    },
+    "errors": {
+      "invalid-contract-address": "Please provide a valid {{contract}} address",
+      "exceeds-limit": "Value must be between 0 and 100",
+      "deploy": "Failed to deploy Network Registry",
+      "dispatcher": "Failed to set dispatcher",
+      "allow": "Failed to allow token",
+      "already-saved": "Network Registry already saved"
+    }
+  },
+  "network": {
+    "title": "Network",
+    "errors": {
+      "network-already-saved": "Default Network already saved, please visit {{network}} settings page."
+    }
+  }
+}

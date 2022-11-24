@@ -47,7 +47,7 @@
       "subtitle": "find a bounty that you want to work on, create a solution and get paid"
     },
     "bounties-closed": "Closed bounties",
-    "bounties-in-network": "In the Network",
+    "in-network": "In the Network",
     "protocol-members": "Protocol members",
     "my-account": "My account",
     "delegated-oracles": "Delegated bv{{token}}",
@@ -124,6 +124,7 @@
     "redeem": "Redeem",
     "reply-on-github": "Reply on Github",
     "review": "Review",
+    "view-proposal": "View Proposal",
     "make-a-review": "Make a Review",
     "success": "Success",
     "view-on-github": "View on Github",
@@ -282,6 +283,9 @@
     }
   },
   "forms": {
+    "is": {
+      "required": "Field is required"
+    },
     "select-placeholder": "Select...",
     "create-pull-request": {
       "title": {
@@ -361,7 +365,9 @@
       "retract-fund": "Retract Bounty Fund",
       "withdraw-fund-reward-bounty": "Withdraw Reward Bounty Fund",
       "deploy-erc20-token": "Deploy ERC20 Token",
-      "config-fees": "Config Fees"
+      "config-fees": "Config Fees",
+      "deploy-registry": "Deploy Network Registry",
+      "change-allowed-tokens": "Change Allowed Tokens"
     }
   },
   "sort": {

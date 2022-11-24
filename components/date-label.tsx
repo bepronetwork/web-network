@@ -45,7 +45,7 @@ export default function DateLabel({ date, className }: IDataLabelProps) {
   }
 
   return (
-    <span className={`caption-small ${className || "text-ligth-gray"}`}>
+    <span className={`caption-small ${className || "text-light-gray"}`}>
       {date &&
         t("info-data.text-data", {
           value: handleDurationTranslation().join(" ")

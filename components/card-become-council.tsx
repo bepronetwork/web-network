@@ -1,21 +1,24 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import Link from "next/link";
 
 import ArrowRight from "assets/icons/arrow-right";
 import CloseIcon from "assets/icons/close-icon";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import useNetwork from "x-hooks/use-network";
 
+import useNetworkTheme from "x-hooks/use-network-theme";
+
+import {useAppState} from "../contexts/app-state";
 import Button from "./button";
 
 export default function CardBecomeCouncil() {
   const { t } = useTranslation("council");
   const [show, setShow] = useState<boolean>(true);
-  const { network: activeNetwork, getURLWithNetwork } = useNetwork();
+  const {state} = useAppState();
+  const { getURLWithNetwork } = useNetworkTheme();
 
   if (!show) return null;
 
@@ -34,10 +37,10 @@ export default function CardBecomeCouncil() {
       <div className="text-gray pe-3 pb-2">
         {t("become-council-description-part-one")}{" "}
         <span className="amount-white-color">
-          {formatNumberToNScale(+activeNetwork?.councilAmount)}
+          {formatNumberToNScale(+state.Service?.network?.amounts?.councilAmount)}
         </span>{" "}
         <span className="text-primary">
-          {activeNetwork?.networkToken?.symbol}
+          {state.Service?.network?.networkToken?.symbol}
         </span>{" "}
         {t("become-council-description-part-two")}
       </div>

@@ -1,6 +1,6 @@
 import InfoTooltip from "components/info-tooltip";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
 interface AmountCardProps {
   title: string;
@@ -24,7 +24,7 @@ export default function AmountCard({
 
       <div className="d-flex flex-row align-items-center mt-3">
         <h4 className="family-Regular text-white">
-          ${formatNumberToCurrency(amount)}
+          {formatNumberToNScale(amount)}
         </h4>
       </div>
     </div>

@@ -11,22 +11,6 @@ export interface User {
   updatedAt: string;
 }
 
-export interface ProposalData {
-  id: number;
-  issueId: number;
-  scMergeId: string;
-  pullRequestId: number;
-  pullRequest?: {
-    id: number;
-    githubId: string;
-    issueId: number;
-    createdAt: string;
-    updatedAt: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface PastEventsParams {
   id? :number;
   fromBlock?: number;
@@ -43,6 +27,7 @@ export interface SearchNetworkParams {
   search?: string;
   isClosed?: boolean;
   isRegistered?: boolean;
+  isDefault?: boolean;
 }
 
 export interface CreatePrePullRequestParams extends RequestParams {
@@ -74,7 +59,7 @@ export interface StartWorkingParams extends RequestParams {
 export interface MergeClosedIssueParams extends RequestParams {
   issueId: string;
   pullRequestId: string;
-  mergeProposalId: string;
+  mergeProposalId: string | number;
   address: string;
 }
 

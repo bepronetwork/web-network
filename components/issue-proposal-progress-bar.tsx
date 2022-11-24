@@ -1,40 +1,40 @@
-import { Fragment, useEffect, useState } from "react";
+import {Fragment, useEffect, useState} from "react";
 
-import { add, addSeconds, compareAsc, intervalToDuration } from "date-fns";
-import { useTranslation } from "next-i18next";
+import {add, addSeconds, compareAsc, intervalToDuration} from "date-fns";
+import {useTranslation} from "next-i18next";
 
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
+import {formatDate, getTimeDifferenceInWords} from "helpers/formatDate";
 
-import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
+import {useAppState} from "../contexts/app-state";
+
 
 export default function IssueProposalProgressBar() {
-  const { t } = useTranslation(["common", "bounty"]);
+  const {t} = useTranslation(["common", "bounty"]);
 
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
-  const [draftTime, setDraftTime] = useState(0);
+  const [chainTime, setChainTime] = useState<number>(+ new Date())
   const [steps, setSteps] = useState<string[]>([
     t("bounty:steps.draft"),
     t("bounty:steps.funding"),
     t("bounty:steps.development"),
     t("bounty:steps.validation"),
     t("bounty:steps.closed")
-  ])  
-  const { activeNetwork } = useNetwork();
-  const { activeIssue, networkIssue } = useIssue();
+  ]);
 
-  const isFinalized = !!networkIssue?.closed;
-  const isInValidation = !!networkIssue?.isInValidation;
-  const isIssueinDraft = !!networkIssue?.isDraft;
-  const isFundingRequest = networkIssue?.fundingAmount?.gt(0) || activeIssue?.fundingAmount?.gt(0);
-  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount);
-  const creationDate = networkIssue?.creationDate;
-  const fundedDate = activeIssue?.fundedAt;
-  const closedDate = networkIssue?.closedDate;
-  const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
+  const {state} = useAppState();
+  const getChainTime = () => state.Service.active.getTimeChain().then(setChainTime).catch(console.log)
+  const isFinalized = !!state.currentBounty?.chainData?.closed;
+  const isInValidation = !!state.currentBounty?.chainData?.isInValidation;
+  const isIssueinDraft = !!state.currentBounty?.chainData?.isDraft;
+  const isFundingRequest = state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
+  const isBountyFunded = state.currentBounty?.data?.fundedAmount?.isEqualTo(state.currentBounty?.data?.fundingAmount);
+  const creationDate = state.currentBounty?.chainData?.creationDate;
+  const fundedDate = state.currentBounty?.data?.fundedAt;
+  const closedDate = state.currentBounty?.chainData?.closedDate;
+  const isCanceled = state.currentBounty?.data?.state === "canceled" || !!state.currentBounty?.chainData?.canceled;
   const lastProposalCreationDate = 
-    networkIssue?.proposals?.filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
+    state.currentBounty?.chainData?.proposals?.filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
       .reduce((proposalAnt, proposalCur) => 
         proposalAnt.creationDate > proposalCur.creationDate && 
         proposalAnt || proposalCur, { creationDate })?.creationDate;
@@ -49,27 +49,27 @@ export default function IssueProposalProgressBar() {
 
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
-
-    const isHigher = creationDate && (new Date() > addSeconds(creationDate, draftTime));
+    const isHigher = creationDate && 
+                    (new Date(chainTime) > addSeconds(creationDate, +state.Service?.network?.times?.draftTime));
 
     const item = (date, toAdd = 0) => ({
       Warning: {
         text: t("bounty:status.until-done", {
           distance: isHigher ? '0 seconds' 
-            : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date())
+            : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date(chainTime))
         }),
         color: "warning",
         bgColor: "warning-opac-25"
       },
       Started: {
         text: t("bounty:status.started-time", {
-          distance: getTimeDifferenceInWords(new Date(date), new Date())
+          distance: getTimeDifferenceInWords(new Date(date), new Date(chainTime))
         }),
-        color: "ligth-gray"
+        color: "light-gray"
       },
       At: {
         text: t("bounty:status.end-time", { data: formatDate(date) }),
-        color: "ligth-gray"
+        color: "light-gray"
       }
     });
 
@@ -78,10 +78,10 @@ export default function IssueProposalProgressBar() {
     };
 
     if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest) 
-      currentValue = item(addSeconds(creationDate, draftTime)).Started;
+      currentValue = item(addSeconds(creationDate, +state.Service?.network?.times?.draftTime)).Started;
 
     if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
-      currentValue = item(creationDate, draftTime).Warning;
+      currentValue = item(creationDate, +state.Service?.network?.times?.draftTime).Warning;
     
     if (
         index === currentStep &&
@@ -95,7 +95,7 @@ export default function IssueProposalProgressBar() {
             end: new Date(fundedDate),
         });
         const startedFundedDate = add(creationDate, intervalFunded)
-        const startedDraftDate = addSeconds(creationDate, draftTime)
+        const startedDraftDate = addSeconds(creationDate, +state.Service?.network?.times?.draftTime)
 
         if(compareAsc(startedDraftDate, startedFundedDate) === 1){
           currentValue = item(startedDraftDate).Started
@@ -129,7 +129,7 @@ export default function IssueProposalProgressBar() {
   function renderColumn(stepLabel, index) {
     const style = { top: index === 0 ? "0" : `${index * 66.7}px`, left: "7px" };
     const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${
-      currentStep >= index ? stepColor : "ligth-gray"
+      currentStep >= index ? stepColor : "light-gray"
     }`;
     const dotStyle = { width: "12px", height: "12px" };
     const labelStyle = { left: "40px" };
@@ -168,10 +168,7 @@ export default function IssueProposalProgressBar() {
     );
   }
 
-  useEffect(() => {
-    if (activeNetwork?.draftTime) setDraftTime(activeNetwork?.draftTime);
-  }, [activeNetwork?.draftTime, activeNetwork?.disputableTime]);
-
+  useEffect(()=> {getChainTime()},[])
   useEffect(() => {
     const isFundingStep = !!steps.find(name => name === t("bounty:steps.funding"))
 
@@ -218,7 +215,7 @@ export default function IssueProposalProgressBar() {
             </div>
             <div className="row">
               <div className="position-relative">
-                <div className="progress bg-ligth-gray issue-progress-horizontal" style={{
+                <div className="progress bg-light-gray issue-progress-horizontal" style={{
                   height: `${heightIssueProgressHorizontal()}`
                 }}>
                   <div

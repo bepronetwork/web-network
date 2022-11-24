@@ -1,15 +1,15 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op, WhereOptions } from "sequelize";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import paginate, { calculateTotalPages } from "helpers/paginate";
+import paginate, {calculateTotalPages} from "helpers/paginate";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const { name, creatorAddress, networkAddress, isClosed, isRegistered, page } = req.query || {};
+  const {name, creatorAddress, networkAddress, isClosed, isRegistered, isDefault, page} = req.query || {};
 
   if (name) whereCondition.name = name;
 
@@ -24,6 +24,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (isRegistered)
     whereCondition.isRegistered = isRegistered;
+  
+  if (isDefault)
+    whereCondition.isDefault = isDefault;
     
   const include = [
     { association: "tokens" }

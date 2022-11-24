@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { head } from "lodash";
 
-import { getSettingsFromSessionStorage } from "helpers/settings";
+import { useAppState } from "contexts/app-state";
 
 import { 
   PastEventsParams, 
@@ -14,6 +14,7 @@ import {
   MergeClosedIssueParams,
   CreateReviewParams
 } from "interfaces/api";
+import { Curator, SearchCuratorParams } from "interfaces/curators";
 import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -24,6 +25,7 @@ import { Token } from "interfaces/token";
 import { api, eventsApi } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
+
 interface NewIssueParams {
   title: string;
   description: string;
@@ -40,6 +42,12 @@ interface CreateBounty {
   repositoryId: string;
 }
 
+interface GetNetworkProps {
+  name?: string;
+  creator?: string;
+  isDefault?: boolean;
+}
+
 type FileUploadReturn = {
   hash: string;
   fileName: string;
@@ -49,9 +57,9 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
-  const sessionStorageSettings = getSettingsFromSessionStorage();
-  const DEFAULT_NETWORK_NAME = sessionStorageSettings?.defaultNetworkConfig?.name || "bepro";
-
+  const  {state} = useAppState()
+  const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
+  
   api.interceptors.request.use(config => {
     config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
 
@@ -86,7 +94,7 @@ export default function useApi() {
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName
+      networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
       .get<{
@@ -191,10 +199,7 @@ export default function useApi() {
       });
   }
 
-  async function cancelPrePullRequest({ 
-    networkName = DEFAULT_NETWORK_NAME,
-    ...rest 
-  } : CancelPrePullRequestParams) {
+  async function cancelPrePullRequest({networkName = DEFAULT_NETWORK_NAME, ...rest} : CancelPrePullRequestParams) {
     return api
       .delete("/pull-request/", { data: { customNetworkName: networkName, ...rest } })
       .then(({ data }) => data)
@@ -411,11 +416,12 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork({ name, creator }: { name?: string, creator?: string }) {
-    const Params = {} as { name?: string, creator?: string }
-    if (name) Params.name = name
-
-    if (creator) Params.creator = creator
+  async function getNetwork({ name, creator, isDefault } : GetNetworkProps) {
+    const Params = {} as Omit<GetNetworkProps, "isDefault"> & { isDefault: string };
+    
+    if (name) Params.name = name;
+    if (creator) Params.creator = creator;
+    if (isDefault) Params.isDefault = isDefault.toString();
 
     const search = new URLSearchParams(Params).toString();
 
@@ -445,7 +451,8 @@ export default function useApi() {
     order = "DESC",
     search = "",
     isClosed = undefined,
-    isRegistered = undefined
+    isRegistered = undefined,
+    isDefault = undefined
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -456,7 +463,8 @@ export default function useApi() {
       order,
       search,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
-      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
+      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
+      ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {})
     }).toString();
 
     return api
@@ -466,6 +474,34 @@ export default function useApi() {
         pages: number;
         currentPage: number;
       }>(`/search/networks/?${params}`)
+      .then(({ data }) => data)
+      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
+  }
+
+  async function searchCurators({
+    page = "1",
+    address = "",
+    isCurrentlyCurator = undefined,
+    networkName = DEFAULT_NETWORK_NAME,
+    sortBy = "updatedAt",
+    order = "DESC"
+  }: SearchCuratorParams) {
+    const params = new URLSearchParams({
+      page,
+      address,
+      networkName,
+      sortBy,
+      order,
+      ...(isCurrentlyCurator !== undefined && { isCurrentlyCurator: isCurrentlyCurator.toString()} || {})
+    }).toString();
+
+    return api
+      .get<{
+        rows: Curator[];
+        count: number;
+        pages: number;
+        currentPage: number;
+      }>(`/search/curators/?${params}`)
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -490,10 +526,18 @@ export default function useApi() {
   }
 
   async function createNFT(issueContractId: number,
-                           proposalscMergeId: number,
+                           proposalContractId: number,
                            networkName: string = DEFAULT_NETWORK_NAME,) {
     return api
-      .post("/nft", { issueContractId, proposalscMergeId, networkName })
+      .post("/nft", { issueContractId, proposalContractId, networkName })
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  async function saveNetworkRegistry(wallet: string, registryAddress: string) {
+    return api.post("/setup/registry", { wallet, registryAddress })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -530,6 +574,7 @@ export default function useApi() {
     searchIssues,
     searchNetworks,
     searchRepositories,
+    searchCurators,
     startWorking,
     updateNetwork,
     uploadFiles,
@@ -539,6 +584,7 @@ export default function useApi() {
     resetUser,
     getSettings,
     getTokens,
-    createNFT
+    createNFT,
+    saveNetworkRegistry
   };
 }

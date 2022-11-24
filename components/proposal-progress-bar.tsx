@@ -1,40 +1,36 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import {
-  formatNumberToNScale
-} from "helpers/formatNumber";
-
+import {useAppState} from "../contexts/app-state";
 import Translation from "./translation";
 
 export default function ProposalProgressBar({
-  isDisputed = null,
-  issueDisputeAmount = 0,
-  isFinished = false,
-  isMerged = false,
-  refused = false
-}) {
+                                              isDisputed = null,
+                                              issueDisputeAmount = 0,
+                                              isFinished = false,
+                                              isMerged = false,
+                                              refused = false,
+                                              disputeMaxAmount = 0,
+                                            }) {
   const { t } = useTranslation("proposal");
-  
-  const { wallet } = useAuthentication();
+
+  const {state} = useAppState();
 
   const [issueState, setIssueState] = useState<string>("");
   const [issueColor, setIssueColor] = useState<string>("");
   const [percentage, setPercentage] = useState<number>(0);
-  const { activeNetwork } = useNetwork();
 
-  const columns = [0, 1, 2, 3, 3];
+  const [_columns, setColumns] = useState<number[]>([]);
 
   function toPercent(value = 0, total = 0, decimals = 2) {
     return ((value / total) * 100).toFixed(decimals);
   }
 
-  function toRepresentationPercent(value = 0, total = 5) {
-    return value > 3 ? 100 : (value * 100) / total;
+  function toRepresentationPercent(value = 0) {
+    return value > disputeMaxAmount ? 100 : ((value * 110) / disputeMaxAmount) / 1.8; // trust.
   }
 
   function getStateColor() {
@@ -65,45 +61,58 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
-    setPercentage(+toPercent(issueDisputeAmount, wallet?.balance?.staked?.toNumber()));
+    setPercentage(+toPercent(issueDisputeAmount, state.currentUser?.balance?.staked?.toNumber()));
   }
 
   function renderColumn(dotLabel, index) {
-    const dotClass = `rounded-circle ${
-      !percentage || dotLabel > percentage ? "empty-dot" : `bg-${issueColor}`
-    }`;
+    const isLastColumn = index + 1 === _columns.length;
+
+    const dotClass = [
+      `rounded-circle`,
+      !percentage || dotLabel > percentage ? `empty-dot` : `bg-${issueColor}`
+    ].join(` `);
+
+    const captionClass = [
+      `caption mt-4 ms-1`,
+      isLastColumn ? `text-${issueColor}` : "text-white"
+    ].join(` `)
+
     const style = { left: index === 0 ? "1%" : `${index * 20}%` };
     const dotStyle = { width: "10px", height: "10px" };
-    const isLastColumn = index + 1 === columns.length;
+
+    const label = `${isLastColumn && `>` || ``} ${dotLabel}%`;
 
     return (
-      <div
-        key={`ppb-${index}`}
-        className="position-absolute d-flex align-items-center flex-column"
-        style={style}
-      >
+      <div key={`ppb-${index}`}
+           className="position-absolute d-flex align-items-center flex-column"
+           style={style}>
         <div className={dotClass} style={dotStyle}>
-          <div
-            className={`caption ${
-              isLastColumn ? `text-${issueColor}` : "text-white"
-            } mt-4 ms-1`}
-          >
-            {isLastColumn ? ">" : ""}
-            {dotLabel}%
-          </div>
+          <div className={captionClass}>{label}</div>
         </div>
       </div>
     );
   }
 
+  function createColumn() {
+    if (!disputeMaxAmount)
+      return;
+
+    const floorIt = (value, zeroes = 10**2) => Math.floor(value * zeroes) / zeroes;
+    const incrementor = floorIt(disputeMaxAmount / 3);
+    const dynamicColumns = [...Array(4)].map((_, i) => floorIt(i * incrementor));
+    setColumns([...dynamicColumns, disputeMaxAmount]);
+  }
+
   useEffect(loadDisputeState, [
-    wallet?.balance?.staked,
+    state.currentUser?.balance?.staked,
     issueDisputeAmount,
     isDisputed,
     isFinished,
     refused,
-    isMerged
+    isMerged,
   ]);
+
+  useEffect(createColumn, [disputeMaxAmount]);
 
   return (
     <>
@@ -118,25 +127,27 @@ export default function ProposalProgressBar({
             <span className={`text-${issueColor} text-uppercase`}>
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
-            /{formatNumberToNScale(wallet?.balance?.staked?.toNumber() || 0)}{" "}
-            <Translation label="$oracles" params={{ token: activeNetwork?.networkToken?.symbol }}/>{" "}
+            /{formatNumberToNScale(state.currentUser?.balance?.staked?.toNumber() || 0)}{" "}
+            <Translation label="$oracles" params={{ token: state.Service?.network?.networkToken?.symbol }}/>{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>
         </div>
       </div>
-      <div className="row">
-        <div className="ms-2 col-12 position-relative">
-          <div className={`progress bg-${issueColor}`}>
-            <div
-              className={`progress-bar bg-${issueColor}`}
-              role="progressbar"
-              style={{ width: `${toRepresentationPercent(percentage)}%` }}
-            >
-              {columns.map(renderColumn)}
+      {!_columns.length
+        ? ''
+        : <div className="row">
+          <div className="ms-2 col-12 position-relative">
+            <div className={`progress bg-${issueColor}`}>
+              <div
+                className={`progress-bar bg-${issueColor}`}
+                role="progressbar"
+                style={{ width: `${toRepresentationPercent(percentage)}%` }}>
+                {_columns.map(renderColumn)}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
     </>
   );
 }

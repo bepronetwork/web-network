@@ -37,6 +37,23 @@ $only-child: 14px;
   }
 }
 
+.btn-purple {
+  background-color: var(--bs-purple);
+  border-color: var(--bs-purple);
+
+  &:hover {
+    background-color: var(--bs-purple);
+    border-color: var(--bs-purple);
+    filter: brightness(0.85);
+  }
+
+  &:disabled,
+  &:focus {
+    background-color: var(--bs-purple);
+    border-color: var(--bs-purple);
+  }
+}
+
 button.btn:not(.not-svg),
 a.btn:not(.brand),
 .main-nav-link:not(.brand) {

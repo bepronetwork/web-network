@@ -1,28 +1,27 @@
-import { signIn } from "next-auth/react";
-import { useTranslation } from "next-i18next";
-import { setCookie } from "nookies";
+import {signIn} from "next-auth/react";
+import {useTranslation} from "next-i18next";
+import {setCookie} from "nookies";
 
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useAuthentication } from "contexts/authentication";
+import {useAppState} from "../contexts/app-state";
 
 export default function UpdateGithubTokenModal({
-  redirectTo,
-  description,
-  isVisible = false,
+                                                 redirectTo,
+                                                 description,
+                                                 isVisible = false,
   setVisible,
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-
-  const { wallet } = useAuthentication();
+  const {state} = useAppState();
 
   function handleClose() {
     setVisible?.(false);
   }
 
   function handleConfirm() {
-    setCookie(null, `updated-github-token:${wallet?.address}`, "true", {
+    setCookie(null, `updated-github-token:${state.currentUser?.walletAddress}`, "true", {
       maxAge: 24 * 60 * 60,
       path: "/"
     });

@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
@@ -18,26 +18,25 @@ import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TokensSettings from "components/tokens-settings";
-import { WarningSpan } from "components/warning-span";
+import {WarningSpan} from "components/warning-span";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-import { useNetworkSettings } from "contexts/network-settings";
-import { addToast, toastError, toastSuccess } from "contexts/reducers/add-toast";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
+import {addToast, toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { psReadAsText } from "helpers/file-reader";
-import { formatDate } from "helpers/formatDate";
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import {psReadAsText} from "helpers/file-reader";
+import {formatDate} from "helpers/formatDate";
+import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { Network } from "interfaces/network";
-import { Token } from "interfaces/token";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {Network} from "interfaces/network";
+import {Token} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
+import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 import RegistryGovernorSettings from "./registry-governor-settings";
 
@@ -57,16 +56,20 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const [errorBigImages, setErrorBigImages] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const { service: DAOService } = useDAO();
+  const { state, dispatch } = useAppState();
+
   const { colorsToCSS } = useNetworkTheme();
   const { updateNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter, handleAddNetworkToRegistry } = useBepro();
-  const { dispatch } = useContext(ApplicationContext);
-  const { activeNetwork, updateActiveNetwork } = useNetwork();
-  const { user, wallet, updateWalletBalance } = useAuthentication();
+
+  const { updateActiveNetwork } = useNetwork();
+  const { updateWalletBalance } = useAuthentication();
   const { details, fields, github, settings, tokens, forcedNetwork, isAbleToClosed } = useNetworkSettings();
 
-  const isCurrentNetwork = !!network && !!activeNetwork && network?.networkAddress === activeNetwork?.networkAddress;
+  const isCurrentNetwork = !!network && 
+    !!state.Service?.network?.active && 
+    network?.networkAddress === state.Service?.network?.active?.networkAddress;
+    
   const networkNeedRegistration = network?.isRegistered === false;
 
   const handleColorChange = value => fields.colors.setter(value);
@@ -82,7 +85,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     NetworkAmount(t("custom-network:oracles-staked", { symbol: forcedNetwork?.networkToken?.symbol }), 
                   t("custom-network:oracles-staked-description"),
                   forcedNetwork?.tokensLocked || 0),
-    NetworkAmount(t("custom-network:tvl"),  t("custom-network:tvl-description"), tvl)
+    NetworkAmount(t("custom-network:tvl"), t("custom-network:tvl-description"), tvl)
   ];
 
   const showTextOrDefault = (text: string, defaultText: string) => text?.trim() === "" ? defaultText : text;
@@ -92,11 +95,10 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   async function handleSubmit() {
     if (
-      !user?.login ||
-      !wallet?.address ||
-      !DAOService ||
+      !state.currentUser?.login ||
+      !state.currentUser?.walletAddress || !state.Service?.active ||
       !forcedNetwork ||
-      activeNetwork.isClosed ||
+      forcedNetwork?.isClosed ||
       errorBigImages
     )
       return;
@@ -116,12 +118,11 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         JSON.stringify(github.repositories
           .filter((repo) => !repo.checked && repo.isSaved)
           .map(({ name, fullName }) => ({ name, fullName }))),
-      creator: wallet.address,
-      githubLogin: user.login,
+      creator: state.currentUser.walletAddress,
+      githubLogin: state.currentUser.login,
       networkAddress: network.networkAddress,
-      accessToken: user.accessToken,
-      allAllowedTokens: tokens?.allowedTransactions
-        .concat(tokens?.allowedRewards)
+      accessToken: state.currentUser.accessToken,
+      allAllowedTokens: tokens?.allowedTransactions?.concat(tokens?.allowedRewards)
         .map((token) => token?.id)
         .filter((v) => v),
     };
@@ -187,22 +188,26 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   }
 
   function handleCloseNetwork() {
-    if (!activeNetwork || !user?.login || !user?.accessToken || !wallet?.address || !DAOService) return;
+    if (!state.Service?.network?.active ||
+      !state.currentUser?.login ||
+      !state.currentUser?.accessToken ||
+      !state.currentUser?.walletAddress ||
+      !state.Service?.active) return;
 
     setIsClosing(true);
 
-    DAOService.unlockFromRegistry()
+    state.Service?.active.unlockFromRegistry()
       .then(() => {
         return updateNetwork({
-          githubLogin: user.login,
+          githubLogin: state.currentUser.login,
           isClosed: true,
-          creator: wallet.address,
+          creator: state.currentUser.walletAddress,
           networkAddress: network?.networkAddress,
-          accessToken: user?.accessToken
+          accessToken: state.currentUser?.accessToken
         });
       })
       .then(() => {
-        updateWalletBalance();
+        updateWalletBalance(true);
 
         if (isCurrentNetwork) updateActiveNetwork(true);
 
@@ -246,7 +251,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   useEffect(() => {
     const logoSize = (details?.fullLogo?.value?.raw?.size || 0)/1024/1024
-    const iconSize = (details?.iconLogo?.value?.raw?.size || 0)/1024/1024 
+    const iconSize = (details?.iconLogo?.value?.raw?.size || 0)/1024/1024
 
     if(logoSize + iconSize >= 1){
       setErrorBigImages(true)
@@ -257,10 +262,10 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   }, [details?.fullLogo, details?.iconLogo])
 
   useEffect(() => {
-    if(!DAOService || !wallet?.address) return;
+    if(!state.Service?.active || !state.currentUser?.walletAddress) return;
 
-    DAOService.isRegistryGovernor(wallet?.address).then(setIsGovernorRegistry)
-  }, [wallet])
+    state.Service?.active.isRegistryGovernor(state.currentUser?.walletAddress).then(setIsGovernorRegistry)
+  }, [state.currentUser])
 
   function setCurrentSelectedTokens({transactional, reward}: {
     transactional: Token[],
@@ -274,7 +279,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     <ReadOnlyButtonWrapper>
       { isCurrentNetwork && <style>{colorsToCSS(settings?.theme?.colors)}</style> }
       {isGovernorRegistry && <RegistryGovernorSettings />}
-      { networkNeedRegistration && 
+      { networkNeedRegistration &&
         <Row className="bg-warning-opac-25 py-2 border border-warning border-radius-4 align-items-center mb-2">
           <Col xs="auto">
             <InfoIconEmpty width={12} height={12} />
@@ -286,8 +291,8 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             <Button 
               color="warning"
               onClick={handleRegisterNetwork}
-              disabled={!wallet?.address || !user?.accessToken || isRegistering}
-              withLockIcon={!wallet?.address || !user?.accessToken}
+              disabled={!state.currentUser?.walletAddress || !state.currentUser?.accessToken || isRegistering}
+              withLockIcon={!state.currentUser?.walletAddress || !state.currentUser?.accessToken}
               isLoading={isRegistering}
             >
               {t("actions.register")}
@@ -358,11 +363,11 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         <Col xs="auto">
           <Button
             color="dark-gray"
-            disabled={!isAbleToClosed || isClosing || !user?.login}
+            disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
             className="ml-2"
             onClick={handleCloseNetwork}
           >
-            {(!isAbleToClosed || !user?.login) && <LockedIcon className="me-2" />}
+            {(!isAbleToClosed || !state.currentUser?.login) && <LockedIcon className="me-2" />}
             <span>{t("custom-network:close-network")}</span>
             {isClosing ? (
               <span className="spinner-border spinner-border-xs ml-1" />
@@ -378,7 +383,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             <small className="text-danger small-info mt-1">
               {t("custom-network:errors.images-too-big")}
             </small>
-          )}        
+          )}
         </Col>
       </Row>
       <Row>
@@ -391,7 +396,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       <Row className="mt-4">
         <span className="caption-medium text-white mb-3">{t("custom-network:steps.repositories.label")}</span>
 
-        { !user?.login &&
+        { !state.currentUser?.login &&
           <ConnectGithub /> || 
           <RepositoriesList
             repositories={github.repositories}

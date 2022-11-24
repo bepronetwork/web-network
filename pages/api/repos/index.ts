@@ -1,16 +1,16 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op } from "sequelize";
+import {withCors} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 async function getAllRepos(req, res) {
-  const { networkName } = req.query;
+  const {networkName} = req.query;
 
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   });
@@ -45,7 +45,7 @@ async function addNewRepo(req, res) {
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName)
+        [Op.iLike]: String(networkName).replaceAll(" ", "-")
       }
     }
   });

@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import Image from "next/image";
 
 import metamaskLogo from "assets/metamask.png";
@@ -8,66 +8,63 @@ import metamaskLogo from "assets/metamask.png";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { changeNetworkId } from "contexts/reducers/change-network-id";
-import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
-import { useSettings } from "contexts/settings";
+import {NetworkColors} from "interfaces/enums/network-colors";
 
-import { NetworkColors } from "interfaces/enums/network-colors";
+import {useAuthentication} from "x-hooks/use-authentication";
 
-export default function ConnectWalletButton({
-  children = null,
-  asModal = false,
-  forceLogin = false,
-}) {
+import {useAppState} from "../contexts/app-state";
+import {changeChain} from "../contexts/reducers/change-chain";
+import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
+
+export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
-  const {
-    dispatch,
-    state: { loading },
-  } = useContext(ApplicationContext);
+  const {dispatch, state: { loading, connectedChain },} = useAppState();
   const [showModal, setShowModal] = useState(false);
 
-  const { service: DAOService } = useDAO();
-  const { settings } = useSettings();
-  const { wallet, connectWallet } = useAuthentication();
+  const {state} = useAppState();
 
-  useEffect(() => {
-    if (!DAOService) return;
-
-    if (forceLogin) connectWallet();
-  }, [DAOService]);
-
-  useEffect(() => {
-    handleShowModal();
-  }, [wallet]);
+  const { connectWallet } = useAuthentication();
 
   async function handleLogin()  {
-    if(!window?.ethereum) return dispatch(changeShowWeb3DialogState(true))
-    if (DAOService) {
-      DAOService.getChainId()
-        .then((chainId) => {
-          if (+chainId === +settings?.requiredChain?.id) {
-            connectWallet();
-          } else {
-            dispatch(changeNetworkId(+chainId));
-            setShowModal(false);
-          }
-        });
-    } else {
+    if(!window?.ethereum) {
+      dispatch(changeShowWeb3(true))
+      return;
+    }
+
+    if (!state.Service?.active)
+      return;
+
+    if (+state.connectedChain?.id === +state.Settings?.requiredChain?.id) {
       connectWallet();
+    } else {
+      console.log('no connected chain?', connectedChain, state.Settings?.requiredChain);
+
+      dispatch(changeChain.update({...state.connectedChain, id: state.Settings?.requiredChain?.id}));
+      setShowModal(false);
     }
   }
 
   function handleShowModal() {
-    if (!wallet?.address) setShowModal(true);
+    if (!state.currentUser?.walletAddress) setShowModal(true);
     else setShowModal(false);
   }
 
+  useEffect(() => {
+    if (!state.Service?.active) return;
+
+    if (forceLogin)
+      connectWallet();
+
+  }, [state.Service?.active, forceLogin]);
+
+  useEffect(() => {
+    handleShowModal();
+  }, [state.currentUser?.walletAddress]);
+
+
   if (asModal) {
-    if (loading.isLoading) return <></>;
+    if (loading?.isLoading) return <></>;
 
     return (
       <Modal
@@ -82,9 +79,9 @@ export default function ConnectWalletButton({
             {t("connect-wallet-button:to-access-this-page")}
             <br />
             <span
-              style={{ color: NetworkColors[settings?.requiredChain?.name?.toLowerCase()] }}
+              style={{ color: NetworkColors[state.Settings?.requiredChain?.name?.toLowerCase()] }}
             >
-              <span>{settings?.requiredChain?.name}</span>{" "}
+              <span>{state.Settings?.requiredChain?.name}</span>{" "}
               {t("connect-wallet-button:network")}
             </span>{" "}
             {t("connect-wallet-button:on-your-wallet")}
@@ -103,7 +100,7 @@ export default function ConnectWalletButton({
           </div>
 
           <div className="small-info text-center text-uppercase mt-1 pt-1">
-            <span className="text-ligth-gray">{t("misc.by-connecting")} </span>
+            <span className="text-light-gray">{t("misc.by-connecting")} </span>
             <a
               href="https://www.bepro.network/terms"
               target="_blank"
@@ -113,7 +110,7 @@ export default function ConnectWalletButton({
               {t("misc.terms-and-conditions")}
             </a>{" "}
             <br />
-            <span className="text-ligth-gray">{t("misc.and")} </span>
+            <span className="text-light-gray">{t("misc.and")} </span>
             <a
               href="https://taikai.network/privacy"
               target="_blank"
@@ -128,7 +125,7 @@ export default function ConnectWalletButton({
     );
   }
 
-  if (!wallet)
+  if (!state.currentUser?.walletAddress)
     return (
       <Button
         color="white"

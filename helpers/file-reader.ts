@@ -8,6 +8,6 @@ export function psReadAsText(file: File) {
 
     fr.onerror = reject;
 
-    fr.readAsText(file);
+    fr?.readAsText(file);
   });
 }

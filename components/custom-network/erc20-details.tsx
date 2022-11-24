@@ -1,21 +1,19 @@
-import { useState, useEffect, useContext } from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
-import { FormGroup } from "components/form-group";
-import InputNumber from "components/input-number";
-import { WarningSpan } from "components/warning-span";
+import {FormGroup} from "components/form-group";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
 import useERC20 from "x-hooks/use-erc20";
+
+import {useAppState} from "../../contexts/app-state";
 
 interface ERC20DetailsProps {
   address?: string;
@@ -41,8 +39,7 @@ export function ERC20Details({
   const [tokenTotalSupply, setTokenTotalSupply] = useState("");
 
   const erc20 = useERC20();
-  const { wallet } = useAuthentication();
-  const { dispatch } = useContext(ApplicationContext);
+  const { state, dispatch } = useAppState();
 
   const isDeployer = !!deployer;
 
@@ -62,8 +59,6 @@ export function ERC20Details({
   const isAddressFieldReadOnly = !!readOnly || isDeployer;
   const hasTotalSupplyError = !!numberError(tokenInfo.totalSupply) && tokenInfo.totalSupply !== "" && isDeployer;
 
-  const handleTotalSupplyChange = ({ value }) => setTokenTotalSupply(value);
-
   const isDeployBtnDisabled = isDeployer ? [
     tokenInfo.name.trim() === "",
     tokenInfo.symbol.trim() === "",
@@ -77,7 +72,7 @@ export function ERC20Details({
   function handleDeploy() {
     setIsDeploying(true);
 
-    erc20.deploy(tokenName, tokenSymbol, tokenTotalSupply, wallet?.address)
+    erc20.deploy(tokenName, tokenSymbol, tokenTotalSupply, state.currentUser?.walletAddress)
       .then(({ contractAddress }) => {
         erc20.setAddress(contractAddress);
         setTokenAddress(contractAddress);
@@ -110,7 +105,7 @@ export function ERC20Details({
 
   return(
     <>
-      <Row className="mt-2">
+      <Row className="mt-2 mb-2">
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.address.label")}
           value={tokenAddress}
@@ -132,7 +127,7 @@ export function ERC20Details({
         />
       </Row>
 
-      <Row>
+      <Row className="mb-2">
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.name.label")}
           value={tokenInfo.name}
@@ -155,30 +150,15 @@ export function ERC20Details({
       </Row>
 
       <Row>
-        <Col>
-          <Form.Group className="form-group">
-            <Form.Label className="caption-small">
-              {t("custom-network:steps.token-configuration.fields.total-supply.label")}
-            </Form.Label>
-            
-            <InputNumber
-              onValueChange={handleTotalSupplyChange}
-              value={tokenInfo.totalSupply}
-              readOnly={!isDeployer || isDeploying}
-              allowNegative={false}
-              decimalScale={0}
-              error={hasTotalSupplyError}
-              thousandSeparator
-            />
-
-            { hasTotalSupplyError &&
-              <WarningSpan
-                type="danger"
-                text={numberError(tokenInfo.totalSupply)}
-              />
-            }
-          </Form.Group>
-        </Col>
+        <FormGroup
+          label={t("custom-network:steps.token-configuration.fields.total-supply.label")}
+          placeholder="0"
+          value={tokenInfo.totalSupply}
+          readOnly={!isDeployer || isDeploying}
+          onChange={setTokenTotalSupply}
+          variant="numberFormat"
+          error={hasTotalSupplyError && numberError(tokenInfo.totalSupply) || ""}
+        />
 
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.your-balance.label")}
@@ -188,7 +168,7 @@ export function ERC20Details({
       </Row>
 
       { isDeployer &&
-        <Row>
+        <Row className="mt-2">
           <Col>
             <Button
               disabled={isDeployBtnDisabled || isDeploying}

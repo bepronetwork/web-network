@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { NumberFormatValues } from "react-number-format";
+import {useEffect, useState} from "react";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
+import getConfig from "next/config";
 
 import ArrowRight from "assets/icons/arrow-right";
 
-import { useSettings } from "contexts/settings";
-
-import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
-
+import {useAppState} from "../contexts/app-state";
+import {getCoinPrice} from "../services/coingecko";
 import InputNumber from "./input-number";
 import TokensDropdown from "./tokens-dropdown";
+
 
 export default function CreateBountyTokenAmount({
   currentToken,
@@ -30,12 +30,13 @@ export default function CreateBountyTokenAmount({
   decimals = 18
 }) {
   const { t } = useTranslation("bounty");
-  const {settings} = useSettings()
-
+  const {state} = useAppState();
+  const {publicRuntimeConfig} = getConfig();
   const [inputError, setInputError] = useState("");
+  const [convertedAmount, setConvertedAmount] = useState(0);
   
   function getCurrentCoin() {
-    return customTokens?.find((token) => token?.address === currentToken);
+    return customTokens?.find((token) => token?.address === currentToken.address);
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
@@ -44,13 +45,13 @@ export default function CreateBountyTokenAmount({
       setInputError(t("bounty:errors.exceeds-allowance"))
     } else if (values.floatValue < 0) {
       setIssueAmount({ formattedValue: "" });
-    } else if(values.floatValue !== 0 && BigNumber(values.floatValue).isLessThan(BigNumber(settings.minBountyValue))){
+    } else if(values.floatValue !== 0 && BigNumber(values.floatValue).isLessThan(BigNumber(state.Settings?.minBountyValue))){
       setInputError(t("bounty:errors.exceeds-minimum-amount",{
-        amount: settings.minBountyValue
+        amount: state.Settings?.minBountyValue
       }))
     } else {
       setIssueAmount(values);
-      inputError && setInputError("")
+      if (inputError) setInputError("");
     }
   }
 
@@ -82,6 +83,18 @@ export default function CreateBountyTokenAmount({
     );
   }
 
+  function updateConversion() {
+    if (!currentToken?.symbol || !publicRuntimeConfig?.enableCoinGecko)
+      return;
+
+    getCoinPrice(currentToken?.symbol, state?.Settings?.currency?.defaultFiat)
+      .then(price => {
+        setConvertedAmount(issueAmount.value * price);
+      });
+  }
+
+  useEffect(updateConversion, [issueAmount.value])
+
   return (
     <div className="container">
       <div className="col-md-12 mt-4">
@@ -102,6 +115,7 @@ export default function CreateBountyTokenAmount({
       <div className="col-md-12">
         <div className="d-flex">
           <InputNumber
+            fullWidth={!publicRuntimeConfig?.enableCoinGecko}
             thousandSeparator
             disabled={review || !currentToken?.currentValue}
             max={tokenBalance.toFixed()}
@@ -129,34 +143,24 @@ export default function CreateBountyTokenAmount({
               </>
             }
           />
-          <div className="mt-4 pt-1 mx-2">
-            <ArrowRight className="text-gray" width={9} height={9} />
-          </div>
-          <InputNumber
-            thousandSeparator
-            label={" "}
-            className="mt-3"
-            symbol={"EUR"}
-            classSymbol="text-white-30 mt-3"
-            allowNegative={false}
-            disabled
-            value={
-              getCurrentCoin()?.tokenInfo
-                ? handleTokenToEurConversion(Number(issueAmount.value),
-                                             getCurrentCoin()?.tokenInfo?.prices["eur"])
-                : "0"
-            }
-            placeholder="-"
-            helperText={
+          {
+            publicRuntimeConfig?.enableCoinGecko &&
               <>
-                {!getCurrentCoin()?.tokenInfo && !review && (
-                  <p className="p-small text-danger">
-                    {t("fields.conversion-token.invalid")}
-                  </p>
-                )}
+                <div className="mt-4 pt-1 mx-2">
+                  <ArrowRight className="text-gray" width={9} height={9} />
+                </div>
+                <InputNumber
+                  thousandSeparator
+                  label={" "}
+                  className="mt-3"
+                  symbol={state.Settings?.currency.defaultFiat}
+                  classSymbol="text-white-30 mt-3"
+                  allowNegative={false}
+                  disabled
+                  value={convertedAmount}
+                  placeholder="-"/>
               </>
-            }
-          />
+          }
         </div>
       </div>
     </div>

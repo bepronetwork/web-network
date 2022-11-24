@@ -1,83 +1,79 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
-import { Defaults } from "@taikai/dappkit";
+import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
+import {useAppState} from "contexts/app-state";
 
-import { isSameSet } from "helpers/array";
-import { isColorsSimilar } from "helpers/colors";
-import { 
-  DEFAULT_CANCEL_FEE, 
-  DEFAULT_CLOSE_FEE, 
-  DEFAULT_COUNCIL_AMOUNT, 
-  DEFAULT_DISPUTE_TIME, 
-  DEFAULT_DRAFT_TIME, 
-  DEFAULT_PERCENTAGE_FOR_DISPUTE 
+import {isSameSet} from "helpers/array";
+import {isColorsSimilar} from "helpers/colors";
+import {
+  DEFAULT_CANCEL_FEE,
+  DEFAULT_CLOSE_FEE,
+  DEFAULT_COUNCIL_AMOUNT,
+  DEFAULT_DISPUTE_TIME,
+  DEFAULT_DRAFT_TIME,
+  DEFAULT_PERCENTAGE_FOR_DISPUTE
 } from "helpers/contants";
-import { DefaultNetworkSettings } from "helpers/custom-network";
+import {DefaultNetworkSettings} from "helpers/custom-network";
 
-import { Color, Network, NetworkSettings, Theme } from "interfaces/network";
+import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
+import { Token } from "interfaces/token";
 
 import DAO from "services/dao-service";
-import { WinStorage } from "services/win-storage";
+import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 import useOctokit from "x-hooks/use-octokit";
-
-import { useSettings } from "./settings";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration", "/setup"];
 const TTL = 48 * 60 * 60 // 2 day
 const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
   
-  /* NOTE - forced network might be renamed to `user network`, 
+  /* NOTE - forced network might be renamed to `user network`,
             referred to user nework when he access `/my-network` page from/in another network.
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
   const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
-  const [isLoadingData, setIsLoadingData] = useState(false)
-  
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [registryToken, setRegistryToken] = useState<Token>();
+
+  const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
-  const { wallet, user } = useAuthentication();
-  
   const { getUserRepositories } = useOctokit();
-  const { settings: appSettings } = useSettings();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
 
-  const IPFS_URL = appSettings?.urls?.ipfs;
+  const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
-    percentageNeededForDispute: appSettings?.networkParametersLimits?.disputePercentage,
-    draftTime: appSettings?.networkParametersLimits?.draftTime,
-    disputableTime: appSettings?.networkParametersLimits?.disputableTime,
-    councilAmount: appSettings?.networkParametersLimits?.councilAmount
+    percentageNeededForDispute: state.Settings?.networkParametersLimits?.disputePercentage,
+    draftTime: state.Settings?.networkParametersLimits?.draftTime,
+    disputableTime: state.Settings?.networkParametersLimits?.disputableTime,
+    councilAmount: state.Settings?.networkParametersLimits?.councilAmount
   };
 
-  const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
+  const isCreating = useMemo(() => ["/new-network", "/setup"].includes(router.pathname), [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
-  const network = useMemo(() => forcedNetwork || activeNetwork, [forcedNetwork, activeNetwork]);
+  const network =
+    useMemo(() =>
+      forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
 
-  function handlerValidateSettings(settings){
+  function handlerValidateSettings(settings) {
     //Treasury
-    if (DAOService) {
-      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
-      settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
+    if (state.Service?.active) {
+      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" ||
+        settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
       const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
 
       Promise.all([
-      conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
+      conditionOrUndefined(state.Service?.active.isAddress(settings?.treasury?.address?.value)),
       conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
       conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
       ]).then((treasuryValidator)=>{
@@ -182,7 +178,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
       storage.setItem(data);
     }
-    
+
     return newState;
   }
 
@@ -266,18 +262,18 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: value => setFields(`settings.treasury.closeFee.value`, value)
     },
     parameter: {
-      setter: value =>  setFields(`settings.parameters.${[value.label]}.value`, value.value),
+      setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value),
       validator: 
         (parameter, value) => value >= (LIMITS[parameter]?.min || value) && value <= (LIMITS[parameter]?.max || value)
     }
   };
 
   async function loadDaoService(): Promise<DAO> {
-    if (!forcedNetwork) return DAOService;
+    if (!forcedNetwork) return state.Service?.active;
 
     const networkAddress = network?.networkAddress;
     const dao = new DAO({
-      web3Connection: DAOService.web3Connection,
+      web3Connection: state.Service?.active.web3Connection,
       skipWindowAssignment: true
     });
 
@@ -285,13 +281,13 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     return dao;
   }
-  
+
   const cleanStorage = () => storage.removeItem();
 
   async function getTokenBalance() {
     const [tokensLockedInRegistry, registryCreatorAmount] = await Promise.all([
-      DAOService.getTokensLockedInRegistryByAddress(wallet.address),
-      DAOService.getRegistryCreatorAmount()
+      state.Service?.active?.getTokensLockedInRegistryByAddress(state.currentUser?.walletAddress),
+      state.Service?.active?.getRegistryCreatorAmount()
     ])
 
     return {
@@ -299,7 +295,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       needed: BigNumber(registryCreatorAmount).toFixed(),
       validated: BigNumber(tokensLockedInRegistry).isGreaterThanOrEqualTo(registryCreatorAmount),
     }
-    
+
   }
 
   async function updateTokenBalance(){
@@ -311,14 +307,14 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   async function loadGHRepos(){
     const repositories = [];
-    
-    if(user?.login){
-      const githubRepositories = await getUserRepositories(user?.login)
-    
+
+    if(state.currentUser?.login){
+      const githubRepositories = await getUserRepositories(state.currentUser?.login)
+
       const filtered = githubRepositories
           .filter(repo => {
-            const isOwner = user.login === repo?.nameWithOwner.split("/")[0];
-            
+            const isOwner = state.currentUser.login === repo?.nameWithOwner.split("/")[0];
+
             if((!repo?.isFork && isOwner || repo?.isInOrganization) && !repo?.isArchived)
               return repo
           })
@@ -331,26 +327,26 @@ export const NetworkSettingsProvider = ({ children }) => {
             fullName: repo?.nameWithOwner,
             mergeCommitAllowed: repo.mergeCommitAllowed
           }));
-        
-      
+
+
       if (!isCreating){
         const repositoryAlreadyExists =  await searchRepositories({ networkName: network?.name })
-            .then(({ rows }) => 
+            .then(({ rows }) =>
             Promise.all(rows.map( async repo => ({
               checked: true,
               isSaved: true,
               name: repo.githubPath.split("/")[1],
               fullName: repo.githubPath,
               hasIssues: await repositoryHasIssues(repo.githubPath),
-              mergeCommitAllowed: 
+              mergeCommitAllowed:
                 filtered.find(({ fullName }) => fullName === repo.githubPath)?.mergeCommitAllowed || false
             }))))
         repositories.push(...repositoryAlreadyExists)
       }
-  
+
       repositories.push(...filtered.filter(repo => !repositories.find((repoB) => repoB.fullName === repo.fullName)));
     }
-    
+
     return repositories;
   }
 
@@ -365,7 +361,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
 
     defaultState.settings.theme.colors = DefaultTheme();
-    
+
     defaultState.settings.parameters = {
         draftTime: {
           value: DEFAULT_DRAFT_TIME,
@@ -401,16 +397,15 @@ export const NetworkSettingsProvider = ({ children }) => {
 
       if(storageData?.settings)
         defaultState.settings = storageData?.settings;
-        
+
       if(storageData?.github)
         defaultState.github = storageData?.github;
 
       if(storageData?.tokens)
         defaultState.tokens = storageData?.tokens;
     }
-    
-    setNetworkSettings(defaultState);
 
+    setNetworkSettings(defaultState);
     return defaultState;
   }
 
@@ -419,13 +414,13 @@ export const NetworkSettingsProvider = ({ children }) => {
     const service = await loadDaoService()
     const [
         treasury,
-        councilAmount, 
-        disputableTime, 
-        draftTime, 
-        percentageNeededForDispute, 
+        councilAmount,
+        disputableTime,
+        draftTime,
+        percentageNeededForDispute,
         isNetworkAbleToBeClosed,
       ] = await Promise.all([
-        service.getTreasury(),
+        service.network.treasuryInfo(),
         service.getNetworkParameter("councilAmount"),
         service.getNetworkParameter("disputableTime"),
         service.getNetworkParameter("draftTime"),
@@ -462,16 +457,16 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     defaultState.details.fullLogo = {
       value: {
-        preview:`${IPFS_URL}/${network?.fullLogo}`, 
+        preview:`${IPFS_URL}/${network?.fullLogo}`,
         raw: undefined
-      }, 
+      },
       validated: true
     }
     defaultState.details.iconLogo = {
       value: {
-        preview:`${IPFS_URL}/${network?.logoIcon}`, 
+        preview:`${IPFS_URL}/${network?.logoIcon}`,
         raw: undefined
-      }, 
+      },
       validated: true
     }
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
@@ -484,38 +479,38 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   useEffect(() => {
     if ([
-      !DAOService,
-      !wallet?.address,
-      !isCreating && !network?.name && !network?.councilAmount, 
-      isCreating && !appSettings?.beproToken?.address,
+      !state.Service?.active,
+      !state.currentUser?.walletAddress,
+      !isCreating && !network?.name && !network?.councilAmount,
+      isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad
     ].some(c => c))
       return;
-    
+
     setIsLoadingData(true);
 
     if (!isCreating && forcedNetwork)
       loadNetworkSettings().finally(()=> setIsLoadingData(false));
     else if(isCreating)
       loadDefaultSettings().finally(()=> setIsLoadingData(false));
-  }, [ 
-    user?.login,
-    wallet?.address,
-    DAOService, 
-    network, 
-    isCreating, 
+  }, [
+    state.currentUser?.login,
+    state.currentUser?.walletAddress,
+    state.Service?.active,
+    network,
+    isCreating,
     forcedNetwork,
     needsToLoad,
     router.pathname,
-    appSettings?.beproToken?.address
+    state.Service?.active?.registry?.token?.contractAddress
   ]);
-  
+
   // NOTE -  Load Forced/User Network
   useEffect(()=>{
-    if(DAOService && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
+    if(state.Service?.active && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
       loadDaoService()
-      .then((service)=> 
-       Promise.all([  
+      .then((service)=>
+       Promise.all([
                 service.getTotalNetworkToken(),
                 0,
                 service.getNetworkParameter("councilAmount"),
@@ -526,12 +521,12 @@ export const NetworkSettingsProvider = ({ children }) => {
        .then(([
         tokensLocked,
         tokensStaked,
-        councilAmount, 
-        disputableTime, 
-        draftTime, 
+        councilAmount,
+        disputableTime,
+        draftTime,
         percentageNeededForDispute, ])=>
          setForcedNetwork((prev)=>({
-          ...prev, 
+          ...prev,
           tokensLocked: tokensLocked.toFixed(),
           tokensStaked: tokensStaked.toFixed(),
           councilAmount: councilAmount.toString(),
@@ -539,7 +534,14 @@ export const NetworkSettingsProvider = ({ children }) => {
           draftTime: +draftTime / 1000,
           percentageNeededForDispute: +percentageNeededForDispute,
          })))
-  },[forcedNetwork, DAOService])
+  },[forcedNetwork, state.Service?.active])
+
+  useEffect(() => {
+    if (state.Service?.active?.registry?.contractAddress)
+      state.Service.active.getERC20TokenData(state.Service.active.registry.token.contractAddress)
+        .then(setRegistryToken)
+        .catch(error => console.debug("Failed to load registry token", error));
+  }, [state.Service?.active?.registry?.contractAddress]);
 
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
@@ -550,7 +552,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     LIMITS,
     cleanStorage,
     updateTokenBalance,
-    fields: Fields
+    fields: Fields,
+    registryToken
   }), [networkSettings, Fields, LIMITS, setForcedNetwork]);
 
   return (

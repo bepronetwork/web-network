@@ -1,35 +1,34 @@
 import React from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { isMobile } from "react-device-detect";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
+import {isMobile} from "react-device-detect";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import BountyStatusInfo from "components/bounty-status-info";
 import Identicon from "components/identicon";
 import Translation from "components/translation";
 
-import { useNetwork } from "contexts/network";
+import {formatDate} from "helpers/formatDate";
+import {formatNumberToNScale} from "helpers/formatNumber";
+import {getIssueState} from "helpers/handleTypeIssue";
 
-import { formatDate } from "helpers/formatDate";
-import { formatNumberToNScale } from "helpers/formatNumber";
-import { getIssueState } from "helpers/handleTypeIssue";
+import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
-import { IssueBigNumberData } from "interfaces/issue-data";
-import { IssueState } from "interfaces/issue-data";
+import {useAppState} from "../contexts/app-state";
 
 export default function IssueListItem({
-  issue = null,
-  xClick,
-}: {
+                                        issue = null,
+                                        xClick,
+                                      }: {
   issue?: IssueBigNumberData;
   xClick?: () => void;
 }) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
-  const { activeNetwork } = useNetwork();
+  const {state} = useAppState();
 
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
   const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
@@ -59,7 +58,7 @@ export default function IssueListItem({
       return (
         <div className="d-flex align-items-center" key={issue.githubId}>
           <span className="caption-medium mr-1 text-white">
-            {issue !== null && value || 0}
+            {value || 0}
           </span>
           <span className="caption-medium text-white-40 text-uppercase">
             {translation}
@@ -90,7 +89,7 @@ export default function IssueListItem({
                 isActive && "-40"
               }`}
             >
-              {formatNumberToNScale(bountyAmount)}{" "}
+              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount) || `< 0.000001`}{" "}
               <label
                 className={`caption-small text-uppercase ${
                   !isActive ? "text-primary" : "text-white-40"
@@ -135,12 +134,14 @@ export default function IssueListItem({
       onClick={() => {
         if (xClick) return xClick();
 
+        console.log(`state.Service?.network?.active`, state.Service?.network);
+
         router.push({
           pathname: "/[network]/bounty",
           query: {
             id: issue?.githubId,
             repoId: issue?.repository_id,
-            network: activeNetwork.name,
+            network: state.Service?.network?.lastVisited,
           },
         });
       }}

@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FormControl, InputGroup } from "react-bootstrap";
-import { isMobile } from "react-device-detect";
+import React, {useEffect, useRef, useState} from "react";
+import {FormControl, InputGroup} from "react-bootstrap";
+import {isMobile} from "react-device-detect";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import { UrlObject } from "url";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
+import {UrlObject} from "url";
 
 import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
@@ -18,18 +18,17 @@ import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
 import ScrollTopButton from "components/scroll-top-button";
 
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
-import { changeLoadState } from "contexts/reducers/change-load-state";
-import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
 
-import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
+
+import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
+import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 
@@ -67,10 +66,7 @@ export default function ListIssues({
   proposer,
   redirect
 }: ListIssuesProps) {
-  const {
-    dispatch,
-    state: { loading }
-  } = useContext(ApplicationContext);
+  const {dispatch, state: appState} = useAppState();
 
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);
@@ -83,10 +79,8 @@ export default function ListIssues({
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
 
   const searchTimeout = useRef(null);
-  
+
   const { searchIssues } = useApi();
-  const { wallet } = useAuthentication();
-  const { activeNetwork } = useNetwork();
   const { page, nextPage, goToFirstPage } = usePage();
 
   const isProfilePage = router?.asPath?.includes("profile");
@@ -129,15 +123,11 @@ export default function ListIssues({
   }
 
   function hasFilter(): boolean {
-    if (state || time || repoId || search) return true;
-
-    return false;
+    return !!(state || time || repoId || search);
   }
 
   function showClearButton(): boolean {
-    if (search.trim() !== "") return true;
-
-    return false;
+    return search.trim() !== "";
   }
 
   function handleClearSearch(): void {
@@ -146,7 +136,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!activeNetwork) return;
+    if (!appState.Service?.network?.active?.name) return;
 
     dispatch(changeLoadState(true));
 
@@ -162,7 +152,7 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: activeNetwork?.name
+      networkName: appState.Service?.network?.active?.name
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -198,7 +188,7 @@ export default function ListIssues({
   }
 
   function handleNotFoundClick() {
-    if (!redirect) return dispatch(changeShowCreateBountyState(true));
+    if (!redirect) return dispatch(changeShowCreateBounty(true));
 
     router.push(redirect);
   }
@@ -222,7 +212,7 @@ export default function ListIssues({
     order,
     creator,
     proposer,
-    activeNetwork
+    appState.Service?.network?.active?.name
   ]);
 
   useEffect(() => {
@@ -329,10 +319,10 @@ export default function ListIssues({
       )) || <></>}
 
       {issuesPages.every((el) => el.issues?.length === 0) &&
-      !loading.isLoading ? (
+      !appState.loading?.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            {wallet?.address && (
+            {appState.currentUser?.walletAddress && (
               <ReadOnlyButtonWrapper>
                 <Button onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
@@ -346,7 +336,7 @@ export default function ListIssues({
       {(issuesPages.some((el) => el.issues?.length > 0) && (
         <InfiniteScroll
           handleNewPage={nextPage}
-          isLoading={loading.isLoading}
+          isLoading={appState.loading?.isLoading}
           hasMore={hasMore}>
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (

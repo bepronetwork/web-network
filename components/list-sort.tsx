@@ -42,15 +42,6 @@ export default function ListSort({
     return options[defaultOptionIndex];
   }
 
-  function SelectValueComponent(props) {
-    const { getValue } = props;
-
-    return (
-      <div className="flex-grow-0 react-select__single-value d-flex align-items-center text-truncate ms-2">
-        {getValue()[0]?.label}
-      </div>
-    );
-  }
 
   return (
     <ReactSelect
@@ -58,9 +49,6 @@ export default function ListSort({
       options={options}
       isSearchable={false}
       onChange={handleSelectChange}
-      components={{
-        ValueContainer: SelectValueComponent,
-      }}
     />
   );
 }

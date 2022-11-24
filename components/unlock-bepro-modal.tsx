@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import {useRef, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
@@ -10,11 +10,15 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
-import { useAuthentication } from "contexts/authentication";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
+
+import useApi from "x-hooks/use-api";
+import {useAuthentication} from "x-hooks/use-authentication";
+
+import {useAppState} from "../contexts/app-state";
 
 export default function UnlockBeproModal({
   show = false,
@@ -28,9 +32,13 @@ export default function UnlockBeproModal({
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const { wallet, updateWalletBalance } = useAuthentication();
+  const {state} = useAppState();
 
-  const oraclesAvailable = wallet?.balance?.oracles?.locked;
+  const { processEvent } = useApi();
+
+  const { updateWalletBalance } = useAuthentication();
+
+  const oraclesAvailable = state.currentUser?.balance?.oracles?.locked;
   const amountExceedsAvailable = amountToUnlock?.gt(oraclesAvailable);
   const textOracleClass = amountExceedsAvailable ? "text-danger" : "text-purple";
   const textBeproClass = amountExceedsAvailable ? "text-danger" : "text-success";
@@ -55,11 +63,18 @@ export default function UnlockBeproModal({
   }
 
   function setToMax() {
-    setAmountToUnlock(wallet?.balance?.oracles?.locked);
+    setAmountToUnlock(state.currentUser?.balance?.oracles?.locked);
   }
 
   function handleChange({ value }) {
     setAmountToUnlock(BigNumber(value));
+  }
+
+  function handleProcessEvent(blockNumber) {
+    processEvent("oracles",
+                 "changed",
+                 state.Service?.network?.lastVisited,
+      { fromBlock: blockNumber }).catch(console.debug);
   }
 
   function handleUnlock() {
@@ -102,7 +117,7 @@ export default function UnlockBeproModal({
             />
 
             <div className="d-flex caption-small justify-content-between align-items-center p-20">
-              <span className="text-ligth-gray">
+              <span className="text-light-gray">
                 <span className="text-purple">
                   {t("$oracles", { token: networkTokenSymbol })}
                 </span>{" "}
@@ -136,14 +151,14 @@ export default function UnlockBeproModal({
         d-flex mb-2 caption-small bg-dark-gray justify-content-between
         border-radius-8 align-items-center p-20 amount-input
                       ">
-          <span className="text-ligth-gray">
+          <span className="text-light-gray">
             <span className="text-primary">{t("$bepro")}</span>{" "}
             {t("misc.available")}
           </span>
 
           <div className="d-flex align-items-center">
             <span className="text-gray">
-              {formatStringToCurrency(wallet?.balance?.bepro?.toFixed())}
+              {formatStringToCurrency(state.currentUser?.balance?.bepro?.toFixed())}
             </span>
 
             {amountToUnlock?.gt(0) && (
@@ -155,7 +170,7 @@ export default function UnlockBeproModal({
                 </span>
 
                 <span className={`${textBeproClass} ml-1`}>
-                  {formatStringToCurrency(wallet?.balance?.bepro?.plus(amountToUnlock)?.toFixed())}
+                  {formatStringToCurrency(state.currentUser?.balance?.bepro?.plus(amountToUnlock)?.toFixed())}
                 </span>
               </>
             )}
@@ -187,8 +202,9 @@ export default function UnlockBeproModal({
         txCurrency={t("$oracles",  { token: networkTokenSymbol })}
         txParams={{
           tokenAmount: amountToUnlock?.toFixed(),
-          from: wallet?.address
+          from: state.currentUser?.walletAddress
         }}
+        handleEvent={handleProcessEvent}
         buttonLabel=""
         modalTitle={t("my-oracles:actions.unlock.title")}
         modalDescription={t("my-oracles:actions.unlock.description", { token: networkTokenSymbol })}

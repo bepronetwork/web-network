@@ -26,7 +26,7 @@ export const output = (level, message, ...rest) => { // eslint-disable-line
   const string = `(${level.toUpperCase()}) (${new Date().toISOString()}) ${message}\n`;
 
   if (LOG_LEVEL && LOG_LEVEL >= +DebugLevel[level])
-    console[level](string, _rest ? _rest : "");
+    console[level](string, _rest ? _rest : ""); // eslint-disable-line
 
   if (node && username && password) {
     const client = new Client({node, auth: {username, password} })

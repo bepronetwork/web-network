@@ -1,16 +1,15 @@
-import { useContext, useState } from "react";
-import { Spinner } from "react-bootstrap";
+import {useState} from "react";
+import {Spinner} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
-import { useSettings } from "contexts/settings";
+import {useAppState} from "contexts/app-state";
 
-import { NETWORKS } from "helpers/networks";
+import {NETWORKS} from "helpers/networks";
 
-import { NetworkColors } from "interfaces/enums/network-colors";
+import {NetworkColors} from "interfaces/enums/network-colors";
 
 import Button from "./button";
 
@@ -26,17 +25,13 @@ export default function WrongNetworkModal({
   const [error, setError] = useState<string>("");
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
 
-  const {
-    state: { networkId: activeNetworkId },
-  } = useContext(ApplicationContext);
-
-  const { settings } = useSettings();
+  const {state: { connectedChain, Settings: settings },} = useAppState();
 
   function showModal() {
     return (
-      !!activeNetworkId &&
+      !!connectedChain?.id &&
       !!requiredNetworkId &&
-      +activeNetworkId !== +requiredNetworkId
+      +connectedChain?.id !== +requiredNetworkId
     );
   }
 
@@ -124,7 +119,7 @@ export default function WrongNetworkModal({
         {error && (
           <p className="caption-small text-uppercase text-danger">{error}</p>
         )}
-        <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
+        <div className="small-info text-light-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
           {t("misc.by-connecting")}{" "}
           <a
             href="https://www.bepro.network/terms"

@@ -50,7 +50,7 @@ export default function InputWithBalance({
         />
 
       <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
-        <span className="text-ligth-gray">
+        <span className="text-light-gray">
           <span className="text-primary">{symbol}</span>{" "}
           {t("misc.available")}
         </span>

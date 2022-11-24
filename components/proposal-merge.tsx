@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import BountyDistributionItem from "components/bounty-distribution-item";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useNetwork } from "contexts/network";
-
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { formatStringToCurrency } from "helpers/formatNumber";
+import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { ProposalExtended } from "interfaces/bounty";
-import { TokenInfo } from "interfaces/token";
+import {ProposalExtended} from "interfaces/bounty";
+import {TokenInfo} from "interfaces/token";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
+
+import {useAppState} from "../contexts/app-state";
 
 
 interface amount {
@@ -65,30 +65,32 @@ export default function ProposalMerge({
       proposerAmount: defaultAmount,
       proposals: [defaultAmount],
     });
+  
+  const {state} = useAppState();
 
-  const { activeNetwork } = useNetwork();
-
-  const amounTotalConverted = BigNumber(handleConversion(amountTotal));
+  const amountTotalConverted = BigNumber(handleConversion(amountTotal));
 
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
 
-    const distributions = calculateDistributedAmounts(activeNetwork?.treasury,
-                                                      activeNetwork?.mergeCreatorFeeShare,
-                                                      activeNetwork?.proposerFeeShare,
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
+
+    const distributions = calculateDistributedAmounts(treasury,
+                                                      mergeCreatorFeeShare,
+                                                      proposerFeeShare,
                                                       amountTotal,
                                                       proposal.details.map(({ percentage }) => percentage));
     setDistributedAmounts(distributions);
   }
 
   async function  getCoinInfo() { 
-    await getCoinInfoByContract(activeNetwork?.networkToken?.address).then((tokenInfo) => {
+    await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
-    }).catch(error => console.log("getCoinInfo", error));
+    }).catch(error => console.debug("getCoinInfo", error));
   }
 
   function handleConversion(value) {
-    return BigNumber(value).multipliedBy(coinInfo?.prices['eur']).toFixed(4);
+    return BigNumber(value).multipliedBy(coinInfo?.prices[state.Settings?.currency?.defaultFiat]).toFixed(4);
   }
 
   function currentTokenSymbol() {
@@ -103,8 +105,7 @@ export default function ProposalMerge({
   useEffect(() => {
     if (
       !proposal ||
-      !activeNetwork?.mergeCreatorFeeShare ||
-      !activeNetwork?.treasury
+      !state.Service?.network?.amounts
     )
       return;
 
@@ -113,10 +114,8 @@ export default function ProposalMerge({
   }, [
     proposal,
     amountTotal,
-    activeNetwork?.treasury,
-    activeNetwork?.mergeCreatorFeeShare,
-    activeNetwork?.proposerFeeShare,
-    activeNetwork?.networkToken?.address
+    state.Service?.network?.amounts,
+    state.Service?.network?.networkToken?.address
   ]);
 
   return (
@@ -172,7 +171,7 @@ export default function ProposalMerge({
               percentage: distributedAmounts.treasuryAmount.percentage,
             })}
             percentage={distributedAmounts.treasuryAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
+            symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
             line={true}
             amounts={[distributedAmounts.treasuryAmount.value, 
                       handleConversion(distributedAmounts.treasuryAmount.value)]}
@@ -181,7 +180,7 @@ export default function ProposalMerge({
             name={t("proposal:merge-modal.proposal-merger")}
             description={t("proposal:merge-modal.proposal-merger-description")}
             percentage={distributedAmounts.mergerAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
+            symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
             line={true}
             amounts={[distributedAmounts.mergerAmount.value, 
                       handleConversion(distributedAmounts.mergerAmount.value)]}
@@ -190,7 +189,7 @@ export default function ProposalMerge({
             name={t("proposal:merge-modal.proposal-creator")}
             description={t("proposal:merge-modal.proposal-creator-description")}
             percentage={distributedAmounts.proposerAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
+            symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
             line={true}
             amounts={[distributedAmounts.proposerAmount.value, 
                       handleConversion(distributedAmounts.proposerAmount.value)]}
@@ -202,7 +201,7 @@ export default function ProposalMerge({
               })}
               description={t("proposal:merge-modal.contributor-description")}
               percentage={item.percentage}
-              symbols={[currentTokenSymbol(), 'eur']}
+              symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
               line={key !== ((distributedAmounts?.proposals?.length || 0 ) - 1)}
               amounts={[item.value, handleConversion(item.value)]}
               key={key}
@@ -219,7 +218,7 @@ export default function ProposalMerge({
 
           <div
             className={`d-flex flex-column cursor-pointer 
-          ${amounTotalConverted?.gt(0) ? "mt-1" : "mt-3"}`}
+          ${amountTotalConverted?.gt(0) ? "mt-1" : "mt-3"}`}
           >
             <div className="d-flex justify-content-end mb-1">
               <span className="text-white caption-medium">
@@ -229,11 +228,11 @@ export default function ProposalMerge({
                 {currentTokenSymbol()}
               </span>
             </div>
-            {amounTotalConverted?.gt(0) && (
+            {amountTotalConverted?.gt(0) && (
             <div className="d-flex justify-content-end">
-              <span className="text-white caption-small text-ligth-gray">
-                {amounTotalConverted?.toFixed()}</span>
-              <span className=" ms-2 caption-small text-ligth-gray">
+              <span className="text-white caption-small text-light-gray">
+                {amountTotalConverted?.toFixed()}</span>
+              <span className=" ms-2 caption-small text-light-gray">
                 EUR
               </span>
             </div>

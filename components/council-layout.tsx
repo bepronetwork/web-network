@@ -1,27 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
+import CardBecomeCouncil from "components/card-become-council";
 import InternalLink from "components/internal-link";
-import PageHero, { InfosHero } from "components/page-hero";
+import PageHero, {InfosHero} from "components/page-hero";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
+import {useAppState} from "contexts/app-state";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
-
-import CardBecomeCouncil from "./card-become-council";
+import {useNetwork} from "x-hooks/use-network";
 
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();
-  const { t } = useTranslation(["council"]);
+  const { t } = useTranslation(["common", "council"]);
+
+  const {state} = useAppState();
 
   const { getTotalBounties } = useApi();
-  const { service: DAOService } = useDAO();
-  const { network: activeNetwork, getURLWithNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
+  const { getURLWithNetwork } = useNetwork();
+
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -35,21 +34,46 @@ export default function CouncilLayout({ children }) {
     {
       value: 0,
       label: t("council:distributed-developers"),
-      currency: "BEPRO",
+      currency: t("misc.token"),
     },
     {
       value: 0,
-      label: t("common:heroes.bounties-in-network"),
-      currency: "BEPRO",
+      label: t("heroes.bounties-in-network"),
+      currency: t("misc.token"),
     },
   ]);
 
+  const internalLinks = [
+    {
+      href: getURLWithNetwork("/curators/ready-to-propose"),
+      label: t("council:ready-to-propose"),
+      className:"mr-3 h3 p-0",
+      active:(asPath.endsWith("/curators") && true) || undefined,
+      nav: true,
+      transparent: true
+    },
+    {
+      href: getURLWithNetwork("/curators/ready-to-merge"),
+      label: t("council:ready-to-merge"),
+      className:"h3 p-0 me-3",
+      nav: true,
+      transparent: true
+    },
+    {
+      href: getURLWithNetwork("/curators/curators-list"),
+      label: t("council:council-list"),
+      className:"h3 p-0 ms-3",
+      nav: true,
+      transparent: true
+    },
+  ]
+
   async function loadTotals() {
-    if (!DAOService || !activeNetwork) return;
+    if (!state.Service?.active?.network || !state.Service?.network?.active?.name) return;
     
     const [totalBounties, onNetwork] = await Promise.all([
-      getTotalBounties("ready"),
-      DAOService.getTotalNetworkToken(),
+      getTotalBounties("ready", state.Service?.network?.active?.name),
+      state.Service?.active.getTotalNetworkToken(),
     ]);
 
     setInfos([
@@ -58,61 +82,48 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: activeNetwork?.councilMembers?.length || 0,
+        value: state.Service?.network?.active?.councilMembers?.length || 0,
         label: t("council:council-members"),
       },
       {
         value: 0,
         label: t("council:distributed-developers"),
-        currency: "BEPRO",
+        currency: state.Service?.network?.networkToken?.symbol,
       },
       {
         value: onNetwork.toFixed(),
-        label: t("common:heroes.bounties-in-network"),
-        currency: "BEPRO",
+        label: t("heroes.in-network"),
+        currency: state.Service?.network?.networkToken?.symbol,
       },
     ]);
   }
 
   useEffect(() => {
     loadTotals();
-  }, [DAOService, activeNetwork]);
+  }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active?.name]);
 
   return (
     <div>
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: activeNetwork?.networkToken?.symbol,
+          token: state.Service?.network?.networkToken?.symbol,
         })}
         infos={infos}
       />
       <div className="container pt-3">
         <div className="row">
           <div className="d-flex justify-content-center">
-            <InternalLink
-              href={getURLWithNetwork("/curators/ready-to-propose")}
-              label={String(t("ready-to-propose"))}
-              className={"mr-3 h3 p-0"}
-              active={(asPath.endsWith("/curators") && true) || undefined}
-              nav
-              transparent
-            />
-
-            <InternalLink
-              href={getURLWithNetwork("/curators/ready-to-merge")}
-              label={String(t("ready-to-merge"))}
-              className={"h3 p-0"}
-              nav
-              transparent
-            />
+            {internalLinks.map((data, key) => (
+              <InternalLink key={key} {...data} />
+            ))}
           </div>
         </div>
       </div>
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10 mt-2">
-            {!wallet?.isCouncil && <CardBecomeCouncil />}
+            {!state?.Service?.network?.active?.isCouncil && <CardBecomeCouncil />}
           </div>
           {children}
         </div>

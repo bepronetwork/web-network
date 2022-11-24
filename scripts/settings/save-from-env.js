@@ -17,10 +17,10 @@ const publicSettings = [
   PublicSettingItem("ipfs", process.env.NEXT_PUBLIC_IPFS_BASE, "string", "urls"),
   PublicSettingItem("blockScan", process.env.NEXT_PUBLIC_BLOCKSCAN_LINK || '', "string", "urls"),
   PublicSettingItem("web3Provider", process.env.NEXT_PUBLIC_WEB3_CONNECTION, "string", "urls"),
-  PublicSettingItem("settlerToken", process.env.NEXT_PUBLIC_SETTLER_ADDRESS, "string", "contracts"),
-  PublicSettingItem("network", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, "string", "contracts"),
-  PublicSettingItem("transactionalToken", process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS, "string", "contracts"),
-  PublicSettingItem("networkRegistry", process.env.NEXT_PUBLIC_NETWORK_REGISTRY_ADDRESS, "string", "contracts"),
+  //PublicSettingItem("settlerToken", process.env.NEXT_PUBLIC_SETTLER_ADDRESS, "string", "contracts"),
+  //PublicSettingItem("network", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, "string", "contracts"),
+  //PublicSettingItem("transactionalToken", process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS, "string", "contracts"),
+  //PublicSettingItem("networkRegistry", process.env.NEXT_PUBLIC_NETWORK_REGISTRY_ADDRESS, "string", "contracts"),
   PublicSettingItem("botUser", process.env.NEXT_PUBLIC_GH_USER, "string", "github"),
   PublicSettingItem("token", process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME, "string", "requiredChain"),
   PublicSettingItem("id", process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID, "string", "requiredChain"),
@@ -47,7 +47,6 @@ const publicSettings = [
   PublicSettingItem("draftTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("councilAmount", `{ "min": 100001, "max": 50000000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("disputePercentage", `{ "max": 15 }`, "json", "networkParametersLimits"),
-  PublicSettingItem("name", process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || 'bepro', "string", "defaultNetworkConfig"),
   PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS || 0, "boolean", "defaultNetworkConfig"),
   PublicSettingItem("minBountyValue", process.env.NEXT_MIN_BOUNTY_VALUE_WEI || "0.000000000000000100", "string"),
   PublicSettingItem("adminWallet", process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS, "string", "defaultNetworkConfig"),
@@ -103,12 +102,12 @@ const updateTokens = async ({
       }
     });
 
-  if (!created)
+  if (!created && process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME.length)
     await TokensModel.update({ address }, { where: { name, symbol, isTransactional }});
 
   const beproNetwork = await NetworkModel.findOne({
     where: {
-      name: "bepro"
+      name: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME
     }
   });
 

@@ -1,17 +1,32 @@
-import {GetServerSideProps} from "next/types";
-import getConfig from "next/config";
+import { useEffect } from "react";
 
-export default function () {}
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next/types";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale, query, res }) => {
-  if (res) {
-    if (!query?.slug) {
-      const {publicRuntimeConfig} = getConfig();
-      res.writeHead(302, {Location: `/${publicRuntimeConfig.defaultName}`});
-      res.end();
-      return {} as any;
-    }
-  }
+import LoadingGlobal from "components/loading-global";
 
-  return {props: {}} as any;
+import { useAppState } from "contexts/app-state";
+
+export default function Index() {
+  const { replace } = useRouter();
+
+  const { state } = useAppState();
+
+  useEffect(() => {
+    if (state.Service?.network?.active?.name && state.Service?.network?.active?.isDefault)
+      replace(`/${state.Service?.network?.active?.name}`);
+  }, [state.Service?.network?.active?.name]);
+
+  return(
+    <LoadingGlobal show={true} />
+  );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button"]))
+    }
+  };
+};
