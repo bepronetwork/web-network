@@ -24,7 +24,7 @@ module.exports = {
 
     if (!networks.length) return;
 
-    console.log("Begin create curators");
+    console.log("Begin create curators -");
     console.log("Networks to verify: ", networks.length);
 
     let curatorsUpdated = 0;
