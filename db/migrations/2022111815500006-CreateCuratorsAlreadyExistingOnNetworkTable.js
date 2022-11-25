@@ -49,14 +49,14 @@ module.exports = {
       await currentNetwork.start();
 
       const councilAmount = await currentNetwork.councilAmount();
-      console.log('amount ->', councilAmount)
+
       const curators = await queryInterface.sequelize.query(
         "SELECT * FROM curators",
         {
           type: QueryTypes.SELECT,
         }
       );
-      console.log('curators ->', curators)
+
       const issues = await queryInterface.sequelize.query(
         "SELECT * FROM issues WHERE network_id = ?",
         {
