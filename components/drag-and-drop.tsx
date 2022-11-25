@@ -1,91 +1,143 @@
 import { useState, useCallback, useEffect } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, FileError } from "react-dropzone";
 
 import { useTranslation } from "next-i18next";
 
 import ClipIcon from "assets/icons/clip-icon";
 import CloseIcon from "assets/icons/close-icon";
+import InfoIconEmpty from "assets/icons/info-icon-empty";
 
-import { truncateAddress } from "helpers/truncate-address";
+import { trimString } from "helpers/string";
 
 import useApi from "x-hooks/use-api";
 
-export interface IFilesProps {
+export interface IFilesProps extends File{
   name: string;
+  path: string;
   hash?: string;
   uploaded: boolean;
-  type?: string;
 }
 
 interface IDragAndDropProps {
-  onUpdateFiles: (files: IFilesProps[]) => void;
+  onUpdateFiles?: (files: IFilesProps[]) => void;
+  onUploading?: (isUploading: boolean) => void
   review?: boolean
   disabled?: boolean;
   externalFiles?: IFilesProps[]
 }
 
-export default function DragAndDrop ({ externalFiles, onUpdateFiles, review = false, disabled }: IDragAndDropProps) {
+export default function DragAndDrop ({ externalFiles, onUpdateFiles, onUploading, review = false, disabled }
+                                      : IDragAndDropProps) {
   const [files, setFiles] = useState<IFilesProps[]>(externalFiles ? externalFiles : [] as IFilesProps[]);
+  const [isUploading, setIsUploading] = useState<boolean>(false)
+  const [errors, setErrors] = useState<{file: File, error: FileError}[]>([])
   const { t } = useTranslation(["common"]);
   const { uploadFiles } = useApi();
 
   const onDropAccepted = useCallback(async (dropedFiles) => {
-    const createFiles = dropedFiles.map((file) => ({
+    setIsUploading(true)
+    uploadFiles(dropedFiles)
+        .then(async (updateData) => {
+          setFiles((oldFiles)=> {
+            return oldFiles.map((file)=>{
+              const find = updateData?.find((el) => el.fileName === file.name)
+              if(find)
+                return{
+                  ...file,
+                  uploaded: true,
+                  hash: find?.hash
+                }
+                
+              return file;
+            });
+          });
+        })
+        .catch(() => {
+          setFiles((oldFiles) => oldFiles.filter((file) => file.uploaded));
+        })
+        .finally(()=> setIsUploading(false))
+  },
+    []);
+
+  const onDropRejected = useCallback((files)=>
+    files.map(({file, errors})=> setErrors((oldErros)=>([...oldErros, {file, error: errors[0]}])))
+  ,[])
+
+  const onDrop = useCallback((acceptedFiles) => {
+    setErrors([])
+    acceptedFiles.forEach((file) => {
+      setFiles((oldFiles)=>([...oldFiles, {
         name: file?.name,
         hash: null,
         uploaded: false,
-        type: file?.type
-    }));
-    const arrFiles = [...files, ...createFiles];
-    setFiles([...files, ...createFiles]);
+        type: file?.type,
+        ...file,
+      }]));
+    })
+    
+  }, [])
 
-    uploadFiles(dropedFiles)
-        .then(async (updateData) => {
-          const updatefiles = await Promise.all(arrFiles.map(async (currentFile) => {
-            const find = updateData?.find((el) => el.fileName === currentFile.name);
-            return {
-                ...currentFile,
-                uploaded: true,
-                hash: find?.hash
-            } as IFilesProps;
-          }));
-          setFiles(updatefiles);
-        })
-        .catch(() => {
-          setFiles(files.filter((file) => file.uploaded));
-        });
-  },
-    [files]);
+  function validator(file) {
+    if (files.findIndex(f=> f.name === file.name || f.path === file.path) !== -1) {
+      return {
+        code: "file-alrady-uploaded",
+        message: "file-alrady-uploaded"
+      };
+    }
+  
+    return null
+  }
+
+  function handlerRemoveFile(file){
+    setErrors([])
+    setFiles((oldFiles)=> oldFiles.filter((i) => i.name !== file.name))
+  }
+
+  function getMessageError(code){
+    if(code === 'file-alrady-uploaded')
+      return t('drag-and-drop.already-uploaded')
+    
+    else if(code === 'file-too-large')
+      return t('drag-and-drop.file-too-large', {
+        value: 10,
+      })
+    
+    else {
+      return t("drag-and-drop.drag-reject")
+    }
+  }
+
+  const useDrop = {
+    accept: "image/jpeg, image/png, application/pdf",
+    validator,
+    maxSize: 10000000, //32mb (max size ipfs)
+    onDropAccepted,
+    onDrop,
+    onDropRejected,
+    disabled
+  };
+
+  const { getRootProps, getInputProps, isDragActive, isDragReject } =
+    useDropzone(useDrop);
 
   useEffect(() => {
     onUpdateFiles?.(files);
   }, [files]);
-  const useDrop = {
-    accept: "image/jpeg, image/png, application/pdf",
-    maxSize: 32000000, //32mb (max size ipfs)
-    onDropAccepted,
-    disabled
-  };
-  const { getRootProps, getInputProps, isDragActive, isDragReject } =
-    useDropzone(useDrop);
 
-  function handlerRemove(file) {
-    const newList = files.filter((i) => i.name !== file.name);
-    setFiles(newList);
-  }
+  useEffect(()=> {
+    onUploading?.(isUploading)
+  },[isUploading])
 
   const filesNames = files?.map((file, i) => (
     <span key={i} className="selected-file-item my-1 mx-2 text-lowercase">
-      {truncateAddress(file?.name, 17, 3)}{" "}
+      {trimString(file?.name, 15)}{" "}
       {file.uploaded ? 
         !review && (
           <CloseIcon
           width={8}
           height={8}
           className="ms-2 cursor-pointer"
-          onClick={() => {
-            handlerRemove(file);
-          }}
+          onClick={()=> handlerRemoveFile(file)}
         />)
        : (
         <span className="spinner-border spinner-border-sm" />
@@ -116,13 +168,28 @@ export default function DragAndDrop ({ externalFiles, onUpdateFiles, review = fa
           </div>
         </button>
         )}
-
-        {filesNames}
+         <span className="d-inline-flex align-items-center p-small text-warning text-center my-2 tran">
+          <InfoIconEmpty width={12} height={12} color="text-warning" className="mr-1"/> {t("drag-and-drop.size-limit", {value: 10})}
+        </span>
+      </div>
+      <div className="d-flex flex-wrap gap-1">
+          {filesNames}
       </div>
       {isDragReject && (
         <span className="p-small text-danger my-2 tran">
           {t("drag-and-drop.drag-reject")}
         </span>
+      )}
+
+      {errors && (
+        <div className="d-flex flex-column my-1">
+          {errors.map(({file, error}) =>{
+            return(
+            <span className="p-small text-danger my-1 tran">
+                {trimString(file?.name, 15)} - {getMessageError(error?.code)}
+          </span>
+            )})}
+        </div>
       )}
     </>
   );

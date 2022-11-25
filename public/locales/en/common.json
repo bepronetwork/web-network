@@ -381,7 +381,10 @@
   },
   "drag-and-drop":{
     "attach-file": "Attach File",
-    "drag-reject": "Some files will be rejected"
+    "drag-reject": "Some files was rejected",
+    "size-limit": "files size limit to {{value}}MB",
+    "file-too-large": "File is larger than {{value}}MB",
+    "already-uploaded": "File has been uploaded"
   },
   "info-data": {
     "minutes_other": "minutes",

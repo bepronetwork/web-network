@@ -76,6 +76,7 @@ export default function CreateBountyModal() {
   const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
   const [repository, setRepository] = useState<{ id: string; path: string }>();
   const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [issueAmount, setIssueAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
   const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
 
@@ -138,6 +139,7 @@ export default function CreateBountyModal() {
         bountyDescription={bountyDescription}
         setBountyDescription={setBountyDescription}
         onUpdateFiles={onUpdateFiles}
+        onUploading={setIsUploading}
         review={review}
         files={files}
       />
@@ -345,7 +347,7 @@ export default function CreateBountyModal() {
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
     const isRewardAmount =
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
-    if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
+    if ((currentSection === 0 && !bountyTitle) || !bountyDescription || isUploading)
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
     if (
@@ -620,14 +622,14 @@ export default function CreateBountyModal() {
           dispatch(changeShowCreateBounty(false))
           setRewardChecked(false);
         }}
-        onCloseDisabled={isLoadingApprove || isLoadingCreateBounty}
+        onCloseDisabled={isLoadingApprove || isLoadingCreateBounty || isUploading}
         footer={
           <>
             <div className="d-flex flex-row justify-content-between">
               <Button 
                 color="dark-gray" 
                 onClick={handleCancelAndBack} 
-                disabled={isLoadingApprove || isLoadingCreateBounty}
+                disabled={isLoadingApprove || isLoadingCreateBounty || isUploading}
               >
                 <span>
                   {currentSection === 0
