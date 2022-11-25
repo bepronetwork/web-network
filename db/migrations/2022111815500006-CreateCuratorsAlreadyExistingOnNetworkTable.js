@@ -24,13 +24,13 @@ module.exports = {
 
     if (!networks.length) return;
 
-    console.log("Begin create curators -");
+    console.log("Begin create curators");
     console.log("Networks to verify: ", networks.length);
 
     let curatorsUpdated = 0;
 
     for (const network of networks) {
-      if(!network.address) return;
+      if(!network.networkAddress) return;
 
       const web3Connection = new Web3Connection({
         skipWindowAssignment: true,
@@ -49,14 +49,14 @@ module.exports = {
       await currentNetwork.start();
 
       const councilAmount = await currentNetwork.councilAmount();
-
+      console.log('amount ->', councilAmount)
       const curators = await queryInterface.sequelize.query(
         "SELECT * FROM curators",
         {
           type: QueryTypes.SELECT,
         }
       );
-
+      console.log('curators ->', curators)
       const issues = await queryInterface.sequelize.query(
         "SELECT * FROM issues WHERE network_id = ?",
         {
@@ -116,7 +116,7 @@ module.exports = {
         }
       }
     }
-
-    console.log("Curators created: ", curatorsUpdated);
+ 
+   console.log("Curators created: ", curatorsUpdated);
   }
 };
