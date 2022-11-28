@@ -80,7 +80,7 @@ async function handleCurators(
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    if (process.env.SKIP_MIGRATION_SEED_CURATORS.toLowerCase() === "true")
+    if (process.env?.SKIP_MIGRATION_SEED_CURATORS?.toLowerCase() === "true")
       return console.log("SKIPPING SEED CURATORS STEP");
 
     const networks = await queryInterface.sequelize.query(
