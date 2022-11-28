@@ -29,7 +29,7 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
     if (!supportedChains.length || !connectedChain?.id)
       return;
 
-    if (!supportedChains.find(o => o.chainId === +option.value))
+    if (!supportedChains.find(o => o.chainId === +option?.value))
       setOption(null);
 
     setShowModal(!supportedChains.find(({chainId}) => chainId === +connectedChain?.id));
