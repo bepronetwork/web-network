@@ -16,7 +16,7 @@ class LeaderBoard extends Model {
           unique: true
         },
         numberNfts: {
-          type: Sequelize.INTEGER,
+          type: DataTypes.INTEGER,
           allowNull: true
         }
       },
