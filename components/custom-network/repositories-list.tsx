@@ -82,7 +82,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         networkName: ""
       })
         .then(({ rows }) => {
-          setExistingRepos(rows.map((repo) => repo.name));
+          setExistingRepos(rows.map((repo) => repo.githubPath));
         })
         .catch(console.log);
 
