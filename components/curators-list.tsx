@@ -4,7 +4,6 @@ import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
 import CustomContainer from "components/custom-container";
-import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
 
 import { useAppState } from "contexts/app-state";

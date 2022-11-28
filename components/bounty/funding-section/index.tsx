@@ -40,8 +40,8 @@ export default function FundingSection() {
 
   const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
   
-  const futureRewards = 
-    fundsGiven.multipliedBy(state.currentBounty?.chainData?.rewardAmount).dividedBy(state.currentBounty?.data?.fundingAmount).toFixed();
+  const futureRewards = fundsGiven.multipliedBy(state.currentBounty?.chainData?.rewardAmount)
+    .dividedBy(state.currentBounty?.data?.fundingAmount).toFixed();
   
   const isCanceled = getIssueState({
     state: state.currentBounty?.data?.state,

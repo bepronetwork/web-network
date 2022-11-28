@@ -17,7 +17,7 @@ import {formatNumberToCurrency} from "helpers/formatNumber";
 
 import {Payment} from "interfaces/payments";
 
-import {getCoinInfoByContract, getCoinPrice} from "services/coingecko";
+import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
@@ -66,7 +66,8 @@ export default function Payments() {
   useEffect(() => {
     if (!state.currentUser?.walletAddress || !state.Service?.network?.active?.name) return;
 
-    getPayments(state.currentUser.walletAddress, state.Service?.network?.active.name, startDate, endDate).then(setPayments);
+    getPayments(state.currentUser.walletAddress, state.Service?.network?.active.name, startDate, endDate)
+      .then(setPayments);
   }, [state.currentUser?.walletAddress, state.Service?.network?.active?.name, startDate, endDate]);
 
   useEffect(() => {

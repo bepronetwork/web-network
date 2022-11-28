@@ -43,7 +43,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   const balance = {
     beproAvailable: registryToken.balance,
-    oraclesAvailable: state.currentUser?.balance?.oracles?.locked?.minus(state.currentUser?.balance?.oracles?.delegatedToOthers),
+    oraclesAvailable: 
+      state.currentUser?.balance?.oracles?.locked?.minus(state.currentUser?.balance?.oracles?.delegatedToOthers),
     tokensLocked: state.currentUser?.balance?.oracles?.locked?.toFixed(),
   };
 

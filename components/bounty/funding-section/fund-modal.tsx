@@ -50,7 +50,8 @@ export default function FundModal({
   const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;
   const transactionalSymbol = state.currentBounty?.chainData?.transactionalTokenData?.symbol;
   const needsApproval = amountToFund?.gt(allowance);
-  const amountNotFunded = state.currentBounty?.data?.fundingAmount?.minus(state.currentBounty?.data?.fundedAmount) || BigNumber(0);
+  const amountNotFunded = 
+    state.currentBounty?.data?.fundingAmount?.minus(state.currentBounty?.data?.fundedAmount) || BigNumber(0);
 
   const ConfirmBtn = {
     label: needsApproval ? t("actions.approve") : t("funding:actions.fund-bounty"),
@@ -124,7 +125,8 @@ export default function FundModal({
     if (!state.currentBounty?.data?.fundingAmount || !state.currentBounty?.chainData?.rewardAmount) return;
 
     if (amountToFund?.lte(amountNotFunded)) {
-      const preview = amountToFund.multipliedBy(state.currentBounty?.chainData.rewardAmount).dividedBy(state.currentBounty?.data.fundingAmount);
+      const preview = amountToFund.multipliedBy(state.currentBounty?.chainData.rewardAmount)
+        .dividedBy(state.currentBounty?.data.fundingAmount);
       setRewardPreview(preview.toFixed());
     } else
       setRewardPreview("0");
