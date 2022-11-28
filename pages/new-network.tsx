@@ -2,11 +2,14 @@
 import {GetServerSideProps} from "next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
+import CustomContainer from "components/custom-container";
 import { NewNetworkStepper } from "components/custom-network/new-network-stepper";
 
 export default function NewNetworkPage() {
   return (
-    <NewNetworkStepper />
+    <CustomContainer className="pt-5">
+      <NewNetworkStepper />
+    </CustomContainer>
   );
 }
 
