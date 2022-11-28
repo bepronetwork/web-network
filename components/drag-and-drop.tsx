@@ -110,7 +110,7 @@ export default function DragAndDrop ({ externalFiles, onUpdateFiles, onUploading
   const useDrop = {
     accept: "image/jpeg, image/png, application/pdf",
     validator,
-    maxSize: 12288000000, //32mb (max size ipfs)
+    maxSize: 12288800, //32mb (max size ipfs)
     onDropAccepted,
     onDrop,
     onDropRejected,
