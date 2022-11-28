@@ -393,6 +393,7 @@ export default function CreateBountyModal() {
   }
 
   function cleanFields() {
+    setFiles([]);
     setBountyTitle("");
     setBountyDescription("");
     setIssueAmount(ZeroNumberFormatValues);
@@ -400,7 +401,6 @@ export default function CreateBountyModal() {
     setRepository(undefined);
     setBranch(null);
     setCurrentSection(0);
-    setFiles([]);
   }
 
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
@@ -600,6 +600,7 @@ export default function CreateBountyModal() {
   }, [Service?.network?.active?.tokens, showCreateBounty]);
 
   useEffect(()=>{
+    cleanFields();
     if(!showCreateBounty) return;
     transactionalERC20.updateAllowanceAndBalance();
     rewardERC20.updateAllowanceAndBalance();
