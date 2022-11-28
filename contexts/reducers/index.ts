@@ -9,6 +9,7 @@ import {changeToaster} from "./change-toaster";
 import {changeTxList} from "./change-tx-list";
 import {Actions, addReducer} from "./main";
 import {changeShowProp} from "./update-show-prop";
+import {changeSupportedChains} from "./change-supported-chains";
 
 let loaded = false;
 
@@ -30,7 +31,8 @@ export default function loadApplicationStateReducers() {
     changeCurrentBountyDataChain,
     changeSpinners,
     changeSettings,
-    changeActiveRepoProps
+    changeActiveRepoProps,
+    changeSupportedChains,
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);

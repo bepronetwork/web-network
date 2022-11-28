@@ -2,7 +2,7 @@ import {SimpleAction} from "./reducer";
 import {SupportedChainData} from "../../interfaces/supported-chain-data";
 import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
 
-export const supportedChains =
+export const changeSupportedChains =
   new SimpleAction<SupportedChainData[]>(AppStateReduceId.SupportedChains, 'supportedChains');
 
-export const changeSupportedChains = (data: SupportedChainData[]) => supportedChains.update(data);
+export const updateSupportedChains = (data: SupportedChainData[]) => changeSupportedChains.update(data);

@@ -1,7 +1,8 @@
 export interface SupportedChainData {
-  chainId: string;
+  chainId: number;
   chainRpc: string;
   name: string;
+  chainName: string;
   shortName: string;
   currencySymbol: string;
   currencyDecimals: string;

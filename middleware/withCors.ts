@@ -1,7 +1,7 @@
 import Cors from 'cors'
 import getConfig from "next/config";
 
-import { info, error } from 'services/logging';
+import {error, info} from 'services/logging';
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -39,7 +39,7 @@ function runLogger(req, e = null) {
 const withCors = (handler) => {
   return async (req, res) => {
     runLogger(req);
-    runMiddleware(req, res, cors)
+    return runMiddleware(req, res, cors)
     .then(()=>{
       return handler(req, res);
     }).catch((e)=>{
