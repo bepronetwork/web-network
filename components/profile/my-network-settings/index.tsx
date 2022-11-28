@@ -23,6 +23,7 @@ import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
+import { ContainerTab } from "./container-tab";
 import GovernanceSettings from "./governance-settings";
 import LogoAndColoursSettings from "./logo-and-colours-settings";
 import RegistrySettings from "./registry-settings";
@@ -38,12 +39,6 @@ interface TabsProps {
   title: string;
   component: ReactNode;
 }
-
-export const ContainerTab = ({ children }) => (
-  <div className="px-2 pt-2 border border-dark-gray container-my-network">
-    {children}
-  </div>
-);
 
 export default function MyNetworkSettings({
   network,
