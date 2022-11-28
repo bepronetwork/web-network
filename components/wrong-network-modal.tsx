@@ -7,8 +7,6 @@ import Modal from "components/modal";
 
 import {useAppState} from "contexts/app-state";
 
-import {NETWORKS} from "helpers/networks";
-
 import Button from "./button";
 import useApi from "../x-hooks/use-api";
 import ReactSelect from "./react-select";
@@ -31,7 +29,10 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
     if (!supportedChains.length || !connectedChain?.id)
       return;
 
-    setShowModal(!supportedChains.find(({chainId}) => chainId === connectedChain?.id));
+    if (!supportedChains.find(o => o.chainId === +option.value))
+      setOption(null);
+
+    setShowModal(!supportedChains.find(({chainId}) => chainId === +connectedChain?.id));
   }
 
   async function selectSupportedChain({value, label}) {
@@ -48,7 +49,7 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
     setError("");
 
     const chainId = `0x${Number(chosenSupportedChain.chainId).toString(16)}`;
-    const currencyNetwork = NETWORKS[chainId];
+
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
@@ -95,15 +96,14 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
     [isAddingNetwork].some((values) => values);
 
   useEffect(() => { api.getSupportedChains() }, []);
-  useEffect(changeShowModal, [supportedChains]);
-  useEffect(changeShowModal, [supportedChains]);
+  useEffect(changeShowModal, [supportedChains, connectedChain]);
 
   return (
     <Modal
       title={t("modals.wrong-network.change-network")}
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
-      show={true}>
+      show={_showModal}>
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}
@@ -114,7 +114,7 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
                    animation="border"/>
         }
 
-        <ReactSelect options={supportedChains.map(opt => ({label: opt.name, value: opt.chainId}))}
+        <ReactSelect options={supportedChains.map(opt => ({label: opt.chainName, value: opt.chainId}))}
                      value={option}
                      onChange={selectSupportedChain}
                      placeholder={t("forms.select-placeholder")}

@@ -1,22 +1,23 @@
-import { useEffect, useState } from "react";
-import { Container, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Container, Row} from "react-bootstrap";
 
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import ConnectWalletButton from "components/connect-wallet-button";
-import { NetworkSetup } from "components/setup/network-setup";
-import { RegistrySetup } from "components/setup/registry-setup";
+import {NetworkSetup} from "components/setup/network-setup";
+import {RegistrySetup} from "components/setup/registry-setup";
 import TabbedNavigation from "components/tabbed-navigation";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
+import ChainsSetup from "../components/setup/chains-setup";
 
 const { publicRuntimeConfig: { adminWallet } } = getConfig();
 
@@ -57,6 +58,11 @@ export default function SetupPage(){
 
   const tabs = [
     {
+      eventKey: 'supportedChains',
+      title: t('chains.title'),
+      component: (<ChainsSetup />)
+    },
+    {
       eventKey: "registry",
       title: t("registry.title"),
       component: (
@@ -75,7 +81,7 @@ export default function SetupPage(){
           defaultNetwork={defaultNetwork}
         />
       )
-    },
+    }
   ];
 
   return(

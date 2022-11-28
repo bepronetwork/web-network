@@ -13,7 +13,6 @@ import {NetworkColors} from "interfaces/enums/network-colors";
 import {useAuthentication} from "x-hooks/use-authentication";
 
 import {useAppState} from "../contexts/app-state";
-import {changeChain} from "../contexts/reducers/change-chain";
 import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
@@ -71,8 +70,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
         titlePosition="center"
         centerTitle
         titleClass="h3 text-white bg-opacity-100"
-        show={showModal}
-      >
+        show={showModal}>
         <div className="d-flex flex-column text-center align-items-center">
           <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
             {t("connect-wallet-button:to-access-this-page")}

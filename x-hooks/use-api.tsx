@@ -26,7 +26,8 @@ import {api, eventsApi} from "services/api";
 
 import {Entities, Events} from "types/dappkit";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
-import {changeSupportedChains} from "../contexts/reducers/change-supported-chains";
+import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
+import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
 
 interface NewIssueParams {
   title: string;
@@ -60,7 +61,7 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
-  const  {state} = useAppState()
+  const  {state, dispatch} = useAppState()
   const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
   
   api.interceptors.request.use(config => {
@@ -711,19 +712,55 @@ export default function useApi() {
       });
   }
 
-  async function getSupportedChains() {
-    if (state?.supportedChains.length)
+  async function getSupportedChains(force = false) {
+    if (!force && state?.supportedChains.length)
       return Promise.resolve(state?.supportedChains);
 
-    return api.get<SupportedChainData[]>(`/search/chains`)
+    return api.get<{result: SupportedChainData[], error?: string; }>(`/chains`)
       .then(({data}) => data)
       .then(data => {
-        changeSupportedChains(data);
-        return data;
+        if (!data.error)
+          dispatch(updateSupportedChains(data.result));
+        else {
+          console.error(`failed to fetch supported chains`, data.error);
+        }
+        return data?.result;
       })
       .catch(e => {
         console.error(`failed to fetch supported chains`, e);
         return [];
+      })
+  }
+
+  async function addSupportedChain(chain) {
+    chain.loading = true;
+    return api.post(`chains`, chain)
+      .then(({status}) => status === 200)
+      .catch(e => {
+        console.error(`failed to addSupportedChain`, e);
+        return false;
+      })
+      .finally(() => {
+        chain.loading = false;
+        getSupportedChains(true);
+      })
+  }
+
+  async function deleteSupportedChain(chain) {
+    chain.loading = true;
+
+    return api.delete(`chains?id=${chain.chainId}`)
+      .then(({status}) => {
+        dispatch(status === 200 ? toastSuccess('deleted chain') : toastError('failed to delete'));
+        return status === 200
+      })
+      .catch(e => {
+        console.error(`failed to addSupportedChain`, e);
+        return false;
+      })
+      .finally(() => {
+        chain.loading = false;
+        getSupportedChains(true);
       })
   }
 
@@ -776,6 +813,8 @@ export default function useApi() {
     getTokens,
     getNetworkTokens,
     createNFT,
-    saveNetworkRegistry
+    saveNetworkRegistry,
+    addSupportedChain,
+    deleteSupportedChain
   };
 }
