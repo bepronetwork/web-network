@@ -63,13 +63,11 @@ export default function LogoAndColoursSettings({
 
   const handleColorChange = (value) => fields.colors.setter(value);
 
-  const isCurrentNetwork =
-  !!network &&
-  !!state.Service?.network?.active &&
-  network?.networkAddress === state.Service?.network?.active?.networkAddress;
+  const isCurrentNetwork = (!!network &&
+                            !!state.Service?.network?.active &&
+                            network?.networkAddress === state.Service?.network?.active?.networkAddress)
 
-  const tvl =
-  (+forcedNetwork?.tokensStaked || 0) + (+forcedNetwork?.tokensLocked || 0);
+  const tvl = (+forcedNetwork?.tokensStaked || 0) + (+forcedNetwork?.tokensLocked || 0);
 
   const NetworkAmount = (title, description, amount) => ({
     title,
