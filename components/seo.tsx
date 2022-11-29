@@ -1,12 +1,13 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 
 import removeMarkdown from "markdown-to-text";
-import { DefaultSeo, NextSeo } from "next-seo";
+import {DefaultSeo, NextSeo} from "next-seo";
 import getConfig from "next/config";
 
-import { IssueData } from "interfaces/issue-data";
+import {IssueBigNumberData, IssueData} from "interfaces/issue-data";
 
 import SEO_CONFIG from "../next-seo-config";
+import {useAppState} from "../contexts/app-state";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -14,11 +15,15 @@ interface ISeoProps {
   issueMeta?: IssueData;
 }
 
-const Seo: React.FC<ISeoProps> = ({ issueMeta }) => {
+const Seo: React.FC<ISeoProps> = () => {
+
+  const {state} = useAppState();
+  const [issueMeta, setIssueMeta] = useState<IssueBigNumberData>(null);
+
+  useEffect(() => { setIssueMeta(state.currentBounty?.data)}, [state.currentBounty?.data]);
+
   if (issueMeta) {
-    // eslint-disable-next-line no-unsafe-optional-chaining
-    const homeUrl = publicRuntimeConfig?.urls?.home
-    // eslint-disable-next-line no-unsafe-optional-chaining
+    const homeUrl = publicRuntimeConfig?.urls?.home;
     const [repoId, ghId] = issueMeta?.issueId?.split("/");
     const description = removeMarkdown(issueMeta?.body?.substring(0, 160).trimEnd());
     if(homeUrl)

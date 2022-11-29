@@ -19,8 +19,6 @@ import RootProviders from "contexts";
 import "../styles/styles.scss";
 
 
-
-
 function App({
   Component,
   pageProps: { session, currentIssue, ...pageProps },
@@ -28,9 +26,9 @@ function App({
 
   return (
     <>
-      <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <RootProviders>
+          <Seo />
           <>
             <WebThreeDialog />
             <InvalidAccountWalletModal/>
