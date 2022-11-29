@@ -12,13 +12,13 @@ import Translation from "components/translation";
 
 import useFilters from "x-hooks/use-filters";
 
-export default function IssueFilters() {
+export default function IssueFilters({ onlyTimeFrame = false }) {
   const node = useRef();
   const [show, setShow] = useState(false);
   const [
     [repoOptions, stateOptions, timeOptions],
     updateOptions,
-    clearFilters
+    clearFilters,
   ] = useFilters();
   const router = useRouter();
   const { state, time, repoId } = router.query;
@@ -54,6 +54,18 @@ export default function IssueFilters() {
     clearFilters();
   }
 
+  function FilterTimeFrame() {
+    return (
+      <IssueFilterBox
+        title={t("filters.timeframe.title")}
+        options={timeOptions}
+        onChange={(opt, checked) =>
+          updateOptions(timeOptions, opt, checked, "time")
+        }
+      />
+    );
+  }
+
   useEffect(loadOutsideClick, [show]);
 
   return (
@@ -86,33 +98,33 @@ export default function IssueFilters() {
           show ? "flex" : "none"
         } justify-content-start align-items-stretch position-absolute`}
       >
-        <div>
-          <IssueFilterBox
-            className="h-100 border border-right border-dark-gray"
-            title={t("filters.repository")}
-            options={repoOptions}
-            filterPlaceholder={t("filters.search-repositories")}
-            onChange={(opt, checked) =>
-              updateOptions(repoOptions, opt, checked, "repo")
-            }
-          />
-        </div>
-        <div>
-          <IssueFilterBox
-            title={t("filters.bounties.title")}
-            options={stateOptions}
-            onChange={(opt, checked) =>
-              updateOptions(stateOptions, opt, checked, "state")
-            }
-          />
-          <IssueFilterBox
-            title={t("filters.timeframe.title")}
-            options={timeOptions}
-            onChange={(opt, checked) =>
-              updateOptions(timeOptions, opt, checked, "time")
-            }
-          />
-        </div>
+        {onlyTimeFrame ? (
+          <FilterTimeFrame />
+        ) : (
+          <>
+            <div>
+              <IssueFilterBox
+                className="h-100 border border-right border-dark-gray"
+                title={t("filters.repository")}
+                options={repoOptions}
+                filterPlaceholder={t("filters.search-repositories")}
+                onChange={(opt, checked) =>
+                  updateOptions(repoOptions, opt, checked, "repo")
+                }
+              />
+            </div>
+            <div>
+              <IssueFilterBox
+                title={t("filters.bounties.title")}
+                options={stateOptions}
+                onChange={(opt, checked) =>
+                  updateOptions(stateOptions, opt, checked, "state")
+                }
+              />
+              <FilterTimeFrame />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
