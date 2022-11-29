@@ -52,7 +52,7 @@ export default function ProposalActionCard({
   const bountyBranch = state.currentBounty?.data?.branch;
   const activeRepoRules = state.Service?.network?.repos?.active?.branchProtectionRules;
   const pullRequestNeedsApproval = currentPullRequest?.approvals?.total < (activeRepoRules ? 
-    activeRepoRules[bountyBranch].requiredApprovingReviewCount : 0);
+    activeRepoRules[bountyBranch]?.requiredApprovingReviewCount : 0);
 
   const isDisable = () => [
     state.currentBounty?.chainData?.closed,
