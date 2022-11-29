@@ -18,7 +18,7 @@ export default function useOctokit() {
 
   function makeOctokitRequest(query: string, params, useBotToken?: boolean): Promise<GraphQlResponse> {
     return api.post("/graphql", { query, params, useBotToken }).then(({ data }) => data).catch(error => {
-      console.log("makeOctokitRequest", error);
+      console.debug("makeOctokitRequest", error);
 
       return error.data;
     });
@@ -121,23 +121,35 @@ export default function useOctokit() {
     });
     if(!response?.repository) return
 
-    const { mergeable, merged, state } = response.repository.pullRequest;
+    const { mergeable, merged, state, approvals } = response.repository.pullRequest;
 
-    return { mergeable, merged, state };
+    return { mergeable, merged, state, approvals };
   }
 
   //  Note: if repository not exist or it private will return null
-  async function getRepository(repositoryPath:  string) {
+  async function getRepository(repositoryPath:  string, useBotToken?: boolean) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(RepositoryQueries.Repository, {
       repo,
       owner
-    });
+    }, useBotToken);
 
-    const repository = response?.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))
+    
+    const repository = 
+      response?.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))?.[0];
+    
+    if (!repository) return null;
 
-    return repository?.[0] || null;
+    const branchProtectionRules = 
+      Object.fromEntries(repository.branchProtectionRules.nodes.map(rule => [rule.pattern, { 
+        requiredApprovingReviewCount: rule.requiredApprovingReviewCount
+      }]));
+
+    return {
+      ...repository,
+      branchProtectionRules
+    }
   }
 
   async function getRepositoryForks(repositoryPath:  string) {

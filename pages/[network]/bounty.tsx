@@ -43,9 +43,7 @@ export default function PageIssue() {
   
     getUserRepositories(state.currentUser?.login)
     .then((repos) => {
-
-      console.log(`REPOS`, repos);
-
+      console.debug(`REPOS`, repos);
       const isFork = repo => repo.isFork ? 
         repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
 

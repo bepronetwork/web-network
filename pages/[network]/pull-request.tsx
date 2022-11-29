@@ -197,7 +197,7 @@ export default function PullRequestPage() {
         setPullRequest(currentPR);
         setNetworkPullRequest(currentNetworkPR);
 
-        console.log(`GOT PR`, currentPR, currentNetworkPR);
+        console.debug(`GOT PR`, currentPR, currentNetworkPR);
 
       })
       .finally(() => {

@@ -4,6 +4,12 @@ export const Repository =
       nameWithOwner
       visibility
       mergeCommitAllowed
+      branchProtectionRules(first: 100) {
+        nodes {
+          pattern
+          requiredApprovingReviewCount
+        }
+      }
     }
   }`;
 
