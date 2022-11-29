@@ -60,6 +60,7 @@
   "main-nav": {
     "developers": "Developers",
     "council": "Curators",
+    "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
     "new-bounty": "New bounty",
     "get-started": "Get Started",
