@@ -47,7 +47,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     where
   });
   
-  if (!network) return res.status(404);
+  if (!network)
+    return res.status(200).json({});
 
   return res.status(200).json(network);
 }

@@ -39,6 +39,13 @@ class Chain extends Model {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      isDefault: {
+        type: DataTypes.BOOLEAN
+      },
+      registryAddress: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

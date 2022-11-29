@@ -14,6 +14,7 @@ import {changeLoadState} from "../../contexts/reducers/change-load";
 import {MiniChainInfo} from "../../interfaces/mini-chain";
 import AddChainModal from "./add-chain-modal";
 import {toastError, toastSuccess} from "../../contexts/reducers/change-toaster";
+import AddCustomChainModal from "./add-custom-chain-modal";
 
 export default function ChainsSetup() {
   const {state, dispatch} = useAppState();
@@ -21,9 +22,9 @@ export default function ChainsSetup() {
   const [chains, setChains] = useState<MiniChainInfo[]>([]);
   const [filteredChains, setFilteredChains] = useState<MiniChainInfo[]>([]);
   const [search, setSearch] = useState('');
-  const [timer, setTimer] = useState<any>(null);
   const [existingState, setExistingState] = useState<number[]>([]);
   const [showChainModal, setShowChainModal] = useState<MiniChainInfo|null>(null);
+  const [showCustomAdd, setShowCustomAdd] = useState<boolean>(false);
 
   const api = useApi();
 
@@ -61,6 +62,7 @@ export default function ChainsSetup() {
   function addChain(chain: MiniChainInfo) {
     if (!chain) {
       setShowChainModal(null);
+      setShowCustomAdd(false);
       return;
     }
 
@@ -87,9 +89,9 @@ export default function ChainsSetup() {
 
   function makeChainRow(chain: MiniChainInfo) {
     if (!chain.rpc.length)
-      return <></>;
+      return <div key={chain.chainId}></div>;
 
-    return <Row>
+    return <Row key={chain.chainId}>
       <Col>
         <Row>
           <Col>{chain?.name || chain?.shortName}</Col>
@@ -133,10 +135,23 @@ export default function ChainsSetup() {
           </InputGroup>
         </div>
       </div>
-      {!filteredChains.length && search && <ContextualSpan context="info">No chains containing {search} </ContextualSpan>}
+      {!filteredChains.length && search && <>
+        <Row>
+          <Col className="d-flex justify-content-center my-3">
+            <ContextualSpan context="info">No chains containing {search}</ContextualSpan>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="d-flex justify-content-center">
+            <Button onClick={() => setShowCustomAdd(true)}>create one</Button>
+          </Col>
+        </Row>
+        </>
+      }
       <hr/>
-      {((filteredChains.length > 0 ? filteredChains : chains).map(makeChainRow))}
+      {((search.length > 0 ? filteredChains : chains).map(makeChainRow))}
       <AddChainModal chain={showChainModal} show={!!showChainModal} add={addChain} />
+      <AddCustomChainModal show={showCustomAdd} add={addChain} />
     </div>
   </>
 

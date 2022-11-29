@@ -8,7 +8,7 @@ import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeActiveNetworkToken, 
+  changeActiveNetworkToken,
   changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
@@ -63,8 +63,15 @@ export function useNetwork() {
       }
     })
       .then(({data}) => {
-        if (!data.isRegistered)
-          throw new Error("Network not registered");
+        if (!data.isRegistered) {
+          if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
+            replace("/setup");
+
+          if(networkName)
+            push({pathname: `/networks`});
+
+          return;
+        }
 
         const key = networkName || data?.name;
 
@@ -77,12 +84,6 @@ export function useNetwork() {
       })
       .catch(error => {
         console.error(`Failed to get network`, error);
-
-        if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
-          replace("/setup");
-        
-        if(networkName)
-          push({pathname: `/networks`});
       });
 
   }

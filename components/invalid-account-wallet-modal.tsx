@@ -1,7 +1,7 @@
-import { useSession } from "next-auth/react";
-import { useTranslation } from "next-i18next";
+import {useSession} from "next-auth/react";
+import {useTranslation} from "next-i18next";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
@@ -9,11 +9,11 @@ import metamaskLogo from "assets/metamask.png";
 import Avatar from "components/avatar";
 import Modal from "components/modal";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { truncateAddress } from "helpers/truncate-address";
+import {truncateAddress} from "helpers/truncate-address";
 
-import { CustomSession } from "interfaces/custom-session";
+import {CustomSession} from "interfaces/custom-session";
 
 export default function InvalidAccountWalletModal() {
   const { t } = useTranslation("common");
@@ -70,7 +70,7 @@ export default function InvalidAccountWalletModal() {
               <div>
                 <Image src={metamaskLogo} width={15} height={15} />{" "}
                 <span className="ms-2">
-                  {currentUser?.walletAddress && truncateAddress(currentUser?.walletAddress)}
+                  {currentUser?.walletAddress && truncateAddress(currentUser?.walletAddress || '')}
                 </span>
               </div>
               <ErrorMarkIcon />

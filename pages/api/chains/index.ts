@@ -11,7 +11,6 @@ async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = fa
 
   const missingValues = [
     [body.chainId, 'no chain id'],
-    [body.networkId, 'missing network id'],
     [body.name, 'missing name'],
     [body.shortName, 'missing currency short name'],
     [body.activeRPC, 'missing active rpc'],
@@ -32,9 +31,15 @@ async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = fa
     chainCurrencySymbol: body.nativeCurrency?.symbol,
     chainCurrencyName: body.nativeCurrency?.name,
     chainCurrencyDecimals: body.nativeCurrency?.decimals,
+    isDefault: (body as any).isDefault
   }
 
   const chain = await models.chain.findOne({where: {chainId: {[Op.eq]: model.chainId}}});
+
+  if (!chain) {
+    const all = await models.chain.findAll();
+    model.isDefault = !all.length;
+  }
 
   if (chain && !update)
     return res.status(400)
@@ -51,6 +56,7 @@ async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = fa
     action = await chain.set(model).save().then(() => true).catch(logError);
   else if (!chain && !update)
     action = await models.chain.create(model).then(() => true).catch(logError);
+
 
   return res.status(action ? 200 : 400)
     .json({message: action ? 'ok' : `Failed to ${update ? 'update' : 'create'} ${model.chainId}`});

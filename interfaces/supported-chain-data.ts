@@ -10,4 +10,5 @@ export interface SupportedChainData {
   blockScanner: string;
   networkRegistry: string;
   beproTokenAddress: string;
+  isDefault: boolean;
 }

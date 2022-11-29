@@ -1,9 +1,8 @@
-import {useState} from "react";
-
 import BigNumber from "bignumber.js";
+import useApi from "x-hooks/use-api";
+import {useState} from "react";
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
-
 import {useAppState} from "contexts/app-state";
 import {
   changeCurrentUser,
@@ -23,10 +22,7 @@ import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
 import {CustomSession} from "interfaces/custom-session";
-
 import {WinStorage} from "services/win-storage";
-
-import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
 import {useTransactions} from "x-hooks/use-transactions";
@@ -34,6 +30,7 @@ import {useTransactions} from "x-hooks/use-transactions";
 import {EventName} from "../interfaces/analytics";
 import useAnalyticEvents from "./use-analytic-events";
 import useSignature from "./use-signature";
+import {changeChain} from "../contexts/reducers/change-chain";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
@@ -69,11 +66,11 @@ export function useAuthentication() {
       return;
 
     transactions.deleteFromStorage();
-    
+
     const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
-    
+
     const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
-    
+
     expirationStorage.removeItem();
 
     signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})
@@ -83,17 +80,14 @@ export function useAuthentication() {
   }
 
   function connectWallet() {
-    if (!state.Service?.active)
-      return;
+    // if (!state.Service?.active)
+    //   return;
 
     connect();
   }
 
   function updateWalletAddress() {
-    if (state.spinners?.wallet)
-      return;
-
-    if (!state.currentUser?.connected)
+    if (state.spinners?.wallet || !state.currentUser?.connected || !state.Service?.active)
       return;
 
     dispatch(changeWalletSpinnerTo(true));
@@ -104,6 +98,14 @@ export function useAuthentication() {
           dispatch(changeCurrentUserWallet(address))
           pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address.toString()})
         }
+
+
+        const windowChainId = +window.ethereum.chainId
+        const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
+        dispatch(changeChain.update({
+          id: (chain?.chainId || windowChainId).toString(),
+          name: chain?.chainName || `unknown`
+        }));
 
         sessionStorage.setItem(`currentWallet`, address);
       })
@@ -138,7 +140,7 @@ export function useAuthentication() {
           return dispatch(changeConnectingGH(false))
 
         lastUrl.value = asPath;
-        
+
         if(signedIn)
           signIn('github', {callbackUrl: `${URL_BASE}${asPath}`})
 

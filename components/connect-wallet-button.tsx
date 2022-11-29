@@ -24,13 +24,14 @@ export default function ConnectWalletButton({children = null, asModal = false, f
   const { connectWallet } = useAuthentication();
 
   async function handleLogin()  {
+
     if(!window?.ethereum) {
       dispatch(changeShowWeb3(true))
       return;
     }
 
-    if (!state.Service?.active)
-      return;
+    // if (!state.Service?.active)
+    //   return;
 
     if (
       (+state.connectedChain?.id || +window?.ethereum?.chainId) ===

@@ -18,21 +18,23 @@ import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 import ChainsSetup from "../components/setup/chains-setup";
+import ConnectGithubSetup from "../components/setup/connect-github-setup";
+import {CallToAction} from "../components/setup/call-to-action";
 
 const { publicRuntimeConfig: { adminWallet } } = getConfig();
 
 export default function SetupPage(){
   const { replace } = useRouter();
-  const { t } = useTranslation("setup")
+  const { t } = useTranslation(["setup", "common"])
 
   const [activeTab, setActiveTab] = useState("registry");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
   const { searchNetworks } = useApi();
-  const { state: { currentUser, Settings } } = useAppState();
+  const { state: { currentUser, Settings, supportedChains } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
-  const isAdmin = adminWallet === currentUser?.walletAddress;
+  const isAdmin = adminWallet?.toLowerCase() === currentUser?.walletAddress?.toLowerCase();
 
   const networkRegistryAddress = Settings?.contracts?.networkRegistry;
 
@@ -58,28 +60,37 @@ export default function SetupPage(){
 
   const tabs = [
     {
+      eventKey: 'githubConnection',
+      title: t('common:connect-github'),
+      component: <><ConnectGithubSetup /></>
+    },
+    {
       eventKey: 'supportedChains',
-      title: t('chains.title'),
-      component: (<ChainsSetup />)
+      title: t('setup:chains.title'),
+      component: (
+        !currentUser?.login
+          ? <CallToAction disabled={false} executing={false} call="missing github configuration step" action="go to" color="info" onClick={() => setActiveTab('githubConnection')} /> // eslint-ignore-line
+          : <ChainsSetup />
+      )
     },
     {
       eventKey: "registry",
-      title: t("registry.title"),
+      title: t("setup:registry.title"),
       component: (
-        <RegistrySetup 
-          registryAddress={networkRegistryAddress}
-          isVisible={activeTab === "registry"} 
-        />
+        !supportedChains.length
+          ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> // eslint-ignore-line
+          : <RegistrySetup registryAddress={networkRegistryAddress}
+                           isVisible={activeTab === "registry"} />
       )
     },
     {
       eventKey: "network",
-      title: t("network.title"),
+      title: t("setup:network.title"),
       component: (
-        <NetworkSetup 
-          isVisible={activeTab === "network"}
-          defaultNetwork={defaultNetwork}
-        />
+        !supportedChains.length
+          ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> // eslint-ignore-line
+          : <NetworkSetup isVisible={activeTab === "network"}
+                          defaultNetwork={defaultNetwork}/>
       )
     }
   ];
@@ -94,12 +105,14 @@ export default function SetupPage(){
         <Row className="mt-2">
           <TabbedNavigation
             tabs={tabs}
+            forceActiveKey={activeTab}
             className="issue-tabs"
-            defaultActiveKey="registry"
+            defaultActiveKey="githubConnection"
             onTransition={setActiveTab}
           />
         </Row>
       }
+
     </Container>
   );
 }

@@ -1,5 +1,5 @@
 import Button from "components/button";
-import { ContextualSpan } from "components/contextual-span";
+import {ContextualSpan} from "components/contextual-span";
 
 export function CallToAction({
   call,
@@ -21,8 +21,7 @@ export function CallToAction({
         disabled={executing || disabled}
         withLockIcon={disabled && !executing}
         isLoading={executing}
-        onClick={onClick}
-      >
+        onClick={onClick}>
         <span>{action}</span>
       </Button>
     </ContextualSpan>

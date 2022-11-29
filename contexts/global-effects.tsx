@@ -5,7 +5,7 @@ import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
 
-import { CustomSession } from "interfaces/custom-session";
+import {CustomSession} from "interfaces/custom-session";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useDao} from "x-hooks/use-dao";
@@ -30,7 +30,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const settings = useSettings();
   const transactions = useTransactions();
 
-  useEffect(dao.start, [state.Settings]);
+  useEffect(dao.start, [state.supportedChains]);
   useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress]);
 
   useEffect(repos.loadRepos, [query?.network , state?.Service?.network?.lastVisited]);
