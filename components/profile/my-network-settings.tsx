@@ -166,11 +166,19 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           console.error(failed);
         }
         
-        if (success.length)
+        if (success.length){
           dispatch(toastSuccess(t("custom-network:messages.updated-parameters", { 
             updated: success.length, 
             total: promises.length 
           })));
+          
+          if(draftTime !== forcedNetwork.draftTime)
+            Promise.all([
+              await processEvent("bounty","update-draft-time", network.name),
+              await processEvent("bounty","moved-to-open", network.name)
+            ])
+        }
+          
 
         if (isCurrentNetwork) updateActiveNetwork(true);
 
