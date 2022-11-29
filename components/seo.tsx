@@ -6,8 +6,8 @@ import getConfig from "next/config";
 
 import {IssueBigNumberData, IssueData} from "interfaces/issue-data";
 
-import SEO_CONFIG from "../next-seo-config";
 import {useAppState} from "../contexts/app-state";
+import SEO_CONFIG from "../next-seo-config";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -23,7 +23,9 @@ const Seo: React.FC<ISeoProps> = () => {
   useEffect(() => { setIssueMeta(state.currentBounty?.data)}, [state.currentBounty?.data]);
 
   if (issueMeta) {
+    // eslint-disable-next-line no-unsafe-optional-chaining
     const homeUrl = publicRuntimeConfig?.urls?.home;
+    // eslint-disable-next-line no-unsafe-optional-chaining
     const [repoId, ghId] = issueMeta?.issueId?.split("/");
     const description = removeMarkdown(issueMeta?.body?.substring(0, 160).trimEnd());
     if(homeUrl)
