@@ -134,8 +134,6 @@ export default function IssueListItem({
       onClick={() => {
         if (xClick) return xClick();
 
-        console.log(`state.Service?.network?.active`, state.Service?.network);
-
         router.push({
           pathname: "/[network]/bounty",
           query: {

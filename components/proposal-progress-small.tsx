@@ -18,7 +18,7 @@ export default function ProposalProgressSmall({
   const {state} = useAppState()
   const dotStyle = { width: "4px", height: "14px" };
 
-  const disputePercentage = +state.Service?.network.amounts.percentageNeededForDispute || 3;
+  const disputePercentage = +state.Service?.network.amounts?.percentageNeededForDispute || 3;
 
   function toRepresentationPercent(value = 0, total = 5) {
     return (value * 100) / total;
