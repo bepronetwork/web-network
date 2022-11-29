@@ -70,7 +70,7 @@ export function useRepos() {
     if (!activeRepo)
       throw new Error(`No repo found for ${id || query.repoId}`);
 
-    getRepository(activeRepo?.githubPath)
+    getRepository(activeRepo?.githubPath, true)
       .then(info => {
         if (!info)
           return []
@@ -81,9 +81,8 @@ export function useRepos() {
           getRepositoryForks(activeRepo.githubPath),
         ])
       })
-      .then(([ghVisibility = false, branches = [], forks = []]) => {
-        console.log(`DISPATCH NEW INFO`);
-        dispatch(changeNetworkReposActive({ghVisibility, ...activeRepo, branches, forks}))
+      .then(([info = undefined, branches = [], forks = []]) => {
+        dispatch(changeNetworkReposActive({ghVisibility: !!info, ...activeRepo, ...info, branches, forks}));
       })
       .catch(error => {
         console.error(`Failed to load repository`, error);

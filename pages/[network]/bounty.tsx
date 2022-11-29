@@ -44,7 +44,7 @@ export default function PageIssue() {
     getUserRepositories(state.currentUser?.login)
     .then((repos) => {
 
-      console.log(`REPOS`, repos);
+      console.debug(`REPOS`, repos);
 
       const isFork = repo => repo.isFork ? 
         repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
@@ -55,7 +55,7 @@ export default function PageIssue() {
       setIsRepoForked(isForked);
     })
     .catch((e) => {
-      console.log("Failed to get users repositories: ", e);
+      console.debug("Failed to get users repositories: ", e);
     });
   }
 

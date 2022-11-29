@@ -33,6 +33,9 @@ export const Details =
         mergeable
         merged
         state
+        approvals: reviews(states: APPROVED) {
+          total: totalCount
+        }
       }
     }
   }`;

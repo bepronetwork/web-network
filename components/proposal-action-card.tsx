@@ -49,6 +49,10 @@ export default function ProposalActionCard({
   const {getRepository} = useOctokit();
 
   const bountyAmount = BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
+  const bountyBranch = state.currentBounty?.data?.branch;
+  const activeRepoRules = state.Service?.network?.repos?.active?.branchProtectionRules;
+  const pullRequestNeedsApproval = currentPullRequest?.approvals?.total < (activeRepoRules ? 
+    activeRepoRules[bountyBranch].requiredApprovingReviewCount : 0);
 
   const isDisable = () => [
     state.currentBounty?.chainData?.closed,
@@ -85,7 +89,8 @@ export default function ProposalActionCard({
     !isMerging,
     !isRefusing,
     !isDisputing,
-    allowMergeCommit === true
+    allowMergeCommit === true,
+    !pullRequestNeedsApproval
   ].every(v => v);
 
   function handleRefuse() {
@@ -204,6 +209,14 @@ export default function ProposalActionCard({
             <div className="row mt-2">
               <ContextualSpan context="warning">
                 {t("pull-request:errors.merge-commit")}
+              </ContextualSpan>
+            </div>
+          }
+
+          { pullRequestNeedsApproval &&
+            <div className="row mt-2">
+              <ContextualSpan context="warning">
+                {t("pull-request:errors.approval")}
               </ContextualSpan>
             </div>
           }

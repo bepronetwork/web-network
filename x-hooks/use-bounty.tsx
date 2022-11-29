@@ -103,7 +103,8 @@ export function useBounty() {
               ...pullRequest,
               isMergeable: details?.mergeable === "MERGEABLE",
               merged: details?.merged,
-              state: details?.state
+              state: details?.state,
+              approvals: details?.approvals
             })))]);
       })
       .then(pullRequests => {
