@@ -75,18 +75,15 @@ export function useDao() {
    */
   function start() {
     const defaultChain = state.supportedChains.find(({isDefault}) => isDefault);
+    const connectedChain = state.supportedChains.find(({chainId}) => +state?.connectedChain?.id === chainId);
+    const activeWeb3Host = state.Service?.active?.web3Host;
 
-    console.debug(`useDao() start`, defaultChain, !(!defaultChain || !!state.Service?.active || !!state.Service?.starting));
-
-    if (!defaultChain || !!state.Service?.active || !!state.Service?.starting)
+    if (!(connectedChain || defaultChain) || (activeWeb3Host && activeWeb3Host === connectedChain?.chainRpc) || state.Service?.starting)
       return;
 
     dispatch(changeStarting(true));
 
-    const {chainRpc: web3Host, networkRegistry} = defaultChain;
-
-    const registryAddress = networkRegistry;
-
+    const {chainRpc: web3Host, networkRegistry: registryAddress} = (connectedChain || defaultChain);
     const daoService = new DAO({web3Host, registryAddress});
 
     daoService.start()
