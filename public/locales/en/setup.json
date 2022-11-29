@@ -103,5 +103,8 @@
     "errors": {
       "network-already-saved": "Default Network already saved, please visit {{network}} settings page."
     }
+  },
+  "chains": {
+    "title": "Chains"
   }
 }

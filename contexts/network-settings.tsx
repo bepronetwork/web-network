@@ -19,7 +19,7 @@ import {
 import {DefaultNetworkSettings} from "helpers/custom-network";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
 import DAO from "services/dao-service";
 import {WinStorage} from "services/win-storage";
@@ -212,7 +212,10 @@ export const NetworkSettingsProvider = ({ children }) => {
         let validated = undefined;
   
         if (value.trim() !== "" && !isSetup)
-          validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
+          validated = /bepro|taikai/gi.test(value)
+            ? false
+            : !(await getNetwork({name: value})
+              .then(({data}) => data?.name === value).catch(() => false));
 
         return !!validated;
       }

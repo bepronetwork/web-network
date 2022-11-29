@@ -8,7 +8,7 @@ export default function AddChainModal({chain, show, add}: {chain: MiniChainInfo,
   if (!show)
     return <></>
 
-  const [activeRPC, setActiveRPC] = useState(chain.rpc[0]);
+  const [activeRPC, setActiveRPC] = useState(chain?.rpc?.[0]);
 
   return <Modal show={show} okLabel={'add chain'}
                 title="Configure RPC"

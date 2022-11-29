@@ -23,10 +23,10 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
   const [option, setOption] = useState<{ value: string; label: string }>(null);
   const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
 
-  const {state: { connectedChain, Settings: settings, supportedChains },} = useAppState();
+  const {state: { connectedChain, currentUser, Settings: settings, supportedChains },} = useAppState();
 
   function changeShowModal() {
-    if (!supportedChains.length || !connectedChain?.id)
+    if (!supportedChains.length || !connectedChain?.id || !currentUser?.connected)
       return;
 
     if (!supportedChains.find(o => o.chainId === +option?.value))

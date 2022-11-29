@@ -36,6 +36,13 @@ async function up(queryInterface, Sequelize) {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    registryAddress: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    isDefault: {
+      type: Sequelize.BOOLEAN
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE

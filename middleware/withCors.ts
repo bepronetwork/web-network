@@ -33,7 +33,7 @@ function runLogger(req, e = null) {
     info('Access', {method, pathname, search,});
 
   if (e)
-    error(e?.message);
+    error(`Access`, e);
 }
 
 const withCors = (handler) => {

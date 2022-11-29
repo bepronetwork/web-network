@@ -1,5 +1,5 @@
 import {useAppState} from "../contexts/app-state";
-import {changeCurrentUserConnected} from "../contexts/reducers/change-current-user";
+import {changeCurrentUserConnected, changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
 import {changeConnecting} from "../contexts/reducers/change-spinners";
 import {toastError,} from "../contexts/reducers/change-toaster";
@@ -14,13 +14,12 @@ export function useDao() {
    * Enables the user/dapp to connect to the active DAOService
    */
   function connect() {
-    if (!state.Service?.active)
-      return;
+    // if (!state.Service?.active)
+    //   return;
 
-    dispatch(changeConnecting(true))
+    dispatch(changeConnecting(true));
 
-    state.Service.active
-      .connect()
+    (state.Service?.active ? state.Service.active.connect() : window.ethereum.request({method: 'eth_requestAccounts'}))
       .then((connected) => {
         if (!connected) {
           dispatch(toastError('Failed to connect'));
@@ -30,6 +29,9 @@ export function useDao() {
 
         dispatch(changeCurrentUserConnected(true));
         dispatch(changeConnecting(false))
+
+        if (!state?.Service?.active)
+          dispatch(changeCurrentUserWallet(connected[0] as string));
       });
   }
 
@@ -72,15 +74,18 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    console.debug(`useDao() start`, !(!state.Settings?.urls || !!state.Service?.active || !!state.Service?.starting));
-    if (!state.Settings?.urls || !!state.Service?.active || !!state.Service?.starting)
+    const defaultChain = state.supportedChains.find(({isDefault}) => isDefault);
+
+    console.debug(`useDao() start`, defaultChain, !(!defaultChain || !!state.Service?.active || !!state.Service?.starting));
+
+    if (!defaultChain || !!state.Service?.active || !!state.Service?.starting)
       return;
 
     dispatch(changeStarting(true));
 
-    const {urls: {web3Provider: web3Host}, contracts} = state.Settings;
+    const {chainRpc: web3Host, networkRegistry} = defaultChain;
 
-    const registryAddress = contracts?.networkRegistry;
+    const registryAddress = networkRegistry;
 
     const daoService = new DAO({web3Host, registryAddress});
 
