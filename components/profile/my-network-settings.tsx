@@ -402,6 +402,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             repositories={github.repositories}
             onClick={fields.repository.setter}
             withLabel={false}
+            botUser={state.Settings?.github?.botUser}
           />
         }
       </Row>
