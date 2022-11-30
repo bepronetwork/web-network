@@ -69,9 +69,9 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
                 chainId: chainId,
                 chainName: chosenSupportedChain.name,
                 nativeCurrency: {
-                  name: chosenSupportedChain.currencyName,
-                  symbol: chosenSupportedChain.currencySymbol,
-                  decimals: chosenSupportedChain.currencyDecimals,
+                  name: chosenSupportedChain.chainCurrencyName,
+                  symbol: chosenSupportedChain.chainCurrencySymbol,
+                  decimals: chosenSupportedChain.chainCurrencyDecimals,
                 },
                 rpcUrls: [chosenSupportedChain.chainRpc],
                 blockExplorerUrls: [chosenSupportedChain.blockScanner],

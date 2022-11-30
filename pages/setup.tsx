@@ -43,7 +43,7 @@ export default function SetupPage(){
       replace("/networks");
   }, [adminWallet, currentUser?.walletAddress]);
 
-  useEffect(() => {
+  function searchForNetwork() {
     if (!isConnected || !isAdmin) return;
 
     searchNetworks({
@@ -53,7 +53,9 @@ export default function SetupPage(){
         if (count > 0)
           setDefaultNetwork(rows[0]);
       });
-  }, [isConnected, isAdmin, currentUser?.walletAddress]);
+  }
+
+  useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
 
   if (!isConnected)
     return <ConnectWalletButton asModal />;
@@ -90,6 +92,7 @@ export default function SetupPage(){
         !supportedChains.length
           ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> // eslint-ignore-line
           : <NetworkSetup isVisible={activeTab === "network"}
+                          refetchNetwork={searchForNetwork}
                           defaultNetwork={defaultNetwork}/>
       )
     }

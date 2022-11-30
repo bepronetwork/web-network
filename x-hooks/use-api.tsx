@@ -790,6 +790,12 @@ export default function useApi() {
       })
   }
 
+  async function updateNetworkChainId(networkAddress: string, chainId: number) {
+    return api.put(`/network/${networkAddress}/`, {chainId})
+      .then(res => res.status === 200)
+      .catch(() => false);
+  }
+
   return {
     getSupportedChains,
     createIssue,
@@ -842,6 +848,7 @@ export default function useApi() {
     saveNetworkRegistry,
     addSupportedChain,
     deleteSupportedChain,
-    updateChainRegistry
+    updateChainRegistry,
+    updateNetworkChainId
   };
 }

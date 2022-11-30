@@ -41,6 +41,7 @@ export interface Network {
   isGovernor?: boolean;
   isDefault?: boolean;
   curators?: Curator[];
+  chain_id?: string;
   totalValueLock?: BigNumber;
   totalIssues?: string;
   totalOpenIssues?: string;
