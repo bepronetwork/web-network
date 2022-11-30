@@ -61,7 +61,7 @@ export default function LeaderBoardListItem({ user }: LeaderBoardListItemProps) 
         </span>
       </div>
 
-      <div className="col-3 d-flex align-items-center justify-content-center">
+      <div className="col-3 d-flex ps-4 align-items-center justify-content-center">
       <div ref={ref}>
           <Button
             key={user?.address}
@@ -83,7 +83,7 @@ export default function LeaderBoardListItem({ user }: LeaderBoardListItemProps) 
           >
             <Popover id={`popover-copy-${user?.address}`} key={user?.address}>
               <Popover.Body className="p-small text-black">
-                <strong>{t("transactions.copied", {value: null})}</strong>
+                <strong>{t("transactions.copied", {value: "address"})}</strong>
               </Popover.Body>
             </Popover>
           </Overlay>
