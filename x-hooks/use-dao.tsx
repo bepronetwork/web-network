@@ -83,7 +83,7 @@ export function useDao() {
 
     dispatch(changeStarting(true));
 
-    const {chainRpc: web3Host, networkRegistry: registryAddress} = (connectedChain || defaultChain);
+    const {chainRpc: web3Host, registryAddress} = (connectedChain || defaultChain);
     const daoService = new DAO({web3Host, registryAddress});
 
     daoService.start()

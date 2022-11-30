@@ -1,32 +1,59 @@
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { ContextualSpan } from "components/contextual-span";
-import { NewNetworkStepper } from "components/custom-network/new-network-stepper";
+import {ContextualSpan} from "components/contextual-span";
+import {NewNetworkStepper} from "components/custom-network/new-network-stepper";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
+import If from "../If";
+import {CallToAction} from "./call-to-action";
+import {useAppState} from "../../contexts/app-state";
+import useApi from "../../x-hooks/use-api";
 
 interface NetworkSetupProps { 
   isVisible?: boolean;
   defaultNetwork?: Network;
+  refetchNetwork: () => void;
 }
 
 export function NetworkSetup({
   isVisible,
-  defaultNetwork
+  defaultNetwork,
+  refetchNetwork,
 } : NetworkSetupProps) {
   const { t } = useTranslation("setup");
+  const {state} = useAppState();
+
+  const { updateNetworkChainId } = useApi();
+
+
+
   
   if (!isVisible)
     return <></>;
 
   return(
     <div className="content-wrapper border-top-0 px-2 py-2">
-      { !!defaultNetwork &&
-        <ContextualSpan context="primary" isAlert>
-          <span>{t("network.errors.network-already-saved", { network: defaultNetwork?.name })}</span>
-        </ContextualSpan> ||
-        <NewNetworkStepper />
-      }
+
+      <If condition={defaultNetwork && !defaultNetwork?.chain_id}>
+        <CallToAction executing={false}
+                      disabled={false}
+                      color="warning"
+                      call={"Please update the network chain id"}
+                      action={"update"}
+                      onClick={() => {
+                        updateNetworkChainId(defaultNetwork.networkAddress, +state.connectedChain?.id)
+                          .then(() => refetchNetwork());
+                      }} />
+      </If>
+
+      <If condition={!!defaultNetwork}
+          children={
+            <ContextualSpan context="primary" isAlert>
+              <span>{t("network.errors.network-already-saved", {network: defaultNetwork?.name})}</span>
+            </ContextualSpan>
+          }
+          otherwise={<NewNetworkStepper />}
+      />
     </div>
   );
 }
