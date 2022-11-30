@@ -28,7 +28,7 @@ function App({
 
   return (
     <>
-      <Seo issueMeta={currentIssue}/>
+      <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <RootProviders>
           <>
