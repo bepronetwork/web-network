@@ -47,7 +47,7 @@ export default function LeaderBoardList() {
   const {dispatch, state: appState} = useAppState();
 
   const router = useRouter();
-  const { t } = useTranslation(["common", "bounty"]);
+  const { t } = useTranslation(["common", "leaderboard"]);
 
   const { search, setSearch, clearSearch } = useSearch();
   
@@ -113,8 +113,6 @@ export default function LeaderBoardList() {
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name) return;
-
     dispatch(changeLoadState(true));
 
     searchLeaderBoard({
@@ -201,7 +199,6 @@ export default function LeaderBoardList() {
           className={"d-flex align-items-center gap-20 list-actions sticky-top"}
         >
           <div className="w-100">
-            {console.log("search", searchState)}
             <InputGroup className="border-radius-8">
               <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
@@ -211,7 +208,7 @@ export default function LeaderBoardList() {
                 value={searchState}
                 onChange={(e) => setSearchState(e.target.value)}
                 className="p-2"
-                placeholder={t("bounty:search")}
+                placeholder={t("leaderboard:search")}
                 onKeyDown={handleSearch}
               />
 
@@ -237,13 +234,13 @@ export default function LeaderBoardList() {
                   value: "most-nfts",
                   sortBy: "numberNfts",
                   order: "DESC",
-                  label: "Most NFTs"
+                  label: t("leaderboard:sort.most-nfts")
                 },
                 {
                   value: "lowest-nfts",
                   sortBy: "numberNfts",
                   order: "ASC",
-                  label: "Lowest NFTs"
+                  label: t("leaderboard:sort.lowest-nfts")
                 },
                 {
                   value: "newest",

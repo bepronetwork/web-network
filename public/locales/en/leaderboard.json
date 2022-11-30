@@ -1,4 +1,9 @@
 {
  "title": "Leaderboard",
- "sub-title": "Find the developers who find the most solutions to many problems"
+ "sub-title": "Find the developers who find the most solutions to many problems",
+ "sort": {
+    "most-nfts": "Most NFTs",
+    "lowest-nfts": "Lowest NFTs"
+},
+"search": "Search for developers"
 }
