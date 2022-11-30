@@ -1,23 +1,23 @@
 import { useTranslation } from "next-i18next";
 
 export default function LeaderBoardListBar() {
-  const { t } = useTranslation("council");
+  const { t } = useTranslation("leaderboard");
 
   const columns = [
     {
-      label: "Address",
+      label: t("table.address"),
       column: 3,
     },
     {
-      label: "GithubHandle",
+      label: t("table.github-handle"),
       column: 3,
     },
     {
-      label: "NFTS",
+      label: t("table.nfts"),
       column: 3,
     },
     {
-      label: "Actions",
+      label: t("table.actions"),
       column: 3,
     },
   ];

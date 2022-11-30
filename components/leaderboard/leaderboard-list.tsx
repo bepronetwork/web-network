@@ -29,15 +29,6 @@ import useSearch from "x-hooks/use-search";
 import LeaderBoardListBar from "./leaderboard-list-bar";
 import LeaderBoardListItem from "./leaderboard-list-item";
 
-
-type Filter = {
-  label: string;
-  value: string;
-  emptyState: string;
-};
-
-type FiltersByIssueState = Filter[];
-
 interface LeaderBoardPage {
   page: number;
   leadBoard: LeaderBoard[];
@@ -69,31 +60,6 @@ export default function LeaderBoardList() {
     sortBy: string;
     order: string;
   };
-
-  const filtersByIssueState: FiltersByIssueState = [
-    {
-      label: t("filters.bounties.all"),
-      value: "all",
-      emptyState: t("filters.bounties.not-found")
-    },
-    {
-      label: t("filters.bounties.open"),
-      value: "open",
-      emptyState: t("filters.bounties.open-not-found")
-    },
-    {
-      label: t("filters.bounties.draft"),
-      value: "draft",
-      emptyState: t("filters.bounties.draft-not-found")
-    },
-    {
-      label: t("filters.bounties.closed"),
-      value: "closed",
-      emptyState: t("filters.bounties.closed-not-found")
-    }
-  ];
-
-  const [filterByState,] = useState<Filter>(filtersByIssueState[0]);
 
   function isListEmpy(): boolean {
     return leaderBoardPages.every((el) => el.leadBoard?.length === 0);
@@ -278,7 +244,7 @@ export default function LeaderBoardList() {
       {leaderBoardPages.every((el) => el.leadBoard?.length === 0) &&
       !appState.loading?.isLoading ? (
         <div className="pt-4">
-          <NothingFound description={ filterByState.emptyState}>
+          <NothingFound description={t("leaderboard:not-found")}>
           </NothingFound>
         </div>
       ) : null}

@@ -5,5 +5,12 @@
     "most-nfts": "Most NFTs",
     "lowest-nfts": "Lowest NFTs"
 },
-"search": "Search for developers"
+"search": "Search for developers",
+"not-found": "Not found",
+"table": {
+    "address": "Address",
+    "github-handle": "GithubHandle",
+    "nfts": "NFTS",
+    "actions": "Actions"
+}
 }
