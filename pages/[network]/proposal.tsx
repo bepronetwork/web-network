@@ -52,9 +52,10 @@ export default function PageProposal() {
       const {url} = await createNFT(state.currentBounty?.data?.contractId, proposal.contractId)
       
       handleCloseIssue(+state.currentBounty?.data?.contractId, +proposal.contractId, url)
-        .then(txInfo => {
+        .then(async txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-
+          
+          await processEvent("bountyToken", "transfer", state.Service?.network?.lastVisited, { fromBlock } )
           return processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } );
         })
         .then(() => {
