@@ -139,12 +139,6 @@ export default function ProposalActionCard({
   return (
     <div className="col-md-6">
       <div className="bg-shadow rounded-5 p-3">
-        {console.debug("hotfix", {
-          pullRequestNeedsApproval,
-          activeRepoRules,
-          bountyBranch,
-          currentPullRequest
-        })}
         <div className="mb-5">
           <ProposalProgressBar
             issueDisputeAmount={+networkProposal?.disputeWeight}
