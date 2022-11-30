@@ -59,11 +59,12 @@ export function RegistrySetup({
   const [bountyTokenDispatcher, setBountyTokenDispatcher] = useState<string>();
   const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState("");
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState("");
+  const [registrySaveCTA, setRegistrySaveCTA] = useState(false);
 
   const { loadSettings } = useSettings();
-  const { saveNetworkRegistry, processEvent } = useApi();
-  const { dispatch, state: { currentUser, Service } } = useAppState();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
+  const { saveNetworkRegistry, processEvent, updateChainRegistry, getSupportedChains } = useApi();
+  const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
 
   function isEmpty(value: string) {
     return value.trim() === "";
@@ -132,6 +133,7 @@ export function RegistrySetup({
 
         Service?.active?.loadRegistry(false, contractAddress);
 
+        // todo: save registry address into chains table
         return saveNetworkRegistry(currentUser?.walletAddress, contractAddress);
       })
       .then(() => {
@@ -224,6 +226,18 @@ export function RegistrySetup({
     allowToken(false);
   }
 
+  function setChainRegistry() {
+    const chain = supportedChains.find(({chainId}) => chainId === +connectedChain?.id);
+    if (!chain || !registryAddress)
+      return;
+
+    return updateChainRegistry({...chain, registryAddress: registryAddress})
+      .then(result => {
+        if (result)
+          return getSupportedChains(true, {registryAddress: registryAddress});
+      })
+  }
+
   useEffect(() => {
     if (!registryAddress || !Service?.active || !isVisible) return;
 
@@ -233,6 +247,19 @@ export function RegistrySetup({
   useEffect(() => {
     if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);
   }, [currentUser?.walletAddress]);
+
+  useEffect(() => {
+    if (!supportedChains.length || !connectedChain?.id)
+      return;
+
+    const chain = supportedChains.find(({chainId}) => chainId === +connectedChain?.id);
+
+    if (!chain)
+      return;
+
+    setRegistrySaveCTA(chain?.registryAddress ? false : !!registryAddress)
+
+  }, [connectedChain, supportedChains, registryAddress])
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">
@@ -277,6 +304,13 @@ export function RegistrySetup({
           disabled={!!isErc20Allowed?.reward || !!isAllowingToken}
           executing={isAllowingToken === "reward"}
         />
+      }
+
+      {
+        registrySaveCTA
+          ? <CallToAction call="Please save your registry onto the connected chain"
+                          action="Save" onClick={setChainRegistry} color="warning" disabled={false} executing={false}/>
+          : ''
       }
 
       <Row className="align-items-center mb-3">
