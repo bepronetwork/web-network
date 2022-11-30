@@ -587,22 +587,48 @@ export default function useApi() {
       });
   }
 
+  async function updateChainRegistry(chain: SupportedChainData) {
+
+    const model: any = {
+      chainId: chain.chainId,
+      name: chain.chainName,
+      shortName: chain.chainShortName,
+      activeRPC: chain.chainRpc,
+      networkId: chain.chainId,
+      nativeCurrency: {
+        decimals: +chain.chainCurrencyDecimals,
+        name: chain.chainCurrencyName,
+        symbol: chain.chainCurrencySymbol
+      },
+      rpc: [],
+      networkRegistry: chain?.registryAddress
+    }
+
+    return api.patch<{message: string}>(`chains`, model)
+      .then(response => response.status === 200)
+      .catch(() => {
+        return false;
+      })
+  }
+
   async function saveNetworkRegistry(wallet: string, registryAddress: string) {
-    return api.post("/setup/registry", { wallet, registryAddress })
+    return api.post("setup/registry", { wallet, registryAddress })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
       });
   }
 
-  async function getSupportedChains(force = false) {
+  async function getSupportedChains(force = false, query: Partial<SupportedChainData> = null) {
     if (!force && state?.supportedChains.length)
       return Promise.resolve(state?.supportedChains);
 
-    return api.get<{result: SupportedChainData[], error?: string; }>(`/chains`)
+    const params = new URLSearchParams(query as any).toString()
+
+    return api.get<{result: SupportedChainData[], error?: string; }>(`/chains`, {... query ? {params} : {}})
       .then(({data}) => data)
       .then(data => {
-        if (!data.error)
+        if (!data.error && !query)
           dispatch(updateSupportedChains(data.result));
         else {
           console.error(`failed to fetch supported chains`, data.error);
@@ -693,6 +719,7 @@ export default function useApi() {
     createNFT,
     saveNetworkRegistry,
     addSupportedChain,
-    deleteSupportedChain
+    deleteSupportedChain,
+    updateChainRegistry
   };
 }

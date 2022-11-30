@@ -3,12 +3,12 @@ export interface SupportedChainData {
   chainRpc: string;
   name: string;
   chainName: string;
-  shortName: string;
-  currencySymbol: string;
-  currencyDecimals: string;
-  currencyName: string;
+  chainShortName: string;
+  chainCurrencySymbol: string;
+  chainCurrencyDecimals: string;
+  chainCurrencyName: string;
   blockScanner: string;
-  networkRegistry: string;
+  registryAddress: string;
   beproTokenAddress: string;
   isDefault: boolean;
 }

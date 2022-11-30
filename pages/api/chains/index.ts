@@ -6,7 +6,7 @@ import models from "db/models";
 import {error} from "../../../services/logging";
 import {withCors} from "../../../middleware";
 
-async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = false) {
+async function PostPatch(req: NextApiRequest, res: NextApiResponse, update = false) {
   const body = req.body as MiniChainInfo;
 
   const missingValues = [
@@ -31,7 +31,8 @@ async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = fa
     chainCurrencySymbol: body.nativeCurrency?.symbol,
     chainCurrencyName: body.nativeCurrency?.name,
     chainCurrencyDecimals: body.nativeCurrency?.decimals,
-    isDefault: (body as any).isDefault
+    isDefault: (body as any).isDefault,
+    registryAddress: (body as any).networkRegistry,
   }
 
   const chain = await models.chain.findOne({where: {chainId: {[Op.eq]: model.chainId}}});
@@ -52,8 +53,14 @@ async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = fa
     return false;
   }
 
-  if (chain && update)
+  if (chain && update) {
+    console.log(`CHAIN`, chain);
+
+    if (chain.registryAddress)
+      return res.status(400).json({message: 'already configured.'});
+
     action = await chain.set(model).save().then(() => true).catch(logError);
+  }
   else if (!chain && !update)
     action = await models.chain.create(model).then(() => true).catch(logError);
 
@@ -62,7 +69,7 @@ async function postUpdate(req: NextApiRequest, res: NextApiResponse, update = fa
     .json({message: action ? 'ok' : `Failed to ${update ? 'update' : 'create'} ${model.chainId}`});
 }
 
-async function _delete(req: NextApiRequest, res: NextApiResponse) {
+async function Remove(req: NextApiRequest, res: NextApiResponse) {
   if (!req.query?.id)
     return res.status(400).json({message: 'missing id'});
 
@@ -77,19 +84,17 @@ async function _delete(req: NextApiRequest, res: NextApiResponse) {
 
 }
 
-async function _get(req: NextApiRequest, res: NextApiResponse) {
+async function Get(req: NextApiRequest, res: NextApiResponse) {
 
   const query = req.query;
   const where = {
-     ... query.chainId ? {chainId: query.chainId} : {},
-     ... query.networkId ? {chainId: query.chainId} : {},
-     ... query.name ? {chainId: query.chainId} : {},
-     ... query.shortName ? {chainId: query.chainId} : {},
-     ... query.activeRPC ? {chainId: query.chainId} : {},
-     ... query.nativeCurrencyName ? {chainId: query.chainId} : {},
-     ... query.nativeCurrencySymbol ? {chainId: query.chainId} : {},
-     ... query.nativeCurrencyDecimals ? {chainId: query.chainId} : {},
-     ... query.chainId ? {chainId: query.chainId} : {},
+     ... query.chainId ? {chainId: {[Op.iLike]: query.chainId}} : {},
+     ... query.name ? {chainId: {[Op.iLike]: query.name}} : {},
+     ... query.shortName ? {chainId: {[Op.iLike]: query.shortName}} : {},
+     ... query.activeRPC ? {chainId: {[Op.iLike]: query.activeRPC}} : {},
+     ... query.nativeCurrencyName ? {chainId: {[Op.iLike]: query.nativeCurrencyName}} : {},
+     ... query.nativeCurrencySymbol ? {chainId: {[Op.iLike]: query.nativeCurrencySymbol}} : {},
+     ... query.nativeCurrencyDecimals ? {chainId: {[Op.iLike]: query.nativeCurrencyDecimals}} : {},
   }
 
   return models.chain.findAll({where})
@@ -104,15 +109,16 @@ async function _get(req: NextApiRequest, res: NextApiResponse) {
 async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
     case "post":
-      await postUpdate(req, res);
+    case "patch":
+      await PostPatch(req, res, req.method.toLowerCase() === "patch");
       break;
 
     case "delete":
-      await _delete(req, res);
+      await Remove(req, res);
       break;
 
     case "get":
-      await _get(req, res);
+      await Get(req, res);
       break;
 
     default:
