@@ -24,6 +24,7 @@ export default function RepositoriesListSettings() {
           repositories={github.repositories}
           onClick={fields.repository.setter}
           withLabel={false}
+          botUser={state.Settings?.github?.botUser}
         />
       )}
     </Row>
