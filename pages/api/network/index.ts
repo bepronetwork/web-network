@@ -184,10 +184,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       if (invitation_id)
         await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
           invitation_id
-        }).catch((e)=>{
-          LogError('[GH Accpet Invitation Fail]', {e})
-          return e;
-        });
+        })
+          .catch((e)=>{
+            LogError('[GH Accpet Invitation Fail]', {e})
+            return e;
+          });
     }
 
     //TODO: move tokens logic to new endpoint   
@@ -375,10 +376,14 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           repo,
           username: publicSettings?.github?.botUser,
           ...(githubLogin !== owner  && { permission: "maintain"} || {})
-        });
+        })
+          .catch((e) => {
+            LogError('[GH Add Colaborator Fail]', {e})
+            return e;
+          });
 
         if (data?.id) invitations.push(data?.id);
-
+        
         await Database.repositories.create({
           githubPath: repository.fullName,
           network_id: network.id
@@ -394,7 +399,11 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           if (invitation_id)
             await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
               invitation_id
-            });
+            })
+              .catch((e)=>{
+                LogError('[GH Accpet Invitation Fail]', {e})
+                return e;
+              });
         }
       }
     }
