@@ -72,7 +72,7 @@ export default function PageIssue() {
     checkForks();
   },[state.currentUser?.login, 
      state.currentBounty?.data?.working, 
-     state.Service?.network?.repos?.active 
+     state.Service?.network?.repos?.active
   ]);
 
   return (
