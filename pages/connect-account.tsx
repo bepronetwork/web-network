@@ -57,7 +57,8 @@ export default function ConnectAccount() {
     if(previusRouter)
       return router.push(previusRouter);
 
-    const redirectTo = state.Service?.network?.lastVisited ? `${state.Service?.network?.lastVisited}/profile` : "/networks";
+    const redirectTo = 
+      state.Service?.network?.lastVisited ? `${state.Service?.network?.lastVisited}/profile` : "/networks";
 
     router.push(redirectTo);
   }

@@ -142,7 +142,8 @@ export default function PageProposal() {
 
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = state.currentBounty?.chainData.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
+      const distributedAmount = 
+        state.currentBounty?.chainData.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
 
       return { 
         githubLogin, 
@@ -180,7 +181,10 @@ export default function PageProposal() {
           />
         </div>
         <div className="mt-3 row justify-content-between">
-          <ProposalListAddresses usersDistribution={usersDistribution} currency={state.currentBounty?.data?.token?.symbol} />
+          <ProposalListAddresses 
+            usersDistribution={usersDistribution} 
+            currency={state.currentBounty?.data?.token?.symbol} 
+          />
           <ProposalActionCard
             proposal={proposal}
             networkProposal={networkProposal}

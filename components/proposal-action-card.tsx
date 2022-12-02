@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import {addSeconds, formatDistance, sub, subSeconds} from "date-fns";
+import {addSeconds, formatDistance} from "date-fns";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
@@ -17,7 +17,6 @@ import {Proposal} from "interfaces/proposal";
 import useOctokit from "x-hooks/use-octokit";
 
 import {useAppState} from "../contexts/app-state";
-import {getTimeDifferenceInWords} from "../helpers/formatDate";
 import {ContextualSpan} from "./contextual-span";
 
 interface IProposalActionCardProps {
@@ -48,7 +47,8 @@ export default function ProposalActionCard({
   const {state} = useAppState();
   const {getRepository} = useOctokit();
 
-  const bountyAmount = BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
+  const bountyAmount = 
+    BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
 
   const isDisable = () => [
     state.currentBounty?.chainData?.closed,
@@ -117,7 +117,11 @@ export default function ProposalActionCard({
     setChainDisputable(+target - +new Date(chaintime) > 0);
   }
 
-  useEffect(changeMissingDisputableTime, [proposal?.createdAt, chaintime, state.Service?.network?.times?.disputableTime]);
+  useEffect(changeMissingDisputableTime, [
+    proposal?.createdAt, 
+    chaintime, 
+    state.Service?.network?.times?.disputableTime
+  ]);
 
   useEffect(() => {
     if (state.Service?.active)

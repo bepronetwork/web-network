@@ -39,7 +39,8 @@ export default function NotMergeableModal({
 
   const { mergeClosedIssue } = useApi();
 
-  const isIssueOwner = !!state.currentBounty?.data && state.currentBounty?.data?.creatorAddress?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+  const isIssueOwner = !!state.currentBounty?.data && 
+    state.currentBounty?.data?.creatorAddress?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
   const isPullRequestOwner = pullRequest?.githubLogin === state.currentUser?.login;
   const isProposer =
     networkProposal?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
