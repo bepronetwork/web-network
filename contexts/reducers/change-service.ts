@@ -23,7 +23,7 @@ export class ChangeServiceProp<T = ServiceState | Partial<ServiceState>, A = key
   }
 
   reducer(state: State, payload, subAction): State {
-    return super.reducer(state, Object.assign(state.Service || {}, {[subAction]: payload}) as T); // eslint-disable-line
+    return super.reducer(state, Object.assign(state.Service || {}, {[subAction]: payload}) as any); // eslint-disable-line
   }
 }
 
