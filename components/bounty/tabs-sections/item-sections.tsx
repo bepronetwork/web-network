@@ -70,7 +70,8 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 key={uuidv4()}
                 id={item?.id} 
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
-                githubLogin={item?.githubLogin} 
+                githubLogin={item?.githubLogin}
+                creator={item?.creator} 
                 status={status}>
                 {(isProposal && networkProposal) ? (
                   <>
