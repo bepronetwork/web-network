@@ -124,7 +124,7 @@ module.exports = {
         await currentNetwork._contract.web3.eth.getBlockNumber();
 
       const OracleChangedEvents = await currentNetwork.getOraclesChangedEvents({
-        fromBlock: process.env.BULK_CHAIN_START_BLOCK || 0,
+        fromBlock: process.env.BULK_CHAIN_START_BLOCK_MIGRATION_CURATORS || 0,
         toBlock: blockNumber,
       });
 
@@ -154,7 +154,7 @@ module.exports = {
 
       const OracleTransferEvents =
         await currentNetwork.getOraclesTransferEvents({
-          fromBlock: process.env.BULK_CHAIN_START_BLOCK || 0,
+          fromBlock: process.env.BULK_CHAIN_START_BLOCK_MIGRATION_CURATORS || 0,
           toBlock: blockNumber,
         });
 
