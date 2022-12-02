@@ -198,8 +198,16 @@ export default function useOctokit() {
         }));
     });
 
-
     return userRepositories || [];
+  }
+
+  async function getUserRepository(login: string, repositoryName: string) {
+    const response = await makeOctokitRequest(UserQueries.Repository, {
+      login,
+      repo: repositoryName
+    });
+
+    return getPropertyRecursively<GraphQlQueryResponseData>("repository", response);
   }
   
   return {
@@ -211,6 +219,7 @@ export default function useOctokit() {
     getRepository,
     getRepositoryForks,
     getRepositoryBranches,
-    getUserRepositories
+    getUserRepositories,
+    getUserRepository
   };
 }
