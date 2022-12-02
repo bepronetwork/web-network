@@ -104,7 +104,8 @@ export function useBounty() {
               isMergeable: details?.mergeable === "MERGEABLE",
               merged: details?.merged,
               state: details?.state,
-              approvals: details?.approvals
+              approvals: details?.approvals,
+              hash: details?.hash
             })))]);
       })
       .then(pullRequests => {

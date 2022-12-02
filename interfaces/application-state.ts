@@ -22,6 +22,7 @@ export interface ServiceNetworkReposActive extends RepoInfo {
   ghVisibility?: boolean;
   githubPath: string;
   branchProtectionRules?: any;
+  viewerPermission?: string;
   id: number;
 }
 

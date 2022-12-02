@@ -3,3 +3,5 @@ export type GraphQlQueryResponseData = {
 };
 
 export type GraphQlResponse = Promise<GraphQlQueryResponseData>;
+
+export type RepositoryPermission = "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";

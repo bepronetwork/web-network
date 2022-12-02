@@ -32,6 +32,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress]);
 
   useEffect(repos.loadRepos, [state?.Service?.network?.lastVisited]);
+  useEffect(repos.updateActiveRepo, [query?.repoId, state.Service?.network?.repos]);
 
   useEffect(auth.validateGhAndWallet,
             [(session?.data as CustomSession),

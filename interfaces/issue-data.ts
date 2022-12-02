@@ -90,6 +90,7 @@ export interface pullRequest {
   userBranch?: string;
   userRepo?: string;
   network_id: number;
+  hash?: string;
   approvals?: {
     total: number;
   }

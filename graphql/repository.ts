@@ -73,3 +73,10 @@ export const CreateLabel =
     }
   }
 }`;
+
+export const ViewerPermission = 
+  `query Repository($repo: String!, $owner: String!) {
+    repository(name: $repo, owner: $owner) {
+      viewerPermission
+    }
+  }`;

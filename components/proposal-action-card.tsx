@@ -8,6 +8,8 @@ import Button from "components/button";
 import ProposalMerge from "components/proposal-merge";
 import ProposalProgressBar from "components/proposal-progress-bar";
 
+import { changeNetworkReposActiveViewerPerm } from "contexts/reducers/change-service";
+
 import {isProposalDisputable} from "helpers/proposal";
 
 import {ProposalExtended} from "interfaces/bounty";
@@ -45,14 +47,16 @@ export default function ProposalActionCard({
   const [isDisputing, setIsDisputing] = useState(false);
   const [allowMergeCommit, setAllowMergeCommit] = useState<boolean>();
 
-  const {state} = useAppState();
-  const {getRepository} = useOctokit();
+  const { dispatch, state } = useAppState();
+  const { getRepository, getRepositoryViewerPermission } = useOctokit();
 
   const bountyAmount = BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
   const bountyBranch = state.currentBounty?.data?.branch;
   const activeRepoRules = state.Service?.network?.repos?.active?.branchProtectionRules;
   const pullRequestNeedsApproval = currentPullRequest?.approvals?.total < (activeRepoRules ? 
     activeRepoRules[bountyBranch]?.requiredApprovingReviewCount : 0);
+  const viewerPermission = state.Service?.network?.repos?.active?.viewerPermission;
+  const canApprovePR = !!viewerPermission && viewerPermission !== "READ";
 
   const isDisable = () => [
     state.currentBounty?.chainData?.closed,
@@ -136,6 +140,18 @@ export default function ProposalActionCard({
         .catch(console.debug);
   }, [state?.currentBounty?.data]);
 
+  useEffect(() => {
+    if (!state.currentUser?.login ||
+        !state.Service?.network?.repos?.active?.githubPath ||
+        state.Service?.network?.repos?.active?.viewerPermission) return;
+
+    getRepositoryViewerPermission(state.Service?.network?.repos?.active?.githubPath)
+      .then(permission => dispatch(changeNetworkReposActiveViewerPerm(permission)))
+      .catch(error => console.debug("Failed to get viewer permission", error));
+  }, [state.currentUser?.login, 
+      state.Service?.network?.repos?.active?.githubPath,
+      state.Service?.network?.repos?.active?.viewerPermission]);
+
   return (
     <div className="col-md-6">
       <div className="bg-shadow rounded-5 p-3">
@@ -166,6 +182,12 @@ export default function ProposalActionCard({
               onClickMerge={handleMerge}
               canMerge={canMerge()}
             />
+
+            { (canApprovePR && pullRequestNeedsApproval) &&
+              <Button>
+                Approve
+              </Button>
+            }
 
             {!isSuccess() && !isDisable() && (
               <Button

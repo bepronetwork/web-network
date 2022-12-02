@@ -19,23 +19,19 @@ import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
-import {useRepos} from "x-hooks/use-repos";
-
 
 export default function PageIssue() {
   useBounty();
   const router = useRouter();
 
   const [commentsIssue, setCommentsIssue] = useState([]);
-  const [isRepoForked, setIsRepoForked] = useState(false);
+  const [isRepoForked, setIsRepoForked] = useState<boolean>();
 
   const {state} = useAppState();
 
   const { getUserRepositories } = useOctokit();
-  const {updateActiveRepo} = useRepos()
 
-  const { id, repoId } = router.query;
-  updateActiveRepo(repoId);
+  const { id } = router.query;
 
   function checkForks(){
     if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
@@ -69,13 +65,16 @@ export default function PageIssue() {
 
   useEffect(() => {
     if (!state.currentUser?.login ||
+        !state.currentUser?.walletAddress ||
         !state.Service?.network?.repos?.active ||
-        !state.currentBounty?.data) 
+        !state.currentBounty?.data ||
+        isRepoForked !== undefined) 
       return;
     checkForks();
   },[state.currentUser?.login, 
      state.currentBounty?.data?.working, 
-     state.Service?.network?.repos?.active 
+     state.Service?.network?.repos?.active,
+     !state.currentUser?.walletAddress
   ]);
 
   return (
@@ -85,7 +84,7 @@ export default function PageIssue() {
       { state.currentBounty?.chainData?.isFundingRequest ? <FundingSection /> : null}
 
       <PageActions
-        isRepoForked={isRepoForked}
+        isRepoForked={!!isRepoForked}
         addNewComment={addNewComment}
       />
 

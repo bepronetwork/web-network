@@ -29,7 +29,7 @@ export const Details =
   `query Details($repo: String!, $owner: String!, $id: Int!) {
     repository(name: $repo, owner: $owner) {
       pullRequest(number: $id) {
-        id
+        hash: id
         mergeable
         merged
         state
@@ -93,6 +93,7 @@ export const Merge =
     }
   }
 }`;
+
 export const PullRequests = `
 query Repository($repo: String!, $owner: String!) {
   repository(name: $repo, owner: $owner) {
@@ -110,4 +111,15 @@ query Repository($repo: String!, $owner: String!) {
     }
   }
 }
-`
+`;
+
+export const Approve =
+`mutation ApprovePullRequest($pullRequestId: ID!, $body: String!) {
+  addPullRequestReview(
+    input: { pullRequestId: $pullRequestId, event: APPROVE, body: $body }
+  ) {
+    pullRequest {
+      id
+    }
+  }
+}`;
