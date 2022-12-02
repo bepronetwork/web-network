@@ -169,9 +169,9 @@ export default function useOctokit() {
     return branches || [];
   }
 
-  async function getUserRepositories(login:  string) {
+  async function getUserRepositories(login:  string, botUser?: string) {
 
-    const response = await getAllPages(UserQueries.Repositories, {
+    const response = await getAllPages(UserQueries.Repositories(botUser), {
       login
     });
 
@@ -187,12 +187,14 @@ export default function useOctokit() {
       parent?: {
         name: string;
         nameWithOwner: string;
-      }
+      },
+      collaborators: string[];
     }>(item => {
       return getPropertyRecursively<GraphQlQueryResponseData>("nodes", item?.["user"]?.repositories)
         ?.map(el => ({
           ...el,
           owner: el.owner.login,
+          collaborators: el.collaborators?.nodes?.flatMap(c => c.login) || []
         }));
     });
 

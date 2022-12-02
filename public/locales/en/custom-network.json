@@ -120,7 +120,9 @@
       "user-permission-not-admin_one": "Your permission level on this repository does not allow giving access.",
       "user-permission-not-admin_other": "Your permission level on these repositories does not allow giving access.",
       "no-merge-commit-permission_one": "Repository {{repos}} don't support \"merge commits\" merge type. Please, allow that in the repository settings.", 
-      "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings." 
+      "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings.",
+      "without-bot-collab_one": "Repository {{repos}} don't have {{bot}} bot as collaborator. Please, remove the repository from the network and re-add it.", 
+      "without-bot-collab_other": "Repositories {{repos}} doesn't have {{bot}} bot as collaborator. Please, remove the repositories from the network and re-add them." 
     },
     "token-configuration": {
       "title": "Governance Token",
