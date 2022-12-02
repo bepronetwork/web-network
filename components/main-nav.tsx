@@ -73,38 +73,58 @@ export default function MainNav() {
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true))
     return dispatch(changeShowCreateBounty(true))
+    
   } 
+
+  const brandLogo = !isNetworksPage ? (
+      <InternalLink
+        href={getURLWithNetwork("/", {
+          network: state.Service?.network?.active?.name,
+        })}
+        icon={
+          fullLogoUrl ? (
+            <img
+              src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
+              width={104}
+              height={32}
+            />
+          ) : (
+            <LogoPlaceholder />
+          )
+        }
+        className="brand"
+        nav
+        active
+        brand
+      />
+    ): (
+      <InternalLink
+        href={'/'}
+        icon={                  
+            <img
+              src={`/images/Bepro_Logo_Light.svg`}
+              width={104}
+              height={32}
+            />                  
+        }
+        className="brand"
+        nav
+        active
+        brand
+      />
+  );
 
   return (
     <div className="nav-container">
       {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
-      <div
-        className="main-nav d-flex flex-column justify-content-center"
-      >
+      <div className="main-nav d-flex flex-column justify-content-center">
         <div
           className={`d-flex flex-row align-items-center justify-content-between px-3 ${
             state.currentUser?.walletAddress ? "py-0" : "py-3"
           }`}
         >
           <div className="d-flex">
-            <InternalLink
-              href={getURLWithNetwork("/", { network: state.Service?.network?.active?.name })}
-              icon={
-                fullLogoUrl ? (
-                  <img
-                    src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
-                    width={104}
-                    height={32}
-                  />
-                ) : (
-                  <LogoPlaceholder />
-                )
-              }
-              className="brand"
-              nav
-              active
-              brand
-            />
+            {brandLogo}
             {(!isNetworksPage && (
               <ul className="nav-links">
                 <li>
