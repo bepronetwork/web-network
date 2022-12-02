@@ -138,7 +138,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     const githubValidate = [
         Fields.repository.validator(newState.github?.repositories),
-        isCreating && newState.github?.botPermission || true,
+        isCreating ? newState.github?.botPermission : true,
     ].every(condition => condition);
     
     newState.settings = handlerValidateSettings(newState.settings)
