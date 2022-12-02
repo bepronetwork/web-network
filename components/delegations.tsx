@@ -26,7 +26,8 @@ export default function Delegations({
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
-      description: t("my-oracles:descriptions.oracles-delegated-to-me", { token: state.Service?.network?.networkToken?.symbol }),
+      description: 
+        t("my-oracles:descriptions.oracles-delegated-to-me", { token: state.Service?.network?.networkToken?.symbol }),
       total: undefined,
       delegations: [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
     },
@@ -35,7 +36,9 @@ export default function Delegations({
       total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) =>
         delegation.amount.plus(acc), BigNumber(0)).toFixed()),
       description: 
-             t("my-oracles:descriptions.oracles-delegated-to-others", { token: state.Service?.network?.networkToken?.symbol }),
+             t("my-oracles:descriptions.oracles-delegated-to-others", { 
+              token: state.Service?.network?.networkToken?.symbol
+             }),
       delegations: state.currentUser?.balance?.oracles?.delegations || []
     }
   };

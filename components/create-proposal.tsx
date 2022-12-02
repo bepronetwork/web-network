@@ -165,7 +165,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
       const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
         return {
-          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
+          currentPrId: 
+            Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
           prAddressAmount: item.details.map(detail => ({
             amount: Number(detail.percentage),
             address: detail.recipient
