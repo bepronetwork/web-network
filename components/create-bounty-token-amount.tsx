@@ -34,10 +34,6 @@ export default function CreateBountyTokenAmount({
   const {publicRuntimeConfig} = getConfig();
   const [inputError, setInputError] = useState("");
   const [convertedAmount, setConvertedAmount] = useState(0);
-  
-  function getCurrentCoin() {
-    return customTokens?.find((token) => token?.address === currentToken.address);
-  }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
     if(needValueValidation && (+values.floatValue > +currentToken?.currentValue)){
@@ -45,7 +41,8 @@ export default function CreateBountyTokenAmount({
       setInputError(t("bounty:errors.exceeds-allowance"))
     } else if (values.floatValue < 0) {
       setIssueAmount({ formattedValue: "" });
-    } else if(values.floatValue !== 0 && BigNumber(values.floatValue).isLessThan(BigNumber(state.Settings?.minBountyValue))){
+    } else if(values.floatValue !== 0 && 
+              BigNumber(values.floatValue).isLessThan(BigNumber(state.Settings?.minBountyValue))){
       setInputError(t("bounty:errors.exceeds-minimum-amount",{
         amount: state.Settings?.minBountyValue
       }))

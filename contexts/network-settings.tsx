@@ -138,7 +138,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     const githubValidate = [
         Fields.repository.validator(newState.github?.repositories),
-        isCreating && newState.github?.botPermission || true,
+        isCreating ? newState.github?.botPermission : true,
     ].every(condition => condition);
     
     newState.settings = handlerValidateSettings(newState.settings)
@@ -309,7 +309,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     const repositories = [];
 
     if(state.currentUser?.login){
-      const githubRepositories = await getUserRepositories(state.currentUser?.login)
+      const botUser = !isCreating ? state.Settings?.github?.botUser : undefined
+      const githubRepositories = await getUserRepositories(state.currentUser?.login, botUser);
 
       const filtered = githubRepositories
           .filter(repo => {
@@ -325,22 +326,27 @@ export const NetworkSettingsProvider = ({ children }) => {
             userPermission:repo.viewerPermission,
             name: repo?.name,
             fullName: repo?.nameWithOwner,
-            mergeCommitAllowed: repo.mergeCommitAllowed
+            mergeCommitAllowed: repo.mergeCommitAllowed,
+            collaborators: repo.collaborators
           }));
 
 
       if (!isCreating){
         const repositoryAlreadyExists =  await searchRepositories({ networkName: network?.name })
             .then(({ rows }) =>
-            Promise.all(rows.map( async repo => ({
-              checked: true,
-              isSaved: true,
-              name: repo.githubPath.split("/")[1],
-              fullName: repo.githubPath,
-              hasIssues: await repositoryHasIssues(repo.githubPath),
-              mergeCommitAllowed:
-                filtered.find(({ fullName }) => fullName === repo.githubPath)?.mergeCommitAllowed || false
-            }))))
+            Promise.all(rows.map( async repo => {
+              const repoOnGh = filtered.find(({ fullName }) => fullName === repo.githubPath);
+
+              return {
+                checked: true,
+                isSaved: true,
+                name: repo.githubPath.split("/")[1],
+                fullName: repo.githubPath,
+                hasIssues: await repositoryHasIssues(repo.githubPath),
+                mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
+                collaborators: repoOnGh?.collaborators || [],
+              };
+            })))
         repositories.push(...repositoryAlreadyExists)
       }
 
@@ -483,7 +489,8 @@ export const NetworkSettingsProvider = ({ children }) => {
       !state.currentUser?.walletAddress,
       !isCreating && !network?.name && !network?.councilAmount,
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
-      !needsToLoad
+      !needsToLoad,
+      !state.Settings
     ].some(c => c))
       return;
 
@@ -502,7 +509,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     forcedNetwork,
     needsToLoad,
     router.pathname,
-    state.Service?.active?.registry?.token?.contractAddress
+    state.Service?.active?.registry?.token?.contractAddress,
+    state.Settings
   ]);
 
   // NOTE -  Load Forced/User Network

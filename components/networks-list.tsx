@@ -100,7 +100,7 @@ export default function NetworksList() {
     const dao = new DAO({web3Host, skipWindowAssignment: true});
 
     dao.start()
-      .then( _ => Promise.all(networks.map(async (network: Network) => {
+      .then( () => Promise.all(networks.map(async (network: Network) => {
         const networkAddress = network?.networkAddress;
         await dao.loadNetwork(networkAddress);
 

@@ -13,13 +13,14 @@ interface infoType {
   text: string
 }
 
-export default function RepositoriesList({ withLabel = true, repositories, onClick }) {
+export default function RepositoriesList({ withLabel = true, repositories, botUser = undefined, onClick }) {
   const { t } = useTranslation("custom-network");
 
   const [existingRepos, setExistingRepos] = useState([]);
   const [reposWithIssues, setReposWithIssues] = useState([]);
   const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
   const [withoutMergeCommitPerm, setWithoutMergeCommitPerm] = useState([]);
+  const [withoutBotCollaborator, setWithoutBotCollaborator] = useState([]);
 
   const { searchRepositories } = useApi();
 
@@ -48,15 +49,34 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
       type: "warning"
     },
     {
+      visible: !!withoutBotCollaborator.length,
+      text: t("steps.repositories.without-bot-collab", { 
+        count: withoutBotCollaborator.length,
+        repos: withoutBotCollaborator.join(", "),
+        bot: botUser
+      }),
+      type: "primary"
+    },
+    {
       visible: !!repositories?.length && !repositories?.some(({ checked }) => checked),
       text: t("steps.repositories.no-repositories-selected"),
       type: "danger"
-    }
+    },
   ]
 
 
   function updateReposWithoutMergeCommitPerm() {
     setWithoutMergeCommitPerm(repositories.filter(repository => repository.checked && !repository.mergeCommitAllowed)
+      .map((repository) => repository.fullName));
+  }
+
+  function updateReposWithoutBotCollaborator() {
+    if (!botUser) return;
+
+    const hasBotAsCollaborator = repo => !!repo.collaborators.find(c => c === botUser);
+
+    setWithoutBotCollaborator(repositories.filter(repository => repository.checked && 
+      repository.isSaved && !hasBotAsCollaborator(repository))
       .map((repository) => repository.fullName));
   }
   
@@ -66,6 +86,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
     onClick(repository.fullName);
 
     updateReposWithoutMergeCommitPerm();
+    updateReposWithoutBotCollaborator();
   }
 
   useEffect(() => {
@@ -82,7 +103,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         networkName: ""
       })
         .then(({ rows }) => {
-          setExistingRepos(rows.map((repo) => repo.name));
+          setExistingRepos(rows.map((repo) => repo.githubPath));
         })
         .catch(console.log);
 
@@ -95,7 +116,10 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
           .map((repository) => repository.fullName));
 
     updateReposWithoutMergeCommitPerm();
+    updateReposWithoutBotCollaborator();
   }, [repositories]);
+
+  useEffect(updateReposWithoutBotCollaborator, [botUser]);
 
   function renderInfo({
     text,
@@ -116,10 +140,10 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
         </span>
       }
 
-      {repositories.map((repository) => (
+      {repositories.map((repository, index) => (
         <>
           <RepositoryCheck
-            key={repository.fullName}
+            key={`${index}-${repository.fullName}`}
             label={repositories.filter(r => r.name === repository.name).length > 1 ? repository.fullName : repository.name}
             active={repository.checked}
             userPermission={repository.userPermission}

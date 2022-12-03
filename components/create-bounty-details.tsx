@@ -10,6 +10,7 @@ export default function CreateBountyDetails({
   bountyDescription,
   setBountyDescription,
   onUpdateFiles,
+  onUploading,
   files,
   review = false,
 }) {
@@ -57,6 +58,7 @@ export default function CreateBountyDetails({
         <DragAndDrop
           externalFiles={files}
           onUpdateFiles={onUpdateFiles}
+          onUploading={onUploading}
           review={review}
         />
       </div>

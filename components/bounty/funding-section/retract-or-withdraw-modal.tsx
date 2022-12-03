@@ -43,7 +43,8 @@ export default function RetractOrWithdrawModal({
   const tokenSymbol = state.currentBounty?.chainData?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;
   const retractOrWithdrawAmount = state.currentBounty?.chainData?.closed ?
-    funding?.amount?.dividedBy(state.currentBounty?.chainData?.fundingAmount).multipliedBy(state.currentBounty?.chainData?.rewardAmount)?.toFixed() :
+    funding?.amount?.dividedBy(state.currentBounty?.chainData?.fundingAmount)
+      .multipliedBy(state.currentBounty?.chainData?.rewardAmount)?.toFixed() :
     funding?.amount?.toFixed();
 
   function handleRetractOrWithdraw() {
@@ -51,7 +52,10 @@ export default function RetractOrWithdrawModal({
 
     setIsExecuting(true);
     if(state.currentBounty?.chainData?.closed){
-      handleWithdrawFundRewardBounty(state.currentBounty?.chainData?.id, funding.contractId, retractOrWithdrawAmount, rewardTokenSymbol)
+      handleWithdrawFundRewardBounty(state.currentBounty?.chainData?.id,
+                                     funding.contractId,
+                                     retractOrWithdrawAmount,
+                                     rewardTokenSymbol)
       .then(() => {
         onCloseClick();
         getChainBounty(true);
@@ -93,14 +97,16 @@ export default function RetractOrWithdrawModal({
   
   return(
     <Modal
-      title={state.currentBounty?.chainData?.closed ? t("funding:modals.reward.title") : t("funding:modals.retract.title")}
+      title={state.currentBounty?.chainData?.closed ? 
+        t("funding:modals.reward.title") : t("funding:modals.retract.title")}
       show={show}
       onCloseClick={onCloseClick}
     >
       <Row className="justify-content-center text-center">
         <Col xs="auto">
           <h4 className="family-Regular font-weight-normal mb-2">
-            {state.currentBounty?.chainData?.closed ? t("funding:modals.reward.description") : t("funding:modals.retract.description")}
+            {state.currentBounty?.chainData?.closed ? 
+              t("funding:modals.reward.description") : t("funding:modals.retract.description")}
           </h4>
 
           <div className="bg-dark-gray border-radius-8 py-2 px-3 mb-2">
