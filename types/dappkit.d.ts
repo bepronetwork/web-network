@@ -32,4 +32,6 @@ export type Events = "created" |
   "funded" | 
   "changed" |
   "transfer" |
-  "registered";
+  "registered"|
+  'moved-to-open'|
+  'update-draft-time';
