@@ -90,7 +90,37 @@ export default function UpdateBountyAmountModal({
   }, [transactionalAddress, state.Service?.active, state.currentUser, show]);
 
   return (
-    <Modal show={show} onCloseClick={handleClose} title={t("modals.update-bounty-amount.title")} titlePosition="center">
+    <Modal 
+      show={show} 
+      onCloseClick={handleClose} 
+      title={t("modals.update-bounty-amount.title")} 
+      titlePosition="center"
+      footer={(
+        <div className="d-flex pt-2 justify-content-between">
+          <Button color="dark-gray" onClick={handleClose}>
+              {t("actions.cancel")}
+          </Button>
+          {needsApproval ? 
+            <Button 
+              onClick={handleApprove} 
+              disabled={isExecuting || exceedsBalance}
+              withLockIcon={exceedsBalance}
+              isLoading={isExecuting}
+            >
+              <span>{t("actions.approve")}</span>
+            </Button> :
+            <Button
+                disabled={isExecuting || exceedsBalance || !newAmount}
+                withLockIcon={exceedsBalance || !newAmount}
+                onClick={handleSubmit}
+                isLoading={isExecuting}
+            >
+              <span>{t("actions.confirm")}</span>
+            </Button>
+          }
+        </div>
+      )}
+      >
       <div className="container">
         <div className="form-group">
           <InputNumber
@@ -110,33 +140,6 @@ export default function UpdateBountyAmountModal({
               </>
             }
           />
-        </div>
-
-        <div className="d-flex pt-2 justify-content-center">
-          {needsApproval ? 
-            <Button 
-              className="mr-2" 
-              onClick={handleApprove} 
-              disabled={isExecuting || exceedsBalance}
-              withLockIcon={exceedsBalance}
-              isLoading={isExecuting}
-            >
-              <span>{t("actions.approve")}</span>
-            </Button> :
-            <Button
-                className="mr-2"
-                disabled={isExecuting || exceedsBalance || !newAmount}
-                withLockIcon={exceedsBalance || !newAmount}
-                onClick={handleSubmit}
-                isLoading={isExecuting}
-            >
-              <span>{t("actions.confirm")}</span>
-            </Button>
-          }
-          
-          <Button color="dark-gray" onClick={handleClose}>
-              {t("actions.cancel")}
-          </Button>
         </div>
       </div>
     </Modal>

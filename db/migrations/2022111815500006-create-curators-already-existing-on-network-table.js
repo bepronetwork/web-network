@@ -123,10 +123,28 @@ module.exports = {
       const blockNumber =
         await currentNetwork._contract.web3.eth.getBlockNumber();
 
-      const OracleChangedEvents = await currentNetwork.getOraclesChangedEvents({
-        fromBlock: process.env.BULK_CHAIN_START_BLOCK || 0,
-        toBlock: blockNumber,
-      });
+
+
+      const OracleChangedEvents = [];
+
+      const paginateRequest = async (pool = [], fn, name) => {
+        const startBlock = process.env.BULK_CHAIN_START_BLOCK || 0;
+        const endBlock = blockNumber;
+        const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
+        const requests = (startBlock - endBlock) / perRequest;
+
+        let toBlock = 0;
+
+        console.log(`Fetching ${name} total of ${requests}, from: ${startBlock} to ${endBlock}`);
+        for (let fromBlock = startBlock; fromBlock < endBlock; fromBlock += perRequest) {
+          toBlock = fromBlock + perRequest > endBlock ? endBlock : fromBlock + perRequest;
+
+          console.log(`${name} fetch from ${fromBlock} to ${toBlock}`);
+          pool.push(...await fn({fromBlock, toBlock}));
+        }
+      }
+
+      await paginateRequest(OracleChangedEvents, currentNetwork.getOraclesChangedEvents, `getOraclesChangedEvents`)
 
       const issues = await queryInterface.sequelize.query(
         "SELECT * FROM issues WHERE network_id = ?",
@@ -152,11 +170,9 @@ module.exports = {
         curatorsUpdated += resultChangedEvent ? 1 : 0;
       }
 
-      const OracleTransferEvents =
-        await currentNetwork.getOraclesTransferEvents({
-          fromBlock: process.env.BULK_CHAIN_START_BLOCK || 0,
-          toBlock: blockNumber,
-        });
+      const OracleTransferEvents = [];
+
+      await paginateRequest(OracleTransferEvents, currentNetwork.getOraclesTransferEvents, `getOraclesTransferEvents`);
 
       for (const changedEvent of OracleTransferEvents) {
         const { from, to } = changedEvent.returnValues;
@@ -177,6 +193,7 @@ module.exports = {
         );
       }
     }
+
     console.log("Number of changes in curators table", curatorsUpdated);
   },
 };

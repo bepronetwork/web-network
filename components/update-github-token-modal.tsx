@@ -40,15 +40,15 @@ export default function UpdateGithubTokenModal({
         <div className="d-flex justify-content-center mb-2 mx-2 text-center flex-column">
           <p className="caption-small text-gray">{description}</p>
         </div>
-        <div className="d-flex justify-content-center mt-3">
+        <div className="d-flex justify-content-between mt-3">
+          <Button color="dark-gray" onClick={handleClose}>
+            <span>{t("actions.cancel")}</span>
+          </Button>
+
           <Button color="primary" onClick={handleConfirm}>
             <span>
               {t("custom-network:modals.update-github-token.update-now")}
             </span>
-          </Button>
-
-          <Button color="dark-gray" onClick={handleClose}>
-            <span>{t("actions.cancel")}</span>
           </Button>
         </div>
       </div>

@@ -40,11 +40,15 @@ export default function useOctokit() {
 
       pages.push(response);
 
-      if(response && response?.pageInfo){
-        const { endCursor, hasNextPage } = getPropertyRecursively<GraphQlQueryResponseData>("pageInfo", response);
+      if(response){
+        const pageInfo = getPropertyRecursively<GraphQlQueryResponseData>("pageInfo", response);
 
-        nextPageCursor = endCursor;
-        hasMorePages = hasNextPage;
+        if (pageInfo) {
+          const { endCursor, hasNextPage } = pageInfo;
+
+          nextPageCursor = endCursor;
+          hasMorePages = hasNextPage;
+        }
       }
 
     } while (hasMorePages);
@@ -161,12 +165,15 @@ export default function useOctokit() {
     const response = await getAllPages(RepositoryQueries.Branches, {
       repo,
       owner
-    }, useBotToken);
+    }, useBotToken) as any;
 
-    const branches = response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
-                                                ?.map(node => node?.name ) );
+    const branches = response?.flatMap(item => item?.repository?.refs?.nodes?.map(node => node?.name ) );
 
-    return branches || [];
+    return {
+      ...response[0]?.repository,
+      owner: response[0]?.repository?.owner?.login,
+      branches: branches || []
+    };
   }
 
   async function getUserRepositories(login:  string, botUser?: string) {
@@ -198,8 +205,16 @@ export default function useOctokit() {
         }));
     });
 
-
     return userRepositories || [];
+  }
+
+  async function getUserRepository(login: string, repositoryName: string) {
+    const response = await makeOctokitRequest(UserQueries.Repository, {
+      login,
+      repo: repositoryName
+    });
+
+    return getPropertyRecursively<GraphQlQueryResponseData>("repository", response);
   }
   
   return {
@@ -211,6 +226,7 @@ export default function useOctokit() {
     getRepository,
     getRepositoryForks,
     getRepositoryBranches,
-    getUserRepositories
+    getUserRepositories,
+    getUserRepository
   };
 }

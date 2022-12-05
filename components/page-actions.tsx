@@ -25,6 +25,7 @@ import useBepro from "x-hooks/use-bepro";
 import {BountyEffectsProvider} from "../contexts/bounty-effects";
 import {useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
+import { ContextualSpan } from "./contextual-span";
 import Modal from "./modal";
 
 interface PageActionsProps {
@@ -55,16 +56,15 @@ export default function PageActions({
   const {createPrePullRequest, cancelPrePullRequest, startWorking, processEvent} = useApi();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
-
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
   const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isGithubConnected = !!state.currentUser?.login;
-  const isFundingRequest =
+  const isFundingRequest = 
     state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
   const isWorkingOnBounty = !!state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login);
-  const isBountyOpen =
+  const isBountyOpen = 
     state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false;
   const issueState = getIssueState({
     state: state.currentBounty?.data?.state,
@@ -82,8 +82,8 @@ export default function PageActions({
   const hasPullRequests =
     !!state.currentBounty?.data?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
 
-  const hasOpenPullRequest =
-    !!state.currentBounty?.data?.pullRequests?.find(pullRequest =>
+  const hasOpenPullRequest = 
+    !!state.currentBounty?.data?.pullRequests?.find(pullRequest => 
       pullRequest?.githubLogin === state.currentUser?.login && pullRequest?.status !== "canceled");
 
 
@@ -238,7 +238,7 @@ export default function PageActions({
   }
 
   function renderStartWorkingButton() {
-    if (isWalletConnected &&
+    if (isWalletConnected && 
         isGithubConnected &&
         !isBountyInDraft &&
         isBountyOpen &&
@@ -263,7 +263,7 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (isWalletConnected &&
+    if (isWalletConnected && 
         isGithubConnected &&
         isBountyOpen &&
         !isBountyInDraft &&
@@ -306,7 +306,7 @@ export default function PageActions({
           <Button
             className="read-only-button me-1"
             onClick={handleRedeem}
-          >
+          > 
             <Translation ns="common" label="actions.cancel"/>
           </Button>
         </ReadOnlyButtonWrapper>
@@ -336,7 +336,7 @@ export default function PageActions({
   }
 
   function renderViewPullRequestLink() {
-    if (isWalletConnected &&
+    if (isWalletConnected && 
         isGithubConnected &&
         !isBountyInDraft &&
         hasOpenPullRequest)
@@ -355,6 +355,11 @@ export default function PageActions({
     <div className="container mt-4">
       <div className="row justify-content-center">
         <div className="col-md-10">
+          {(!isGithubConnected && isWalletConnected) && 
+          <ContextualSpan context="info" className="mb-2" isAlert>
+            {t("actions.connect-github-to-work")}
+          </ContextualSpan>}
+
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h4 className="h4 d-flex align-items-center">
               {t("misc.details")}
