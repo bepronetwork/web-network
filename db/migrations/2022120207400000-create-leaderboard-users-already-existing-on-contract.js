@@ -53,51 +53,67 @@ module.exports = {
     );
     await _bountyToken.loadContract();
 
-    const blockNumber = await web3Connection.eth.getBlockNumber();
+    const paginateRequest = async (pool = [], name) => {
+      const startBlock = +(process.env.BULK_CHAIN_START_BLOCK_MIGRATION_LEADERBOARD || 0);
+      const endBlock = await web3Connection.eth.getBlockNumber();;
+      const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
+      const requests = Math.ceil((endBlock - startBlock) / perRequest);
 
-    const TransferEvents = await _bountyToken.getTransferEvents({
-      fromBlock: process.env.BULK_CHAIN_START_BLOCK_MIGRATION_LEADERBOARD || 0,
-      toBlock: blockNumber,
-    });
+      let toBlock = 0;
 
-    console.log('TransferEvent', TransferEvents.length)
+      console.log(`Fetching ${name} total of ${requests}, from: ${startBlock} to ${endBlock}`);
+      for (let fromBlock = startBlock; fromBlock < endBlock; fromBlock += perRequest) {
+        toBlock = fromBlock + perRequest > endBlock ? endBlock : fromBlock + perRequest;
 
-    for (const transferEvent of TransferEvents) {
-      const { to, tokenId } = transferEvent.returnValues;
-
-      let result;
-
-      const userLeaderboard = await queryInterface.sequelize.query(
-        "SELECT * FROM leaderboard WHERE address = :address",
-        {
-          replacements: { address: to },
-          type: QueryTypes.SELECT,
-        }
-      );
-
-      const nftToken = await _bountyToken.getBountyToken(tokenId);
-      const balance = await _bountyToken.balanceOf(to);
-
-      if (userLeaderboard[0] && nftToken && balance) {
-        const query = `UPDATE leaderboard SET "numberNfts" = $numberNfts WHERE id = $id`;
-
-        result = await queryInterface.sequelize.query(query, {
-          bind: {
-            numberNfts: balance,
-            id: userLeaderboard[0].id,
-          },
-        });
-      } else if (!userLeaderboard[0] && nftToken && balance) {
-        result = await queryInterface.insert(LeaderBoard, "leaderboard", {
-          address: to,
-          numberNfts: balance,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
+        console.log(`${name} fetch from ${fromBlock} to ${toBlock}`);
+        
+        pool.push(await _bountyToken.getTransferEvents({fromBlock, toBlock}));
       }
-
-      usersUpdated += result ? 1 : 0;
     }
+
+    const AllTransferEvents = [];
+    
+    await paginateRequest(AllTransferEvents, `getTransferEvents`)
+
+    for (const TransferEvents of AllTransferEvents) {
+      for (const transferEvent of TransferEvents) {
+        const { to, tokenId } = transferEvent.returnValues;
+  
+        let result;
+  
+        const userLeaderboard = await queryInterface.sequelize.query(
+          "SELECT * FROM leaderboard WHERE address = :address",
+          {
+            replacements: { address: to },
+            type: QueryTypes.SELECT,
+          }
+        );
+  
+        const nftToken = await _bountyToken.getBountyToken(tokenId);
+        const balance = await _bountyToken.balanceOf(to);
+  
+        if (userLeaderboard[0] && nftToken && balance) {
+          const query = `UPDATE leaderboard SET "numberNfts" = $numberNfts WHERE id = $id`;
+  
+          result = await queryInterface.sequelize.query(query, {
+            bind: {
+              numberNfts: balance,
+              id: userLeaderboard[0].id,
+            },
+          });
+        } else if (!userLeaderboard[0] && nftToken && balance) {
+          result = await queryInterface.insert(LeaderBoard, "leaderboard", {
+            address: to,
+            numberNfts: balance,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+  
+        usersUpdated += result ? 1 : 0;
+      }
+    }
+
 
     console.log("Number of changes in leaderboard table", usersUpdated);
   },
