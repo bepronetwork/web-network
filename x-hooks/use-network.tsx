@@ -34,7 +34,7 @@ export function useNetwork() {
       new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`).delete();
   }
 
-  async function updateActiveNetwork(forceUpdate = false) {
+  function updateActiveNetwork(forceUpdate = false) {
     const networkName = query?.network?.toString();
 
     if (networkName) {
@@ -59,7 +59,7 @@ export function useNetwork() {
     const getNetworkParams = {
       ... networkName ? {name: networkName} : {},
       ... !networkName ? {isDefault: true} : {},
-      chain_id: await state?.Service.active.getChainId() || null,
+      chain_id: state?.connectedChain?.id || null,
     }
 
     getNetwork(getNetworkParams)

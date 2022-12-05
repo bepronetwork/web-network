@@ -207,7 +207,7 @@ export default class DAO {
     try {
       await this.web3Connection.connect();
 
-      await this.loadNetwork(this.network?.contractAddress);
+      //await this.loadNetwork(this.network?.contractAddress);
 
       return true;
     } catch (error) {
