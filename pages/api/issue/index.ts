@@ -17,7 +17,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title,
     body,
     repositoryId,
-    networkName
+    networkName,
+    isKyc
   } = req.body;
 
   const network = await models.network.findOne({
@@ -85,7 +86,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     state: "pending",
     title: '',
     body: body,
-    network_id: network.id
+    network_id: network.id,
+    isKyc
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);

@@ -40,6 +40,7 @@ interface CreateBounty {
   body: string;
   creator: string;
   repositoryId: string;
+  isKyc: boolean;
 }
 
 interface GetNetworkProps {
@@ -62,6 +63,7 @@ export default function useApi() {
   
   api.interceptors.request.use(config => {
     config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
+    config.headers["network"] = DEFAULT_NETWORK_NAME;
 
     return config;
   });
@@ -544,6 +546,14 @@ export default function useApi() {
       });
   }
 
+  async function getKycSession(){
+    return api.get("/kyc/init")
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -585,6 +595,7 @@ export default function useApi() {
     getSettings,
     getTokens,
     createNFT,
-    saveNetworkRegistry
+    saveNetworkRegistry,
+    getKycSession
   };
 }

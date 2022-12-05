@@ -38,6 +38,7 @@ import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 import {useRepos} from "../x-hooks/use-repos";
+import InfoTooltip from "./info-tooltip";
 
 interface BountyPayload {
   title: string;
@@ -70,6 +71,7 @@ export default function CreateBountyModal() {
   const [currentSection, setCurrentSection] = useState<number>(0);
   const [isBountyType, setisBountyType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
+  const [isKyc, setIsKyc] = useState<boolean>(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
@@ -128,6 +130,10 @@ export default function CreateBountyModal() {
       setRewardAmount(ZeroNumberFormatValues)
       setRewardToken(undefined);
     }
+  }
+  
+  function handleIsKYCChecked(e) {
+    setIsKyc(e.target.checked);
   }
 
   function renderDetails(review = false) {
@@ -247,6 +253,21 @@ export default function CreateBountyModal() {
                 {rewardChecked && renderBountyToken(false, "reward")}
               </>
             )}
+             <div className="col-md-12 d-flex flex-row gap-2">
+                <FormCheck
+                  className="form-control-md pb-0"
+                  type="checkbox"
+                  label={t("bounty:kyc.is-required")}
+                  onChange={handleIsKYCChecked}
+                  checked={isKyc}
+                />
+                <span>
+                <InfoTooltip 
+                    description={t("bounty:kyc.label")}
+                    secondaryIcon
+                  />
+                </span>
+            </div>
           </div>
         </div>
       );
@@ -458,6 +479,7 @@ export default function CreateBountyModal() {
         body: payload.body,
         creator: payload.githubUser,
         repositoryId: payload.repositoryId,
+        isKyc,
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 

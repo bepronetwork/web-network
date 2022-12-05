@@ -34,6 +34,10 @@ class Issue extends Model {
         fundedAt: {
           type: DataTypes.DATE,
           allowNull: true
+        },
+        isKyc:{
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
         }
     },
                {

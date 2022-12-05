@@ -51,6 +51,7 @@ export interface IssueData {
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
+  isKyc: boolean
 }
 
 export interface Disputes {
