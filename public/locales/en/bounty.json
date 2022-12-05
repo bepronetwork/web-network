@@ -110,5 +110,10 @@
   },
   "create-bounty": "Create Bounty",
   "next-step": "Next Step",
-  "bounty-created": "Bounty created"
+  "bounty-created": "Bounty created",
+  "kyc": {
+    "is-required": "Required KYC validation",
+    "label": "KYC is a validation process",
+    "validation": "Validation KYC"
+  }
 }

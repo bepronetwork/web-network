@@ -9,6 +9,7 @@ import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
+import KYC from "components/kyc";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
@@ -373,7 +374,7 @@ export default function PageActions({
               {renderHardCancelButton()}
 
               {renderForkRepositoryLink()}
-
+              {state.currentBounty?.data?.isKyc ? <KYC /> : null}
               {renderStartWorkingButton()}
 
               {renderCreatePullRequestButton()}
