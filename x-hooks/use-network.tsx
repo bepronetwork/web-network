@@ -34,7 +34,7 @@ export function useNetwork() {
       new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`).delete();
   }
 
-  function updateActiveNetwork(forceUpdate = false) {
+  async function updateActiveNetwork(forceUpdate = false) {
     const networkName = query?.network?.toString();
 
     if (networkName) {
@@ -47,7 +47,6 @@ export function useNetwork() {
         if (storage.value === networkName) {
           if (cachedNetworkData.value) {
             dispatch(changeActiveNetwork(cachedNetworkData.value));
-
             return;
           }
         } else 
@@ -57,13 +56,13 @@ export function useNetwork() {
 
     console.debug(`Updating active network`, networkName);
 
-    getNetwork({
-      ... networkName && {
-        name: networkName
-      } || {
-        isDefault: true
-      }
-    })
+    const getNetworkParams = {
+      ... networkName ? {name: networkName} : {},
+      ... !networkName ? {isDefault: true} : {},
+      chain_id: await state?.Service.active.getChainId() || null,
+    }
+
+    getNetwork(getNetworkParams)
       .then(({data}) => {
         if (!data.isRegistered) {
           if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
