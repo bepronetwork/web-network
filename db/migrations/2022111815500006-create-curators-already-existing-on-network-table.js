@@ -123,12 +123,9 @@ module.exports = {
       const blockNumber =
         await currentNetwork._contract.web3.eth.getBlockNumber();
 
+      const paginateRequest = async (poll = [], name) => {
 
-
-      const OracleChangedEvents = [];
-
-      const paginateRequest = async (pool = [], fn, name) => {
-        const startBlock = process.env.BULK_CHAIN_START_BLOCK || 0;
+        const startBlock = +(process.env.BULK_CHAIN_START_BLOCK || 0);
         const endBlock = blockNumber;
         const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
         const requests = (startBlock - endBlock) / perRequest;
@@ -140,11 +137,17 @@ module.exports = {
           toBlock = fromBlock + perRequest > endBlock ? endBlock : fromBlock + perRequest;
 
           console.log(`${name} fetch from ${fromBlock} to ${toBlock}`);
-          pool.push(...await fn({fromBlock, toBlock}));
+          if(name === "getOraclesChangedEvents"){
+            poll.push(await currentNetwork.getOraclesChangedEvents({fromBlock, toBlock}));
+          }else {
+            poll.push(await currentNetwork.getOraclesTransferEvents({fromBlock, toBlock}));
+          }
         }
       }
 
-      await paginateRequest(OracleChangedEvents, currentNetwork.getOraclesChangedEvents, `getOraclesChangedEvents`)
+      const AllOracleChangedEvents = [] 
+      
+      await paginateRequest(AllOracleChangedEvents, `getOraclesChangedEvents`)
 
       const issues = await queryInterface.sequelize.query(
         "SELECT * FROM issues WHERE network_id = ?",
@@ -154,43 +157,47 @@ module.exports = {
         }
       );
 
-      for (const changedEvent of OracleChangedEvents) {
-        const { actor } = changedEvent.returnValues;
-        const actorTotalVotes = await currentNetwork.getOraclesOf(actor);
-
-        const resultChangedEvent = await handleCurators(
-          actor,
-          actorTotalVotes,
-          councilAmount,
-          network.id,
-          issues,
-          queryInterface
-        );
-
-        curatorsUpdated += resultChangedEvent ? 1 : 0;
+      for (const OracleChangedEvents  of AllOracleChangedEvents){
+        for (const changedEvent of OracleChangedEvents) {
+          const { actor } = changedEvent.returnValues;
+          const actorTotalVotes = await currentNetwork.getOraclesOf(actor);
+  
+          const resultChangedEvent = await handleCurators(
+            actor,
+            actorTotalVotes,
+            councilAmount,
+            network.id,
+            issues,
+            queryInterface
+          );
+  
+          curatorsUpdated += resultChangedEvent ? 1 : 0;
+        }
       }
 
-      const OracleTransferEvents = [];
+       const AllOracleTransferEvents = []
 
-      await paginateRequest(OracleTransferEvents, currentNetwork.getOraclesTransferEvents, `getOraclesTransferEvents`);
+       await paginateRequest(AllOracleTransferEvents, `getOraclesTransferEvents`);
+      
+      for(const OracleTransferEvents  of AllOracleTransferEvents) {
+        for (const changedEvent of OracleTransferEvents) {
+          const { from, to } = changedEvent.returnValues;
 
-      for (const changedEvent of OracleTransferEvents) {
-        const { from, to } = changedEvent.returnValues;
+          [from, to].map((address) =>
+            currentNetwork.getOraclesOf(address).then(async (votes) => {
+              const resultChangedEvent = await handleCurators(
+                address,
+                votes,
+                councilAmount,
+                network.id,
+                issues,
+                queryInterface
+              );
 
-        [from, to].map((address) =>
-          currentNetwork.getOraclesOf(address).then(async (votes) => {
-            const resultChangedEvent = await handleCurators(
-              address,
-              votes,
-              councilAmount,
-              network.id,
-              issues,
-              queryInterface
-            );
-
-            curatorsUpdated += resultChangedEvent ? 1 : 0;
-          })
-        );
+              curatorsUpdated += resultChangedEvent ? 1 : 0;
+            })
+          );
+        }
       }
     }
 
