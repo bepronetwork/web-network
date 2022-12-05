@@ -146,7 +146,6 @@ function NewNetwork() {
     setCreatingNetwork(6);
     cleanStorage?.();
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
-      .then(() => router.push(getURLWithNetwork("/", { network: payload.name.toLowerCase().replaceAll(" ", "-") })))
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({
@@ -160,6 +159,24 @@ function NewNetwork() {
         setCreatingNetwork(-1);
         console.debug("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
+
+    setCreatingNetwork(7);
+    await updateNetworkChainId(deployedNetworkAddress, +state?.connectedChain?.id)
+      .then(() => router.push(getURLWithNetwork("/", { network: payload.name.toLowerCase().replaceAll(" ", "-") })))
+      .catch((error) => {
+
+        dispatch(addToast({
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("custom-network:errors.failed-to-update-network-id", {
+            error: error.message || error.toString(),
+          }),
+        }));
+
+        setCreatingNetwork(-1);
+        console.debug("Failed update networkChainId", deployedNetworkAddress, error);
+      })
+
   }
 
   function goToMyNetworkPage() {
