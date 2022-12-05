@@ -141,6 +141,24 @@ export default function CreatePullRequestModal({
       onCloseClick={onCloseClick}
       onCloseDisabled={isCreating}
       title={t("pull-request:actions.create.title")}
+      footer={
+        (
+          <div className="d-flex justify-content-between">
+          <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
+              {t("actions.cancel")}
+            </Button>
+  
+            <Button
+              disabled={isButtonDisabled() || isCreating}
+              onClick={handleConfirm}
+              withLockIcon={isButtonDisabled()}
+              isLoading={isCreating}
+            >
+              <span>{t("pull-request:actions.create.title")}</span>
+            </Button>
+          </div>
+        )
+      }
       titlePosition="center">
       <div className="container">
         <div>
@@ -170,7 +188,7 @@ export default function CreatePullRequestModal({
               placeholder={t("forms.create-pull-request.description.placeholder")}
             />
           </div>
-          <div className="form-group">
+          <div className="form-group mb-0">
             <label className="caption-small mb-2 text-gray">
               {t("forms.create-pull-request.branch.label")}
             </label>
@@ -185,21 +203,6 @@ export default function CreatePullRequestModal({
               isOptionDisabled={(option) => option?.isDisabled}
               />
           </div>
-        </div>
-        <div className="d-flex pt-2 justify-content-center">
-          <Button
-            className="mr-2"
-            disabled={isButtonDisabled() || isCreating}
-            onClick={handleConfirm}
-            withLockIcon={isButtonDisabled()}
-            isLoading={isCreating}
-          >
-            <span>{t("pull-request:actions.create.title")}</span>
-          </Button>
-
-          <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
-            {t("actions.cancel")}
-          </Button>
         </div>
       </div>
     </Modal>
