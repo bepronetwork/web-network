@@ -9,6 +9,7 @@ const publicRuntimeConfig = {
     api: process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3000",
     home: process.env.NEXT_PUBLIC_HOME_URL || "http://localhost:3000",
     events: process.env.NEXT_PUBLIC_EVENTS_API || "http://localhost:3334",
+    kyc: process.env.NEXT_PUBLIC_KYC_API || 'https://individual-api.synaps.io/v3',
     ipfs: process.env.NEXT_PUBLIC_IPFS_BASE
   },
   enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO,
@@ -28,6 +29,10 @@ const serverRuntimeConfig = {
     mainBranch: process.env.NEXT_GH_MAINBRANCH,
     owner: process.env.NEXT_GH_OWNER,
     repository: process.env.NEXT_GH_REPO,
+  },
+  kyc:{
+    clientId: process.env.NEXT_SYNAPS_CLIENT_ID,
+    key: process.env.NEXT_SYNAPS_KEY,
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
   elasticSearch: {
