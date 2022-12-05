@@ -30,3 +30,20 @@ export const Repositories = (botUser?: string) =>
       }
     }
   }`;
+
+export const Repository = 
+`
+query FindUserRepository($login: String!, $repo: String!) {
+  user(login: $login) {
+    repository(name: $repo) {
+      isFork
+      parent {
+        name
+        nameWithOwner
+      }
+      name
+      nameWithOwner
+    }
+  }
+}
+`;

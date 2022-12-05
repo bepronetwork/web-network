@@ -3,12 +3,12 @@ export function getPropertyRecursively<T> (property: string, data = {}): T[keyof
 
   let found = null;
 
-  if(data){
-    const keys = Object?.keys(data)
+  if(data && typeof data === "object") {
+    const keys = Object.keys(data);
   
-    if(keys?.length > 0) 
+    if(keys.length > 0) 
       for (let x = 0; x < keys.length && !found; x++) {
-        found = getPropertyRecursively(property, data?.[keys[x]]);
+        found = getPropertyRecursively(property, data[keys[x]]);
       }
 
   }
