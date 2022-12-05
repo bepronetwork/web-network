@@ -48,7 +48,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.updateWalletBalance, [state.currentUser?.walletAddress, state?.Service?.active?.network]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [state.currentUser?.walletAddress]);
-  useEffect(network.updateActiveNetwork, [query?.network, state?.Service?.active?.network]);
+  useEffect(network.updateActiveNetwork, [query?.network, state?.Service?.active]);
   useEffect(network.loadNetworkToken, [state?.Service?.active?.network]);
   useEffect(network.loadNetworkTimes, [state.Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [state.Service?.active?.network]);

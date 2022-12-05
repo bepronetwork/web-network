@@ -1,24 +1,24 @@
-import { 
-  ERC20,
+import {
   Bounty,
-  Defaults,
-  Network_v2,
   BountyToken,
-  TreasuryInfo,
-  Web3Connection,
+  Defaults,
+  ERC20,
+  Network_v2,
   NetworkRegistry,
-  toSmartContractDecimals
+  toSmartContractDecimals,
+  TreasuryInfo,
+  Web3Connection
 } from "@taikai/dappkit";
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
 import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
 import {Contract} from "web3-eth-contract";
 
-import { BountyExtended } from "interfaces/bounty";
-import { OraclesResumeExtended } from "interfaces/oracles-state";
-import { Token } from "interfaces/token";
+import {BountyExtended} from "interfaces/bounty";
+import {OraclesResumeExtended} from "interfaces/oracles-state";
+import {Token} from "interfaces/token";
 
-import { NetworkParameters, RegistryParameters } from "types/dappkit";
+import {NetworkParameters, RegistryParameters} from "types/dappkit";
 
 interface DAOServiceProps {
   skipWindowAssignment?: boolean;
@@ -208,7 +208,7 @@ export default class DAO {
     try {
       await this.web3Connection.connect();
 
-      await this.loadNetwork(this.network?.contractAddress);
+      //await this.loadNetwork(this.network?.contractAddress);
 
       return true;
     } catch (error) {
