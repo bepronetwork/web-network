@@ -7,9 +7,11 @@ $only-child: 14px;
 
 .btn-outline {
   &-primary {
+    border-color: var(--bs-primary);
     &:hover {
       color: $white;
-      background-color: rgba($primary, 0.1);
+      border-color: rgba(var(--bs-primary), 0.1);
+      background-color: rgba(var(--bs-primary), 0.1);
     }
   }
   &-purple {
