@@ -17,6 +17,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
+import DateLabel from "./date-label";
 
 export default function IssueListItem({
                                         issue = null,
@@ -122,12 +123,6 @@ export default function IssueListItem({
     );
   }
 
-  function createIssueDate(date: Date) {
-    return (
-      <span className="caption-medium text-white-40">{formatDate(date)}</span>
-    );
-  }
-
   return (
     <div
       className="bg-shadow list-item p-3"
@@ -195,7 +190,7 @@ export default function IssueListItem({
                 amount: issue?.amount,
                 fundingAmount: issue?.fundingAmount,
             }))}
-            {createIssueDate(issue?.createdAt)}
+            <DateLabel date={issue?.createdAt} className="text-white-40" />
           </div>
         </div>
 
