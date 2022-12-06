@@ -422,6 +422,7 @@ export default function CreateBountyModal() {
     setRepository(undefined);
     setBranch(null);
     setCurrentSection(0);
+    setIsKyc(false)
     setFiles([]);
   }
 
