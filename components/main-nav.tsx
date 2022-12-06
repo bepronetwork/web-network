@@ -91,6 +91,8 @@ export default function MainNav() {
     );
   }
 
+  }
+
   function LinkNetworks() {
     return(
       <InternalLink

@@ -9,8 +9,9 @@ import {useAppState} from "contexts/app-state";
 
 import Button from "./button";
 import useApi from "../x-hooks/use-api";
-import ReactSelect from "./react-select";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
+import SelectNetworkDropdown from "./select-network-dropdown";
+import UseNetworkChange from "../x-hooks/use-network-change";
 
 type typeError = { code?: number; message?: string }
 
@@ -25,6 +26,8 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
 
   const {state: { connectedChain, currentUser, Settings: settings, supportedChains },} = useAppState();
 
+  const {handleAddNetwork} = UseNetworkChange()
+
   function changeShowModal() {
     if (!supportedChains.length || !connectedChain?.id || !currentUser?.connected)
       return;
@@ -35,62 +38,77 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
     setShowModal(!supportedChains.find(({chainId}) => chainId === +connectedChain?.id));
   }
 
-  async function selectSupportedChain({value, label}) {
-    const chain = supportedChains.find(({chainId}) => chainId === value);
+  async function selectSupportedChain(chain: SupportedChainData) {
     if (!chain)
       return;
 
     setChosenSupportedChain(chain);
-    setOption({value, label});
   }
 
-  async function handleAddNetwork() {
+  async function _handleAddNetwork() {
     setIsAddingNetwork(true);
     setError("");
-
-    const chainId = `0x${Number(chosenSupportedChain.chainId).toString(16)}`;
-
-    try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [
-          {
-            chainId: chainId,
-          },
-        ],
-      });
-    } catch (error) {
-      if ((error as typeError)?.message?.indexOf('wallet_addEthereumChain') > -1) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: chainId,
-                chainName: chosenSupportedChain.name,
-                nativeCurrency: {
-                  name: chosenSupportedChain.chainCurrencyName,
-                  symbol: chosenSupportedChain.chainCurrencySymbol,
-                  decimals: chosenSupportedChain.chainCurrencyDecimals,
-                },
-                rpcUrls: [chosenSupportedChain.chainRpc],
-                blockExplorerUrls: [chosenSupportedChain.blockScanner],
-              },
-            ],
-          });
-        } catch (error) {
-          if ((error as typeError).code === -32602) {
-            setError(t("modals.wrong-network.error-invalid-rpcUrl"));
-          }
-          if ((error as typeError).code === -32603) {
-            setError(t("modals.wrong-network.error-failed-rpcUrl"));
-          }
+    handleAddNetwork(chosenSupportedChain)
+      .catch(error => {
+        if ((error as typeError).code === -32602) {
+          setError(t("modals.wrong-network.error-invalid-rpcUrl"));
         }
-      }
-    } finally {
-      setIsAddingNetwork(false);
-    }
+        if ((error as typeError).code === -32603) {
+          setError(t("modals.wrong-network.error-failed-rpcUrl"));
+        }
+      })
+      .finally(() => {
+        setIsAddingNetwork(false);
+      });
   }
+
+  // async function handleAddNetwork() {
+  //   setIsAddingNetwork(true);
+  //   setError("");
+  //
+  //   const chainId = `0x${Number(chosenSupportedChain.chainId).toString(16)}`;
+  //
+  //   try {
+  //     await window.ethereum.request({
+  //       method: "wallet_switchEthereumChain",
+  //       params: [
+  //         {
+  //           chainId: chainId,
+  //         },
+  //       ],
+  //     });
+  //   } catch (error) {
+  //     if ((error as typeError)?.message?.indexOf('wallet_addEthereumChain') > -1) {
+  //       try {
+  //         await window.ethereum.request({
+  //           method: "wallet_addEthereumChain",
+  //           params: [
+  //             {
+  //               chainId: chainId,
+  //               chainName: chosenSupportedChain.name,
+  //               nativeCurrency: {
+  //                 name: chosenSupportedChain.chainCurrencyName,
+  //                 symbol: chosenSupportedChain.chainCurrencySymbol,
+  //                 decimals: chosenSupportedChain.chainCurrencyDecimals,
+  //               },
+  //               rpcUrls: [chosenSupportedChain.chainRpc],
+  //               blockExplorerUrls: [chosenSupportedChain.blockScanner],
+  //             },
+  //           ],
+  //         });
+  //       } catch (error) {
+  //         if ((error as typeError).code === -32602) {
+  //           setError(t("modals.wrong-network.error-invalid-rpcUrl"));
+  //         }
+  //         if ((error as typeError).code === -32603) {
+  //           setError(t("modals.wrong-network.error-failed-rpcUrl"));
+  //         }
+  //       }
+  //     }
+  //   } finally {
+  //     setIsAddingNetwork(false);
+  //   }
+  // }
 
   const isButtonDisabled = (): boolean =>
     [isAddingNetwork].some((values) => values);
@@ -114,15 +132,11 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
                    animation="border"/>
         }
 
-        <ReactSelect options={supportedChains.map(opt => ({label: opt.chainName, value: opt.chainId}))}
-                     value={option}
-                     onChange={selectSupportedChain}
-                     placeholder={t("forms.select-placeholder")}
-                     isDisabled={!supportedChains?.length}/>
+        <SelectNetworkDropdown onSelect={selectSupportedChain} />
 
         <Button className="my-3"
                 disabled={isButtonDisabled()}
-                onClick={handleAddNetwork}>
+                onClick={_handleAddNetwork}>
           {t("modals.wrong-network.change-network")}
         </Button>
         {error && (
