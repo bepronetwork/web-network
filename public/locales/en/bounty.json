@@ -113,7 +113,8 @@
   "bounty-created": "Bounty created",
   "kyc": {
     "is-required": "Required KYC validation",
-    "label": "KYC is a validation process",
-    "validation": "Validation KYC"
+    "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
+    "identify-to-start": "Identify to start working",
+    "label": "KYC"
   }
 }

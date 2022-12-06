@@ -4,6 +4,7 @@ import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
+import getConfig from "next/config";
 import router from "next/router";
 
 import BranchsDropdown from "components/branchs-dropdown";
@@ -61,6 +62,7 @@ const ZeroNumberFormatValues = {
   floatValue: 0,
 };
 
+const {publicRuntimeConfig} = getConfig()
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
@@ -257,7 +259,8 @@ export default function CreateBountyModal() {
                 {rewardChecked && renderBountyToken(false, "reward")}
               </>
             )}
-             <div className="col-md-12 d-flex flex-row gap-2">
+            {isBountyType && publicRuntimeConfig.kyc.isEnabled ? 
+            (<div className="col-md-12 d-flex flex-row gap-2">
                 <FormCheck
                   className="form-control-md pb-0"
                   type="checkbox"
@@ -267,11 +270,11 @@ export default function CreateBountyModal() {
                 />
                 <span>
                 <InfoTooltip 
-                    description={t("bounty:kyc.label")}
+                    description={t("bounty:kyc.tool-tip")}
                     secondaryIcon
                   />
                 </span>
-            </div>
+            </div>): null}
           </div>
         </div>
       );
