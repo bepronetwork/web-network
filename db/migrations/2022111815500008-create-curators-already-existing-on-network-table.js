@@ -123,12 +123,12 @@ module.exports = {
       const blockNumber =
         await currentNetwork._contract.web3.eth.getBlockNumber();
 
-      const paginateRequest = async (poll = [], name) => {
+      const paginateRequest = async (pool = [], name, fn) => {
 
-        const startBlock = +(process.env.BULK_CHAIN_START_BLOCK || 0);
+        const startBlock = +(process.env.MIGRATION_START_BLOCK || 0);
         const endBlock = blockNumber;
         const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
-        const requests = (startBlock - endBlock) / perRequest;
+        const requests = Math.ceil((startBlock ? (startBlock - endBlock) : endBlock) / perRequest);
 
         let toBlock = 0;
 
@@ -137,11 +137,15 @@ module.exports = {
           toBlock = fromBlock + perRequest > endBlock ? endBlock : fromBlock + perRequest;
 
           console.log(`${name} fetch from ${fromBlock} to ${toBlock}`);
-          if(name === "getOraclesChangedEvents"){
-            poll.push(await currentNetwork.getOraclesChangedEvents({fromBlock, toBlock}));
-          }else {
-            poll.push(await currentNetwork.getOraclesTransferEvents({fromBlock, toBlock}));
-          }
+
+          let result = null;
+
+          if (name === "getOraclesChangedEvents")
+            result = await currentNetwork.getOraclesChangedEvents({fromBlock, toBlock});
+          else
+            result = await currentNetwork.getOraclesTransferEvents({fromBlock, toBlock});
+
+          pool.push(... result);
         }
       }
 
@@ -157,8 +161,8 @@ module.exports = {
         }
       );
 
-      for (const OracleChangedEvents  of AllOracleChangedEvents){
-        for (const changedEvent of OracleChangedEvents) {
+      for (const changedEvent  of AllOracleChangedEvents.flat()){
+        // for (const changedEvent of OracleChangedEvents) {
           const { actor } = changedEvent.returnValues;
           const actorTotalVotes = await currentNetwork.getOraclesOf(actor);
   
@@ -172,15 +176,15 @@ module.exports = {
           );
   
           curatorsUpdated += resultChangedEvent ? 1 : 0;
-        }
+        // }
       }
 
        const AllOracleTransferEvents = []
 
        await paginateRequest(AllOracleTransferEvents, `getOraclesTransferEvents`);
       
-      for(const OracleTransferEvents  of AllOracleTransferEvents) {
-        for (const changedEvent of OracleTransferEvents) {
+      for(const changedEvent  of AllOracleTransferEvents.flat()) {
+        // for (const changedEvent of OracleTransferEvents) {
           const { from, to } = changedEvent.returnValues;
 
           [from, to].map((address) =>
@@ -197,7 +201,7 @@ module.exports = {
               curatorsUpdated += resultChangedEvent ? 1 : 0;
             })
           );
-        }
+        // }
       }
     }
 

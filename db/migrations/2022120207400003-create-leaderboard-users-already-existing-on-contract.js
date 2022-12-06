@@ -53,11 +53,11 @@ module.exports = {
     );
     await _bountyToken.loadContract();
 
-    const paginateRequest = async (pool = [], name) => {
-      const startBlock = +(process.env.BULK_CHAIN_START_BLOCK_MIGRATION_LEADERBOARD || 0);
-      const endBlock = await web3Connection.eth.getBlockNumber();;
+    const paginateRequest = async (pool = [], name, fn) => {
+      const startBlock = +(process.env.MIGRATION_START_BLOCK || 0);
+      const endBlock = await web3Connection.eth.getBlockNumber();
       const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
-      const requests = Math.ceil((endBlock - startBlock) / perRequest);
+      const requests = Math.ceil((startBlock ? (startBlock - endBlock) : endBlock) / perRequest);
 
       let toBlock = 0;
 
@@ -67,7 +67,7 @@ module.exports = {
 
         console.log(`${name} fetch from ${fromBlock} to ${toBlock}`);
         
-        pool.push(await _bountyToken.getTransferEvents({fromBlock, toBlock}));
+        pool.push(... await _bountyToken.getTransferEvents({fromBlock, toBlock}));
       }
     }
 
@@ -75,8 +75,8 @@ module.exports = {
     
     await paginateRequest(AllTransferEvents, `getTransferEvents`)
 
-    for (const TransferEvents of AllTransferEvents) {
-      for (const transferEvent of TransferEvents) {
+    for (const transferEvent of AllTransferEvents.flat()) {
+      // for (const transferEvent of TransferEvents) {
         const { to, tokenId } = transferEvent.returnValues;
   
         let result;
@@ -111,7 +111,7 @@ module.exports = {
         }
   
         usersUpdated += result ? 1 : 0;
-      }
+      // }
     }
 
 
