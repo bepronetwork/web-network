@@ -1,9 +1,8 @@
 "use strict";
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("kyc-session", {
+    await queryInterface.createTable("kyc_sessions", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -11,35 +10,42 @@ module.exports = {
         unique: true,
       },
       user_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: "users",
+          key: "id"
+        }
       },
       session_id: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
+      },
+      tier:{
+        type:  Sequelize.INTEGER,
+        allowNull: false,
       },
       state: {
         type: Sequelize.STRING,
       },
-      steps: {
-        type: Sequelize.STRING,
-      },
       validatedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("kyc-session");
+    await queryInterface.dropTable("kyc_sessions");
   },
 };

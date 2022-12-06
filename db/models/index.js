@@ -16,6 +16,7 @@ import Settings from "./settings.model";
 import Benefactors from './benefactor.model';
 import Curators from './curator-model'
 import Disputes from './dispute-model';
+import KycSession from './kyc-session.model'
 
 const Database = { sequelize: null };
 
@@ -39,6 +40,7 @@ Database.userPayments = UserPayments;
 Database.settings = Settings;
 Database.curator = Curators;
 Database.dispute = Disputes;
+Database.kycSession = KycSession;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {
