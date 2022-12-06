@@ -24,6 +24,8 @@ import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-s
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
+import SelectNetworkDropdown from "./select-network-dropdown";
+import useNetworkChange from "../x-hooks/use-network-change";
 
 interface MyNetworkLink {
   href: string;
@@ -45,6 +47,7 @@ export default function MainNav() {
   const {state} = useAppState();
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
+  const {handleAddNetwork} = useNetworkChange();
 
   const noNeedNetworkInstance = ["/","/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);
   const fullLogoUrl = state.Service?.network?.active?.fullLogo;
@@ -103,6 +106,9 @@ export default function MainNav() {
       />
     )
   }
+  function handleNetworkSelected(chain) {
+    return handleAddNetwork(chain).catch(() => null)
+  }
 
   function LinkLeaderBoard() {
     return (
@@ -155,6 +161,9 @@ export default function MainNav() {
             {brandLogo}
             {(!noNeedNetworkInstance && (
               <ul className="nav-links">
+                <li className="select-network-dropdown">
+                  <SelectNetworkDropdown onSelect={(chain) => handleNetworkSelected(chain)} />
+                </li>
                 <li>
                   <LinkBounties />
                 </li>
@@ -226,7 +235,7 @@ export default function MainNav() {
               <HelpIcon />
             </Button>
 
-            <WrongNetworkModal requiredNetworkId={state.Settings?.requiredChain?.id} />
+            <WrongNetworkModal />
 
             <ConnectWalletButton>
               <>

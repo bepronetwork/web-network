@@ -6,8 +6,6 @@ import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
-
-import ConnectWalletButton from "components/connect-wallet-button";
 import {NetworkSetup} from "components/setup/network-setup";
 import {RegistrySetup} from "components/setup/registry-setup";
 import TabbedNavigation from "components/tabbed-navigation";
@@ -20,6 +18,7 @@ import useApi from "x-hooks/use-api";
 import ChainsSetup from "../components/setup/chains-setup";
 import ConnectGithubSetup from "../components/setup/connect-github-setup";
 import {CallToAction} from "../components/setup/call-to-action";
+import WrongNetworkModal from "../components/wrong-network-modal";
 
 const { publicRuntimeConfig: { adminWallet } } = getConfig();
 
@@ -58,7 +57,7 @@ export default function SetupPage(){
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
 
   if (!isConnected)
-    return <ConnectWalletButton asModal />;
+    return <WrongNetworkModal />;
 
   const tabs = [
     {
