@@ -41,6 +41,12 @@ const GLMR: Currency = {
   symbol: "GLMR"
 }
 
+const BNB: Currency = {
+  name: "BNB",
+  ticker: "BNB",
+  symbol: "BNB"
+}
+
 export const NETWORKS: {
   [key: string]: Network;
 } = {
@@ -151,5 +157,15 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://aurorascan.dev",
     rpcUrls: ["https://mainnet.aurora.dev"]
+  },
+  "0x38": {
+    id: "56",
+    name: "Binance Smart Chain",
+    key: "bsc",
+    currency: BNB,
+    decimals: 18,
+    explorerURL: "https://bscscan.com/",
+    rpcUrls: ["https://bscrpc.com"]
   }
+  
 };
