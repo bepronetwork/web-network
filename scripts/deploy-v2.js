@@ -130,6 +130,9 @@ const networks = {
   aurora: {
     url: 'https://mainnet.aurora.dev',
   },  
+  bsc: {
+    url: 'https://bscrpc.com',
+  },  
 }
 
 async function main() {
