@@ -25,6 +25,7 @@ import { Token } from "interfaces/token";
 import { api, eventsApi } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
+import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 
 interface NewIssueParams {
   title: string;
@@ -506,6 +507,34 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
+  async function searchLeaderBoard({
+    address = "",
+    page = "1",
+    sortBy = "numberNfts",
+    time = "",
+    search = "",
+    order = "DESC"
+  }: SearchLeaderBoard) {
+    const params = new URLSearchParams({
+      page,
+      address,
+      time,
+      search,
+      sortBy,
+      order
+    }).toString();
+    
+    return api
+      .get<{
+        rows: LeaderBoard[];
+        count: number;
+        pages: number;
+        currentPage: number;
+      }>(`/search/leaderboard/?${params}`)
+      .then(({ data }) => data)
+      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
+  }
+
   async function repositoryHasIssues(repoPath) {
     const search = new URLSearchParams({ repoPath }).toString();
 
@@ -576,6 +605,7 @@ export default function useApi() {
     searchNetworks,
     searchRepositories,
     searchCurators,
+    searchLeaderBoard,
     startWorking,
     updateNetwork,
     uploadFiles,
