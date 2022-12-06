@@ -21,9 +21,9 @@ export default function CreateBountyDetails({
   function handleChangeTitle (e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value
 
-    if(value.length >= 130){
+    if(value.length >= 131){
       setErrorTitle(true)
-    } else if(errorTitle && value.length < 130) setErrorTitle(false)
+    } else if(errorTitle && value.length <= 130) setErrorTitle(false)
     
     setBountyTitle(value)
   }

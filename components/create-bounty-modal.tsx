@@ -347,7 +347,7 @@ export default function CreateBountyModal() {
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
     const isRewardAmount =
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
-    if ((currentSection === 0 && !bountyTitle) || !bountyDescription || isUploading || bountyTitle.length >= 130)
+    if ((currentSection === 0 && !bountyTitle) || !bountyDescription || isUploading || bountyTitle.length >= 131)
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
     if (
