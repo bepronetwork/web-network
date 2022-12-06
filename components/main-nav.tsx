@@ -73,8 +73,8 @@ export default function MainNav() {
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true))
     return dispatch(changeShowCreateBounty(true))
-    
-  } 
+
+  }
 
 
   function LeaderBoard() {
@@ -112,12 +112,12 @@ export default function MainNav() {
     ): (
       <InternalLink
         href={'/'}
-        icon={                  
+        icon={
             <img
               src={`/images/Bepro_Logo_Light.svg`}
               width={104}
               height={40}
-            />                  
+            />
         }
         className="brand"
         nav
