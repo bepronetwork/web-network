@@ -1,3 +1,5 @@
+import { kycSession } from "interfaces/kyc-session";
+
 import {CurrentUserState, State} from "../../interfaces/application-state";
 import {Balance} from "../../interfaces/balance-state";
 import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
@@ -41,3 +43,6 @@ export const changeCurrentUserBalance = (balance: Balance | Partial<Balance>) =>
 
 export const changeCurrentUserConnected = (connected: boolean) =>
   changeCurrentUser.update({connected})
+
+export const changeCurrentUserKycSession = (kyc: kycSession) =>
+  changeCurrentUser.update({kyc})

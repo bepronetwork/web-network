@@ -41,6 +41,7 @@ export const GlobalEffectsProvider = ({children}) => {
               // asPath.includes('profile'),
             ]);
   useEffect(auth.updateWalletAddress, [state.currentUser]);
+  useEffect(auth.updateKycSession, [state?.currentUser?.login]);
   useEffect(auth.listenToAccountsChanged, [state.Service]);
   useEffect(auth.updateWalletBalance, [state.currentUser?.walletAddress]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
