@@ -15,5 +15,6 @@ export enum NetworkColors {
   moonbeam = "#f6c343",
   diogenes = "#29b6af",
   aurelius = "#29b6af",
-  aurora = "#29b6af"
+  aurora = "#29b6af",
+  bsc = "#fbd044"
 }

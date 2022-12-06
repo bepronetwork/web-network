@@ -16,7 +16,7 @@ import {
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 
-import { CustomSession } from "interfaces/custom-session";
+import {CustomSession} from "interfaces/custom-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -146,7 +146,7 @@ export function useAuthentication() {
   }
 
   function listenToAccountsChanged() {
-    if (!state.Service)
+    if (!state.Service || !window.ethereum)
       return;
 
     window.ethereum.on(`accountsChanged`, () => {
