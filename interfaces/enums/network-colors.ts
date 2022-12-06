@@ -16,5 +16,5 @@ export enum NetworkColors {
   diogenes = "#29b6af",
   aurelius = "#29b6af",
   aurora = "#29b6af",
-  bsc = "#29b6af"
+  bsc = "#fbd044"
 }
