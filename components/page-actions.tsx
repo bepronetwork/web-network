@@ -227,7 +227,12 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (isGithubConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+    if (isWalletConnected && 
+        isGithubConnected &&
+        !isBountyInDraft &&
+        !isBountyFinished &&
+        isBountyOpen &&
+        !isRepoForked)
       return (
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
@@ -245,22 +250,28 @@ export default function PageActions({
         isBountyOpen &&
         !isWorkingOnBounty &&
         isRepoForked &&
-        isStateToWorking)
+        isStateToWorking){
+
+      if(state.currentBounty?.data?.isKyc && state?.currentUser?.kyc && state?.currentUser?.kyc?.state !== 'VERIFIED')
+        return <KYC/>
+
       return (
-        <ReadOnlyButtonWrapper>
-          <Button
-            color="primary"
-            onClick={handleStartWorking}
-            className="read-only-button"
-            disabled={isExecuting}
-            isLoading={isExecuting}
-          >
-            <span>
-              <Translation ns="bounty" label="actions.start-working.title"/>
-            </span>
-          </Button>
-        </ReadOnlyButtonWrapper>
+          <ReadOnlyButtonWrapper>
+            <Button
+              color="primary"
+              onClick={handleStartWorking}
+              className="read-only-button"
+              disabled={isExecuting}
+              isLoading={isExecuting}
+            >
+              <span>
+                <Translation ns="bounty" label="actions.start-working.title"/>
+              </span>
+            </Button>
+          </ReadOnlyButtonWrapper>
       );
+    }
+    return <></>
   }
 
   function renderCreatePullRequestButton() {
@@ -374,7 +385,7 @@ export default function PageActions({
               {renderHardCancelButton()}
 
               {renderForkRepositoryLink()}
-              {state.currentBounty?.data?.isKyc ? <KYC /> : null}
+              
               {renderStartWorkingButton()}
 
               {renderCreatePullRequestButton()}

@@ -1,6 +1,7 @@
 import {useState} from "react";
 
 import {signIn, signOut, useSession} from "next-auth/react";
+import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -26,6 +27,7 @@ import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
 
 import { useTransactions } from "./use-transactions";
+const {publicRuntimeConfig} = getConfig()
 
 export function useAuthentication() {
 
@@ -209,7 +211,7 @@ export function useAuthentication() {
   }
 
   function updateKycSession(){
-    if(!state?.currentUser?.login || state?.currentUser?.walletAddress) 
+    if(!state?.currentUser?.login || state?.currentUser?.walletAddress || !publicRuntimeConfig.kyc.isEnabled) 
       return
 
     getKycSession()

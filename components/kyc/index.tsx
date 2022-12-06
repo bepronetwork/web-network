@@ -24,7 +24,7 @@ export function KYC() {
   const session = state?.currentUser?.kyc
 
   function handlerValidateSession() {
-    if(session?.session_id && session.state !== 'VERIFIED')
+    if(session?.session_id && session?.state !== 'VERIFIED')
       validateKycSession(session?.session_id)
         .then((data) => {
           if(session.state !== data.state){
@@ -34,6 +34,11 @@ export function KYC() {
     else
     setIsLoading(false)
   }
+
+  useEffect(handlerValidateSession,[show])
+
+  if(!session)
+    return <></>
 
   return (
     <ReadOnlyButtonWrapper>
@@ -54,10 +59,6 @@ export function KYC() {
             service={'individual'}
             lang={'en'}
             tier={session?.tier}
-          // color={{
-          //   primary: '212b39',
-          //   secondary: 'ffffff'
-          // }}
           /> : null}
         </div>
       </Modal>

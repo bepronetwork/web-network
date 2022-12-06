@@ -433,6 +433,7 @@ export default function CreateBountyModal() {
     setRepository(undefined);
     setBranch(null);
     setCurrentSection(0);
+    setIsKyc(false)
   }
 
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
