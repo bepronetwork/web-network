@@ -145,23 +145,22 @@ export default function ProposalMerge({
         titlePosition="center"
         onCloseClick={() => setShow(false)}
         footer={
-          <>
+          <div className="d-flex justify-content-between">
             <Button
-              className="btn-block w-100"
+              color="dark-gray"
+              onClick={() => setShow(false)}
+            >
+              <span>{t("common:actions.cancel")}</span>
+            </Button>
+
+            <Button
+              className="btn-block"
               onClick={handleMerge}
               disabled={!canMerge}
             >
               <span>{t("proposal:merge-modal.confirm-merge")}</span>
             </Button>
-            
-            <Button
-              color="dark-gray"
-              className="w-100"
-              onClick={() => setShow(false)}
-            >
-              <span>{t("common:actions.cancel")}</span>
-            </Button>
-          </>
+          </div>
         }
       >
         <ul className="mb-0 bg-dark-gray rounded-3 px-1 py-2">

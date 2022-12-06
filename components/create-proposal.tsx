@@ -165,7 +165,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
       const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
         return {
-          currentPrId: Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
+          currentPrId: 
+            Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
           prAddressAmount: item.details.map(detail => ({
             amount: Number(detail.percentage),
             address: detail.recipient
@@ -417,33 +418,34 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         title={t("proposal:actions.new")}
         titlePosition="center"
         onCloseClick={handleClose}
-        footer={<>
-          <Button
-            onClick={handleClickCreate}
-            disabled={!state.currentUser?.walletAddress ||
-              participants.length === 0 ||
-              !success ||
-              executing ||
-              cantBeMergeable()}
-          >
-            {!state.currentUser?.walletAddress ||
-              participants.length === 0 ||
-              executing ||
-              (!success && (
-                <LockedIcon width={12} height={12} className="mr-1" />
-              ))}
-            <span>{t("proposal:actions.create")}</span>
-            {executing ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
-          </Button>
-
-          <Button color="dark-gray" onClick={handleClose}>
-            {t("actions.cancel")}
-          </Button>
-        </>}>
+        footer={
+          <div className="d-flex justify-content-between">
+            <Button color="dark-gray" onClick={handleClose}>
+              {t("actions.cancel")}
+            </Button>
+            <Button
+              onClick={handleClickCreate}
+              disabled={!state.currentUser?.walletAddress ||
+                participants.length === 0 ||
+                !success ||
+                executing ||
+                cantBeMergeable()}
+            >
+              {!state.currentUser?.walletAddress ||
+                participants.length === 0 ||
+                executing ||
+                (!success && (
+                  <LockedIcon width={12} height={12} className="mr-1" />
+                ))}
+              <span>{t("proposal:actions.create")}</span>
+              {executing ? (
+                <span className="spinner-border spinner-border-xs ml-1" />
+              ) : (
+                ""
+              )}
+            </Button>
+          </div>
+        }>
         <p className="caption-small text-white-50 mb-2 mt-2">
           {t("pull-request:select")}
         </p>

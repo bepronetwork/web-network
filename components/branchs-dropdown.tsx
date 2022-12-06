@@ -30,7 +30,8 @@ export default function BranchsDropdown({
     if (!state.Service?.network?.repos?.active?.branches?.length || !repoId)
       return;
 
-    const _options = state.Service.network.repos.active.branches.map((branch: string) => ({value: branch, label: branch}));
+    const _options = 
+      state.Service.network.repos.active.branches.map((branch: string) => ({value: branch, label: branch}));
     setOptions(_options);
 
   }

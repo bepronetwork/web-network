@@ -44,7 +44,7 @@ export default function CreatePullRequestModal({
 
   const {state} = useAppState();
 
-  const { getRepositoryBranches, getUserRepositories, getPullRequestList } = useOctokit();
+  const { getRepositoryBranches, getPullRequestList } = useOctokit();
 
   function onSelectedBranch(option) {
     setSelectedBranch(option.value);
@@ -69,70 +69,67 @@ export default function CreatePullRequestModal({
 
   useEffect(setDefaults, [show]);
   useEffect(() => {
-    if (!state.currentUser?.login || !repo || !show) return;
+    if (!state.currentUser?.login || !repo || !show || !state.Service?.network?.repos?.active?.githubPath) return;
+
+    const [, activeName] = state.Service.network.repos.active.githubPath.split("/");
 
     // todo: add app-state for user-repositories ?
-    getUserRepositories(state.currentUser.login)
-      .then(repositories => {
-        const isFork = repo => repo.isFork ? 
-          repo.parent.nameWithOwner === state.Service?.network?.repos?.active?.githubPath : false;
+    getRepositoryBranches(`${state.currentUser.login}/${activeName}`)
+      .then(async branches => {
 
-        const filteredRepos = 
-          repositories.filter(repo => isFork(repo) || 
-            repo.nameWithOwner === state.Service?.network?.repos?.active?.githubPath);
-        
-        return Promise.all(filteredRepos
-          .map(async (repository) => ({ 
-            repository, 
-            branches:  await getRepositoryBranches(repository.nameWithOwner),
-            pullRequests: await getPullRequestList(repository.nameWithOwner)
-          })));
+        return { 
+          repository: { 
+            nameWithOwner: branches.nameWithOwner,
+            isFork: branches.isFork,
+            isInOrganization: branches.isInOrganization,
+            owner: branches.owner
+          },
+          branches:  branches.branches,
+          pullRequests: await getPullRequestList(branches.nameWithOwner)
+        }
       })
-      .then(reposWithBranches => reposWithBranches
-        .map(({ repository, branches }) => branches
-          .map(branch => {
-            const prExistAtGh = 
-                    reposWithBranches.flatMap(repos=> repos.pullRequests)
-                  .some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`)
+      .then(({ repository, branches, pullRequests }) => branches.map(branch => {
+        const prExistAtGh =  
+          pullRequests.some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`);
 
-            const prExistsInActiveIssue =
-              state.currentBounty?.data.pullRequests
-                .some(({userBranch: b}) => b === `${repository.owner}:${branch}`);
+        const prExistsInActiveIssue =
+          state.currentBounty?.data.pullRequests
+            .some(({userBranch: b}) => b === `${repository.owner}:${branch}`);
 
-            const isBaseBranch =
-              (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
-                state.currentBounty?.data.branch === branch) ;
-            
-            let postIcon = <></>
+        const isBaseBranch =
+          (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
+            state.currentBounty?.data.branch === branch);
+        
+        let postIcon = <></>;
 
-            if(repository.isFork)
-              postIcon = <Badge
-                color={"primary-30"}
-                label={t("misc.fork")}
-              />
+        if(repository.isFork)
+          postIcon = <Badge
+            color={"primary-30"}
+            label={t("misc.fork")}
+          />;
 
 
-            if (repository.isInOrganization)
-              postIcon =  <Badge 
-                color={"white-10"}
-                label={t("misc.organization")}
-              />
+        if (repository.isInOrganization)
+          postIcon =  <Badge 
+            color={"white-10"}
+            label={t("misc.organization")}
+          />;
 
 
-            const disabledIcon = (prExistsInActiveIssue || prExistAtGh)
-              ? <Badge color={"danger"}
-                      label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />
-              : <></>
+        const disabledIcon = (prExistsInActiveIssue || prExistAtGh)
+          ? <Badge color={"danger"}
+                  label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />
+          : <></>;
 
-            return {
-              value: `${repository.owner}:${branch}`, 
-              label: branch,
-              isDisabled: prExistsInActiveIssue || prExistAtGh || isBaseBranch,
-              disabledIcon,
-              postIcon,
-              isSelected: !!selectedBranch && branch === selectedBranch}
-          }))
-        .flatMap(branch => branch))
+        return {
+          value: `${repository.owner}:${branch}`, 
+          label: branch,
+          isDisabled: prExistsInActiveIssue || prExistAtGh || isBaseBranch,
+          disabledIcon,
+          postIcon,
+          isSelected: !!selectedBranch && branch === selectedBranch
+        };
+      }))
       .then(setOptions)
       .catch(console.log);
   }, [state.currentUser?.login, repo, show]);
@@ -144,6 +141,24 @@ export default function CreatePullRequestModal({
       onCloseClick={onCloseClick}
       onCloseDisabled={isCreating}
       title={t("pull-request:actions.create.title")}
+      footer={
+        (
+          <div className="d-flex justify-content-between">
+          <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
+              {t("actions.cancel")}
+            </Button>
+  
+            <Button
+              disabled={isButtonDisabled() || isCreating}
+              onClick={handleConfirm}
+              withLockIcon={isButtonDisabled()}
+              isLoading={isCreating}
+            >
+              <span>{t("pull-request:actions.create.title")}</span>
+            </Button>
+          </div>
+        )
+      }
       titlePosition="center">
       <div className="container">
         <div>
@@ -173,7 +188,7 @@ export default function CreatePullRequestModal({
               placeholder={t("forms.create-pull-request.description.placeholder")}
             />
           </div>
-          <div className="form-group">
+          <div className="form-group mb-0">
             <label className="caption-small mb-2 text-gray">
               {t("forms.create-pull-request.branch.label")}
             </label>
@@ -188,21 +203,6 @@ export default function CreatePullRequestModal({
               isOptionDisabled={(option) => option?.isDisabled}
               />
           </div>
-        </div>
-        <div className="d-flex pt-2 justify-content-center">
-          <Button
-            className="mr-2"
-            disabled={isButtonDisabled() || isCreating}
-            onClick={handleConfirm}
-            withLockIcon={isButtonDisabled()}
-            isLoading={isCreating}
-          >
-            <span>{t("pull-request:actions.create.title")}</span>
-          </Button>
-
-          <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
-            {t("actions.cancel")}
-          </Button>
         </div>
       </div>
     </Modal>

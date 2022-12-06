@@ -60,6 +60,7 @@
   "main-nav": {
     "developers": "Developers",
     "council": "Curators",
+    "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
     "new-bounty": "New bounty",
     "get-started": "Get Started",
@@ -112,7 +113,8 @@
     "completed": "Completed",
     "confirm": "Confirm",
     "connect": "Connect",
-    "connect-github": "Connect your GitHub account!",
+    "connect-github": "Please, connect your GitHub account",
+    "connect-github-to-work": "To start working on this bounty, please connect your github account below.",
     "connect-wallet": "Connect Wallet",
     "connect-your-wallet": "Connect your Wallet",
     "create-one": "Create one",
@@ -381,7 +383,10 @@
   },
   "drag-and-drop":{
     "attach-file": "Attach File",
-    "drag-reject": "Some files will be rejected"
+    "drag-reject": "Some files was rejected",
+    "size-limit": "files size limit to {{value}}MB",
+    "file-too-large": "File is larger than {{value}}MB",
+    "already-uploaded": "File has been uploaded"
   },
   "info-data": {
     "minutes_other": "minutes",

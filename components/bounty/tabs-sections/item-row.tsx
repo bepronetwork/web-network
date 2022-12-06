@@ -1,20 +1,24 @@
-import React from 'react'
+import React from "react";
 
 import Link from "next/link";
 import { UrlObject } from "url";
 
 import Avatar from "components/avatar";
+import Identicon from "components/identicon";
 import PullRequestLabels, { IPRLabel } from "components/pull-request-labels";
+
+import { truncateAddress } from "helpers/truncate-address";
 
 interface ItemRowProps {
   id: string | number;
-  githubLogin: string;
+  githubLogin?: string;
+  creator?: string;
   status?: IPRLabel[];
   children?: React.ReactNode;
   href?: UrlObject | string;
 }
 
-function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
+function ItemRow({ id, githubLogin, creator, status, children, href }: ItemRowProps) {
   return (
     <Link passHref key={`${githubLogin}-${id}`} href={href || "#"}>
       <div
@@ -27,10 +31,21 @@ function ItemRow({ id, githubLogin, status, children, href }: ItemRowProps) {
             <span className="label-m text-gray-500">#{id}</span>
           </div>
           <div className="col-md-4 col-xl-3 d-flex align-items-center gap-2">
-            <Avatar userLogin={githubLogin} />
-            <span className="text-uppercase text-white caption text-truncate">
-              {githubLogin}
-            </span>
+          {githubLogin ? (
+              <>
+                <Avatar userLogin={githubLogin} />
+                <span className={`text-uppercase text-white caption ${status?.length && "text-truncate"}`}>
+                  {githubLogin}
+                </span>
+              </>
+            ) : (
+              <>
+              <Identicon size="sm" address={creator} className="mx-1"/>
+              <span className={`text-uppercase text-white caption ${status?.length && "text-truncate"}`}>
+                {truncateAddress(creator)}
+              </span>
+              </>
+            )}
           </div>
           <div className="col-4 d-flex gap-2">
             {status?.length

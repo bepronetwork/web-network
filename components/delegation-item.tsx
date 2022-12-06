@@ -94,7 +94,9 @@ export default function DelegationItem({
         <p className="text-center h4">
           <span className="me-2">{t("actions.take-back")}</span>
           <span className="text-purple me-2">
-            {formatStringToCurrency(delegationAmount)} {t("$oracles", {token: state.Service?.network?.networkToken?.symbol})}
+            {formatStringToCurrency(delegationAmount)} {t("$oracles", {
+              token: state.Service?.network?.networkToken?.symbol
+            })}
           </span>
           <span>
             {t("misc.from")} {truncateAddress(delegation?.to || "", 12, 3)}

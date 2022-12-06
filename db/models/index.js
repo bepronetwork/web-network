@@ -16,6 +16,7 @@ import Settings from "./settings.model";
 import Benefactors from './benefactor.model';
 import Curators from './curator-model'
 import Disputes from './dispute-model';
+import LeaderBoard from './leaderboard.model';
 
 const Database = { sequelize: null };
 
@@ -39,6 +40,7 @@ Database.userPayments = UserPayments;
 Database.settings = Settings;
 Database.curator = Curators;
 Database.dispute = Disputes;
+Database.leaderBoard = LeaderBoard;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {

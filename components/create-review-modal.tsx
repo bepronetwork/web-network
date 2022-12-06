@@ -103,9 +103,16 @@ export default function CreateReviewModal({
             />
           </div>
         </div>
-        <div className="d-flex pt-2 justify-content-center">
+        <div className="d-flex pt-2 justify-content-between">
+        <Button 
+            color="dark-gray" 
+            onClick={onCloseClick}
+            disabled={isExecuting}
+            withLockIcon={isExecuting}
+          >
+            {t("actions.cancel")}
+          </Button>
           <Button
-            className="mr-2"
             disabled={isButtonDisabled()}
             onClick={() => onConfirm(body)}
           >
@@ -118,14 +125,6 @@ export default function CreateReviewModal({
             ) : (
               ""
             )}
-          </Button>
-          <Button 
-            color="dark-gray" 
-            onClick={onCloseClick}
-            disabled={isExecuting}
-            withLockIcon={isExecuting}
-          >
-            {t("actions.cancel")}
           </Button>
         </div>
       </div>

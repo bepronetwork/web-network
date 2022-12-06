@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 
-import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {useRouter} from "next/router";
 import {GetServerSideProps} from "next/types";
@@ -27,34 +26,32 @@ export default function PageIssue() {
   const router = useRouter();
 
   const [commentsIssue, setCommentsIssue] = useState([]);
-  const [isRepoForked, setIsRepoForked] = useState(false);
+  const [isRepoForked, setIsRepoForked] = useState<boolean>();
 
   const {state} = useAppState();
 
-  const { getUserRepositories } = useOctokit();
   const {updateActiveRepo} = useRepos()
+  const { getUserRepository } = useOctokit();
 
   const { id, repoId } = router.query;
   updateActiveRepo(repoId);
 
   function checkForks(){
+    if (!state.Service?.network?.repos?.active?.githubPath || isRepoForked !== undefined) return;
+
     if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
       return setIsRepoForked(true);
+
+    const [, activeName] = state.Service.network.repos.active.githubPath.split("/");
   
-    getUserRepositories(state.currentUser?.login)
-    .then((repos) => {
+    getUserRepository(state.currentUser?.login, activeName)
+    .then(repository => {
+      const { isFork, parent: { nameWithOwner } } = repository;
 
-      console.log(`REPOS`, repos);
-
-      const isFork = repo => repo.isFork ? 
-        repo.parent.nameWithOwner === state.Service?.network?.repos?.active.githubPath : false;
-
-      const isForked = 
-        !!repos.find(repo => isFork(repo) || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
-
-      setIsRepoForked(isForked);
+      setIsRepoForked(isFork && nameWithOwner === state.Service.network.repos.active.githubPath);
     })
     .catch((e) => {
+      setIsRepoForked(false);
       console.log("Failed to get users repositories: ", e);
     });
   }
@@ -75,7 +72,7 @@ export default function PageIssue() {
     checkForks();
   },[state.currentUser?.login, 
      state.currentBounty?.data?.working, 
-     state.Service?.network?.repos?.active 
+     state.Service?.network?.repos?.active
   ]);
 
   return (
@@ -85,7 +82,7 @@ export default function PageIssue() {
       { state.currentBounty?.chainData?.isFundingRequest ? <FundingSection /> : null}
 
       <PageActions
-        isRepoForked={isRepoForked}
+        isRepoForked={!!isRepoForked}
         addNewComment={addNewComment}
       />
 

@@ -356,12 +356,12 @@ function OraclesActions({
         titlePosition="center"
         onCloseClick={handleCancel}
         footer={
-          <>
-            <Button onClick={handleConfirm}>{t("actions.confirm")}</Button>
+          <div className="d-flex justify-content-between">
             <Button color="dark-gray" onClick={handleCancel}>
               {t("actions.cancel")}
             </Button>
-          </>
+            <Button onClick={handleConfirm}>{t("actions.confirm")}</Button>
+          </div>
         }
       >
         <p className="caption-small text-uppercase text-center mb-2">

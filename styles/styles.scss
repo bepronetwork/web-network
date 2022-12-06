@@ -1161,6 +1161,49 @@ a.row-button svg {
   }
 }
 
+.container-my-network {
+  border-radius: 0 0 math.div($m, 2) math.div($m, 2);
+}
+
+.my-network-tabs {
+  border-radius: math.div($m, 2) math.div($m, 2) 0 0;
+
+  .nav-item {
+    .nav-link {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 160%;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+
+      border: 0;
+      border-radius: math.div($m, 2) math.div($m, 2) 0 0;
+      padding: 20px;
+
+      color: rgba($white, 0.4);
+
+
+      &.active {
+        color: $white;
+        background-color: $bg-shadow;
+      }
+    }
+  }
+  
+  &.collapsed {
+    border-radius: math.div($m, 2);
+
+    .nav-item {
+      &:first-child {
+        .nav-link {
+          border-bottom-left-radius: math.div($m, 2);
+        }
+      }
+    }
+  }
+}
+
 .github-link {
   width: max-content;
 }

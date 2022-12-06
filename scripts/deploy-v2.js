@@ -276,37 +276,6 @@ async function main() {
     });
 
     if (!argv.production) {
-      await Promise.all([
-        // updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
-        // updateSetting("network", network.contractAddress, "contracts"),
-        // updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
-        updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
-        updateTokens({
-          name: await networkToken.name(),
-          symbol: await networkToken.symbol(),
-          isTransactional: false,
-          address: networkToken.contractAddress
-        }),
-        updateTokens({
-          name: await networkToken.name(),
-          symbol: await networkToken.symbol(),
-          isTransactional: true,
-          address: networkToken.contractAddress
-        }),
-        updateTokens({
-          name: await rewardToken.name(),
-          symbol: await rewardToken.symbol(),
-          isTransactional: false,
-          address: rewardToken.contractAddress
-        }),
-        updateTokens({
-          name: await bountyTransactional.name(),
-          symbol: await bountyTransactional.symbol(),
-          isTransactional: true,
-          address: bountyTransactional.contractAddress
-        })
-      ]);
-
       try {
         const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
         NetworkModel.init(sequelize);
@@ -338,6 +307,37 @@ async function main() {
       } catch (error) {
         console.log("Failed to save default netwrk", error);
       }
+      
+      await Promise.all([
+        // updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
+        // updateSetting("network", network.contractAddress, "contracts"),
+        // updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
+        updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
+        updateTokens({
+          name: await networkToken.name(),
+          symbol: await networkToken.symbol(),
+          isTransactional: false,
+          address: networkToken.contractAddress
+        }),
+        updateTokens({
+          name: await networkToken.name(),
+          symbol: await networkToken.symbol(),
+          isTransactional: true,
+          address: networkToken.contractAddress
+        }),
+        updateTokens({
+          name: await rewardToken.name(),
+          symbol: await rewardToken.symbol(),
+          isTransactional: false,
+          address: rewardToken.contractAddress
+        }),
+        updateTokens({
+          name: await bountyTransactional.name(),
+          symbol: await bountyTransactional.symbol(),
+          isTransactional: true,
+          address: bountyTransactional.contractAddress
+        })
+      ]);
     } else {
       console.log('Skiping Database Save');
     }

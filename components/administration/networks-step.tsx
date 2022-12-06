@@ -140,7 +140,9 @@ export default function NetworksStep({
       if (network.networkAddress !== state.Service?.active.network.contractAddress)
         await state.Service?.active.loadNetwork(network.networkAddress);
 
-      state.Service?.active.isNetworkGovernor(state.currentUser.walletAddress).then(setIsNetworkGovernor).catch(error => console.log(error));
+      state.Service?.active.isNetworkGovernor(state.currentUser.walletAddress)
+        .then(setIsNetworkGovernor)
+        .catch(error => console.log(error));
 
       await Promise.all([
         state.Service?.active.getNetworkParameter("councilAmount"),
@@ -229,10 +231,12 @@ export default function NetworksStep({
       await state.Service?.active.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
 
     if (forcedNetwork.disputableTime !== parameters.disputableTime.value)
-      await state.Service?.active.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
+      await state.Service?.active.setNetworkParameter("disputableTime", parameters.disputableTime.value)
+        .catch(console.log);
 
     if (+forcedNetwork.councilAmount !== parameters.councilAmount.value)
-      await state.Service?.active.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
+      await state.Service?.active.setNetworkParameter("councilAmount", parameters.councilAmount.value)
+        .catch(console.log);
 
     if (forcedNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
       await state.Service?.active.setNetworkParameter("percentageNeededForDispute",

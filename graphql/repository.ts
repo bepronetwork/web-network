@@ -27,6 +27,13 @@ export const Forks =
 export const Branches =
   `query Branches($repo: String!, $owner: String!, $cursor: String) {
     repository(name: $repo, owner: $owner) {
+      owner {
+        login
+      }
+      name
+      nameWithOwner
+      isFork
+      isInOrganization
       refs(first: 100, refPrefix:"refs/heads/", after: $cursor) {
         pageInfo {
           endCursor

@@ -49,12 +49,16 @@ export default function PageProposal() {
 
   async function closeIssue() {
     try{
-      const {url} = await createNFT(state.currentBounty?.data?.contractId, proposal.contractId)
+      if (!state.currentUser?.walletAddress) return;
+
+      const { url } =
+        await createNFT(state.currentBounty?.data?.contractId, proposal.contractId, state.currentUser?.walletAddress);
       
       handleCloseIssue(+state.currentBounty?.data?.contractId, +proposal.contractId, url)
-        .then(txInfo => {
+        .then(async txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-
+          
+          await processEvent("bountyToken", "transfer", state.Service?.network?.lastVisited, { fromBlock } )
           return processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } );
         })
         .then(() => {
@@ -141,7 +145,8 @@ export default function PageProposal() {
 
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = state.currentBounty?.chainData.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
+      const distributedAmount = 
+        state.currentBounty?.chainData.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
 
       return { 
         githubLogin, 
@@ -179,7 +184,10 @@ export default function PageProposal() {
           />
         </div>
         <div className="mt-3 row justify-content-between">
-          <ProposalListAddresses usersDistribution={usersDistribution} currency={state.currentBounty?.data?.token?.symbol} />
+          <ProposalListAddresses 
+            usersDistribution={usersDistribution} 
+            currency={state.currentBounty?.data?.token?.symbol} 
+          />
           <ProposalActionCard
             proposal={proposal}
             networkProposal={networkProposal}

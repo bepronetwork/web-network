@@ -8,7 +8,8 @@ export type NetworkParameters = "councilAmount" |
   "cancelFee" |
   "closeFee" |
   "cancelableTime" |
-  "treasury";
+  "treasury" |
+  "transfer"
 
 export type RegistryParameters = "networkCreationFeePercentage" | 
   "lockAmountForNetworkCreation" | 
@@ -20,7 +21,7 @@ export type RegistryParameters = "networkCreationFeePercentage" |
   "MAX_LOCK_PERCENTAGE_FEE" |
   "DIVISOR" 
 
-export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles";
+export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles" | "bountyToken";
 
 export type Events = "created" | 
   "canceled" | 
@@ -32,4 +33,6 @@ export type Events = "created" |
   "funded" | 
   "changed" |
   "transfer" |
-  "registered";
+  "registered"|
+  'moved-to-open'|
+  'update-draft-time';

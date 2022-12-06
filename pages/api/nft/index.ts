@@ -13,10 +13,28 @@ import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
 import {error as LogError} from "services/logging";
 
+interface NftPayload { 
+  issueContractId: number;
+  proposalContractId: number;
+  networkName: string;
+  mergerAddress: string;
+}
+
+const NftParticipant = (githubHandle, percentage, address, distributedAmount) => ({ 
+  githubHandle, 
+  percentage, 
+  address, 
+  distributedAmount
+});
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try{
-    // eslint-disable-next-line max-len
-    const {issueContractId, proposalContractId, networkName} = req.body as {issueContractId: number, proposalContractId: number, networkName: string};
+    const {
+      issueContractId,
+      proposalContractId,
+      mergerAddress,
+      networkName
+    } = req.body as NftPayload;
   
     if(!networkName || proposalContractId < 0 || issueContractId < 0)
       return res.status(400).json("Missing parameters");
@@ -88,29 +106,34 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                                                       BigNumber(networkBounty.tokenAmount), 
                                                       proposal.details.map(({ percentage }) => percentage));
 
+    if (!mergerAddress)
+      return res.status(404).json("Merger address not found");
+
+    const getNftParticipant = async (address, amounts) => {
+      const user = await models.user.findOne({ where: { address: { [Op.iLike]: String(address) } } });
+
+      return NftParticipant(user?.githubHandle || '', amounts.percentage, address, amounts.value);
+    }
+
+    const merger = await getNftParticipant(mergerAddress, distributions.mergerAmount);
+
     const participants = await Promise.all(proposal.details.map(async(detail: ProposalDetail, i) => {
       if(!detail.recipient) return;
 
-      const user = await models.user.findOne({
-        where: { address: {
-        [Op.iLike]: String(detail.recipient)
-        } }});
-
-      return { 
-        githubHandle: user?.githubHandle || '', 
-        percentage: distributions.proposals[i].percentage, 
-        address: detail.recipient, 
-        distributedAmount: distributions.proposals[i].value,
-      };
-    }))
+      return getNftParticipant(detail.recipient, distributions.proposals[i]);
+    }));
     
     const nft = {
       price: networkBounty.tokenAmount,
+      merger,
       participants,
       repository: networkBounty.repoPath,
       githubId: networkBounty?.cid.split("/")[1],
       githubPullRequestId: pullRequest.cid.toString(),
     }
+
+    console.log({ nft });
+
     const { hash } = await ipfsService.add(nft, true);
 
     if(!hash) return res.status(500);

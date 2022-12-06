@@ -27,14 +27,15 @@ export default function IssueProposalProgressBar() {
   const isFinalized = !!state.currentBounty?.chainData?.closed;
   const isInValidation = !!state.currentBounty?.chainData?.isInValidation;
   const isIssueinDraft = !!state.currentBounty?.chainData?.isDraft;
-  const isFundingRequest = state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
+  const isFundingRequest = 
+    state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
   const isBountyFunded = state.currentBounty?.data?.fundedAmount?.isEqualTo(state.currentBounty?.data?.fundingAmount);
   const creationDate = state.currentBounty?.chainData?.creationDate;
   const fundedDate = state.currentBounty?.data?.fundedAt;
   const closedDate = state.currentBounty?.chainData?.closedDate;
   const isCanceled = state.currentBounty?.data?.state === "canceled" || !!state.currentBounty?.chainData?.canceled;
-  const lastProposalCreationDate = 
-    state.currentBounty?.chainData?.proposals?.filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
+  const lastProposalCreationDate = state.currentBounty?.chainData?.proposals?.
+      filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
       .reduce((proposalAnt, proposalCur) => 
         proposalAnt.creationDate > proposalCur.creationDate && 
         proposalAnt || proposalCur, { creationDate })?.creationDate;

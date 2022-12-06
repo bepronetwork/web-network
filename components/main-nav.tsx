@@ -76,6 +76,18 @@ export default function MainNav() {
     
   } 
 
+
+  function LeaderBoard() {
+    return (
+      <InternalLink
+      href={"/leaderboard"}
+      label={<Translation label={"main-nav.leaderboard"} />}
+      nav
+      uppercase
+    />
+    )
+  }
+
   const brandLogo = !isNetworksPage ? (
       <InternalLink
         href={getURLWithNetwork("/", {
@@ -152,9 +164,17 @@ export default function MainNav() {
                     uppercase
                   />
                 </li>
+                <li>
+                  <LeaderBoard />
+                </li>
               </ul>
-            )) ||
-              ""}
+            )) || (
+              <ul className="nav-links">
+                <li>
+                  <LeaderBoard />
+                </li>
+              </ul>
+            )}
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">

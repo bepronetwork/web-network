@@ -1,4 +1,4 @@
-export const Repositories = 
+export const Repositories = (botUser?: string) =>
   `query Repositories($login: String!, $cursor: String) {
     user(login: $login) {
       repositories(first: 100, after: $cursor, ownerAffiliations: [COLLABORATOR, ORGANIZATION_MEMBER, OWNER]) {
@@ -21,7 +21,29 @@ export const Repositories =
             nameWithOwner
             name
           }
+          ${botUser ? `collaborators(query: "${botUser}", first: 100) {
+            nodes {
+              login
+            }
+          }` : ""}
         }
       }
     }
   }`;
+
+export const Repository = 
+`
+query FindUserRepository($login: String!, $repo: String!) {
+  user(login: $login) {
+    repository(name: $repo) {
+      isFork
+      parent {
+        name
+        nameWithOwner
+      }
+      name
+      nameWithOwner
+    }
+  }
+}
+`;

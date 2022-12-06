@@ -81,7 +81,7 @@ export function useRepos() {
           getRepositoryForks(activeRepo.githubPath),
         ])
       })
-      .then(([ghVisibility = false, branches = [], forks = []]) => {
+      .then(([ghVisibility = false, { branches = [] }, forks = []]) => {
         console.log(`DISPATCH NEW INFO`);
         dispatch(changeNetworkReposActive({ghVisibility, ...activeRepo, branches, forks}))
       })
