@@ -15,7 +15,7 @@ import UseNetworkChange from "../x-hooks/use-network-change";
 
 type typeError = { code?: number; message?: string }
 
-export default function WrongNetworkModal({requiredNetworkId = null,}: { requiredNetworkId: string | number; }) {
+export default function WrongNetworkModal() {
   const { t } = useTranslation("common");
   const api = useApi();
   const [error, setError] = useState<string>("");
@@ -29,6 +29,7 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
   const {handleAddNetwork} = UseNetworkChange()
 
   function changeShowModal() {
+    console.log('connectedChain', connectedChain)
     if (!supportedChains.length || !connectedChain?.id || !currentUser?.connected)
       return;
 
@@ -61,54 +62,6 @@ export default function WrongNetworkModal({requiredNetworkId = null,}: { require
         setIsAddingNetwork(false);
       });
   }
-
-  // async function handleAddNetwork() {
-  //   setIsAddingNetwork(true);
-  //   setError("");
-  //
-  //   const chainId = `0x${Number(chosenSupportedChain.chainId).toString(16)}`;
-  //
-  //   try {
-  //     await window.ethereum.request({
-  //       method: "wallet_switchEthereumChain",
-  //       params: [
-  //         {
-  //           chainId: chainId,
-  //         },
-  //       ],
-  //     });
-  //   } catch (error) {
-  //     if ((error as typeError)?.message?.indexOf('wallet_addEthereumChain') > -1) {
-  //       try {
-  //         await window.ethereum.request({
-  //           method: "wallet_addEthereumChain",
-  //           params: [
-  //             {
-  //               chainId: chainId,
-  //               chainName: chosenSupportedChain.name,
-  //               nativeCurrency: {
-  //                 name: chosenSupportedChain.chainCurrencyName,
-  //                 symbol: chosenSupportedChain.chainCurrencySymbol,
-  //                 decimals: chosenSupportedChain.chainCurrencyDecimals,
-  //               },
-  //               rpcUrls: [chosenSupportedChain.chainRpc],
-  //               blockExplorerUrls: [chosenSupportedChain.blockScanner],
-  //             },
-  //           ],
-  //         });
-  //       } catch (error) {
-  //         if ((error as typeError).code === -32602) {
-  //           setError(t("modals.wrong-network.error-invalid-rpcUrl"));
-  //         }
-  //         if ((error as typeError).code === -32603) {
-  //           setError(t("modals.wrong-network.error-failed-rpcUrl"));
-  //         }
-  //       }
-  //     }
-  //   } finally {
-  //     setIsAddingNetwork(false);
-  //   }
-  // }
 
   const isButtonDisabled = (): boolean =>
     [isAddingNetwork].some((values) => values);

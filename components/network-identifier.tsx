@@ -24,6 +24,8 @@ export default function NetworkIdentifier() {
       const windowChainId = +window.ethereum.chainId;
       const chain = findChain(windowChainId);
 
+
+
       dispatch(changeChain.update({
         id: (chain?.chainId || windowChainId).toString(),
         name: chain?.chainName || 'unknown'
