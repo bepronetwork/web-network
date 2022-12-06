@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
+import clsx from "clsx";
 import { useTranslation } from "next-i18next";
+
+import { useAppState } from "contexts/app-state";
+
+import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
 
 import DragAndDrop from "./drag-and-drop";
 
@@ -15,6 +20,36 @@ export default function CreateBountyDetails({
   review = false,
 }) {
   const { t } = useTranslation("bounty");
+  const [errorDescription, setErrorDescription] = useState<boolean>(false);
+  const [bodyLength, setBodyLength] = useState<number>(0);
+  const {
+    state: {
+      Settings
+    },
+  } = useAppState();
+
+  function handleChangeDescription (e: React.ChangeEvent<HTMLTextAreaElement>) { 
+    setBountyDescription(e.target.value)
+  }
+
+  useEffect(() => {
+    const strFiles = files?.map((file) =>
+        file.uploaded &&
+        `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
+          Settings?.urls?.ipfs
+        }/${file.hash}) \n\n`);
+
+    const body = `${bountyDescription}\n\n${strFiles
+          .toString()
+          .replace(",![", "![")
+          .replace(",[", "[")}`
+
+    body?.length && setBodyLength(body.length)
+
+    if(body.length > BODY_CHARACTERES_LIMIT && !errorDescription) setErrorDescription(true)
+    if(body.length <= BODY_CHARACTERES_LIMIT && errorDescription) setErrorDescription(false)
+
+  }, [bountyDescription, files])
 
   return (
     <div className="container">
@@ -46,13 +81,20 @@ export default function CreateBountyDetails({
           {t("fields.description.label")}
         </label>
         <textarea
-          className="form-control"
+          className={clsx("form-control",{
+            "border border-1 border-danger border-radius-8": errorDescription
+          })}
           rows={3}
           placeholder={t("fields.description.placeholder")}
           value={bountyDescription}
-          onChange={(e) => setBountyDescription(e.target.value)}
+          onChange={handleChangeDescription}
           disabled={review}
         />
+        {errorDescription && (
+          <span className="caption-small text-danger bg-opacity-100">
+             {t("errors.description-limit", {value: bodyLength})}
+          </span>
+        )}
       </div>
       <div className="mb-4">
         <DragAndDrop
