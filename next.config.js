@@ -12,6 +12,9 @@ const publicRuntimeConfig = {
     kyc: process.env.NEXT_PUBLIC_KYC_API || 'https://individual-api.synaps.io/v3',
     ipfs: process.env.NEXT_PUBLIC_IPFS_BASE
   },
+  kyc:{
+    isEnabled: process.env.NEXT_PUBLIC_ENABLE_KYC || false
+  },
   enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO,
   adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
 }
@@ -33,6 +36,7 @@ const serverRuntimeConfig = {
   kyc:{
     clientId: process.env.NEXT_SYNAPS_CLIENT_ID,
     key: process.env.NEXT_SYNAPS_KEY,
+    defaultTier: process.env.NEXT_SYNAPS_TIER_ID
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
   elasticSearch: {

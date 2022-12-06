@@ -28,8 +28,6 @@ eventsApi.interceptors.response.use((response) => response,
                                     });
 
 kycApi.interceptors.request.use(function (config) {
-  debugger;
-
   if (serverRuntimeConfig.kyc.key && serverRuntimeConfig.kyc.clientId) {
     config.headers["Api-Key"] = serverRuntimeConfig.kyc.key;
     config.headers["Client-Id"] = serverRuntimeConfig.kyc.clientId;
