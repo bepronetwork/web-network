@@ -18,6 +18,7 @@ import Curators from './curator-model'
 import Disputes from './dispute-model';
 import LeaderBoard from './leaderboard.model';
 import ProposalDistributions from './proposal-distributions.model';
+import KycSession from './kyc-session.model'
 
 const Database = { sequelize: null };
 
@@ -43,6 +44,7 @@ Database.curator = Curators;
 Database.dispute = Disputes;
 Database.leaderBoard = LeaderBoard;
 Database.proposalDistributions = ProposalDistributions;
+Database.kycSession = KycSession;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {
