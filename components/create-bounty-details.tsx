@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 
+import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 
 import DragAndDrop from "./drag-and-drop";
@@ -15,6 +16,17 @@ export default function CreateBountyDetails({
   review = false,
 }) {
   const { t } = useTranslation("bounty");
+  const [errorTitle, setErrorTitle] = useState<boolean>(false);
+
+  function handleChangeTitle (e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value
+
+    if(value.length >= 130){
+      setErrorTitle(true)
+    } else if(errorTitle && value.length < 130) setErrorTitle(false)
+    
+    setBountyTitle(value)
+  }
 
   return (
     <div className="container">
@@ -26,12 +38,19 @@ export default function CreateBountyDetails({
             </label>
             <input
               type="text"
-              className="form-control rounded-lg"
+              className={clsx("form-control rounded-lg", {
+                "border border-1 border-danger border-radius-8": errorTitle
+              })}
               placeholder={t("fields.title.placeholder")}
               value={bountyTitle}
-              onChange={(e) => setBountyTitle(e.target.value)}
+              onChange={handleChangeTitle}
               disabled={review}
             />
+            {errorTitle && (
+              <span className="caption-small mt-3 text-danger bg-opacity-100">
+                {t("errors.title-character-limit", {value: bountyTitle?.length})}
+              </span>
+            )}
             {!review && (
               <p className="p-small text-gray trans mt-2">
                 {t("fields.title.tip")}
