@@ -9,6 +9,7 @@ import {
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserHandle,
+  changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserWallet
@@ -17,6 +18,7 @@ import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 
 import { CustomSession } from "interfaces/custom-session";
+import { kycSession } from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -30,7 +32,7 @@ export function useAuthentication() {
   const {connect} = useDao();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith} = useApi();
+  const {getUserOf, getUserWith, getKycSession, validateKycSession} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -202,6 +204,14 @@ export function useAuthentication() {
     dispatch(changeCurrentUserAccessToken((sessionUser.accessToken)));
   }
 
+  function updateKycSession(){
+    if(!state?.currentUser?.login || state?.currentUser?.walletAddress) 
+      return
+
+    getKycSession()
+      .then((data: kycSession) => data.state !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
+      .then((session)=> dispatch(changeCurrentUserKycSession(session)))
+  }
   return {
     connectWallet,
     disconnectWallet,
@@ -211,6 +221,7 @@ export function useAuthentication() {
     updateWalletAddress,
     validateGhAndWallet,
     listenToAccountsChanged,
-    updateCurrentUserLogin
+    updateCurrentUserLogin,
+    updateKycSession
   }
 }

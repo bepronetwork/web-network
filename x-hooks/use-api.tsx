@@ -546,8 +546,24 @@ export default function useApi() {
       });
   }
 
-  async function getKycSession(){
-    return api.get("/kyc/init")
+  async function getKycSession(newSession = false){
+    const params = newSession ? {newSession}: {};
+
+    return api.get("/kyc/init",{
+      params
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+ 
+  async function validateKycSession(session_id){
+    return api.get("/kyc/validate", {
+      headers:{
+        session_id
+      }
+    })
     .then(({ data }) => data)
     .catch((error) => {
       throw error;
@@ -596,6 +612,7 @@ export default function useApi() {
     getTokens,
     createNFT,
     saveNetworkRegistry,
-    getKycSession
+    getKycSession,
+    validateKycSession
   };
 }
