@@ -14,7 +14,7 @@ module.exports = {
     if (process.env?.SKIP_MIGRATION_SEED_LEADERBOARD?.toLowerCase() === "true")
       return console.log("SKIPPING SEED LEADERBOARD STEP");
 
-    const sleep = (ms = 1000) => new Promise(r => setTimeout(r, ms));
+    const sleep = (ms = 200) => new Promise(r => setTimeout(r, ms));
 
     const settings = await queryInterface.sequelize.query(
       "SELECT * FROM settings WHERE visibility = :public",
@@ -61,6 +61,7 @@ module.exports = {
       const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
       const requests = Math.ceil((endBlock - startBlock) / perRequest);
 
+
       let toBlock = 0;
 
       console.log(`Fetching ${name} total of ${requests}, from: ${startBlock} to ${endBlock}`);
@@ -70,7 +71,7 @@ module.exports = {
         console.log(`${name} fetch from ${fromBlock} to ${toBlock} (missing ${Math.ceil((endBlock - toBlock) / perRequest)})`);
         
         pool.push(... await _bountyToken.getTransferEvents({fromBlock, toBlock}));
-
+        
         await sleep();
       }
     }
@@ -115,6 +116,7 @@ module.exports = {
         }
   
         usersUpdated += result ? 1 : 0;
+
         await sleep();
       // }
     }
