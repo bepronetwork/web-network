@@ -66,7 +66,7 @@ export default function NetworkContractSettings() {
         min: formatNumberToCurrency(LIMITS?.councilAmount?.min, 0),
         max: formatNumberToCurrency(LIMITS?.councilAmount?.max, 0)
       }),
-      symbol: "BEPRO", 
+      symbol: networkTokenSymbol || "Token", 
       value: settings?.parameters?.councilAmount?.value,
       error: settings?.parameters?.councilAmount?.validated === false,
       onChange: handleCouncilAmountChange
