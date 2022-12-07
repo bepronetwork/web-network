@@ -26,11 +26,10 @@ export default function WrongNetworkModal() {
 
   const {state: { connectedChain, currentUser, Settings: settings, supportedChains },} = useAppState();
 
-  const {handleAddNetwork} = UseNetworkChange()
+  const {handleAddNetwork} = UseNetworkChange();
 
   function changeShowModal() {
-    console.log('connectedChain', connectedChain)
-    if (!supportedChains.length || !connectedChain?.id || !currentUser?.connected)
+    if (!supportedChains.length || !connectedChain?.id || !currentUser?.walletAddress)
       return;
 
     if (!supportedChains.find(o => o.chainId === +option?.value))
