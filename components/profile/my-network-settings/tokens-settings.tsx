@@ -137,15 +137,15 @@ export default function TokensSettings({
   }
 
   async function addTransactionalTokens() {
-    const addTransactionalTokens = selectedTransactionalTokens
+    const tokensList = selectedTransactionalTokens
       ?.map(({ address }) => {
         const token = currentAllowedTokens?.transactional?.find((currentAddress) => address === currentAddress);
         if (!token) return address;
       })
       .filter((v) => v);
 
-    if (addTransactionalTokens.length > 0) {
-      await state.Service?.active.addAllowedTokens(addTransactionalTokens, true)
+    if (tokensList.length > 0) {
+      await state.Service?.active.addAllowedTokens(tokensList, true)
       .then((txInfo) => {
         processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
@@ -156,13 +156,13 @@ export default function TokensSettings({
   }
 
   function removeTransactionalTokens() {
-    const removeTransactionalTokens = currentAllowedTokens?.transactional?.map((currentAddress) => {
+    const tokensList = currentAllowedTokens?.transactional?.map((currentAddress) => {
       const token = selectedTransactionalTokens?.find(({ address }) => address === currentAddress);
       if (!token) return currentAddress;
     }).filter(v => v)
 
-    if (removeTransactionalTokens.length > 0) {
-      state.Service?.active.removeAllowedTokens(removeTransactionalTokens, true)
+    if (tokensList.length > 0) {
+      state.Service?.active.removeAllowedTokens(tokensList, true)
       .then((txInfo) => {
         processEvent("registry", "changed", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
