@@ -1,27 +1,22 @@
 /* eslint-disable no-prototype-builtins */
-const { QueryTypes } = require("sequelize");
+const {QueryTypes} = require("sequelize");
 
-const { Network } = require("../models/network.model");
-const { Curators } = require("../models/curator-model");
+const {Network} = require("../models/network.model");
+const {Curators} = require("../models/curator-model");
 
-const { Web3Connection, Network_v2 } = require("@taikai/dappkit");
+const {Web3Connection, Network_v2} = require("@taikai/dappkit");
 const BigNumber = require("bignumber.js");
 require("dotenv").config();
 
-async function handleCurators(
-  address,
-  totalVotes,
-  councilAmount,
-  networkId,
-  issues,
-  queryInterface
-) {
+async function handleCurators(address, totalVotes, councilAmount, networkId, issues, queryInterface) {
   const isCurator = BigNumber(totalVotes).gte(councilAmount);
+
+  console.log(`handleCurators`, address, `isCurator:`, isCurator, `totalVotes:`, totalVotes, `neededAmount:`, councilAmount, `networkId:`, networkId);
 
   const curatorInDb = await queryInterface.sequelize.query(
     'SELECT * FROM curators WHERE address = :address AND "networkId" = :networkId',
     {
-      replacements: { address: address, networkId: networkId },
+      replacements: {address: address, networkId: networkId},
       type: QueryTypes.SELECT,
     }
   );
@@ -49,11 +44,7 @@ async function handleCurators(
     .filter((e) => e);
 
   if (curatorInDb[0]) {
-    const query = `UPDATE curators SET 
-    "tokensLocked" = $tokensLocked, 
-    "isCurrentlyCurator" = $isCurrentlyCurator,
-    "acceptedProposals" = $acceptedProposals
-    WHERE id = $id`;
+    const query = `UPDATE curators SET "tokensLocked" = $tokensLocked, "isCurrentlyCurator" = $isCurrentlyCurator, "acceptedProposals" = $acceptedProposals WHERE id = $id`;
 
     return await queryInterface.sequelize.query(query, {
       bind: {
@@ -82,6 +73,8 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     if (process.env?.SKIP_MIGRATION_SEED_CURATORS?.toLowerCase() === "true")
       return console.log("SKIPPING SEED CURATORS STEP");
+
+    const sleep = (ms = 100) => new Promise(r => setTimeout(r, ms));
 
     const networks = await queryInterface.sequelize.query(
       "SELECT * FROM networks",
@@ -123,12 +116,12 @@ module.exports = {
       const blockNumber =
         await currentNetwork._contract.web3.eth.getBlockNumber();
 
-      const paginateRequest = async (poll = [], name) => {
+      const paginateRequest = async (pool = [], name, fn) => {
 
-        const startBlock = +(process.env.BULK_CHAIN_START_BLOCK || 0);
+        const startBlock = +(process.env.MIGRATION_START_BLOCK || 0);
         const endBlock = blockNumber;
         const perRequest = +(process.env.EVENTS_PER_REQUEST || 1500);
-        const requests = (startBlock - endBlock) / perRequest;
+        const requests = Math.ceil((endBlock - startBlock) / perRequest);
 
         let toBlock = 0;
 
@@ -136,18 +129,25 @@ module.exports = {
         for (let fromBlock = startBlock; fromBlock < endBlock; fromBlock += perRequest) {
           toBlock = fromBlock + perRequest > endBlock ? endBlock : fromBlock + perRequest;
 
-          console.log(`${name} fetch from ${fromBlock} to ${toBlock}`);
-          if(name === "getOraclesChangedEvents"){
-            poll.push(await currentNetwork.getOraclesChangedEvents({fromBlock, toBlock}));
-          }else {
-            poll.push(await currentNetwork.getOraclesTransferEvents({fromBlock, toBlock}));
-          }
+          console.log(`${name} fetch from ${fromBlock} to ${toBlock} (missing ${Math.ceil((endBlock - toBlock) / perRequest)})`);
+
+          let result = null;
+
+          if (name === "getOraclesChangedEvents")
+            result = await currentNetwork.getOraclesChangedEvents({fromBlock, toBlock});
+          else
+            result = await currentNetwork.getOraclesTransferEvents({fromBlock, toBlock});
+
+          pool.push(...result);
+
+          await sleep();
         }
       }
 
-      const AllOracleChangedEvents = [] 
-      
-      await paginateRequest(AllOracleChangedEvents, `getOraclesChangedEvents`)
+      const AllOracleChangedEvents = []
+      const AllOracleTransferEvents = [];
+      await paginateRequest(AllOracleChangedEvents, `getOraclesChangedEvents`);
+      await paginateRequest(AllOracleTransferEvents, `getOraclesTransferEvents`);
 
       const issues = await queryInterface.sequelize.query(
         "SELECT * FROM issues WHERE network_id = ?",
@@ -157,48 +157,21 @@ module.exports = {
         }
       );
 
-      for (const OracleChangedEvents  of AllOracleChangedEvents){
-        for (const changedEvent of OracleChangedEvents) {
-          const { actor } = changedEvent.returnValues;
-          const actorTotalVotes = await currentNetwork.getOraclesOf(actor);
-  
-          const resultChangedEvent = await handleCurators(
-            actor,
-            actorTotalVotes,
-            councilAmount,
-            network.id,
-            issues,
-            queryInterface
-          );
-  
-          curatorsUpdated += resultChangedEvent ? 1 : 0;
-        }
+      const mappedOraclesChange = [...new Set(AllOracleChangedEvents.map(({returnValues}) => returnValues.actor))];
+      const mappedOraclesTransfers = [...new Set(AllOracleTransferEvents.reduce((p, {returnValues}) => [...p, returnValues.from, returnValues.to], []))];
+
+      const mappedAddresses = [...new Set(mappedOraclesTransfers.concat(mappedOraclesChange))];
+
+      for (const actor of mappedAddresses) {
+
+        const actorTotalVotes = await currentNetwork.getOraclesOf(actor);
+        const resultChangedEvent = await handleCurators(actor, actorTotalVotes, councilAmount, network.id, issues, queryInterface);
+
+        curatorsUpdated += resultChangedEvent ? 1 : 0;
+
+        await sleep();
       }
 
-       const AllOracleTransferEvents = []
-
-       await paginateRequest(AllOracleTransferEvents, `getOraclesTransferEvents`);
-      
-      for(const OracleTransferEvents  of AllOracleTransferEvents) {
-        for (const changedEvent of OracleTransferEvents) {
-          const { from, to } = changedEvent.returnValues;
-
-          [from, to].map((address) =>
-            currentNetwork.getOraclesOf(address).then(async (votes) => {
-              const resultChangedEvent = await handleCurators(
-                address,
-                votes,
-                councilAmount,
-                network.id,
-                issues,
-                queryInterface
-              );
-
-              curatorsUpdated += resultChangedEvent ? 1 : 0;
-            })
-          );
-        }
-      }
     }
 
     console.log("Number of changes in curators table", curatorsUpdated);
