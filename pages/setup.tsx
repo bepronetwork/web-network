@@ -18,7 +18,7 @@ import useApi from "x-hooks/use-api";
 import ChainsSetup from "../components/setup/chains-setup";
 import ConnectGithubSetup from "../components/setup/connect-github-setup";
 import {CallToAction} from "../components/setup/call-to-action";
-import WrongNetworkModal from "../components/wrong-network-modal";
+import ConnectWalletButton from "../components/connect-wallet-button";
 
 const { publicRuntimeConfig: { adminWallet } } = getConfig();
 
@@ -56,8 +56,10 @@ export default function SetupPage(){
 
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
 
-  if (!isConnected)
-    return <WrongNetworkModal />;
+  console.log('setup USER', currentUser?.walletAddress)
+
+  if (!currentUser?.walletAddress)
+    return <ConnectWalletButton asModal />;
 
   const tabs = [
     {

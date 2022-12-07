@@ -1,6 +1,4 @@
 {
   "title": "Connect your MetaMask Wallet",
-  "to-access-this-page": "to access this page please, connect to the ",
-  "network": "network",
-  "on-your-wallet": "on your metamask wallet"
+  "this-page-needs-access-to-your-wallet-address": "This page needs access to your wallet address"
 }
