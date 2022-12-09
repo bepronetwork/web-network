@@ -6,7 +6,7 @@ import {error, info} from 'services/logging';
 const { publicRuntimeConfig } = getConfig();
 
 const cors = Cors({
-  methods: ['GET', 'PUT', 'POST'],
+  methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
   origin: [publicRuntimeConfig?.urls?.home || 'http://localhost:3000'],
 })
 
@@ -33,7 +33,7 @@ function runLogger(req, e = null) {
     info('Access', {method, pathname, search,});
 
   if (e)
-    error(`Access`, e);
+    error(`Access`, {method, pathname, error: e});
 }
 
 const withCors = (handler) => {

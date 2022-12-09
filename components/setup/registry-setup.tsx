@@ -18,6 +18,7 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
+import useSignature from "../../x-hooks/use-signature";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;
@@ -61,8 +62,10 @@ export function RegistrySetup({
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState("");
   const [registrySaveCTA, setRegistrySaveCTA] = useState(false);
 
+
+  const {signMessage} = useSignature();
   const { loadSettings } = useSettings();
-  const { saveNetworkRegistry, processEvent, updateChainRegistry, getSupportedChains } = useApi();
+  const { saveNetworkRegistry, patchSupportedChain, updateNetworkChainId, processEvent, updateChainRegistry, getSupportedChains } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
   const { handleDeployRegistry, handleSetDispatcher, handleAddAllowedTokens } = useBepro();
 
@@ -243,13 +246,26 @@ export function RegistrySetup({
     const value = val(registry);
     setRegistry(value);
 
-    console.log(`value.value`,value.value)
-
     if (!hasRegistryAddress && value.validated)
       updateData(value.value);
-
-
   }
+
+  function _patchSupportedChain() {
+    const chain = supportedChains?.find(c => +connectedChain.id === c.chainId);
+    if (!chain)
+      return;
+
+    return patchSupportedChain(chain, registry.value)
+      .then(result => {
+        if (result)
+          toastSuccess('updated chain registry');
+        else toastError('failed to update chain registry');
+      })
+  }
+
+  useEffect(() => {
+    signMessage(`hello, son`).then(r => console.log(r)).catch(e => console.error(e));
+  }, [])
 
   useEffect(() => {
     if (!registryAddress || !Service?.active || !isVisible) return;
@@ -335,6 +351,16 @@ export function RegistrySetup({
           onChange={_setRegistry}
           mustBeAddress
           docsLink="https://sdk.dappkit.dev/classes/Network_Registry.html"
+          action={
+            {...false
+                ? null
+                : {
+                    label: t("registry.actions.save-registry"),
+                    executing: false, disabled: false,
+                    onClick: () => signMessage(`hello, son`).then(r => console.log(r))
+                  }
+            }
+          }
         />
       </Row>
 

@@ -673,6 +673,19 @@ export default function useApi() {
       })
   }
 
+  async function patchSupportedChain(chain, registryAddress) {
+    return api.patch(`chains`, {...chain, registryAddress})
+      .then(({status}) => status === 200)
+      .catch(e => {
+        console.error(`failed to patchSupportedChain`, e);
+        return false;
+      })
+      .finally(() => {
+        chain.loading = false;
+        getSupportedChains(true);
+      })
+  }
+
   async function updateNetworkChainId(networkAddress: string, chainId: number) {
     return api.put(`/network/${networkAddress}/`, {chainId})
       .then(res => res.status === 200)
@@ -727,6 +740,7 @@ export default function useApi() {
     addSupportedChain,
     deleteSupportedChain,
     updateChainRegistry,
-    updateNetworkChainId
+    updateNetworkChainId,
+    patchSupportedChain
   };
 }

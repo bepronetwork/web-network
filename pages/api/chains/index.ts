@@ -5,8 +5,9 @@ import {Op} from "sequelize";
 import models from "db/models";
 import {error} from "../../../services/logging";
 import {withCors} from "../../../middleware";
+import getConfig from "next/config";
 
-async function PostPatch(req: NextApiRequest, res: NextApiResponse, update = false) {
+async function Post(req: NextApiRequest, res: NextApiResponse, update = false) {
   const body = req.body as MiniChainInfo;
 
   const missingValues = [
@@ -18,6 +19,12 @@ async function PostPatch(req: NextApiRequest, res: NextApiResponse, update = fal
     [body.nativeCurrency?.symbol, 'missing currency symbol'],
     [body.nativeCurrency?.decimals, 'missing currency decimals'],
   ].filter(([value]) => !value).map(([,error]) => error);
+
+
+  const {publicRuntimeConfig} = getConfig();
+  const {wallet} = req.headers;
+  if ((wallet as string)?.toLowerCase() !== publicRuntimeConfig.adminWallet.toLowerCase())
+    return res.status(401).json({message: 'nope.'});
 
   if (missingValues.length)
     return res.status(400).json({message: missingValues});
@@ -40,33 +47,52 @@ async function PostPatch(req: NextApiRequest, res: NextApiResponse, update = fal
   if (!chain) {
     const all = await models.chain.findAll();
     model.isDefault = !all.length;
-  }
-
-  if (chain && !update)
+  } else if (chain)
     return res.status(400)
       .json({message: `Chain already exists`});
-
-  let action = false;
 
   const logError = (e) => {
     error(`Failed to ${update ? 'update' : 'create'} ${model.chainId}`, e);
     return false;
   }
 
-  if (chain && update) {
-    console.log(`CHAIN`, chain);
-
-    if (chain.registryAddress)
-      return res.status(400).json({message: 'already configured.'});
-
-    action = await chain.set(model).save().then(() => true).catch(logError);
-  }
-  else if (!chain && !update)
-    action = await models.chain.create(model).then(() => true).catch(logError);
-
+  const action = await models.chain.create(model).then(() => true).catch(logError);
 
   return res.status(action ? 200 : 400)
     .json({message: action ? 'ok' : `Failed to ${update ? 'update' : 'create'} ${model.chainId}`});
+}
+
+async function Patch(req: NextApiRequest, res: NextApiResponse) {
+  if (!req.body.chainId)
+    return res.status(400).json({message: 'missing chain id'});
+
+  const where = {where: {chainId: {[Op.eq]: req.body.chainId}}};
+
+  const chain = await models.chain.findOne(where);
+  if (!chain)
+    return res.status(404).json({message: 'not found'});
+
+  if (req.body.isDefault !== undefined) {
+    if ((!!chain.isDefault !== req.body.isDefault))
+      return res.status(400).json({message: "can't change isDefault from self"})
+
+    if (req.body.isDefault) {
+      const defaultChain = await models.chain.findOne({where: {isDefault: {[Op.eq]: true}}});
+      if (defaultChain) {
+        defaultChain.isDefault = false;
+        await defaultChain.save();
+      }
+    }
+
+    chain.isDefault = req.body.isDefault;
+  }
+
+  if (chain.registryAddress)
+    chain.registryAddress = req.body.registryAddress;
+
+  await chain.save();
+
+  return res.status(200).json(chain);
 }
 
 async function Remove(req: NextApiRequest, res: NextApiResponse) {
@@ -107,10 +133,19 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
+
+  const {publicRuntimeConfig} = getConfig();
+  const {wallet} = req.headers;
+  if ((wallet as string)?.toLowerCase() !== publicRuntimeConfig.adminWallet.toLowerCase())
+    return res.status(401).json({message: 'nope.'});
+
   switch (req.method.toLowerCase()) {
     case "post":
+      await Post(req, res);
+      break;
+
     case "patch":
-      await PostPatch(req, res, req.method.toLowerCase() === "patch");
+      await Patch(req, res)
       break;
 
     case "delete":
