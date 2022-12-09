@@ -77,7 +77,7 @@ export const changeNetwork = new ChangeServiceNetworkProp();
 export const changeRepos = new ChangeServiceNetworkReposProp();
 export const changeActiveRepoProps = new ChangeServiceNetworkActiveRepoProp();
 
-export const changeStarting = (starting: boolean) => changeServiceProp.update({starting}, 'starting');
+export const changeStarting = (starting: boolean) => changeServiceProp.update(starting as any, 'starting');
 
 export const changeMicroServiceReady = (microReady: boolean) =>
   changeServiceProp.update({microReady}, 'microReady');

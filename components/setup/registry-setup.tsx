@@ -36,7 +36,7 @@ enum ModalKeys {
 
 const defaultContractField: ContractField = {
   value: "",
-  validated: undefined
+  validated: null
 };
 
 export function RegistrySetup({
@@ -147,12 +147,12 @@ export function RegistrySetup({
       .finally(() => setisDeployingRegistry(false));
   }
 
-  function updateData() {
+  function updateData(forcedValue?: string) {
     const updatedValue = value => ({ ...defaultContractField, value });
 
-    setRegistry(updatedValue(registryAddress));
+    setRegistry(updatedValue(forcedValue || registryAddress));
 
-    Service.active.loadRegistry(true, registryAddress)
+    Service.active.loadRegistry(true, forcedValue || registryAddress)
       .then(loaded => {
         if (!loaded) throw new Error("Not Loaded");
 
@@ -174,6 +174,7 @@ export function RegistrySetup({
         ])
       })
       .then(parameters => {
+        console.log(parameters);
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
         setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
@@ -238,6 +239,18 @@ export function RegistrySetup({
       })
   }
 
+  function _setRegistry(val) {
+    const value = val(registry);
+    setRegistry(value);
+
+    console.log(`value.value`,value.value)
+
+    if (!hasRegistryAddress && value.validated)
+      updateData(value.value);
+
+
+  }
+
   useEffect(() => {
     if (!registryAddress || !Service?.active || !isVisible) return;
 
@@ -247,6 +260,8 @@ export function RegistrySetup({
   useEffect(() => {
     if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);
   }, [currentUser?.walletAddress]);
+
+  useEffect(() => { console.log('registry', registry) }, [registry])
 
   useEffect(() => {
     if (!supportedChains.length || !connectedChain?.id)
@@ -317,8 +332,9 @@ export function RegistrySetup({
         <ContractInput
           field={registry}
           contractName="Network Registry"
+          onChange={_setRegistry}
+          mustBeAddress
           docsLink="https://sdk.dappkit.dev/classes/Network_Registry.html"
-          readOnly
         />
       </Row>
 
@@ -385,6 +401,7 @@ export function RegistrySetup({
           value={networkCreationFeePercentage}
           onChange={setNetworkCreationFeePercentage}
           variant="numberFormat"
+          decimalScale={7}
           description={t("registry.fields.network-creation-fee.description")}
           error={exceedsFeesLimitsError(networkCreationFeePercentage)}
           readOnly={hasRegistryAddress}
@@ -397,6 +414,7 @@ export function RegistrySetup({
           value={closeFeePercentage}
           onChange={setCloseFeePercentage}
           variant="numberFormat"
+          decimalScale={7}
           description={t("registry.fields.close-bounty-fee.description")}
           error={exceedsFeesLimitsError(closeFeePercentage)}
           readOnly={hasRegistryAddress}
@@ -409,6 +427,7 @@ export function RegistrySetup({
           value={cancelFeePercentage}
           onChange={setCancelFeePercentage}
           variant="numberFormat"
+          decimalScale={7}
           description={t("registry.fields.cancel-bounty-fee.description")}
           error={exceedsFeesLimitsError(cancelFeePercentage)}
           readOnly={hasRegistryAddress}
