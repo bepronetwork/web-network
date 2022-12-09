@@ -4,7 +4,7 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 const cors = Cors({
-  methods: ['GET', 'PUT', 'POST'],
+  methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
   origin: [publicRuntimeConfig?.urls?.home || 'http://localhost:3000'],
 })
 
