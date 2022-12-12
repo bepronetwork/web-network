@@ -6,11 +6,8 @@ import models from "db/models";
 import {error} from "../../../services/logging";
 import {withCors} from "../../../middleware";
 import getConfig from "next/config";
-import useSignature from "../../../x-hooks/use-signature";
 
 async function Post(req: NextApiRequest, res: NextApiResponse, isAdmin = false) {
-
-  const {messageFor} = useSignature();
 
   if (!isAdmin)
     return res.status(401).json({message: 'nope.'});
@@ -145,10 +142,12 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 
 async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
 
-  const {publicRuntimeConfig} = getConfig();
-  const {wallet, signature} = req.headers;
+  console.log(`ChainMethods`)
 
-  const isAdmin = ((wallet as string)?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase());
+  const {publicRuntimeConfig} = getConfig();
+  const {wallet} = req.headers;
+
+  const isAdmin = wallet && (wallet as string).toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase();
 
   switch (req.method.toLowerCase()) {
     case "post":

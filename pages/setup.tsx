@@ -56,8 +56,6 @@ export default function SetupPage(){
 
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
 
-  console.log('setup USER', currentUser?.walletAddress)
-
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;
 
