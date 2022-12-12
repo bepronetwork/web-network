@@ -20,6 +20,7 @@ import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
 
 import useSignature from "../../x-hooks/use-signature";
+import {changeCurrentUserSignature} from "../../contexts/reducers/change-current-user";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;
@@ -264,8 +265,17 @@ export function RegistrySetup({
       })
   }
 
+  function sign_() {
+    signMessage(`hello, son`)
+      .then(r => {
+        changeCurrentUserSignature(r);
+        console.log(r)
+      })
+      .catch(e => console.error(e));
+  }
+
   useEffect(() => {
-    signMessage(`hello, son`).then(r => console.log(r)).catch(e => console.error(e));
+
   }, [])
 
   useEffect(() => {
@@ -295,6 +305,19 @@ export function RegistrySetup({
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">
+
+      <CallToAction
+        call={t("registry.cta.dispatcher.call")}
+        action={t("registry.cta.dispatcher.action")}
+        onClick={() => sign_()}
+        color="warning"
+        disabled={false}
+        executing={false}
+      />
+
+
+
+
       { hasRegistryAddress &&
         <ContextualSpan
           context="info"

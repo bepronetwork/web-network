@@ -4,29 +4,31 @@ export default function useSignature() {
 
   const {state: {connectedChain, Service, currentUser}} = useAppState();
 
-  const messageFor = (chainId, contents = "Hello, world") => JSON.stringify({
-    domain: {
-      chainId: +chainId,
-      name: 'BEPRO-Message',
-      version: '1',
-    },
-    message: {
-      contents,
-    },
-    primaryType: 'Message',
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-      ],
-      Message: [
-        {name: 'contents', type: 'string'}
-      ]
-    }
-  })
+  function messageFor(chainId, contents = "Hello, world") {
+    return JSON.stringify({
+      domain: {
+        chainId: +chainId,
+        name: 'BEPRO-Message',
+        version: '1',
+      },
+      message: {
+        contents,
+      },
+      primaryType: 'Message',
+      types: {
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+        ],
+        Message: [
+          {name: 'contents', type: 'string'}
+        ]
+      }
+    })
+  }
 
-  async function signMessage(message = "") {
+  async function signMessage(message = ""): Promise<string> {
     if (!Service.active || !currentUser?.walletAddress)
       return;
 
@@ -39,11 +41,13 @@ export default function useSignature() {
     }
 
     return new Promise((res, rej) => {
-      Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, (err, d) => { err ? rej(err) : res(d) });
+      const resolver = (err, d) => { err ? rej(err) : res(d?.result) };
+      Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, resolver);
     });
   }
 
   return {
-    signMessage
+    signMessage,
+    messageFor,
   }
 }

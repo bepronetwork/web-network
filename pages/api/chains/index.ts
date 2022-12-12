@@ -6,8 +6,15 @@ import models from "db/models";
 import {error} from "../../../services/logging";
 import {withCors} from "../../../middleware";
 import getConfig from "next/config";
+import useSignature from "../../../x-hooks/use-signature";
 
-async function Post(req: NextApiRequest, res: NextApiResponse, update = false) {
+async function Post(req: NextApiRequest, res: NextApiResponse, isAdmin = false) {
+
+  const {messageFor} = useSignature();
+
+  if (!isAdmin)
+    return res.status(401).json({message: 'nope.'});
+
   const body = req.body as MiniChainInfo;
 
   const missingValues = [
@@ -52,17 +59,21 @@ async function Post(req: NextApiRequest, res: NextApiResponse, update = false) {
       .json({message: `Chain already exists`});
 
   const logError = (e) => {
-    error(`Failed to ${update ? 'update' : 'create'} ${model.chainId}`, e);
+    error(`Failed to create ${model.chainId}`, e);
     return false;
   }
 
   const action = await models.chain.create(model).then(() => true).catch(logError);
 
   return res.status(action ? 200 : 400)
-    .json({message: action ? 'ok' : `Failed to ${update ? 'update' : 'create'} ${model.chainId}`});
+    .json({message: action ? 'ok' : `Failed to create ${model.chainId}`});
 }
 
-async function Patch(req: NextApiRequest, res: NextApiResponse) {
+async function Patch(req: NextApiRequest, res: NextApiResponse, isAdmin = false) {
+
+  if (!isAdmin)
+    return res.status(401).json({message: 'nope.'});
+
   if (!req.body.chainId)
     return res.status(400).json({message: 'missing chain id'});
 
@@ -135,17 +146,17 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
 
   const {publicRuntimeConfig} = getConfig();
-  const {wallet} = req.headers;
-  if ((wallet as string)?.toLowerCase() !== publicRuntimeConfig.adminWallet.toLowerCase())
-    return res.status(401).json({message: 'nope.'});
+  const {wallet, signature} = req.headers;
+
+  const isAdmin = ((wallet as string)?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase());
 
   switch (req.method.toLowerCase()) {
     case "post":
-      await Post(req, res);
+      await Post(req, res, isAdmin);
       break;
 
     case "patch":
-      await Patch(req, res)
+      await Patch(req, res, isAdmin)
       break;
 
     case "delete":
