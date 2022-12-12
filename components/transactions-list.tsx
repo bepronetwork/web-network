@@ -87,12 +87,12 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
         { 
           transactions.length &&
           <Button 
-            textClass="text-light-gray" 
-            className="px-0 hover-primary" 
+            textClass="text-danger" 
+            className="px-0" 
             onClick={clearTransactionsList} 
             transparent
           >
-            Clear
+            {t("actions.clear-all")}
             </Button>  || <></>
         }
       </div>

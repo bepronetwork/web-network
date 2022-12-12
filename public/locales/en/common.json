@@ -142,7 +142,8 @@
     "show": "Show",
     "hide": "Hide",
     "remove": "Remove",
-    "register": "Register"
+    "register": "Register",
+    "clear-all": "Clear All"
   },
   "misc": {
     "by": "by",
