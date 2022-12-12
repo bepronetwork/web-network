@@ -66,8 +66,17 @@ export default function useApi() {
   
   api.interceptors.request.use(config => {
 
-    config.headers.wallet = typeof window !== "undefined" && state?.currentUser?.walletAddress;
-    config.headers.signature = typeof window !== "undefined" && state?.currentUser?.signature;
+    if (typeof window === 'undefined')
+      return config;
+
+    const currentWallet = sessionStorage.getItem("currentWallet") || ''
+    const currentSignature = sessionStorage.getItem("currentSignature") || ''
+
+    if (currentWallet)
+      config.headers["wallet"] = currentWallet;
+
+    if (currentSignature)
+      config.headers["signature"] = currentSignature;
 
     return config;
   });

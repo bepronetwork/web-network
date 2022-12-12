@@ -1,22 +1,22 @@
 export function messageFor(chainId, contents = "Hello, world") {
   return JSON.stringify({
     domain: {
-      chainId: chainId.toString(),
-      name: "BEPRO-Message",
-      version: "1"
+      chainId: +chainId,
+      name: 'BEPRO-Message',
+      version: '1',
     },
     message: {
       contents,
     },
-    primaryType: "Message",
+    primaryType: 'Message',
     types: {
       EIP712Domain: [
-        { name: "name", type: "string" },
-        { name: "version", type: "string" },
-        { name: "chainId", type: "string" }
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
       ],
       Message: [
-        {name: "contents", type: "string"}
+        {name: 'contents', type: 'string'}
       ]
     }
   })

@@ -1,35 +1,12 @@
 import {useAppState} from "../contexts/app-state";
+import {messageFor} from "../helpers/message-for";
 
 export default function useSignature() {
 
   const {state: {connectedChain, Service, currentUser}} = useAppState();
 
-  function messageFor(chainId, contents = "Hello, world") {
-    return JSON.stringify({
-      domain: {
-        chainId: +chainId,
-        name: 'BEPRO-Message',
-        version: '1',
-      },
-      message: {
-        contents,
-      },
-      primaryType: 'Message',
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-        ],
-        Message: [
-          {name: 'contents', type: 'string'}
-        ]
-      }
-    })
-  }
-
   async function signMessage(message = ""): Promise<string> {
-    if (!Service.active || !currentUser?.walletAddress)
+    if (!Service?.active || !currentUser?.walletAddress)
       return;
 
     const payload = {
@@ -41,8 +18,7 @@ export default function useSignature() {
     }
 
     return new Promise((res, rej) => {
-      const resolver = (err, d) => { err ? rej(err) : res(d?.result) };
-      Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, resolver);
+      Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, (err, d) => { err ? rej(err) : res(d?.result) });
     });
   }
 
