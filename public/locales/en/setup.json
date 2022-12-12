@@ -29,7 +29,7 @@
         "description": "Percentage of the bounty amount charged when a bounty is canceled"
       },
       "governance-token": {
-        "label": "Governance Token"
+        "label": "Network Creation Token (BEPRO)"
       },
       "nft-token": {
         "label": "NFT Bounty Token"
