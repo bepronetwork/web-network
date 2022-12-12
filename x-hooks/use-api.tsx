@@ -61,11 +61,13 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
-  const  {state, dispatch} = useAppState()
+  const  {state, dispatch} = useAppState();
   const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
   
   api.interceptors.request.use(config => {
-    config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
+
+    config.headers.wallet = typeof window !== "undefined" && state?.currentUser?.walletAddress;
+    config.headers.signature = typeof window !== "undefined" && state?.currentUser?.signature;
 
     return config;
   });

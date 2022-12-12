@@ -80,6 +80,7 @@ export interface CurrentUserState {
   login?: string;
   accessToken?: string;
   connected?: boolean;
+  signature?: string;
 }
 
 export interface CurrentBounty {
