@@ -58,7 +58,7 @@ const withCors = (handler) => {
         return res.status(401).write(MISSING_ADMIN_SIGNATURE);
 
       const params = {
-        signature: signature,
+        signature,
         data: JSON.parse(messageFor(IM_AN_ADMIN)),
         version: 'V4'
       }

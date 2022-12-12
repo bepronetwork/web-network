@@ -13,7 +13,7 @@ export function messageFor(chainId, contents = "Hello, world") {
       EIP712Domain: [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
+        { name: 'chainId', type: 'string' },
       ],
       Message: [
         {name: 'contents', type: 'string'}
