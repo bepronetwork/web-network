@@ -21,7 +21,7 @@ import "../styles/styles.scss";
 
 function App({
   Component,
-  pageProps: { session, currentIssue, ...pageProps },
+  pageProps: { session, ...pageProps },
 }: AppProps) {
 
   return (
