@@ -43,7 +43,7 @@ export default function TransactionType({ type }) {
   };
 
   return (
-    <span className="d-block caption-small text-white-50 text-uppercase fs-small">
+    <span className="d-block caption-small text-white text-uppercase fs-small">
       {[TypeMaps[type]] || t("transactions.types.unknown")}
     </span>
   );

@@ -191,8 +191,6 @@ function OraclesActions({
   function approveSettlerToken() {
     setIsApproving(true);
 
-    console.log(`APPROVE`);
-
     networkTokenERC20.approve(tokenAmount)
      .finally(() => setIsApproving(false));
   }

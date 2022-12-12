@@ -3,32 +3,17 @@ import React from "react";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
-import CenterArrows from "assets/icons/center-arrows";
-import ChatBubbles from "assets/icons/chat-bubbles";
-import CloseIssueIcon from "assets/icons/close-issue";
-import CrossArrow from "assets/icons/cross-arrow";
-import DownloadIcon from "assets/icons/download";
-import HelpIcon from "assets/icons/help-icon";
-import InformationChatBubble from "assets/icons/information-chat-bubble";
-import PullRequestIcon from "assets/icons/pull-request-icon";
-import RecognizeFinishedIcon from "assets/icons/recognize-finished-icon";
-import RefreshIcon from "assets/icons/refresh-icon";
-import ReturnArrow from "assets/icons/return-arrow";
-import ThumbsUp from "assets/icons/thumbs-up";
-import UploadIcon from "assets/icons/upload";
-
 import Button from "components/button";
 import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
+import { TransactionIcon } from "components/transactions-icon";
 
 import {useAppState} from "contexts/app-state";
+import {setTxList,} from "contexts/reducers/change-tx-list";
 
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 
-import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Transaction} from "interfaces/transaction";
-
-import {setTxList,} from "../contexts/reducers/change-tx-list";
 
 interface TransactionListProps {
   onActiveTransactionChange: (transaction: Transaction) => void
@@ -38,24 +23,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
   const {dispatch, state: {transactions, currentUser}} = useAppState();
   const {t} = useTranslation("common");
 
-  const IconMaps = {
-    [TransactionTypes.openIssue]: <InformationChatBubble />,
-    [TransactionTypes.createPullRequest]: <PullRequestIcon />,
-    [TransactionTypes.makePullRequestReady]: <PullRequestIcon />,
-    [TransactionTypes.lock]: <UploadIcon />,
-    [TransactionTypes.unlock]: <DownloadIcon />,
-    [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,
-    [TransactionTypes.delegateOracles]: <CrossArrow />,
-    [TransactionTypes.dispute]: <ChatBubbles />,
-    [TransactionTypes.redeemIssue]: <ReturnArrow />,
-    [TransactionTypes.closeIssue]: <CloseIssueIcon />,
-    [TransactionTypes.proposeMerge]: <CenterArrows />,
-    [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
-    [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />,
-    [TransactionTypes.updateBountyAmount]: <RefreshIcon />,
-    [TransactionTypes.cancelPullRequest]: <CloseIssueIcon />,
-    [TransactionTypes.refuseProposal]: <CloseIssueIcon />
-  };
+  
 
   function renderTransactionRow(item: Transaction) {
     const className = "h-100 w-100 px-3 py-2 tx-row mt-2 cursor-pointer";
@@ -64,7 +32,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
     const bnAmount = BigNumber(item.amount);
 
     if (bnAmount.gt(1))
-      amount = formatNumberToNScale(bnAmount.toFixed());
+      amount = formatNumberToNScale(bnAmount.toFixed(), 2, '');
     else if (bnAmount.lt(0.000001))
       amount = `less than 0.000001`;
     else amount = bnAmount.toFixed();
@@ -76,16 +44,17 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
         key={item.id}
       >
         <div className="d-flex justify-content-start align-items-center">
-          {IconMaps[item.type] || <HelpIcon />}
+          <TransactionIcon type={item.type} />
 
           <div className="ms-3 me-auto">
+            <TransactionType type={item.type} />
+
             {(item.amount > 0 && (
-              <span className="caption-large text-white text-uppercase">
+              <span className="caption-medium text-gray text-uppercase">
                 {formatStringToCurrency(amount)} {item.currency}
               </span>
             )) ||
               ""}
-            <TransactionType type={item.type} />
           </div>
 
           <TransactionStats status={item.status} />
