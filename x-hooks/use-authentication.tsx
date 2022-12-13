@@ -11,6 +11,7 @@ import {
   changeCurrentUserHandle,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
+  changeCurrentUserSignature,
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
@@ -22,6 +23,9 @@ import {useDao} from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
 import { useTransactions } from "x-hooks/use-transactions";
 import {changeChain} from "../contexts/reducers/change-chain";
+import {IM_AN_ADMIN} from "../helpers/contants";
+import getConfig from "next/config";
+import useSignature from "./use-signature";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
@@ -32,9 +36,11 @@ export function useAuthentication() {
   const {connect} = useDao();
   const transactions = useTransactions();
   const { loadNetworkAmounts } = useNetwork();
+  const {publicRuntimeConfig} = getConfig()
 
   const {asPath, push} = useRouter();
   const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {signMessage, decodeMessage} = useSignature();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -232,6 +238,19 @@ export function useAuthentication() {
     dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
+  function signMessageIfAdmin() {
+    if (!state?.currentUser?.walletAddress || decodeMessage(IM_AN_ADMIN, state?.currentUser?.signature, publicRuntimeConfig?.adminWallet))
+      return;
+
+    if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())
+      signMessage(IM_AN_ADMIN)
+        .then(r => {
+          dispatch(changeCurrentUserSignature(r));
+          sessionStorage.setItem(`currentSignature`, r);
+        })
+    else sessionStorage.setItem(`currentSignature`, '');
+  }
+
   return {
     connectWallet,
     disconnectWallet,
@@ -242,6 +261,8 @@ export function useAuthentication() {
     validateGhAndWallet,
     listenToAccountsChanged,
     updateCurrentUserLogin,
-    verifyReAuthorizationNeed
+    verifyReAuthorizationNeed,
+    updateCurrentUserLogin,
+    signMessageIfAdmin,
   }
 }

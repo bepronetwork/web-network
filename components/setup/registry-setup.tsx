@@ -18,7 +18,8 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
-import useSignature from "../../x-hooks/use-signature";
+import {isAddress} from "web3-utils";
+import {isZeroAddress} from "ethereumjs-util";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;
@@ -62,8 +63,6 @@ export function RegistrySetup({
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState("");
   const [registrySaveCTA, setRegistrySaveCTA] = useState(false);
 
-
-  const {signMessage} = useSignature();
   const { loadSettings } = useSettings();
   const { saveNetworkRegistry, patchSupportedChain, updateNetworkChainId, processEvent, updateChainRegistry, getSupportedChains } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
@@ -237,8 +236,12 @@ export function RegistrySetup({
 
     return updateChainRegistry({...chain, registryAddress: registryAddress})
       .then(result => {
-        if (result)
-          return getSupportedChains(true, {registryAddress: registryAddress});
+        if (!result) {
+          dispatch(toastError(`Failed to update chain ${chain.chainId} with ${registryAddress}`));
+          return;
+        }
+        dispatch(toastSuccess(`Updated chain ${chain.chainId} with ${registryAddress} `))
+        return getSupportedChains(true);
       })
   }
 
@@ -258,8 +261,8 @@ export function RegistrySetup({
     return patchSupportedChain(chain, registry.value)
       .then(result => {
         if (result)
-          toastSuccess('updated chain registry');
-        else toastError('failed to update chain registry');
+          dispatch(toastSuccess('updated chain registry'));
+        else dispatch(toastError('failed to update chain registry'));
       })
   }
 
@@ -349,13 +352,14 @@ export function RegistrySetup({
           mustBeAddress
           docsLink="https://sdk.dappkit.dev/classes/Network_Registry.html"
           action={
-            {...false
-                ? null
-                : {
-                    label: t("registry.actions.save-registry"),
-                    executing: false, disabled: false,
-                    onClick: () => _patchSupportedChain()
-                  }
+            {... registry?.value && isAddress(registry?.value) && !isZeroAddress(registry?.value)
+                ? {
+                  label: t("registry.actions.save-registry"),
+                  executing: false, disabled: false,
+                  onClick: () => _patchSupportedChain()
+                }
+                : null
+
             }
           }
         />

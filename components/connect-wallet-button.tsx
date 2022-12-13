@@ -12,19 +12,13 @@ import {useAuthentication} from "x-hooks/use-authentication";
 
 import {useAppState} from "../contexts/app-state";
 import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
-import useSignature from "../x-hooks/use-signature";
-import {changeCurrentUserSignature} from "../contexts/reducers/change-current-user";
-import {IM_AN_ADMIN} from "../helpers/contants";
-import getConfig from "next/config";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
-  const {publicRuntimeConfig} = getConfig()
 
   const [showModal, setShowModal] = useState(false);
 
   const {dispatch, state} = useAppState();
-  const {signMessage} = useSignature();
 
   const { connectWallet } = useAuthentication();
 
@@ -41,20 +35,6 @@ export default function ConnectWalletButton({children = null, asModal = false, f
 
   function onWalletChange() {
     setShowModal(!state.currentUser?.walletAddress);
-
-    console.log(`isAdmin`,state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())
-
-    if (!state?.currentUser?.walletAddress)
-      return;
-
-    if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())
-      signMessage(IM_AN_ADMIN)
-        .then(r => {
-          console.log(`r`,r);
-          changeCurrentUserSignature(r);
-          sessionStorage.setItem(`currentSignature`, r);
-        })
-    else sessionStorage.setItem(`currentSignature`, '');
   }
 
   useEffect(() => {
@@ -66,8 +46,6 @@ export default function ConnectWalletButton({children = null, asModal = false, f
   }, [state.Service?.active, forceLogin]);
 
   useEffect(onWalletChange, [state.currentUser?.walletAddress]);
-
-  console.log(`loading`, state?.loading?.isLoading)
 
 
   if (asModal) {

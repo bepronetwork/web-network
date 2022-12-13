@@ -12,7 +12,5 @@ export default function decodeMessage(chainId, message = "", signature: string, 
     version: 'V4'
   }
 
-  console.log(recoverTypedSignature<any, any>(params))
-
   return recoverTypedSignature<any, any>(params)?.toLowerCase() === assumedOwner.toLowerCase();
 }

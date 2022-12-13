@@ -2,16 +2,13 @@ import Cors from 'cors'
 import getConfig from "next/config";
 
 import {error, info} from 'services/logging';
-import {IM_AN_ADMIN, MISSING_ADMIN_SIGNATURE, NOT_AN_ADMIN} from "../helpers/contants";
-import {recoverTypedSignature} from "@metamask/eth-sig-util";
-import {messageFor} from "../helpers/message-for";
 
 const { publicRuntimeConfig } = getConfig();
 
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
   origin: [publicRuntimeConfig?.urls?.home || 'http://localhost:3000'],
-})
+});
 
 const ignorePaths = ['health', 'ip'];
 
@@ -41,33 +38,6 @@ function runLogger(req, e = null) {
 
 const withCors = (handler) => {
   return async (req, res) => {
-
-    // todo: move this logic to somewhere that it actually makes sense, such as another higher-order-fn
-
-    const headers = req.headers;
-    const adminWallet = publicRuntimeConfig?.adminWallet?.toLowerCase();
-    const wallet = (headers.wallet as string)?.toLowerCase();
-
-    if (req.method?.toLowerCase !== "get" && !!wallet && wallet === adminWallet) {
-
-      console.log(headers)
-
-      const signature = headers.signature as string;
-
-      if (!signature)
-        return res.status(401).write(MISSING_ADMIN_SIGNATURE);
-
-      const params = {
-        signature,
-        data: JSON.parse(messageFor(IM_AN_ADMIN)),
-        version: 'V4'
-      }
-
-      if (recoverTypedSignature<any, any>(params)?.toLowerCase() == publicRuntimeConfig.adminWallet.toLowerCase())
-        return res.status(401).write(NOT_AN_ADMIN);
-    }
-
-
     runLogger(req);
     return runMiddleware(req, res, cors)
     .then(()=>{
