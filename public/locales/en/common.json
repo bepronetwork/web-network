@@ -58,7 +58,6 @@
     "wallet": {}
   },
   "main-nav": {
-    "developers": "Developers",
     "council": "Curators",
     "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
