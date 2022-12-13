@@ -14,6 +14,7 @@ export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`,
   const { publicRuntimeConfig } = getConfig();
 
   return async (req, res) => {
+
     if (!methods.includes(req.method.toUpperCase()))
       return handler(req, res);
 
