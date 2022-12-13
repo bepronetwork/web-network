@@ -1,3 +1,5 @@
+import getConfig from "next/config";
+import {IM_AN_ADMIN, MISSING_ADMIN_SIGNATURE, NOT_ADMIN_WALLET, NOT_AN_ADMIN} from "../helpers/contants";
 import {NextApiHandler} from "next";
 import getConfig from "next/config";
 
@@ -14,7 +16,6 @@ export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`,
   const { publicRuntimeConfig } = getConfig();
 
   return async (req, res) => {
-
     if (!methods.includes(req.method.toUpperCase()))
       return handler(req, res);
 

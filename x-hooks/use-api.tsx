@@ -71,12 +71,16 @@ export default function useApi() {
 
     const currentWallet = sessionStorage.getItem("currentWallet") || ''
     const currentSignature = sessionStorage.getItem("currentSignature") || ''
+    const currentChainId = sessionStorage.getItem("currentChainId") || ''
 
     if (currentWallet)
       config.headers["wallet"] = currentWallet;
 
     if (currentSignature)
       config.headers["signature"] = currentSignature;
+
+    if (currentChainId)
+      config.headers["chain"] = currentChainId;
 
     return config;
   });

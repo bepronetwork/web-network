@@ -6,13 +6,9 @@ import models from "db/models";
 import {error} from "../../../services/logging";
 import {withCors} from "../../../middleware";
 import getConfig from "next/config";
-import AdminRoute from "../../../middleware/admin-route";
+import {AdminRoute} from "../../../middleware/admin-route";
 
-async function Post(req: NextApiRequest, res: NextApiResponse, isAdmin = false) {
-
-  if (!isAdmin)
-    return res.status(401).json({message: 'nope.'});
-
+async function Post(req: NextApiRequest, res: NextApiResponse) {
   const body = req.body as MiniChainInfo;
 
   const missingValues = [
@@ -67,11 +63,7 @@ async function Post(req: NextApiRequest, res: NextApiResponse, isAdmin = false) 
     .json({message: action ? 'ok' : `Failed to create ${model.chainId}`});
 }
 
-async function Patch(req: NextApiRequest, res: NextApiResponse, isAdmin = false) {
-
-  if (!isAdmin)
-    return res.status(401).json({message: 'nope.'});
-
+async function Patch(req: NextApiRequest, res: NextApiResponse) {
   if (!req.body.chainId)
     return res.status(400).json({message: 'missing chain id'});
 
@@ -144,20 +136,15 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 
 async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
 
-  console.log(`ChainMethods`)
-
-  const {publicRuntimeConfig} = getConfig();
-  const {wallet} = req.headers;
-
-  const isAdmin = wallet && (wallet as string).toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase();
+  console.log(req.method, `ChainMethods`);
 
   switch (req.method.toLowerCase()) {
     case "post":
-      await Post(req, res, isAdmin);
+      await Post(req, res);
       break;
 
     case "patch":
-      await Patch(req, res, isAdmin)
+      await Patch(req, res)
       break;
 
     case "delete":
@@ -175,4 +162,4 @@ async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(AdminRoute(ChainMethods))
+export default withCors(AdminRoute(ChainMethods));

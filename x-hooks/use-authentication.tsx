@@ -239,7 +239,15 @@ export function useAuthentication() {
   }
 
   function signMessageIfAdmin() {
-    if (!state?.currentUser?.walletAddress || decodeMessage(IM_AN_ADMIN, state?.currentUser?.signature, publicRuntimeConfig?.adminWallet))
+
+    const hasAdminSignature =
+      decodeMessage(
+        state?.connectedChain?.id,
+        IM_AN_ADMIN,
+        state?.currentUser?.signature,
+        publicRuntimeConfig?.adminWallet);
+
+    if (!state?.currentUser?.walletAddress || hasAdminSignature)
       return;
 
     if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())
@@ -247,8 +255,12 @@ export function useAuthentication() {
         .then(r => {
           dispatch(changeCurrentUserSignature(r));
           sessionStorage.setItem(`currentSignature`, r);
+          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id);
         })
-    else sessionStorage.setItem(`currentSignature`, '');
+    else {
+      sessionStorage.setItem(`currentSignature`, '');
+      sessionStorage.setItem(`currentChainId`, '');
+    }
   }
 
   return {
