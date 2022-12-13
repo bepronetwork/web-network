@@ -113,6 +113,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       branch,
       status: "pending",
       network_id: customNetwork?.id,
+      userRepo: `${username}/${repo}`,
+      userBranch: branch,
     });
 
     return res.status(200).json({ 
@@ -153,6 +155,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       branch,
       status: "pending",
       network_id: customNetwork?.id,
+      userRepo: `${username}/${repo}`,
+      userBranch: branch,
     });
 
     return res.status(200).json({ 
@@ -191,7 +195,6 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid");
-
   const issue = await models.issue.findOne({
     where: {
       issueId,
@@ -211,7 +214,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
     where: {
       githubId: String(pullRequestGithubId),
       githubLogin: creator,
-      branch: userBranch,
+      userBranch: userBranch,
       status: "pending",
       network_id: customNetwork.id,
     }
