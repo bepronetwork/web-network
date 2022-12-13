@@ -79,8 +79,8 @@ export default function useApi() {
     if (currentSignature)
       config.headers["signature"] = currentSignature;
 
-    if (+currentChainId)
-      config.headers["chain"] = +currentChainId;
+    if (currentChainId)
+      config.headers["chain"] = currentChainId;
 
     return config;
   });

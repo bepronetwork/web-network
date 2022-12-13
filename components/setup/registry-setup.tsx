@@ -358,10 +358,7 @@ export function RegistrySetup({
                   label: t("registry.actions.save-registry"),
                   executing: false, disabled: false,
                   onClick: () => _patchSupportedChain()
-                }
-                : null
-
-          }
+                } : null }
           }
         />
       </Row>
