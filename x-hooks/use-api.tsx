@@ -721,8 +721,8 @@ export default function useApi() {
       networkRegistry: chain?.registryAddress
     }
 
-    return api.patch<{message: string}>(`chains`, model)
-      .then(response => response.status === 200)
+    return api.patch<{registryAddress?: string}>(`chains`, model)
+      .then(response => response.status === 200 && !!response.data?.registryAddress)
       .catch(() => {
         return false;
       })

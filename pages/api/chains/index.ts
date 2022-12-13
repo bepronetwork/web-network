@@ -6,6 +6,7 @@ import models from "db/models";
 import {error} from "../../../services/logging";
 import {withCors} from "../../../middleware";
 import getConfig from "next/config";
+import AdminRoute from "../../../middleware/admin-route";
 
 async function Post(req: NextApiRequest, res: NextApiResponse, isAdmin = false) {
 
@@ -100,6 +101,7 @@ async function Patch(req: NextApiRequest, res: NextApiResponse, isAdmin = false)
 
   await chain.save();
 
+
   return res.status(200).json(chain);
 }
 
@@ -173,4 +175,4 @@ async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(ChainMethods)
+export default withCors(AdminRoute(ChainMethods))

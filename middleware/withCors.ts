@@ -10,7 +10,7 @@ const { publicRuntimeConfig } = getConfig();
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
   origin: [publicRuntimeConfig?.urls?.home || 'http://localhost:3000'],
-})
+});
 
 
 const WithCors = (handler) =>
