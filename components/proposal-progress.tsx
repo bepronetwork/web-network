@@ -62,15 +62,13 @@ export default function ProposalProgress({
     <div className="container bg-shadow p-2">
       <div className="d-flex justify-content-center align-items-center gap-1">
         {proposals?.length &&
-          React.Children.toArray(
-            proposals.map((item, index) => (
+          React.Children.toArray(proposals.map((item, index) => (
               <ProgressItem
                 key={`user_${index}`}
                 percentage={item.percentage}
                 githubLogin={item?.githubLogin}
               />
-            ))
-          )}
+            )))}
 
         <ProgressItem
           percentage={proposer.percentage}
