@@ -87,7 +87,10 @@ export default function useERC20() {
                         cap: string,
                         ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTx([{ type: TransactionTypes.deployERC20Token } as any]);
+      const transaction = addTx([{
+        type: TransactionTypes.deployERC20Token,
+        network: state.Service?.network?.active
+      } as any]);
 
       dispatch(transaction);
 

@@ -474,7 +474,11 @@ export default function CreateBountyModal() {
         return dispatch(toastError(t("bounty:errors.creating-bounty")));
       }
       
-      const transactionToast =  addTx([{type: TransactionTypes.openIssue, amount: payload.amount } as any]);
+      const transactionToast =  addTx([{
+        type: TransactionTypes.openIssue, 
+        amount: payload.amount,
+        network: Service?.network?.active
+      } as any]);
 
       dispatch(transactionToast);
 
