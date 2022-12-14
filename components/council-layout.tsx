@@ -54,7 +54,7 @@ export default function CouncilLayout({ children }) {
     },
     {
       href: getURLWithNetwork("/curators/ready-to-merge"),
-      label: t("council:ready-to-merge"),
+      label: t("council:ready-for-dispute"),
       className:"h3 p-0 me-3",
       nav: true,
       transparent: true
