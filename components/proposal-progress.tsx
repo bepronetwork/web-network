@@ -2,18 +2,17 @@ import React from "react";
 
 import { formatNumberToString } from "helpers/formatNumber";
 
-import { DistribuitonPerUser } from "interfaces/proposal";
+import { DistributedAmounts } from "interfaces/proposal";
 
 
 import Avatar from "./avatar";
 
 interface IProposalProgressProps {
-  usersDistribution: DistribuitonPerUser[];
+  distributedAmounts: DistributedAmounts;
 }
 
-export default function ProposalProgress({
-  usersDistribution
-}: IProposalProgressProps) {
+export default function ProposalProgress({distributedAmounts}: IProposalProgressProps) {
+  const usersDistribution = distributedAmounts.proposals;
   return (
     <div className="container bg-shadow p-2">
       <div className="d-flex justify-content-center align-items-center gap-2">

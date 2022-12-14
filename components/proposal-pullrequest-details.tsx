@@ -1,29 +1,25 @@
-import {useTranslation} from "next-i18next";
+import { useTranslation } from "next-i18next";
 
-import {pullRequest} from "interfaces/issue-data";
-import {DistribuitonPerUser} from "interfaces/proposal";
+import { pullRequest } from "interfaces/issue-data";
 
-import {useAppState} from "../contexts/app-state";
+import { useAppState } from "../contexts/app-state";
 import Avatar from "./avatar";
 import DateLabel from "./date-label";
 import GithubInfo from "./github-info";
-import ProposalProgress from "./proposal-progress";
 import PullRequestLabels from "./pull-request-labels";
 import Translation from "./translation";
 
 interface IProposalPRDetailsProps {
   currentPullRequest: pullRequest;
-  usersDistribution: DistribuitonPerUser[];
 }
 export default function ProposalPullRequestDetail({
   currentPullRequest,
-  usersDistribution
 }: IProposalPRDetailsProps) {
   const { t } = useTranslation("pull-request");
   const { state } = useAppState();
 
   return (
-    <div className="bg-shadow rounded-5 p-3 d-flex flex-column">
+    <>
       <div className="pt-1 mb-2 d-inline-flex align-items-center justify-content-md-start gap-2">
         <span className="caption-large text-uppercase text-white">
           {t("pull-request:label")}
@@ -62,7 +58,9 @@ export default function ProposalPullRequestDetail({
 
         <span className="caption-small text-light-gray text-uppercase">
           <Translation label={"branch"} />
-          <span className="text-primary">:{currentPullRequest?.userBranch}</span>
+          <span className="text-primary">
+            :{currentPullRequest?.userBranch}
+          </span>
         </span>
 
         {currentPullRequest?.createdAt && (
@@ -72,7 +70,6 @@ export default function ProposalPullRequestDetail({
           />
         )}
       </div>
-      <ProposalProgress usersDistribution={usersDistribution} />
-    </div>
+    </>
   );
 }

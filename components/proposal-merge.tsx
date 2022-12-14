@@ -9,6 +9,7 @@ import Modal from "components/modal";
 import {formatStringToCurrency} from "helpers/formatNumber";
 
 import {ProposalExtended} from "interfaces/bounty";
+import { DistributedAmounts } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
@@ -26,6 +27,7 @@ interface props {
   canMerge: boolean;
   idBounty: string;
   isMerging?: boolean;
+  distributedAmounts: DistributedAmounts;
 }
 
 export default function ProposalMerge({
@@ -35,7 +37,8 @@ export default function ProposalMerge({
   onClickMerge,
   canMerge,
   idBounty,
-  isMerging
+  isMerging,
+  distributedAmounts
 }: props) {
   const { t } = useTranslation(["common", "proposal"]);
 
@@ -114,7 +117,7 @@ export default function ProposalMerge({
           </div>
         }
       >
-       <ProposalListDistribution proposal={proposal}/>
+       <ProposalListDistribution distributedAmounts={distributedAmounts}/>
 
         <div className="mt-4 border-dashed"></div>
 

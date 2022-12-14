@@ -21,10 +21,18 @@ export interface INetworkProposal {
   votes: number;
 }
 
-export interface DistribuitonPerUser {
-  githubLogin: string;
-  address: string;
-  oracles: string;
-  percentage: number;
-  distributedAmount?: string;
+type amount  = {
+  value: string;
+  percentage: string;
+}
+export interface DistributedAmounts {
+  treasuryAmount: amount;
+  mergerAmount: amount;
+  proposerAmount: amount;
+  proposals: {
+    value: string;
+    percentage: string;
+    recipient: string;
+    githubLogin?: string;
+  }[];
 }

@@ -104,7 +104,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                                                       creatorFee, 
                                                       proposerFee,
                                                       BigNumber(networkBounty.tokenAmount), 
-                                                      proposal.details.map(({ percentage }) => percentage));
+                                                      proposal.details);
 
     if (!mergerAddress)
       return res.status(404).json("Merger address not found");

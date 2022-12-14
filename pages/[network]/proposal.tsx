@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {ProposalDetail} from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {useRouter} from "next/router";
@@ -12,16 +12,20 @@ import NotMergeableModal from "components/not-mergeable-modal";
 import ProposalActionCard from "components/proposal-action-card";
 import ProposalHero from "components/proposal-hero";
 import ProposalListDistribution from "components/proposal-list-distribution";
+import ProposalProgress from "components/proposal-progress";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
+
 
 import {useAppState} from "contexts/app-state";
 import {addToast} from "contexts/reducers/change-toaster";
+
+import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 
 
 import {ProposalExtended} from "interfaces/bounty";
 import {MetamaskErrors} from "interfaces/enums/Errors";
 import {pullRequest} from "interfaces/issue-data";
-import {DistribuitonPerUser, Proposal} from "interfaces/proposal";
+import {DistributedAmounts, Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -29,6 +33,12 @@ import useBepro from "x-hooks/use-bepro";
 import {ProposalDisputes} from "../../components/proposal-disputes";
 import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 import {useBounty} from "../../x-hooks/use-bounty";
+
+
+const defaultAmount = {
+  value: "0",
+  percentage: "0",
+};
 
 export default function PageProposal() {
   useBounty();
@@ -39,14 +49,24 @@ export default function PageProposal() {
   
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
-  const [usersDistribution, setUsersDistribution] = useState<DistribuitonPerUser[]>([]);
   const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
+
+  const [distributedAmounts, setDistributedAmounts] =
+    useState<DistributedAmounts>({
+      treasuryAmount: defaultAmount,
+      mergerAmount: defaultAmount,
+      proposerAmount: defaultAmount,
+      proposals: [],
+    });
   
   const {getChainBounty, getDatabaseBounty} = useBounty();
   const { getUserOf, processEvent, createNFT } = useApi();
 
   const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
 
+  const amountTotal = 
+    BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
+    
   async function closeIssue() {
     try{
       if (!state.currentUser?.walletAddress) return;
@@ -137,26 +157,34 @@ export default function PageProposal() {
     });
   }
 
+  async function getDistributedAmounts() {
+    if (!networkProposal?.details || !state?.Service?.network?.amounts) return;
+    
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
+
+    const distributions = calculateDistributedAmounts(treasury,
+                                                      mergeCreatorFeeShare,
+                                                      proposerFeeShare,
+                                                      amountTotal,
+                                                      networkProposal.details);
+
+    Promise.all(distributions.proposals.map(async({recipient, ...rest}) => {
+      let githubLogin = null
+
+      try {
+        const user = await getUserOf(recipient);
+        githubLogin = user.githubLogin;
+      } catch (error) {
+        console.error(error)
+      }
+      return  {...rest, recipient, githubLogin}
+    })).then(proposals => setDistributedAmounts({...distributions, proposals}))
+  }
+
   useEffect(() => {
     if (!networkProposal?.details?.length) return;
-
-    Promise.all(networkProposal.details.map( async (detail: ProposalDetail, i: number) => {
-      if(!detail.recipient) return;
-
-      const { githubLogin } = await getUserOf(detail.recipient);
-      const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = 
-        state.currentBounty?.chainData.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
-
-      return { 
-        githubLogin, 
-        percentage: detail.percentage, 
-        address: detail.recipient, 
-        oracles, 
-        distributedAmount,
-      };
-    })).then(setUsersDistribution);
-  }, [networkProposal, state.currentBounty?.data]);
+    getDistributedAmounts();
+  }, [networkProposal, state?.Service?.network?.amounts]);
 
   useEffect(() => {
     if (!state.currentBounty?.data || !state.currentBounty?.chainData) return;
@@ -177,15 +205,15 @@ export default function PageProposal() {
       <ProposalHero proposal={proposal} />
 
       <CustomContainer>
-        <div className="mt-3">
+        <div className="mt-3 bg-shadow rounded-5 p-3 d-flex flex-column">
           <ProposalPullRequestDetail
             currentPullRequest={pullRequest}
-            usersDistribution={usersDistribution}
           />
+          <ProposalProgress distributedAmounts={distributedAmounts} />
         </div>
         <div className="mt-3 row justify-content-between">
           <div className="col-md-6">
-          <ProposalListDistribution proposal={networkProposal}/>
+          <ProposalListDistribution distributedAmounts={distributedAmounts} />
           </div>
           <ProposalActionCard
             proposal={proposal}
@@ -194,6 +222,7 @@ export default function PageProposal() {
             onMerge={closeIssue}
             onDispute={disputeProposal}
             onRefuse={handleRefuse}
+            distributedAmounts={distributedAmounts}
           />
         </div>
         <ProposalDisputes proposalId={proposal?.id} />

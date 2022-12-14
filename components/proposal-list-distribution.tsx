@@ -5,67 +5,23 @@ import {useTranslation} from "next-i18next";
 
 import BountyDistributionItem from "components/bounty-distribution-item";
 
-import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-
-import {ProposalExtended} from "interfaces/bounty";
+import { DistributedAmounts } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
 import {useAppState} from "../contexts/app-state";
-
-
-interface amount {
-  value: string;
-  percentage: string;
+interface Props {
+  distributedAmounts: DistributedAmounts
 }
 
-interface distributedAmounts {
-  treasuryAmount: amount;
-  mergerAmount: amount;
-  proposerAmount: amount;
-  proposals: amount[];
-}
-
-interface props {
-  proposal: ProposalExtended;
-}
-
-const defaultAmount = {
-  value: "0",
-  percentage: "0",
-};
-
-
-export default function ProposalListDistribution({proposal}: props) {
+export default function ProposalListDistribution({distributedAmounts}: Props) {
   const { t } = useTranslation(["common", "proposal"]);
 
   const [coinInfo, setCoinInfo] = useState<TokenInfo>()
-  const [distributedAmounts, setDistributedAmounts] =
-    useState<distributedAmounts>({
-      treasuryAmount: defaultAmount,
-      mergerAmount: defaultAmount,
-      proposerAmount: defaultAmount,
-      proposals: [defaultAmount],
-    });
   
   const {state} = useAppState();
 
-  const amountTotal = 
-    BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
-
-  async function getDistributedAmounts() {
-    if (!proposal?.details) return;
-    
-    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
-
-    const distributions = calculateDistributedAmounts(treasury,
-                                                      mergeCreatorFeeShare,
-                                                      proposerFeeShare,
-                                                      amountTotal,
-                                                      proposal.details.map(({ percentage }) => percentage));
-    setDistributedAmounts(distributions);
-  }
 
   async function  getCoinInfo() { 
     await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol).then((tokenInfo) => {
@@ -73,18 +29,17 @@ export default function ProposalListDistribution({proposal}: props) {
     }).catch(error => console.debug("getCoinInfo", error));
   }
 
-  function handleConversion(value) {
-    return BigNumber(value).multipliedBy(coinInfo?.prices[state.Settings?.currency?.defaultFiat]).toFixed(4);
-  }
+  const handleConversion = (value) =>  BigNumber(value)
+                                        .multipliedBy(coinInfo?.prices[state.Settings?.currency?.defaultFiat])
+                                        .toFixed(4);
+  
 
   const currentTokenSymbol = state.currentBounty?.data?.token?.symbol  ||  t("common:misc.token")
 
   useEffect(() => {
-    if (!proposal || !state.Service?.network?.amounts)
-      return;
-    getDistributedAmounts();
-    getCoinInfo()
-  }, [proposal, state.Service?.network?.amounts]);
+    if (state.Service?.network?.amounts)
+      getCoinInfo()
+  }, [state.Service?.network?.amounts]);
 
 
   return (
