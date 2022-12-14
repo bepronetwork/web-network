@@ -15,6 +15,8 @@ import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber
 
 import {Transaction} from "interfaces/transaction";
 
+import { useTransactions } from "x-hooks/use-transactions";
+
 interface TransactionListProps {
   onActiveTransactionChange: (transaction: Transaction) => void
 }
@@ -22,7 +24,7 @@ interface TransactionListProps {
 export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
   const {dispatch, state: {transactions, currentUser}} = useAppState();
   const {t} = useTranslation("common");
-
+  const {deleteFromStorage} = useTransactions();
   
 
   function renderTransactionRow(item: Transaction) {
@@ -74,8 +76,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
   }
 
   function clearTransactionsList() {
-    localStorage.setItem(`bepro.transactions:${currentUser?.walletAddress?.toLowerCase()}`, "[]");
-
+    deleteFromStorage();
     dispatch(setTxList([]));
   }
 
