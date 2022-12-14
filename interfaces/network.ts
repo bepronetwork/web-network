@@ -2,6 +2,8 @@ import {TreasuryInfo} from "@taikai/dappkit";
 
 import {Token} from "interfaces/token";
 
+import { Curator } from "./curators";
+
 export interface Network {
   id: number;
   name: string;
@@ -37,6 +39,7 @@ export interface Network {
   isCouncil?: boolean;
   isGovernor?: boolean;
   isDefault?: boolean;
+  curators?: Curator[];
 }
 
 export interface ThemeColors {

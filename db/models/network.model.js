@@ -65,6 +65,12 @@ class Network extends Model {
       sourceKey: "id",
       as: "mergeProposals"
     });
+
+    this.hasMany(models.curator, {
+      foreignKey: "networkId",
+      sourceKey: "id",
+      as: "curators"
+    });
   }
 }
 
