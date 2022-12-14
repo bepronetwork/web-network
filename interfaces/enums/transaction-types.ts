@@ -31,5 +31,6 @@ export enum TransactionTypes {
   deployERC20Token,
   configFees,
   deployNetworkRegistry,
-  changeAllowedTokens
+  changeAllowedTokens,
+  closeNetwork
 }

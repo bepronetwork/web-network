@@ -55,7 +55,8 @@ export function TransactionIcon({ type } : TransactionIconProps) {
     [TransactionTypes.deployERC20Token]: <CurrencyIcon />,
     [TransactionTypes.configFees]: <SettingsIcon />,
     [TransactionTypes.deployNetworkRegistry]: <CurrencyIcon />,
-    [TransactionTypes.changeAllowedTokens]: <SettingsIcon />
+    [TransactionTypes.changeAllowedTokens]: <SettingsIcon />,
+    [TransactionTypes.closeNetwork]: <CancelIcon />
   };
 
   if (icons[type]) return icons[type];

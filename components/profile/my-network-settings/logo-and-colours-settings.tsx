@@ -49,7 +49,7 @@ export default function LogoAndColoursSettings({
   const {state, dispatch} = useAppState();
 
   const { updateNetwork, processEvent } = useApi();
-  const {  handleAddNetworkToRegistry } = useBepro();
+  const {  handleAddNetworkToRegistry, handleCloseNetwork } = useBepro();
   const { updateWalletBalance } = useAuthentication();
   const { updateActiveNetwork } = useNetwork();
 
@@ -131,7 +131,7 @@ export default function LogoAndColoursSettings({
       .finally(() => setIsRegistering(false));
   }
 
-  function handleCloseNetwork() {
+  function handleCloseMyNetwork() {
     if (
       !state.Service?.network?.active ||
       !state.currentUser?.login ||
@@ -143,8 +143,7 @@ export default function LogoAndColoursSettings({
 
     setIsClosing(true);
 
-    state.Service?.active
-      .unlockFromRegistry()
+    handleCloseNetwork()
       .then(() => {
         return updateNetwork({
           githubLogin: state.currentUser.login,
@@ -276,7 +275,7 @@ export default function LogoAndColoursSettings({
             color="dark-gray"
             disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
             className="ml-2"
-            onClick={handleCloseNetwork}
+            onClick={handleCloseMyNetwork}
           >
             {(!isAbleToClosed || !state.currentUser?.login) && (
               <LockedIcon className="me-2" />
