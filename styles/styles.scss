@@ -690,6 +690,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
+.min-w-fit{
+  min-width: fit-content !important;
+}
+
 .ico-metamask {
   display: inline-block;
   width: 18px;

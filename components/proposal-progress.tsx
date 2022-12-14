@@ -6,38 +6,52 @@ import { formatNumberToString } from "helpers/formatNumber";
 
 import { DistributedAmounts } from "interfaces/proposal";
 
-
 import Avatar from "./avatar";
+import InfoTooltip from "./info-tooltip";
 
 interface IProposalProgressProps {
   distributedAmounts: DistributedAmounts;
 }
 
-
-function ProgressItem({percentage, githubLogin = null, label = '', description = ''}){
-  return(
+function ProgressItem({
+  percentage,
+  githubLogin = null,
+  label = "",
+  description = "",
+  progressColor = "primary",
+}) {
+  return (
     <div
-    className={
-      "rounded-bottom d-flex flex-column align-items-center gap-2"
-    }
-    style={{ width: `${percentage}%` }}
-  >
-    {githubLogin ? <Avatar key={githubLogin} userLogin={githubLogin} tooltip /> : (
+      className={
+        "rounded-bottom d-flex flex-column align-self-end align-items-center gap-2 min-w-fit"
+      }
+      style={{ width: `${percentage}%` }}
+    >
+      {githubLogin ? (
+        <Avatar key={githubLogin} userLogin={githubLogin} tooltip />
+      ) : (
+        <span className="text-gray-500 text-uppercase xs-medium mt-1">
+          {label}
+        </span>
+      )}
+
       <div>
-        <span>{label}</span>
+        <span className="caption-small mr-1">
+          {formatNumberToString(percentage, 2)}%
+        </span>
+        {description && (
+          <InfoTooltip description={description} secondaryIcon={true} />
+        )}
       </div>
-    )}
 
-    <p className="caption-small">
-      {formatNumberToString(percentage, 0)}%
-    </p>
-
-    <span className="w-100 bg-primary p-1 rounded" />
-  </div>
-  )
+      <span className={`w-100 bg-${progressColor} p-1 rounded`} />
+    </div>
+  );
 }
 
-export default function ProposalProgress({distributedAmounts}: IProposalProgressProps) {
+export default function ProposalProgress({
+  distributedAmounts,
+}: IProposalProgressProps) {
   const { t } = useTranslation(["common", "proposal"]);
   const treasury = distributedAmounts.treasuryAmount;
   const merge = distributedAmounts.mergerAmount;
@@ -46,25 +60,40 @@ export default function ProposalProgress({distributedAmounts}: IProposalProgress
 
   return (
     <div className="container bg-shadow p-2">
-      <div className="d-flex justify-content-center align-items-center gap-2">
+      <div className="d-flex justify-content-center align-items-center gap-1">
         {proposals?.length &&
-          React.Children.toArray(proposals.map((item, index) => 
-            <ProgressItem key={`user_${index}`} percentage={item.percentage} githubLogin={item?.githubLogin}/>))}
+          React.Children.toArray(
+            proposals.map((item, index) => (
+              <ProgressItem
+                key={`user_${index}`}
+                percentage={item.percentage}
+                githubLogin={item?.githubLogin}
+              />
+            ))
+          )}
 
-        <ProgressItem 
-          percentage={treasury.percentage} 
-          label={t("proposal:merge-modal.network-fee")}
-          description={t("proposal:merge-modal.network-fee-description", {
-          percentage: distributedAmounts.treasuryAmount.percentage,
-          })}/>
-        <ProgressItem 
+        <ProgressItem
+          percentage={proposer.percentage}
+          progressColor="purple"
+          label={t("proposal:merge-modal.proposal-creator")}
+          description={t("proposal:merge-modal.proposal-creator-description")}
+        />
+
+        <ProgressItem
           percentage={merge.percentage}
           label={t("proposal:merge-modal.proposal-merger")}
-          description={t("proposal:merge-modal.proposal-merger-description")} />
-        <ProgressItem 
-          percentage={proposer.percentage} 
-          label={t("proposal:merge-modal.proposal-creator")}
-          description={t("proposal:merge-modal.proposal-creator-description")} />
+          progressColor="gray-700"
+          description={t("proposal:merge-modal.proposal-merger-description")}
+        />
+
+        <ProgressItem
+          percentage={treasury.percentage}
+          label={t("proposal:merge-modal.network-fee")}
+          progressColor="white"
+          description={t("proposal:merge-modal.network-fee-description", {
+            percentage: distributedAmounts.treasuryAmount.percentage,
+          })}
+        />
       </div>
     </div>
   );
