@@ -636,9 +636,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   left: 94%;
 }
 .circle-1 {
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
 }
 .circle-2 {
   width: 32px;
@@ -1342,6 +1342,9 @@ textarea.form-control {
   }
 }
 
+.gap-px-1{
+  gap: 1px;
+}
 .gap-20 {
   gap: 20px;
 

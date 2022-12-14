@@ -213,6 +213,9 @@ export default function PageProposal() {
         </div>
         <div className="mt-3 row justify-content-between">
           <div className="col-md-6">
+          <div className="p-3 bg-gray-900 d-flex align-item-center rounded-top">
+            <h4 className="text-uppercase caption-medium text-gray">{t("proposal:addresses_for_the_distribution")}</h4>
+          </div>
           <ProposalListDistribution distributedAmounts={distributedAmounts} />
           </div>
           <ProposalActionCard
