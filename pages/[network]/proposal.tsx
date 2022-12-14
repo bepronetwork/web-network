@@ -11,7 +11,7 @@ import CustomContainer from "components/custom-container";
 import NotMergeableModal from "components/not-mergeable-modal";
 import ProposalActionCard from "components/proposal-action-card";
 import ProposalHero from "components/proposal-hero";
-import ProposalListAddresses from "components/proposal-list-addresses";
+import ProposalListDistribution from "components/proposal-list-distribution";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 
 import {useAppState} from "contexts/app-state";
@@ -184,10 +184,9 @@ export default function PageProposal() {
           />
         </div>
         <div className="mt-3 row justify-content-between">
-          <ProposalListAddresses 
-            usersDistribution={usersDistribution} 
-            currency={state.currentBounty?.data?.token?.symbol} 
-          />
+          <div className="col-md-6">
+          <ProposalListDistribution proposal={networkProposal}/>
+          </div>
           <ProposalActionCard
             proposal={proposal}
             networkProposal={networkProposal}
