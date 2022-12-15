@@ -70,7 +70,7 @@ async function validateProposal(
     proposal,
     dbBounty: dbBounty[0],
     dbPullRequest: dbPullRequest[0],
-    dbProposal: dbProposal ? dbProposal[0] : dbProposal,
+    dbProposal: dbProposal[0],
   };
 }
 
