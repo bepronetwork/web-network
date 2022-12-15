@@ -76,6 +76,8 @@ export function useBounty() {
 
         const mergeProposalMapper = (proposal) => ({
           ...proposal,
+          disputeWeight: BigNumber(proposal?.disputeWeight || 0),
+          contractCreationDate: BigNumber(proposal.contractCreationDate).toNumber(),
           isMerged: bounty.merged !== null && +proposal?.contractId === +bounty.merged
         })
 
@@ -83,6 +85,7 @@ export function useBounty() {
           bounty.benefactors = bounty?.benefactors.map((benefactor) => 
           ({...benefactor, amount: BigNumber(benefactor?.amount)}))
 
+        
         const mergeProposals = bounty?.mergeProposals.map(mergeProposalMapper);
         const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
 
