@@ -122,7 +122,7 @@ export function RegistrySetup({
     handleDeployRegistry( erc20.value,
                           lockAmountForNetworkCreation,
                           treasury,
-                          networkCreationFeePercentage,
+                          `${+networkCreationFeePercentage / 100}`, // TO NORMALIZE INPUT BETWEEN 0 AND 100
                           closeFeePercentage,
                           cancelFeePercentage,
                           bountyToken.value )
@@ -174,9 +174,9 @@ export function RegistrySetup({
       .then(parameters => {
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
-        setNetworkCreationFeePercentage((+parameters[2] * parameters[6]).toString());
-        setCloseFeePercentage(parameters[3].toString());
-        setCancelFeePercentage(parameters[4].toString());
+        setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
+        setCloseFeePercentage((+parameters[3]/+parameters[6]).toString());
+        setCancelFeePercentage((+parameters[4]/+parameters[6]).toString());
         setBountyTokenDispatcher(parameters[5].toString());
 
         const transactional = !!parameters[8].transactional.find(address => parameters[7] = address);
@@ -347,6 +347,7 @@ export function RegistrySetup({
         <FormGroup
           label={t("registry.fields.network-creation-fee.label")}
           placeholder="0"
+          symbol="%"
           value={networkCreationFeePercentage}
           onChange={setNetworkCreationFeePercentage}
           variant="numberFormat"
@@ -358,6 +359,7 @@ export function RegistrySetup({
         <FormGroup
           label={t("registry.fields.close-bounty-fee.label")}
           placeholder="0"
+          symbol="%"
           value={closeFeePercentage}
           onChange={setCloseFeePercentage}
           variant="numberFormat"
@@ -369,6 +371,7 @@ export function RegistrySetup({
         <FormGroup
           label={t("registry.fields.cancel-bounty-fee.label")}
           placeholder="0"
+          symbol="%"
           value={cancelFeePercentage}
           onChange={setCancelFeePercentage}
           variant="numberFormat"
