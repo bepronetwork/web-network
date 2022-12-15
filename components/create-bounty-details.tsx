@@ -20,36 +20,38 @@ export default function CreateBountyDetails({
   review = false,
 }) {
   const { t } = useTranslation("bounty");
-  const [errorDescription, setErrorDescription] = useState<boolean>(false);
   const [bodyLength, setBodyLength] = useState<number>(0);
+  const [strFiles, setStrFiles] = useState<string>("");
   const {
-    state: {
-      Settings
-    },
+    state: { Settings },
   } = useAppState();
 
-  function handleChangeDescription (e: React.ChangeEvent<HTMLTextAreaElement>) { 
-    setBountyDescription(e.target.value)
+  function handleChangeDescription(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setBountyDescription(e.target.value);
   }
 
   useEffect(() => {
-    const strFiles = files?.map((file) =>
-        file.uploaded &&
-        `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
-          Settings?.urls?.ipfs
-        }/${file.hash}) \n\n`);
+    if (bountyDescription.length > 0) {
+      const body = `${bountyDescription}\n\n${strFiles
+        .toString()
+        .replace(",![", "![")
+        .replace(",[", "[")}`;
 
-    const body = `${bountyDescription}\n\n${strFiles
-          .toString()
-          .replace(",![", "![")
-          .replace(",[", "[")}`
+      if(body?.length) setBodyLength(body.length);
+    }
+  }, [bountyDescription, strFiles]);
 
-    body?.length && setBodyLength(body.length)
+  useEffect(() => {
+    if (files.length > 0) {
+      const strFiles = files?.map((file) =>
+          file.uploaded &&
+          `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
+            Settings?.urls?.ipfs
+          }/${file.hash}) \n\n`);
 
-    if(body.length > BODY_CHARACTERES_LIMIT && !errorDescription) setErrorDescription(true)
-    if(body.length <= BODY_CHARACTERES_LIMIT && errorDescription) setErrorDescription(false)
-
-  }, [bountyDescription, files])
+      setStrFiles(strFiles);
+    }
+  }, [files]);
 
   return (
     <div className="container">
@@ -57,7 +59,7 @@ export default function CreateBountyDetails({
         <div className="col-md-12 m-0">
           <div className="form-group">
             <label className="caption-small mb-2">
-             {t("fields.title.label")}
+              {t("fields.title.label")}
             </label>
             <input
               type="text"
@@ -81,8 +83,8 @@ export default function CreateBountyDetails({
           {t("fields.description.label")}
         </label>
         <textarea
-          className={clsx("form-control",{
-            "border border-1 border-danger border-radius-8": errorDescription
+          className={clsx("form-control", {
+            "border border-1 border-danger border-radius-8": (bodyLength > BODY_CHARACTERES_LIMIT),
           })}
           rows={3}
           placeholder={t("fields.description.placeholder")}
@@ -90,9 +92,9 @@ export default function CreateBountyDetails({
           onChange={handleChangeDescription}
           disabled={review}
         />
-        {errorDescription && (
+        {(bodyLength > BODY_CHARACTERES_LIMIT) && (
           <span className="caption-small text-danger bg-opacity-100">
-             {t("errors.description-limit", {value: bodyLength})}
+            {t("errors.description-limit", { value: bodyLength })}
           </span>
         )}
       </div>
