@@ -14,6 +14,19 @@ class MergeProposal extends Model {
         contractId: DataTypes.INTEGER,
         creator: DataTypes.STRING,
         network_id: DataTypes.INTEGER,
+        contractCreationDate: {
+          type: DataTypes.STRING(255),
+          allowNull: true
+        },
+        disputeWeight: {
+          type: DataTypes.STRING(255),
+          allowNull: true
+        },
+        refusedByBountyOwner: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false
+        },
     },
                {
         sequelize,
