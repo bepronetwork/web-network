@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 export interface Proposal {
   createdAt: Date | number;
   githubLogin: string;
@@ -8,6 +10,9 @@ export interface Proposal {
   contractId?: number;
   creator?: string;
   network_id: number;
+  contractCreationDate?: number;
+  disputeWeight?: BigNumber;
+  refusedByBountyOwner?: boolean;
 }
 
 export interface INetworkProposal {
