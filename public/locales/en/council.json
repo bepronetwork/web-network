@@ -9,7 +9,8 @@
   "become-council-description-part-one": "By becoming a curator you can participate in the bounty distribution and disputes on the network. Become a Curator by locking",
   "become-council-description-part-two": "through your wallet.",
   "go-to-lock-unlock": "Go to Lock/Unlock",
-  "ready-to-merge": "Ready to Merge",
+  "ready-to-dispute": "Ready to Dispute",
+  "ready-to-close": "Ready to Close",
   "ready-to-propose": "Ready to Propose",
   "council-list": "Curators List",
   "council-table": {

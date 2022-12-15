@@ -1,0 +1,44 @@
+.mini-tabs {
+  @extend .bg-gray-900;
+
+  height: 41px;
+  border-radius: 12px;
+  width: max-content;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1px;
+
+  .mini-tabs-item {
+    @extend .caption-medium;
+    @extend .text-gray-500;
+
+    border-radius: 12px;
+    font-weight: 500;
+
+    padding: 12px 0;
+
+    span {
+      padding: 0 20px;
+    }
+
+    &:hover {
+      @extend .text-gray-100;
+    }
+
+    &.active {
+      @extend .text-white;
+      @extend .bg-gray-700;
+    }
+
+    & + .mini-tabs-item {
+      &:not(:first-child) {
+        span {
+          border-left: 1px solid $gray-700;
+        }
+      }
+    }
+  }
+}

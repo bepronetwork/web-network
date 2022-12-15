@@ -12,8 +12,10 @@ import {useAppState} from "contexts/app-state";
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
+import { MiniTabs } from "./mini-tabs";
+
 export default function CouncilLayout({ children }) {
-  const { asPath } = useRouter();
+  const { asPath, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
   const {state} = useAppState();
@@ -44,27 +46,25 @@ export default function CouncilLayout({ children }) {
 
   const internalLinks = [
     {
-      href: getURLWithNetwork("/curators/ready-to-propose"),
+      onClick: () => push(getURLWithNetwork("/curators/ready-to-propose")),
       label: t("council:ready-to-propose"),
-      className:"mr-3 h3 p-0",
-      active:(asPath.endsWith("/curators") && true) || undefined,
-      nav: true,
-      transparent: true
+      active: asPath.endsWith("/curators") || asPath.endsWith("/ready-to-propose")
     },
     {
-      href: getURLWithNetwork("/curators/ready-to-merge"),
-      label: t("council:ready-to-merge"),
-      className:"h3 p-0 me-3",
-      nav: true,
-      transparent: true
+      onClick: () => push(getURLWithNetwork("/curators/ready-to-dispute")),
+      label: t("council:ready-to-dispute"),
+      active: asPath.endsWith("/ready-to-dispute")
     },
     {
-      href: getURLWithNetwork("/curators/curators-list"),
+      onClick: () => push(getURLWithNetwork("/curators/ready-to-close")),
+      label: t("council:ready-to-close"),
+      active: asPath.endsWith("/ready-to-close")
+    },
+    {
+      onClick: () => push(getURLWithNetwork("/curators/curators-list")),
       label: t("council:council-list"),
-      className:"h3 p-0 ms-3",
-      nav: true,
-      transparent: true
-    },
+      active: asPath.endsWith("/curators-list")
+    }
   ]
 
   async function loadTotals() {
@@ -118,12 +118,8 @@ export default function CouncilLayout({ children }) {
         infos={infos}
       />
       <div className="container pt-3">
-        <div className="row">
-          <div className="d-flex justify-content-center">
-            {internalLinks.map((data, key) => (
-              <InternalLink key={key} {...data} />
-            ))}
-          </div>
+        <div className="d-flex justify-content-center">
+          <MiniTabs items={internalLinks} />
         </div>
       </div>
       <div className="container p-footer">

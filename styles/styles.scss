@@ -19,6 +19,7 @@
 @import "components/amount-with-preview";
 @import "components/identicon";
 @import "components/profile-menu";
+@import "components/mini-tabs";
 
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
