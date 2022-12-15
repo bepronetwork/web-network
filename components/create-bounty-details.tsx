@@ -16,16 +16,10 @@ export default function CreateBountyDetails({
   review = false,
 }) {
   const { t } = useTranslation("bounty");
-  const [errorTitle, setErrorTitle] = useState<boolean>(false);
+  const titleLimit = 131
 
   function handleChangeTitle (e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value
-
-    if(value.length >= 131 && !errorTitle){
-      setErrorTitle(true)
-    } else if(errorTitle && value.length <= 130) setErrorTitle(false)
-    
-    setBountyTitle(value)
+    setBountyTitle(e.target.value)
   }
 
   return (
@@ -39,14 +33,14 @@ export default function CreateBountyDetails({
             <input
               type="text"
               className={clsx("form-control rounded-lg", {
-                "border border-1 border-danger border-radius-8": errorTitle
+                "border border-1 border-danger border-radius-8": bountyTitle.length >= titleLimit
               })}
               placeholder={t("fields.title.placeholder")}
               value={bountyTitle}
               onChange={handleChangeTitle}
               disabled={review}
             />
-            {errorTitle && (
+            {bountyTitle.length >= titleLimit && (
               <span className="caption-small mt-3 text-danger bg-opacity-100">
                 {t("errors.title-character-limit", {value: bountyTitle?.length})}
               </span>
