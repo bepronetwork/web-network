@@ -10,6 +10,7 @@ export interface Proposal {
   contractId?: number;
   creator?: string;
   network_id: number;
+  distributions?: DistribuitonPerUser[]
   contractCreationDate?: number;
   disputeWeight?: BigNumber;
   refusedByBountyOwner?: boolean;
@@ -27,9 +28,9 @@ export interface INetworkProposal {
 }
 
 export interface DistribuitonPerUser {
-  githubLogin: string;
+  githubLogin?: string;
   address: string;
-  oracles: string;
+  oracles?: string;
   percentage: number;
   distributedAmount?: string;
 }
