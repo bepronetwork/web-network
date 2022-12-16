@@ -29,7 +29,7 @@ export default function CreateBountyDetails({
   const titleLimit = 131
   
   
-   function handleChangeTitle (e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChangeTitle (e: React.ChangeEvent<HTMLInputElement>) {
     setBountyTitle(e.target.value)
   }
 
