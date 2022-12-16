@@ -37,6 +37,12 @@ class MergeProposal extends Model {
 
   static associate(models) {
     // define association here
+    this.hasMany(models.ProposalDistributions, {
+      foreignKey: "proposalId",
+      sourceKey: "id",
+      as: "distributions"
+    });
+
     this.belongsTo(models.issue, {
       foreignKey: "issueId",
       sourceKey: "id",
