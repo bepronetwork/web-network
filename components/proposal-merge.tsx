@@ -10,7 +10,7 @@ import Modal from "components/modal";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import {formatStringToCurrency} from "helpers/formatNumber";
 
-import {ProposalExtended} from "interfaces/bounty";
+import { Proposal } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
@@ -33,7 +33,7 @@ interface distributedAmounts {
 interface props {
   amountTotal: BigNumber;
   tokenSymbol?: string;
-  proposal: ProposalExtended;
+  proposal: Proposal;
   onClickMerge: () => void;
   canMerge: boolean;
   idBounty: string;
@@ -71,7 +71,7 @@ export default function ProposalMerge({
   const amountTotalConverted = BigNumber(handleConversion(amountTotal));
 
   async function getDistributedAmounts() {
-    if (!proposal?.details) return;
+    if (!proposal?.distributions) return;
 
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
 
@@ -79,7 +79,7 @@ export default function ProposalMerge({
                                                       mergeCreatorFeeShare,
                                                       proposerFeeShare,
                                                       amountTotal,
-                                                      proposal.details.map(({ percentage }) => percentage));
+                                                      proposal.distributions.map(({ percentage }) => percentage));
     setDistributedAmounts(distributions);
   }
 

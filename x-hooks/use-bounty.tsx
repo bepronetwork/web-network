@@ -178,12 +178,10 @@ export function useBounty() {
     const wallet = state.currentUser?.walletAddress;
 
     return Promise.all(bounty.proposals.map(proposal =>
-        state.Service.active.isProposalDisputed(+bounty.id, proposal.id)
-        .then(isDisputed =>
           !wallet
-            ? ({...proposal, isDisputed})
+            ? ({...proposal})
             : state.Service.active.getDisputesOf(wallet, +bounty.id, +proposal.id)
-              .then(value => ({...proposal, isDisputed, canUserDispute: !value.gt(0)})))))
+              .then(value => ({...proposal, canUserDispute: !value.gt(0)}))))
       .then(proposals => {
         return Promise.resolve(proposals)
       })
