@@ -157,7 +157,7 @@ export function useBounty() {
             dispatch(changeSpinners.update({bountyChain: false}))
           });
 
-      });
+      }).catch(error => console.debug("getChainBounty", error));
 
   }
 

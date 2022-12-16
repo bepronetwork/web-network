@@ -46,8 +46,6 @@ export default function PriceConversorModal({
           return ({ prices: { [value]: 0 } })
         });
 
-    console.log(data, value);
-
     if(data.prices[value] > 0) setErrorCoinInfo(false)
     setCurrentCurrency({value, label});
     setCurrentPrice(data.prices[value]);

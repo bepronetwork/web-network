@@ -67,7 +67,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
 
             return (
               <ItemRow 
-                key={uuidv4()}
+                key={`${uuidv4()} ${item?.id}`}
                 id={item?.id} 
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin}
