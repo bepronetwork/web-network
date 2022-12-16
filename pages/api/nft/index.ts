@@ -132,8 +132,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       githubPullRequestId: pullRequest.cid.toString(),
     }
 
-    console.log({ nft });
-
     const { hash } = await ipfsService.add(nft, true);
 
     if(!hash) return res.status(500);
