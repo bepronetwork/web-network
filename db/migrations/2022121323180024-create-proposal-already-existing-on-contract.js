@@ -327,7 +327,7 @@ module.exports = {
                   {
                     address: detail.recipient,
                     percentage: detail.percentage,
-                    proposalId: createProposalId,
+                    proposalId: dbProposal.id,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                   }
