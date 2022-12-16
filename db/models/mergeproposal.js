@@ -27,6 +27,11 @@ class MergeProposal extends Model {
           allowNull: false,
           defaultValue: false
         },
+        isDisputed: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false
+        },
     },
                {
         sequelize,

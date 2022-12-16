@@ -234,6 +234,7 @@ module.exports = {
               creator: proposal.creator,
               contractId: proposal.id,
               network_id: network?.id,
+              isDisputed: false,
               createdAt: new Date(),
               updatedAt: new Date(),
             }
@@ -305,12 +306,15 @@ module.exports = {
           console.log('refused and disputed')
         if (dbProposal) {
           console.log('refused and disputed in dbProposal', dbProposal.id)
-          const queryUpdateProposal = `UPDATE merge_proposals SET "disputeWeight" = $disputeWeight, "refusedByBountyOwner" = $refusedByBountyOwner WHERE id = $id`;
+          const queryUpdateProposal = `UPDATE merge_proposals SET "disputeWeight" = $disputeWeight, "refusedByBountyOwner" = $refusedByBountyOwner, "isDisputed" = $isDisputed WHERE id = $id`;
+
+          const isDisputed = await currentNetwork.isProposalDisputed(bountyId, proposalId)
 
           await queryInterface.sequelize.query(queryUpdateProposal, {
             bind: {
               disputeWeight: new BigNumber(proposal.disputeWeight).toFixed(),
               refusedByBountyOwner: proposal.refusedByBountyOwner,
+              isDisputed: isDisputed,
               id: dbProposal.id,
             },
           });
