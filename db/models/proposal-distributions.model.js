@@ -29,7 +29,6 @@ class ProposalDistributions extends Model {
       },
       {
         sequelize,
-        modelName: "proposal_distributions",
         tableName: "proposal_distributions"
       }
     );
