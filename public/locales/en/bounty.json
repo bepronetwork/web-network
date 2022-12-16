@@ -74,7 +74,8 @@
     "sync": "The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty",
     "exceeds-allowance": "Bounty amount exceeds your allowance",
     "exceeds-minimum-amount": "Minimum amount is {{amount}}",
-    "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}" 
+    "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
+    "description-limit": "Exceeds allowed limit of characters and files: {{value}}" 
   },
   "title": "Create new Bounty",
   "fields": {

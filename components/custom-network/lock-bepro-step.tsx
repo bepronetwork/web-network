@@ -15,13 +15,19 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
+import { addTx, updateTx } from "contexts/reducers/change-tx-list";
 
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
+import { parseTransaction } from "helpers/transactions";
 
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {StepWrapperProps} from "interfaces/stepper";
+import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import useERC20 from "x-hooks/use-erc20";
+
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
@@ -34,7 +40,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
-  const { state } = useAppState();
+  const { state, dispatch } = useAppState();
   const registryToken = useERC20();
   const { updateWalletBalance } = useAuthentication();
   const { tokensLocked, updateTokenBalance } = useNetworkSettings();
@@ -67,35 +73,64 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   ].some(c => c);
   const isUnlockBtnDisabled = lockedPercent?.isZero() || lockedPercent?.isNaN();
 
+  const failTx = (err, tx) => {
+
+    dispatch(updateTx([{
+      ...tx.payload[0],
+      status: err?.message?.search("User denied") > -1 ? TransactionStatus.rejected : TransactionStatus.failed
+    }]));
+
+    console.error("Tx error", err);
+  }
+
   async function handleLock() {
     if (!state.Service?.active || !amount) return;
 
+    const lockTxAction = addTx([{ 
+      type: TransactionTypes.lock,
+      amount: amount,
+      currency: registryTokenSymbol
+    }] as any);
+
+    dispatch(lockTxAction)
     setIsLocking(true);
 
     state.Service?.active.lockInRegistry(amount.toFixed())
-      .then(() => {
+      .then((tx) => {
         updateWalletBalance();
         updateAllowance();
         setAmount(BigNumber(0));
+        dispatch(updateTx([parseTransaction(tx, lockTxAction.payload[0] as SimpleBlockTransactionPayload)]));
         return updateTokenBalance()
       })
-      .catch(console.log)
+      .catch((error) => {
+        failTx(error, lockTxAction)
+      })
       .finally(() => setIsLocking(false));
   }
 
   async function handleUnLock() {
     if (!state.Service?.active) return;
 
+    const unlockTxAction = addTx([{ 
+      type: TransactionTypes.unlock,
+      amount: amountLocked,
+      currency: t("$oracles", { token: registryTokenSymbol })  
+    }] as any);
+
+    dispatch(unlockTxAction)
     setIsUnlocking(true);
 
     state.Service?.active.unlockFromRegistry()
-      .then(() => {
+      .then((tx) => {
         updateWalletBalance();
         updateAllowance();
         setAmount(BigNumber(0));
+        dispatch(updateTx([parseTransaction(tx, unlockTxAction.payload[0] as SimpleBlockTransactionPayload)]));
         return updateTokenBalance();
       })
       .catch((error) => {
+        failTx(error, unlockTxAction);
         console.log("Failed to Unlock", error);
       })
       .finally(() => setIsUnlocking(false));
@@ -127,11 +162,19 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   function handleApproval() {
     if (amountNeeded?.lte(0) || isApproving) return;
 
+    const approveTxAction = addTx([{ type: TransactionTypes.approveTransactionalERC20Token }] as any);
+    
+    dispatch(approveTxAction)
     setIsApproving(true)
 
     state.Service?.active.approveTokenInRegistry(amount?.toFixed())
-      .then(() => updateAllowance())
-      .catch(console.log)
+      .then((tx) => {
+        dispatch(updateTx([parseTransaction(tx, approveTxAction.payload[0] as SimpleBlockTransactionPayload)]));
+        return updateAllowance()
+      })
+      .catch((err) => {
+        failTx(err, approveTxAction);
+      })
       .finally(()=> setIsApproving(false));
   }
 

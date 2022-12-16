@@ -11,12 +11,13 @@ import Identicon from "components/identicon";
 import Translation from "components/translation";
 
 import {formatDate} from "helpers/formatDate";
-import {formatNumberToNScale} from "helpers/formatNumber";
+import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
+import DateLabel from "./date-label";
 
 export default function IssueListItem({
                                         issue = null,
@@ -32,8 +33,13 @@ export default function IssueListItem({
 
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
   const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
+  const issueState = getIssueState({
+    state: issue?.state,
+    amount: issue?.amount,
+    fundingAmount: issue?.fundingAmount,
+  })
 
-  function renderIssueData(state: IssueState) {
+  function RenderIssueData({ state }: {state: IssueState}) {
     const types = {
       open: {
         value: issue?.working?.length,
@@ -68,7 +74,7 @@ export default function IssueListItem({
     } else return <></>;
   }
 
-  function renderAmount() {
+  function RenderAmount() {
     const isActive = ["closed", "canceled"].includes(issue?.state);
     
     const percentage =
@@ -77,6 +83,17 @@ export default function IssueListItem({
         .toFixed(1, 1) || 0;
     
     return (
+      <OverlayTrigger
+      key="bottom-amount"
+      placement="bottom"
+      overlay={
+        <Tooltip id={"tooltip-amount-bottom"} className="caption-small">
+          {formatStringToCurrency(issue?.amount?.toFixed())} 
+          {" "}
+          {issue?.token?.symbol || t("common:misc.token")}
+        </Tooltip>
+      }
+    >
       <div
         className={`row justify-content-md-center m-0 px-1 pb-1 rounded-5 ${
           !isActive ? "bg-black" : "bg-dark-gray"
@@ -89,7 +106,7 @@ export default function IssueListItem({
                 isActive && "-40"
               }`}
             >
-              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount) || `< 0.000001`}{" "}
+              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount) || issue?.amount.toExponential()}{" "}
               <label
                 className={`caption-small text-uppercase ${
                   !isActive ? "text-primary" : "text-white-40"
@@ -119,12 +136,7 @@ export default function IssueListItem({
           </>
         )}
       </div>
-    );
-  }
-
-  function createIssueDate(date: Date) {
-    return (
-      <span className="caption-medium text-white-40">{formatDate(date)}</span>
+      </OverlayTrigger>
     );
   }
 
@@ -157,13 +169,7 @@ export default function IssueListItem({
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
             {!isMobile && (
               <>
-                <BountyStatusInfo
-                  issueState={getIssueState({
-                    state: issue?.state,
-                    amount: issue?.amount,
-                    fundingAmount: issue?.fundingAmount,
-                  })}
-                />
+                <BountyStatusInfo issueState={issueState} />
                 <div className="d-flex align-items-center">
                   <Identicon
                     className="mr-2"
@@ -190,16 +196,14 @@ export default function IssueListItem({
                 </div>
               </>
             )}
-            {renderIssueData(getIssueState({
-                state: issue?.state,
-                amount: issue?.amount,
-                fundingAmount: issue?.fundingAmount,
-            }))}
-            {createIssueDate(issue?.createdAt)}
+            <RenderIssueData state={issueState} />
+            <DateLabel date={issue?.createdAt} className="text-white-40" />
           </div>
         </div>
 
-        <div className="col-md-2 my-auto text-center">{renderAmount()}</div>
+        <div className="col-md-2 my-auto text-center">
+          <RenderAmount />
+        </div>
       </div>
     </div>
   );

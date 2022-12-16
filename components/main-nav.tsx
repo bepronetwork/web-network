@@ -142,7 +142,7 @@ export default function MainNav() {
                 <li>
                   <InternalLink
                     href={getURLWithNetwork("/developers")}
-                    label={<Translation label={"main-nav.developers"} />}
+                    label={<Translation label={"main-nav.nav-avatar.bounties"} />}
                     nav
                     uppercase
                   />

@@ -19,8 +19,7 @@ export default function CouncilLayout({ children }) {
   const {state} = useAppState();
 
   const { getTotalBounties } = useApi();
-  const { getURLWithNetwork } = useNetwork();
-
+  const { getURLWithNetwork, updateActiveNetwork } = useNetwork();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -76,13 +75,16 @@ export default function CouncilLayout({ children }) {
       state.Service?.active.getTotalNetworkToken(),
     ]);
 
+    const totalCurators = 
+      state.Service?.network?.active?.curators?.filter(({ isCurrentlyCurator }) => isCurrentlyCurator)?.length;
+
     setInfos([
       {
         value: totalBounties,
         label: t("council:ready-bountys"),
       },
       {
-        value: state.Service?.network?.active?.councilMembers?.length || 0,
+        value: totalCurators || 0,
         label: t("council:council-members"),
       },
       {
@@ -101,6 +103,10 @@ export default function CouncilLayout({ children }) {
   useEffect(() => {
     loadTotals();
   }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active?.name]);
+
+  useEffect(() => {
+    updateActiveNetwork(true);
+  }, []);
 
   return (
     <div>

@@ -14,12 +14,13 @@ interface FormGroupProps {
   error?: string | ReactNode;
   hint?: string | ReactNode;
   description?: string;
+  symbol?: string;
   variant?: "input" | "numberFormat";
   onBlur?: () => void;
   onChange?: (newValue: string) => void;
 }
 
-export function FormGroup({ label, onChange, error, hint, variant = "input", ...rest } : FormGroupProps) {
+export function FormGroup({ label, onChange, error, hint, variant = "input", symbol, ...rest } : FormGroupProps) {
   const isNumberFormat = variant === "numberFormat";
 
   function handleChange(e) {
@@ -75,6 +76,7 @@ export function FormGroup({ label, onChange, error, hint, variant = "input", ...
             decimalScale={0}
             error={!!error}
             thousandSeparator
+            symbol={symbol}
             {...rest}
           />
         }
