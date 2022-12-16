@@ -1573,7 +1573,7 @@ input[type="color"] {
      button, a, input, select,
      .react-select-container{
       cursor: not-allowed !important;
-      pointer-events: none;
+      pointer-events: none !important;
       opacity: 0.65;
     }
   }

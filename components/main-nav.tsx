@@ -184,6 +184,7 @@ export default function MainNav() {
                   outline
                   onClick={handleNewBounty}
                   textClass="text-white"
+                  className="read-only-button"
                 >
                   <PlusIcon />
                   <span><Translation label={"main-nav.new-bounty"} /></span>
