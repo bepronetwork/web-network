@@ -310,6 +310,32 @@ module.exports = {
 
           const isDisputed = await currentNetwork.isProposalDisputed(bountyId, proposalId)
 
+          const dbDistributions = await queryInterface.sequelize.query(
+            'SELECT * FROM proposal_distributions WHERE "proposalId" = :proposalId',
+            {
+              replacements: { proposalId: dbProposal.id },
+              type: QueryTypes.SELECT,
+            }
+          );
+
+          if(!dbDistributions[0]){
+            await Promise.all(
+              proposal.details.map(async (detail) =>
+                queryInterface.insert(
+                  ProposalDistributions,
+                  "proposal_distributions",
+                  {
+                    address: detail.recipient,
+                    percentage: detail.percentage,
+                    proposalId: createProposalId,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                  }
+                )
+              )
+            );
+          }
+
           await queryInterface.sequelize.query(queryUpdateProposal, {
             bind: {
               disputeWeight: new BigNumber(proposal.disputeWeight).toFixed(),
