@@ -17,6 +17,7 @@
 
     border-radius: 12px;
     font-weight: 500;
+    cursor: pointer;
 
     padding: 12px 0;
 
@@ -33,7 +34,7 @@
       @extend .bg-gray-700;
     }
 
-    & + .mini-tabs-item {
+    &:not(.active) + .mini-tabs-item {
       &:not(:first-child) {
         span {
           border-left: 1px solid $gray-700;

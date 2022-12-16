@@ -4,7 +4,6 @@ import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
 import CardBecomeCouncil from "components/card-become-council";
-import InternalLink from "components/internal-link";
 import PageHero, {InfosHero} from "components/page-hero";
 
 import {useAppState} from "contexts/app-state";
@@ -21,7 +20,7 @@ export default function CouncilLayout({ children }) {
   const {state} = useAppState();
 
   const { getTotalBounties } = useApi();
-  const { getURLWithNetwork, updateActiveNetwork } = useNetwork();
+  const { getURLWithNetwork } = useNetwork();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -103,10 +102,6 @@ export default function CouncilLayout({ children }) {
   useEffect(() => {
     loadTotals();
   }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active?.name]);
-
-  useEffect(() => {
-    updateActiveNetwork(true);
-  }, []);
 
   return (
     <div>
