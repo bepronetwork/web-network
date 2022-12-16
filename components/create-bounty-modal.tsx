@@ -353,6 +353,7 @@ export default function CreateBountyModal() {
         !bountyDescription ||
         isUploading ||
         addFilesInDescription(bountyDescription).length > BODY_CHARACTERES_LIMIT
+        || bountyTitle.length >= 131
       )
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
