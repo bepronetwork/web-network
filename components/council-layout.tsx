@@ -4,23 +4,22 @@ import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
 import CardBecomeCouncil from "components/card-become-council";
+import { MiniTabs } from "components/mini-tabs";
 import PageHero, {InfosHero} from "components/page-hero";
 
 import {useAppState} from "contexts/app-state";
+import { changeActiveNetwork } from "contexts/reducers/change-service";
 
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
-
-import { MiniTabs } from "./mini-tabs";
 
 export default function CouncilLayout({ children }) {
   const { asPath, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
-  const {state} = useAppState();
-
-  const { getTotalBounties } = useApi();
+  const { state, dispatch} = useAppState();
   const { getURLWithNetwork } = useNetwork();
+  const { getTotalBounties, searchCurators } = useApi();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -69,13 +68,16 @@ export default function CouncilLayout({ children }) {
   async function loadTotals() {
     if (!state.Service?.active?.network || !state.Service?.network?.active?.name) return;
     
-    const [totalBounties, onNetwork] = await Promise.all([
+    const [totalBounties, onNetwork, curators] = await Promise.all([
       getTotalBounties("ready", state.Service?.network?.active?.name),
       state.Service?.active.getTotalNetworkToken(),
+      searchCurators({
+        isCurrentlyCurator: true,
+        networkName: state.Service?.network?.active?.name,
+      }).then(({ rows }) => rows)
     ]);
 
-    const totalCurators = 
-      state.Service?.network?.active?.curators?.filter(({ isCurrentlyCurator }) => isCurrentlyCurator)?.length;
+    dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, { curators })));
 
     setInfos([
       {
@@ -83,7 +85,7 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: totalCurators || 0,
+        value: curators.length || 0,
         label: t("council:council-members"),
       },
       {
