@@ -88,7 +88,7 @@ export default function IssueListItem({
       placement="bottom"
       overlay={
         <Tooltip id={"tooltip-amount-bottom"} className="caption-small">
-          {formatStringToCurrency(issue?.amount?.toFixed())} 
+          {formatStringToCurrency(bountyAmount?.toFixed())} 
           {" "}
           {issue?.token?.symbol || t("common:misc.token")}
         </Tooltip>
@@ -106,7 +106,7 @@ export default function IssueListItem({
                 isActive && "-40"
               }`}
             >
-              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount.toFixed(4)) || 
+              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount?.toFixed()) || 
                 bountyAmount?.toExponential()}{" "}
                 
               <label
