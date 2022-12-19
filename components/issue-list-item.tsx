@@ -32,7 +32,7 @@ export default function IssueListItem({
   const {state} = useAppState();
 
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
-  const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
+  const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0"));
   const issueState = getIssueState({
     state: issue?.state,
     amount: issue?.amount,
@@ -88,7 +88,7 @@ export default function IssueListItem({
       placement="bottom"
       overlay={
         <Tooltip id={"tooltip-amount-bottom"} className="caption-small">
-          {formatStringToCurrency(issue?.amount?.toFixed())} 
+          {formatStringToCurrency(bountyAmount?.toFixed())} 
           {" "}
           {issue?.token?.symbol || t("common:misc.token")}
         </Tooltip>
@@ -106,7 +106,9 @@ export default function IssueListItem({
                 isActive && "-40"
               }`}
             >
-              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount) || issue?.amount.toExponential()}{" "}
+              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount?.toFixed()) || 
+                bountyAmount?.toExponential()}{" "}
+                
               <label
                 className={`caption-small text-uppercase ${
                   !isActive ? "text-primary" : "text-white-40"
