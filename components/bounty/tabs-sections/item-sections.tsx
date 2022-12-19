@@ -43,8 +43,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
             } as any
             const status = []
 
-            const proposal = state.currentBounty?.data.mergeProposals
-                             .find((proposal) => proposal.contractId === +item?.contractId);
+            const proposal = state.currentBounty?.data?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
             const isDisputed = !!proposal?.isDisputed
             const isMerged = item?.isMerged;
 
