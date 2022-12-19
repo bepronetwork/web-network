@@ -142,7 +142,8 @@
     "show": "Show",
     "hide": "Hide",
     "remove": "Remove",
-    "register": "Register"
+    "register": "Register",
+    "clear-all": "Clear All"
   },
   "misc": {
     "by": "by",
@@ -368,7 +369,8 @@
       "deploy-erc20-token": "Deploy ERC20 Token",
       "config-fees": "Config Fees",
       "deploy-registry": "Deploy Network Registry",
-      "change-allowed-tokens": "Change Allowed Tokens"
+      "change-allowed-tokens": "Change Allowed Tokens",
+      "close-network": "Close Network"
     }
   },
   "sort": {

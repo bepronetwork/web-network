@@ -17,6 +17,8 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
 import {CustomSession} from "interfaces/custom-session";
 
+import { WinStorage } from "services/win-storage";
+
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 
@@ -52,13 +54,10 @@ export default function ConnectAccount() {
   </FlexRow>;
 
   function redirectToProfile() {
-    const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
-
-    if(previusRouter)
-      return router.push(previusRouter);
+    const lastNetworkVisited = new WinStorage(`lastNetworkVisited`, 0, 'localStorage');
 
     const redirectTo = 
-      state.Service?.network?.lastVisited ? `${state.Service?.network?.lastVisited}/profile` : "/networks";
+    lastNetworkVisited.value ? `${lastNetworkVisited.value}/profile` : "/networks";
 
     router.push(redirectTo);
   }

@@ -47,11 +47,8 @@ export interface ProposalExtended extends Proposal {
     oracles: number;
     disputeWeight: BigNumber;
     prId: number;
-    refusedByBountyOwner: boolean;
     creator: string;
-
     details: ProposalDetail[];
-
     isDisputed?: boolean;
     canUserDispute?: boolean;
 }

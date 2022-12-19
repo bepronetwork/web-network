@@ -14,6 +14,24 @@ class MergeProposal extends Model {
         contractId: DataTypes.INTEGER,
         creator: DataTypes.STRING,
         network_id: DataTypes.INTEGER,
+        contractCreationDate: {
+          type: DataTypes.STRING(255),
+          allowNull: true
+        },
+        disputeWeight: {
+          type: DataTypes.STRING(255),
+          allowNull: true
+        },
+        refusedByBountyOwner: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false
+        },
+        isDisputed: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false
+        },
     },
                {
         sequelize,
@@ -24,6 +42,12 @@ class MergeProposal extends Model {
 
   static associate(models) {
     // define association here
+    this.hasMany(models.ProposalDistributions, {
+      foreignKey: "proposalId",
+      sourceKey: "id",
+      as: "distributions"
+    });
+
     this.belongsTo(models.issue, {
       foreignKey: "issueId",
       sourceKey: "id",
