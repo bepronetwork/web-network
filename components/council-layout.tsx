@@ -10,6 +10,8 @@ import PageHero, {InfosHero} from "components/page-hero";
 import {useAppState} from "contexts/app-state";
 import { changeActiveNetwork } from "contexts/reducers/change-service";
 
+import { IssueBigNumberData } from "interfaces/issue-data";
+
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
@@ -19,7 +21,7 @@ export default function CouncilLayout({ children }) {
 
   const { state, dispatch} = useAppState();
   const { getURLWithNetwork } = useNetwork();
-  const { getTotalBounties, searchCurators } = useApi();
+  const { getTotalBounties, searchCurators, searchIssues } = useApi();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -66,15 +68,24 @@ export default function CouncilLayout({ children }) {
   ]
 
   async function loadTotals() {
-    if (!state.Service?.active?.network || !state.Service?.network?.active?.name) return;
+    if (!state.Service?.active?.network ||
+        !state.Service?.network?.active?.name ||
+        !state.Service?.network?.networkToken?.address) return;
     
-    const [totalBounties, onNetwork, curators] = await Promise.all([
+    const [totalBounties, onNetwork, curators, distributed] = await Promise.all([
       getTotalBounties("ready", state.Service?.network?.active?.name),
       state.Service?.active.getTotalNetworkToken(),
       searchCurators({
         isCurrentlyCurator: true,
         networkName: state.Service?.network?.active?.name,
-      }).then(({ rows }) => rows)
+      }).then(({ rows }) => rows),
+      searchIssues({
+        state: "closed",
+        networkName: state.Service.network.active.name,
+        tokenAddress: state.Service.network.networkToken.address
+      })
+        .then(({ rows } : { rows: IssueBigNumberData[] }) => 
+          rows.reduce((acc, { payments }) => acc + payments.reduce((acc, { ammount }) => acc + ammount, 0), 0))
     ]);
 
     dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, { curators })));
@@ -89,7 +100,7 @@ export default function CouncilLayout({ children }) {
         label: t("council:council-members"),
       },
       {
-        value: 0,
+        value: distributed,
         label: t("council:distributed-developers"),
         currency: state.Service?.network?.networkToken?.symbol,
       },
@@ -103,7 +114,9 @@ export default function CouncilLayout({ children }) {
 
   useEffect(() => {
     loadTotals();
-  }, [state.Service?.active?.network?.contractAddress, state.Service?.network?.active?.name]);
+  }, [state.Service?.active?.network?.contractAddress,
+      state.Service?.network?.active?.name,
+      state.Service?.network?.networkToken?.address]);
 
   return (
     <div>

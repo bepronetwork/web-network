@@ -17,19 +17,20 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
     const {
       state,
-    issueId,
-    repoId,
-    time,
-    creator,
-    address,
-    search,
-    page,
-    pullRequesterLogin,
-    pullRequesterAddress,
-    proposer,
-    networkName,
-    repoPath
-  } = req.query || {};
+      issueId,
+      repoId,
+      time,
+      creator,
+      address,
+      search,
+      page,
+      pullRequesterLogin,
+      pullRequesterAddress,
+      proposer,
+      networkName,
+      repoPath,
+      tokenAddress
+    } = req.query || {};
 
     if (state) whereCondition.state = state;
 
@@ -103,32 +104,45 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const include = [
-    { association: "developers" },
-    {
-      association: "pullRequests",
-      required: !!pullRequester,
-      where: {
-        status: {
-          [Op.not]: "canceled"
-        },
-        ...(pullRequester
-          ? 
-          handlePrConditional(pullRequester)
-          : {}),
-      }
-    },
-    { 
-      association: "mergeProposals",
-      required: !!proposer,
-      where: {
-        ...(proposer ? { 
-          [Op.or]: [ iLikeCondition("githubLogin", proposer), iLikeCondition("creator", proposer) ] 
-        } : {})
-      }
-    },
-    { association: "repository" },
-    { association: "token" }
+      { association: "developers" },
+      {
+        association: "pullRequests",
+        required: !!pullRequester,
+        where: {
+          status: {
+            [Op.not]: "canceled"
+          },
+          ...(pullRequester
+            ? 
+            handlePrConditional(pullRequester)
+            : {}),
+        }
+      },
+      { 
+        association: "mergeProposals",
+        required: !!proposer,
+        where: {
+          ...(proposer ? { 
+            [Op.or]: [ iLikeCondition("githubLogin", proposer), iLikeCondition("creator", proposer) ] 
+          } : {})
+        }
+      },
+      { association: "repository" },
+      {
+        association: "token",
+        required: !!tokenAddress,
+        where: {
+          ...(tokenAddress ? {
+            address: { [Op.iLike]: tokenAddress }
+          } : {})
+        }
+      },
     ];
+
+    if (state === "closed")
+      include.push({
+        association: "payments"
+      });
 
     const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
                                     .replaceAll(',',`,+,`)
