@@ -104,7 +104,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                                                       creatorFee, 
                                                       proposerFee,
                                                       BigNumber(networkBounty.tokenAmount), 
-                                                      proposal.details.map(({ percentage }) => percentage));
+                                                      proposal.details);
 
     if (!mergerAddress)
       return res.status(404).json("Merger address not found");
@@ -131,8 +131,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       githubId: networkBounty?.cid.split("/")[1],
       githubPullRequestId: pullRequest.cid.toString(),
     }
-
-    console.log({ nft });
 
     const { hash } = await ipfsService.add(nft, true);
 

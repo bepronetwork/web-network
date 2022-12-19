@@ -142,7 +142,7 @@ export default function MainNav() {
                 <li>
                   <InternalLink
                     href={getURLWithNetwork("/developers")}
-                    label={<Translation label={"main-nav.developers"} />}
+                    label={<Translation label={"main-nav.nav-avatar.bounties"} />}
                     nav
                     uppercase
                   />
@@ -184,6 +184,7 @@ export default function MainNav() {
                   outline
                   onClick={handleNewBounty}
                   textClass="text-white"
+                  className="read-only-button"
                 >
                   <PlusIcon />
                   <span><Translation label={"main-nav.new-bounty"} /></span>

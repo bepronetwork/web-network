@@ -1,1 +1,1 @@
-export type SizeOptions = "sm" | "md" | "lg";
+export type SizeOptions = "xsm"|"sm" | "md" | "lg";

@@ -12,7 +12,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const include = [
     { association: "developers" },
     { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
-    { association: "mergeProposals" },
+    { association: "mergeProposals", include: [{ association: "distributions" }]  },
     { association: "repository" },
     { association: "token" },
     { association: "benefactors" },

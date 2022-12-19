@@ -144,7 +144,10 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
         <>
           <RepositoryCheck
             key={`${index}-${repository.fullName}`}
-            label={repositories.filter(r => r.name === repository.name).length > 1 ? repository.fullName : repository.name}
+            label={repositories.filter(r => 
+              r.name === repository.name).length > 1 
+              ? repository.fullName 
+              : repository.name}
             active={repository.checked}
             userPermission={repository.userPermission}
             hasIssues={reposWithIssues.includes(repository.fullName)}

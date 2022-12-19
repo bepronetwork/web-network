@@ -23,11 +23,14 @@ import {WinStorage} from "services/win-storage";
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
 
+import { useTransactions } from "./use-transactions";
+
 export function useAuthentication() {
 
   const session = useSession();
   const {state, dispatch} = useAppState();
   const {connect} = useDao();
+  const transactions = useTransactions();
 
   const {asPath, push} = useRouter();
   const {getUserOf, getUserWith} = useApi();
@@ -50,6 +53,7 @@ export function useAuthentication() {
     if (!state.currentUser?.walletAddress)
       return;
 
+    transactions.deleteFromStorage();
     const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
 
     signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})

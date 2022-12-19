@@ -19,6 +19,7 @@
 @import "components/amount-with-preview";
 @import "components/identicon";
 @import "components/profile-menu";
+@import "components/mini-tabs";
 
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -65,7 +66,7 @@ li {
 }
 
 .text-purple {
-  color: var(--bs-purple);
+  color: var(--bs-purple) !important;
 }
 
 .border-purple {
@@ -636,9 +637,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   left: 94%;
 }
 .circle-1 {
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
 }
 .circle-2 {
   width: 32px;
@@ -688,6 +689,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border-width: 2px;
     border-color: var(--bs-primary);
   }
+}
+
+.min-w-fit{
+  min-width: fit-content !important;
 }
 
 .ico-metamask {
@@ -1032,10 +1037,6 @@ $c_props: (
     width: 333px;
   }
 
-  path {
-    fill: var(--bs-primary);
-  }
-
   svg {
     width: 18px !important;
     height: 18px !important;
@@ -1342,6 +1343,9 @@ textarea.form-control {
   }
 }
 
+.gap-px-1{
+  gap: 1px;
+}
 .gap-20 {
   gap: 20px;
 
@@ -1577,7 +1581,7 @@ input[type="color"] {
      button, a, input, select,
      .react-select-container{
       cursor: not-allowed !important;
-      pointer-events: none;
+      pointer-events: none !important;
       opacity: 0.65;
     }
   }
@@ -1733,4 +1737,12 @@ input[type="color"] {
       background-color: rgba(var(--bs-info-rgb), 0.25);
     }
   }
+}
+
+.text-purple {
+  color: rgb(var(--bs-purple-rgb)) !important;
+}
+
+.btn-outline-purple {
+  border-color: var(--bs-purple);
 }

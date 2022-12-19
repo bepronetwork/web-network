@@ -82,7 +82,6 @@ export function useRepos() {
         ])
       })
       .then(([ghVisibility = false, { branches = [] }, forks = []]) => {
-        console.log(`DISPATCH NEW INFO`);
         dispatch(changeNetworkReposActive({ghVisibility, ...activeRepo, branches, forks}))
       })
       .catch(error => {

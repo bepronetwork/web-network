@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import {  useRef, useState } from "react";
 
 export default function ColorInput({ label, code, onChange, error = false }) {
   const [color, setColor] = useState(code);
+  const inputRef = useRef<HTMLInputElement>(null);
   const debounce = useRef(null)
 
   function handleBlur(event) {
@@ -21,6 +22,11 @@ export default function ColorInput({ label, code, onChange, error = false }) {
     }, 500)
   }
 
+  function focusInput(){
+    if(inputRef?.current)
+      inputRef?.current?.click();
+  }
+
   return (
     <div className="d-flex flex-column mb-2">
       <span
@@ -30,7 +36,7 @@ export default function ColorInput({ label, code, onChange, error = false }) {
       </span>
 
       <div className={`d-flex flex-row align-items-center bg-black border-radius-8 
-        custom-color-input-wrapper cursor-pointer`}>
+        custom-color-input-wrapper cursor-pointer`} onClick={focusInput}>
         <div className={`custom-color-input mr-1 ${(error && "is-invalid") || ""}`}>
           <input
             type="color"
@@ -39,6 +45,8 @@ export default function ColorInput({ label, code, onChange, error = false }) {
             value={color}
             onChange={handleChange}
             onBlur={handleBlur}
+            ref={inputRef}
+            className={'cursor-pointer'}
           />
         </div>
 

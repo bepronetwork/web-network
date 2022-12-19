@@ -16,21 +16,20 @@ import IssueFilters from "components/issue-filters";
 import IssueListItem from "components/issue-list-item";
 import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ScrollTopButton from "components/scroll-top-button";
 
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
+import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
+import { isProposalDisputable } from "helpers/proposal";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
-
-import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
-
 
 type Filter = {
   label: string;
@@ -49,6 +48,7 @@ interface ListIssuesProps {
   pullRequesterLogin?: string;
   pullRequesterAddress?: string;
   proposer?: string;
+  disputableFilter?: "dispute" | "merge";
 }
 
 interface IssuesPage {
@@ -64,7 +64,8 @@ export default function ListIssues({
   pullRequesterLogin,
   pullRequesterAddress,
   proposer,
-  redirect
+  redirect,
+  disputableFilter
 }: ListIssuesProps) {
   const {dispatch, state: appState} = useAppState();
 
@@ -135,6 +136,29 @@ export default function ListIssues({
     clearSearch();
   }
 
+  async function disputableFilterFn(bounties: IssueBigNumberData[]): Promise<IssueBigNumberData[]> {
+    const bountiesIds = 
+      (await Promise.all(bounties.map(async ({ contractId, mergeProposals}) => {
+        const proposals = [];
+
+        for await (const proposal of mergeProposals) {
+          const isDisputed = await appState.Service?.active?.isProposalDisputed(contractId, proposal.contractId);
+          const isDisputable = isProposalDisputable(proposal?.createdAt, 
+                                                    +appState.Service?.network?.times?.disputableTime, 
+                                                    await appState.Service?.active.getTimeChain());
+          
+          if (disputableFilter === "merge" && !isDisputed && !isDisputable) proposals.push(proposal);
+          else if (disputableFilter === "dispute" && !isDisputed && isDisputable) proposals.push(proposal);
+        }
+
+        return { contractId, status: !!proposals.length };
+      })))
+        .filter(({ status }) => status)
+        .map(({ contractId }) => contractId);
+
+    return bounties.filter(({ contractId }) => bountiesIds.includes(contractId));
+  }
+
   function handlerSearch() {
     if (!appState.Service?.network?.active?.name) return;
 
@@ -154,11 +178,13 @@ export default function ListIssues({
       proposer,
       networkName: appState.Service?.network?.active?.name
     })
-      .then(({ rows, pages, currentPage }) => {
+      .then(async ({ rows, pages, currentPage }) => {
+        const issues = disputableFilter ? await disputableFilterFn(rows) : rows;
+
         if (currentPage > 1) {
           if (issuesPages.find((el) => el.page === currentPage)) return;
 
-          const tmp = [...issuesPages, { page: currentPage, issues: rows }];
+          const tmp = [...issuesPages, { page: currentPage, issues }];
 
           tmp.sort((pageA, pageB) => {
             if (pageA.page < pageB.page) return -1;
@@ -168,7 +194,7 @@ export default function ListIssues({
           });
           setIssuesPages(tmp);
         } else {
-          setIssuesPages([{ page: currentPage, issues: rows }]);
+          setIssuesPages([{ page: currentPage, issues }]);
         }
 
         setHasMore(currentPage < pages);
