@@ -46,9 +46,10 @@ export default function PageIssue() {
   
     getUserRepository(state.currentUser?.login, activeName)
     .then(repository => {
-      const { isFork, parent: { nameWithOwner } } = repository;
+      const { isFork, nameWithOwner, parent } = repository;
 
-      setIsRepoForked(isFork && nameWithOwner === state.Service.network.repos.active.githubPath);
+      setIsRepoForked(isFork && parent?.nameWithOwner === state.Service.network.repos.active.githubPath ||
+        nameWithOwner.startsWith(`${state.currentUser?.login}/`));
     })
     .catch((e) => {
       setIsRepoForked(false);
