@@ -8,9 +8,7 @@ import Modal from "components/modal";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
-import {ProposalExtended} from "interfaces/bounty";
-import { DistributedAmounts } from "interfaces/proposal";
-
+import { DistributedAmounts, Proposal } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
