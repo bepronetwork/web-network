@@ -9,6 +9,7 @@ export default function PullRequestIcon(props: SVGProps<SVGSVGElement>) {
       version="1.1"
       width="16"
       data-view-component="true"
+      fill="white"
       {...props}
     >
       <path

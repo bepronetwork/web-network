@@ -10,6 +10,7 @@ import Button from "components/button";
 import {ConnectionButton} from "components/profile/connect-button";
 import ProfileLayout from "components/profile/profile-layout";
 import {RemoveGithubAccount} from "components/profile/remove-github-modal";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {truncateAddress} from "helpers/truncate-address";
 
@@ -71,10 +72,11 @@ export default function Profile() {
           />
 
           { isConnected &&
-            <Button outline color="danger" className="mt-3" onClick={handleClickDisconnect}>
-              {t("actions.remove-github-account")}
-            </Button>
-          }
+            <ReadOnlyButtonWrapper>
+              <Button outline color="danger" className="mt-3" onClick={handleClickDisconnect}>
+                {t("actions.remove-github-account")}
+              </Button>
+            </ReadOnlyButtonWrapper>          }
         </div>
 
         <div className="col-4">
