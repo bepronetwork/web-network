@@ -31,7 +31,7 @@ export function ProposalDisputes({proposalId}: { proposalId: number}) {
   )
     return null;
 
-  function renderDisputeRow({ address, weight }, i) {
+  function renderDisputeRow({ address, weight }) {
     const label = (
         <span className="caption-medium text-gray">
           {truncateAddress(address)}

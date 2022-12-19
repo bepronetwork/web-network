@@ -10,6 +10,7 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 
 import {ProposalExtended} from "interfaces/bounty";
 import { DistributedAmounts } from "interfaces/proposal";
+
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
@@ -22,7 +23,7 @@ import ProposalListDistribution from "./proposal-list-distribution";
 interface props {
   amountTotal: BigNumber;
   tokenSymbol?: string;
-  proposal: ProposalExtended;
+  proposal: Proposal;
   onClickMerge: () => void;
   canMerge: boolean;
   idBounty: string;

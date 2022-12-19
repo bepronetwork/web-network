@@ -19,6 +19,7 @@
 @import "components/amount-with-preview";
 @import "components/identicon";
 @import "components/profile-menu";
+@import "components/mini-tabs";
 
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -1036,10 +1037,6 @@ $c_props: (
     width: 333px;
   }
 
-  path {
-    fill: var(--bs-primary);
-  }
-
   svg {
     width: 18px !important;
     height: 18px !important;
@@ -1584,7 +1581,7 @@ input[type="color"] {
      button, a, input, select,
      .react-select-container{
       cursor: not-allowed !important;
-      pointer-events: none;
+      pointer-events: none !important;
       opacity: 0.65;
     }
   }
@@ -1740,4 +1737,12 @@ input[type="color"] {
       background-color: rgba(var(--bs-info-rgb), 0.25);
     }
   }
+}
+
+.text-purple {
+  color: rgb(var(--bs-purple-rgb)) !important;
+}
+
+.btn-outline-purple {
+  border-color: var(--bs-purple);
 }

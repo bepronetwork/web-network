@@ -152,11 +152,7 @@ export default function TransactionModal({
         <div className="caption-small d-flex flex-row mb-3">
           <span className="text-light-gray">{t("misc.on")}</span>
           <InternalLink
-            className={`${
-              transaction?.network?.name === state.Settings?.defaultNetworkConfig?.name
-                ? " text-primary "
-                : ""
-            } p-0 ml-1`}
+            className={`${ transaction?.network?.isDefault ? "text-primary" : "" } p-0 ml-1`}
             label={transaction?.network?.name}
             href={getURLWithNetwork("/", {
               network: transaction?.network?.name

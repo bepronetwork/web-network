@@ -12,6 +12,7 @@ import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
 import {useRepos} from "x-hooks/use-repos";
 import {useSettings} from "x-hooks/use-settings";
+import { useTransactions } from "x-hooks/use-transactions";
 
 const _context = {};
 
@@ -19,7 +20,7 @@ export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
   const {state} = useAppState();
-  const {asPath, query} = useRouter();
+  const {query} = useRouter();
   const session = useSession();
 
   const dao = useDao();
@@ -27,6 +28,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const auth = useAuthentication();
   const network = useNetwork();
   const settings = useSettings();
+  const transactions = useTransactions();
 
   useEffect(dao.start, [state.Settings]);
   useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress]);
@@ -51,6 +53,9 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(network.loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active]);
 
   useEffect(settings.loadSettings, []);
+
+  useEffect(transactions.loadFromStorage, [state.currentUser?.walletAddress]);
+  useEffect(transactions.saveToStorage, [state.transactions]);
 
   return <GlobalEffectsContext.Provider value={_context} children={children} />
 }
