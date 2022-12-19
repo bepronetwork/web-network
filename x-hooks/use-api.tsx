@@ -16,6 +16,7 @@ import {
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
 import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
+import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
@@ -25,7 +26,6 @@ import { Token } from "interfaces/token";
 import { api, eventsApi } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
-import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 
 interface NewIssueParams {
   title: string;
@@ -80,6 +80,7 @@ export default function useApi() {
     pullRequesterLogin = "",
     pullRequesterAddress = "",
     proposer = "",
+    tokenAddress = "",
     networkName = DEFAULT_NETWORK_NAME
   }) {
     const params = new URLSearchParams({
@@ -95,6 +96,7 @@ export default function useApi() {
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
+      tokenAddress,
       networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
