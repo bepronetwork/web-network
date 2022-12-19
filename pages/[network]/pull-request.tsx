@@ -196,9 +196,6 @@ export default function PullRequestPage() {
 
         setPullRequest(currentPR);
         setNetworkPullRequest(currentNetworkPR);
-
-        console.log(`GOT PR`, currentPR, currentNetworkPR);
-
       })
       .finally(() => {
         dispatch(changeLoadState(false))

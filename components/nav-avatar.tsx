@@ -149,7 +149,7 @@ export default function NavAvatar() {
         <LinksSession>
           <ProfileExternalLink 
             label={t("main-nav.nav-avatar.web-network-1")}
-            href="https://development.bepro.network/" 
+            href="https://v1.bepro.network/" 
             className="text-primary" 
           />
         </LinksSession>

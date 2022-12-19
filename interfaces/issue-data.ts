@@ -3,6 +3,8 @@ import BigNumber from "bignumber.js";
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
 
+import { Payment } from "./payments";
+
 export type IssueState =
   | "pending"
   | "draft"
@@ -51,6 +53,7 @@ export interface IssueData {
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
+  payments: Payment[];
 }
 
 export interface Disputes {

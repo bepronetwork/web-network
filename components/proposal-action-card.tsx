@@ -12,7 +12,7 @@ import {isProposalDisputable} from "helpers/proposal";
 
 import {ProposalExtended} from "interfaces/bounty";
 import {pullRequest} from "interfaces/issue-data";
-import {Proposal} from "interfaces/proposal";
+import {DistributedAmounts, Proposal} from "interfaces/proposal";
 
 import useOctokit from "x-hooks/use-octokit";
 
@@ -23,6 +23,7 @@ interface IProposalActionCardProps {
   proposal: Proposal;
   networkProposal: ProposalExtended;
   currentPullRequest: pullRequest;
+  distributedAmounts: DistributedAmounts;
   onMerge: () => Promise<void>;
   onDispute: () => Promise<void>;
   onRefuse: () => Promise<void>;
@@ -34,7 +35,8 @@ export default function ProposalActionCard({
   currentPullRequest,
   onMerge,
   onDispute,
-  onRefuse
+  onRefuse,
+  distributedAmounts
 }: IProposalActionCardProps) {
   const { t } = useTranslation(["common", "pull-request", "proposal"]);
   
@@ -55,8 +57,8 @@ export default function ProposalActionCard({
     !isProposalDisputable(proposal?.createdAt, 
                           BigNumber(state.Service?.network.times?.disputableTime).toNumber(), 
                           chaintime),
-    networkProposal?.isDisputed,
-    networkProposal?.refusedByBountyOwner,
+    proposal?.isDisputed,
+    proposal?.refusedByBountyOwner,
     !networkProposal?.canUserDispute,
     (state.currentUser?.balance?.oracles?.locked?.isZero() &&
     state.currentUser?.balance?.oracles?.delegatedByOthers.isZero()),
@@ -66,22 +68,22 @@ export default function ProposalActionCard({
 
   const isSuccess =  () => [
     state.currentBounty?.chainData?.closed,
-    !networkProposal?.isDisputed && proposal?.isMerged
+    !proposal?.isDisputed && proposal?.isMerged
   ].every((v) => v);
 
   const isRefusable = () => [
     !state.currentBounty?.chainData?.closed,
     !state.currentBounty?.chainData?.canceled,
-    !networkProposal?.isDisputed,
-    !networkProposal?.refusedByBountyOwner,
+    !proposal?.isDisputed,
+    !proposal?.refusedByBountyOwner,
     state.currentBounty?.chainData?.creator === state.currentUser?.walletAddress
   ].every(v => v);
 
   const canMerge = () => [
     currentPullRequest?.isMergeable,
     !proposal?.isMerged,
-    !networkProposal?.isDisputed,
-    !networkProposal?.refusedByBountyOwner,
+    !proposal?.isDisputed,
+    !proposal?.refusedByBountyOwner,
     !isProposalDisputable(proposal?.createdAt, BigNumber(state.Service?.network.times?.disputableTime).toNumber()),
     !isMerging,
     !isRefusing,
@@ -141,12 +143,12 @@ export default function ProposalActionCard({
       <div className="bg-shadow rounded-5 p-3">
         <div className="mb-5">
           <ProposalProgressBar
-            issueDisputeAmount={+networkProposal?.disputeWeight}
+            issueDisputeAmount={proposal?.disputeWeight?.toNumber()}
             disputeMaxAmount={+state.Service?.network?.amounts?.percentageNeededForDispute || 0}
-            isDisputed={networkProposal?.isDisputed}
+            isDisputed={proposal?.isDisputed}
             isFinished={state.currentBounty?.chainData?.closed}
             isMerged={proposal?.isMerged}
-            refused={networkProposal?.refusedByBountyOwner}
+            refused={proposal?.refusedByBountyOwner}
           />
         </div>
         <div className="mt-2 py-2 text-center">
@@ -160,11 +162,12 @@ export default function ProposalActionCard({
             <ProposalMerge 
               amountTotal={bountyAmount} 
               tokenSymbol={state.currentBounty?.data?.token?.symbol}
-              proposal={networkProposal}
+              proposal={proposal}
               isMerging={isMerging}
               idBounty={state.currentBounty?.data?.id}
               onClickMerge={handleMerge}
               canMerge={canMerge()}
+              distributedAmounts={distributedAmounts}
             />
 
             {!isSuccess() && !isDisable() && (
