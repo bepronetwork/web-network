@@ -10,7 +10,11 @@ export default function ReadyToPropose() {
 
   return (
     <CouncilLayout>
-      <ListIssues filterState="proposal" emptyMessage={t("council:empty")}/>
+      <ListIssues 
+        filterState="proposal" 
+        emptyMessage={t("council:empty")}
+        disputableFilter="merge"
+      />
     </CouncilLayout>
   );
 }
