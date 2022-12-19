@@ -20,6 +20,7 @@ import ReposDropdown from "components/repos-dropdown";
 
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 
+import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
@@ -347,7 +348,13 @@ export default function CreateBountyModal() {
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
     const isRewardAmount =
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
-    if ((currentSection === 0 && !bountyTitle) || !bountyDescription || isUploading)
+    if (
+        (currentSection === 0 && !bountyTitle) ||
+        !bountyDescription ||
+        isUploading ||
+        addFilesInDescription(bountyDescription).length > BODY_CHARACTERES_LIMIT
+        || bountyTitle.length >= 131
+      )
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
     if (
