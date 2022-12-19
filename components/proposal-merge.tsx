@@ -3,32 +3,20 @@ import {useEffect, useState} from "react";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
-import BountyDistributionItem from "components/bounty-distribution-item";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { Proposal } from "interfaces/proposal";
+import { DistributedAmounts, Proposal } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
 import {useAppState} from "../contexts/app-state";
+import ProposalListDistribution from "./proposal-list-distribution";
 
 
-interface amount {
-  value: string;
-  percentage: string;
-}
-
-interface distributedAmounts {
-  treasuryAmount: amount;
-  mergerAmount: amount;
-  proposerAmount: amount;
-  proposals: amount[];
-}
 
 interface props {
   amountTotal: BigNumber;
@@ -38,12 +26,8 @@ interface props {
   canMerge: boolean;
   idBounty: string;
   isMerging?: boolean;
+  distributedAmounts: DistributedAmounts;
 }
-
-const defaultAmount = {
-  value: "0",
-  percentage: "0",
-};
 
 export default function ProposalMerge({
   amountTotal,
@@ -52,35 +36,21 @@ export default function ProposalMerge({
   onClickMerge,
   canMerge,
   idBounty,
-  isMerging
+  isMerging,
+  distributedAmounts
 }: props) {
   const { t } = useTranslation(["common", "proposal"]);
 
   const [show, setShow] = useState<boolean>(false);
   const [coinInfo, setCoinInfo] = useState<TokenInfo>()
-  const [distributedAmounts, setDistributedAmounts] =
-    useState<distributedAmounts>({
-      treasuryAmount: defaultAmount,
-      mergerAmount: defaultAmount,
-      proposerAmount: defaultAmount,
-      proposals: [defaultAmount],
-    });
   
   const {state} = useAppState();
 
   const amountTotalConverted = BigNumber(handleConversion(amountTotal));
+  const currentTokenSymbol = tokenSymbol ||  t("common:misc.token")
 
-  async function getDistributedAmounts() {
-    if (!proposal?.distributions) return;
-
-    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
-
-    const distributions = calculateDistributedAmounts(treasury,
-                                                      mergeCreatorFeeShare,
-                                                      proposerFeeShare,
-                                                      amountTotal,
-                                                      proposal.distributions.map(({ percentage }) => percentage));
-    setDistributedAmounts(distributions);
+  function handleConversion(value) {
+    return BigNumber(value).multipliedBy(coinInfo?.prices[state.Settings?.currency?.defaultFiat]).toFixed(4);
   }
 
   async function  getCoinInfo() { 
@@ -89,34 +59,17 @@ export default function ProposalMerge({
     }).catch(error => console.debug("getCoinInfo", error));
   }
 
-  function handleConversion(value) {
-    return BigNumber(value).multipliedBy(coinInfo?.prices[state.Settings?.currency?.defaultFiat]).toFixed(4);
-  }
-
-  function currentTokenSymbol() {
-    return tokenSymbol ? tokenSymbol : t("common:misc.token")
-  }
-
   function handleMerge() {
     setShow(false);
     onClickMerge();
   }
 
   useEffect(() => {
-    if (
-      !proposal ||
-      !state.Service?.network?.amounts
-    )
+    if (!proposal ||!state.Service?.network?.amounts)
       return;
 
-    getDistributedAmounts();
     getCoinInfo()
-  }, [
-    proposal,
-    amountTotal,
-    state.Service?.network?.amounts,
-    state.Service?.network?.networkToken?.address
-  ]);
+  }, [proposal,amountTotal]);
 
   return (
     <>
@@ -163,50 +116,7 @@ export default function ProposalMerge({
           </div>
         }
       >
-        <ul className="mb-0 bg-dark-gray rounded-3 px-1 py-2">
-        <BountyDistributionItem
-            name={t("proposal:merge-modal.network-fee")}
-            description={t("proposal:merge-modal.network-fee-description", {
-              percentage: distributedAmounts.treasuryAmount.percentage,
-            })}
-            percentage={distributedAmounts.treasuryAmount.percentage}
-            symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
-            line={true}
-            amounts={[distributedAmounts.treasuryAmount.value, 
-                      handleConversion(distributedAmounts.treasuryAmount.value)]}
-          />
-          <BountyDistributionItem
-            name={t("proposal:merge-modal.proposal-merger")}
-            description={t("proposal:merge-modal.proposal-merger-description")}
-            percentage={distributedAmounts.mergerAmount.percentage}
-            symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
-            line={true}
-            amounts={[distributedAmounts.mergerAmount.value, 
-                      handleConversion(distributedAmounts.mergerAmount.value)]}
-          />
-          <BountyDistributionItem
-            name={t("proposal:merge-modal.proposal-creator")}
-            description={t("proposal:merge-modal.proposal-creator-description")}
-            percentage={distributedAmounts.proposerAmount.percentage}
-            symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
-            line={true}
-            amounts={[distributedAmounts.proposerAmount.value, 
-                      handleConversion(distributedAmounts.proposerAmount.value)]}
-          />
-          {distributedAmounts?.proposals?.map((item, key) => (
-            <BountyDistributionItem
-              name={t("proposal:merge-modal.contributor", {
-                count: key + 1,
-              })}
-              description={t("proposal:merge-modal.contributor-description")}
-              percentage={item.percentage}
-              symbols={[currentTokenSymbol(), state.Settings?.currency?.defaultFiat]}
-              line={key !== ((distributedAmounts?.proposals?.length || 0 ) - 1)}
-              amounts={[item.value, handleConversion(item.value)]}
-              key={key}
-            />
-          ))}
-        </ul>
+       <ProposalListDistribution distributedAmounts={distributedAmounts}/>
 
         <div className="mt-4 border-dashed"></div>
 
@@ -224,7 +134,7 @@ export default function ProposalMerge({
                 {formatStringToCurrency(amountTotal?.toFixed())}
               </span>
               <span className="text-primary ms-2 caption-medium text-white-40">
-                {currentTokenSymbol()}
+                {currentTokenSymbol}
               </span>
             </div>
             {amountTotalConverted?.gt(0) && (

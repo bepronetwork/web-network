@@ -170,12 +170,11 @@ export default function DragAndDrop ({ externalFiles, onUpdateFiles, onUploading
         )}
          <span className="d-inline-flex align-items-center p-small text-warning text-center my-2 tran">
           <InfoIconEmpty 
-            width={12} 
+            width={12}
             height={12} 
             color="text-warning" 
-            className="mr-1"
-          />
-          {t("drag-and-drop.size-limit", {value: 10})}
+            className="mr-1"/> 
+            {t("drag-and-drop.size-limit", {value: 10})}
         </span>
       </div>
       <div className="d-flex flex-wrap gap-1">

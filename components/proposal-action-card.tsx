@@ -12,7 +12,7 @@ import {isProposalDisputable} from "helpers/proposal";
 
 import {ProposalExtended} from "interfaces/bounty";
 import {pullRequest} from "interfaces/issue-data";
-import {Proposal} from "interfaces/proposal";
+import {DistributedAmounts, Proposal} from "interfaces/proposal";
 
 import useOctokit from "x-hooks/use-octokit";
 
@@ -23,6 +23,7 @@ interface IProposalActionCardProps {
   proposal: Proposal;
   networkProposal: ProposalExtended;
   currentPullRequest: pullRequest;
+  distributedAmounts: DistributedAmounts;
   onMerge: () => Promise<void>;
   onDispute: () => Promise<void>;
   onRefuse: () => Promise<void>;
@@ -34,7 +35,8 @@ export default function ProposalActionCard({
   currentPullRequest,
   onMerge,
   onDispute,
-  onRefuse
+  onRefuse,
+  distributedAmounts
 }: IProposalActionCardProps) {
   const { t } = useTranslation(["common", "pull-request", "proposal"]);
   
@@ -165,6 +167,7 @@ export default function ProposalActionCard({
               idBounty={state.currentBounty?.data?.id}
               onClickMerge={handleMerge}
               canMerge={canMerge()}
+              distributedAmounts={distributedAmounts}
             />
 
             {!isSuccess() && !isDisable() && (

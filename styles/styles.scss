@@ -637,9 +637,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   left: 94%;
 }
 .circle-1 {
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
 }
 .circle-2 {
   width: 32px;
@@ -689,6 +689,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border-width: 2px;
     border-color: var(--bs-primary);
   }
+}
+
+.min-w-fit{
+  min-width: fit-content !important;
 }
 
 .ico-metamask {
@@ -1339,6 +1343,9 @@ textarea.form-control {
   }
 }
 
+.gap-px-1{
+  gap: 1px;
+}
 .gap-20 {
   gap: 20px;
 

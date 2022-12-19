@@ -1,9 +1,12 @@
 import BigNumber from "bignumber.js";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import ArrowRight from "assets/icons/arrow-right";
+
+import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { BountyDistribution } from "interfaces/bounty-distribution";
 
+import Avatar from "./avatar";
 import InfoTooltip from "./info-tooltip";
 
 export default function BountyDistributionItem({
@@ -12,7 +15,7 @@ export default function BountyDistributionItem({
   symbols,
   amounts,
   description,
-  line,
+  githubLogin,
 }: BountyDistribution) {
   function verifyAmount(): boolean {
     return amounts.length > 1 && BigNumber(amounts[1]).gt(0);
@@ -21,30 +24,43 @@ export default function BountyDistributionItem({
   return (
     <>
       <li
-        className="d-flex align-items-center px-3 py-1 my-1 rounded-3 mb-2"
+        className="d-flex align-items-center bg-gray-850 px-3 py-2"
         key={name}
       >
         <div className="d-flex flex-grow-1 flex-column">
-          <span className="caption-medium text-truncate pb-1">
-            {name} {percentage}%{" "}
+          <span className="text-gray label-m">
+            {githubLogin ? <Avatar key={githubLogin}  size="xsm"  userLogin={githubLogin} tooltip /> : null}
+            <label className="mx-2 text-truncate text-uppercase">
+              {name}
+            </label>
             {description && (
               <InfoTooltip description={description} secondaryIcon={true} />
             )}
+
           </span>
           {verifyAmount() && (
             <span className="caption-small text-light-gray">{name}</span>
           )}
         </div>
-
+        
         <div className={"d-flex flex-shrink-0 w-40 flex-column"}>
-          <div className="d-flex justify-content-end">
-            <span className="caption-medium pb-1">
-              {formatStringToCurrency(amounts[0])}{" "}
+          <div className="d-flex align-items-center gap-2 justify-content-end">
+            <span className="text-gray label-m">
+              {percentage}%
             </span>
-            <label className="ps-1 pt-1 caption-small text-uppercase text-white-40">
+            
+            <ArrowRight color="text-gray" width={14}/>
+
+            <span className="caption-medium text-white">
+              {formatNumberToNScale(amounts[0])}{" "}
+
+              <label className="ps-1 pt-1 caption-small text-uppercase text-primary">
               {symbols[0]}
             </label>
+            </span>
+            
           </div>
+
           {verifyAmount() && (
             <div className="d-flex justify-content-end">
               <span className="caption-small text-light-gray">
@@ -57,7 +73,6 @@ export default function BountyDistributionItem({
           )}
         </div>
       </li>
-      {line && <div className="mx-3 line bg-light-gray"></div>}
     </>
   );
 }

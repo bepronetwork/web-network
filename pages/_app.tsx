@@ -19,11 +19,7 @@ import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 
-
-function App({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppProps) {
+function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
   return (
     <>
