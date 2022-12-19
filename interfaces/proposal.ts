@@ -11,7 +11,7 @@ export interface Proposal {
   contractId?: number;
   creator?: string;
   network_id: number;
-  distributions?: DistribuitonPerUser[]
+  distributions?: DistributedAmounts[]
   contractCreationDate?: number;
   disputeWeight?: BigNumber;
   refusedByBountyOwner?: boolean;
