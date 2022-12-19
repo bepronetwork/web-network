@@ -43,8 +43,8 @@ function ItemSections({ data, isProposal }: ItemProps) {
             } as any
             const status = []
 
-            const networkProposal = state.currentBounty?.chainData?.proposals?.[+item?.contractId]
-            const isDisputed = !!networkProposal?.isDisputed;
+            const proposal = state.currentBounty?.data?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
+            const isDisputed = !!proposal?.isDisputed
             const isMerged = item?.isMerged;
 
             if(!isProposal){
@@ -54,13 +54,13 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 isDraft: item?.status === "draft"
               })
               valueRedirect.prId = (item as pullRequest)?.githubId
-            } else if(networkProposal){
+            } else if(proposal){
               if(isDisputed || isMerged){
                 status.push({
                   label: isDisputed ? 'disputed' : 'accepted'
                 })
               }
-              if(networkProposal.refusedByBountyOwner) status.push({ label: 'failed' })
+              if(proposal.refusedByBountyOwner) status.push({ label: 'failed' })
 
               valueRedirect.proposalId = item?.id
             }
@@ -73,12 +73,12 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 githubLogin={item?.githubLogin}
                 creator={item?.creator} 
                 status={status}>
-                {(isProposal && networkProposal) ? (
+                {(isProposal && proposal) ? (
                   <>
                     <div className="d-flex align-items-center text-center col-4">
                       <ProposalProgressSmall
                         color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
-                        value={networkProposal?.disputeWeight}
+                        value={proposal?.disputeWeight}
                         total={state.currentUser?.balance?.staked}
                       />
                     </div>
