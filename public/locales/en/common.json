@@ -228,6 +228,19 @@
         "review": {
           "label": "Review",
           "placeholder": "Type a review..."
+        },
+        "type": {
+          "label": "Type",
+          "options": {
+            "comment": {
+              "label": "Comment",
+              "description": "Submit general feedback without explicit approval."
+            },
+            "approve": {
+              "label": "Approve",
+              "description": "Submit feedback and approve merging these changes."
+            }
+          }
         }
       },
       "create-review": "Create Review"

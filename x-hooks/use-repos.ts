@@ -4,7 +4,11 @@ import {useRouter} from "next/router";
 
 import {useAppState} from "../contexts/app-state";
 import {changeLoadState} from "../contexts/reducers/change-load";
-import {changeNetworkReposActive, changeNetworkReposList} from "../contexts/reducers/change-service";
+import {
+  changeNetworkReposActive,
+  changeNetworkReposActiveViewerPerm, 
+  changeNetworkReposList
+} from "../contexts/reducers/change-service";
 import {changeSpinners} from "../contexts/reducers/change-spinners";
 import {RepoInfo} from "../interfaces/repos-list";
 import {WinStorage} from "../services/win-storage";
@@ -12,13 +16,14 @@ import useApi from "./use-api";
 import useOctokit from "./use-octokit";
 
 export function useRepos() {
-  const {state, dispatch} = useAppState();
-
-  const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokit();
-  const {getReposList} = useApi();
   const {query} = useRouter();
 
   const [loadedActiveRepo, setActiveRepo] = useState(null);
+
+  const {state, dispatch} = useAppState();
+
+  const {getReposList} = useApi();
+  const { getRepository, getRepositoryForks, getRepositoryBranches, getRepositoryViewerPermission } = useOctokit();
 
   function loadRepos(force = false, name = state?.Service?.network?.lastVisited) {
     if (!name || state.spinners?.repos)
@@ -70,7 +75,7 @@ export function useRepos() {
     if (!activeRepo)
       throw new Error(`No repo found for ${id || query.repoId}`);
 
-    getRepository(activeRepo?.githubPath)
+    getRepository(activeRepo?.githubPath, true)
       .then(info => {
         if (!info)
           return []
@@ -79,10 +84,12 @@ export function useRepos() {
           Promise.resolve(info),
           getRepositoryBranches(activeRepo.githubPath),
           getRepositoryForks(activeRepo.githubPath),
+          getRepositoryViewerPermission(activeRepo.githubPath)
         ])
       })
-      .then(([ghVisibility = false, { branches = [] }, forks = []]) => {
-        dispatch(changeNetworkReposActive({ghVisibility, ...activeRepo, branches, forks}))
+      .then(([info = undefined, branches = [], forks = [], permission]) => {
+        dispatch(changeNetworkReposActive({ghVisibility: !!info, ...activeRepo, ...info, branches, forks}));
+        dispatch(changeNetworkReposActiveViewerPerm(permission));
       })
       .catch(error => {
         console.error(`Failed to load repository`, error);

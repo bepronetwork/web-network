@@ -29,13 +29,35 @@ export const Details =
   `query Details($repo: String!, $owner: String!, $id: Int!) {
     repository(name: $repo, owner: $owner) {
       pullRequest(number: $id) {
+        hash: id
         id
         mergeable
         merged
         state
+        approvals: reviews(states: APPROVED) {
+          total: totalCount
+        }
       }
     }
   }`;
+
+export const Reviews = 
+`query Reviews($repo: String!, $owner: String!, $id: Int!) {
+  repository(name: $repo, owner: $owner) {
+    pullRequest(number: $id) {
+      reviews(first: 100) {
+        nodes {
+          author {
+            login
+          }
+          body
+          submittedAt
+          state
+        }
+      }
+    }
+  }
+}`;
 
 export const Close =
 `mutation ClosePullRequest($pullRequestId: ID!) {
@@ -108,3 +130,21 @@ query Repository($repo: String!, $owner: String!) {
   }
 }
 `
+
+export const AddReview =
+`
+mutation AddReview($pullRequestId: ID!, $body: String!, $event: PullRequestReviewEvent!) {
+  addPullRequestReview(
+    input: { pullRequestId: $pullRequestId, event: $event, body: $body }
+  ) {
+    pullRequestReview {
+      id
+      author {
+        login
+      }
+      body
+      updatedAt
+    }
+  }
+}
+`;

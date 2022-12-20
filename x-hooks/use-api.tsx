@@ -341,9 +341,13 @@ export default function useApi() {
       });
   }
 
-  async function createReviewForPR({ networkName = DEFAULT_NETWORK_NAME, ...rest } : CreateReviewParams) {
+  async function createReviewForPR({
+    networkName = DEFAULT_NETWORK_NAME,
+    event = "COMMENT",
+    ...rest
+  } : CreateReviewParams) {
     return api
-      .put("/pull-request/review", { networkName, ...rest })
+      .put("/pull-request/review", { networkName, event, ...rest })
       .then((response) => response)
       .catch(error => {
         throw error;

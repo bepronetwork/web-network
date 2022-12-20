@@ -39,7 +39,7 @@ export function useBounty() {
 
   const {query} = useRouter();
   const {getIssue} = useApi();
-  const { getIssueOrPullRequestComments, getPullRequestDetails } = useOctokit();
+  const { getIssueOrPullRequestComments, getPullRequestDetails, getPullRequestReviews } = useOctokit();
 
   function isCurrentBountyCached() {
     const lastUpdated = state.currentBounty?.lastUpdated;
@@ -106,7 +106,9 @@ export function useBounty() {
               ...pullRequest,
               isMergeable: details?.mergeable === "MERGEABLE",
               merged: details?.merged,
-              state: details?.state
+              state: details?.state,
+              approvals: details?.approvals,
+              hash: details?.hash
             })))]);
       })
       .then(pullRequests => {
@@ -200,13 +202,17 @@ export function useBounty() {
     return Promise.all(bounty.pullRequests.map(pullRequest =>
       getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
         .then(details =>
-          getIssueOrPullRequestComments(bounty.repository.githubPath, +pullRequest.githubId)
-            .then(comments => ({
+          Promise.all([
+            getIssueOrPullRequestComments(bounty.repository.githubPath, +pullRequest.githubId),
+            getPullRequestReviews(bounty.repository.githubPath, +pullRequest.githubId)
+          ])
+            .then(([comments, reviews]) => ({
               ...pullRequest,
               isMergeable: details.mergeable === "MERGEABLE",
               merged: details.merged,
               state: details.state,
               comments,
+              reviews
             })))))
       .then(extendedPrs => {
         // dispatch(changeCurrentBountyDataPullRequests(extendedPrs));
