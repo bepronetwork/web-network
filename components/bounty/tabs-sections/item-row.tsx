@@ -34,14 +34,14 @@ function ItemRow({ id, githubLogin, creator, status, children, href }: ItemRowPr
           {githubLogin ? (
               <>
                 <Avatar userLogin={githubLogin} />
-                <span className={`text-uppercase text-white caption ${status?.length && "text-truncate"}`}>
+                <span className={`text-uppercase text-white caption`}>
                   {githubLogin}
                 </span>
               </>
             ) : (
               <>
               <Identicon size="sm" address={creator} className="mx-1"/>
-              <span className={`text-uppercase text-white caption ${status?.length && "text-truncate"}`}>
+              <span className={`text-uppercase text-white caption`}>
                 {truncateAddress(creator)}
               </span>
               </>
