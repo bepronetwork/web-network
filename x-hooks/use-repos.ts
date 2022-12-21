@@ -88,7 +88,13 @@ export function useRepos() {
         ])
       })
       .then(([info = undefined, branches = [], forks = [], permission]) => {
-        dispatch(changeNetworkReposActive({ghVisibility: !!info, ...activeRepo, ...info, branches, forks}));
+        dispatch(changeNetworkReposActive({
+          ghVisibility: !!info, 
+          ...activeRepo, 
+          ...info, 
+          branches: branches.branches, 
+          forks
+        }));
         dispatch(changeNetworkReposActiveViewerPerm(permission));
       })
       .catch(error => {
