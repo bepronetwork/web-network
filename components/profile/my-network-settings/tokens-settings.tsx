@@ -89,7 +89,7 @@ export default function TokensSettings({
   }
 
   async function updateTransactionalTokens(tokenType: TokenType){
-
+    debugger;
     const isTransactional = tokenType === 'transactional';
     const currentTokens = currentAllowedTokens[tokenType]
 
@@ -143,6 +143,7 @@ export default function TokensSettings({
 
 
   function renderButtons(tokenType: TokenType) {
+    console.log({tokenType})
     return (
       <div className="d-flex" key={`col-${tokenType}`}>
         <Button className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
@@ -187,7 +188,7 @@ export default function TokensSettings({
     )
   }
 
-  function renderTokens(type: "transactional" | "reward") {
+  function renderTokens(type: TokenType) {
     const col = isGovernorRegistry ? 7 : 12
     
     return(
@@ -195,7 +196,7 @@ export default function TokensSettings({
         <Col xs={col} key={`col-${type}`}>{handleSelectTokens(type)}</Col>
         {isGovernorRegistry && (
           <Col xs={4} className="mt-4 pt-1">
-            {renderButtons("transactional")}
+            {renderButtons(type)}
           </Col>
         )}
       </>
