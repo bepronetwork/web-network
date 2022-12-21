@@ -240,11 +240,14 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   }
 
   function getParticipantsPullRequest(githubId: string) {
-    if (!state.Service?.network?.repos?.active) return;
-    setIsLoadingParticipants(true)
+    if (!state.Service?.network?.repos?.active || !state.Settings?.github?.botUser) return;
+
+    setIsLoadingParticipants(true);
+
     getPullRequestParticipants(state.Service?.network?.repos?.active.githubPath, +githubId)
       .then((participants) => {
-        const tmpParticipants = [...participants];
+        const tmpParticipants = 
+          participants.filter(p => p.toLowerCase() !== state.Settings.github.botUser.toLowerCase());
 
         pullRequests
           ?.find((pr) => pr.githubId === githubId)
@@ -322,13 +325,13 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
-    if (pullRequests.length && state.Service?.network?.repos?.active) {
+    if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
       const defaultPr =
         pullRequests.find((el) => el.isMergeable) || pullRequests[0];
       setCurrentPullRequest(defaultPr);
       getParticipantsPullRequest(defaultPr?.githubId);
     }
-  }, [pullRequests, state.Service?.network?.repos?.active]);
+  }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
 
 
   function renderDistribution() {
