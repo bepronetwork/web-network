@@ -10,7 +10,6 @@ import BountyStatusInfo from "components/bounty-status-info";
 import Identicon from "components/identicon";
 import Translation from "components/translation";
 
-import {formatDate} from "helpers/formatDate";
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 

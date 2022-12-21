@@ -5,6 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {v4 as uuidv4} from "uuid";
 
+import ItemRow from "components/bounty/tabs-sections/item-row";
 import Button from "components/button";
 import NothingFound from "components/nothing-found";
 import ProposalProgressSmall from "components/proposal-progress-small";
@@ -17,8 +18,6 @@ import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import { useNetwork } from "x-hooks/use-network";
-
-import ItemRow from "./item-row";
 
 interface ItemProps {
   data: Proposal[] | pullRequest[],
@@ -40,10 +39,13 @@ function ItemSections({ data, isProposal }: ItemProps) {
             const valueRedirect = {
               id: state.currentBounty?.data?.githubId,
               repoId: state.currentBounty?.data?.repository_id,
-            } as any
+              prId: undefined,
+              proposalId: undefined
+            };
             const status = []
 
-            const proposal = state.currentBounty?.data?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
+            const proposal = 
+              state.currentBounty?.data?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
             const isDisputed = !!proposal?.isDisputed
             const isMerged = item?.isMerged;
 
