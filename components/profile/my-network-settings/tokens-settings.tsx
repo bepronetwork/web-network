@@ -89,7 +89,6 @@ export default function TokensSettings({
   }
 
   async function updateTransactionalTokens(tokenType: TokenType){
-    debugger;
     const isTransactional = tokenType === 'transactional';
     const currentTokens = currentAllowedTokens[tokenType]
 
@@ -143,7 +142,6 @@ export default function TokensSettings({
 
 
   function renderButtons(tokenType: TokenType) {
-    console.log({tokenType})
     return (
       <div className="d-flex" key={`col-${tokenType}`}>
         <Button className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
