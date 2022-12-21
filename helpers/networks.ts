@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import {ReactNode} from "react";
 
 export type Currency = {
   name: string;
@@ -26,7 +26,7 @@ const DEV: Currency = {
 const ETH: Currency = {
   name: "Ethereum",
   ticker: "ETH",
-  symbol: "Ξ"
+  symbol: "ETH" // metamask can't handle symbols of just one char, it needs at least 2
 };
 
 const MOVR: Currency = {
