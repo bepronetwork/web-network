@@ -215,7 +215,6 @@ export function useBounty() {
               reviews
             })))))
       .then(extendedPrs => {
-        // dispatch(changeCurrentBountyDataPullRequests(extendedPrs));
         return extendedPrs;
       })
       .catch(e => {

@@ -18,7 +18,10 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
-import {changeCurrentBountyComments} from "contexts/reducers/change-current-bounty";
+import {
+  changeCurrentBountyComments, 
+  changeCurrentBountyDataPullRequests
+} from "contexts/reducers/change-current-bounty";
 import {changeLoadState} from "contexts/reducers/change-load";
 import {changeSpinners} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
@@ -195,7 +198,11 @@ export default function PullRequestPage() {
     dispatch(changeSpinners.update({pullRequests: true}));
 
     getExtendedPullRequestsForCurrentBounty()
-      .then(prs => prs.find((pr) => +pr.githubId === +prId))
+      .then(prs => {
+        dispatch(changeCurrentBountyDataPullRequests(prs));
+
+        return prs.find((pr) => +pr.githubId === +prId);
+      })
       .then(currentPR => {
         const currentNetworkPR = 
           state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
@@ -287,7 +294,9 @@ export default function PullRequestPage() {
                 { (isWalletConnected && 
                    isGithubConnected && 
                    prsNeedsApproval && 
-                   canUserApprove) && 
+                   canUserApprove &&
+                   isPullRequestReady &&
+                   !isPullRequestCanceled) && 
                   <GithubLink
                     forcePath={state.Service?.network?.repos?.active?.githubPath}
                     hrefPath={`pull/${pullRequest?.githubId || ""}/files`}
