@@ -1,3 +1,5 @@
+import { useTranslation } from "next-i18next";
+
 import Button from "components/button";
 import Modal from "components/modal";
 
@@ -6,6 +8,8 @@ import { useAppState } from "contexts/app-state";
 import { useAuthentication } from "x-hooks/use-authentication";
 
 export default function ReAuthorizeGithubModal() {
+  const { t } = useTranslation("common");
+  
   const { 
     state:{
       show: {
@@ -19,16 +23,16 @@ export default function ReAuthorizeGithubModal() {
     <Modal
       centerTitle
       show={reAuthorizeGithub}
-      title="Reauthorize Github"
+      title={t("modals.reauthorize-github.title")}
     >
       <p className="font-weight-medium text-center">
-        Your github connection has expired. Please, reauthorize the session.
+      {t("modals.reauthorize-github.description")}
       </p>
 
       <Button
         onClick={connectGithub}
       >
-        Reauthorize
+        {t("modals.reauthorize-github.button-label")}
       </Button>
     </Modal>
   );

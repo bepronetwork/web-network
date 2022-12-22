@@ -282,6 +282,11 @@
     "settings-not-loaded": {
       "title": "Failed to load settings",
       "description": "Please reload the page or contact the administrator."
+    },
+    "reauthorize-github": {
+      "title": "Reauthorize Github",
+      "description": "Your github connection has expired. Please, reauthorize the session.",
+      "button-label": "Reauthorize"
     }
   },
   "forms": {
