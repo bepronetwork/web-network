@@ -7,6 +7,7 @@ import {v4 as uuidv4} from "uuid";
 
 import ItemRow from "components/bounty/tabs-sections/item-row";
 import Button from "components/button";
+import GithubLink from "components/github-link";
 import NothingFound from "components/nothing-found";
 import ProposalProgressSmall from "components/proposal-progress-small";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
@@ -29,6 +30,12 @@ function ItemSections({ data, isProposal }: ItemProps) {
   const {state} = useAppState();
   const router = useRouter();
   const { getURLWithNetwork } = useNetwork();
+
+  const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
+  const approvalsRequired = 
+    branchProtectionRules ? 
+      branchProtectionRules[state.currentBounty?.data?.branch]?.requiredApprovingReviewCount || 0 : 0;
+  const canUserApprove = state.Service?.network?.repos?.active?.viewerPermission !== "READ";
 
   return (
     <section className="content-wrapper border-top-0 p-20 d-flex flex-column gap-2 bg-gray-900">
@@ -67,6 +74,9 @@ function ItemSections({ data, isProposal }: ItemProps) {
               valueRedirect.proposalId = item?.id
             }
 
+            const approvalsCurrentPr = item?.approvals?.total || 0;
+            const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove;
+
             return (
               <ItemRow 
                 key={`${uuidv4()} ${item?.id}`}
@@ -102,20 +112,37 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 )}
 
                 <ReadOnlyButtonWrapper>
-                  <Button
-                    className="read-only-button"
-                    onClick={(ev) => {
-                      ev.preventDefault();
-                      router.push?.(getURLWithNetwork(pathRedirect, {
-                        ...valueRedirect,
-                        review: true
-                      }))
-                    }}
-                  >
-                    <span className="label-m text-white">
-                      <Translation label={isProposal ? "actions.view-proposal" : "actions.review"} />
-                    </span>
-                  </Button>
+                  <div className="row align-items-center">
+                    <div className="col">
+                      <Button
+                        className="read-only-button"
+                        onClick={(ev) => {
+                          ev.preventDefault();
+                          router.push?.(getURLWithNetwork(pathRedirect, {
+                            ...valueRedirect,
+                            review: true
+                          }))
+                        }}
+                      >
+                        <span className="label-m text-white">
+                          <Translation label={isProposal ? "actions.view-proposal" : "actions.review"} />
+                        </span>
+                      </Button>
+                    </div>
+
+                    { shouldRenderApproveButton && 
+                      <div className="col">
+                        <GithubLink
+                          forcePath={state.Service?.network?.repos?.active?.githubPath}
+                          hrefPath={`pull/${item?.githubId || ""}/files`}
+                          color="primary"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          Approve
+                        </GithubLink>
+                      </div>
+                    }
+                  </div>
                 </ReadOnlyButtonWrapper>
               </ItemRow>
             )
