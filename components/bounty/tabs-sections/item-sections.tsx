@@ -75,7 +75,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
             }
 
             const approvalsCurrentPr = item?.approvals?.total || 0;
-            const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove;
+            const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
 
             return (
               <ItemRow 
