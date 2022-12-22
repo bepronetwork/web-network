@@ -63,7 +63,6 @@ export default function TokensSettings({
         await Promise.all([
           Promise.all(tokens?.transactional?.map((address) => state.Service?.active.getERC20TokenData(address))),
           Promise.all(tokens?.reward?.map((address) => state.Service?.active.getERC20TokenData(address))),
-          getTokens(),
         ]).then(([transactionals, reward])=> {
           setAllowedTransactionalTokensList(transactionals);
           setSelectedTransactionalTokens(transactionals);
