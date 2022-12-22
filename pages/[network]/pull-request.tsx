@@ -19,8 +19,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 import {
-  changeCurrentBountyComments, 
-  changeCurrentBountyDataPullRequests,
+  changeCurrentBountyComments,
   changeCurrentBountyData
 } from "contexts/reducers/change-current-bounty";
 import {changeLoadState} from "contexts/reducers/change-load";
