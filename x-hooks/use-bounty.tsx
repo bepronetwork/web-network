@@ -152,7 +152,7 @@ export function useBounty() {
         getExtendedProposalsForCurrentBounty(bounty)
           .then(proposals => dispatch(changeCurrentBountyDataProposals(proposals)))
 
-        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.active)
+        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.active.network)
           .catch(() => -1)
           .then(value => {
             dispatch(changeCurrentBountyDataIsFinished(value !== 0));
