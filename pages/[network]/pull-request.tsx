@@ -302,7 +302,7 @@ export default function PullRequestPage() {
                     hrefPath={`pull/${pullRequest?.githubId || ""}/files`}
                     color="primary"
                   >
-                    Approve
+                    {t("actions.approve")}
                   </GithubLink>
                 }
 

@@ -26,7 +26,7 @@ interface ItemProps {
 }
 
 function ItemSections({ data, isProposal }: ItemProps) {
-  const { t } = useTranslation(["proposal", "pullrequest"]);
+  const { t } = useTranslation(["proposal", "pullrequest", "common"]);
   const {state} = useAppState();
   const router = useRouter();
   const { getURLWithNetwork } = useNetwork();
@@ -138,7 +138,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                           color="primary"
                           onClick={e => e.stopPropagation()}
                         >
-                          Approve
+                          {t("common:actions.approve")}
                         </GithubLink>
                       </div>
                     }
