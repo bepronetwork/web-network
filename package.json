@@ -35,6 +35,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
     "@metamask/jazzicon": "^2.0.0",
+    "@primer/css": "^20.8.0",
     "@taikai/dappkit": "^2.1.10",
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
     "abort-controller": "^3.0.0",
