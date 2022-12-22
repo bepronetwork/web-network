@@ -20,7 +20,8 @@ import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 import {
   changeCurrentBountyComments, 
-  changeCurrentBountyDataPullRequests
+  changeCurrentBountyDataPullRequests,
+  changeCurrentBountyData
 } from "contexts/reducers/change-current-bounty";
 import {changeLoadState} from "contexts/reducers/change-load";
 import {changeSpinners} from "contexts/reducers/change-spinners";
@@ -191,17 +192,20 @@ export default function PullRequestPage() {
   }
 
   useEffect(() => {
-    if (!state.currentBounty?.data || !state.currentBounty?.chainData || !prId || state?.spinners?.pullRequests) return;
-
+    if (!state.currentBounty?.data || 
+        !state.currentBounty?.chainData || 
+        !prId || 
+        state?.spinners?.pullRequests ||
+        !!pullRequest) return;
 
     dispatch(changeLoadState(true));
     dispatch(changeSpinners.update({pullRequests: true}));
 
     getExtendedPullRequestsForCurrentBounty()
-      .then(prs => {
-        dispatch(changeCurrentBountyDataPullRequests(prs));
+      .then(pullRequests => {
+        dispatch(changeCurrentBountyData(Object.assign(state.currentBounty.data, { pullRequests })));
 
-        return prs.find((pr) => +pr.githubId === +prId);
+        return pullRequests.find((pr) => +pr.githubId === +prId);
       })
       .then(currentPR => {
         const currentNetworkPR = 
