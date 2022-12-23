@@ -152,11 +152,11 @@ export function useBounty() {
         getExtendedProposalsForCurrentBounty(bounty)
           .then(proposals => dispatch(changeCurrentBountyDataProposals(proposals)))
 
-        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.network)
+        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.active.network)
           .catch(() => -1)
           .then(value => {
             dispatch(changeCurrentBountyDataIsFinished(value !== 0));
-            dispatch(changeCurrentBountyDataIsInValidation([2, 3].includes(value)))
+            dispatch(changeCurrentBountyDataIsInValidation([2].includes(value)))
             dispatch(changeSpinners.update({bountyChain: false}))
           });
 
