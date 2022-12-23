@@ -1,2 +1,38 @@
 @import "@primer/css/markdown/index.scss";
+@import "@primer/primitives/dist/scss/colors/_dark.scss";
 
+.markdown-body {
+  @include primer-colors-dark;
+
+  ul {
+    list-style-type: disc;
+
+    li {
+      list-style-type: disc;
+    }
+  }
+
+  ul[type='disc'] {
+    list-style-type: disc;
+
+    li {
+      list-style-type: disc;
+    }
+  }
+
+  ul[type='circle'] {
+    list-style-type: circle;
+
+    li {
+      list-style-type: circle;
+    }
+  }
+
+  ul[type='square'] {
+    list-style-type: square;
+
+    li {
+      list-style-type: square;
+    }
+  }
+}

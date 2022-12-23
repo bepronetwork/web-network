@@ -147,6 +147,13 @@ li {
       top: 1.5%;
     }
   }
+
+  .modal-xl {
+    .modal-content > .modal-header > .close-button {
+      left: 97%;
+      top: 10px;
+    }
+  }
 }
 
 .react-select {
