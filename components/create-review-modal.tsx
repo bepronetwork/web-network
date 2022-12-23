@@ -1,6 +1,6 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-import {useTranslation} from "next-i18next";
+import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -9,11 +9,11 @@ import Button from "components/button";
 import GithubInfo from "components/github-info";
 import Modal from "components/modal";
 
-import {formatDate} from "helpers/formatDate";
+import { useAppState } from "contexts/app-state";
 
-import {pullRequest} from "interfaces/issue-data";
+import { formatDate } from "helpers/formatDate";
 
-import {useAppState} from "../contexts/app-state";
+import { pullRequest } from "interfaces/issue-data";
 
 interface CreateReviewModalModalProps {
   show: boolean,
@@ -24,7 +24,7 @@ interface CreateReviewModalModalProps {
 }
 
 export default function CreateReviewModal({
-                                            show = false,
+  show = false,
   isExecuting = false,
   onConfirm,
   onCloseClick,
@@ -34,7 +34,7 @@ export default function CreateReviewModal({
 
   const [body, setBody] = useState("");
 
-  const {state} = useAppState();
+  const { state } = useAppState();
 
   function isButtonDisabled(): boolean {
     return body.trim() === "" || isExecuting;
@@ -42,6 +42,10 @@ export default function CreateReviewModal({
 
   function setDefaults() {
     setBody("");
+  }
+
+  function handleConfirm() {
+    onConfirm(body);
   }
 
   useEffect(setDefaults, [show]);
@@ -88,21 +92,21 @@ export default function CreateReviewModal({
             <Avatar className="ml-2" userLogin={pullRequest?.githubLogin} />
           </div>
         </div>
-        <div>
-          <div className="form-group">
-            <label className="caption-small mb-2 text-gray">
-              {t("modals.create-review.fields.review.label")}
-            </label>
-            
-            <textarea
-              value={body}
-              rows={5}
-              onChange={(e) => setBody(e.target.value)}
-              className="form-control"
-              placeholder={t("modals.create-review.fields.review.placeholder")}
-            />
-          </div>
+
+        <div className="form-group">
+          <label className="caption-small mb-2 text-gray">
+            {t("modals.create-review.fields.review.label")}
+          </label>
+          
+          <textarea
+            value={body}
+            rows={5}
+            onChange={(e) => setBody(e.target.value)}
+            className="form-control"
+            placeholder={t("modals.create-review.fields.review.placeholder")}
+          />
         </div>
+
         <div className="d-flex pt-2 justify-content-between">
         <Button 
             color="dark-gray" 
@@ -114,7 +118,7 @@ export default function CreateReviewModal({
           </Button>
           <Button
             disabled={isButtonDisabled()}
-            onClick={() => onConfirm(body)}
+            onClick={handleConfirm}
           >
             {isButtonDisabled() && !isExecuting && (
               <LockedIcon className="me-2" />

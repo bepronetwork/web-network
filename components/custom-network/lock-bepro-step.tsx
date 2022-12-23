@@ -15,7 +15,7 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
-import { addTx, updateTx } from "contexts/reducers/change-tx-list";
+import { TxList, addTx, updateTx } from "contexts/reducers/change-tx-list";
 
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import { parseTransaction } from "helpers/transactions";
@@ -88,9 +88,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     const lockTxAction = addTx([{ 
       type: TransactionTypes.lock,
-      amount: amount,
+      amount: amount.toFixed(),
       currency: registryTokenSymbol
-    }] as any);
+    }]);
 
     dispatch(lockTxAction)
     setIsLocking(true);
@@ -114,9 +114,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     const unlockTxAction = addTx([{ 
       type: TransactionTypes.unlock,
-      amount: amountLocked,
+      amount: amountLocked.toFixed(),
       currency: t("$oracles", { token: registryTokenSymbol })  
-    }] as any);
+    }]);
 
     dispatch(unlockTxAction)
     setIsUnlocking(true);
@@ -162,7 +162,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   function handleApproval() {
     if (amountNeeded?.lte(0) || isApproving) return;
 
-    const approveTxAction = addTx([{ type: TransactionTypes.approveTransactionalERC20Token }] as any);
+    const approveTxAction = addTx([{ type: TransactionTypes.approveTransactionalERC20Token }] as TxList);
     
     dispatch(approveTxAction)
     setIsApproving(true)

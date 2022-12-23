@@ -1,3 +1,5 @@
+import { ReviewTypes } from "types/octokit";
+
 export interface RequestParams {
   networkName?: string;
   wallet?: string;
@@ -68,6 +70,7 @@ export interface CreateReviewParams extends RequestParams {
   pullRequestId: string;
   githubLogin: string;
   body: string;
+  event?: ReviewTypes;
 }
 
 export interface PatchUserParams extends RequestParams {

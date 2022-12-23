@@ -85,7 +85,7 @@ function networkTxButton({
       amount: txParams?.tokenAmount || "0",
       currency: txCurrency || t("misc.$token"),
       network: state.Service?.network?.active
-    } as unknown as any]);
+    }]);
 
     dispatch(tmpTransaction);
     
