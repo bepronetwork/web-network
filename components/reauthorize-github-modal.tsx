@@ -29,11 +29,13 @@ export default function ReAuthorizeGithubModal() {
       {t("modals.reauthorize-github.description")}
       </p>
 
-      <Button
-        onClick={connectGithub}
-      >
-        {t("modals.reauthorize-github.button-label")}
-      </Button>
+      <div className="d-flex flex-row justify-content-center">
+        <Button
+          onClick={connectGithub}
+        >
+          {t("modals.reauthorize-github.button-label")}
+        </Button>
+      </div>
     </Modal>
   );
 }
