@@ -15,6 +15,7 @@ import {
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
+import { changeReAuthorizeGithub } from "contexts/reducers/update-show-prop";
 
 import {CustomSession} from "interfaces/custom-session";
 
@@ -22,8 +23,9 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
+import { useTransactions } from "x-hooks/use-transactions";
 
-import { useTransactions } from "./use-transactions";
+export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
 export function useAuthentication() {
 
@@ -54,7 +56,12 @@ export function useAuthentication() {
       return;
 
     transactions.deleteFromStorage();
+    
     const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
+    
+    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+    
+    expirationStorage.removeItem();
 
     signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})
       .then(() => {
@@ -75,6 +82,7 @@ export function useAuthentication() {
 
     if (!state.currentUser?.connected)
       return;
+
     dispatch(changeWalletSpinnerTo(true));
 
     state.Service.active.getAddress()
@@ -201,9 +209,19 @@ export function useAuthentication() {
       sessionUser.accessToken === state.currentUser?.accessToken)
       return;
 
+    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+
+    expirationStorage.value =  session.data.expires;
+
     dispatch(changeCurrentUserHandle(session.data.user.name));
     dispatch(changeCurrentUserLogin(sessionUser.login));
     dispatch(changeCurrentUserAccessToken((sessionUser.accessToken)));
+  }
+
+  function verifyReAuthorizationNeed() {
+    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+
+    dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
   return {
@@ -215,6 +233,7 @@ export function useAuthentication() {
     updateWalletAddress,
     validateGhAndWallet,
     listenToAccountsChanged,
-    updateCurrentUserLogin
+    updateCurrentUserLogin,
+    verifyReAuthorizationNeed
   }
 }
