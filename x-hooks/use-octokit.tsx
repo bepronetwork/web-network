@@ -7,7 +7,7 @@ import { getPropertyRecursively } from "helpers/object";
 
 import { api } from "services/api";
 
-import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
+import { GraphQlQueryResponseData, GraphQlResponse, RepositoryPermissions } from "types/octokit";
 
 export default function useOctokit() {
   function getOwnerRepoFrom(path: string) {
@@ -18,7 +18,7 @@ export default function useOctokit() {
 
   function makeOctokitRequest(query: string, params, useBotToken?: boolean): Promise<GraphQlResponse> {
     return api.post("/graphql", { query, params, useBotToken }).then(({ data }) => data).catch(error => {
-      console.log("makeOctokitRequest", error);
+      console.debug("makeOctokitRequest", error);
 
       return error.data;
     });
@@ -56,7 +56,7 @@ export default function useOctokit() {
     return pages;
   }
 
-  async function getPullRequestParticipants(repositoryPath:  string, pullId: number): Promise<string[]> {
+  async function getPullRequestParticipants(repositoryPath: string, pullId: number): Promise<string[]> {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(PullRequestQueries.Participants, {
@@ -72,7 +72,7 @@ export default function useOctokit() {
     return participants;
   }
 
-  async function getPullRequestLinesOfCode(repositoryPath:  string, pullId: number): Promise<number> {
+  async function getPullRequestLinesOfCode(repositoryPath: string, pullId: number): Promise<number> {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await makeOctokitRequest(PullRequestQueries.LinesOfCode, {
@@ -86,7 +86,7 @@ export default function useOctokit() {
     return additions + deletions;
   }
 
-  async function getIssueOrPullRequestComments(repositoryPath:  string, id: number) {
+  async function getIssueOrPullRequestComments(repositoryPath: string, id: number) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(CommentsQueries.List, {
@@ -102,7 +102,7 @@ export default function useOctokit() {
     return comments.filter(el => el) || [];
   }
 
-  async function getPullRequestList(repositoryPath:  string) {
+  async function getPullRequestList(repositoryPath: string) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(PullRequestQueries.PullRequests, {
@@ -115,7 +115,7 @@ export default function useOctokit() {
     return pullRequests || [];
   }
 
-  async function getPullRequestDetails(repositoryPath:  string, id: number) {
+  async function getPullRequestDetails(repositoryPath: string, id: number) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await makeOctokitRequest(PullRequestQueries.Details, {
@@ -123,28 +123,58 @@ export default function useOctokit() {
       owner,
       id
     });
+
     if(!response?.repository) return
 
-    const { mergeable, merged, state } = response.repository.pullRequest;
+    const { mergeable, merged, state, approvals, hash } = response.repository.pullRequest;
 
-    return { mergeable, merged, state };
+    return { mergeable, merged, state, approvals, hash };
+  }
+
+  async function getPullRequestReviews(repositoryPath: string, id: number) {
+    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+
+    const response = await makeOctokitRequest(PullRequestQueries.Reviews, {
+      repo,
+      owner,
+      id
+    });
+
+    const reviews = getPropertyRecursively<GraphQlQueryResponseData>("nodes", response)?.map(review => ({
+        author: review.author.login,
+        updated_at: review.submittedAt,
+        body: review.body
+    }));
+
+    return reviews;
   }
 
   //  Note: if repository not exist or it private will return null
-  async function getRepository(repositoryPath:  string) {
+  async function getRepository(repositoryPath: string, useBotToken?: boolean) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(RepositoryQueries.Repository, {
       repo,
       owner
-    });
+    }, useBotToken);
 
-    const repository = response?.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))
+    const repository = 
+      response?.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))?.[0];
 
-    return repository?.[0] || null;
+    if (!repository) return null;
+
+    const branchProtectionRules = 
+      Object.fromEntries(repository.branchProtectionRules.nodes.map(rule => [rule.pattern, { 
+        requiredApprovingReviewCount: rule.requiredApprovingReviewCount
+      }]));
+
+    return {
+      ...repository,
+      branchProtectionRules
+    };
   }
 
-  async function getRepositoryForks(repositoryPath:  string) {
+  async function getRepositoryForks(repositoryPath: string) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(RepositoryQueries.Forks, {
@@ -176,7 +206,7 @@ export default function useOctokit() {
     };
   }
 
-  async function getUserRepositories(login:  string, botUser?: string) {
+  async function getUserRepositories(login: string, botUser?: string) {
 
     const response = await getAllPages(UserQueries.Repositories(botUser), {
       login
@@ -189,7 +219,7 @@ export default function useOctokit() {
       isArchived: boolean;
       isInOrganization: boolean;
       owner: string;
-      viewerPermission: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
+      viewerPermission: RepositoryPermissions;
       mergeCommitAllowed: boolean;
       parent?: {
         name: string;
@@ -216,6 +246,20 @@ export default function useOctokit() {
 
     return getPropertyRecursively<GraphQlQueryResponseData>("repository", response);
   }
+
+  async function getRepositoryViewerPermission(repositoryPath: string) {
+    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+
+    const response = await makeOctokitRequest(RepositoryQueries.ViewerPermission, {
+      repo,
+      owner
+    });
+
+    const permission: RepositoryPermissions = 
+      getPropertyRecursively<GraphQlQueryResponseData>("viewerPermission", response);
+
+    return permission;
+  }
   
   return {
     getPullRequestParticipants,
@@ -227,6 +271,8 @@ export default function useOctokit() {
     getRepositoryForks,
     getRepositoryBranches,
     getUserRepositories,
-    getUserRepository
+    getUserRepository,
+    getRepositoryViewerPermission,
+    getPullRequestReviews
   };
 }

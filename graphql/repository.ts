@@ -4,6 +4,12 @@ export const Repository =
       nameWithOwner
       visibility
       mergeCommitAllowed
+      branchProtectionRules(first: 100) {
+        nodes {
+          pattern
+          requiredApprovingReviewCount
+        }
+      }
     }
   }`;
 
@@ -47,30 +53,37 @@ export const Branches =
   }`;
 
 export const Details =
-`query Details($repo: String!, $owner: String!) {
-  repository(name: $repo, owner: $owner) {
-      id
-      labels(first: 1, query: "draft") {
-        nodes {
-          id
-          name
+  `query Details($repo: String!, $owner: String!) {
+    repository(name: $repo, owner: $owner) {
+        id
+        labels(first: 1, query: "draft") {
+          nodes {
+            id
+            name
+          }
         }
-      }
-  }
-}`;
+    }
+  }`;
 
 export const CreateLabel =
-`mutation CreateLabel($name: String!, $repositoryId: ID!, $color: String!, $description: String) {
-  createLabel(
-    input: {
-      color: $color,
-      name: $name,
-      description: $description,
-      repositoryId: $repositoryId
+  `mutation CreateLabel($name: String!, $repositoryId: ID!, $color: String!, $description: String) {
+    createLabel(
+      input: {
+        color: $color,
+        name: $name,
+        description: $description,
+        repositoryId: $repositoryId
+      }
+    ) {
+      label {
+        id
+      }
     }
-  ) {
-    label {
-      id
+  }`;
+
+export const ViewerPermission = 
+  `query ViewerPermission($repo: String!, $owner: String!) {
+    repository(name: $repo, owner: $owner) {
+      viewerPermission
     }
-  }
-}`;
+  }`;

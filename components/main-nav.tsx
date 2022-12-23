@@ -141,7 +141,7 @@ export default function MainNav() {
               <ul className="nav-links">
                 <li>
                   <InternalLink
-                    href={getURLWithNetwork("/developers")}
+                    href={getURLWithNetwork("/bounties")}
                     label={<Translation label={"main-nav.nav-avatar.bounties"} />}
                     nav
                     uppercase

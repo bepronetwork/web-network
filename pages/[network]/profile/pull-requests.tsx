@@ -20,7 +20,7 @@ export default function PullRequests() {
       <span className="family-Regular h4 text-white text-capitalize">{t("label_other")}</span>
 
       <ListIssues
-        redirect={getURLWithNetwork("/developers")}
+        redirect={getURLWithNetwork("/bounties")}
         buttonMessage={t('bounty:label_other')}
         pullRequesterAddress={state.currentUser.walletAddress || null}
         pullRequesterLogin={state.currentUser?.login || null}

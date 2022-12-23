@@ -3,7 +3,7 @@ import React from "react";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {GetServerSideProps} from "next/types";
 
-import PageDevelopers from "pages/[network]/developers";
+import PageDevelopers from "pages/[network]/bounties";
 
 export default function Home() {
   return <PageDevelopers/>;
