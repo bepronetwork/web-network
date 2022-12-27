@@ -6,15 +6,14 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import * as CommentsQueries from "graphql/comments";
 import * as PullRequestQueries from "graphql/pull-request";
 
 import {GraphQlResponse} from "types/octokit";
 
-const {serverRuntimeConfig} = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
-  const { issueId, pullRequestId, githubLogin, body, networkName } = req.body;
+  const { issueId, pullRequestId, githubLogin, body, networkName, event } = req.body;
 
   try {
     const network = await models.network.findOne({
@@ -47,28 +46,29 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     const [owner, repo] = repository.githubPath.split("/");
 
     const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
-
+    
     const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,
       owner,
       id: +pullRequest.githubId
     });
-
+    
     const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
 
-    const response = await githubAPI<GraphQlResponse>(CommentsQueries.Create, {
-      issueOrPullRequestId: pullRequestGithubId,
-      body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
+    const response = await githubAPI<GraphQlResponse>(PullRequestQueries.AddReview, {
+      pullRequestId: pullRequestGithubId,
+      body: `<p>@${githubLogin} reviewed this Pull Request with the following message:</p><p>${body}</p>`,
+      event: event.toUpperCase()
     });
 
-    const reviewEdge = response.addComment.commentEdge.node;
+    const { addPullRequestReview: { pullRequestReview } } = response;
 
     const review = {
-      id: reviewEdge.id,
-      body: reviewEdge.body,
-      updatedAt: reviewEdge.updatedAt,
-      author: reviewEdge.author.login
-    };
+      id: pullRequestReview.id,
+      body: pullRequestReview.body,
+      updatedAt: pullRequestReview.updatedAt,
+      author: pullRequestReview.author.login
+    }
     
     if (!pullRequest.reviewers.find((el) => el === String(githubLogin))) {
       pullRequest.reviewers = [...pullRequest.reviewers, githubLogin];
@@ -79,7 +79,10 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(review);
   } catch (error) {
     console.log(error);
-    return res.status(error.status || 500).json(error.response?.data || error);
+    return res.status(error.status || 500).json(error?.errors && { 
+      data: error.response?.data, 
+      errors: error.response?.error 
+    } || error);
   }
 }
 

@@ -10,6 +10,7 @@ import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 import Loading from "components/loading";
 import MainNav from "components/main-nav";
 import ReadOnlyContainer from "components/read-only-container";
+import ReAuthorizeGithubModal from "components/reauthorize-github-modal";
 import Seo from "components/seo";
 import StatusBar from "components/status-bar";
 import Toaster from "components/toaster";
@@ -29,6 +30,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           <ReadOnlyContainer>
             <WebThreeDialog />
             <InvalidAccountWalletModal/>
+            <ReAuthorizeGithubModal />
             <MainNav />
             <div id="root-container">
               <Component {...pageProps} />

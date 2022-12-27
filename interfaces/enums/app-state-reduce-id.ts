@@ -25,4 +25,5 @@ export enum AppStateReduceId {
   CurrentBounty,
   CurrentBountyChainData,
   Spinners,
+  NetworkActiveRepoProps
 }

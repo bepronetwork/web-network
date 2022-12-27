@@ -34,6 +34,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress]);
 
   useEffect(repos.loadRepos, [state?.Service?.network?.lastVisited]);
+  useEffect(repos.updateActiveRepo, [query?.repoId, state.Service?.network?.repos]);
 
   useEffect(auth.validateGhAndWallet,
             [(session?.data as CustomSession),
@@ -46,6 +47,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.listenToAccountsChanged, [state.Service]);
   useEffect(auth.updateWalletBalance, [state.currentUser?.walletAddress, state?.Service?.active?.network]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
+  useEffect(auth.verifyReAuthorizationNeed, [state.currentUser?.walletAddress]);
   useEffect(network.updateActiveNetwork, [query?.network, state?.Service?.active?.network]);
   useEffect(network.loadNetworkToken, [state?.Service?.active?.network]);
   useEffect(network.loadNetworkTimes, [state.Service?.active?.network]);

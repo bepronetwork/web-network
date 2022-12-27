@@ -57,6 +57,7 @@ export default function TransactionsStateIndicator() {
     if (!storage?.value || !storage?.value?.length)
       return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const {eth: {getTransaction}} = (window as any).web3;
 
     Promise.all(storage.value
