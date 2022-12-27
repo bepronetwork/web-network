@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
+
+import DescriptionPreviewModal from "components/description-preview-modal";
+import DragAndDrop from "components/drag-and-drop";
 
 import { useAppState } from "contexts/app-state";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
 
-import DragAndDrop from "./drag-and-drop";
+import Button from "./button";
 
 export default function CreateBountyDetails({
   bountyTitle,
@@ -21,13 +23,24 @@ export default function CreateBountyDetails({
   review = false,
 }) {
   const { t } = useTranslation("bounty");
-  const [bodyLength, setBodyLength] = useState<number>(0);
+
   const [strFiles, setStrFiles] = useState<string>("");
+  const [bodyLength, setBodyLength] = useState<number>(0);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+
   const {
     state: { Settings },
   } = useAppState();
-  const titleLimit = 131
-  
+
+  const titleLimit = 131;
+
+  function handleShowModal() {
+    setShowPreviewModal(true);
+  }
+
+  function handleCloseModal() {
+    setShowPreviewModal(false);
+  }
   
   function handleChangeTitle (e: React.ChangeEvent<HTMLInputElement>) {
     setBountyTitle(e.target.value)
@@ -111,6 +124,16 @@ export default function CreateBountyDetails({
             {t("errors.description-limit", { value: bodyLength })}
           </span>
         )}
+
+        { review && 
+          <Button 
+          onClick={handleShowModal}
+          outline
+          className="mt-2"
+        >
+          Preview Description
+        </Button>
+        }
       </div>
       <div className="mb-4">
         <DragAndDrop
@@ -120,6 +143,12 @@ export default function CreateBountyDetails({
           review={review}
         />
       </div>
+
+      <DescriptionPreviewModal
+        description={bountyDescription}
+        show={showPreviewModal && review}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }

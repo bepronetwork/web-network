@@ -52,7 +52,7 @@ module.exports = () => {
   return {
     i18n,
     sassOptions: {
-      includePaths: [path.join(__dirname, "styles")]
+      includePaths: [path.join(__dirname, "styles"), path.join(__dirname, "node_modules/@primer/css/markdown")]
     },
     images: {
       domains: ["ipfs.infura.io"]
