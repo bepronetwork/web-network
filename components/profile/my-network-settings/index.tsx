@@ -266,6 +266,8 @@ export default function MyNetworkSettings({
             <GovernanceSettings 
               address={network?.networkAddress}
               tokens={network?.tokens}
+              network={network}
+              updateEditingNetwork={updateEditingNetwork}
             />
           </NetworkContainer>
         ),
