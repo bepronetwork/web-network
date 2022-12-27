@@ -7,7 +7,7 @@ interface GithubLinkParams {
   forcePath?: string;
   hrefPath: string;
   children: ReactNode;
-  onClick?: () => void;
+  onClick?: (e?:any) => void;
   color?: string;
 }
 
@@ -18,24 +18,21 @@ export default function GithubLink({
   onClick,
   color = "dark-gray"
 }: GithubLinkParams) {
-
-
   return (
-    <div onClick={onClick}>
-      <a
-        href={!onClick ?`https://github.com/${forcePath}/${hrefPath}`: "#"}
-        target="_blank"
-        className={`btn btn-${color} text-uppercase d-flex align-items-center github-link`}
-        rel="noreferrer"
-      >
-        <span className="text-nowrap">{children}</span>
-        <ExternalLinkIcon
-          className="ml-1"
-          height={10}
-          width={10}
-          color="text-white-50"
-        />
-      </a>
-    </div>
+    <a
+      href={`https://github.com/${forcePath}/${hrefPath}`}
+      target="_blank"
+      className={`btn btn-${color} text-uppercase d-flex align-items-center github-link`}
+      rel="noreferrer"
+      onClick={onClick}
+    >
+      <span className="text-nowrap">{children}</span>
+      <ExternalLinkIcon
+        className="ml-1"
+        height={10}
+        width={10}
+        color="text-white-50"
+      />
+    </a>
   );
 }

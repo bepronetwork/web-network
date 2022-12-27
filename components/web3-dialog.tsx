@@ -32,7 +32,7 @@ export default function WebThreeDialog() {
   useEffect(() => {
     if (![
       getURLWithNetwork("/").pathname,
-      getURLWithNetwork("/developers").pathname,
+      getURLWithNetwork("/bounties").pathname,
       getURLWithNetwork("/curators").pathname,
       getURLWithNetwork("/oracle").pathname,
       getURLWithNetwork("/oracle/new-bounties").pathname,

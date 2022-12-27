@@ -87,12 +87,17 @@ export interface pullRequest {
   updatedAt: Date;
   issue?: IssueData;
   comments?: IssueDataComment[];
+  reviews?: IssueDataComment[];
   status?: string;
   reviewers?: string[];
   contractId?: number;
   userBranch?: string;
   userRepo?: string;
   network_id: number;
+  hash?: string;
+  approvals?: {
+    total: number;
+  }
 }
 
 export interface developer {

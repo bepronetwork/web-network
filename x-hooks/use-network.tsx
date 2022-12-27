@@ -53,7 +53,7 @@ export function useNetwork() {
         } else 
           storage.value = networkName;
       }
-    }
+    } else if (storage.value) dispatch(changeNetworkLastVisited(storage.value));
 
     console.debug(`Updating active network`, networkName);
 

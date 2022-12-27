@@ -8,7 +8,7 @@ import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction}
 import {SimpleAction} from "./reducer";
 
 type Tx = Partial<(SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)>;
-type TxList = Tx[];
+export type TxList = Tx[];
 
 enum SubActions {add, remove, update, change}
 

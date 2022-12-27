@@ -27,6 +27,7 @@ import {MetamaskErrors} from "interfaces/enums/Errors";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Token} from "interfaces/token";
+import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
@@ -478,7 +479,7 @@ export default function CreateBountyModal() {
         type: TransactionTypes.openIssue, 
         amount: payload.amount,
         network: Service?.network?.active
-      } as any]);
+      }]);
 
       dispatch(transactionToast);
 
@@ -524,7 +525,8 @@ export default function CreateBountyModal() {
       });
 
       if (networkBounty?.error !== true) {
-        dispatch(updateTx([parseTransaction(networkBounty, transactionToast.payload[0] as any)]));
+        dispatch(updateTx([
+          parseTransaction(networkBounty, transactionToast.payload[0] as SimpleBlockTransactionPayload)]));
 
         const createdBounty = await processEvent("bounty",
                                                  "created",

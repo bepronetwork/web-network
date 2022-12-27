@@ -39,7 +39,7 @@ export function useBounty() {
 
   const {query} = useRouter();
   const {getIssue} = useApi();
-  const { getIssueOrPullRequestComments, getPullRequestDetails } = useOctokit();
+  const { getIssueOrPullRequestComments, getPullRequestDetails, getPullRequestReviews } = useOctokit();
 
   function isCurrentBountyCached() {
     const lastUpdated = state.currentBounty?.lastUpdated;
@@ -106,7 +106,9 @@ export function useBounty() {
               ...pullRequest,
               isMergeable: details?.mergeable === "MERGEABLE",
               merged: details?.merged,
-              state: details?.state
+              state: details?.state,
+              approvals: details?.approvals,
+              hash: details?.hash
             })))]);
       })
       .then(pullRequests => {
@@ -152,11 +154,11 @@ export function useBounty() {
         getExtendedProposalsForCurrentBounty(bounty)
           .then(proposals => dispatch(changeCurrentBountyDataProposals(proposals)))
 
-        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.network)
+        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.active.network)
           .catch(() => -1)
           .then(value => {
             dispatch(changeCurrentBountyDataIsFinished(value !== 0));
-            dispatch(changeCurrentBountyDataIsInValidation([2, 3].includes(value)))
+            dispatch(changeCurrentBountyDataIsInValidation([2].includes(value)))
             dispatch(changeSpinners.update({bountyChain: false}))
           });
 
@@ -200,16 +202,19 @@ export function useBounty() {
     return Promise.all(bounty.pullRequests.map(pullRequest =>
       getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
         .then(details =>
-          getIssueOrPullRequestComments(bounty.repository.githubPath, +pullRequest.githubId)
-            .then(comments => ({
+          Promise.all([
+            getIssueOrPullRequestComments(bounty.repository.githubPath, +pullRequest.githubId),
+            getPullRequestReviews(bounty.repository.githubPath, +pullRequest.githubId)
+          ])
+            .then(([comments, reviews]) => ({
               ...pullRequest,
               isMergeable: details.mergeable === "MERGEABLE",
               merged: details.merged,
               state: details.state,
               comments,
+              reviews
             })))))
       .then(extendedPrs => {
-        // dispatch(changeCurrentBountyDataPullRequests(extendedPrs));
         return extendedPrs;
       })
       .catch(e => {
