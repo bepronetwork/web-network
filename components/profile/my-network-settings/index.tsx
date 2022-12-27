@@ -28,6 +28,7 @@ import GovernanceSettings from "./governance-settings";
 import LogoAndColoursSettings from "./logo-and-colours-settings";
 import RegistrySettings from "./registry-settings";
 import RepositoriesListSettings from "./repositories-list-settings";
+import WarningGithub from "./warning-github";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -292,6 +293,7 @@ export default function MyNetworkSettings({
       {isCurrentNetwork && (
         <style>{colorsToCSS(settings?.theme?.colors)}</style>
       )}
+      {!state.currentUser?.login && <WarningGithub />}
       <TabbedNavigation
         className="my-network-tabs border border-dark-gray"
         defaultActiveKey="logo-and-colours"
