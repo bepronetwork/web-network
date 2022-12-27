@@ -358,7 +358,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   async function loadDefaultSettings(): Promise<typeof DefaultNetworkSettings>{
-    const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object //Deep Copy, More: https://www.codingem.com/javascript-clone-object
+    const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
 
     const balance = await getTokenBalance();
 
