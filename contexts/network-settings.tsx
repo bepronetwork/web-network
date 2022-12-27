@@ -41,7 +41,7 @@ export const NetworkSettingsProvider = ({ children }) => {
             referred to user nework when he access `/my-network` page from/in another network.
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
-  const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
+  const [networkSettings, setNetworkSettings] = useState(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [registryToken, setRegistryToken] = useState<Token>();
 
@@ -60,6 +60,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const isCreating = useMemo(() => ["/new-network", "/setup"].includes(router.pathname), [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
+  const isSetup = useMemo(() => router.pathname === "/setup", [router.pathname]);
   const network =
     useMemo(() =>
       forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
@@ -210,7 +211,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: async (value: string) => {
         let validated = undefined;
   
-        if (value.trim() !== "")
+        if (value.trim() !== "" && !isSetup)
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
 
         return !!validated;
@@ -357,7 +358,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   async function loadDefaultSettings(): Promise<typeof DefaultNetworkSettings>{
-    const defaultState = DefaultNetworkSettings;
+    const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object //Deep Copy, More: https://www.codingem.com/javascript-clone-object
 
     const balance = await getTokenBalance();
 
@@ -397,7 +398,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     if(storageData){
       if(storageData?.details){
-        defaultState.details.name =  storageData?.details.name;
+        const nameValue =  storageData?.details.name.value;
+        defaultState.details.name =  {value: nameValue, validated: await Fields.name.validator(nameValue)};
         defaultState.details.description =  storageData?.details.description;
       }
 
@@ -416,7 +418,8 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
-    const defaultState = DefaultNetworkSettings;
+    const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
+
     const service = await loadDaoService()
     const [
         treasury,
