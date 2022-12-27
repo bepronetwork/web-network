@@ -1,6 +1,8 @@
 import { ReactElement } from "react";
 
 import BigNumber from "bignumber.js";
+
+export type TokenType = 'reward' | 'transactional';
 export interface Token {
   id?: number;
   address: string;
