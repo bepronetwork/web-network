@@ -91,7 +91,7 @@ export default function Modal({
         {onCloseClick && (
           <Button
             transparent
-            className="close-button p-1 position-absolute end-94 text-gray mt-1"
+            className="close-button p-1 position-absolute end-94 text-gray"
             onClick={onCloseClick}
             disabled={isExecuting||onCloseDisabled}
           >

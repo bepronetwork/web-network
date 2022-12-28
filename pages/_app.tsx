@@ -19,6 +19,7 @@ import WebThreeDialog from "components/web3-dialog";
 import RootProviders from "contexts";
 
 import "../styles/styles.scss";
+import "../node_modules/@primer/css/dist/markdown.css";
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 

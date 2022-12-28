@@ -23,7 +23,7 @@ export function useNetwork() {
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
 
-  const {getNetwork, getTokens} = useApi();
+  const {getNetwork, getNetworkTokens} = useApi();
   const {pathname, query, push, replace} = useRouter();
 
   function clearNetworkFromStorage() {
@@ -124,7 +124,7 @@ export function useNetwork() {
     if (!state.Service?.active || !state?.Service?.network?.active)
       return;
 
-    getTokens().then(tokens => {
+    getNetworkTokens({networkName: state?.Service?.network?.active?.name}).then(tokens => {
       const transactional = [];
       const reward = [];
 
