@@ -119,12 +119,15 @@ export function useAuthentication() {
       })
       .then(signedIn => {
         if (!signedIn)
-          return;
+          return dispatch(changeConnectingGH(false))
 
         lastUrl.value = asPath;
+        
+        if(signedIn)
+          signIn('github', {callbackUrl: `${URL_BASE}${asPath}`})
 
-        return signedIn ? signIn('github', {callbackUrl: `${URL_BASE}${asPath}`}) : null;
-      }).finally(()=> dispatch(changeConnectingGH(false)))
+        return setTimeout(() => dispatch(changeConnectingGH(false)), 5 * 1000)
+      })
   }
 
   function validateGhAndWallet() {
