@@ -448,6 +448,18 @@ export default function useApi() {
         throw error;
       });
   }
+  
+  async function getNetworkTokens({
+    networkName = DEFAULT_NETWORK_NAME
+  }) {
+    const params = new URLSearchParams({networkName}).toString();
+    return api
+      .get<Token[]>(`/search/tokens?${params}`)
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
 
   async function searchNetworks({
     page = "1",
@@ -621,6 +633,7 @@ export default function useApi() {
     resetUser,
     getSettings,
     getTokens,
+    getNetworkTokens,
     createNFT,
     saveNetworkRegistry
   };
