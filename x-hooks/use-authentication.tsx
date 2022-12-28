@@ -173,7 +173,6 @@ export function useAuthentication() {
 
     const update = newBalance => {
       const newState = Object.assign(state.currentUser.balance || {}, newBalance);
-      console.log('newState', newState)
       dispatch(changeCurrentUserBalance(newState));
       balance.value = newState;
     }
