@@ -34,7 +34,7 @@ export default function NetworkListItem({
           <NetworkLogo
             src={`${settings?.urls?.ipfs}/${network?.logoIcon}`}
             alt={`${network?.name} logo`}
-            isBepro={network?.name === settings?.defaultNetworkConfig?.name}
+            isBepro={network?.name.toLowerCase() === 'bepro'}
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
