@@ -449,7 +449,6 @@ li {
 .banner-shadow {
   width: 100%;
   min-height: 164px;
-  background-color: $bg;
   color: $white;
   padding: $m + 4;
   border-bottom: 1px solid $dark-gray;
@@ -1252,7 +1251,6 @@ textarea.form-control {
 }
 
 .list-actions {
-  background-color: $bg;
   border-radius: 0;
 
   &.sticky-top {
