@@ -96,7 +96,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const token = await DAOService.getERC20TokenData(networkBounty.transactional);
     
     const nft = {
-      name: `BEPRO Bounty ${network.id} - ${networkBounty.title}`,
+      name: `BEPRO Bounty ${issue.githubId} - ${networkBounty.title}`,
       description: `Created on ${customNetwork.name} awarded along with ${formatNumberToNScale(networkBounty.tokenAmount)} ${token.symbol}`,
       image: issue.seoImage? `${defaultConfig.urls.ipfs}/${issue.seoImage}`: ""
     }
