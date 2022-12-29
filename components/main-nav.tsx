@@ -98,7 +98,7 @@ export default function MainNav() {
             <img
               src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
               width={104}
-              height={32}
+              height={40}
             />
           ) : (
             <LogoPlaceholder />
@@ -116,7 +116,7 @@ export default function MainNav() {
             <img
               src={`/images/Bepro_Logo_Light.svg`}
               width={104}
-              height={32}
+              height={40}
             />                  
         }
         className="brand"
