@@ -16,6 +16,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
+import Badge from "./badge";
 import DateLabel from "./date-label";
 
 export default function IssueListItem({
@@ -169,6 +170,10 @@ export default function IssueListItem({
             {!isMobile && (
               <>
                 <BountyStatusInfo issueState={issueState} />
+                {issue.isKyc ? <Badge
+                  className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                  label={t("bounty:kyc.label")}
+                /> : null}
                 <div className="d-flex align-items-center">
                   <Identicon
                     className="mr-2"

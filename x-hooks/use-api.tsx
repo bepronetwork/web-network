@@ -41,6 +41,7 @@ interface CreateBounty {
   body: string;
   creator: string;
   repositoryId: string;
+  isKyc: boolean;
 }
 
 interface GetNetworkProps {
@@ -63,7 +64,7 @@ export default function useApi() {
   
   api.interceptors.request.use(config => {
     config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
-
+    config.headers["network"] = DEFAULT_NETWORK_NAME;
     return config;
   });
 

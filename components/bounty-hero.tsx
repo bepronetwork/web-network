@@ -9,6 +9,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {truncateAddress} from "helpers/truncate-address";
 
 import {useAppState} from "../contexts/app-state";
+import Badge from "./badge";
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
@@ -52,6 +53,11 @@ export default function BountyHero() {
                     })}
                   />
 
+                  {state.currentBounty?.data.isKyc
+                  ? <Badge
+                    className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                    label={t("bounty:kyc.label")}
+                  /> : null}
                   <div className="d-flex align-items-center">
                     <Avatar
                       className="me-2"
