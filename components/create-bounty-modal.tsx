@@ -4,6 +4,7 @@ import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
+import getConfig from "next/config";
 import router from "next/router";
 
 import BranchsDropdown from "components/branchs-dropdown";
@@ -61,6 +62,8 @@ const ZeroNumberFormatValues = {
   formattedValue: "",
   floatValue: 0,
 };
+
+const {publicRuntimeConfig} = getConfig()
 
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
