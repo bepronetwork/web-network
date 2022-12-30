@@ -293,17 +293,17 @@ export function useAuthentication() {
   }
 
   function updateKycSession(){
-    if(!state?.currentUser?.login 
+    if(!state?.currentUser?.login
         || !state?.currentUser?.accessToken
-        || !state?.currentUser?.walletAddress 
-        || !state?.Settings?.kyc?.isKycEnabled) 
+        || !state?.currentUser?.walletAddress
+        || !state?.Settings?.kyc?.isKycEnabled)
       return
 
     getKycSession()
       .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
       .then((session)=> dispatch(changeCurrentUserKycSession(session)))
   }
-  
+
   return {
     connectWallet,
     disconnectWallet,
