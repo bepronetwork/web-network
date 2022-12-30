@@ -16,6 +16,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
+import Badge from "./badge";
 import CardItem from "./card-item";
 import IssueAmountInfo from "./issue-amount-info";
 
@@ -56,7 +57,7 @@ export default function IssueListItem({
   function IssueTag() {
     const tag = issue?.network?.name;
     const id = issue?.githubId;
-    
+
     return (
       <span className={`${tag && 'text-uppercase'} h6 text-white-40 me-2`}>
         {tag ? `${tag}-${id}` : `#${id}`}
@@ -145,6 +146,10 @@ export default function IssueListItem({
             {!isMobile && (
               <>
                 <BountyStatusInfo issueState={issueState} />
+                {issue.isKyc ? <Badge
+                  className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                  label={t("bounty:kyc.label")}
+                /> : null}
                 <div className="d-flex align-items-center">
                   <AvatarOrIdenticon
                     address={issue?.creatorAddress}
@@ -174,7 +179,7 @@ export default function IssueListItem({
             )}
 
             <RenderIssueData state={issueState} />
-            
+
             <DateLabel date={issue?.createdAt} className="text-white-40" />
 
             <BountyTags tags={issue?.tags} />

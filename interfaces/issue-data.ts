@@ -63,6 +63,7 @@ export interface IssueData {
     logoIcon: string;
   }
   tags: string[];
+  isKyc: boolean;
 }
 
 export interface Disputes {
@@ -80,8 +81,8 @@ export interface IssueBigNumberData extends Omit<IssueData , "amount" | "funding
 }
 
 export interface IssueNetwork extends IssueBigNumberData {
-  networkName?: string; 
-  totalValueLock?: BigNumber; 
+  networkName?: string;
+  totalValueLock?: BigNumber;
   issues?: IssueBigNumberData[]
 }
 export interface IssueSearch {

@@ -129,5 +129,11 @@
   "cancel-changes": "Cancel Changes",
   "preview": "preview",
   "edit": "edit",
-  "most-active-network-empty": "Not found active networks"
+  "most-active-network-empty": "Not found active networks",
+  "kyc": {
+    "is-required": "Required KYC validation",
+    "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
+    "identify-to-start": "Identify to start working",
+    "label": "KYC"
+  }
 }

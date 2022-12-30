@@ -9,6 +9,7 @@ import {Balance} from "./balance-state";
 import {BountyExtended} from "./bounty";
 import {BranchesList} from "./branches-list";
 import {IssueBigNumberData, IssueDataComment} from "./issue-data";
+import { kycSession } from "./kyc-session";
 import {LoadingState} from "./loading-state";
 import {Network} from "./network";
 import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
@@ -80,6 +81,7 @@ export interface CurrentUserState {
   accessToken?: string;
   connected?: boolean;
   signature?: string;
+  kyc?: kycSession;
 }
 
 export interface CurrentBounty {

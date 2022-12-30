@@ -4,6 +4,7 @@ import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
+import getConfig from "next/config";
 import router from "next/router";
 
 import BranchsDropdown from "components/branchs-dropdown";
@@ -40,6 +41,7 @@ import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 import {useRepos} from "../x-hooks/use-repos";
+import InfoTooltip from "./info-tooltip";
 
 interface BountyPayload {
   title: string;
@@ -60,6 +62,8 @@ const ZeroNumberFormatValues = {
   floatValue: 0,
 };
 
+const {publicRuntimeConfig} = getConfig()
+
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
@@ -72,6 +76,7 @@ export default function CreateBountyModal() {
   const [currentSection, setCurrentSection] = useState<number>(0);
   const [isBountyType, setisBountyType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
+  const [isKyc, setIsKyc] = useState<boolean>(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
@@ -132,6 +137,10 @@ export default function CreateBountyModal() {
       setRewardAmount(ZeroNumberFormatValues)
       setRewardToken(undefined);
     }
+  }
+
+  function handleIsKYCChecked(e) {
+    setIsKyc(e.target.checked);
   }
 
   function renderDetails(review = false) {
@@ -254,6 +263,22 @@ export default function CreateBountyModal() {
                 {rewardChecked && renderBountyToken(false, "reward")}
               </>
             )}
+          {isBountyType && publicRuntimeConfig.kyc.isEnabled ?
+            (<div className="col-md-12 d-flex flex-row gap-2">
+                <FormCheck
+                  className="form-control-md pb-0"
+                  type="checkbox"
+                  label={t("bounty:kyc.is-required")}
+                  onChange={handleIsKYCChecked}
+                  checked={isKyc}
+                />
+                <span>
+                <InfoTooltip
+                    description={t("bounty:kyc.tool-tip")}
+                    secondaryIcon
+                  />
+                </span>
+            </div>): null}
           </div>
         </div>
       );
@@ -472,7 +497,8 @@ export default function CreateBountyModal() {
         body: payload.body,
         creator: payload.githubUser,
         repositoryId: payload.repositoryId,
-        tags: selectedTags
+        tags: selectedTags,
+        isKyc,
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 

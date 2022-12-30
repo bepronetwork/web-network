@@ -45,6 +45,7 @@ interface CreateBounty {
   creator: string;
   repositoryId: string;
   tags: string[];
+  isKyc: boolean;
 }
 
 interface GetNetworkProps {
@@ -157,7 +158,7 @@ export default function useApi() {
     }).toString();
     return api
       .get<IssueBigNumberData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => 
+      .then(({ data }): IssueBigNumberData[] =>
         (data.map(bounty => ({
           ...bounty,
           amount: BigNumber(bounty.amount),
@@ -166,7 +167,7 @@ export default function useApi() {
         }))))
       .catch((): IssueBigNumberData[] => ([]));
   }
-  
+
 
   async function searchRepositories({
     page = "1",
@@ -302,7 +303,7 @@ export default function useApi() {
   async function getTotalNetworks(creatorAddress = "",
                                   isClosed = undefined,
                                   isRegistered = undefined): Promise<number> {
-    const search = new URLSearchParams({ 
+    const search = new URLSearchParams({
       creatorAddress,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
@@ -521,7 +522,7 @@ export default function useApi() {
         throw error;
       });
   }
-  
+
   async function getTokens() {
     return api
       .get<Token[]>(`/tokens`)
