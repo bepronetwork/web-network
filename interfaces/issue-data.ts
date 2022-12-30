@@ -57,6 +57,7 @@ export interface IssueData {
   isKyc: boolean;
   kycTierList: number[];
   tags: string[];
+  isKyc: boolean;
 }
 
 export interface Disputes {
