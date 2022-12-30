@@ -49,6 +49,10 @@ class Issue extends Model {
         tags: {
           type: DataTypes.ARRAY(DataTypes.STRING)
         },
+        isKyc:{
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        }
     },
                {
         sequelize,
