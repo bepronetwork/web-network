@@ -1,5 +1,6 @@
 import {useState} from "react";
 
+import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
@@ -35,7 +36,7 @@ export function useAuthentication() {
   const transactions = useTransactions();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith} = useApi();
+  const {getUserOf, getUserWith, searchCurators} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -188,15 +189,14 @@ export function useAuthentication() {
       state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
       state.Service.active.getBalance('settler', state.currentUser.walletAddress),
-      state.Service.active.getBalance('eth', state.currentUser.walletAddress),
-      state.Service.active.getBalance('staked', state.currentUser.walletAddress),
-
+      searchCurators({ address: state.currentUser.walletAddress, networkName: state.Service?.network?.active?.name })
+      .then(v => v?.rows[0]?.tokensLocked || 0).then(value => new BigNumber(value)),
       // not balance, but related to address, no need for a second useEffect()
       state.Service.active.isCouncil(state.currentUser.walletAddress),
       state.Service.active.isNetworkGovernor(state.currentUser.walletAddress)
     ])
-      .then(([oracles, bepro, eth, staked, isCouncil, isGovernor]) => {
-        update({oracles, bepro, eth, staked});
+      .then(([oracles, bepro, staked, isCouncil, isGovernor]) => {
+        update({oracles, bepro, staked});
         updateNetwork({isCouncil, isGovernor});
       })
       .finally(() => {
