@@ -2,6 +2,7 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
+import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -12,7 +13,8 @@ import {
   changeCurrentUserHandle,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
-  changeCurrentUserWallet
+  changeCurrentUserWallet,
+  changeCurrentUserKycSession
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
@@ -28,6 +30,8 @@ import { useTransactions } from "x-hooks/use-transactions";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
+const {publicRuntimeConfig} = getConfig()
+
 export function useAuthentication() {
 
   const session = useSession();
@@ -36,7 +40,7 @@ export function useAuthentication() {
   const transactions = useTransactions();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {getUserOf, getUserWith, searchCurators, getKycSession} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -227,6 +231,17 @@ export function useAuthentication() {
     dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
+  function updateKycSession(){
+    if(!state?.currentUser?.login 
+        || !state?.currentUser?.accessToken
+        || !state?.currentUser?.walletAddress 
+        || publicRuntimeConfig.kyc.isEnabled !== 'true') 
+      return
+
+    getKycSession()
+      .then((session)=> dispatch(changeCurrentUserKycSession(session)))
+  }
+  
   return {
     connectWallet,
     disconnectWallet,
@@ -237,6 +252,7 @@ export function useAuthentication() {
     validateGhAndWallet,
     listenToAccountsChanged,
     updateCurrentUserLogin,
-    verifyReAuthorizationNeed
+    verifyReAuthorizationNeed,
+    updateKycSession
   }
 }
