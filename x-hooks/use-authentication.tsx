@@ -2,6 +2,7 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
+import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -13,7 +14,8 @@ import {
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
-  changeCurrentUserWallet
+  changeCurrentUserWallet,
+  changeCurrentUserKycSession
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
@@ -37,6 +39,8 @@ import useSignature from "./use-signature";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
+const {publicRuntimeConfig} = getConfig()
+
 export function useAuthentication() {
 
   const session = useSession();
@@ -47,7 +51,7 @@ export function useAuthentication() {
   const { pushAnalytic } = useAnalyticEvents();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {getUserOf, getUserWith, searchCurators, getKycSession} = useApi();
   const {signMessage} = useSignature()
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
@@ -287,6 +291,17 @@ export function useAuthentication() {
     })
   }
 
+  function updateKycSession(){
+    if(!state?.currentUser?.login 
+        || !state?.currentUser?.accessToken
+        || !state?.currentUser?.walletAddress 
+        || publicRuntimeConfig.kyc.isEnabled !== 'true') 
+      return
+
+    getKycSession()
+      .then((session)=> dispatch(changeCurrentUserKycSession(session)))
+  }
+  
   return {
     connectWallet,
     disconnectWallet,
@@ -298,6 +313,7 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    signMessageIfCreatorIssue
+    signMessageIfCreatorIssue,
+    updateKycSession,
   }
 }

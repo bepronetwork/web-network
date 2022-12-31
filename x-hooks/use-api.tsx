@@ -714,6 +714,18 @@ export default function useApi() {
       });
   }
 
+  async function getKycSession(asNewSession = false){
+    const params = asNewSession ? {asNewSession}: {};
+
+    return api.get("/kyc/init",{
+      params
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
   return {
     createIssue,
     updateIssue,
@@ -762,6 +774,7 @@ export default function useApi() {
     getTokens,
     getNetworkTokens,
     createNFT,
-    saveNetworkRegistry
+    saveNetworkRegistry,
+    getKycSession
   };
 }
