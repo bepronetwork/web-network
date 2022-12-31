@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Web3Connection, ERC20, BountyToken, Network_v2, NetworkRegistry } = require("@taikai/dappkit");
 const { exit } = require("process");
+const localAccounts = require("./local-accounts");
 const stagingAccounts = require("./staging-accounts");
 const { updateSetting, updateTokens } = require("./settings/save-from-env");
 const Sequelize = require("sequelize");
@@ -221,14 +222,22 @@ async function main() {
     await bountyToken.loadContract();
 
     // Transfer BEPRO to dev accounts
-    if ((argv.network !== 'custom' || argv.network !== 'local') && !argv.production)
+    if ((argv.network !== 'custom' && argv.network !== 'development') && !argv.production)
       for (const address of stagingAccounts) {
-        console.log(`Transfering 10M BEPRO to ${address}`);
+        console.log(`Transfering 10M BEPRO to ${address} - Stage Account`);
         await bountyTransactional.transferTokenAmount(address, 10000000);
         await rewardToken.transferTokenAmount(address, 10000000);
         await networkToken.transferTokenAmount(address, 10000000);
       }
 
+    if(argv.network === 'development' && !argv.production) {
+      for (const address of localAccounts) {
+        console.log(`Transfering 10M BEPRO to ${address} - Local Account`);
+        await bountyTransactional.transferTokenAmount(address, 10000000);
+        await rewardToken.transferTokenAmount(address, 10000000);
+        await networkToken.transferTokenAmount(address, 10000000);
+      }
+    }
 
     console.log(`Deploying Network_V2 With Registry...`);
     const treasuryAddress = argv.treasuryAddress ? argv.treasuryAddress: ownerAddress;

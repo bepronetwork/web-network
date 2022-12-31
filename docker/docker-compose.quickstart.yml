@@ -1,0 +1,77 @@
+version: '3.8'
+services:
+  frontend:
+    container_name: frontend
+    # image: taikai/webnetwork:latest
+    image: clarkjoao/webnetwork:latest
+    env_file: ../.env
+    networks:
+      - webnetwork
+    links:
+      - "db"
+      - "ganache"
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      ganache: 
+        condition: service_healthy
+      db: 
+        condition: service_healthy
+ 
+  events:
+    container_name: events
+    # image: taikai/webnetwork-events:latest
+    image: clarkjoao/webnetwork-events:latest
+    env_file: ../.env.events
+    networks:
+      - webnetwork
+    links:
+      - "db"
+      - "ganache"
+    restart: always
+    ports:
+      - "3334:3334"
+    depends_on:
+      ganache: 
+        condition: service_healthy
+      db: 
+        condition: service_healthy
+
+  ganache:
+    container_name: ganache
+    image: trufflesuite/ganache-cli
+    command: --db ./db -e 10000 -h 0.0.0.0 -p 8545 -a 50 -s qj670CH86wWRTBZN7iBSLArUt7HlIgZrBvjHE16wSVs
+    healthcheck:
+      test: ["CMD", "echo", "life"]
+      start_period: 5s
+      interval: 5s
+      timeout: 8s
+      retries: 5
+    ports:
+      - "8545:8545"
+    networks:
+      - webnetwork
+
+  db:
+    container_name: db
+    image: postgres:13
+    restart: always
+    env_file: ../.env
+    environment:
+      - POSTGRES_USER=github
+      - POSTGRES_PASSWORD=github
+      - POSTGRES_DB=github
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      start_period: 5s
+      interval: 5s
+      timeout: 8s
+      retries: 5
+    ports:
+      - '54320:5432'
+    networks:
+      - webnetwork
+
+networks:
+  webnetwork:
