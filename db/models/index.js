@@ -19,6 +19,7 @@ import Disputes from './dispute-model';
 import LeaderBoard from './leaderboard.model';
 import ProposalDistributions from './proposal-distributions.model';
 import HeaderInformation from './header-information';
+import KycSession from './kyc-session.model'
 
 const Database = { sequelize: null };
 
@@ -45,6 +46,7 @@ Database.dispute = Disputes;
 Database.leaderBoard = LeaderBoard;
 Database.proposalDistributions = ProposalDistributions;
 Database.headerInformation = HeaderInformation;
+Database.kycSession = KycSession;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {
