@@ -58,7 +58,6 @@ export function KycSession() {
             sessionId={session?.session_id}
             service={'individual'}
             lang={'en'}
-            tier={session?.tier}
           /> : null}
         </div>
       </Modal>
