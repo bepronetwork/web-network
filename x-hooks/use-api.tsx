@@ -726,6 +726,18 @@ export default function useApi() {
     });
   }
 
+  async function validateKycSession(session_id: string){
+    return api.get("/kyc/validate", {
+      headers:{
+        session_id
+      }
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
   return {
     createIssue,
     updateIssue,
@@ -775,6 +787,7 @@ export default function useApi() {
     getNetworkTokens,
     createNFT,
     saveNetworkRegistry,
-    getKycSession
+    getKycSession,
+    validateKycSession
   };
 }

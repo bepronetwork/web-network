@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      state: {
+      status: {
         type: Sequelize.STRING,
       },
       steps:{

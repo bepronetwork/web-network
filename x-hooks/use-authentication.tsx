@@ -25,6 +25,7 @@ import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
 import {CustomSession} from "interfaces/custom-session";
+import { kycSession } from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -51,7 +52,7 @@ export function useAuthentication() {
   const { pushAnalytic } = useAnalyticEvents();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith, searchCurators, getKycSession} = useApi();
+  const {getUserOf, getUserWith, searchCurators, getKycSession, validateKycSession} = useApi();
   const {signMessage} = useSignature()
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
@@ -252,7 +253,7 @@ export function useAuthentication() {
   }
 
   async function signMessageIfCreatorIssue() {
-    return new Promise(async (resolve, reject) => { 
+    return new Promise(async (resolve, reject) => {
       console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
 
       if (
@@ -299,6 +300,7 @@ export function useAuthentication() {
       return
 
     getKycSession()
+      .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
       .then((session)=> dispatch(changeCurrentUserKycSession(session)))
   }
   

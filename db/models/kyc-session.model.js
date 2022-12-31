@@ -6,7 +6,7 @@ class KycSession extends Model {
     super.init({
         user_id: DataTypes.INTEGER,
         session_id: DataTypes.STRING,
-        state: {
+        status: {
           type: DataTypes.STRING,
         },
         steps:{
