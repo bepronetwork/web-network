@@ -21,6 +21,7 @@ import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "context
 import { changeReAuthorizeGithub } from "contexts/reducers/update-show-prop";
 
 import {CustomSession} from "interfaces/custom-session";
+import { kycSession } from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -40,7 +41,7 @@ export function useAuthentication() {
   const transactions = useTransactions();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith, searchCurators, getKycSession} = useApi();
+  const {getUserOf, getUserWith, searchCurators, getKycSession, validateKycSession} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -239,6 +240,7 @@ export function useAuthentication() {
       return
 
     getKycSession()
+      .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
       .then((session)=> dispatch(changeCurrentUserKycSession(session)))
   }
   

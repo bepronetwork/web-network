@@ -9,6 +9,7 @@ import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
+import KycModal from "components/modals/kyc-session";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
@@ -245,7 +246,14 @@ export default function PageActions({
         !isWorkingOnBounty &&
         isRepoForked &&
         isStateToWorking)
-      return (
+
+      if(state.currentBounty?.data?.isKyc 
+          && state?.currentUser?.kyc 
+          && state?.currentUser?.kyc?.status !== 'VERIFIED'
+        )
+        return <KycModal/>
+    
+    return (
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"
@@ -259,7 +267,7 @@ export default function PageActions({
             </span>
           </Button>
         </ReadOnlyButtonWrapper>
-      );
+    );
   }
 
   function renderCreatePullRequestButton() {

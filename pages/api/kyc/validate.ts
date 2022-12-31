@@ -7,14 +7,13 @@ import { kycApi } from "services/api";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
-
     const session = await getSession({ req }) as any;
-    const { asNewSession } = req.query
-    let kycSession = {}
-
+    
     if(!session.user.login)
       return res.status(500).json('User Session not found')
     
+    const { session_id } = req.headers
+
     const user = await models.user.findOne({
       where: { 
         githubLogin: session.user.login
@@ -22,19 +21,36 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       raw: true
     })
 
-    kycSession = await models.kycSession.findOne({
+    if(!user)
+      return res.status(500).json('User not found')
+
+    const kycSession = await models.kycSession.findOne({
        where:{
           user_id: user.id,
+          session_id
        }
     })
     
-    if(!kycSession || asNewSession){
-      const {data} = await kycApi.post('/session/init');
-      kycSession = await models.kycSession.create({
-        user_id: user.id,
-        session_id: data.session_id,
-        status: "PENDING",
+    if(!kycSession)
+      return res.status(500).json('KYC Session not found')
+
+    if(!kycSession?.validatedAt){
+      const {data} = await kycApi.get('/onboarding/overview',{
+        headers:{
+          'Session-Id': kycSession.session_id
+        }
       })
+      
+      kycSession.steps = data.steps;
+      
+      if(data.session.status !== kycSession.status){
+        kycSession.status = data.session.status
+
+        if(data.session.status === 'VERIFIED')
+          kycSession.validatedAt = new Date();
+      }
+
+      kycSession.save();
     }
 
     return res.status(200).json(kycSession);
