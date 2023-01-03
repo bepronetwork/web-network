@@ -3,23 +3,15 @@ import {getSession} from "next-auth/react";
 
 import models from "db/models";
 
+import findUserBySession from 'helpers/query/findUserBySession';
+
 import { kycApi } from "services/api";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const session = await getSession({ req }) as any;
-    
-    if(!session.user.login)
-      return res.status(500).json('User Session not found')
-    
     const { session_id } = req.headers
 
-    const user = await models.user.findOne({
-      where: { 
-        githubLogin: session.user.login
-      },
-      raw: true
-    })
+    const user = await findUserBySession(req, res)
 
     if(!user)
       return res.status(500).json('User not found')
@@ -59,8 +51,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function GetIssues(req: NextApiRequest,
-                                        res: NextApiResponse) {
+export default async function KycValidate(req: NextApiRequest,
+                                          res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
