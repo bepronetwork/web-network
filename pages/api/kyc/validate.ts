@@ -1,5 +1,4 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {getSession} from "next-auth/react";
 
 import models from "db/models";
 
@@ -11,7 +10,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { session_id } = req.headers
 
-    const user = await findUserBySession(req, res)
+    const user = await findUserBySession(req)
 
     if(!user)
       return res.status(500).json('User not found')
