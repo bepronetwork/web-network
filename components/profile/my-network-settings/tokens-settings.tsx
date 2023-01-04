@@ -104,13 +104,8 @@ export default function TokensSettings({
     if(toAdd.length) transactions.push(state.Service?.active.addAllowedTokens(toAdd, isTransactional))
     if(toRemove.length) transactions.push(state.Service?.active.removeAllowedTokens(toRemove, isTransactional))
 
-    Promise.all(transactions).then(([txAdd, txRemove])=>{
-      const blockAdd = (txAdd as { blockNumber: number })?.blockNumber 
-      
-      if(!blockAdd) return;
-      
-      const blockRemove = (txRemove as { blockNumber: number })?.blockNumber 
-      const fromBlock = isNaN(blockRemove) ? blockAdd : Math.min(blockAdd, blockRemove);
+    Promise.all(transactions).then((txs : { blockNumber: number }[]) => {
+      const fromBlock = txs.reduce((acc, tx) => Math.min(acc, tx.blockNumber), Number.MAX_SAFE_INTEGER)
       
       processEvent("registry", "changed", state.Service?.network?.active.name, {
                 fromBlock
