@@ -1,15 +1,15 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 import { getSession } from "next-auth/react";
 
 import models from "db/models";
 
 import {User} from "interfaces/api";
 
-async function findUserBySession(req: NextApiRequest, res: NextApiResponse): Promise<User | void> {
+async function findUserBySession(req: NextApiRequest): Promise<User | null> {
   const session = await getSession({ req }) as any;
 
   if(!session?.user?.login)
-    return res.status(400).json('User Session not found')
+    return null
 
   const user = await models.user.findOne({
       where: { 
@@ -19,7 +19,7 @@ async function findUserBySession(req: NextApiRequest, res: NextApiResponse): Pro
   })
 
   if(!user)
-    return res.status(400).json('User not found')
+    return null;
 
   return user;
 }

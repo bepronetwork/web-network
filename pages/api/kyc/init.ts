@@ -1,5 +1,4 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {getSession} from "next-auth/react";
 
 import models from "db/models";
 
@@ -13,7 +12,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     let kycSession = {}
 
-    const user = await findUserBySession(req, res);
+    const user = await findUserBySession(req);
 
     if(!user)
       return res.status(400).json('User not found')
