@@ -1,6 +1,6 @@
 import {useAppState} from "../contexts/app-state";
-import {messageFor} from "../helpers/message-for";
 import decodeMessage from "../helpers/decode-message";
+import {messageFor} from "../helpers/message-for";
 
 export default function useSignature() {
 

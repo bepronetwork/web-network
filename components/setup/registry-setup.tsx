@@ -20,7 +20,6 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
-import useSignature from "x-hooks/use-signature";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;

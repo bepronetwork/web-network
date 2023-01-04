@@ -4,10 +4,11 @@ import {ContextualSpan} from "components/contextual-span";
 import {NewNetworkStepper} from "components/custom-network/new-network-stepper";
 
 import {Network} from "interfaces/network";
-import If from "../If";
-import {CallToAction} from "./call-to-action";
+
 import {useAppState} from "../../contexts/app-state";
 import useApi from "../../x-hooks/use-api";
+import If from "../If";
+import {CallToAction} from "./call-to-action";
 
 interface NetworkSetupProps { 
   isVisible?: boolean;

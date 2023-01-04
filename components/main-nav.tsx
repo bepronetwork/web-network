@@ -24,8 +24,9 @@ import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-s
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
-import SelectNetworkDropdown from "./select-network-dropdown";
+
 import useNetworkChange from "../x-hooks/use-network-change";
+import SelectNetworkDropdown from "./select-network-dropdown";
 
 interface MyNetworkLink {
   href: string;

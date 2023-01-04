@@ -6,6 +6,7 @@ import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
+
 import {NetworkSetup} from "components/setup/network-setup";
 import {RegistrySetup} from "components/setup/registry-setup";
 import TabbedNavigation from "components/tabbed-navigation";
@@ -15,10 +16,11 @@ import {useAppState} from "contexts/app-state";
 import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
+
+import ConnectWalletButton from "../components/connect-wallet-button";
+import {CallToAction} from "../components/setup/call-to-action";
 import ChainsSetup from "../components/setup/chains-setup";
 import ConnectGithubSetup from "../components/setup/connect-github-setup";
-import {CallToAction} from "../components/setup/call-to-action";
-import ConnectWalletButton from "../components/connect-wallet-button";
 
 const { publicRuntimeConfig: { adminWallet } } = getConfig();
 

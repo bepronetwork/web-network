@@ -1,8 +1,9 @@
 import {useState} from "react";
-import Modal from "../modal";
-import {MiniChainInfo} from "../../interfaces/mini-chain";
 import {Col, Row} from "react-bootstrap";
+
+import {MiniChainInfo} from "../../interfaces/mini-chain";
 import {FormGroup} from "../form-group";
+import Modal from "../modal";
 
 interface AddCustomChainModalProps {
   show: boolean;

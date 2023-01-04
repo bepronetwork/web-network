@@ -7,11 +7,11 @@ import Modal from "components/modal";
 
 import {useAppState} from "contexts/app-state";
 
-import Button from "./button";
-import useApi from "../x-hooks/use-api";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
-import SelectNetworkDropdown from "./select-network-dropdown";
+import useApi from "../x-hooks/use-api";
 import UseNetworkChange from "../x-hooks/use-network-change";
+import Button from "./button";
+import SelectNetworkDropdown from "./select-network-dropdown";
 
 type typeError = { code?: number; message?: string }
 

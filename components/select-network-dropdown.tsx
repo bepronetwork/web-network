@@ -1,8 +1,10 @@
-import ReactSelect from "./react-select";
 import React, {useEffect, useState} from "react";
+
+import {useTranslation} from "next-i18next";
+
 import {useAppState} from "../contexts/app-state";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
-import {useTranslation} from "next-i18next";
+import ReactSelect from "./react-select";
 
 interface SelectNetworkDropdownProps {
   onSelect: (chain: SupportedChainData) => void;

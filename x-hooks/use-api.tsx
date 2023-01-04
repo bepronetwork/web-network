@@ -25,9 +25,10 @@ import { Token } from "interfaces/token";
 import {api, eventsApi} from "services/api";
 
 import {Entities, Events} from "types/dappkit";
-import {SupportedChainData} from "../interfaces/supported-chain-data";
+
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
+import {SupportedChainData} from "../interfaces/supported-chain-data";
 
 interface NewIssueParams {
   title: string;
