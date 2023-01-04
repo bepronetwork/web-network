@@ -29,7 +29,7 @@ export function FormGroup({
                             variant = "input",
                             symbol,
                             decimalScale,
-                            ...rest,
+                            ...rest
                           }: FormGroupProps) {
   const isNumberFormat = variant === "numberFormat";
 
