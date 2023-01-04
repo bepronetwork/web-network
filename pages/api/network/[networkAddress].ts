@@ -1,8 +1,9 @@
-import {withCors} from "../../../middleware";
 import {NextApiRequest, NextApiResponse} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
-import {Op} from "sequelize";
+
+import {withCors} from "../../../middleware";
 
 async function Put(req: NextApiRequest, res: NextApiResponse) {
   const {networkAddress} = req.query;
@@ -26,12 +27,12 @@ async function Put(req: NextApiRequest, res: NextApiResponse) {
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
 
-    case "put":
-      await Put(req, res);
-      break;
+  case "put":
+    await Put(req, res);
+    break;
 
-    default:
-      res.status(405).json("Method not allowed");
+  default:
+    res.status(405).json("Method not allowed");
   }
 
   res.end();

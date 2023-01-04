@@ -1,9 +1,10 @@
+import {useState} from "react";
 import {Col, Row} from "react-bootstrap";
+
+import {useAppState} from "../../contexts/app-state";
+import {useAuthentication} from "../../x-hooks/use-authentication";
 import GithubConnectionState from "../github-connection-state";
 import {RemoveGithubAccount} from "../profile/remove-github-modal";
-import {useState} from "react";
-import {useAuthentication} from "../../x-hooks/use-authentication";
-import {useAppState} from "../../contexts/app-state";
 
 export default function ConnectGithubSetup() {
 

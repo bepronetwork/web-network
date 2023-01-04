@@ -8,14 +8,13 @@ import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
 import ProfileLayout from "components/profile/profile-layout";
 import {RemoveGithubAccount} from "components/profile/remove-github-modal";
-import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-import {useAppState} from "../../../contexts/app-state";
 import GithubConnectionState from "../../../components/github-connection-state";
+import {useAppState} from "../../../contexts/app-state";
 
 export default function Profile() {
   const { t } = useTranslation("profile");

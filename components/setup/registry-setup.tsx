@@ -2,7 +2,9 @@ import {useEffect, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {isZeroAddress} from "ethereumjs-util";
 import {useTranslation} from "next-i18next";
+import {isAddress} from "web3-utils";
 
 import Button from "components/button";
 import {ContextualSpan} from "components/contextual-span";
@@ -18,8 +20,6 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
-import {isAddress} from "web3-utils";
-import {isZeroAddress} from "ethereumjs-util";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;

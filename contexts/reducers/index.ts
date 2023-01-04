@@ -5,11 +5,11 @@ import {changeLoad} from "./change-load";
 import {changeActiveRepoProps, changeNetwork, changeRepos, changeServiceProp} from "./change-service";
 import {changeSettings,} from "./change-settings";
 import {changeSpinners} from "./change-spinners";
+import {changeSupportedChains} from "./change-supported-chains";
 import {changeToaster} from "./change-toaster";
 import {changeTxList} from "./change-tx-list";
 import {Actions, addReducer} from "./main";
 import {changeShowProp} from "./update-show-prop";
-import {changeSupportedChains} from "./change-supported-chains";
 
 let loaded = false;
 

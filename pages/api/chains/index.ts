@@ -1,12 +1,14 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {MiniChainInfo} from "../../../interfaces/mini-chain";
+import getConfig from "next/config";
 import {Op} from "sequelize";
 
 import models from "db/models";
-import {error} from "../../../services/logging";
+
+import {MiniChainInfo} from "../../../interfaces/mini-chain";
 import {withCors} from "../../../middleware";
-import getConfig from "next/config";
 import {AdminRoute} from "../../../middleware/admin-route";
+import {error} from "../../../services/logging";
+
 
 async function Post(req: NextApiRequest, res: NextApiResponse) {
   const body = req.body as MiniChainInfo;
@@ -139,24 +141,24 @@ async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   console.log(req.method, `ChainMethods`);
 
   switch (req.method.toLowerCase()) {
-    case "post":
-      await Post(req, res);
-      break;
+  case "post":
+    await Post(req, res);
+    break;
 
-    case "patch":
-      await Patch(req, res)
-      break;
+  case "patch":
+    await Patch(req, res)
+    break;
 
-    case "delete":
-      await Remove(req, res);
-      break;
+  case "delete":
+    await Remove(req, res);
+    break;
 
-    case "get":
-      await Get(req, res);
-      break;
+  case "get":
+    await Get(req, res);
+    break;
 
-    default:
-      return res.status(405).json({message: "Method not allowed"});
+  default:
+    return res.status(405).json({message: "Method not allowed"});
   }
 
   res.end();

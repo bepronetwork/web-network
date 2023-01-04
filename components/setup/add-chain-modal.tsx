@@ -1,7 +1,8 @@
+import React, {useState} from "react";
+import {Col, FormControl, Row} from "react-bootstrap";
+
 import {MiniChainInfo} from "../../interfaces/mini-chain";
 import Modal from "../modal";
-import {Col, FormControl, Row} from "react-bootstrap";
-import React, {useState} from "react";
 import ReactSelect from "../react-select";
 
 export default function AddChainModal({chain, show, add}: {chain: MiniChainInfo, show: boolean, add: (chain: MiniChainInfo) => void}) {

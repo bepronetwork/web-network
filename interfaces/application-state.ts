@@ -12,10 +12,10 @@ import {IssueBigNumberData, IssueDataComment} from "./issue-data";
 import {LoadingState} from "./loading-state";
 import {Network} from "./network";
 import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
+import {SupportedChainData} from "./supported-chain-data";
 import {ToastNotification} from "./toast-notification";
 import {Token} from "./token";
 import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
-import {SupportedChainData} from "./supported-chain-data";
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];

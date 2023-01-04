@@ -1,16 +1,13 @@
 import getConfig from "next/config";
-import {IM_AN_ADMIN, MISSING_ADMIN_SIGNATURE, NOT_ADMIN_WALLET, NOT_AN_ADMIN} from "../helpers/contants";
-import {NextApiHandler} from "next";
-import getConfig from "next/config";
-
 import {
   IM_AN_ADMIN,
   MISSING_ADMIN_SIGNATURE,
   MISSING_CHAIN_ID,
   NOT_ADMIN_WALLET,
   NOT_AN_ADMIN
-} from "helpers/contants";
-import decodeMessage from "helpers/decode-message";
+} from "../helpers/contants";
+import {NextApiHandler} from "next";
+import decodeMessage from "../helpers/decode-message";
 
 export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`, `PATCH`, `PUT`, `DELETE`]) => {
   const { publicRuntimeConfig } = getConfig();

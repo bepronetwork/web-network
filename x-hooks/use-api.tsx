@@ -16,7 +16,7 @@ import {
 } from "interfaces/api";
 import {Curator, SearchCuratorParams} from "interfaces/curators";
 import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
-import {LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
+import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
 import {Network} from "interfaces/network";
 import {PaginatedData} from "interfaces/paginated-data";
 import {Proposal} from "interfaces/proposal";
@@ -26,9 +26,10 @@ import {Token} from "interfaces/token";
 import {api, eventsApi} from "services/api";
 
 import {Entities, Events} from "types/dappkit";
-import {SupportedChainData} from "../interfaces/supported-chain-data";
+
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
+import {SupportedChainData} from "../interfaces/supported-chain-data";
 
 interface NewIssueParams {
   title: string;

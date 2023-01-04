@@ -1,8 +1,10 @@
-import BigNumber from "bignumber.js";
-import useApi from "x-hooks/use-api";
 import {useState} from "react";
+
+import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
+import getConfig from "next/config";
 import {useRouter} from "next/router";
+
 import {useAppState} from "contexts/app-state";
 import {
   changeCurrentUser,
@@ -17,14 +19,18 @@ import {
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
+
 import {CustomSession} from "interfaces/custom-session";
+
 import {WinStorage} from "services/win-storage";
+
+import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
 import {useTransactions} from "x-hooks/use-transactions";
+
 import {changeChain} from "../contexts/reducers/change-chain";
 import {IM_AN_ADMIN} from "../helpers/contants";
-import getConfig from "next/config";
 import useSignature from "./use-signature";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
@@ -241,11 +247,10 @@ export function useAuthentication() {
   function signMessageIfAdmin() {
 
     const hasAdminSignature =
-      decodeMessage(
-        state?.connectedChain?.id,
-        IM_AN_ADMIN,
-        state?.currentUser?.signature,
-        publicRuntimeConfig?.adminWallet);
+      decodeMessage(state?.connectedChain?.id,
+                    IM_AN_ADMIN,
+                    state?.currentUser?.signature,
+                    publicRuntimeConfig?.adminWallet);
 
     if (!state?.currentUser?.walletAddress || hasAdminSignature)
       return;

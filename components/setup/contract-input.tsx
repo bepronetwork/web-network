@@ -1,6 +1,5 @@
 import {SetStateAction} from "react";
 import {Col} from "react-bootstrap";
-
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
@@ -8,7 +7,6 @@ import {ExternalLink} from "components/external-link";
 import {FormGroup} from "components/form-group";
 
 import {useAppState} from "contexts/app-state";
-import is from "@sindresorhus/is";
 
 export interface ContractField {
   value: string;

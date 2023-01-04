@@ -1,19 +1,21 @@
-import {useAppState} from "../../contexts/app-state";
 import React, {useEffect, useState} from "react";
-import axios from "axios";
 import {Col, FormControl, InputGroup, Row} from "react-bootstrap";
-import SearchIcon from "../../assets/icons/search-icon";
-import CloseIcon from "../../assets/icons/close-icon";
+
+import axios from "axios";
 import {useTranslation} from "next-i18next";
-import {ContextualSpan} from "../contextual-span";
-import PlusIcon from "../../assets/icons/plus-icon";
-import Button from "../button";
-import useApi from "../../x-hooks/use-api";
+
+import CloseIcon from "../../assets/icons/close-icon";
 import LoadingDots from "../../assets/icons/loading-dots";
+import PlusIcon from "../../assets/icons/plus-icon";
+import SearchIcon from "../../assets/icons/search-icon";
+import {useAppState} from "../../contexts/app-state";
 import {changeLoadState} from "../../contexts/reducers/change-load";
-import {MiniChainInfo} from "../../interfaces/mini-chain";
-import AddChainModal from "./add-chain-modal";
 import {toastError, toastSuccess} from "../../contexts/reducers/change-toaster";
+import {MiniChainInfo} from "../../interfaces/mini-chain";
+import useApi from "../../x-hooks/use-api";
+import Button from "../button";
+import {ContextualSpan} from "../contextual-span";
+import AddChainModal from "./add-chain-modal";
 import AddCustomChainModal from "./add-custom-chain-modal";
 
 export default function ChainsSetup() {

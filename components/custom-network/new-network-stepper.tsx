@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {Defaults} from "@taikai/dappkit";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
+
 import ConnectWalletButton from "components/connect-wallet-button";
 import CreatingNetworkLoader from "components/creating-network-loader";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
@@ -28,9 +29,10 @@ import {psReadAsText} from "helpers/file-reader";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network-theme";
+
 import {ContextualSpan} from "../contextual-span";
-import {CallToAction} from "../setup/call-to-action";
 import If from "../If";
+import {CallToAction} from "../setup/call-to-action";
 
 function NewNetwork() {
   const router = useRouter();

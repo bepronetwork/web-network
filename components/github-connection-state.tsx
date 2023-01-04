@@ -1,8 +1,10 @@
-import {ConnectionButton} from "./profile/connect-button";
-import Button from "./button";
-import {useAuthentication} from "../x-hooks/use-authentication";
-import {useAppState} from "../contexts/app-state";
 import {useTranslation} from "next-i18next";
+
+import {useAppState} from "../contexts/app-state";
+import {useAuthentication} from "../x-hooks/use-authentication";
+import Button from "./button";
+import {ConnectionButton} from "./profile/connect-button";
+
 
 interface GithubConnectionStateProps {
   handleClickDisconnect?: () => void;
