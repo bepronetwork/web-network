@@ -16,12 +16,12 @@ import {
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
-import { changeReAuthorizeGithub } from "contexts/reducers/update-show-prop";
+import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 import {CustomSession} from "interfaces/custom-session";
 import {WinStorage} from "services/win-storage";
 import {useDao} from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
-import { useTransactions } from "x-hooks/use-transactions";
+import {useTransactions} from "x-hooks/use-transactions";
 import {changeChain} from "../contexts/reducers/change-chain";
 import {IM_AN_ADMIN} from "../helpers/contants";
 import getConfig from "next/config";
@@ -274,7 +274,6 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    updateCurrentUserLogin,
     signMessageIfAdmin,
   }
 }
