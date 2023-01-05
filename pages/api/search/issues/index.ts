@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import {subHours, subMonths, subWeeks, subYears} from "date-fns";
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
@@ -11,9 +12,18 @@ import {searchPatternInText} from "helpers/string";
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
 const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
+const getLastIssuesByStatus = async (state, whereCondition, limit = 2) => (models.issue.findAll({
+  where: {
+    ...whereCondition,
+    state,
+  },
+  order: [ [ 'updatedAt', 'DESC' ]],
+  limit
+}))
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
+    let networks = []
     const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
     const {
       state,
@@ -29,7 +39,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       proposer,
       networkName,
       repoPath,
-      tokenAddress
+      tokenAddress,
+      lastEdited,
+      mostTokensValueLocked
     } = req.query || {};
 
     if (state) whereCondition.state = state;
@@ -52,8 +64,22 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       });
 
       if (!network) return res.status(404).json("Invalid network");
-
+      networks = [network]
       whereCondition.network_id = network?.id;
+    } else {
+      networks = await models.network.findAll({
+        where: {
+          isRegistered: true,
+          isClosed: false
+        },
+        include: [
+          { association: "curators" }
+        ]
+      })
+
+      if (networks.length === 0) return res.status(404).json("Networks not found");
+
+      whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
     }
 
     if (repoPath) {
@@ -149,6 +175,64 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                                     .split(',')
                                     .map((value)=> value === '+' ? Sequelize.literal('+') : 
                                       (COLS_TO_CAST.includes(value) ? castToDecimal(value) : value));
+
+    if(lastEdited) {
+      const issuesOpen = await getLastIssuesByStatus("open", whereCondition)
+      const issuesReady = await  getLastIssuesByStatus("ready", whereCondition)
+      const issuesProposal = await getLastIssuesByStatus("proposal", whereCondition)
+                                    
+      const result = [];
+                                    
+      result.push(...issuesOpen,...issuesReady,...issuesProposal);
+                                    
+      const paginatedData = paginateArray(result, 10, page || 1);
+                
+      return res.status(200).json({
+        count: result.length,
+        rows: paginatedData.data,
+        pages: paginatedData.pages,
+        currentPage: +paginatedData.page
+      });
+    }
+
+    if(mostTokensValueLocked) {
+      const result = await Promise.all(networks.map(async (network) => {
+        const condition = { ...whereCondition, network_id: network.id }
+
+        const issuesOpen = await getLastIssuesByStatus("open",
+                                                       condition,
+                                                       1);
+        const issuesReady = await getLastIssuesByStatus("ready",
+                                                        condition,
+                                                        1);
+        const issuesProposal = await getLastIssuesByStatus("proposal",
+                                                           condition,
+                                                           1);
+        return {
+          totalValueLock: network.curators.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
+                                                  0),
+          networkName: network.name,
+          issues: [...issuesOpen, ...issuesReady, ...issuesProposal],
+        };
+      }))
+
+      const compare = (networkOne, networkTwo) => (networkOne?.totalValueLock.gt(networkTwo?.totalValueLock) ? -1 : 0 )
+
+      const paginatedData = paginateArray(result
+        .sort(compare)
+        .slice(0, 3)
+        .map((network) => ({
+          ...network,
+          totalValueLock: network.totalValueLock.toFixed(),
+        })), 10, page || 1);
+                
+      return res.status(200).json({
+        count: result.length,
+        rows: paginatedData.data,
+        pages: paginatedData.pages,
+        currentPage: +paginatedData.page
+      });
+    }
 
     if (search) {
       const issues = await models.issue.findAll({
