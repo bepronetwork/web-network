@@ -38,6 +38,7 @@ export interface IssueData {
   merged: string;
   numberOfComments: number;
   owner?: string;
+  network_id?: number;
   pullRequests: pullRequest[];
   repo?: string;
   repository?: Repository;
@@ -68,6 +69,18 @@ export interface IssueBigNumberData extends Omit<IssueData , "amount" | "funding
   fundingAmount: BigNumber;
   fundedAmount: BigNumber;
   fundedPercent: BigNumber;
+}
+
+export interface IssueNetwork extends IssueBigNumberData {
+  networkName?: string; 
+  totalValueLock?: BigNumber; 
+  issues?: IssueBigNumberData[]
+}
+export interface IssueSearch {
+  rows: IssueNetwork[] | [],
+  count: number,
+  pages: number,
+  currentPage: number
 }
 
 export interface Repository {
