@@ -26,9 +26,6 @@ export function NetworkSetup({
 
   const { updateNetworkChainId } = useApi();
 
-
-
-  
   if (!isVisible)
     return <></>;
 
