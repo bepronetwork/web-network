@@ -135,8 +135,7 @@ export function RegistrySetup({
 
         Service?.active?.loadRegistry(false, contractAddress);
 
-        // todo: save registry address into chains table
-        return saveNetworkRegistry(currentUser?.walletAddress, contractAddress);
+        return setChainRegistry(contractAddress);
       })
       .then(() => {
         loadSettings(true);
@@ -229,23 +228,23 @@ export function RegistrySetup({
     allowToken(false);
   }
 
-  function setChainRegistry() {
+  function setChainRegistry(address = registryAddress) {
     const chain = supportedChains.find(({chainId}) => chainId === +connectedChain?.id);
-    if (!chain || !registryAddress)
+    if (!chain || !address)
       return;
 
-    if (!isAddress(registryAddress)) {
+    if (!isAddress(address)) {
       dispatch(toastInfo('Registry address value must be an address; Can be 0x0'));
       return;
     }
 
-    return updateChainRegistry({...chain, registryAddress: registryAddress})
+    return updateChainRegistry({...chain, registryAddress: address})
       .then(result => {
         if (!result) {
-          dispatch(toastError(`Failed to update chain ${chain.chainId} with ${registryAddress}`));
+          dispatch(toastError(`Failed to update chain ${chain.chainId} with ${address}`));
           return;
         }
-        dispatch(toastSuccess(`Updated chain ${chain.chainId} with ${registryAddress} `))
+        dispatch(toastSuccess(`Updated chain ${chain.chainId} with ${address} `))
         return getSupportedChains(true);
       })
   }

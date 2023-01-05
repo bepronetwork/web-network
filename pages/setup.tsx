@@ -31,13 +31,13 @@ export default function SetupPage(){
   const [activeTab, setActiveTab] = useState("registry");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
-  const { searchNetworks } = useApi();
-  const { state: { currentUser, Settings, supportedChains } } = useAppState();
+  const { searchNetworks, getSupportedChains } = useApi();
+  const { state: { currentUser, supportedChains, connectedChain } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
   const isAdmin = adminWallet?.toLowerCase() === currentUser?.walletAddress?.toLowerCase();
 
-  const networkRegistryAddress = Settings?.contracts?.networkRegistry;
+  const [networkRegistryAddress, setNetworkRegistryAddress] = useState<string>('');
 
   useEffect(() => {
     if (isConnected && adminWallet && !isAdmin)
@@ -56,7 +56,17 @@ export default function SetupPage(){
       });
   }
 
+  function updateNetworkRegistryAddressForConnectedChainId() {
+    if (!currentUser?.connected || connectedChain?.id || !supportedChains.length)
+      return;
+
+    getSupportedChains()
+      .then(chains => chains.find(c => c.chainId === connectedChain.id))
+      .then(chain => setNetworkRegistryAddress(chain?.registryAddress || ''))
+  }
+
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
+  useEffect(updateNetworkRegistryAddressForConnectedChainId, [currentUser.connected, connectedChain.id, supportedChains])
 
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;
@@ -91,10 +101,12 @@ export default function SetupPage(){
       title: t("setup:network.title"),
       component: (
         !supportedChains.length
-          ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> // eslint-ignore-line
-          : <NetworkSetup isVisible={activeTab === "network"}
-                          refetchNetwork={searchForNetwork}
-                          defaultNetwork={defaultNetwork}/>
+          ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> : // eslint-ignore-line
+          !networkRegistryAddress
+            ? <CallToAction disabled={false} executing={false} action="go to" color="info" call="Registry not setup" onClick={() => setActiveTab('registry')} />
+            : <NetworkSetup isVisible={activeTab === "network"}
+                            refetchNetwork={searchForNetwork}
+                            defaultNetwork={defaultNetwork}/>
       )
     }
   ];
