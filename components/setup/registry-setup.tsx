@@ -15,7 +15,7 @@ import {DeployBountyTokenModal} from "components/setup/deploy-bounty-token-modal
 import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 
 import {useAppState} from "contexts/app-state";
-import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
+import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -234,6 +234,11 @@ export function RegistrySetup({
     if (!chain || !registryAddress)
       return;
 
+    if (!isAddress(registryAddress)) {
+      dispatch(toastInfo('Registry address value must be an address; Can be 0x0'));
+      return;
+    }
+
     return updateChainRegistry({...chain, registryAddress: registryAddress})
       .then(result => {
         if (!result) {
@@ -290,6 +295,8 @@ export function RegistrySetup({
     setRegistrySaveCTA(chain?.registryAddress ? false : !!registryAddress)
 
   }, [connectedChain, supportedChains, registryAddress])
+
+  // AURELIUS Registry 0xd7630A747b24b7245ff60e3095aD04684dC1a292
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">

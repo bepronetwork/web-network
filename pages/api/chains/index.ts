@@ -90,11 +90,10 @@ async function Patch(req: NextApiRequest, res: NextApiResponse) {
     chain.isDefault = req.body.isDefault;
   }
 
-  if (chain.registryAddress)
+  if (req.body.registryAddress)
     chain.registryAddress = req.body.registryAddress;
 
   await chain.save();
-
 
   return res.status(200).json(chain);
 }

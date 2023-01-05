@@ -29,6 +29,7 @@ import {Entities, Events} from "types/dappkit";
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
+import {isZeroAddress} from "ethereumjs-util";
 
 interface NewIssueParams {
   title: string;
@@ -719,12 +720,17 @@ export default function useApi() {
         symbol: chain.chainCurrencySymbol
       },
       rpc: [],
-      networkRegistry: chain?.registryAddress
+      registryAddress: chain?.registryAddress
     }
 
     return api.patch<{registryAddress?: string}>(`chains`, model)
-      .then(response => response.status === 200 && !!response.data?.registryAddress)
-      .catch(() => {
+      .then(response =>
+        response.status === 200 &&
+        !!response.data?.registryAddress &&
+        !isZeroAddress(response.data?.registryAddress)
+      )
+      .catch((e) => {
+        console.log(`error patching registry`, e)
         return false;
       })
   }
