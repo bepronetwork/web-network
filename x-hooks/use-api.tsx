@@ -15,7 +15,7 @@ import {
   CreateReviewParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
-import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
+import { IssueData, IssueSearch, pullRequest } from "interfaces/issue-data";
 import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -81,7 +81,9 @@ export default function useApi() {
     pullRequesterAddress = "",
     proposer = "",
     tokenAddress = "",
-    networkName = DEFAULT_NETWORK_NAME
+    networkName = "",
+    lastEdited = "",
+    mostTokensValueLocked = "",
   }) {
     const params = new URLSearchParams({
       address,
@@ -97,25 +99,37 @@ export default function useApi() {
       pullRequesterAddress,
       proposer,
       tokenAddress,
-      networkName: networkName.replaceAll(" ", "-")
+      networkName: networkName.replaceAll(" ", "-"),
+      lastEdited,
+      mostTokensValueLocked
     }).toString();
     return api
-      .get<{
-        rows: IssueBigNumberData[];
-        count: number;
-        pages: number;
-        currentPage: number;
-      }>(`/search/issues/?${params}`)
-      .then(({ data }) => ({
+      .get<IssueSearch>(`/search/issues/?${params}`)
+      .then(({ data }): IssueSearch => ({
         ...data,
-        rows: data.rows.map(row => ({
-          ...row,
-          amount: BigNumber(row.amount),
-          fundingAmount: BigNumber(row.fundingAmount),
-          fundedAmount: BigNumber(row.fundedAmount)
-        }))
+        rows: data.rows.map(row => {
+          if(row?.issues?.length > 0) {
+            return ({
+              ...row,
+              totalValueLock: BigNumber(row.totalValueLock),
+              issues: row.issues.map(issue => ({
+                ...issue,
+                amount: BigNumber(issue.amount),
+                fundingAmount: BigNumber(issue.fundingAmount),
+                fundedAmount: BigNumber(issue.fundedAmount)
+              }))
+            })
+          } else {
+            return ({
+              ...row,
+              amount: BigNumber(row.amount),
+              fundingAmount: BigNumber(row.fundingAmount),
+              fundedAmount: BigNumber(row.fundedAmount)
+            })
+          }
+        })
       }))
-      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
+      .catch((): IssueSearch => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
   async function searchRepositories({
