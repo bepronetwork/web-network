@@ -295,7 +295,7 @@ export function RegistrySetup({
 
   }, [connectedChain, supportedChains, registryAddress])
 
-  // AURELIUS Registry 0xd7630A747b24b7245ff60e3095aD04684dC1a292
+  // AURELIUS Registry 0x27F56eb75a1EBbE7e7218e8fCa5FF51E3d655f22
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">

@@ -10,3 +10,6 @@ export const NOT_AN_ADMIN = `Not an admin`;
 export const MISSING_ADMIN_SIGNATURE = `Missing admin signature`;
 export const NOT_ADMIN_WALLET = `Wrong wallet`;
 export const MISSING_CHAIN_ID = `Missing chain id`;
+export const CHAIN_ID_NOT_SUPPORTED = `Given chain id is not supported`;
+export const NO_NETWORKS_FOR_GIVEN_CHAIN_ID = `No networks for given chain id`;
+export const CHAIN_NOT_CONFIGURED = `Chain not configured`;

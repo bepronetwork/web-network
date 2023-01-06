@@ -4,9 +4,15 @@ import {Op} from "sequelize";
 import models from "db/models";
 
 import {withCors} from "../../../middleware";
+import {isAdmin} from "../../../helpers/is-admin";
+import {resJsonMessage} from "../../../helpers/res-json-message";
+import {NOT_AN_ADMIN} from "../../../helpers/contants";
 
 async function Put(req: NextApiRequest, res: NextApiResponse) {
   const {networkAddress} = req.query;
+
+  if (!isAdmin(req))
+    return resJsonMessage(NOT_AN_ADMIN, res);
 
   if (!req.body.chainId)
     return res.status(400).json({message: `missing body.chainId`});
@@ -15,8 +21,6 @@ async function Put(req: NextApiRequest, res: NextApiResponse) {
 
   if (!dbNetwork)
     return res.status(400).json({message: `no network for ${networkAddress}`});
-  if (dbNetwork?.chain_id)
-    return res.status(400).json({message: `already configured`});
 
   dbNetwork.chain_id = req.body.chainId;
   await dbNetwork.save();

@@ -15,15 +15,15 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
-import { TxList, addTx, updateTx } from "contexts/reducers/change-tx-list";
+import {addTx, TxList, updateTx} from "contexts/reducers/change-tx-list";
 
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
-import { parseTransaction } from "helpers/transactions";
+import {parseTransaction} from "helpers/transactions";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {StepWrapperProps} from "interfaces/stepper";
-import { SimpleBlockTransactionPayload } from "interfaces/transaction";
+import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import useERC20 from "x-hooks/use-erc20";
@@ -181,12 +181,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   function updateAllowance() {
     if (!state.Service?.active ||
         !state.currentUser?.walletAddress ||
-        !registryToken.address ||
-        !state.Settings?.contracts?.networkRegistry) return;
+        !registryToken.address) return;
     
     const { address } = registryToken;
     const { walletAddress} = state.currentUser;
-    const { networkRegistry } = state.Settings.contracts;
+    const networkRegistry = state?.Service.active?.registryAddress;
 
     state.Service.active.getAllowance(address, walletAddress, networkRegistry)
       .then(setSettlerAllowance).catch(() => BigNumber(0));
@@ -201,13 +200,13 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   useEffect(() => {
     const tokenAddress = state.Service?.active?.registry?.token?.contractAddress;
-    const registryAddress = state.Settings?.contracts?.networkRegistry;
+    const registryAddress = state.Service?.active?.registryAddress;
 
     if (tokenAddress && registryAddress) {
       registryToken.setAddress(tokenAddress);
       registryToken.setSpender(registryAddress);
     }
-  }, [state.Service?.active?.registry?.token?.contractAddress, state.Settings?.contracts?.networkRegistry]);
+  }, [state.Service?.active?.registry?.token?.contractAddress, state.Service?.active?.registryAddress]);
 
   return (
     <Step

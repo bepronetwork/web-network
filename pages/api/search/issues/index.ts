@@ -7,6 +7,7 @@ import models from "db/models";
 
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -42,18 +43,21 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (address) whereCondition.creatorAddress = address;
 
+    const chain = await chainFromHeader(req);
+
     if (networkName) {
       const network = await models.network.findOne({
       where: {
         name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+          [Op.iLike]: String(networkName).replaceAll(" ", "-"),
+        },
+        chain_id: {[Op.eq]: chain?.chainId,}
       }
       });
 
       if (!network) return res.status(404).json("Invalid network");
 
-      whereCondition.network_id = network?.id;
+      whereCondition.network_id = {[Op.eq]: network?.id};
     }
 
     if (repoPath) {

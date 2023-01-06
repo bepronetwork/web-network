@@ -8,6 +8,7 @@ import {MiniChainInfo} from "../../../interfaces/mini-chain";
 import {withCors} from "../../../middleware";
 import {AdminRoute} from "../../../middleware/admin-route";
 import {error} from "../../../services/logging";
+import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
 
 
 async function Post(req: NextApiRequest, res: NextApiResponse) {
@@ -163,4 +164,4 @@ async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(AdminRoute(ChainMethods));
+export default withCors(WithValidChainId(AdminRoute(ChainMethods)));

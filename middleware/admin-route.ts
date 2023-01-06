@@ -1,12 +1,6 @@
-import getConfig from "next/config";
-import {
-  IM_AN_ADMIN,
-  MISSING_ADMIN_SIGNATURE,
-  MISSING_CHAIN_ID,
-  NOT_ADMIN_WALLET,
-  NOT_AN_ADMIN
-} from "../helpers/contants";
 import {NextApiHandler} from "next";
+import getConfig from "next/config";
+import {IM_AN_ADMIN, MISSING_ADMIN_SIGNATURE, NOT_ADMIN_WALLET, NOT_AN_ADMIN} from "../helpers/contants";
 import decodeMessage from "../helpers/decode-message";
 
 export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`, `PATCH`, `PUT`, `DELETE`]) => {
@@ -20,9 +14,6 @@ export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`,
     const adminWallet = publicRuntimeConfig?.adminWallet?.toLowerCase();
     const wallet = (headers.wallet as string)?.toLowerCase();
     const chainId = (headers.chain as string);
-
-    if (!chainId)
-      return res.status(401).json({message: MISSING_CHAIN_ID})
 
     if (!wallet || wallet !== adminWallet)
       return res.status(401).json({message: NOT_ADMIN_WALLET});

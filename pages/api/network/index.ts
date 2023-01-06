@@ -11,11 +11,16 @@ import {Settings} from "helpers/settings";
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 import {error as LogError} from 'services/logging';
+import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
+import {chainFromHeader} from "../../../helpers/chain-from-header";
+import {isAdmin} from "../../../helpers/is-admin";
 
 const {serverRuntimeConfig} = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName, creator: creatorAddress, isDefault } = req.query;
+  const { name: networkName, creator: creatorAddress, isDefault, address } = req.query;
+
+  const chain = await chainFromHeader(req);
 
   const where = {
     ... networkName && {
@@ -30,7 +35,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     } || {},
     ... isDefault && {
       isDefault: isDefault === "true"
-    } || {}
+    } || {},
+    ... address && {
+      [Op.iLike]: String(address),
+    } || {},
+    chain_id: {[Op.iLike]: chain?.chainId}
   };
 
   const network = await Database.network.findOne({
@@ -70,14 +79,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
+    const chain = await chainFromHeader(req);
+
     const hasNetwork = await Database.network.findOne({
       where: {
         creatorAddress: creator,
+        chain_id: chain?.chainId,
         isClosed: false,
       }
     });
 
-    if(hasNetwork){
+    if (hasNetwork) {
       return res.status(409).json("Already exists a network created for this wallet");
     }
 
@@ -88,25 +100,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const publicSettings = (new Settings(settings)).raw();
 
-    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
-    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
-    if (isDefault && creator !== publicSettings?.defaultNetworkConfig?.adminWallet)
-      return res.status(401).json("Unauthorized");
-
     const defaultNetwork = await Database.network.findOne({
         where: {
-          isDefault: true
+          isDefault: true,
+          chain_id: chain?.chainId,
         }
     });
     
     if (isDefault && defaultNetwork)
       return res.status(409).json("Default Network already saved");
 
+
     // Contract Validations
     const DAOService = new DAO({ 
       skipWindowAssignment: true,
-      web3Host: publicSettings.urls.web3Provider,
-      registryAddress: publicSettings.contracts.networkRegistry
+      web3Host: chain.chainRpc,
+      registryAddress: chain.registryAddress,
     });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
@@ -141,7 +150,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       logoIcon: logoIconHash,
       fullLogo: fullLogoHash,
       networkAddress,
-      isDefault: isDefault || false
+      isDefault: isDefault || false,
+      chain_id: chain?.chainId,
     });
 
     const repos = JSON.parse(repositories);
@@ -238,13 +248,13 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       allAllowedTokens
     } = req.body;
 
-    const isAdminOverriding = !!override;
+    const isAdminOverriding = isAdmin(req) && !!override;
 
     if (!accessToken && !isAdminOverriding) return res.status(401).json("Unauthorized user");
-    
+
     const network = await Database.network.findOne({
       where: {
-        ...(isAdminOverriding ? {} : { 
+        ...(isAdminOverriding ? {} : {
           creatorAddress: 
             Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("creatorAddress")), "=", creator.toLowerCase()) 
         }),
@@ -275,11 +285,13 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
     if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
 
+    const chain = await chainFromHeader(req);
+
     // Contract Validations
     const DAOService = new DAO({ 
       skipWindowAssignment: true,
-      web3Host: publicSettings.urls.web3Provider,
-      registryAddress: publicSettings.contracts.networkRegistry
+      web3Host: chain.chainRpc,
+      registryAddress: chain.registryAddress,
     });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
@@ -486,4 +498,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(handler)
+export default withCors(WithValidChainId(handler));

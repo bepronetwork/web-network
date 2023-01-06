@@ -57,16 +57,16 @@ export default function SetupPage(){
   }
 
   function updateNetworkRegistryAddressForConnectedChainId() {
-    if (!currentUser?.connected || connectedChain?.id || !supportedChains.length)
+    if (!currentUser?.connected || !connectedChain?.id || !supportedChains.length)
       return;
 
     getSupportedChains()
-      .then(chains => chains.find(c => c.chainId === connectedChain.id))
+      .then(chains => chains.find(c => c.chainId === +connectedChain.id))
       .then(chain => setNetworkRegistryAddress(chain?.registryAddress || ''))
   }
 
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
-  useEffect(updateNetworkRegistryAddressForConnectedChainId, [currentUser.connected, connectedChain.id, supportedChains])
+  useEffect(updateNetworkRegistryAddressForConnectedChainId, [currentUser?.connected, connectedChain?.id, supportedChains])
 
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;

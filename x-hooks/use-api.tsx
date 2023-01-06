@@ -52,6 +52,7 @@ interface GetNetworkProps {
   name?: string;
   creator?: string;
   isDefault?: boolean;
+  address?: string;
 }
 
 type FileUploadReturn = {
@@ -443,12 +444,13 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork({ name, creator, isDefault } : GetNetworkProps) {
+  async function getNetwork({ name, creator, isDefault, address } : GetNetworkProps) {
     const Params = {} as Omit<GetNetworkProps, "isDefault"> & { isDefault: string };
     
     if (name) Params.name = name;
     if (creator) Params.creator = creator;
     if (isDefault) Params.isDefault = isDefault.toString();
+    if (address) Params.address = address;
 
     const search = new URLSearchParams(Params).toString();
 
@@ -456,6 +458,7 @@ export default function useApi() {
       .get<Network>(`/network?${search}`)
       .then((response) => response)
       .catch((error) => {
+        console.log(`failed to get`, error)
         throw error;
       });
   }
