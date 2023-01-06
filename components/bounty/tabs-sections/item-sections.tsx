@@ -76,11 +76,12 @@ function ItemSections({ data, isProposal }: ItemProps) {
 
             const approvalsCurrentPr = item?.approvals?.total || 0;
             const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
+            const itemId = isProposal ? item?.id : item?.githubId;
 
             return (
               <ItemRow 
                 key={`${uuidv4()} ${item?.id}`}
-                id={item?.id} 
+                id={itemId} 
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin}
                 creator={item?.creator} 
