@@ -4,6 +4,7 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
@@ -31,7 +32,8 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
       where: {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+        },
+        chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
       }
     });
 

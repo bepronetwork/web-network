@@ -1,6 +1,4 @@
 import {useEffect, useState} from "react";
-
-import {Defaults} from "@taikai/dappkit";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -33,6 +31,7 @@ import useNetworkTheme from "x-hooks/use-network-theme";
 import {ContextualSpan} from "../contextual-span";
 import If from "../If";
 import {CallToAction} from "../setup/call-to-action";
+import {isZeroAddress} from "ethereumjs-util";
 
 function NewNetwork() {
   const router = useRouter();
@@ -62,7 +61,8 @@ function NewNetwork() {
     { id: 1, name: t("custom-network:modals.loader.steps.changing-dispute-percentage") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-council-amount") },
     { id: 2, name: t("custom-network:modals.loader.steps.add-to-registry") },
-    { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") }
+    { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") },
+    { id: 3, name: t("custom-network:modals.loader.steps.sync-chain-id") }
   ];
 
   async function handleCreateNetwork() {
@@ -190,8 +190,11 @@ function NewNetwork() {
     
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(networkAddress => {
-        setHasNetwork(networkAddress !== Defaults.nativeZeroAddress);
+        setHasNetwork(!isZeroAddress(networkAddress));
         setNetworkAddress(networkAddress);
+        if (!isZeroAddress(networkAddress))
+          getNetwork({address: networkAddress})
+            .then(({data}) => setHasChainId(!!data.chain_id))
       })
       .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)));

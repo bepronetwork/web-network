@@ -27,6 +27,9 @@ async function getAllRepos(req, res) {
 }
 
 async function addNewRepo(req, res) {
+  if (!isAdmin(req))
+    return res.status(401).json({message: NOT_AN_ADMIN});
+
   const issues = (await models.issue.findAndCountAll())?.count;
   if (issues)
     return res
@@ -65,6 +68,10 @@ async function addNewRepo(req, res) {
 }
 
 async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
+
+  if (!isAdmin(req))
+    return res.status(401).json({message: NOT_AN_ADMIN});
+
   const issues = (await models.issue.findAndCountAll())?.count;
   if (issues)
     return res
