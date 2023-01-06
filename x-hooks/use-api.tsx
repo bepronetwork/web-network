@@ -341,9 +341,13 @@ export default function useApi() {
       });
   }
 
-  async function createReviewForPR({ networkName = DEFAULT_NETWORK_NAME, ...rest } : CreateReviewParams) {
+  async function createReviewForPR({
+    networkName = DEFAULT_NETWORK_NAME,
+    event = "COMMENT",
+    ...rest
+  } : CreateReviewParams) {
     return api
-      .put("/pull-request/review", { networkName, ...rest })
+      .put("/pull-request/review", { networkName, event, ...rest })
       .then((response) => response)
       .catch(error => {
         throw error;
@@ -439,6 +443,18 @@ export default function useApi() {
   async function getTokens() {
     return api
       .get<Token[]>(`/tokens`)
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+  
+  async function getNetworkTokens({
+    networkName = DEFAULT_NETWORK_NAME
+  }) {
+    const params = new URLSearchParams({networkName}).toString();
+    return api
+      .get<Token[]>(`/search/tokens?${params}`)
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -617,6 +633,7 @@ export default function useApi() {
     resetUser,
     getSettings,
     getTokens,
+    getNetworkTokens,
     createNFT,
     saveNetworkRegistry
   };

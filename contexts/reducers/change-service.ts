@@ -1,3 +1,5 @@
+import { RepositoryPermissions } from "types/octokit";
+
 import {
   NetworkAmounts,
   NetworkTimes,
@@ -50,10 +52,30 @@ export class ChangeServiceNetworkReposProp
   }
 }
 
+export class ChangeServiceNetworkActiveRepoProp
+  extends ChangeServiceNetworkProp<ServiceNetworkReposActive | Partial<ServiceNetworkReposActive>, 
+    keyof ServiceNetworkReposActive> {
+  constructor() {
+    super(AppStateReduceId.NetworkActiveRepoProps);
+  }
+
+  reducer(state: State, payload): State {
+    return super.reducer(state, Object.assign(state.Service.network || {}, {
+      repos: {
+        ...state.Service?.network?.repos || {},
+        active: {
+          ...state.Service?.network?.repos?.active || {},
+          ...payload
+        }
+      }
+    })); // eslint-disable-line
+  }
+}
 
 export const changeServiceProp = new ChangeServiceProp();
 export const changeNetwork = new ChangeServiceNetworkProp();
 export const changeRepos = new ChangeServiceNetworkReposProp();
+export const changeActiveRepoProps = new ChangeServiceNetworkActiveRepoProp();
 
 export const changeStarting = (starting: boolean) => changeServiceProp.update({starting}, 'starting');
 
@@ -80,3 +102,6 @@ export const changeNetworkReposForks = (forks: ForksList) => changeRepos.update(
 export const changeNetworkReposBranches = (branches: BranchesList) => changeRepos.update({branches});
 
 export const changeNetworkReposActive = (active: ServiceNetworkReposActive) => changeRepos.update({active});
+
+export const changeNetworkReposActiveViewerPerm = 
+  (viewerPermission: RepositoryPermissions) => changeActiveRepoProps.update({viewerPermission});

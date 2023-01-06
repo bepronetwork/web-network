@@ -39,7 +39,7 @@ export default function BountyHero() {
           <div className="col-10 row">
             <div className="d-flex flex-row">
               <h4 className="me-2 text-white-70">#{state.currentBounty?.data?.githubId}</h4>
-              <h4>{state.currentBounty?.data?.title}</h4>
+              <h4 className="text-break">{state.currentBounty?.data?.title}</h4>
             </div>
             {!isMobile && (
               <>

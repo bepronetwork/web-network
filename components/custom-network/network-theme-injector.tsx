@@ -17,12 +17,12 @@ export default function NetworkThemeInjector() {
 
   useEffect(() => {
     if (state.Service?.network?.active?.name &&
-        state.Service?.network?.active?.name !== state.Settings?.defaultNetworkConfig?.name &&
+        state.Service?.network?.active?.name.toLowerCase() !== 'bepro' &&
         !ignorePaths.includes(pathname))
       setCurrentColors(colorsToCSS());
     else
       setCurrentColors("");
-  }, [state.Service?.network?.active?.name, state.Settings?.defaultNetworkConfig?.name, pathname]);
+  }, [state.Service?.network?.active?.name, pathname]);
 
   return (
     <>

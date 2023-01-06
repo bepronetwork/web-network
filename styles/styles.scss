@@ -1,4 +1,5 @@
 @use "sass:math";
+
 @import "variables";
 @import "toasts";
 @import "vendor";
@@ -12,6 +13,7 @@
 @import "x-popover";
 @import "x-tooltip";
 @import "x-stepper";
+@import "primer";
 
 @import "components/network-logo";
 @import "components/network-hero";
@@ -143,6 +145,13 @@ li {
     .modal-content > .modal-header > .close-button {
       left: 96%;
       top: 1.5%;
+    }
+  }
+
+  .modal-xl {
+    .modal-content > .modal-header > .close-button {
+      left: 97%;
+      top: 10px;
     }
   }
 }
@@ -440,7 +449,6 @@ li {
 .banner-shadow {
   width: 100%;
   min-height: 164px;
-  background-color: $bg;
   color: $white;
   padding: $m + 4;
   border-bottom: 1px solid $dark-gray;
@@ -1243,7 +1251,6 @@ textarea.form-control {
 }
 
 .list-actions {
-  background-color: $bg;
   border-radius: 0;
 
   &.sticky-top {

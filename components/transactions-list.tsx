@@ -22,7 +22,7 @@ interface TransactionListProps {
 }
 
 export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
-  const {dispatch, state: {transactions, currentUser}} = useAppState();
+  const {dispatch, state: {transactions}} = useAppState();
   const {t} = useTranslation("common");
   const {deleteFromStorage} = useTransactions();
   

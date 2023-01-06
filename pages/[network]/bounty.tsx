@@ -18,8 +18,6 @@ import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
-import {useRepos} from "x-hooks/use-repos";
-
 
 export default function PageIssue() {
   useBounty();
@@ -30,11 +28,9 @@ export default function PageIssue() {
 
   const {state} = useAppState();
 
-  const {updateActiveRepo} = useRepos()
   const { getUserRepository } = useOctokit();
 
-  const { id, repoId } = router.query;
-  updateActiveRepo(repoId);
+  const { id } = router.query;
 
   function checkForks(){
     if (!state.Service?.network?.repos?.active?.githubPath || isRepoForked !== undefined) return;
@@ -67,13 +63,16 @@ export default function PageIssue() {
 
   useEffect(() => {
     if (!state.currentUser?.login ||
+        !state.currentUser?.walletAddress ||
         !state.Service?.network?.repos?.active ||
-        !state.currentBounty?.data) 
+        !state.currentBounty?.data ||
+        isRepoForked !== undefined) 
       return;
     checkForks();
   },[state.currentUser?.login, 
      state.currentBounty?.data?.working, 
-     state.Service?.network?.repos?.active
+     state.Service?.network?.repos?.active,
+     !state.currentUser?.walletAddress
   ]);
 
   return (

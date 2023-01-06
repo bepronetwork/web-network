@@ -9,12 +9,24 @@ export default function MarkedRender({ className = "", source = "_loading..._" }
   useEffect(() => {
     setInnerHtml({
       __html: sanitizeHtml(marked(source), {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"])
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+        transformTags: {
+          "a": (_tagName, attribs) => {
+            return {
+              tagName: "a",
+              attribs: {
+                ...attribs,
+                target: "_blank",
+                rel: "noopener noreferrer"
+              }
+            };
+          }
+        }
       })
     });
   }, [source]);
 
   return (
-    <div className={`marked-render ${className}`} dangerouslySetInnerHTML={innerHtml}></div>
+    <div className={`marked-render markdown-body ${className}`} dangerouslySetInnerHTML={innerHtml}></div>
   );
 }

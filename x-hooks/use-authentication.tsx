@@ -1,5 +1,6 @@
 import {useState} from "react";
 
+import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
@@ -15,6 +16,7 @@ import {
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
+import { changeReAuthorizeGithub } from "contexts/reducers/update-show-prop";
 
 import {CustomSession} from "interfaces/custom-session";
 
@@ -22,8 +24,9 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
+import { useTransactions } from "x-hooks/use-transactions";
 
-import { useTransactions } from "./use-transactions";
+export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
 export function useAuthentication() {
 
@@ -33,7 +36,7 @@ export function useAuthentication() {
   const transactions = useTransactions();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith} = useApi();
+  const {getUserOf, getUserWith, searchCurators} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -54,7 +57,12 @@ export function useAuthentication() {
       return;
 
     transactions.deleteFromStorage();
+    
     const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
+    
+    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+    
+    expirationStorage.removeItem();
 
     signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})
       .then(() => {
@@ -75,6 +83,7 @@ export function useAuthentication() {
 
     if (!state.currentUser?.connected)
       return;
+
     dispatch(changeWalletSpinnerTo(true));
 
     state.Service.active.getAddress()
@@ -111,12 +120,15 @@ export function useAuthentication() {
       })
       .then(signedIn => {
         if (!signedIn)
-          return;
+          return dispatch(changeConnectingGH(false))
 
         lastUrl.value = asPath;
+        
+        if(signedIn)
+          signIn('github', {callbackUrl: `${URL_BASE}${asPath}`})
 
-        return signedIn ? signIn('github', {callbackUrl: `${URL_BASE}${asPath}`}) : null;
-      }).finally(()=> dispatch(changeConnectingGH(false)))
+        return setTimeout(() => dispatch(changeConnectingGH(false)), 5 * 1000)
+      })
   }
 
   function validateGhAndWallet() {
@@ -177,15 +189,14 @@ export function useAuthentication() {
       state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
       state.Service.active.getBalance('settler', state.currentUser.walletAddress),
-      state.Service.active.getBalance('eth', state.currentUser.walletAddress),
-      state.Service.active.getBalance('staked', state.currentUser.walletAddress),
-
+      searchCurators({ address: state.currentUser.walletAddress, networkName: state.Service?.network?.active?.name })
+      .then(v => v?.rows[0]?.tokensLocked || 0).then(value => new BigNumber(value)),
       // not balance, but related to address, no need for a second useEffect()
       state.Service.active.isCouncil(state.currentUser.walletAddress),
       state.Service.active.isNetworkGovernor(state.currentUser.walletAddress)
     ])
-      .then(([oracles, bepro, eth, staked, isCouncil, isGovernor]) => {
-        update({oracles, bepro, eth, staked});
+      .then(([oracles, bepro, staked, isCouncil, isGovernor]) => {
+        update({oracles, bepro, staked});
         updateNetwork({isCouncil, isGovernor});
       })
       .finally(() => {
@@ -201,9 +212,19 @@ export function useAuthentication() {
       sessionUser.accessToken === state.currentUser?.accessToken)
       return;
 
+    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+
+    expirationStorage.value =  session.data.expires;
+
     dispatch(changeCurrentUserHandle(session.data.user.name));
     dispatch(changeCurrentUserLogin(sessionUser.login));
     dispatch(changeCurrentUserAccessToken((sessionUser.accessToken)));
+  }
+
+  function verifyReAuthorizationNeed() {
+    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+
+    dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
   return {
@@ -215,6 +236,7 @@ export function useAuthentication() {
     updateWalletAddress,
     validateGhAndWallet,
     listenToAccountsChanged,
-    updateCurrentUserLogin
+    updateCurrentUserLogin,
+    verifyReAuthorizationNeed
   }
 }

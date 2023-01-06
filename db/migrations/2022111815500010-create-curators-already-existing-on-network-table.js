@@ -54,11 +54,11 @@ async function handleCurators(address, totalVotes, councilAmount, networkId, iss
         id: curatorInDb[0].id,
       },
     });
-  } else if (!curatorInDb[0] && isCurator) {
+  } else if (!curatorInDb[0]) {
     return await queryInterface.insert(Curators, "curators", {
       address: address,
       networkId,
-      isCurrentlyCurator: true,
+      isCurrentlyCurator: isCurator,
       tokensLocked: totalVotes,
       acceptedProposals: closedsBounty.length,
       createdAt: new Date(),

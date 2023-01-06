@@ -17,7 +17,11 @@ import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {useAppState} from "contexts/app-state";
-import {changeCurrentBountyComments} from "contexts/reducers/change-current-bounty";
+import {BountyEffectsProvider} from "contexts/bounty-effects";
+import {
+  changeCurrentBountyComments,
+  changeCurrentBountyData
+} from "contexts/reducers/change-current-bounty";
 import {changeLoadState} from "contexts/reducers/change-load";
 import {changeSpinners} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
@@ -30,29 +34,27 @@ import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
 import {useNetwork} from "x-hooks/use-network";
 
-import {BountyEffectsProvider} from "../../contexts/bounty-effects";
-
 export default function PullRequestPage() {
-  const {getExtendedPullRequestsForCurrentBounty} = useBounty();
   const router = useRouter();
-
-  const {t} = useTranslation(["common", "pull-request"]);
-
+  
+  const { t } = useTranslation(["common", "pull-request"]);
+  
   const [showModal, setShowModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isMakingReady, setIsMakingReady] = useState(false);
-  const [isCreatingReview, setIsCreatingReview] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
+  const [isCreatingReview, setIsCreatingReview] = useState(false);
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
+  
+  const { state, dispatch } = useAppState();
+  
+  const { getURLWithNetwork } = useNetwork();
+  const { createReviewForPR, processEvent } = useApi();
+  const { getDatabaseBounty, getChainBounty } = useBounty();
+  const { getExtendedPullRequestsForCurrentBounty } = useBounty();
+  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
 
-  const {state, dispatch} = useAppState();
-
-  const {getURLWithNetwork} = useNetwork();
-  const {createReviewForPR, processEvent} = useApi();
-  const {handleMakePullRequestReady, handleCancelPullRequest} = useBepro();
-  const {getDatabaseBounty, getChainBounty} = useBounty();
-
-  const {prId, review} = router.query;
+  const { prId, review } = router.query;
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isGithubConnected = !!state.currentUser?.login;
@@ -62,8 +64,15 @@ export default function PullRequestPage() {
   const isPullRequestCancelable = !!networkPullRequest?.isCancelable;
   const isPullRequestCreator = 
     networkPullRequest?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+  const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
+  const approvalsRequired = 
+    branchProtectionRules ? 
+      branchProtectionRules[state.currentBounty?.data?.branch]?.requiredApprovingReviewCount || 0 : 0;
+  const canUserApprove = state.Service?.network?.repos?.active?.viewerPermission !== "READ";
+  const approvalsCurrentPr = pullRequest?.approvals?.total || 0;
+  const prsNeedsApproval = approvalsCurrentPr < approvalsRequired;
 
-  function handleCreateReview(body) {
+  function handleCreateReview(body: string) {
     if (!state.currentUser?.login) return;
 
     setIsCreatingReview(true);
@@ -182,14 +191,21 @@ export default function PullRequestPage() {
   }
 
   useEffect(() => {
-    if (!state.currentBounty?.data || !state.currentBounty?.chainData || !prId || state?.spinners?.pullRequests) return;
-
+    if (!state.currentBounty?.data || 
+        !state.currentBounty?.chainData || 
+        !prId || 
+        state?.spinners?.pullRequests ||
+        !!pullRequest) return;
 
     dispatch(changeLoadState(true));
     dispatch(changeSpinners.update({pullRequests: true}));
 
     getExtendedPullRequestsForCurrentBounty()
-      .then(prs => prs.find((pr) => +pr.githubId === +prId))
+      .then(pullRequests => {
+        dispatch(changeCurrentBountyData(Object.assign(state.currentBounty.data, { pullRequests })));
+
+        return pullRequests.find((pr) => +pr.githubId === +prId);
+      })
       .then(currentPR => {
         const currentNetworkPR = 
           state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
@@ -277,6 +293,22 @@ export default function PullRequestPage() {
                 )
                 }
 
+                {/* Approve Link */}
+                { (isWalletConnected && 
+                   isGithubConnected && 
+                   prsNeedsApproval && 
+                   canUserApprove &&
+                   isPullRequestReady &&
+                   !isPullRequestCanceled) && 
+                  <GithubLink
+                    forcePath={state.Service?.network?.repos?.active?.githubPath}
+                    hrefPath={`pull/${pullRequest?.githubId || ""}/files`}
+                    color="primary"
+                  >
+                    {t("actions.approve")}
+                  </GithubLink>
+                }
+
                 <GithubLink
                   forcePath={state.Service?.network?.repos?.active?.githubPath}
                   hrefPath={`pull/${pullRequest?.githubId || ""}`}>
@@ -286,14 +318,21 @@ export default function PullRequestPage() {
             </div>
 
             <div className="col-12 mt-4">
-              {(pullRequest?.comments?.length > 0 &&
+              {!!pullRequest?.comments?.length &&
                 React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
                   <Comment comment={comment} key={index}/>
-                )))) || (
+                )))}
+
+              {!!pullRequest?.reviews?.length &&
+                React.Children.toArray(pullRequest?.reviews?.map((comment, index) => (
+                  <Comment comment={comment} key={index}/>
+                )))}
+
+              {(!pullRequest?.comments?.length && !pullRequest?.reviews?.length) &&
                 <NothingFound
                   description={t("pull-request:errors.no-reviews-found")}
                 />
-              )}
+              }
             </div>
           </div>
         </div>
