@@ -1,6 +1,7 @@
 
 import React from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {v4 as uuidv4} from "uuid";
@@ -92,7 +93,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                       <ProposalProgressSmall
                         color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
                         value={proposal?.disputeWeight}
-                        total={state.currentUser?.balance?.staked}
+                        total={BigNumber(state.Service?.network?.amounts?.totalNetworkToken)}
                       />
                     </div>
                   </>

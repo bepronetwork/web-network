@@ -45,6 +45,7 @@ export interface NetworkAmounts {
   percentageNeededForDispute: string | number;
   oracleExchangeRate: string | number;
   treasury: TreasuryInfo;
+  totalNetworkToken: string | number;
 }
 
 export interface ServiceNetwork {
