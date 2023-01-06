@@ -3,8 +3,10 @@ import {useRouter} from "next/router";
 
 import ArrowLeft from "assets/icons/arrow-left";
 
-import Avatar from "components/avatar";
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import GithubInfo from "components/github-info";
+
+import { truncateAddress } from "helpers/truncate-address";
 
 import {Proposal} from "interfaces/proposal";
 
@@ -57,11 +59,18 @@ export default function ProposalHero({
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
               <div className="d-flex align-items-center">
-                <Avatar className="me-2" userLogin={proposal?.githubLogin} />{" "}
+                <div className="mr-1">
+                  <AvatarOrIdenticon
+                    user={proposal?.githubLogin}
+                    address={proposal?.creator}
+                    size="sm"
+                  />
+                </div>
+                
                 <GithubInfo
                   parent="hero"
                   variant="user"
-                  label={["@", proposal?.githubLogin].join("")}
+                  label={proposal?.githubLogin ? `@${proposal?.githubLogin}` : truncateAddress(proposal?.creator)}
                 />
               </div>
 
