@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
+    "@metamask/eth-sig-util": "^5.0.2",
     "@metamask/jazzicon": "^2.0.0",
     "@primer/css": "^20.8.0",
     "@synaps-io/react-verify": "^1.0.3",
