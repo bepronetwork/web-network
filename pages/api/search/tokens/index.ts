@@ -1,8 +1,9 @@
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import { Sequelize } from "sequelize";
+import {Op} from "sequelize";
 
 import Database from "db/models";
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {networkName} = req.query
@@ -10,7 +11,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const network = await Database.network.findOne({
       where:{
-        name: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("name")), "=", (networkName as string).toLowerCase()) 
+        name: {[Op.iLike]: networkName},
+        chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
       },
       include:[{ association: "tokens" }]
     });  

@@ -8,6 +8,8 @@ import models from "db/models";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
 import {chainFromHeader} from "../../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../../helpers/res-json-message";
+import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -43,19 +45,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (address) whereCondition.creatorAddress = address;
 
-    const chain = await chainFromHeader(req);
-
     if (networkName) {
       const network = await models.network.findOne({
-      where: {
-        name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-        },
-        chain_id: {[Op.eq]: chain?.chainId,}
-      }
+        where: {
+          name: {
+            [Op.iLike]: String(networkName).replaceAll(" ", "-"),
+          },
+          chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
+        }
       });
 
-      if (!network) return res.status(404).json("Invalid network");
+      if (!network) return resJsonMessage("Invalid network", res, 404);
 
       whereCondition.network_id = {[Op.eq]: network?.id};
     }
@@ -207,4 +207,4 @@ async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
-export default withCors(SearchIssues)
+export default withCors(WithValidChainId(SearchIssues))

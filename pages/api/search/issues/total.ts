@@ -5,6 +5,8 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 import {chainFromHeader} from "../../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../../helpers/res-json-message";
+import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
@@ -37,7 +39,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    if (!network) return res.status(404).json("Invalid network");
+    if (!network) return resJsonMessage("Invalid network", res, 404);
 
     whereCondition.network_id = network?.id;
   }
@@ -63,4 +65,4 @@ async function getAll(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(withJwt(getAll))
+export default withCors(withJwt(WithValidChainId(getAll)))

@@ -12,18 +12,23 @@ import * as IssueQueries from "graphql/issue";
 import {getPropertyRecursively} from "helpers/object";
 
 import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
+import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
 
 const { serverRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin, networkName } = req.body;
 
+  const chain = await chainFromHeader(req);
+
   try {
     const network = await models.network.findOne({
       where: {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+        },
+        chain_id: {[Op.eq]: chain?.chainId}
       }
     });
 
@@ -93,4 +98,4 @@ async function Working(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(Working)
+export default withCors(WithValidChainId(Working))

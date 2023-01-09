@@ -4,41 +4,40 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
+import {chainFromHeader} from "../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../helpers/res-json-message";
+import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {wallet, networkName, startDate, endDate} = req.query;
+
+  const chain = await chainFromHeader(req);
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: {[Op.eq]: chain?.chainId}
     }
   });
 
-  if (!network) return res.status(404).json("Invalid network");
+  if (!network) return resJsonMessage("Invalid network", res, 404);
 
   let filter: Date[] | Date = null
 
-  if(startDate && endDate){
+  if (startDate && endDate) {
     const initialDate = parseISO(startDate?.toString())
     const finalDate = parseISO(endDate?.toString())
   
-    if(isAfter(initialDate, finalDate)) return res.status(404).json("Invalid date");
+    if (isAfter(initialDate, finalDate))
+      return resJsonMessage("Invalid date", res, 400);
 
     filter = [startOfDay(initialDate), endOfDay(finalDate)]
-  }else if(endDate){
+  } else if (endDate) {
     filter = parseISO(endDate?.toString())
   }
 
-  function handleOpFilter(Op) {
-    if(Array.isArray(filter)) {
-      return {[Op.between]: filter}
-    }else {
-      return {[Op.lte]: filter}
-    }
-    
-  }
   const payments = await models.userPayments.findAll({
     include: [
       { 
@@ -52,7 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       transactionHash:{
         [Op.not]: null
       },
-      createdAt: filter && handleOpFilter(Op)
+      ... !!filter ? {[Array.isArray(filter) ? Op.between : Op.lte]: filter} : {},
     }
   });
 
@@ -74,4 +73,4 @@ async function Payments(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withCors(Payments)
+export default withCors(WithValidChainId(Payments))

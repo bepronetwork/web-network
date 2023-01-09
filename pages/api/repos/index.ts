@@ -5,6 +5,8 @@ import {Op} from "sequelize";
 import models from "db/models";
 import {isAdmin} from "../../../helpers/is-admin";
 import {NOT_AN_ADMIN} from "../../../helpers/contants";
+import {chainFromHeader} from "../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../helpers/res-json-message";
 
 async function getAllRepos(req, res) {
   const {networkName} = req.query;
@@ -45,18 +47,22 @@ async function addNewRepo(req, res) {
   const found = await models.repositories.findOne({
     where: { githubPath: `${owner}/${repo}` }
   });
+
   if (found) return res.status(409).json("Path already exists");
+
+  const chain = await chainFromHeader(req);
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: {[Op.eq]: chain?.chainId}
     }
   });
 
-  if (!network) return res.status(404).json("Invalid network");
-  if (network.isClosed) return res.status(404).json("Invalid network");
+  if (!network || network?.isClosed)
+    return resJsonMessage("Invalid network", res, 404);
 
   const created = await models.repositories
     .create({ githubPath: `${owner}/${repo}`, network_id: network.id })

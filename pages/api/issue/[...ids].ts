@@ -2,11 +2,12 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
+import {chainFromHeader} from "../../../helpers/chain-from-header";
+import WithCors from "../../../middleware/withCors";
+import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    ids: [repoId, ghId, networkName]
-  } = req.query;
+  const {ids: [repoId, ghId, networkName]} = req.query;
   const issueId = [repoId, ghId].join("/");
 
   const include = [
@@ -19,11 +20,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "disputes" }
   ];
 
+  const chain = await chainFromHeader(req);
+
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: {[Op.eq]: chain.chainId}
     }
   });
 
@@ -42,7 +46,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issue);
 }
 
-export default async function GetIssues(req: NextApiRequest,
+export async function handler(req: NextApiRequest,
                                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -55,3 +59,5 @@ export default async function GetIssues(req: NextApiRequest,
 
   res.end();
 }
+
+export default WithCors(WithValidChainId(handler));

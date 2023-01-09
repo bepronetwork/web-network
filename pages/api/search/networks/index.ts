@@ -5,6 +5,7 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import paginate, {calculateTotalPages} from "helpers/paginate";
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -27,6 +28,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   
   if (isDefault)
     whereCondition.isDefault = isDefault;
+
+  const chain = await chainFromHeader(req);
+  if (chain)
+    whereCondition.chain_id = {[Op.eq]: chain.chainId};
+
     
   const include = [
     { association: "tokens" }

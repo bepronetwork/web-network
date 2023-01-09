@@ -8,11 +8,12 @@ import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
-import {Settings} from "helpers/settings";
-
 import DAO from "services/dao-service";
 
 import {GraphQlResponse} from "types/octokit";
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../../helpers/res-json-message";
+import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -20,48 +21,46 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address, networkName } =
     req.body;
 
+  const chain = await chainFromHeader(req);
+
   try {
     const customNetwork = await models.network.findOne({
       where: {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+        },
+        chain_id: {[Op.eq]: chain?.chainId}
       }
     });
 
-    if (!customNetwork) return res.status(404).json("Invalid network");
-    if (customNetwork.isClosed) return res.status(404).json("Invalid network");
+    if (!customNetwork || customNetwork?.isClosed)
+      return resJsonMessage("Invalid network", res, 404);
 
     const issue = await models.issue.findOne({
       where: { issueId, network_id: customNetwork.id }
     });
 
-    if (!issue) return res.status(404).json("Bounty not found");
+    if (!issue) return resJsonMessage("Bounty not found", res, 404);
 
     const pullRequest = await models.pullRequest.findOne({
       where: { githubId: pullRequestId, issueId: issue.id }
     });
 
-    if (!pullRequest) return res.status(404).json("Pull Request not found");
+    if (!pullRequest) return resJsonMessage("Pull Request not found", res, 404);
 
-    const settings = await models.settings.findAll({
-      where: { visibility: "public" },
-      raw: true,
-    });
-  
-    const publicSettings = (new Settings(settings)).raw();
-  
-    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+    if (!chain.chainRpc)
+      return resJsonMessage("Missing web3 provider url", res, 400);
 
     const DAOService = new DAO({ 
       skipWindowAssignment: true,
-      web3Host: publicSettings.urls.web3Provider
+      web3Host: chain.chainRpc
     });
 
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    if (!await DAOService.start())
+      return resJsonMessage("Failed to connect with chain", res, 400);
 
     if (!await DAOService.loadNetwork(customNetwork.networkAddress))
-      return res.status(500).json("Failed to load network contract");
+      return resJsonMessage("Failed to load network contract", res, 400);
 
     const network = DAOService.network;
 
@@ -69,14 +68,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const issueBepro = await network.getBounty(issue.contractId);
 
-    if (!issueBepro) return res.status(404).json("Bounty not found on network");
+    if (!issueBepro) return resJsonMessage("Bounty not found on network", res, 404);
 
     if (issueBepro.canceled || !issueBepro.closed)
-      return res.status(400).json("Bounty canceled or not closed yet");
+      return resJsonMessage("Bounty canceled or not closed yet", res, 400);
 
     const proposal = issueBepro.proposals[mergeProposalId];
 
-    if (!proposal) return res.status(404).json("Merge proposal not found");
+    if (!proposal) return resJsonMessage("Merge proposal not found", res, 400);
 
     const isCouncil = await network.getOraclesOf(address) >= await network.councilAmount();
 
@@ -130,4 +129,4 @@ async function PullRequest(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(PullRequest)
+export default withCors(WithValidChainId(PullRequest))
