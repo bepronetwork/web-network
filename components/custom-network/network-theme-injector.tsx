@@ -16,9 +16,7 @@ export default function NetworkThemeInjector() {
   const ignorePaths = ["/networks", "/new-network"];
 
   useEffect(() => {
-    if (state.Service?.network?.active?.name &&
-        state.Service?.network?.active?.name.toLowerCase() !== 'bepro' &&
-        !ignorePaths.includes(pathname))
+    if (state.Service?.network?.active?.colors && !ignorePaths.includes(pathname))
       setCurrentColors(colorsToCSS());
     else
       setCurrentColors("");
