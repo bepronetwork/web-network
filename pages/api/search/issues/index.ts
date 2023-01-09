@@ -7,9 +7,13 @@ import models from "db/models";
 import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+
 import {chainFromHeader} from "../../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../../helpers/res-json-message";
+import {LogAccess} from "../../../../middleware/log-access";
+import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
+import WithCors from "../../../../middleware/withCors";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -47,16 +51,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (address) whereCondition.creatorAddress = address;
 
-    const chain = await chainFromHeader(req);
-
     if (networkName) {
       const network = await models.network.findOne({
-      where: {
-        name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-        },
-        chain_id: {[Op.eq]: chain?.chainId,}
-      }
+        where: {
+          name: {
+            [Op.iLike]: String(networkName).replaceAll(" ", "-"),
+          },
+          chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
+        }
       });
 
       if (!network) return res.status(404).json("Invalid network");
@@ -232,4 +234,4 @@ async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
-export default LogAccess(WithCors(SearchIssues))
+export default LogAccess(WithCors(WithValidChainId(SearchIssues)));

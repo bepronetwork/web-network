@@ -4,7 +4,12 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import paginate, {calculateTotalPages} from "helpers/paginate";
+
+
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../../helpers/res-json-message";
 import {LogAccess} from "../../../../middleware/log-access";
+import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
 import WithCors from "../../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -24,11 +29,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       where: {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+        },
+        chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
       }
     });
 
-    if (!network) return res.status(404).json("Invalid network");
+    if (!network) return resJsonMessage("Invalid network", res, 404);
 
     whereCondition.network_id = network.id;
   }
@@ -57,4 +63,4 @@ async function SearchRepositories(req: NextApiRequest,
   res.end();
 }
 
-export default LogAccess(WithCors(SearchRepositories));
+export default LogAccess(WithCors(WithValidChainId(SearchRepositories)));

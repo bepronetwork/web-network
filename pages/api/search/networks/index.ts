@@ -9,6 +9,7 @@ import {paginateArray} from "helpers/paginate";
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
+import {chainFromHeader} from "../../../../helpers/chain-from-header";
 interface includeProps {
   association: string;
   required?: boolean;
@@ -19,6 +20,7 @@ interface includeProps {
     } | string;
   }
 }
+
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -50,6 +52,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   
   if (isDefault)
     whereCondition.isDefault = isDefault;
+
+  const chain = await chainFromHeader(req);
+  if (chain)
+    whereCondition.chain_id = {[Op.eq]: chain.chainId};
+
     
   const include: includeProps[] = [
       { association: "tokens" }

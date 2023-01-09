@@ -15,6 +15,10 @@ import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
 import {error as LogError} from "services/logging";
 
+import {chainFromHeader} from "../../../helpers/chain-from-header";
+import {resJsonMessage} from "../../../helpers/res-json-message";
+import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
+
 interface NftPayload { 
   issueContractId: number;
   proposalContractId: number;
@@ -37,28 +41,30 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       mergerAddress,
       networkName
     } = req.body as NftPayload;
-    
-    if(!networkName || proposalContractId < 0 || issueContractId < 0)
-      return res.status(400).json("Missing parameters");
-    
-    const settings = await models.settings.findAll({
-    where: { 
-      visibility: "public",
-      group: "urls"
-    },
-    raw: true,
-    });
 
+    const missingParams = [
+      [networkName, 'Missing network name'],
+      [proposalContractId, 'Missing proposal contract id'],
+      [issueContractId, 'Missing bounty contract Id']
+    ].filter(([v,]) => !v).map(([,m]) => m as string)
+
+    if (missingParams.length)
+      return resJsonMessage(missingParams, res, 400);
+    
+    const settings = await models.settings.findAll({where: {visibility: "public", group: "urls"}, raw: true,});
     const defaultConfig = (new Settings(settings)).raw();
-  
+
     if (!defaultConfig?.urls?.ipfs)
       return res.status(500).json("Missing ipfs url on settings");
+
+    const chain = await chainFromHeader(req);
 
     const customNetwork = await models.network.findOne({
         where: {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-")
-          }
+          },
+          chain_id: {[Op.eq]: chain?.chainId}
         }
     });
     
@@ -67,35 +73,37 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const DAOService = new DAO({ 
       skipWindowAssignment: true,
-      web3Host: defaultConfig.urls.web3Provider,
+      web3Host: chain?.chainRpc,
     });
 
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-    if(!await DAOService.loadNetwork(customNetwork.networkAddress)) 
-      return res.status(500).json("network could not be loaded");
+    if (!await DAOService.start())
+      return resJsonMessage(`Failed to connect to chainRpc ${chain?.chainRpc} for id ${chain?.chainId}`, res, 500);
+
+    if(!await DAOService.loadNetwork(customNetwork.networkAddress))
+      return resJsonMessage(`Failed to load networks on chainRpc ${chain?.chainRpc} for address ${customNetwork.networkAddress}`,res, 500);
 
     const network = DAOService.network;
 
     await network.start();
 
     const networkBounty = await network.getBounty(issueContractId) as Bounty;
-    if (!networkBounty) return res.status(404).json("Bounty invalid");
+    if (!networkBounty) return resJsonMessage("Bounty invalid", res, 404);
 
     if(networkBounty.canceled || networkBounty.closed)
-      return res.status(404).json("Bounty has been closed or canceled");
+      return resJsonMessage("Bounty has been closed or canceled", res, 404);
 
     const proposal = networkBounty.proposals.find(p=> p.id === +proposalContractId)
     
     if(!proposal)
-      return res.status(404).json("Proposal invalid");
+      return resJsonMessage("Proposal invalid", res, 404);
 
     if(proposal.refusedByBountyOwner || await network.isProposalDisputed(+issueContractId, +proposalContractId))
-      return res.status(404).json("proposal cannot be accepted");
+      return resJsonMessage("proposal cannot be accepted", res, 404);
 
     const pullRequest = networkBounty.pullRequests.find(pr=> pr.id === proposal.prId)
 
     if(pullRequest.canceled || !pullRequest.ready)
-      return res.status(404).json("PR cannot be accepted");
+      return resJsonMessage("PR cannot be accepted", res, 404);
 
     const issue = await models.issue.findOne({
       where: {
@@ -154,13 +162,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const { hash } = await ipfsService.add(nft, true);
 
-    if(!hash) return res.status(500);
+    if (!hash) return resJsonMessage('no hash found', res, 400);
 
     const url = `${defaultConfig.urls.ipfs}/${hash}`;
  
     return res.status(200).json({url});
-  }
-  catch(error){
+  } catch (error) {
     LogError(error)
     return res.status(500).send(error);
   }
@@ -179,4 +186,4 @@ async function NftMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(NftMethods));
+export default LogAccess(WithCors(WithValidChainId(NftMethods)));
