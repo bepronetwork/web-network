@@ -17,7 +17,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       include:[{ association: "tokens" }]
     });
 
-    return res.status(200).json(network.tokens);
+    return res.status(200).json(network.tokens || []);
   } catch (error) {
     console.log(error)
     return res.status(500)
