@@ -128,7 +128,7 @@ export default function useApi() {
         count: number;
         pages: number;
         currentPage: number;
-      }>(`/search/issues/?${params}`)
+      }>(`/search/issues/`, {params})
       .then(({ data }) => ({
         ...data,
         rows: data.rows.map(row => ({

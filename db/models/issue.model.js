@@ -38,6 +38,9 @@ class Issue extends Model {
         tags: {
           type: DataTypes.ARRAY(DataTypes.STRING)
         },
+      chain_id: {
+          type: DataTypes.INTEGER,
+      }
     },
                {
         sequelize,
