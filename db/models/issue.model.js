@@ -34,7 +34,10 @@ class Issue extends Model {
         fundedAt: {
           type: DataTypes.DATE,
           allowNull: true
-        }
+        },
+      chain_id: {
+          type: DataTypes.INTEGER,
+      }
     },
                {
         sequelize,

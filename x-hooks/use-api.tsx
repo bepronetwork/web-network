@@ -119,14 +119,14 @@ export default function useApi() {
       proposer,
       tokenAddress,
       networkName: networkName.replaceAll(" ", "-")
-    }).toString();
+    });
     return api
       .get<{
         rows: IssueBigNumberData[];
         count: number;
         pages: number;
         currentPage: number;
-      }>(`/search/issues/?${params}`)
+      }>(`/search/issues/`, {params})
       .then(({ data }) => ({
         ...data,
         rows: data.rows.map(row => ({

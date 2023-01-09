@@ -10,6 +10,7 @@ import {searchPatternInText} from "helpers/string";
 import {chainFromHeader} from "../../../../helpers/chain-from-header";
 import {resJsonMessage} from "../../../../helpers/res-json-message";
 import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
+import {error} from "../../../../services/logging";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -62,7 +63,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const chain = await chainFromHeader(req);
     if (chain?.chainId)
-      whereCondition.chain_id = {[Op.eq]: chain.chainId}
+      whereCondition.chain_id = {[Op.eq]: +chain.chainId};
 
     if (repoPath) {
       const repository = await models.repositories.findOne({
@@ -158,6 +159,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                                     .map((value)=> value === '+' ? Sequelize.literal('+') : 
                                       (COLS_TO_CAST.includes(value) ? castToDecimal(value) : value));
 
+    console.log(`WHERE`, whereCondition);
+
     if (search) {
       const issues = await models.issue.findAll({
       where: whereCondition,
@@ -193,7 +196,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pages: calculateTotalPages(issues.count)
       })}
   } catch(e){
-    console.error(e)
+    error(e);
     return res.status(500)
   }
 }
