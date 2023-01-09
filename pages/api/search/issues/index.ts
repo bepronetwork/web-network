@@ -51,7 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
           },
-          chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
+          chain_id: {[Op.eq]: +(await chainFromHeader(req))?.chainId }
         }
       });
 
@@ -59,6 +59,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
       whereCondition.network_id = {[Op.eq]: network?.id};
     }
+
+    const chain = await chainFromHeader(req);
+    if (chain?.chainId)
+      whereCondition.chain_id = {[Op.eq]: chain.chainId}
 
     if (repoPath) {
       const repository = await models.repositories.findOne({

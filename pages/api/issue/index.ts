@@ -30,7 +30,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      chain_id: {[Op.eq]: chain?.chainId}
+      chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 
@@ -91,7 +91,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     state: "pending",
     title: '',
     body: body,
-    network_id: network.id
+    network_id: network.id,
+    chain_id: +(await chainFromHeader(req))?.chainId
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);
