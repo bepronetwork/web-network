@@ -20,7 +20,7 @@ const publicRuntimeConfig = {
     bountyCanceled: process.env.NEXT_PUBLIC_BOUNTY_CANCELED || -0.5,
     proposalCreated: process.env.NEXT_PUBLIC_PROPOSAL_CREATED || 0.5,
     proposalAccepted: process.env.NEXT_PUBLIC_PROPOSAL_ACCEPTED || 0.3,
-    proposalRejected: process.env.NEXT_PUBLIC_PROPOSAL_ACCEPTED || -0.5
+    proposalRejected: process.env.NEXT_PUBLIC_PROPOSAL_REJECTED || -0.5
   }
 }
 
