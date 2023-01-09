@@ -12,10 +12,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const network = await Database.network.findOne({
       where:{
         name: {[Op.iLike]: networkName},
-        chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
+        chain_id: {[Op.eq]: +(await chainFromHeader(req))?.chainId }
       },
       include:[{ association: "tokens" }]
-    });  
+    });
 
     return res.status(200).json(network.tokens);
   } catch (error) {

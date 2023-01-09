@@ -33,7 +33,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      chain_id: {[Op.eq]: chain?.chainId}
+      chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 
@@ -96,6 +96,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     body: body,
     network_id: network.id,
     tags
+    chain_id: +(await chainFromHeader(req))?.chainId
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);

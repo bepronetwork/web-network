@@ -11,7 +11,7 @@ export const WithValidChainId = (handler: NextApiHandler, methods: string[] = [`
     if (!req.headers?.chain)
       return res.status(400).json({message: MISSING_CHAIN_ID});
 
-    const foundChain = await models.chain.findOne({where: {chainId: {[Op.iLike]: req.headers.chain}}});
+    const foundChain = await models.chain.findOne({where: {chainId: {[Op.eq]: +req.headers.chain}}});
     if (!foundChain)
       return res.status(400).json({message: CHAIN_ID_NOT_SUPPORTED});
 

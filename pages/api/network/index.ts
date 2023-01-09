@@ -2,7 +2,7 @@ import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
-import Sequelize, {Op} from "sequelize";
+import {Op} from "sequelize";
 
 import Database from "db/models";
 
@@ -44,7 +44,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     ... address && {
       [Op.iLike]: String(address),
     } || {},
-    chain_id: {[Op.iLike]: chain?.chainId}
+    chain_id: {[Op.eq]: chain?.chainId}
   };
 
   const network = await Database.network.findOne({
@@ -254,8 +254,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     const network = await Database.network.findOne({
       where: {
         ...(isAdminOverriding ? {} : {
-          creatorAddress: 
-            Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("creatorAddress")), "=", creator.toLowerCase()) 
+          creatorAddress: {[Op.iLike]: creator}
         }),
         networkAddress
       },
