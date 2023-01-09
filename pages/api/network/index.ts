@@ -39,7 +39,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     ... address && {
       [Op.iLike]: String(address),
     } || {},
-    chain_id: {[Op.eq]: chain?.chainId}
+    chain_id: {[Op.eq]: +chain?.chainId}
   };
 
   const network = await Database.network.findOne({
@@ -84,7 +84,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const hasNetwork = await Database.network.findOne({
       where: {
         creatorAddress: creator,
-        chain_id: chain?.chainId,
+        chain_id: +chain?.chainId,
         isClosed: false,
       }
     });
@@ -103,7 +103,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const defaultNetwork = await Database.network.findOne({
         where: {
           isDefault: true,
-          chain_id: chain?.chainId,
+          chain_id: +chain?.chainId,
         }
     });
     
@@ -151,7 +151,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       fullLogo: fullLogoHash,
       networkAddress,
       isDefault: isDefault || false,
-      chain_id: chain?.chainId,
+      chain_id: +chain?.chainId,
     });
 
     const repos = JSON.parse(repositories);
