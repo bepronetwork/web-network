@@ -47,5 +47,5 @@ export const changeCurrentUserConnected = (connected: boolean) =>
 export const changeCurrentUserSignature = (signature: string) =>
   changeCurrentUser.update({signature});
 
-export const changeCurrentUserKycSession = (kyc: kycSession) =>
-  changeCurrentUser.update({kyc})
+export const changeCurrentUserKycSession = (kycSession: kycSession) =>
+  changeCurrentUser.update({kycSession})
