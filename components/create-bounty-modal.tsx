@@ -63,8 +63,6 @@ const ZeroNumberFormatValues = {
   floatValue: 0,
 };
 
-const {publicRuntimeConfig} = getConfig()
-
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
