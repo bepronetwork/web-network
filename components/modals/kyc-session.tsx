@@ -29,6 +29,7 @@ export function KycSession() {
   const session = state?.currentUser?.kycSession
   
   function handlerValidateSession() {
+    setIsLoading(true)
     if(session?.session_id && (session?.status !== 'VERIFIED' && state.currentBounty.kycSteps.length))
       validateKycSession(session?.session_id)
         .then((data) => {
@@ -75,7 +76,7 @@ export function KycSession() {
         }
       >
         <div className='d-flex flex-column align-items-center justify-content-center'>
-          {isLoading  ? <span className="spinner-border spinner-border-md" /> : null}
+          {isLoading || !currentTier  ? <span className="spinner-border spinner-border-md" /> : null}
           {session && !isLoading ? (
             <>
               <Synaps
