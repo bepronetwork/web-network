@@ -236,7 +236,7 @@ export function useAuthentication() {
     if(!state?.currentUser?.login 
         || !state?.currentUser?.accessToken
         || !state?.currentUser?.walletAddress 
-        || publicRuntimeConfig.kyc.isEnabled !== 'true') 
+        || !state?.Settings?.kyc?.isKycEnabled) 
       return
 
     getKycSession()
