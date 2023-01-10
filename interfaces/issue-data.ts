@@ -64,6 +64,7 @@ export interface IssueData {
   }
   tags: string[];
   isKyc: boolean;
+  kycTierList: number[];
 }
 
 export interface Disputes {

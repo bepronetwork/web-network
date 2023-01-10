@@ -41,6 +41,7 @@ import {useAppState} from "../contexts/app-state";
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 import {useRepos} from "../x-hooks/use-repos";
+import DropDown from "./dropdown";
 import InfoTooltip from "./info-tooltip";
 
 interface BountyPayload {
@@ -62,8 +63,6 @@ const ZeroNumberFormatValues = {
   floatValue: 0,
 };
 
-const {publicRuntimeConfig} = getConfig()
-
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
@@ -77,6 +76,7 @@ export default function CreateBountyModal() {
   const [isBountyType, setisBountyType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [isKyc, setIsKyc] = useState<boolean>(false);
+  const [tierList, setTierList] = useState<number[]>([]);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
@@ -263,22 +263,38 @@ export default function CreateBountyModal() {
                 {rewardChecked && renderBountyToken(false, "reward")}
               </>
             )}
-          {isBountyType && publicRuntimeConfig.kyc.isEnabled ?
-            (<div className="col-md-12 d-flex flex-row gap-2">
-                <FormCheck
-                  className="form-control-md pb-0"
-                  type="checkbox"
-                  label={t("bounty:kyc.is-required")}
-                  onChange={handleIsKYCChecked}
-                  checked={isKyc}
-                />
-                <span>
-                <InfoTooltip
-                    description={t("bounty:kyc.tool-tip")}
-                    secondaryIcon
+            {isBountyType && Settings?.kyc?.isKycEnabled ? (
+              <>
+                <div className="col-md-12 d-flex flex-row gap-2">
+                  <FormCheck
+                    className="form-control-md pb-0"
+                    type="checkbox"
+                    label={t("bounty:kyc.is-required")}
+                    onChange={handleIsKYCChecked}
+                    checked={isKyc}
                   />
-                </span>
-            </div>): null}
+                  <span>
+                    <InfoTooltip
+                      description={t("bounty:kyc.tool-tip")}
+                      secondaryIcon
+                    />
+                  </span>
+                </div>
+                {isKyc && Settings?.kyc?.tierList?.length ? (
+                  <DropDown
+                    className="mt-2"
+                    onSelected={(opt) =>{
+                      setTierList(Array.isArray(opt) ? opt.map((i) => +i.value) : [+opt.value])
+                    }
+                    }
+                    options={Settings?.kyc?.tierList.map((i) => ({
+                      value: i.id,
+                      label: i.name,
+                    }))}
+                  />
+                ) : null}
+              </>
+            ) : null}
           </div>
         </div>
       );
@@ -407,6 +423,14 @@ export default function CreateBountyModal() {
       isRewardAmount
     )
       return true;
+
+    if (
+      currentSection === 1 &&
+      isKyc &&
+      !tierList.length
+    )
+      return true;
+
     if (currentSection === 2 && (!repository || !branch)) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
     return currentSection === 3 && isLoadingCreateBounty;
@@ -437,6 +461,8 @@ export default function CreateBountyModal() {
     setRewardAmount(ZeroNumberFormatValues);
     setRepository(undefined);
     setBranch(null);
+    setIsKyc(false);
+    setTierList([]);
     setCurrentSection(0);
   }
 
@@ -499,6 +525,7 @@ export default function CreateBountyModal() {
         repositoryId: payload.repositoryId,
         tags: selectedTags,
         isKyc,
+        tierList,
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 
