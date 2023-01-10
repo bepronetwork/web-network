@@ -152,16 +152,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (search) {
       const issues = await models.issue.findAll({
-      where: whereCondition,
-      include,
-      nest: true,
-      order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
+        where: whereCondition,
+        include,
+        nest: true,
+        order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
       });
 
       const result = [];
 
-      result.push(...issues.filter(({ title, body }) =>
-        [title, body].some((text) =>
+      result.push(...issues.filter(({ title, body, tags }) =>
+        [title, body, ...(tags || [])].some((text) =>
           searchPatternInText(text || "", String(search)))));
 
       const paginatedData = paginateArray(result, 10, page || 1);
