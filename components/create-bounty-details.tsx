@@ -167,7 +167,7 @@ export default function CreateBountyDetails({
         }
       </div>
 
-      <div className="mb-4">
+      <div>
         <DragAndDrop
           externalFiles={files}
           onUpdateFiles={onUpdateFiles}

@@ -3,23 +3,23 @@ import {isMobile} from "react-device-detect";
 import {useTranslation} from "next-i18next";
 
 import Avatar from "components/avatar";
+import BountyStatusInfo from "components/bounty-status-info";
+import BountyTags from "components/bounty/bounty-tags";
+import CustomContainer from "components/custom-container";
+import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
+import PriceConversor from "components/price-conversor";
+import Translation from "components/translation";
+
+import {useAppState} from "contexts/app-state";
 
 import {getIssueState} from "helpers/handleTypeIssue";
 import {truncateAddress} from "helpers/truncate-address";
 
-import {useAppState} from "../contexts/app-state";
-import Badge from "./badge";
-import BountyStatusInfo from "./bounty-status-info";
-import CustomContainer from "./custom-container";
-import DateLabel from "./date-label";
-import PriceConversor from "./price-conversor";
-import Translation from "./translation";
-
 export default function BountyHero() {
   const {t} = useTranslation(["bounty", "common"]);
+  
   const {state} = useAppState();
-
 
   function renderPriceConversor() {
     return (
@@ -31,7 +31,6 @@ export default function BountyHero() {
     </div>
     )
   }
-
 
   return (
     <div className="banner-shadow">
@@ -120,18 +119,13 @@ export default function BountyHero() {
                       className="text-white"
                     />
                   )}
-
-                  {!!state.currentBounty?.data?.tags?.length &&
-                    <div className="d-flex gap-1">
-                      {state.currentBounty.data.tags.map(tag => 
-                        <Badge 
-                          label={tag} 
-                          className="caption-small border border-primary border-radius-8" 
-                          color="primary-30"
-                        /> )}
-                    </div>
-                  }
                 </div>
+
+                { !!state.currentBounty?.data?.tags?.length &&
+                  <div className="mt-3">
+                    <BountyTags tags={state.currentBounty.data.tags} />
+                  </div>
+                }
               </>
             )}
           </div>

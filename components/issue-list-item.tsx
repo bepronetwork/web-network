@@ -7,26 +7,27 @@ import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
 import BountyStatusInfo from "components/bounty-status-info";
+import BountyTags from "components/bounty/bounty-tags";
+import DateLabel from "components/date-label";
 import Identicon from "components/identicon";
 import Translation from "components/translation";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
-import {useAppState} from "../contexts/app-state";
-import AvatarOrIdenticon from "./avatar-or-identicon";
-import Badge from "./badge";
-import DateLabel from "./date-label";
-
-export default function IssueListItem({
-                                        issue = null,
-                                        xClick,
-                                      }: {
+interface IssueListItemProps {
   issue?: IssueBigNumberData;
   xClick?: () => void;
-}) {
+}
+
+export default function IssueListItem({
+  issue = null,
+  xClick,
+}: IssueListItemProps) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
@@ -197,19 +198,12 @@ export default function IssueListItem({
                 </div>
               </>
             )}
+
             <RenderIssueData state={issueState} />
+            
             <DateLabel date={issue?.createdAt} className="text-white-40" />
 
-            {!!issue?.tags?.length &&
-                    <div className="d-flex gap-1">
-                      {issue?.tags?.map(tag => 
-                        <Badge
-                          label={tag} 
-                          className="caption-small border border-primary border-radius-8" 
-                          color="primary-30"
-                        /> )}
-                    </div>
-                  }
+            <BountyTags tags={issue?.tags} />
           </div>
         </div>
 
