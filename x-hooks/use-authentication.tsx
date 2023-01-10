@@ -243,7 +243,7 @@ export function useAuthentication() {
       .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
       .then((session)=> dispatch(changeCurrentUserKycSession(session)))
   }
-  
+
   return {
     connectWallet,
     disconnectWallet,
@@ -256,5 +256,6 @@ export function useAuthentication() {
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
     updateKycSession
+    verifyReAuthorizationNeed
   }
 }
