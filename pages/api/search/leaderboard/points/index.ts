@@ -1,6 +1,6 @@
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
-import { WhereOptions } from "sequelize";
+import { WhereOptions, Op } from "sequelize";
 
 import models from "db/models";
 
@@ -22,25 +22,27 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       where: whereCondition,
       nest: true,
       raw: true
-    }, req.query, [[sortBy || "numberNfts", order || "DESC"]]))
-      .then(async (items) => {
-        return Promise.all(items.rows.map(async (item) => {
-          const user = await models.user.findOne({
-              where: { address: item.address.toLowerCase() },
-          });
-          
-          return {
-            ...item,
-            githubHandle: user?.githubHandle,
-            ...calculateLeaderboardScore(item)
-          };
-        }))
-          .then((values) => ({ count: items.count, rows: values }))
-          .catch(() => items);
-      });
+    }, req.query, [[sortBy || "numberNfts", order || "DESC"]]));
+
+    const users = await models.user.findAll({
+      where: { 
+        address: {
+          [Op.in]: leaderboard.rows.map(({ address }) => address.toLowerCase())
+        }
+      },
+    });
+
+    const leaderBoardWithPoints = {
+      ...leaderboard,
+      rows: leaderboard.rows.map(row => ({
+        ...row,
+        githubHandle: users.find(({ address }) => address.toLowerCase() === row.address.toLowerCase())?.githubHandle,
+        ...calculateLeaderboardScore(row)
+      }))
+    };
       
     return res.status(200).json({
-      ...leaderboard,
+      ...leaderBoardWithPoints,
       currentPage: +page || 1,
       pages: calculateTotalPages(leaderboard.count),
     });
