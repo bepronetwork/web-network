@@ -17,6 +17,7 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
 import AvatarOrIdenticon from "./avatar-or-identicon";
+import Badge from "./badge";
 import DateLabel from "./date-label";
 
 export default function IssueListItem({
@@ -198,6 +199,17 @@ export default function IssueListItem({
             )}
             <RenderIssueData state={issueState} />
             <DateLabel date={issue?.createdAt} className="text-white-40" />
+
+            {!!issue?.tags?.length &&
+                    <div className="d-flex gap-1">
+                      {issue?.tags?.map(tag => 
+                        <Badge
+                          label={tag} 
+                          className="caption-small border border-primary border-radius-8" 
+                          color="primary-30"
+                        /> )}
+                    </div>
+                  }
           </div>
         </div>
 

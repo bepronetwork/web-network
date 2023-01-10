@@ -3,14 +3,17 @@ import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 
+import { PROGRAMMING_LANGUAGES } from "assets/bounty-labels";
+
+import Button from "components/button";
+import { ContextualSpan } from "components/contextual-span";
 import DescriptionPreviewModal from "components/description-preview-modal";
 import DragAndDrop from "components/drag-and-drop";
+import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
-
-import Button from "./button";
 
 export default function CreateBountyDetails({
   bountyTitle,
@@ -21,18 +24,23 @@ export default function CreateBountyDetails({
   onUploading,
   files,
   review = false,
+  selectedTags,
+  setSelectedTags
 }) {
   const { t } = useTranslation("bounty");
 
   const [strFiles, setStrFiles] = useState<string>("");
   const [bodyLength, setBodyLength] = useState<number>(0);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-
+  
   const {
     state: { Settings },
   } = useAppState();
 
+  
   const titleLimit = 131;
+  const MAX_TAGS = 3;
+  const TAGS_OPTIONS = PROGRAMMING_LANGUAGES.map(({ tag }) => ({ label: tag, value: tag }));
 
   function handleShowModal() {
     setShowPreviewModal(true);
@@ -48,6 +56,10 @@ export default function CreateBountyDetails({
 
   function handleChangeDescription(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setBountyDescription(e.target.value);
+  }
+
+  function handleChangeTags(newTags) {
+    setSelectedTags(newTags.map(({ value}) => value));
   }
 
   useEffect(() => {
@@ -135,6 +147,26 @@ export default function CreateBountyDetails({
         </Button>
         }
       </div>
+
+      <div className="form-group">
+        <label htmlFor="" className="caption-small mb-2">Tags</label>
+
+        <ReactSelect
+          value={selectedTags.map(tag => ({ label: tag, value: tag }))}
+          options={TAGS_OPTIONS}
+          onChange={handleChangeTags}
+          isOptionDisabled={() => selectedTags.length >= MAX_TAGS}
+          isDisabled={review}
+          isMulti
+        />
+
+        {!review &&
+          <ContextualSpan context="info" className="mt-1">
+            Selected {selectedTags.length} of {MAX_TAGS}
+          </ContextualSpan>
+        }
+      </div>
+
       <div className="mb-4">
         <DragAndDrop
           externalFiles={files}

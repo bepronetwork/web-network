@@ -9,6 +9,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {truncateAddress} from "helpers/truncate-address";
 
 import {useAppState} from "../contexts/app-state";
+import Badge from "./badge";
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
@@ -119,6 +120,17 @@ export default function BountyHero() {
                       className="text-white"
                     />
                   )}
+
+                  {!!state.currentBounty?.data?.tags?.length &&
+                    <div className="d-flex gap-1">
+                      {state.currentBounty.data.tags.map(tag => 
+                        <Badge 
+                          label={tag} 
+                          className="caption-small border border-primary border-radius-8" 
+                          color="primary-30"
+                        /> )}
+                    </div>
+                  }
                 </div>
               </>
             )}
