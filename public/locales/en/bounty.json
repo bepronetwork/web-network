@@ -113,8 +113,10 @@
   "bounty-created": "Bounty created",
   "kyc": {
     "is-required": "Required KYC validation",
+    "refresh": "Refresh Session",
     "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
     "identify-to-start": "Identify to start working",
-    "label": "KYC"
+    "label": "KYC",
+    "steps": "{{current}} of {{total}} steps"
   }
 }

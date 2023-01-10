@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
 import Synaps from '@synaps-io/react-verify'
-
+import { useTranslation } from 'next-i18next';
 
 import Modal from 'components/modal';
 import ReadOnlyButtonWrapper from 'components/read-only-button-wrapper';
@@ -21,6 +21,8 @@ export function KycSession() {
   const [currentTier, setCurrentTier] = useState<Tier>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
+  const {t} = useTranslation(["bounty"]);
+  
   const { validateKycSession } = useApi()
   const { state, dispatch } = useAppState()
 
@@ -58,16 +60,33 @@ export function KycSession() {
       </Button>
 
       <Modal show={show} onCloseClick={() => setShow(false)}
+        title={t("bounty:kyc.steps", {
+          current:  (state.currentBounty.data.kycTierList.length - state.currentBounty.kycSteps.length) + 1,
+          total: state.currentBounty.data.kycTierList.length
+        })}
+        footer={
+          <Button
+            color="danger"
+            className="read-only-button me-1"
+            onClick={handlerValidateSession}
+          >
+            <Translation ns="bounty" label="kyc.refresh" />
+          </Button>
+        }
       >
         <div className='d-flex flex-column align-items-center justify-content-center'>
           {isLoading  ? <span className="spinner-border spinner-border-md" /> : null}
-          {session && !isLoading ? <Synaps
-            sessionId={session?.session_id}
-            tier={+currentTier.id || null}
-            onFinish={() => setShow(false)}
-            service={'individual'}
-            lang={'en'}
-          /> : null}
+          {session && !isLoading ? (
+            <>
+              <Synaps
+              sessionId={session?.session_id}
+              tier={+currentTier.id || null}
+              onFinish={() => setShow(false)}
+              service={'individual'}
+              lang={'en'}
+            /> 
+          </>
+          ): null}
         </div>
       </Modal>
     </ReadOnlyButtonWrapper>

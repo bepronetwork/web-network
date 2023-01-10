@@ -245,27 +245,29 @@ export default function PageActions({
         isBountyOpen &&
         !isWorkingOnBounty &&
         isRepoForked &&
-        isStateToWorking)
+        isStateToWorking){
 
       if(state.currentBounty?.data?.kycTierList?.length 
-        && (state?.currentUser?.kycSession?.status !== 'VERIFIED' && state.currentBounty?.kycSteps?.length))
+            && (state?.currentUser?.kycSession?.status !== 'VERIFIED' 
+            && state.currentBounty?.kycSteps?.length))
         return <KycModal/>
-    
-    return (
-        <ReadOnlyButtonWrapper>
-          <Button
-            color="primary"
-            onClick={handleStartWorking}
-            className="read-only-button"
-            disabled={isExecuting}
-            isLoading={isExecuting}
-          >
-            <span>
-              <Translation ns="bounty" label="actions.start-working.title"/>
-            </span>
-          </Button>
-        </ReadOnlyButtonWrapper>
-    );
+        
+      return (
+            <ReadOnlyButtonWrapper>
+              <Button
+                color="primary"
+                onClick={handleStartWorking}
+                className="read-only-button"
+                disabled={isExecuting}
+                isLoading={isExecuting}
+              >
+                <span>
+                  <Translation ns="bounty" label="actions.start-working.title"/>
+                </span>
+              </Button>
+            </ReadOnlyButtonWrapper>
+      );
+    }
   }
 
   function renderCreatePullRequestButton() {
