@@ -54,7 +54,7 @@ export interface IssueData {
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
   payments: Payment[];
-  isKyc: boolean;
+  kycTierList: number[];
 }
 
 export interface Disputes {

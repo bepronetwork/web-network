@@ -27,7 +27,6 @@ export interface kycSession {
   session_id: string;
   status: string;
   steps: Step[];
-  tiers?: number[];
   validatedAt: Date;
   createdAt: Date;
   updatedAt: Date;

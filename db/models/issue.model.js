@@ -35,9 +35,9 @@ class Issue extends Model {
           type: DataTypes.DATE,
           allowNull: true
         },
-        isKyc:{
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
+        kycTierList:{
+          type: DataTypes.ARRAY(DataTypes.INTEGER),
+          default: []
         }
     },
                {
