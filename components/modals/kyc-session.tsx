@@ -12,29 +12,36 @@ import { useAppState } from 'contexts/app-state';
 import { changeCurrentUserKycSession } from 'contexts/reducers/change-current-user';
 
 
+import { Tier } from 'types/settings';
+
 import useApi from 'x-hooks/use-api';
 
 export function KycSession() {
   const [show, setShow] = useState<boolean>(false);
+  const [currentTier, setCurrentTier] = useState<Tier>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   const { validateKycSession } = useApi()
   const { state, dispatch } = useAppState()
 
-  const session = state?.currentUser?.kyc
-
+  const session = state?.currentUser?.kycSession
+  
   function handlerValidateSession() {
-    if(session?.session_id && session?.status !== 'VERIFIED')
+    if(session?.session_id && (session?.status !== 'VERIFIED' && state.currentBounty.kycSteps.length))
       validateKycSession(session?.session_id)
         .then((data) => {
-          if(session.status !== data.status){
-            dispatch(changeCurrentUserKycSession(data))
-          }
+          dispatch(changeCurrentUserKycSession(data))
         }).finally(()=> setIsLoading(false))
     else
     setIsLoading(false)
   }
 
+  function getCurrentTier(){
+    if(!state.currentBounty.kycSteps.length) return;
+    setCurrentTier(state.currentBounty.kycSteps[0])
+  }
+
+  useEffect(getCurrentTier,[state.currentBounty.kycSteps])
   useEffect(handlerValidateSession,[show])
 
   if(!session)
@@ -56,6 +63,8 @@ export function KycSession() {
           {isLoading  ? <span className="spinner-border spinner-border-md" /> : null}
           {session && !isLoading ? <Synaps
             sessionId={session?.session_id}
+            tier={+currentTier.id || null}
+            onFinish={() => setShow(false)}
             service={'individual'}
             lang={'en'}
           /> : null}

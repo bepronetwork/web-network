@@ -247,7 +247,8 @@ export default function PageActions({
         isRepoForked &&
         isStateToWorking)
 
-      if(state.currentBounty?.data?.isKyc && state?.currentUser?.kyc?.status !== 'VERIFIED')
+      if(state.currentBounty?.data?.kycTierList?.length 
+        && (state?.currentUser?.kycSession?.status !== 'VERIFIED' && state.currentBounty?.kycSteps?.length))
         return <KycModal/>
     
     return (

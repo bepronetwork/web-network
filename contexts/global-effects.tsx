@@ -43,7 +43,9 @@ export const GlobalEffectsProvider = ({children}) => {
               // asPath.includes('bounty'),
               // asPath.includes('profile'),
             ]);
-  useEffect(auth.updateKycSession, [state?.currentUser?.login, state?.currentUser?.walletAddress]);
+  useEffect(auth.updateKycSession, [state?.currentUser?.login, 
+                                    state?.currentUser?.walletAddress, 
+                                    state?.Settings?.kyc?.tierList]);
   useEffect(auth.updateWalletAddress, [state.currentUser]);
   useEffect(auth.listenToAccountsChanged, [state.Service]);
   useEffect(auth.updateWalletBalance, [state.currentUser?.walletAddress, state?.Service?.active?.network]);

@@ -44,5 +44,5 @@ export const changeCurrentUserBalance = (balance: Balance | Partial<Balance>) =>
 export const changeCurrentUserConnected = (connected: boolean) =>
   changeCurrentUser.update({connected})
   
-export const changeCurrentUserKycSession = (kyc: kycSession) =>
-  changeCurrentUser.update({kyc})
+export const changeCurrentUserKycSession = (kycSession: kycSession) =>
+  changeCurrentUser.update({kycSession})

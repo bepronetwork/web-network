@@ -1,4 +1,5 @@
-export type Status =  "PENDING" | "VERIFIED" | "CANCELLED"
+export type Status =  "PENDING" | "VERIFIED" | "CANCELLED";
+export type State =  "VALIDATED" | "NOT_STARTED" | "PENDING" | "FINAL_REJECTED";
 export interface History {
   review_message: string;
   review_date: string;
@@ -12,7 +13,7 @@ export interface Identity {
 }
 
 export interface Step {
-  state: string;
+  state: State;
   name: string;
   id: string;
   ip: string;
@@ -25,7 +26,7 @@ export interface kycSession {
   id: number;
   user_id: number;
   session_id: string;
-  status: string;
+  status: Status;
   steps: Step[];
   validatedAt: Date;
   createdAt: Date;

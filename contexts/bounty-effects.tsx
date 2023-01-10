@@ -23,6 +23,10 @@ export const BountyEffectsProvider = ({children}) => {
     state.currentBounty?.data?.contractId,
     state.currentUser?.walletAddress 
             ])
+  useEffect(bounty.validateKycSteps, [
+      state?.currentBounty?.data?.kycTierList,
+      state?.currentUser?.kycSession?.steps,
+  ]);
 
   return <BountyEffectsContext.Provider value={_context} children={children} />
 }
