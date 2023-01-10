@@ -29,6 +29,14 @@ MergeProposal.belongsTo(Issue, {
 });
 
 async function updateLeaderboardRow(address, property, value) {
+  const tableColumns = await LeaderBoard.describe();
+
+  if (!tableColumns.hasOwnProperty(property)) {
+    console.log("updateLeaderboardRow invalid property passed", { property })
+
+    return false;
+  }
+
   const userLeaderboard = await LeaderBoard.findOne({
     where: { address }
   });
@@ -42,6 +50,8 @@ async function updateLeaderboardRow(address, property, value) {
       address,
       [property]: value,
     });
+
+  return true;
 }
 
 /**
@@ -62,8 +72,10 @@ async function updateLeaderboardBounties(state = "opened") {
       } : {}
     });
 
-    if (!bountiesOfCreators.length) 
-      return console.log(`Leaderboard: updateLeaderboardBounties ${state} no bounties found`);
+    if (!bountiesOfCreators.length)  {
+      console.log(`Leaderboard: updateLeaderboardBounties ${state} no bounties found`);
+      return;
+    }
 
     const leaderBoardColumnsByState = {
       opened: "ownedBountiesOpened",
@@ -74,12 +86,11 @@ async function updateLeaderboardBounties(state = "opened") {
     for (const creator of bountiesOfCreators) {
       const { creatorAddress, id: bountiesCount} = creator;
 
-      await updateLeaderboardRow(creatorAddress, leaderBoardColumnsByState[state], bountiesCount);
-
-      console.log(`Leaderboard: updateLeaderboardBounties ${state} of ${creatorAddress} to ${bountiesCount}`);
+      if (await updateLeaderboardRow(creatorAddress, leaderBoardColumnsByState[state], bountiesCount))
+        console.log(`Leaderboard: updateLeaderboardBounties ${state} of ${creatorAddress} to ${bountiesCount}`);
     }
   } catch (error) {
-    console.log(`Leaderboard: failed to updateLeaderboardBounties ${state}`, error);
+    console.log(`Leaderboard: failed to updateLeaderboardBounties ${state}`, error.toString());
   }
 }
 
@@ -104,7 +115,10 @@ async function updateLeaderboardProposals(state = "created") {
           { 
             association: "issue",
             where: {
-              state: "closed"
+              state: "closed",
+              merged: {
+                [Op.eq]: Sequelize.cast(Sequelize.col("mergeProposal.contractId"), "varchar")
+              }
             },
             attributes: []
           }
@@ -118,8 +132,10 @@ async function updateLeaderboardProposals(state = "created") {
       ...stateCondition
     });
 
-    if (!proposalsOfCreators.length) 
-      return console.log(`Leaderboard: updateLeaderboardProposalCreated ${state} no bounties found`);
+    if (!proposalsOfCreators.length) {
+      console.log(`Leaderboard: updateLeaderboardProposals ${state} no bounties found`);
+      return;
+    }
 
     const leaderBoardColumnsByState = {
       created: "ownedProposalCreated",
@@ -130,13 +146,12 @@ async function updateLeaderboardProposals(state = "created") {
     for (const creatorProposal of proposalsOfCreators) {
       const { creator, id: proposalsCount} = creatorProposal;
 
-      await updateLeaderboardRow(creator, leaderBoardColumnsByState[state], proposalsCount);
-
-      console.log(`Leaderboard: updateLeaderboardBounties ${state} of ${creator} to ${proposalsCount}`);
+      if (await updateLeaderboardRow(creator, leaderBoardColumnsByState[state], proposalsCount))
+        console.log(`Leaderboard: updateLeaderboardProposals ${state} of ${creator} to ${proposalsCount}`);
     }
 
   } catch (error) {
-    console.log(`Leaderboard: failed to updateLeaderboardProposalCreated ${state}`, error);
+    console.log(`Leaderboard: failed to updateLeaderboardProposals ${state}`, error.toString());
   }
 }
 
