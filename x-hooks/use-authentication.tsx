@@ -255,7 +255,6 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    updateKycSession
-    verifyReAuthorizationNeed
+    updateKycSession,
   }
 }
