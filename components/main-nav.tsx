@@ -77,7 +77,7 @@ export default function MainNav() {
   } 
 
 
-  function LeaderBoard() {
+  function LinkLeaderBoard() {
     return (
       <InternalLink
       href={"/leaderboard"}
@@ -85,6 +85,17 @@ export default function MainNav() {
       nav
       uppercase
     />
+    )
+  }
+
+  function LinkBounties() {
+    return (
+      <InternalLink
+        href={"/bounties"}
+        label={<Translation label={"main-nav.nav-avatar.bounties"} />}
+        nav
+        uppercase
+      />
     )
   }
 
@@ -140,12 +151,7 @@ export default function MainNav() {
             {(!isNetworksPage && (
               <ul className="nav-links">
                 <li>
-                  <InternalLink
-                    href={getURLWithNetwork("/bounties")}
-                    label={<Translation label={"main-nav.nav-avatar.bounties"} />}
-                    nav
-                    uppercase
-                  />
+                  <LinkBounties />
                 </li>
 
                 <li>
@@ -165,13 +171,16 @@ export default function MainNav() {
                   />
                 </li>
                 <li>
-                  <LeaderBoard />
+                  <LinkLeaderBoard />
                 </li>
               </ul>
             )) || (
               <ul className="nav-links">
                 <li>
-                  <LeaderBoard />
+                  <LinkBounties />
+                </li>
+                <li>
+                  <LinkLeaderBoard />
                 </li>
               </ul>
             )}
