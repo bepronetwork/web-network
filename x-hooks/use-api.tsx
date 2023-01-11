@@ -12,10 +12,11 @@ import {
   StartWorkingParams, 
   PatchUserParams, 
   MergeClosedIssueParams,
-  CreateReviewParams
+  CreateReviewParams,
+  SearchActiveNetworkParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
-import { IssueData, IssueSearch, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
 import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -81,9 +82,7 @@ export default function useApi() {
     pullRequesterAddress = "",
     proposer = "",
     tokenAddress = "",
-    networkName = "",
-    lastEdited = "",
-    mostTokensValueLocked = "",
+    networkName = ""
   }) {
     const params = new URLSearchParams({
       address,
@@ -99,38 +98,55 @@ export default function useApi() {
       pullRequesterAddress,
       proposer,
       tokenAddress,
-      networkName: networkName.replaceAll(" ", "-"),
-      lastEdited,
-      mostTokensValueLocked
+      networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
-      .get<IssueSearch>(`/search/issues/?${params}`)
-      .then(({ data }): IssueSearch => ({
+      .get<{
+        rows: IssueBigNumberData[];
+        count: number;
+        pages: number;
+        currentPage: number;
+      }>(`/search/issues/?${params}`)
+      .then(({ data }) => ({
         ...data,
-        rows: data.rows.map(row => {
-          if(row?.issues?.length > 0) {
-            return ({
-              ...row,
-              totalValueLock: BigNumber(row.totalValueLock),
-              issues: row.issues.map(issue => ({
-                ...issue,
-                amount: BigNumber(issue.amount),
-                fundingAmount: BigNumber(issue.fundingAmount),
-                fundedAmount: BigNumber(issue.fundedAmount)
-              }))
-            })
-          } else {
-            return ({
-              ...row,
-              amount: BigNumber(row.amount),
-              fundingAmount: BigNumber(row.fundingAmount),
-              fundedAmount: BigNumber(row.fundedAmount)
-            })
-          }
-        })
+        rows: data.rows.map(row => ({
+          ...row,
+          amount: BigNumber(row.amount),
+          fundingAmount: BigNumber(row.fundingAmount),
+          fundedAmount: BigNumber(row.fundedAmount)
+        }))
       }))
-      .catch((): IssueSearch => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
+      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
+
+  async function searchRecentIssues({
+    repoId = "",
+    sortBy = "updatedAt",
+    order = "DESC",
+    address = "",
+    creator = "",
+    networkName = ""
+  }) {
+    const params = new URLSearchParams({
+      address,
+      repoId,
+      sortBy,
+      order,
+      creator,
+      networkName: networkName.replaceAll(" ", "-")
+    }).toString();
+    return api
+      .get<IssueBigNumberData[]>(`/search/issues/recent/?${params}`)
+      .then(({ data }): IssueBigNumberData[] => 
+        (data.map(bounty => ({
+          ...bounty,
+          amount: BigNumber(bounty.amount),
+          fundingAmount: BigNumber(bounty.fundingAmount),
+          fundedAmount: BigNumber(bounty.fundedAmount)
+        }))))
+      .catch((): IssueBigNumberData[] => ([]));
+  }
+  
 
   async function searchRepositories({
     page = "1",
@@ -251,9 +267,22 @@ export default function useApi() {
     return api.get<number>("/search/users/total").then(({ data }) => data);
   }
   
-  async function getTotalBounties(state: string, networkName = DEFAULT_NETWORK_NAME): Promise<number> {
+  async function getTotalBounties(state = "", networkName = ""): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return api.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
+  }
+
+  async function getTotalNetworks(creatorAddress = "",
+                                  isClosed = undefined,
+                                  isRegistered = undefined): Promise<number> {
+    const search = new URLSearchParams({ 
+      creatorAddress,
+      ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
+      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
+    }).toString();
+    return api
+      .get<number>(`/search/networks/total?${search}`)
+      .then(({ data }) => data);
   }
 
   async function getAllUsers(payload: { page: number } = { page: 1 }) {
@@ -511,6 +540,40 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
+  async function searchActiveNetworks({
+    page = "1",
+    creatorAddress = "",
+    sortBy = "updatedAt",
+    order = "DESC",
+    isClosed = undefined,
+    isRegistered = undefined
+  }: SearchActiveNetworkParams) {
+    const params = new URLSearchParams({
+      page,
+      creatorAddress,
+      sortBy,
+      order,
+      ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
+      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
+    }).toString();
+
+    return api
+      .get<{
+        rows: Network[];
+        count: number;
+        pages: number;
+        currentPage: number;
+      }>(`/search/networks/active/?${params}`)
+      .then(({ data }) => ({
+        ...data,
+        rows: data.rows.map(row => ({
+          ...row,
+          totalValueLock: BigNumber(row.totalValueLock)
+        }))
+      }))
+      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
+  }
+
   async function searchCurators({
     page = "1",
     address = "",
@@ -623,6 +686,7 @@ export default function useApi() {
     getReposList,
     getTotalUsers,
     getTotalBounties,
+    getTotalNetworks,
     getUserOf,
     getUserPullRequests,
     getUserWith,
@@ -634,7 +698,9 @@ export default function useApi() {
     removeUser,
     repositoryHasIssues,
     searchIssues,
+    searchRecentIssues,
     searchNetworks,
+    searchActiveNetworks,
     searchRepositories,
     searchCurators,
     searchLeaderBoard,
