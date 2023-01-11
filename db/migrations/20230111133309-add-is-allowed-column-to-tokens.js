@@ -22,6 +22,8 @@ module.exports = {
       }
     });
 
+    if (!registrySetting) return;
+
     const web3Connection = new Web3Connection({
       skipWindowAssignment: true,
       web3Host: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
