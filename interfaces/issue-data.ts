@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
 
+import { ThemeColors } from "./network";
 import { Payment } from "./payments";
 
 export type IssueState =
@@ -55,6 +56,11 @@ export interface IssueData {
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
   payments: Payment[];
+  network?: {
+    colors: ThemeColors;
+    name: string;
+    logoIcon: string;
+  }
 }
 
 export interface Disputes {
