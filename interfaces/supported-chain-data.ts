@@ -7,8 +7,8 @@ export interface SupportedChainData {
   chainCurrencySymbol: string;
   chainCurrencyDecimals: string;
   chainCurrencyName: string;
-  blockScanner: string;
+  blockScanner?: string;
   registryAddress: string;
-  beproTokenAddress: string;
+  eventsApi: string
   isDefault: boolean;
 }

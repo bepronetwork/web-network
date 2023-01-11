@@ -4,11 +4,17 @@ import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-servi
 import {changeConnecting} from "../contexts/reducers/change-spinners";
 import {toastError,} from "../contexts/reducers/change-toaster";
 import DAO from "../services/dao-service";
+import getConfig from "next/config";
+import {useRouter} from "next/router";
+import {isAddress} from "web3-utils";
+import {isZeroAddress} from "ethereumjs-util";
 
 
 export function useDao() {
 
   const {state, dispatch} = useAppState();
+  const {publicRuntimeConfig} = getConfig();
+  const {replace, asPath} = useRouter();
 
   /**
    * Enables the user/dapp to connect to the active DAOService
@@ -29,9 +35,7 @@ export function useDao() {
 
         dispatch(changeCurrentUserConnected(true));
         dispatch(changeConnecting(false))
-
-        if (!state?.Service?.active)
-          dispatch(changeCurrentUserWallet(connected[0] as string));
+        dispatch(changeCurrentUserWallet(connected[0] as string));
       });
   }
 
@@ -77,12 +81,17 @@ export function useDao() {
     const defaultChain = state.supportedChains.find(({isDefault}) => isDefault);
     const connectedChain = state.supportedChains.find(({chainId}) => +state?.connectedChain?.id === chainId);
     const activeWeb3Host = state.Service?.active?.web3Host;
-
-    console.log(connectedChain?.chainRpc, activeWeb3Host)
-
     const hostsDiffer = connectedChain?.chainRpc !== activeWeb3Host;
+    const hasChainRpc = !!connectedChain?.chainRpc;
+    const hasChainRegistry = isAddress(connectedChain?.registryAddress) && !isZeroAddress(connectedChain?.registryAddress);
 
-    console.log(`useDao start()`, !hostsDiffer || state.Service?.starting)
+    console.debug(`useDao start()`, hasChainRpc && (hostsDiffer || !state.Service?.starting))
+
+    if (!hasChainRpc || !hasChainRegistry) {
+      console.debug(`Chain not configured`, state.connectedChain);
+      if (publicRuntimeConfig.adminWallet === state.currentUser?.walletAddress && !asPath.includes(`setup`))
+        replace(`/setup`).then(_ => {});
+    }
 
     if (!hostsDiffer || state.Service?.starting)
       return;
@@ -90,7 +99,7 @@ export function useDao() {
     dispatch(changeStarting(true));
 
     const {chainRpc: web3Host, registryAddress} = (connectedChain || defaultChain);
-    const daoService = new DAO({web3Host, registryAddress});
+    const daoService = new DAO({web3Host, ... hasChainRegistry ? {registryAddress} : {}});
 
     console.log('web3Host',daoService?.web3Host);
 

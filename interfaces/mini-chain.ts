@@ -11,4 +11,6 @@ export interface MiniChainInfo {
   rpc: string[];
   activeRPC?: string;
   loading?: boolean;
+  explorer?: string;
+  eventsApi?: string;
 }

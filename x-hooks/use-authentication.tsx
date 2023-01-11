@@ -88,18 +88,22 @@ export function useAuthentication() {
   }
 
   function updateWalletAddress() {
-    if (state.spinners?.wallet || !state.currentUser?.connected || !state.Service?.active)
+    console.log(`updateWalletAddress`, state.currentUser)
+    if (state.spinners?.wallet || !state.currentUser?.connected)
       return;
 
     dispatch(changeWalletSpinnerTo(true));
 
-    state.Service.active.getAddress()
-      .then(address => {
+    (state.Service?.active ? state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
+      .then(_address => {
+        const address = Array.isArray(_address) ? _address[0] : _address;
+
         if (address !== state.currentUser?.walletAddress)
-          dispatch(changeCurrentUserWallet(address))
+          dispatch(changeCurrentUserWallet(address));
 
         const windowChainId = +window.ethereum.chainId
         const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
+
         dispatch(changeChain.update({
           id: (chain?.chainId || windowChainId).toString(),
           name: chain?.chainName || `unknown`
@@ -246,21 +250,26 @@ export function useAuthentication() {
 
   function signMessageIfAdmin() {
 
-    const hasAdminSignature =
-      decodeMessage(state?.connectedChain?.id,
-                    IM_AN_ADMIN,
-                    state?.currentUser?.signature,
-                    publicRuntimeConfig?.adminWallet);
+    console.log(`signMessageIfAdmin()`, state.connectedChain, state.currentUser?.walletAddress)
 
-    if (!state?.currentUser?.walletAddress || hasAdminSignature)
+    if (!state?.currentUser?.walletAddress || !state?.connectedChain?.id)
+      return;
+
+    if (decodeMessage(state?.connectedChain?.id,
+        IM_AN_ADMIN,
+        state?.currentUser?.signature,
+        publicRuntimeConfig?.adminWallet))
       return;
 
     if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())
       signMessage(IM_AN_ADMIN)
-        .then(r => {
+        .then((r) => {
           dispatch(changeCurrentUserSignature(r));
-          sessionStorage.setItem(`currentSignature`, r);
-          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id);
+          sessionStorage.setItem(`currentSignature`, r || '');
+          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id || '0');
+        })
+        .catch(e => {
+          console.error(`ERROR`, e);
         })
     else {
       sessionStorage.setItem(`currentSignature`, '');
