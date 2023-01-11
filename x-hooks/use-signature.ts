@@ -7,7 +7,7 @@ export default function useSignature() {
   const {state: {connectedChain, Service, currentUser}} = useAppState();
 
   async function signMessage(message = ""): Promise<string> {
-    if (!Service?.active || !currentUser?.walletAddress)
+    if ((!Service?.active && !window.ethereum) || !currentUser?.walletAddress)
       return;
 
     const payload = {
@@ -19,7 +19,11 @@ export default function useSignature() {
     }
 
     return new Promise((res, rej) => {
-      Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, (err, d) => { err ? rej(err) : res(d?.result) });
+      const _promise = (err, d) => { err ? rej(err) : res(d?.result) };
+
+      if (Service.active)
+        Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, _promise);
+      else if (window.ethereum) window.ethereum.request(payload).then(v => _promise(null, {result: v})).catch(e => _promise(e, null))
     });
   }
 

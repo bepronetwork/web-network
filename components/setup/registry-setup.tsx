@@ -21,6 +21,8 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
 
+import {SupportedChainData} from "../../interfaces/supported-chain-data";
+
 interface RegistrySetupProps { 
   isVisible?: boolean;
   registryAddress: string;
@@ -72,7 +74,7 @@ export function RegistrySetup({
     return value.trim() === "";
   }
   
-  const hasRegistryAddress = !!registryAddress;
+  const hasRegistryAddress = !!registryAddress && isAddress(registryAddress) && !isZeroAddress(registryAddress);
   const needToSetDispatcher = hasRegistryAddress && bountyTokenDispatcher && registryAddress !== bountyTokenDispatcher;
 
   const isDeployRegistryBtnDisabled = [
@@ -150,6 +152,9 @@ export function RegistrySetup({
 
   function updateData(forcedValue?: string) {
     const updatedValue = value => ({ ...defaultContractField, value });
+
+    if (!isAddress(forcedValue || registryAddress) || isZeroAddress(forcedValue || registryAddress))
+      return;
 
     setRegistry(updatedValue(forcedValue || registryAddress));
 
@@ -257,12 +262,12 @@ export function RegistrySetup({
       updateData(value.value);
   }
 
-  function _patchSupportedChain() {
+  function _patchSupportedChain(data: Partial<SupportedChainData>) {
     const chain = supportedChains?.find(c => +connectedChain.id === c.chainId);
     if (!chain)
       return;
 
-    return patchSupportedChain(chain, registry.value)
+    return patchSupportedChain(chain, data)
       .then(result => {
         if (result)
           dispatch(toastSuccess('updated chain registry'));
@@ -362,8 +367,9 @@ export function RegistrySetup({
                 ? {
                   label: t("registry.actions.save-registry"),
                   executing: false, disabled: false,
-                  onClick: () => _patchSupportedChain()
+                  onClick: () => _patchSupportedChain({registryAddress: registry.value})
                 } : null }
+                
           }
         />
       </Row>

@@ -10,10 +10,18 @@ export default function AddChainModal({chain, show, add}: {chain: MiniChainInfo,
     return <></>
 
   const [activeRPC, setActiveRPC] = useState(chain?.rpc?.[0]);
+  const [eventsApi, setEventsApi] = useState('');
+  const [explorer, setExplorer] = useState('');
+
+  function validUrl(url: string) {
+    try { return new URL(url)?.protocol?.search(/https?:/) > -1}
+    catch { return false; }
+  }
 
   return <Modal show={show} okLabel={'add chain'}
                 title="Configure RPC"
-                onOkClick={() => add({...chain, activeRPC})} okDisabled={!activeRPC}
+                onOkClick={() => add({...chain, activeRPC, eventsApi, explorer})}
+                okDisabled={!validUrl(activeRPC) || !validUrl(eventsApi) || !validUrl(explorer)}
                 onCloseClick={() => add(null)}>
     <Row>
       <Col>{chain?.name || chain?.shortName}</Col>
@@ -40,6 +48,28 @@ export default function AddChainModal({chain, show, add}: {chain: MiniChainInfo,
           value={activeRPC}
           className="p-2"
           onChange={e => setActiveRPC(e?.target?.value)} />
+      </Col>
+    </Row>
+    <Row className="mt-3 mb-2">
+      <Col>Configure Events Api</Col>
+    </Row>
+    <Row>
+      <Col>
+        <FormControl
+          value={eventsApi}
+          className="p-2"
+          onChange={e => setEventsApi(e?.target?.value)} />
+      </Col>
+    </Row>
+    <Row className="mt-3 mb-2">
+      <Col>Configure Explorer</Col>
+    </Row>
+    <Row>
+      <Col>
+        <FormControl
+          value={explorer}
+          className="p-2"
+          onChange={e => setExplorer(e?.target?.value)} />
       </Col>
     </Row>
   </Modal>

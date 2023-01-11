@@ -76,14 +76,16 @@ export default function useApi() {
     const currentSignature = sessionStorage.getItem("currentSignature") || undefined;
     const currentChainId = sessionStorage.getItem("currentChainId") || 0;
 
+    console.log(`useApi`, currentSignature, currentWallet, currentChainId)
+
     if (currentWallet)
       config.headers["wallet"] = currentWallet;
 
     if (currentSignature)
       config.headers["signature"] = currentSignature;
 
-    if (currentChainId)
-      config.headers["chain"] = currentChainId;
+    if (+currentChainId)
+      config.headers["chain"] = +currentChainId;
 
     return config;
   });
@@ -722,8 +724,9 @@ export default function useApi() {
         name: chain.chainCurrencyName,
         symbol: chain.chainCurrencySymbol
       },
-      rpc: [],
-      registryAddress: chain?.registryAddress
+      blockScanner: chain.blockScanner,
+      eventsApi: chain.eventsApi,
+      registryAddress: chain.registryAddress
     }
 
     return api.patch<{registryAddress?: string}>(`chains`, model)
@@ -750,12 +753,12 @@ export default function useApi() {
     if (!force && state?.supportedChains.length)
       return Promise.resolve(state?.supportedChains);
 
-    const params = new URLSearchParams(query as any).toString()
+    const params = new URLSearchParams(query as any);
 
     return api.get<{result: SupportedChainData[], error?: string; }>(`/chains`, {... query ? {params} : {}})
       .then(({data}) => data)
       .then(data => {
-        if (!data.error && !query)
+        if (!data.error)
           dispatch(updateSupportedChains(data.result));
         else {
           console.error(`failed to fetch supported chains`, data.error);
@@ -800,8 +803,8 @@ export default function useApi() {
       })
   }
 
-  async function patchSupportedChain(chain, registryAddress) {
-    return api.patch(`chains`, {...chain, registryAddress})
+  async function patchSupportedChain(chain, patch: Partial<SupportedChainData>) {
+    return api.patch(`chains`, {...chain, ...patch})
       .then(({status}) => status === 200)
       .catch(e => {
         console.error(`failed to patchSupportedChain`, e);

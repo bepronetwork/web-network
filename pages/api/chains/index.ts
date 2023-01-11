@@ -9,6 +9,10 @@ import {withCors} from "../../../middleware";
 import {AdminRoute} from "../../../middleware/admin-route";
 import {error} from "../../../services/logging";
 import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
+import {isAddress} from "web3-utils";
+import {isZeroAddress} from "ethereumjs-util";
+import {resJsonMessage} from "../../../helpers/res-json-message";
+import {WRONG_PARAM_ADDRESS, WRONG_PARAM_URL} from "../../../helpers/contants";
 
 
 async function Post(req: NextApiRequest, res: NextApiResponse) {
@@ -22,8 +26,9 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
     [body.nativeCurrency?.name, 'missing currency name'],
     [body.nativeCurrency?.symbol, 'missing currency symbol'],
     [body.nativeCurrency?.decimals, 'missing currency decimals'],
+    [body.eventsApi, 'missing events api'],
+    [body.explorer, 'missing explorer'],
   ].filter(([value]) => !value).map(([,error]) => error);
-
 
   const {publicRuntimeConfig} = getConfig();
   const {wallet} = req.headers;
@@ -43,7 +48,8 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
     chainCurrencyName: body.nativeCurrency?.name,
     chainCurrencyDecimals: body.nativeCurrency?.decimals,
     isDefault: (body as any).isDefault,
-    registryAddress: (body as any).networkRegistry,
+    blockScanner: body.explorer,
+    eventsApi: body.eventsApi
   }
 
   const chain = await models.chain.findOne({where: {chainId: {[Op.eq]: model.chainId}}});
@@ -70,6 +76,7 @@ async function Patch(req: NextApiRequest, res: NextApiResponse) {
   if (!req.body.chainId)
     return res.status(400).json({message: 'missing chain id'});
 
+  const isUrl = (url) => { try { return (new URL(url))?.protocol?.search(/https?:/) > -1 } catch { return false } }
   const where = {where: {chainId: {[Op.eq]: req.body.chainId}}};
 
   const chain = await models.chain.findOne(where);
@@ -91,8 +98,26 @@ async function Patch(req: NextApiRequest, res: NextApiResponse) {
     chain.isDefault = req.body.isDefault;
   }
 
-  if (req.body.registryAddress)
+  if (req.body.registryAddress) {
+    if (!isAddress(req.body.registryAddress) || isZeroAddress(req.body.registryAddress))
+      return resJsonMessage(WRONG_PARAM_ADDRESS`registryAddress`, res, 400);
+
     chain.registryAddress = req.body.registryAddress;
+  }
+
+  if (req.body.eventsApi) {
+    if (!isUrl(req.body.eventsApi))
+      return resJsonMessage(WRONG_PARAM_URL`eventsApi`, res, 400);
+
+    chain.eventsApi = req.body.eventsApi;
+  }
+
+  if (req.body.explorer) {
+    if (!isUrl(req.body.explorer))
+      return resJsonMessage(WRONG_PARAM_URL`explorer`, res, 400);
+
+    chain.blockScanner = req.body.explorer;
+  }
 
   await chain.save();
 
@@ -118,13 +143,13 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 
   const query = req.query;
   const where = {
-     ... query.chainId ? {chainId: {[Op.iLike]: query.chainId}} : {},
-     ... query.name ? {chainId: {[Op.iLike]: query.name}} : {},
-     ... query.shortName ? {chainId: {[Op.iLike]: query.shortName}} : {},
-     ... query.activeRPC ? {chainId: {[Op.iLike]: query.activeRPC}} : {},
-     ... query.nativeCurrencyName ? {chainId: {[Op.iLike]: query.nativeCurrencyName}} : {},
-     ... query.nativeCurrencySymbol ? {chainId: {[Op.iLike]: query.nativeCurrencySymbol}} : {},
-     ... query.nativeCurrencyDecimals ? {chainId: {[Op.iLike]: query.nativeCurrencyDecimals}} : {},
+     ... query.chainId ? {chainId: {[Op.eq]: query.chainId}} : {},
+     ... query.name ? {name: {[Op.iLike]: query.name}} : {},
+     ... query.shortName ? {shortName: {[Op.iLike]: query.shortName}} : {},
+     ... query.chainRpc ? {chainRpc: {[Op.iLike]: query.chainRpc}} : {},
+     ... query.nativeCurrencyName ? {nativeCurrencyName: {[Op.iLike]: query.nativeCurrencyName}} : {},
+     ... query.nativeCurrencySymbol ? {nativeCurrencySymbol: {[Op.iLike]: query.nativeCurrencySymbol}} : {},
+     ... query.nativeCurrencyDecimals ? {nativeCurrencyDecimals: {[Op.eq]: query.nativeCurrencyDecimals}} : {},
   }
 
   return models.chain.findAll({where})

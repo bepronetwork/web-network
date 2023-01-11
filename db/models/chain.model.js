@@ -1,6 +1,7 @@
 const {Model, DataTypes} = require("sequelize");
 
 class Chain extends Model {
+
   static init(sqlz) {
     super.init({
       id: {
@@ -15,7 +16,6 @@ class Chain extends Model {
       },
       chainRpc: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       chainName: {
         type: DataTypes.STRING,
@@ -25,7 +25,6 @@ class Chain extends Model {
       chainShortName: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false
       },
       chainCurrencyName: {
         type: DataTypes.STRING,
@@ -39,12 +38,17 @@ class Chain extends Model {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      isDefault: {
-        type: DataTypes.BOOLEAN
-      },
       registryAddress: {
         type: DataTypes.STRING,
-        allowNull: true,
+      },
+      eventsApi: {
+        type: DataTypes.STRING,
+      },
+      blockScanner: {
+        type: DataTypes.STRING,
+      },
+      isDefault: {
+        type: DataTypes.BOOLEAN
       },
       createdAt: {
         allowNull: false,

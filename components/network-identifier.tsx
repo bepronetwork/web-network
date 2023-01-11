@@ -15,7 +15,7 @@ export default function NetworkIdentifier() {
   }
 
   useEffect(() => {
-    if (!window.ethereum || !state.supportedChains.length)
+    if (!window.ethereum && !state.supportedChains.length)
       return;
 
     window.ethereum.removeAllListeners(`chainChanged`);
@@ -24,7 +24,7 @@ export default function NetworkIdentifier() {
       const windowChainId = +window.ethereum.chainId;
       const chain = findChain(windowChainId);
 
-
+      console.log(`Trying to find chain`, chain, windowChainId);
 
       dispatch(changeChain.update({
         id: (chain?.chainId || windowChainId).toString(),
@@ -37,8 +37,9 @@ export default function NetworkIdentifier() {
     });
 
     window.ethereum.on(`chainChanged`, evt => {
-      console.debug(`chainChanged`, evt);
       const chain = findChain(+evt);
+
+      console.log(`Trying to find chain changed`, chain, evt);
       dispatch(changeChain.update({
         id: (chain?.chainId || evt)?.toString(),
         name: chain?.chainName || 'unknown'

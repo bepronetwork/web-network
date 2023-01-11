@@ -20,6 +20,8 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
   const [currencySymbol, setCurrencySymbol] = useState('');
   const [currencyName, setCurrencyName] = useState('');
   const [currencyDecimals, setCurrencyDecimals] = useState('');
+  const [eventsApi, setEventsApi] = useState('');
+
 
   function getChainModel(): MiniChainInfo {
     return {
@@ -27,6 +29,8 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
       shortName,
       chainId: +chainId,
       activeRPC,
+      explorer,
+      eventsApi,
       nativeCurrency: {
         name: currencyName,
         symbol: currencySymbol,
@@ -46,6 +50,7 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
     ['chain currency decimals', '18', currencyDecimals, setCurrencyDecimals],
     ['chain rpc', 'https://', activeRPC, setActiveRPC],
     ['chain explorer', 'https://', explorer, setExplorer],
+    ['chain events api', 'https://', eventsApi, setEventsApi],
   ]
 
   function makeRowColInput([label, placeholder, value, onChange]) {
