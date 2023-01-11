@@ -582,6 +582,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
+.issue-body {
+  max-width: 260px;
+}
+
 .status {
   padding: math.div($m, 4);
   border-radius: 50px;
