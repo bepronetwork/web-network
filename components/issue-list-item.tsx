@@ -120,10 +120,7 @@ export default function IssueListItem({
             <BountyStatusInfo issueState={issueState} className="mt-1 px-2 " />
           </div>
           <div className="text-truncate mb-2 mt-4">{issue?.title}</div>
-          <div
-            className="text-white-40 text-break text-truncate mb-3"
-            style={{ maxWidth: "260px" }}
-          >
+          <div className="issue-body text-white-40 text-break text-truncate mb-3" >
             {issue?.body}
           </div>
           <IssueAmountInfo issue={issue} size={size} />
