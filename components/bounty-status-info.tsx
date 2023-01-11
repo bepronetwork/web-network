@@ -7,9 +7,10 @@ import Translation from "./translation";
 
 interface IBountyStatusInfo {
   issueState: IssueState;
+  className?: string
 }
 
-export default function BountyStatusInfo({ issueState }: IBountyStatusInfo) {
+export default function BountyStatusInfo({ issueState, className }: IBountyStatusInfo) {
 
   const colors = {
     draft: { ellipse: "bg-info", badge: "bg-info-30 text-info" },
@@ -23,7 +24,7 @@ export default function BountyStatusInfo({ issueState }: IBountyStatusInfo) {
 
   return (
       <Badge
-        className={`d-flex status caption-medium py-1 px-3 ${colors[issueState]?.badge}`}
+        className={`d-flex status caption-medium ${className ? className : 'py-1 px-3'} ${colors[issueState]?.badge} `}
       >
         <>
           {colors[issueState]?.ellipse && <div className={`ellipse bg-primary me-2 ${colors[issueState]?.ellipse}`} />}
