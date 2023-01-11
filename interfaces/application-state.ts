@@ -69,7 +69,9 @@ export interface ServiceState {
 
 export interface ConnectedChain {
   id: string;
-  name: string
+  name: string;
+  explorer?: string;
+  events?: string;
 }
 
 export interface CurrentUserState {

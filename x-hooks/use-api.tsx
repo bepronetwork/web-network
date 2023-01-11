@@ -23,7 +23,7 @@ import {Proposal} from "interfaces/proposal";
 import {ReposList} from "interfaces/repos-list";
 import {Token} from "interfaces/token";
 
-import {api, eventsApi} from "services/api";
+import {api} from "services/api";
 
 import {Entities, Events} from "types/dappkit";
 
@@ -31,6 +31,7 @@ import {updateSupportedChains} from "../contexts/reducers/change-supported-chain
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
 import {isZeroAddress} from "ethereumjs-util";
+import axios from "axios";
 
 interface NewIssueParams {
   title: string;
@@ -75,8 +76,6 @@ export default function useApi() {
     const currentWallet = sessionStorage.getItem("currentWallet") || ''
     const currentSignature = sessionStorage.getItem("currentSignature") || undefined;
     const currentChainId = sessionStorage.getItem("currentChainId") || 0;
-
-    console.log(`useApi`, currentSignature, currentWallet, currentChainId)
 
     if (currentWallet)
       config.headers["wallet"] = currentWallet;
@@ -305,8 +304,13 @@ export default function useApi() {
                               event: Events, 
                               networkName: string = DEFAULT_NETWORK_NAME,
                               params: PastEventsParams = {}) {
-    
-    return eventsApi.get(`/past-events/${entity}/${event}`, {
+
+    console.log(`processEvent`, state.connectedChain?.events);
+
+    if (!state.connectedChain?.events)
+      return;
+
+    return axios.get(`${state.connectedChain?.events}/past-events/${entity}/${event}`, {
       params: { ...params, networkName }
     }).then(({ data }) => data?.[networkName]);
   }

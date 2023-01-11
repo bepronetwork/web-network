@@ -24,11 +24,11 @@ export default function NetworkIdentifier() {
       const windowChainId = +window.ethereum.chainId;
       const chain = findChain(windowChainId);
 
-      console.log(`Trying to find chain`, chain, windowChainId);
-
       dispatch(changeChain.update({
         id: (chain?.chainId || windowChainId).toString(),
-        name: chain?.chainName || 'unknown'
+        name: chain?.chainName || 'unknown',
+        explorer: chain?.blockScanner,
+        events: chain?.eventsApi,
       }))
     }
 
@@ -38,11 +38,11 @@ export default function NetworkIdentifier() {
 
     window.ethereum.on(`chainChanged`, evt => {
       const chain = findChain(+evt);
-
-      console.log(`Trying to find chain changed`, chain, evt);
       dispatch(changeChain.update({
         id: (chain?.chainId || evt)?.toString(),
-        name: chain?.chainName || 'unknown'
+        name: chain?.chainName || 'unknown',
+        explorer: chain?.blockScanner,
+        events: chain?.eventsApi,
       }))
     });
 
