@@ -16,7 +16,7 @@ import useApi from "x-hooks/use-api";
 
 
 export default function BountiesPage() {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const { t } = useTranslation(["common", "custom-network", "bounty"]);
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
 
@@ -27,20 +27,20 @@ export default function BountiesPage() {
   const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
-      label: t("custom-network:hero.number-of-networks"),
+      label: t("custom-network:hero.number-of-networks")
     },
     {
       value: 0,
-      label: t("custom-network:hero.number-of-bounties"),
+      label: t("custom-network:hero.number-of-bounties")
     },
     {
       value: 0,
-      label: "in bounties",
+      label: t("bounty:in-bounties"),
       currency: "USD",
     },
     {
       value: 0,
-      label: "distributed",
+      label: t("bounty:distributed"),
       currency: "USD",
     },
   ]);
@@ -67,12 +67,12 @@ export default function BountiesPage() {
       },
       {
         value: 0,
-        label: "in bounties",
+        label: t("bounty:in-bounties"),
         currency: "USD",
       },
       {
         value: 0,
-        label: "distributed",
+        label: t("bounty:distributed"),
         currency: "USD",
       },
     ]);    
@@ -81,8 +81,8 @@ export default function BountiesPage() {
   return (
     <BountyEffectsProvider>
       <PageHero
-        title={"Bounty Hall"}
-        subtitle={"Explanatory text"}
+        title={t("bounty:title-bounties")}
+        subtitle={t("bounty:sub-title-bounties")}
         infos={infos}
       />
       <ListActiveNetworks />

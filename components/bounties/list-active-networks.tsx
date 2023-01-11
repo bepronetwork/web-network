@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -16,6 +17,7 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function ListActiveNetworks() {
+  const { t } = useTranslation(["bounty"]);
   const [networks, setNetworks] = useState<Network[]>();
   const { searchActiveNetworks } = useApi();
   const { state } = useAppState();
@@ -36,14 +38,14 @@ export default function ListActiveNetworks() {
   return (
     <CustomContainer className="mb-3">
       <div className="d-flex mt-2 p-1 justify-content-between">
-        <h4 className="mt-1">Most Active Networks</h4>
+        <h4 className="mt-1">{t("most-active-networks")}</h4>
         <Link href={"/networks"}>
           <a
             target="_blank"
             className="text-decoration-none text-primary mt-2"
             rel="noreferrer"
           >
-            Explore All
+            {t("explore-all")}
           </a>
         </Link>
       </div>
@@ -80,7 +82,7 @@ export default function ListActiveNetworks() {
                       <span className="bg-dark-gray p-1 border-radius-8 px-2">
                         {network?.countIssues || 0}{" "}
                         <span className="text-uppercase text-white-40">
-                          bounties
+                          {t("label_other")}
                         </span>
                       </span>
                     </div>

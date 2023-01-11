@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import CustomContainer from "components/custom-container";
 import IssueListItem from "components/issue-list-item";
 
@@ -9,6 +11,7 @@ import useApi from "x-hooks/use-api";
 
 
 export default function ListRecentIssues() {
+  const { t } = useTranslation(["bounty"]);
   const [bounties, setBounties] = useState<IssueBigNumberData[]>();
   const { searchRecentIssues } = useApi();
 
@@ -19,7 +22,7 @@ export default function ListRecentIssues() {
   return (
       <CustomContainer className="mb-3">
       <div className="d-flex mt-2 p-1">
-          <h4 className="mt-1">Recent Bounties</h4>
+          <h4 className="mt-1">{t("recent-bounties")}</h4>
         </div>
         <div className="row mt-3">
           {bounties &&

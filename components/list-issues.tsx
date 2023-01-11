@@ -270,7 +270,7 @@ export default function ListIssues({
     >
       {allNetworks && (
         <div className="d-flex mt-2 p-1">
-          <h4 className="mt-1">All Bounties</h4>
+          <h4 className="mt-1">{t("bounty:all-bounties")}</h4>
           <div className="bg-shadow border-radius-8 p-1 ms-3 px-2">
             <span className="p text-white-40">{totalBounties}</span>
           </div>
