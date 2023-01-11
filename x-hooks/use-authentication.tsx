@@ -115,10 +115,12 @@ export function useAuthentication() {
 
         dispatch(changeChain.update({
           id: (chain?.chainId || windowChainId).toString(),
-          name: chain?.chainName || `unknown`
+          name: chain?.chainName || `unknown`,
+          explorer: chain?.blockScanner,
+          events: chain?.eventsApi,
         }));
 
-        sessionStorage.setItem(`currentWallet`, address);
+        sessionStorage.setItem(`currentWallet`, address || '');
       })
       .catch(e => {
         console.error(`Error getting address`, e);
