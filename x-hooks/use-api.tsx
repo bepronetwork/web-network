@@ -73,7 +73,7 @@ export default function useApi() {
     repoId = "",
     time = "",
     state = "",
-    sortBy = "updatedAt",
+    sortBy = "createdAt",
     order = "DESC",
     address = "",
     creator = "",
