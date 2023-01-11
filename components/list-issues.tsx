@@ -49,6 +49,7 @@ interface ListIssuesProps {
   pullRequesterAddress?: string;
   proposer?: string;
   disputableFilter?: "dispute" | "merge";
+  allNetworks?: boolean;
 }
 
 interface IssuesPage {
@@ -65,7 +66,8 @@ export default function ListIssues({
   pullRequesterAddress,
   proposer,
   redirect,
-  disputableFilter
+  disputableFilter,
+  allNetworks = false
 }: ListIssuesProps) {
   const {dispatch, state: appState} = useAppState();
 
@@ -78,10 +80,11 @@ export default function ListIssues({
   const [searchState, setSearchState] = useState(search);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
+  const [totalBounties, setTotalBounties] = useState<number>(0);
 
   const searchTimeout = useRef(null);
 
-  const { searchIssues } = useApi();
+  const { searchIssues, getTotalBounties } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
 
   const isProfilePage = router?.asPath?.includes("profile");
@@ -164,6 +167,8 @@ export default function ListIssues({
 
     dispatch(changeLoadState(true));
 
+    if(allNetworks) getTotalBounties().then(setTotalBounties)
+
     searchIssues({
       page,
       repoId,
@@ -176,7 +181,7 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: appState.Service?.network?.active?.name
+      networkName: allNetworks ? "" : appState.Service?.network?.active?.name
     })
       .then(async ({ rows, pages, currentPage }) => {
         const issues = disputableFilter ? await disputableFilterFn(rows) : rows;
@@ -263,6 +268,14 @@ export default function ListIssues({
       className={isProfilePage && "px-0 mx-0" || ""}
       childWrapperClassName={isProfilePage && "justify-content-left" || ""}
     >
+      {allNetworks && (
+        <div className="d-flex mt-2 p-1">
+          <h4 className="mt-1">All Bounties</h4>
+          <div className="bg-shadow border-radius-8 p-1 ms-3 px-2">
+            <span className="p text-white-40">{totalBounties}</span>
+          </div>
+        </div>
+      )}
       {isRenderFilter() ? (
         <div
           className={"d-flex align-items-center gap-20 list-actions sticky-top"}
