@@ -25,7 +25,7 @@ export function useRepos() {
   const {getReposList} = useApi();
   const { getRepository, getRepositoryForks, getRepositoryBranches, getRepositoryViewerPermission } = useOctokit();
 
-  function loadRepos(force = false, name = state?.Service?.network?.lastVisited) {
+  function loadRepos(force = false, name = query?.network || state?.Service?.network?.lastVisited) {
     if (!name || state.spinners?.repos)
       return;
 
@@ -43,7 +43,7 @@ export function useRepos() {
 
     dispatch(changeLoadState(true));
 
-    getReposList(force, name)
+    getReposList(force, name.toString())
       .then(repos => {
         if (!repos) {
           console.error(`No repos found for`, name);
