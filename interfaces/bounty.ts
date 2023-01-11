@@ -3,6 +3,8 @@ import BigNumber from "bignumber.js";
 
 import { Token } from "interfaces/token";
 
+import { ThemeColors } from "./network";
+
 export interface BountyExtended extends Bounty {
     id: number;
     creationDate: number;
@@ -36,7 +38,11 @@ export interface BountyExtended extends Bounty {
     isInValidation?: boolean;
     isFundingRequest?: boolean;
     proposals: ProposalExtended[];
-
+    network?: {
+        colors: ThemeColors;
+        name: string;
+        logoIcon: string;
+    }
     transactionalTokenData?: Token;
     rewardTokenData?: Token;
 }
