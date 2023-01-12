@@ -52,7 +52,7 @@ export default function IssueListItem({
     });
   }
 
-  function Tag() {
+  function IssueTag() {
     const tag = issue?.network?.name;
     const id = issue?.githubId;
     
@@ -135,7 +135,7 @@ export default function IssueListItem({
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate mb-3">
-            <Tag/>
+            <IssueTag/>
             {(issue?.title !== null && issue?.title) || (
               <Translation ns="bounty" label={"errors.fetching"} />
             )}
