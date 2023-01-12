@@ -175,7 +175,7 @@ export default function ListIssues({
       time,
       state: filterState || state,
       search,
-      sortBy,
+      sortBy: sortBy || 'createdAt',
       order,
       creator,
       pullRequesterLogin,
