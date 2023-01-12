@@ -16,7 +16,7 @@ import { Tier } from 'types/settings';
 
 import useApi from 'x-hooks/use-api';
 
-export function KycSession() {
+export function KycSessionModal() {
   const [show, setShow] = useState<boolean>(false);
   const [currentTier, setCurrentTier] = useState<Tier>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -94,4 +94,4 @@ export function KycSession() {
   )
 }
 
-export default KycSession;
+export default KycSessionModal;

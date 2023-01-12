@@ -15,7 +15,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const user = await findUserBySession(req);
 
     if(!user)
-      return res.status(400).json('User not found')
+      return res.status(404).send('User not found')
 
     kycSession = await models.kycSession.findOne({
        where:{

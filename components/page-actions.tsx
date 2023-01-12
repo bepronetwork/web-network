@@ -9,7 +9,7 @@ import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
-import KycModal from "components/modals/kyc-session";
+import KycSessionModal from "components/modals/kyc-session";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
@@ -250,7 +250,7 @@ export default function PageActions({
       if(state.currentBounty?.data?.kycTierList?.length 
             && (state?.currentUser?.kycSession?.status !== 'VERIFIED' 
             && state.currentBounty?.kycSteps?.length))
-        return <KycModal/>
+        return <KycSessionModal/>
         
       return (
             <ReadOnlyButtonWrapper>
