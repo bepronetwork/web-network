@@ -91,7 +91,7 @@ export default function MainNav() {
   function LinkBounties() {
     return (
       <InternalLink
-        href={"/bounties"}
+        href={"/bounty-hall"}
         label={<Translation label={"main-nav.nav-avatar.bounties"} />}
         nav
         uppercase

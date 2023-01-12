@@ -10,7 +10,7 @@ export default function Index() {
   const { replace } = useRouter();
 
   useEffect(() => {
-    replace(`/bounties`);
+    replace(`/bounty-hall`);
   }, []);
 
   return(

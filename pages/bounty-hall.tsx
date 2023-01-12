@@ -15,7 +15,7 @@ import { BountyEffectsProvider } from "contexts/bounty-effects";
 import useApi from "x-hooks/use-api";
 
 
-export default function BountiesPage() {
+export default function BountyHallPage() {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
@@ -44,11 +44,6 @@ export default function BountiesPage() {
       currency: "USD",
     },
   ]);
-
-  
-  useEffect(() => {
-    if (state.Service?.active) state.Service?.active.loadRegistry();
-  }, [state.Service?.active]);
 
   useEffect(() => {
     getTotalNetworks().then(setNumberOfNetworks)
