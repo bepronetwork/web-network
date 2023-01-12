@@ -424,8 +424,7 @@ export default function CreateBountyModal() {
     
     if (
       currentSection === 1 &&
-      isKyc &&
-      !tierList.length
+      isKyc && Settings?.kyc?.tierList?.length && !tierList.length
     )
       return true;
       

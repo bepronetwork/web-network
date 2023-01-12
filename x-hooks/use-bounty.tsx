@@ -230,14 +230,14 @@ export function useBounty() {
     const settingsTierAllowed = state?.Settings?.kyc?.tierList;
     if(!sessionSteps?.length || !bountyTierNeeded?.length) return;
 
-    const missingSteps = settingsTierAllowed.
-                          filter(({id}) => bountyTierNeeded.includes(+id))
-                          .map(tier=>({
+    const missingSteps = settingsTierAllowed
+                          ?.filter(({id}) => bountyTierNeeded.includes(+id))
+                          ?.map(tier=>({
                             ...tier,
                             steps: sessionSteps
                                     .filter(({id, state}) => tier.steps_id.includes(id) && state !== "VALIDATED")
                           }))
-                          .filter(({steps})=> steps?.length)
+                          ?.filter(({steps})=> steps?.length) || [];
 
     dispatch(changeCurrentKycSteps(missingSteps))
   }

@@ -75,7 +75,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (await models.issue.findOne({ where: { githubId: `${githubId}`, repository_id: repository.id } }))
     return res.status(409).json("issueId already exists on database");
-
+  
   await models.issue.create({
     issueId: `${repository.id}/${githubId}`,
     githubId: `${githubId}`,
@@ -88,7 +88,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title: '',
     body: body,
     network_id: network.id,
-    isKyc: isKyc === "true" ? true : false,
+    isKyc: !!isKyc,
     kycTierList: tierList?.map(Number).filter(id=> !Number.isNaN(id)) || []
   });
 

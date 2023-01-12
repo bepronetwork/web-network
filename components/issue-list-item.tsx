@@ -170,7 +170,7 @@ export default function IssueListItem({
             {!isMobile && (
               <>
                 <BountyStatusInfo issueState={issueState} />
-                {issue.kycTierList.length ? <Badge
+                {issue?.isKyc ? <Badge
                   className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
                   label={t("bounty:kyc.label")}
                 /> : null}
