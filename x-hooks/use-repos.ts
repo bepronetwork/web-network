@@ -25,7 +25,8 @@ export function useRepos() {
   const {getReposList} = useApi();
   const { getRepository, getRepositoryForks, getRepositoryBranches, getRepositoryViewerPermission } = useOctokit();
 
-  function loadRepos(force = false, name = query?.network || state?.Service?.network?.lastVisited) {
+  function loadRepos(force = false) {
+    const name = query?.network
     if (!name || state.spinners?.repos)
       return;
 
@@ -63,7 +64,7 @@ export function useRepos() {
           !state.Service?.network?.repos ||
           state.Service?.network?.repos?.active?.id?.toString() === (id || query?.repoId))
       return;
-
+     
     const findRepoId = (repo: RepoInfo) => repo.id.toString() === (id || query.repoId).toString();
     const activeRepo = state.Service.network.repos.list.find(findRepoId);
 
@@ -72,9 +73,10 @@ export function useRepos() {
 
     setActiveRepo(activeRepo);
 
-    if (!activeRepo)
-      throw new Error(`No repo found for ${id || query.repoId}`);
-
+    if (!activeRepo){
+      console.log(`No repo found for repoId: ${id || query?.repoId}`)
+      return;
+    }
     getRepository(activeRepo?.githubPath, true)
       .then(info => {
         if (!info)
