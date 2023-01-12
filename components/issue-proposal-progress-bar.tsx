@@ -24,16 +24,15 @@ export default function IssueProposalProgressBar() {
 
   const {state} = useAppState();
   const getChainTime = () => state.Service.active.getTimeChain().then(setChainTime).catch(console.log)
-  const isFinalized = !!state.currentBounty?.chainData?.closed;
-  const isInValidation = !!state.currentBounty?.chainData?.isInValidation;
-  const isIssueinDraft = !!state.currentBounty?.chainData?.isDraft;
-  const isFundingRequest = 
-    state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
+  const isFinalized = !!(state.currentBounty?.data?.state === "closed")
+  const isInValidation = !!(state.currentBounty?.data?.state === "proposal")
+  const isIssueinDraft = !!(state.currentBounty?.data?.state === "draft")
+  const isFundingRequest = state.currentBounty?.data?.fundingAmount?.gt(0);
   const isBountyFunded = state.currentBounty?.data?.fundedAmount?.isEqualTo(state.currentBounty?.data?.fundingAmount);
   const creationDate = state.currentBounty?.chainData?.creationDate;
   const fundedDate = state.currentBounty?.data?.fundedAt;
   const closedDate = state.currentBounty?.chainData?.closedDate;
-  const isCanceled = state.currentBounty?.data?.state === "canceled" || !!state.currentBounty?.chainData?.canceled;
+  const isCanceled = !!(state.currentBounty?.data?.state === "canceled")
   const lastProposalCreationDate = state.currentBounty?.data?.mergeProposals?.
       filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
       .reduce((proposalAnt, proposalCur) => 

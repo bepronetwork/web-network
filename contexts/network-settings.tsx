@@ -479,7 +479,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       validated: true
     }
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
-    defaultState.settings.theme.colors = network?.colors || defaultState.settings?.theme?.colors || DefaultTheme();
+    defaultState.settings.theme.colors = network?.colors || DefaultTheme();
     defaultState.github.repositories = await loadGHRepos();
 
     setNetworkSettings(defaultState)

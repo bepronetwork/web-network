@@ -60,24 +60,17 @@ export default function ProposalActionCard({
   const approvalsCurrentPr = currentPullRequest?.approvals?.total || 0;
   const prsNeedsApproval = approvalsCurrentPr < approvalsRequired;
 
-  const isDisable = () => [
-    state.currentBounty?.chainData?.closed,
-    !isProposalDisputable(proposal?.createdAt, 
-                          BigNumber(state.Service?.network.times?.disputableTime).toNumber(), 
-                          chaintime),
-    proposal?.isDisputed,
-    proposal?.refusedByBountyOwner,
-    !networkProposal?.canUserDispute,
-    (state.currentUser?.balance?.oracles?.locked?.isZero() &&
-    state.currentUser?.balance?.oracles?.delegatedByOthers.isZero()),
-    isMerging,
-    isRefusing
-  ].some((v) => v);
-
-  const isSuccess =  () => [
-    state.currentBounty?.chainData?.closed,
-    !proposal?.isDisputed && proposal?.isMerged
-  ].every((v) => v);
+  const proposalCanBeDisputed = () => [
+    isProposalDisputable(proposal?.createdAt, 
+                         BigNumber(state.Service?.network.times?.disputableTime).toNumber(),
+                         chaintime),
+    networkProposal?.canUserDispute,
+    !proposal?.isDisputed,
+    !proposal?.refusedByBountyOwner,
+    !state.currentBounty?.chainData?.closed,
+    !proposal?.isDisputed,
+    !proposal?.isMerged
+  ].every(c => c);
 
   const isRefusable = () => [
     !state.currentBounty?.chainData?.closed,
@@ -176,15 +169,15 @@ export default function ProposalActionCard({
               distributedAmounts={distributedAmounts}
             />
 
-            {!isSuccess() && !isDisable() && (
+            {proposalCanBeDisputed() && (
               <Button
                 className="flex-grow-1"
                 textClass="text-uppercase text-white"
                 color="purple"
-                disabled={isDisable() || isDisputing}
+                disabled={!proposalCanBeDisputed() || isDisputing}
                 onClick={handleDispute}
                 isLoading={isDisputing}
-                withLockIcon={isDisable()}
+                withLockIcon={!proposalCanBeDisputed() || isMerging || isRefusing}
               >
                 {t("actions.dispute")}
               </Button>
