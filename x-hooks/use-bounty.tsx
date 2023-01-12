@@ -234,7 +234,7 @@ export function useBounty() {
     const sessionSteps = state?.currentUser?.kycSession?.steps;
     const bountyTierNeeded = state?.currentBounty?.data?.kycTierList;
     const settingsTierAllowed = state?.Settings?.kyc?.tierList;
-    if(!sessionSteps?.length || !bountyTierNeeded?.length || !settingsTierAllowed?.length) return;
+    if(!sessionSteps?.length || !bountyTierNeeded?.length) return;
 
     const missingSteps = settingsTierAllowed.
                           filter(({id}) => bountyTierNeeded.includes(+id))

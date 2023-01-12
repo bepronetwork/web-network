@@ -23,6 +23,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     tags,
     isKyc,
     tierList,
+    isKyc,
   } = req.body;
 
   const network = await models.network.findOne({
@@ -92,8 +93,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     body: body,
     network_id: network.id,
     tags,
-    isKyc,
-    kycTierList: tierList?.map(Number).filter(id=> !Number.isNaN(id)) || [],
+    isKyc: isKyc === "true" ? true : false,
+    kycTierList: tierList?.map(Number).filter(id=> !Number.isNaN(id)) || []
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);

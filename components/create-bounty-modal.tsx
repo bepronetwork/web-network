@@ -241,6 +241,8 @@ export default function CreateBountyModal() {
                 onClick={() => {
                   setisBountyType(false);
                   setRewardChecked(true);
+                  setIsKyc(false);
+                  setTierList([]);
                   setIssueAmount(ZeroNumberFormatValues);
                 }}
               >
@@ -523,8 +525,8 @@ export default function CreateBountyModal() {
         creator: payload.githubUser,
         repositoryId: payload.repositoryId,
         tags: selectedTags,
-        isKyc,
-        tierList,
+        isKyc: isBountyType ? isKyc : false,
+        tierList: isBountyType ? tierList : null,
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 

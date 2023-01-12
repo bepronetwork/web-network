@@ -251,14 +251,17 @@ export default function PageActions({
         isBountyOpen &&
         !isWorkingOnBounty &&
         isRepoForked &&
-        isStateToWorking){
+        isStateToWorking
+        ){
 
-      if(state.currentBounty?.data?.kycTierList?.length 
-            && (state?.currentUser?.kycSession?.status !== 'VERIFIED' 
-            && state.currentBounty?.kycSteps?.length))
+      if(state.Settings.kyc.isKycEnabled 
+            && ((!state.Settings.kyc.tierList
+                && state?.currentUser?.kycSession?.status !== 'VERIFIED')
+            || state.currentBounty?.kycSteps?.length)){
         return <KycSessionModal/>
-        
-      return (
+      }
+      else{
+        return (
             <ReadOnlyButtonWrapper>
               <Button
                 color="primary"
@@ -272,7 +275,8 @@ export default function PageActions({
                 </span>
               </Button>
             </ReadOnlyButtonWrapper>
-      );
+        );
+      }
     }
   }
 
