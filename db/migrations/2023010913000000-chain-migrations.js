@@ -67,7 +67,9 @@ async function up(queryInterface, Sequelize) {
   await queryInterface.addColumn('networks', 'chain_id', chain_id);
   await queryInterface.addColumn('issues', 'chain_id', chain_id);
   await queryInterface.addColumn('chain_events', 'chain_id', chain_id);
-
+  await queryInterface.changeColumn('chain_events', 'name', {type: DataTypes.STRING, unique: false});
+  await queryInterface.removeConstraint('chain_events', 'chain_events_name_key')
+  // todo future self note: This should make it so we can have multiple names
 }
 
 async function down(queryInterface, Sequelize) {
@@ -75,6 +77,7 @@ async function down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('networks', 'chain_id');
   await queryInterface.removeColumn('issues', 'chain_id');
   await queryInterface.removeColumn('chain_events', 'chain_id');
+  await queryInterface.addConstraint('chain_events', {type: 'unique', fields: ['name']});
 }
 
 module.exports = {up, down}
