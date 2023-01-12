@@ -31,9 +31,8 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
-import {useNetwork} from "x-hooks/use-network";
-import {useTransactions} from "x-hooks/use-transactions";
-
+import { useNetwork } from "x-hooks/use-network";
+import { useTransactions } from "x-hooks/use-transactions";
 import {EventName} from "../interfaces/analytics";
 import useAnalyticEvents from "./use-analytic-events";
 import useSignature from "./use-signature";
