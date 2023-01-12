@@ -103,7 +103,7 @@ export default function IssueListItem({
       <CardItem onClick={handleClickCard}>
         <>
           <div className="d-flex justify-content-between">
-            <div className="bg-dark-gray p-1 border-radius-8">
+            <div className="network-name bg-dark-gray p-1 border-radius-8">
               {issue?.network?.logoIcon && (
                 <img
                   src={`${state.Settings?.urls?.ipfs}/${issue?.network?.logoIcon}`}
@@ -112,7 +112,7 @@ export default function IssueListItem({
                   className="ms-1 me-2"
                 />
               )}
-              <span className="caption-small me-1 text-uppercase text-truncate">
+              <span className="caption-small me-1 text-uppercase">
                 {issue?.network?.name}
               </span>
             </div>

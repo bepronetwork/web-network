@@ -586,6 +586,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   max-width: 260px;
 }
 
+.network-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 155px
+}
+
 .status {
   padding: math.div($m, 4);
   border-radius: 50px;
