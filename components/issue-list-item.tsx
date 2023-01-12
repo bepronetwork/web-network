@@ -6,10 +6,10 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
 import DateLabel from "components/date-label";
-import Identicon from "components/identicon";
 import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
