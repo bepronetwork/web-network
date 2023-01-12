@@ -1,6 +1,7 @@
 
 import React from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {v4 as uuidv4} from "uuid";
@@ -76,11 +77,12 @@ function ItemSections({ data, isProposal }: ItemProps) {
 
             const approvalsCurrentPr = item?.approvals?.total || 0;
             const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
+            const itemId = isProposal ? item?.id : item?.githubId;
 
             return (
               <ItemRow 
                 key={`${uuidv4()} ${item?.id}`}
-                id={item?.id} 
+                id={itemId} 
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin}
                 creator={item?.creator} 
@@ -91,7 +93,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                       <ProposalProgressSmall
                         color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
                         value={proposal?.disputeWeight}
-                        total={state.currentUser?.balance?.staked}
+                        total={BigNumber(state.Service?.network?.amounts?.totalNetworkToken)}
                       />
                     </div>
                   </>
