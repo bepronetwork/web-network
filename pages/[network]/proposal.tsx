@@ -74,7 +74,7 @@ export default function PageProposal() {
       const { url } =
         await createNFT(state.currentBounty?.data?.contractId, proposal.contractId, state.currentUser?.walletAddress);
       
-      handleCloseIssue(+state.currentBounty?.data?.contractId, +proposal.contractId, url)
+      await handleCloseIssue(+state.currentBounty?.data?.contractId, +proposal.contractId, url)
         .then(async txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
           

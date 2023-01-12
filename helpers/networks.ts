@@ -47,6 +47,12 @@ const BNB: Currency = {
   symbol: "BNB"
 }
 
+const MATIC: Currency = {
+  name: "MATIC",
+  ticker: "MATIC",
+  symbol: "MATIC"
+}
+
 export const NETWORKS: {
   [key: string]: Network;
 } = {
@@ -166,6 +172,15 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://bscscan.com/",
     rpcUrls: ["https://bscrpc.com"]
+  },
+  "0x89": {
+    id: "137",
+    name: "Polygon by Ankr Protocol",
+    key: "polygon",
+    currency: MATIC,
+    decimals: 18,
+    explorerURL: "https://polygonscan.com/",
+    rpcUrls: ["https://polygon-rpc.com"]
   }
   
 };

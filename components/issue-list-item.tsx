@@ -16,6 +16,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
+import AvatarOrIdenticon from "./avatar-or-identicon";
 import DateLabel from "./date-label";
 
 export default function IssueListItem({
@@ -170,9 +171,9 @@ export default function IssueListItem({
               <>
                 <BountyStatusInfo issueState={issueState} />
                 <div className="d-flex align-items-center">
-                  <Identicon
-                    className="mr-2"
+                  <AvatarOrIdenticon
                     address={issue?.creatorAddress}
+                    user={issue?.creatorGithub}
                     size="sm"
                   />
                   {issue?.repository && (
@@ -185,7 +186,7 @@ export default function IssueListItem({
                         </Tooltip>
                       }
                     >
-                      <div className="bg-primary rounded-4 px-2 py-1">
+                      <div className="bg-primary rounded-4 px-2 py-1 ml-2">
                         <span className="caption-medium text-uppercase mw-github-info">
                           {issue?.repository?.githubPath.split("/")?.[1]}
                         </span>
