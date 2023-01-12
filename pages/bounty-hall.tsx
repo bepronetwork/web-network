@@ -32,17 +32,7 @@ export default function BountyHallPage() {
     {
       value: 0,
       label: t("custom-network:hero.number-of-bounties")
-    },
-    {
-      value: 0,
-      label: t("bounty:in-bounties"),
-      currency: "USD",
-    },
-    {
-      value: 0,
-      label: t("bounty:distributed"),
-      currency: "USD",
-    },
+    }
   ]);
 
   useEffect(() => {
@@ -59,17 +49,7 @@ export default function BountyHallPage() {
       {
         value: numberOfBounties,
         label: t("custom-network:hero.number-of-bounties"),
-      },
-      {
-        value: 0,
-        label: t("bounty:in-bounties"),
-        currency: "USD",
-      },
-      {
-        value: 0,
-        label: t("bounty:distributed"),
-        currency: "USD",
-      },
+      }
     ]);    
   }, [numberOfNetworks, numberOfBounties]);
 
