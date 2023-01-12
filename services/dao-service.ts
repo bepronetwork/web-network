@@ -90,6 +90,7 @@ export default class DAO {
 
       const registry = new NetworkRegistry(this.web3Connection, registryAddress || this.registryAddress);
 
+      console.log(`reg`, registryAddress, this.web3Connection.options, this.registryAddress)
       await registry.loadContract();
 
       if (!skipAssignment) this._registry = registry;

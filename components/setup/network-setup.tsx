@@ -44,7 +44,7 @@ export function NetworkSetup({
                       }} />
       </If>
 
-      <If condition={!!defaultNetwork}
+      <If condition={!!defaultNetwork && defaultNetwork.chain_id === state?.connectedChain.id}
           children={
             <ContextualSpan context="primary" isAlert>
               <span>{t("network.errors.network-already-saved", {network: defaultNetwork?.name})}</span>

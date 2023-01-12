@@ -16,6 +16,7 @@ import {Logger} from 'services/logging';
 import {chainFromHeader} from "../../../helpers/chain-from-header";
 import {UNAUTHORIZED} from "../../../helpers/error-messages";
 import {isAdmin} from "../../../helpers/is-admin";
+import {resJsonMessage} from "../../../helpers/res-json-message";
 import {LogAccess} from "../../../middleware/log-access";
 import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
 
@@ -28,6 +29,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const chain = await chainFromHeader(req);
 
   const where = {
+    ... chain ? {chain_id: {[Op.eq]: +chain?.chainId}} : {},
     ... networkName && {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
@@ -42,10 +44,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       isDefault: isDefault === "true"
     } || {},
     ... address && {
-      [Op.iLike]: String(address),
-    } || {},
-    chain_id: {[Op.eq]: +chain?.chainId}
+      networkAddress: { [Op.iLike]: String(address) },
+    } || {}
   };
+
+  console.log(`GET`, where);
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
@@ -113,7 +116,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
     
     if (isDefault && defaultNetwork)
-      return res.status(409).json("Default Network already saved");
+      return resJsonMessage("Default Network already saved", res, 409);
 
 
     // Contract Validations
@@ -123,12 +126,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       registryAddress: chain.registryAddress,
     });
 
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    console.log(`chain`, chain.chainRpc);
+
+    if (!await DAOService.start())
+      return resJsonMessage("Failed to connect with chain", res, 400);
     
-    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
+    if (!await DAOService.loadRegistry())
+      return resJsonMessage("Failed to load registry", res, 400);
 
     if (await DAOService.hasNetworkRegistered(creator))
-      return res.status(403).json("Already exists a network registered for this wallet");
+      return resJsonMessage("Already exists a network registered for this wallet", res, 403);
 
     // Uploading logos to IPFS
     let fullLogoHash = null
@@ -280,10 +287,13 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const publicSettings = (new Settings(settings)).raw();
 
-    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
-    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
-
     const chain = await chainFromHeader(req);
+
+    if (!chain.chainRpc)
+      return resJsonMessage(`Missing chainRpc`, res, 400);
+
+    if (!chain.registryAddress)
+      return resJsonMessage(`Missing registryAddress`, res, 400);
 
     // Contract Validations
     const DAOService = new DAO({ 
@@ -298,7 +308,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     if (!isAdminOverriding) {
       const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
-      if (checkingNetworkAddress !== networkAddress)
+      if (checkingNetworkAddress?.toLowerCase() !== networkAddress?.toLowerCase())
         return res.status(403).json("Creator and network addresses do not match");
     } else {
       const isRegistryGovernor = await DAOService.isRegistryGovernor(creator);
