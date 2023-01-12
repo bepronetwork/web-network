@@ -7,7 +7,6 @@ import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
 import BountyStatusInfo from "components/bounty-status-info";
-import Identicon from "components/identicon";
 import Translation from "components/translation";
 
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
@@ -16,6 +15,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
+import AvatarOrIdenticon from "./avatar-or-identicon";
 import Badge from "./badge";
 import DateLabel from "./date-label";
 
@@ -175,9 +175,9 @@ export default function IssueListItem({
                   label={t("bounty:kyc.label")}
                 /> : null}
                 <div className="d-flex align-items-center">
-                  <Identicon
-                    className="mr-2"
+                  <AvatarOrIdenticon
                     address={issue?.creatorAddress}
+                    user={issue?.creatorGithub}
                     size="sm"
                   />
                   {issue?.repository && (
@@ -190,7 +190,7 @@ export default function IssueListItem({
                         </Tooltip>
                       }
                     >
-                      <div className="bg-primary rounded-4 px-2 py-1">
+                      <div className="bg-primary rounded-4 px-2 py-1 ml-2">
                         <span className="caption-medium text-uppercase mw-github-info">
                           {issue?.repository?.githubPath.split("/")?.[1]}
                         </span>

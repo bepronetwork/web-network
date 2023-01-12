@@ -16,7 +16,16 @@ const publicRuntimeConfig = {
   kyc:{
     isEnabled: process.env.NEXT_PUBLIC_ENABLE_KYC || false
   },
-  adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
+  adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS,
+  leaderboardPoints: {
+    bountyClosedDev: process.env.NEXT_PUBLIC_BOUNTY_CLOSED_DEV || 1,
+    bountyClosedOwner: process.env.NEXT_PUBLIC_BOUNTY_CLOSED_OWNER || 0.5,
+    bountyOpened: process.env.NEXT_PUBLIC_BOUNTY_OPENED || 0.5,
+    bountyCanceled: process.env.NEXT_PUBLIC_BOUNTY_CANCELED || -0.5,
+    proposalCreated: process.env.NEXT_PUBLIC_PROPOSAL_CREATED || 0.5,
+    proposalAccepted: process.env.NEXT_PUBLIC_PROPOSAL_ACCEPTED || 0.3,
+    proposalRejected: process.env.NEXT_PUBLIC_PROPOSAL_REJECTED || -0.5
+  }
 }
 
 // Will only be available on the server-side

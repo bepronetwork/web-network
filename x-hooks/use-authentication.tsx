@@ -27,6 +27,7 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
+import { useNetwork } from "x-hooks/use-network";
 import { useTransactions } from "x-hooks/use-transactions";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
@@ -39,6 +40,7 @@ export function useAuthentication() {
   const {state, dispatch} = useAppState();
   const {connect} = useDao();
   const transactions = useTransactions();
+  const { loadNetworkAmounts } = useNetwork();
 
   const {asPath, push} = useRouter();
   const {getUserOf, getUserWith, searchCurators, getKycSession, validateKycSession} = useApi();
@@ -208,6 +210,8 @@ export function useAuthentication() {
         dispatch(changeSpinners.update({balance: false}));
         console.debug(`should have updated state`, state.currentUser.balance)
       })
+
+    loadNetworkAmounts();
   }
 
   function updateCurrentUserLogin() {
