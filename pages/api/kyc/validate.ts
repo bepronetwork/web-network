@@ -13,7 +13,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const user = await findUserBySession(req)
 
     if(!user)
-      return res.status(500).json('User not found')
+      return res.status(404).send('User not found')
 
     const kycSession = await models.kycSession.findOne({
        where:{
@@ -23,7 +23,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     })
     
     if(!kycSession)
-      return res.status(500).json('KYC Session not found')
+      return res.status(404).send('KYC Session not found')
 
     if(!kycSession?.validatedAt){
       const {data} = await kycApi.get('/onboarding/overview',{
