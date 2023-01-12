@@ -41,6 +41,7 @@ interface CreateBounty {
   body: string;
   creator: string;
   repositoryId: string;
+  isKyc?: boolean;
   tierList?: number[];
 }
 
