@@ -16,6 +16,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (networkName)
       queryParams = {
+        where: {
+          isAllowed: true
+        },
         include: [
           {
             association: "networks",

@@ -5,7 +5,7 @@ import {useTranslation} from "next-i18next";
 
 import { useNetworkSettings } from "contexts/network-settings";
 
-import {handleAllowedTokensDatabase} from "helpers/handleAllowedTokens";
+import { removeDuplicated } from "helpers/array";
 
 import {Token} from "interfaces/token";
 import {TokenType} from 'interfaces/token'
@@ -32,15 +32,12 @@ export default function TokensSettings({
 
   const {state} = useAppState();
 
-  const [currentAllowedTokens, setCurrentAllowedTokens] = useState<SelectedTokens>();
-  const [allowedRewardTokensList, setAllowedRewardTokensList] = useState<Token[]>();
-
+  const [isLoadingTokens, setIsLoadingTokens] = useState<boolean>(false);
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>();
-
-  const [transansactionLoading, setTransansactionLoading] = useState<boolean>(false);
-  const [allowedTransactionalTokensList, setAllowedTransactionalTokensList] = useState<Token[]>();
-
+  const [allowedRewardTokensList, setAllowedRewardTokensList] = useState<Token[]>();
+  const [currentAllowedTokens, setCurrentAllowedTokens] = useState<SelectedTokens>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
+  const [allowedTransactionalTokensList, setAllowedTransactionalTokensList] = useState<Token[]>();
 
   const { getTokens, processEvent } = useApi();
 
@@ -48,35 +45,54 @@ export default function TokensSettings({
     fields
   } = useNetworkSettings();
 
+  const tokenToAddress = ({ address } : Token) => address;
+  const tokenIsAllowed = ({ isAllowed } : Token) => isAllowed;
+  const tokenNotInSelected = ({ address } : Token, selecteds: Token[], isTransactional) => 
+    !selecteds?.find(f => f.address === address && f.isTransactional === isTransactional);
+
   async function getAllowedTokensContract() {
-    state.Service?.active.getAllowedTokens().then(async (tokens) => {
+    setIsLoadingTokens(true);
+
+    try {
+      const dbTokens = await getTokens();
+
+      const dbReward = dbTokens.filter(({ isTransactional }) => !isTransactional);
+      const dbTransactional = dbTokens.filter(({ isTransactional }) => isTransactional);
+
+      const dbRewardAllowed = dbReward.filter(tokenIsAllowed);
+      const dbTransactionalAllowed = dbTransactional.filter(tokenIsAllowed);
+
       setCurrentAllowedTokens({
-        "transactional": tokens["transactional"] || [],
-        "reward": tokens["reward"] || [],
-      } as SelectedTokens);
+        "transactional": dbTransactionalAllowed.map(tokenToAddress),
+        "reward": dbRewardAllowed.map(tokenToAddress)
+      });
 
-      if(!isGovernorRegistry){
-        const current = handleAllowedTokensDatabase(tokens, await getTokens())
-        setAllowedTransactionalTokensList(current.transactional);
-        setAllowedRewardTokensList(current.reward);
+      if (isGovernorRegistry) {
+        setSelectedRewardTokens(dbRewardAllowed);
+        setSelectedTransactionalTokens(dbTransactionalAllowed);
+
+        const availableReward = 
+          dbTokens.filter(({ address }) => !dbRewardAllowed.find( f => f.address === address));
+
+        const availableTransactional = 
+          dbTokens.filter(({ address }) => !dbTransactionalAllowed.find( f => f.address === address));
+
+        setAllowedRewardTokensList(removeDuplicated(availableReward, "address"));
+        setAllowedTransactionalTokensList(removeDuplicated(availableTransactional, "address"));
       } else {
-        await Promise.all([
-          Promise.all(tokens?.transactional?.map((address) => state.Service?.active.getERC20TokenData(address))),
-          Promise.all(tokens?.reward?.map((address) => state.Service?.active.getERC20TokenData(address))),
-        ]).then(([transactionals, reward])=> {
-          setAllowedTransactionalTokensList(transactionals);
-          setSelectedTransactionalTokens(transactionals);
-
-          setAllowedRewardTokensList(reward)
-          setSelectedRewardTokens(reward)
-  
-        }).catch(console.error)
-        .finally(() => {
-          setTransansactionLoading(false);
-        })
+        setAllowedTransactionalTokensList(dbTransactional
+          .filter(tokenIsAllowed)
+          .filter(t => tokenNotInSelected(t, defaultSelectedTokens, true)));
+          
+        setAllowedRewardTokensList(dbReward
+          .filter(tokenIsAllowed)
+          .filter(t => tokenNotInSelected(t, defaultSelectedTokens, false)));
       }
-     
-    });
+    } catch (error) {
+      console.debug("Failed to getAllowedTokensContract", error);
+    } finally {
+      setIsLoadingTokens(false);
+    }
   }
 
   function addRewardToken(newToken: Token) {
@@ -104,13 +120,12 @@ export default function TokensSettings({
     if(toAdd.length) transactions.push(state.Service?.active.addAllowedTokens(toAdd, isTransactional))
     if(toRemove.length) transactions.push(state.Service?.active.removeAllowedTokens(toRemove, isTransactional))
 
-    Promise.all(transactions).then((txs : { blockNumber: number }[]) => {
+    Promise.all(transactions).then(async (txs : { blockNumber: number }[]) => {
       const fromBlock = txs.reduce((acc, tx) => Math.min(acc, tx.blockNumber), Number.MAX_SAFE_INTEGER)
       
-      processEvent("registry", "changed", state.Service?.network?.active.name, {
-                fromBlock
-      })
-      getAllowedTokensContract();
+      await processEvent("registry", "changed", state.Service?.network?.active.name, { fromBlock });
+
+      await getAllowedTokensContract();
     })
   }
 
@@ -120,7 +135,7 @@ export default function TokensSettings({
 
     getAllowedTokensContract();
       
-  }, [isGovernorRegistry]);
+  }, [state.Service?.active, isGovernorRegistry]);
 
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {
@@ -131,7 +146,7 @@ export default function TokensSettings({
 
   useEffect(() => {
     fields.allowedTransactions.setter(selectedTransactionalTokens);
-    fields.allowedRewards.setter(selectedRewardTokens)
+    fields.allowedRewards.setter(selectedRewardTokens);
   }, [selectedRewardTokens, selectedTransactionalTokens]);
 
 
@@ -161,7 +176,7 @@ export default function TokensSettings({
         canAddToken: isGovernorRegistry,
         selectedTokens: selectedTransactionalTokens,
         changeSelectedTokens: setSelectedTransactionalTokens,
-        isloading: transansactionLoading
+        isloading: isLoadingTokens
       },
       reward: {
         key: "select-multi-reward",
@@ -205,6 +220,7 @@ export default function TokensSettings({
         </span>
         {renderTokens("transactional")}
       </Row>
+
       {isGovernorRegistry && (
         <div className="mb-3">
           <WarningSpan
@@ -212,6 +228,7 @@ export default function TokensSettings({
           />
         </div>
       )}
+
       <Row className="mb-2">
         {renderTokens("reward")}
       </Row>
