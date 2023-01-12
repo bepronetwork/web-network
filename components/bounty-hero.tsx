@@ -52,7 +52,7 @@ export default function BountyHero() {
                     })}
                   />
 
-                  {state.currentBounty?.data?.kycTierList?.length
+                  {state.currentBounty?.data?.isKyc
                   ? <Badge
                     className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
                     label={t("bounty:kyc.label")}

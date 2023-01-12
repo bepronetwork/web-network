@@ -21,7 +21,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     repositoryId,
     networkName,
     tags,
-    isKyc,
     tierList,
     isKyc,
   } = req.body;
@@ -93,7 +92,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     body: body,
     network_id: network.id,
     tags,
-    isKyc: isKyc === "true" ? true : false,
+    isKyc: !!isKyc,
     kycTierList: tierList?.map(Number).filter(id=> !Number.isNaN(id)) || []
   });
 

@@ -76,7 +76,7 @@ export function KycSessionModal() {
               lang={'en'}
             /> 
 
-          {isLoading || !currentTier  ? <span className="spinner-border spinner-border-md" /> : null}
+          {isLoading ? <span className="spinner-border spinner-border-md" /> : null}
           </>
           ): null}
         </div>
