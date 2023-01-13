@@ -1,4 +1,5 @@
 import Handlebars from "handlebars";
+import cache from "memory-cache";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Op } from "sequelize";
@@ -11,6 +12,8 @@ import { rssTemplate } from "templates/rss";
 
 const { publicRuntimeConfig } = getConfig();
 
+const TTL = 1 * 60 * 60 * 1000; // 1 hour in miliseconds
+const getCacheKey = (type, limit) => `RSS:${type}:${limit}`;
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { type = "all", limit = 50 } = req.query;
@@ -18,6 +21,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (!["open", "closed", "all"].includes(type.toString()))
       return res.status(403).json("Type must be open, closed or all");
+
+    const cachedData = cache.get(getCacheKey(type, limit));
+
+    if (cachedData)
+      return res
+        .setHeader("Content-Type", "text/xml")
+        .status(200)
+        .send(cachedData);
+
+    console.log("passou")
 
     let where = {};
 
@@ -66,6 +79,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const handlebar = Handlebars.compile(rssTemplate);
 
     const result = handlebar(templateData);
+
+    cache.put(getCacheKey(type, limit), result, TTL);
 
     return res
       .setHeader("Content-Type", "text/xml")
