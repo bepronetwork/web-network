@@ -5,6 +5,7 @@ import {Op, Sequelize, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
 
@@ -174,7 +175,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       include,
       nest: true,
       order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
-      });
+      }).then(data => handleNetworkValues(data))
 
       const result = [];
 
@@ -185,17 +186,18 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       const paginatedData = paginateArray(result, 10, page || 1);
 
       return res.status(200).json({
-      count: result.length,
-      rows: paginatedData.data,
-      pages: paginatedData.pages,
-      currentPage: +paginatedData.page
+        count: result.length,
+        rows: paginatedData.data,
+        pages: paginatedData.pages,
+        currentPage: +paginatedData.page
       });
     } else {
+      
       const issues = await models.issue.findAndCountAll(paginate({ 
       where: whereCondition, 
       include, nest: true }, req.query, [
         [...sortBy|| ["createdAt"], req.query.order || "DESC"]
-      ]));
+      ])).then(data => handleNetworkValues(data))
 
       return res.status(200).json({
       ...issues,

@@ -4,6 +4,8 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import handleNetworkValues from 'helpers/handleNetworksValuesApi';
+
 const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 1) => (models.issue.findAll({
   where: {
     ...whereCondition,
@@ -74,7 +76,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const issuesOpen = await  getLastIssuesByStatus("open", whereCondition, sortBy, order)
   const issuesProposal = await getLastIssuesByStatus("proposal", whereCondition, sortBy, order)
   
-  return res.status(200).json([...issuesDraft, ...issuesOpen, ...issuesProposal]);
+  return res.status(200).json(handleNetworkValues([...issuesDraft, ...issuesOpen, ...issuesProposal]));
 }
 
 async function getAll(req: NextApiRequest,
