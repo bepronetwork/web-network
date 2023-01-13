@@ -12,7 +12,7 @@ import { rssTemplate } from "templates/rss";
 
 const { publicRuntimeConfig } = getConfig();
 
-const TTL = 1 * 60 * 60 * 1000; // 1 hour in miliseconds
+const convertMinutesToMs = minutes => +minutes * 60 * 1000;
 const getCacheKey = (type, limit) => `RSS:${type}:${limit}`;
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -29,8 +29,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         .setHeader("Content-Type", "text/xml")
         .status(200)
         .send(cachedData);
-
-    console.log("passou")
 
     let where = {};
 
@@ -79,6 +77,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const handlebar = Handlebars.compile(rssTemplate);
 
     const result = handlebar(templateData);
+
+    const ttlSetting = await models.settings.findAll({
+      where: { 
+        key: "rssTtl",
+        visibility: "public"
+      },
+      raw: true,
+    });
+
+    const TTL = convertMinutesToMs(ttlSetting.value || 1);
 
     cache.put(getCacheKey(type, limit), result, TTL);
 
