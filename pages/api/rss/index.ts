@@ -24,7 +24,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     if (type === "open")
       where = {
         state: {
-          [Op.notIn]: ["closed", "canceled", "pending"]
+          [Op.notIn]: ["draft", "closed", "canceled", "pending"]
         }
       };
     else if (type === "closed")
