@@ -54,6 +54,7 @@ export interface IssueData {
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
   payments: Payment[];
+  tags: string[];
 }
 
 export interface Disputes {

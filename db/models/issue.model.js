@@ -34,7 +34,10 @@ class Issue extends Model {
         fundedAt: {
           type: DataTypes.DATE,
           allowNull: true
-        }
+        },
+        tags: {
+          type: DataTypes.ARRAY(DataTypes.STRING)
+        },
     },
                {
         sequelize,
