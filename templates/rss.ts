@@ -13,9 +13,11 @@ export const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
                     <div>
                         <img src="{{seoUrl}}" style="width: 100%;" />
                         <div>{{description}}</div>
-                        {{#each tags}}
-                            <div>#{{tag}}</div>
-                        {{/each}}
+                        <div>
+                            {{#each tags}}
+                                #{{tag}}
+                            {{/each}}
+                        </div>
                     </div> 
                 ]]>
             </description>
