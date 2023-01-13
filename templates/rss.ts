@@ -15,7 +15,9 @@ export const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
                         <div style="text-transform: capitalize;">{{description}}</div>
                         <div>
                             {{#each tags}}
-                                <span style="color: white; background-color: #4250e4;">#{{tag}}</span>
+                                <span style="color: white; background-color: rgba(66, 80, 228, 0.3); font-weight: bold; text-transform: uppercase; border-radius: 8px; border: 1px; solid #4250e4;">
+                                    #{{tag}}
+                                </span>
                             {{/each}}
                         </div>
                     </div> 
