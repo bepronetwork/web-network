@@ -526,6 +526,7 @@ export default function CreateBountyModal() {
         tags: selectedTags,
         isKyc: isBountyType ? isKyc : false,
         tierList: isBountyType ? tierList : null,
+        tags: selectedTags
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 

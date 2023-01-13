@@ -47,6 +47,7 @@ interface CreateBounty {
   tags: string[];
   isKyc?: boolean;
   tierList?: number[];
+  tags: string[];
 }
 
 interface GetNetworkProps {
