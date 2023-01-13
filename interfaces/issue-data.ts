@@ -3,7 +3,6 @@ import BigNumber from "bignumber.js";
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
 
-import { ThemeColors } from "./network";
 import { Payment } from "./payments";
 
 export type IssueState =

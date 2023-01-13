@@ -9,7 +9,6 @@ import ListRecentIssues from "components/bounties/list-recent-issues";
 import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
 
-import { useAppState } from "contexts/app-state";
 import { BountyEffectsProvider } from "contexts/bounty-effects";
 
 import useApi from "x-hooks/use-api";
@@ -21,7 +20,6 @@ export default function BountyHallPage() {
   const [numberOfBounties, setNumberOfBounties] = useState(0);
 
   const { getTotalNetworks, getTotalBounties } = useApi();
-  const {state} = useAppState();
 
 
   const [infos, setInfos] = useState<InfosHero[]>([
