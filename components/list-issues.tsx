@@ -361,7 +361,7 @@ export default function ListIssues({
       !appState.loading?.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            {appState.currentUser?.walletAddress && (
+            {(appState.currentUser?.walletAddress && !allNetworks) && (
               <ReadOnlyButtonWrapper>
                 <Button onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
