@@ -43,6 +43,7 @@ interface CreateBounty {
   repositoryId: string;
   isKyc?: boolean;
   tierList?: number[];
+  tags: string[];
 }
 
 interface GetNetworkProps {

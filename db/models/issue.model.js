@@ -42,7 +42,10 @@ class Issue extends Model {
         kycTierList:{
           type: DataTypes.ARRAY(DataTypes.INTEGER),
           default: []
-        }
+        },
+        tags: {
+          type: DataTypes.ARRAY(DataTypes.STRING)
+        },
     },
                {
         sequelize,
