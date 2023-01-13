@@ -57,7 +57,9 @@ export interface IssueData {
   disputes?: Disputes[];
   payments: Payment[];
   network?: {
-    colors: ThemeColors;
+    colors: {
+        primary: string;
+    };
     name: string;
     logoIcon: string;
   }

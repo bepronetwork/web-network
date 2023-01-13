@@ -39,7 +39,9 @@ export interface BountyExtended extends Bounty {
     isFundingRequest?: boolean;
     proposals: ProposalExtended[];
     network?: {
-        colors: ThemeColors;
+        colors: {
+            primary: string;
+        };
         name: string;
         logoIcon: string;
     }
