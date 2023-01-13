@@ -9,7 +9,15 @@ export const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
         <item>
             <title>{{title}}</title>
             <description>
-                <![CDATA[ <div><img src="{{seoUrl}}" style="width: 500px;" /><div>{{title}}</div></div> ]]>
+                <![CDATA[ 
+                    <div>
+                        <img src="{{seoUrl}}" style="width: 100%;" />
+                        <div>{{description}}</div>
+                        {{#each tags}}
+                            <div>#{{tag}}</div>
+                        {{/each}}
+                    </div> 
+                ]]>
             </description>
             <link>{{link}}</link>
             <pubDate>{{creationDate}}</pubDate>
