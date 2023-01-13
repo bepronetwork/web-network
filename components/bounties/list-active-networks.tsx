@@ -52,7 +52,7 @@ export default function ListActiveNetworks() {
       <div className="row mt-3">
         {networks &&
           networks?.map((network) => (
-            <div className="col" key={network.name}>
+            <div className="col-4" key={network.name}>
               <CardItem onClick={() => {
                 router.push(getURLWithNetwork("/", {
                       network: network.name
