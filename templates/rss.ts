@@ -7,7 +7,7 @@ export const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
         <description>{{appDescription}}</description>
         {{#each bounties}}
         <item>
-            <title>{{title}}</title>
+            <title style="text-transform: capitalize;">{{title}}</title>
             <description>
                 <![CDATA[ 
                     <div>
@@ -15,7 +15,7 @@ export const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
                         <div style="text-transform: capitalize;">{{description}}</div>
                         <div>
                             {{#each tags}}
-                                <span style="color: white; background-color: #4250e4; font-weight: bold; text-transform: uppercase; border-radius: 8px; border: 1px; solid #4250e4; padding: 3px">
+                                <span style="color: white; background-color: #4250e4; font-weight: bold; text-transform: uppercase; border-radius: 8px; border: 1px; solid #4250e4; padding: 2px 3px; margin-right: 2px;">
                                     #{{tag}}
                                 </span>
                             {{/each}}
