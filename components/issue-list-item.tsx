@@ -5,8 +5,10 @@ import {isMobile} from "react-device-detect";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import BountyStatusInfo from "components/bounty-status-info";
-import Identicon from "components/identicon";
+import BountyTags from "components/bounty/bounty-tags";
+import DateLabel from "components/date-label";
 import Translation from "components/translation";
 
 import {getIssueState} from "helpers/handleTypeIssue";
@@ -14,12 +16,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
-
 import CardItem from "./card-item";
-
-import AvatarOrIdenticon from "./avatar-or-identicon";
-
-import DateLabel from "./date-label";
 import IssueAmountInfo from "./issue-amount-info";
 
 export default function IssueListItem({
@@ -175,8 +172,12 @@ export default function IssueListItem({
                 </div>
               </>
             )}
+
             <RenderIssueData state={issueState} />
+            
             <DateLabel date={issue?.createdAt} className="text-white-40" />
+
+            <BountyTags tags={issue?.tags} />
           </div>
         </div>
 

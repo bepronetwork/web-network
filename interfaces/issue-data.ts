@@ -63,6 +63,7 @@ export interface IssueData {
     name: string;
     logoIcon: string;
   }
+  tags: string[];
 }
 
 export interface Disputes {

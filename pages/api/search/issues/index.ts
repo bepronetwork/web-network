@@ -179,8 +179,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
       const result = [];
 
-      result.push(...issues.filter(({ title, body }) =>
-        [title, body].some((text) =>
+      result.push(...issues.filter(({ title, body, tags }) =>
+        [title, body, ...(tags || [])].some((text) =>
           searchPatternInText(text || "", String(search)))));
 
       const paginatedData = paginateArray(result, 10, page || 1);
