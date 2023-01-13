@@ -12,10 +12,10 @@ export const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
                 <![CDATA[ 
                     <div>
                         <img src="{{seoUrl}}" style="width: 100%;" />
-                        <div>{{description}}</div>
+                        <div style="text-transform: capitalize;">{{description}}</div>
                         <div>
                             {{#each tags}}
-                                #{{tag}}
+                                <span style="color: white; background-color: #4250e4;">#{{tag}}</span>
                             {{/each}}
                         </div>
                     </div> 
