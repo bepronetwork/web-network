@@ -45,6 +45,7 @@ export const GlobalEffectsProvider = ({children}) => {
             ]);
   useEffect(auth.updateKycSession, [state?.currentUser?.login,
                                     state?.currentUser?.accessToken,
+                                    state?.currentUser?.match,
                                     state?.currentUser?.walletAddress,
                                     state?.Settings?.kyc?.tierList]);
   useEffect(auth.updateWalletAddress, [state.currentUser]);
