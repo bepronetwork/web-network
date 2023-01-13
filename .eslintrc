@@ -67,6 +67,7 @@
           ["/^pages/"],
           ["/^services/"],
           ["/^styles/"],
+          ["/^templates/"],
           ["/^types/"],
           ["/^x-hooks/"],
           ["parent", "sibling", "index"]
