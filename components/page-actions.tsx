@@ -255,8 +255,8 @@ export default function PageActions({
         isStateToWorking &&
         state?.currentUser?.accessToken
         ){
-          
-      if(state.Settings.kyc.isKycEnabled && !isKycVerified){
+
+      if(state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
         return <KycSessionModal/>
       }
       else{
