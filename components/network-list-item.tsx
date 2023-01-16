@@ -18,7 +18,7 @@ export default function NetworkListItem({
                                           tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
-  const {state: {Settings: settings}} = useAppState();
+  const {state: {Settings: settings, connectedChain, currentUser}} = useAppState();
 
   const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
   const isNotUndefined = value => value !== undefined;

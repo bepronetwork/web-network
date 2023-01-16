@@ -62,7 +62,7 @@ export default class DAO {
 
       const network = new Network_v2(this.web3Connection, networkAddress);
 
-      await network.loadAbi();
+      await network.loadContract();
 
       if (!skipAssignment)
         this._network = network;
