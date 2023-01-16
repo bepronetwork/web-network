@@ -23,7 +23,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     
   const include = [
     { association: "tokens" },
-    { association: "issues" },
+    { association: "issues",
+      where: { 
+        state: {[Op.not]: "pending" }
+      }
+    },
     { association: "curators" }
   ];
 
