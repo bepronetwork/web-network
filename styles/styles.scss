@@ -1753,3 +1753,7 @@ input[type="color"] {
 .btn-outline-purple {
   border-color: var(--bs-purple);
 }
+
+.kyc-modal-body{
+  min-height: 630px !important;
+}

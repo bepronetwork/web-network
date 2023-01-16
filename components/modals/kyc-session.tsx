@@ -71,7 +71,7 @@ export function KycSessionModal() {
               <Synaps
               sessionId={session?.session_id}
               tier={+currentTier?.id || null}
-              className={`${isLoading ? 'd-none' : ''}`}
+              className={`${isLoading ? 'd-none' : ''} kyc-modal-body`}
               onReady={() => setIsLoading(false)}
               onFinish={() => setShow(false)}
               service={'individual'}
