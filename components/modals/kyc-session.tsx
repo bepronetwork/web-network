@@ -63,20 +63,20 @@ export function KycSessionModal() {
         <Translation ns="bounty" label="kyc.identify-to-start" />
       </Button>
 
-      <Modal show={show} onCloseClick={() => setShow(false)}>
+      <Modal show={show} onCloseClick={() => setShow(false)} scrollable={false}>
         <div className='d-flex flex-column align-items-center justify-content-center'>
+        {isLoading ? <span className="spinner-border spinner-border-md" /> : null}
           {session ? (
             <>
               <Synaps
               sessionId={session?.session_id}
               tier={+currentTier?.id || null}
+              className={`${isLoading ? 'd-none' : ''}`}
               onReady={() => setIsLoading(false)}
               onFinish={() => setShow(false)}
               service={'individual'}
               lang={'en'}
             /> 
-
-          {isLoading ? <span className="spinner-border spinner-border-md" /> : null}
           </>
           ): null}
         </div>
