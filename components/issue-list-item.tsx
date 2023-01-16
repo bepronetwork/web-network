@@ -20,6 +20,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import Badge from "./badge";
+
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
   xClick?: () => void;
