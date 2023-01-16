@@ -14,7 +14,7 @@ const usage = `-----------------------------------------------------------------
 
 Usage: $0 -n <network> [-u <rpcUrl> -e <env file> -t <transactional>] 
 
-<network> =  development | moonbase | kovan | mainnet | ropsten | seneca | afrodite | custom`
+<network> =  development | moonbase | kovan | mainnet | ropsten | seneca | afrodite | apolodorus | custom`
 
 const epilog = 'TAIKAI Copyright 2022'
 
@@ -45,7 +45,7 @@ const argv = require('yargs')
   .alias('n', 'network')
   .describe('n', 'Ethereum Blockchain')
   .default('n', 'development')
-  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom", "diogenes","aurelius"])
+  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom", "diogenes","aurelius", "apollodorus"])
   .option('k', {
     alias: "ownerKey",
     describe: "Owner Private key",
@@ -132,7 +132,10 @@ const networks = {
   },  
   bsc: {
     url: 'https://bscrpc.com',
-  },  
+  },
+  apollodorus: {
+    url: 'https://eth-apollodorus.taikai.network:8080'
+  }
 }
 
 async function main() {
