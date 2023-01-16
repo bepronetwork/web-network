@@ -16,15 +16,19 @@ import { Network } from "interfaces/network";
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
+import LoadingList from "./loading-list";
+
 export default function ListActiveNetworks() {
   const { t } = useTranslation(["bounty"]);
   const [networks, setNetworks] = useState<Network[]>();
+  const [loading, setLoading] = useState<boolean>(false);
   const { searchActiveNetworks } = useApi();
   const { state } = useAppState();
   const router = useRouter();
   const { getURLWithNetwork } = useNetworkTheme();
 
   useEffect(() => {
+    setLoading(true)
     searchActiveNetworks({
       isClosed: false,
       isRegistered: true,
@@ -32,7 +36,7 @@ export default function ListActiveNetworks() {
       .then((data) => {
         data?.rows && setNetworks(data.rows);
       })
-      .catch(console.log);
+      .catch(console.log).finally(() => setLoading(false))
   }, []);
 
   return (
@@ -49,6 +53,7 @@ export default function ListActiveNetworks() {
           </a>
         </Link>
       </div>
+      <LoadingList  loading={loading} />
       <div className="row mt-3">
         {networks &&
           networks?.map((network) => (
