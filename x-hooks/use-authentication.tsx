@@ -101,8 +101,10 @@ export function useAuthentication() {
 
     dispatch(changeWalletSpinnerTo(true));
 
+    console.log("updateWalletAddress service", state.Service?.active);
+
     (state.Service?.active ? state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
-      .then(address => {
+      .then(_address => {
         const address = Array.isArray(_address) ? _address[0] : _address;
         if (address !== state.currentUser?.walletAddress) {
           dispatch(changeCurrentUserWallet(address))
@@ -310,9 +312,9 @@ export function useAuthentication() {
       return;
 
     if (decodeMessage(state?.connectedChain?.id,
-        IM_AN_ADMIN,
-        state?.currentUser?.signature,
-        publicRuntimeConfig?.adminWallet))
+                      IM_AN_ADMIN,
+                      state?.currentUser?.signature,
+                      publicRuntimeConfig?.adminWallet))
       return;
 
     if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())

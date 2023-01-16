@@ -31,7 +31,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const transactions = useTransactions();
 
   useEffect(dao.start, [state.supportedChains, state.connectedChain]);
-  useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress]);
+  useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress, state?.connectedChain?.id]);
 
   useEffect(repos.loadRepos, [query?.network , state?.Service?.network?.lastVisited]);
   useEffect(repos.updateActiveRepo, [query?.repoId, state.Service?.network?.repos]);

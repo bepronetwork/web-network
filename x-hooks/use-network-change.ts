@@ -2,7 +2,6 @@ import {SupportedChainData} from "../interfaces/supported-chain-data";
 
 export default function UseNetworkChange() {
   async function handleAddNetwork(chosenSupportedChain: SupportedChainData) {
-
     const chainId = `0x${Number(chosenSupportedChain.chainId).toString(16)}`;
 
     return window.ethereum.request({
@@ -19,7 +18,7 @@ export default function UseNetworkChange() {
           params: [
             {
               chainId: chainId,
-              chainName: chosenSupportedChain.name,
+              chainName: chosenSupportedChain.chainName,
               nativeCurrency: {
                 name: chosenSupportedChain.chainCurrencyName,
                 symbol: chosenSupportedChain.chainCurrencySymbol,

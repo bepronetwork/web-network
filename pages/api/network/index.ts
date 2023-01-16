@@ -29,7 +29,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const chain = await chainFromHeader(req);
 
   const where = {
-    ... chain ? {chain_id: {[Op.eq]: +chain?.chainId}} : {},
+    // ... chain ? {chain_id: {[Op.eq]: +chain?.chainId}} : {},
     ... networkName && {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")

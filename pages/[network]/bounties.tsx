@@ -79,6 +79,7 @@ export default function BountiesPage() {
 
   return (
     <BountyEffectsProvider>
+      {console.log({ state })}
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}

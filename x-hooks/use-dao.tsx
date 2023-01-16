@@ -1,13 +1,14 @@
+import {isZeroAddress} from "ethereumjs-util";
+import getConfig from "next/config";
+import {useRouter} from "next/router";
+import {isAddress} from "web3-utils";
+
 import {useAppState} from "../contexts/app-state";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
 import {changeConnecting} from "../contexts/reducers/change-spinners";
 import {toastError,} from "../contexts/reducers/change-toaster";
 import DAO from "../services/dao-service";
-import getConfig from "next/config";
-import {useRouter} from "next/router";
-import {isAddress} from "web3-utils";
-import {isZeroAddress} from "ethereumjs-util";
 
 
 export function useDao() {
@@ -45,6 +46,14 @@ export function useDao() {
    */
   function changeNetwork() {
     const networkAddress = state.Service?.network?.active?.networkAddress;
+
+    console.log({
+      networkAddress,
+      activeService: state.Service?.active,
+      loadedNetwork: state.Service?.active?.network?.contractAddress,
+      connectedChain: state?.connectedChain,
+      networkChainId: state.Service?.network?.active
+    });
     
     if (!state.Service?.active || !networkAddress)
       return;
@@ -52,7 +61,12 @@ export function useDao() {
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
+    if (+state.Service?.network?.active?.chain_id !== +state?.connectedChain?.id)
+      return;
+
     const service = state.Service.active;
+
+    console.debug("starting network")
 
     dispatch(changeStarting(true));
 
@@ -85,6 +99,8 @@ export function useDao() {
     const hasChainRegistry = isAddress(connectedChain?.registryAddress) && !isZeroAddress(connectedChain?.registryAddress);
 
     console.debug(`useDao start()`, connectedChain && hasChainRpc && (hostsDiffer || !state.Service?.starting))
+
+    console.debug("useDAO", { connectedChain, activeWeb3Host, hostsDiffer, hasChainRpc, hasChainRegistry })
 
     if (!connectedChain)
       return;

@@ -17,6 +17,8 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 
+import UseNetworkChange from "./use-network-change";
+
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
@@ -26,6 +28,7 @@ export function useNetwork() {
 
   const {getNetwork, getNetworkTokens} = useApi();
   const {query, replace} = useRouter();
+  const { handleAddNetwork } = UseNetworkChange();
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -51,13 +54,18 @@ export function useNetwork() {
       }
 
       getNetwork({name: queryNetworkName,})
-        .then(({data}) => {
+        .then(async ({data}) => {
           if (!data.isRegistered)
             return replace(`/networks`);
 
           if (state?.currentUser?.connected && state?.connectedChain?.id !== data?.chain_id) {
             console.log(`Should have asked to change chains`);
-            return;
+            const chainData = state.supportedChains?.find(({ chainId }) => chainId === +data?.chain_id);
+
+            if (chainData)
+              await handleAddNetwork(chainData);
+            else
+              return;
           }
 
           const newCachedData = new WinStorage(storageKey, 3600, `sessionStorage`);
