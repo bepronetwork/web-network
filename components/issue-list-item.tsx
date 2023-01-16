@@ -6,25 +6,28 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import BountyStatusInfo from "components/bounty-status-info";
-import Identicon from "components/identicon";
+import BountyTags from "components/bounty/bounty-tags";
+import DateLabel from "components/date-label";
 import Translation from "components/translation";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
-import {useAppState} from "../contexts/app-state";
-import DateLabel from "./date-label";
-
-export default function IssueListItem({
-                                        issue = null,
-                                        xClick,
-                                      }: {
+interface IssueListItemProps {
   issue?: IssueBigNumberData;
   xClick?: () => void;
-}) {
+}
+
+export default function IssueListItem({
+  issue = null,
+  xClick,
+}: IssueListItemProps) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
@@ -170,9 +173,9 @@ export default function IssueListItem({
               <>
                 <BountyStatusInfo issueState={issueState} />
                 <div className="d-flex align-items-center">
-                  <Identicon
-                    className="mr-2"
+                  <AvatarOrIdenticon
                     address={issue?.creatorAddress}
+                    user={issue?.creatorGithub}
                     size="sm"
                   />
                   {issue?.repository && (
@@ -185,7 +188,7 @@ export default function IssueListItem({
                         </Tooltip>
                       }
                     >
-                      <div className="bg-primary rounded-4 px-2 py-1">
+                      <div className="bg-primary rounded-4 px-2 py-1 ml-2">
                         <span className="caption-medium text-uppercase mw-github-info">
                           {issue?.repository?.githubPath.split("/")?.[1]}
                         </span>
@@ -195,8 +198,12 @@ export default function IssueListItem({
                 </div>
               </>
             )}
+
             <RenderIssueData state={issueState} />
+            
             <DateLabel date={issue?.createdAt} className="text-white-40" />
+
+            <BountyTags tags={issue?.tags} />
           </div>
         </div>
 

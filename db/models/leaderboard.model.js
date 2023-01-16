@@ -18,7 +18,31 @@ class LeaderBoard extends Model {
         numberNfts: {
           type: DataTypes.INTEGER,
           allowNull: true
-        }
+        },
+        ownedBountiesOpened: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        ownedBountiesClosed: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        ownedBountiesCanceled: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        ownedProposalCreated: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        ownedProposalAccepted: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        ownedProposalRejected: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
       },
       {
         sequelize,

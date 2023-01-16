@@ -81,6 +81,7 @@ export default function CreateBountyModal() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [issueAmount, setIssueAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
   const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
+  const [selectedTags, setSelectedTags]= useState<string[]>([]);
 
   const rewardERC20 = useERC20();
 
@@ -144,6 +145,8 @@ export default function CreateBountyModal() {
         onUploading={setIsUploading}
         review={review}
         files={files}
+        selectedTags={selectedTags}
+        setSelectedTags={setSelectedTags}
       />
     );
   }
@@ -402,6 +405,7 @@ export default function CreateBountyModal() {
 
   function cleanFields() {
     setFiles([]);
+    setSelectedTags([]);
     setBountyTitle("");
     setBountyDescription("");
     setIssueAmount(ZeroNumberFormatValues);
@@ -460,7 +464,7 @@ export default function CreateBountyModal() {
         creatorAddress: currentUser.walletAddress,
         githubUser: currentUser?.login,
         repositoryId: repository?.id,
-        branch,
+        branch
       };
 
       const cid = await createPreBounty({
@@ -468,6 +472,7 @@ export default function CreateBountyModal() {
         body: payload.body,
         creator: payload.githubUser,
         repositoryId: payload.repositoryId,
+        tags: selectedTags
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 
