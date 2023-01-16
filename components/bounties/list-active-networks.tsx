@@ -52,7 +52,7 @@ export default function ListActiveNetworks() {
       <div className="row mt-3">
         {networks &&
           networks?.map((network) => (
-            <div className="col-4" key={network.name}>
+            <div className="col-md-4 mb-1" key={network.name}>
               <CardItem onClick={() => {
                 router.push(getURLWithNetwork("/", {
                       network: network.name
@@ -72,7 +72,7 @@ export default function ListActiveNetworks() {
                   <div className="col">
                     <span className="caption-medium">{network.name}</span>
                     <div className="d-flex justify-content-between mt-2">
-                      <span className="bg-dark-gray p-1 border-radius-8 px-2">
+                      <span className="bg-dark-gray p-1 border-radius-8 px-2 me-1">
                         {formatNumberToNScale(network?.totalValueLock.toFixed(0),
                                               0) || 0}{" "}
                         <span className="text-uppercase text-white-40">
