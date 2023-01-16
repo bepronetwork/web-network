@@ -2,7 +2,6 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
-import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -31,8 +30,6 @@ import { useNetwork } from "x-hooks/use-network";
 import { useTransactions } from "x-hooks/use-transactions";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
-
-const {publicRuntimeConfig} = getConfig()
 
 export function useAuthentication() {
 
