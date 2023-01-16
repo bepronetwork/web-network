@@ -1,18 +1,14 @@
-const newNetworkObj = (issue) => ({
-  name: issue.network?.name,
-  logoIcon: issue.network?.logoIcon,
-  colors: {
-    primary: issue.network?.colors?.primary,
-  },
-});
-
 const handleNetwork = (issues) =>
-  issues?.map((issue) => {
-    if (issue?.network) {
-      issue.network.dataValues = newNetworkObj(issue);
-    }
-    return issue;
-  });
+  issues
+    .filter((i) => i?.network)
+    .map((issue) => {
+      issue.network.dataValues = {
+        name: issue.network.name,
+        logoIcon: issue.network.logoIcon, 
+        colors: { primary: issue.network.colors.primary }
+      }
+      return issue
+    });
 
 export default function handleNetworkValues(issues) {
   if (issues?.rows) {
@@ -20,7 +16,7 @@ export default function handleNetworkValues(issues) {
       ...issues,
       rows: handleNetwork(issues.rows),
     };
-  } else if (issues?.length > 0) {
+  } else if (Array.isArray(issues) && issues?.length > 0) {
     return handleNetwork(issues);
   } else return issues;
 }
