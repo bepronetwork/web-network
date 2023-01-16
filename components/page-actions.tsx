@@ -249,7 +249,7 @@ export default function PageActions({
         isStateToWorking &&
         state?.currentUser?.accessToken
         ){
-      debugger;
+          
       if(state.Settings.kyc.isKycEnabled && !isKycVerified){
         return <KycSessionModal/>
       }
