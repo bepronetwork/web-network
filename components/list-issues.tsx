@@ -181,7 +181,8 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: allNetworks ? "" : appState.Service?.network?.active?.name
+      networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
+      allNetworks: allNetworks
     })
       .then(async ({ rows, pages, currentPage }) => {
         const issues = disputableFilter ? await disputableFilterFn(rows) : rows;

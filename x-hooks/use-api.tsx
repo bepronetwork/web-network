@@ -83,7 +83,8 @@ export default function useApi() {
     pullRequesterAddress = "",
     proposer = "",
     tokenAddress = "",
-    networkName = ""
+    networkName = "",
+    allNetworks = undefined,
   }) {
     const params = new URLSearchParams({
       address,
@@ -99,7 +100,8 @@ export default function useApi() {
       pullRequesterAddress,
       proposer,
       tokenAddress,
-      networkName: networkName.replaceAll(" ", "-")
+      networkName: networkName.replaceAll(" ", "-"),
+      ... (allNetworks !== undefined && { allNetworks: allNetworks.toString() } || {}),
     }).toString();
     return api
       .get<{

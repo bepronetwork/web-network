@@ -30,6 +30,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pullRequesterAddress,
       proposer,
       networkName,
+      allNetworks,
       repoPath,
       tokenAddress
     } = req.query || {};
@@ -56,7 +57,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       if (!network) return res.status(404).json("Invalid network");
       networks = [network]
       whereCondition.network_id = network?.id;
-    } else {
+    } 
+    
+    if(allNetworks) {
       networks = await models.network.findAll({
         where: {
           isRegistered: true,
