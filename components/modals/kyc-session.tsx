@@ -28,7 +28,7 @@ export function KycSessionModal() {
   
   function handlerValidateSession() {
     if(session?.session_id && 
-      (session?.status !== 'VERIFIED' || state.currentBounty.kycSteps.length))
+      (session?.status !== 'VERIFIED' || state?.currentBounty?.kycSteps?.length))
       validateKycSession(session?.session_id)
         .then((data) => {
           dispatch(changeCurrentUserKycSession(data))
