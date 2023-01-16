@@ -96,11 +96,8 @@ export function useDao() {
     const activeWeb3Host = state.Service?.active?.web3Host;
     const hostsDiffer = connectedChain?.chainRpc !== activeWeb3Host;
     const hasChainRpc = !!connectedChain?.chainRpc;
-    const hasChainRegistry = isAddress(connectedChain?.registryAddress) && !isZeroAddress(connectedChain?.registryAddress);
-
-    console.debug(`useDao start()`, connectedChain && hasChainRpc && (hostsDiffer || !state.Service?.starting))
-
-    console.debug("useDAO", { connectedChain, activeWeb3Host, hostsDiffer, hasChainRpc, hasChainRegistry })
+    const hasChainRegistry = 
+      isAddress(connectedChain?.registryAddress) && !isZeroAddress(connectedChain?.registryAddress);
 
     if (!connectedChain)
       return;
@@ -117,7 +114,15 @@ export function useDao() {
     dispatch(changeStarting(true));
 
     const {chainRpc: web3Host, registryAddress} = (connectedChain);
-    const daoService = new DAO({web3Host, ... hasChainRegistry ? {registryAddress} : {}});
+    
+    let web3Connection = undefined;
+
+    if (state.Service?.active) {
+      web3Connection = state.Service.active.web3Connection;
+      web3Connection.options.web3Host = web3Host;
+    }
+
+    const daoService = new DAO({web3Connection, web3Host, ... hasChainRegistry ? {registryAddress} : {}});
 
     console.log('web3Host',daoService?.web3Host);
 
