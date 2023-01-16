@@ -5,8 +5,6 @@ import {useTranslation} from "next-i18next";
 
 import { useNetworkSettings } from "contexts/network-settings";
 
-import { removeDuplicated } from "helpers/array";
-
 import {Token} from "interfaces/token";
 import {TokenType} from 'interfaces/token'
 
@@ -20,6 +18,13 @@ import {WarningSpan} from "../../warning-span";
 interface SelectedTokens {
    [tokenType: TokenType | string]: string[]
 }
+
+const emptyTokens = { 
+  dbRewardAllowed: [], 
+  dbTransactionalAllowed: [], 
+  availableReward: [], 
+  availableTransactional: []
+};
 
 export default function TokensSettings({
   isGovernorRegistry = false,
@@ -46,9 +51,10 @@ export default function TokensSettings({
   } = useNetworkSettings();
 
   const tokenToAddress = ({ address } : Token) => address;
-  const tokenIsAllowed = ({ isAllowed } : Token) => isAllowed;
   const tokenNotInSelected = ({ address } : Token, selecteds: Token[], isTransactional) => 
     !selecteds?.find(f => f.address === address && f.isTransactional === isTransactional);
+  const pushTokenIfNotIncluded = (tokens: Token[], token: Token) => 
+    tokens.find(({ address }) => address === token.address) ? tokens : [...tokens, token];
 
   async function getAllowedTokensContract() {
     setIsLoadingTokens(true);
@@ -56,11 +62,25 @@ export default function TokensSettings({
     try {
       const dbTokens = await getTokens();
 
-      const dbReward = dbTokens.filter(({ isTransactional }) => !isTransactional);
-      const dbTransactional = dbTokens.filter(({ isTransactional }) => isTransactional);
+      const { 
+        dbRewardAllowed,
+        dbTransactionalAllowed,
+        availableReward,
+        availableTransactional
+      } = dbTokens.reduce((previous, current) => {
+        const tmp = { ...previous };
 
-      const dbRewardAllowed = dbReward.filter(tokenIsAllowed);
-      const dbTransactionalAllowed = dbTransactional.filter(tokenIsAllowed);
+        if (current.isTransactional && current.isAllowed)
+          tmp.dbTransactionalAllowed = pushTokenIfNotIncluded(tmp.dbTransactionalAllowed, current);
+        else if (!current.isTransactional && current.isAllowed)
+          tmp.dbRewardAllowed = pushTokenIfNotIncluded(tmp.dbRewardAllowed, current);
+        else {
+          tmp.availableReward = pushTokenIfNotIncluded(tmp.availableReward, current);
+          tmp.availableTransactional = pushTokenIfNotIncluded(tmp.availableTransactional, current);
+        }
+
+        return tmp;
+      }, emptyTokens);
 
       setCurrentAllowedTokens({
         "transactional": dbTransactionalAllowed.map(tokenToAddress),
@@ -71,21 +91,13 @@ export default function TokensSettings({
         setSelectedRewardTokens(dbRewardAllowed);
         setSelectedTransactionalTokens(dbTransactionalAllowed);
 
-        const availableReward = 
-          dbTokens.filter(({ address }) => !dbRewardAllowed.find( f => f.address === address));
-
-        const availableTransactional = 
-          dbTokens.filter(({ address }) => !dbTransactionalAllowed.find( f => f.address === address));
-
-        setAllowedRewardTokensList(removeDuplicated(availableReward, "address"));
-        setAllowedTransactionalTokensList(removeDuplicated(availableTransactional, "address"));
+        setAllowedRewardTokensList(availableReward);
+        setAllowedTransactionalTokensList(availableTransactional);
       } else {
-        setAllowedTransactionalTokensList(dbTransactional
-          .filter(tokenIsAllowed)
+        setAllowedTransactionalTokensList(dbTransactionalAllowed
           .filter(t => tokenNotInSelected(t, defaultSelectedTokens, true)));
           
-        setAllowedRewardTokensList(dbReward
-          .filter(tokenIsAllowed)
+        setAllowedRewardTokensList(dbRewardAllowed
           .filter(t => tokenNotInSelected(t, defaultSelectedTokens, false)));
       }
     } catch (error) {

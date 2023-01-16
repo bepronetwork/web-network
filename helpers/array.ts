@@ -12,6 +12,3 @@ export const orderByProperty = (elements, property, order) => {
     return 0;
   });
 };
-
-export const removeDuplicated = (arr, prop) => 
-  arr.filter((value, index, self) => index === self.findIndex(t => t[prop] === value[prop]));
