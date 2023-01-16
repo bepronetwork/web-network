@@ -133,7 +133,7 @@ const networks = {
   bsc: {
     url: 'https://bscrpc.com',
   },
-  apolodorus: {
+  apollodorus: {
     url: 'https://eth-apollodorus.taikai.network:8080'
   }
 }
