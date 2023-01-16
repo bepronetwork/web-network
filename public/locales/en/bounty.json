@@ -88,6 +88,8 @@
       "label": "Description",
       "placeholder": "Type a description..."
     },
+    "preview-descripion": "Preview Description",
+    "tags": "Tags",
     "select-token": {
       "bounty": "{{set}} Bounty Token",
       "reward": "{{set}} Reward Token"
