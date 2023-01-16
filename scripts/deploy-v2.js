@@ -45,7 +45,7 @@ const argv = require('yargs')
   .alias('n', 'network')
   .describe('n', 'Ethereum Blockchain')
   .default('n', 'development')
-  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom", "diogenes","aurelius", "apolodorus"])
+  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom", "diogenes","aurelius", "apollodorus"])
   .option('k', {
     alias: "ownerKey",
     describe: "Owner Private key",
