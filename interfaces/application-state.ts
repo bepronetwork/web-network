@@ -101,7 +101,7 @@ export interface State {
   currentUser: CurrentUserState | null,
   connectedChain: ConnectedChain | null,
   currentBounty: CurrentBounty | null,
-  supportedChains: SupportedChainData[],
+  supportedChains: SupportedChainData[] | null,
   show: {
     [key: string]: boolean;
   }

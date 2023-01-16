@@ -12,7 +12,7 @@ import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
 import {useRepos} from "x-hooks/use-repos";
 import {useSettings} from "x-hooks/use-settings";
-import { useTransactions } from "x-hooks/use-transactions";
+import {useTransactions} from "x-hooks/use-transactions";
 
 const _context = {};
 
@@ -20,7 +20,7 @@ export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
   const {state} = useAppState();
-  const {query} = useRouter();
+  const {query, asPath} = useRouter();
   const session = useSession();
 
   const dao = useDao();
@@ -49,7 +49,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.signMessageIfAdmin, [state.currentUser?.walletAddress]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [state.currentUser?.walletAddress]);
-  useEffect(network.updateActiveNetwork, [query?.network, state?.Service?.active]);
+  useEffect(network.updateActiveNetwork, [query?.network]);
   useEffect(network.loadNetworkToken, [state?.Service?.active?.network]);
   useEffect(network.loadNetworkTimes, [state.Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [state.Service?.active?.network]);

@@ -652,7 +652,7 @@ export default function useApi() {
   }
 
   async function getSupportedChains(force = false, query: Partial<SupportedChainData> = null) {
-    if (!force && state?.supportedChains.length)
+    if (!force && state?.supportedChains?.length)
       return Promise.resolve(state?.supportedChains);
 
     const params = new URLSearchParams(query as any);

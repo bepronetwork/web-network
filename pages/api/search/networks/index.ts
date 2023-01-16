@@ -5,7 +5,6 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import paginate, {calculateTotalPages} from "helpers/paginate";
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -16,8 +15,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) };
-
-  console.log(`NETWORK ADDRESS`, networkAddress)
 
   if (networkAddress)
     whereCondition.networkAddress = { [Op.iLike]: String(networkAddress) };
@@ -31,12 +28,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (isDefault)
     whereCondition.isDefault = isDefault;
 
-  const chain = await chainFromHeader(req);
-  if (chain)
-    whereCondition.chain_id = {[Op.eq]: chain.chainId};
-
-  console.log(`WHERE`, whereCondition);
-    
   const include = [
     { association: "tokens" }
   ];

@@ -3,7 +3,6 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import Database from "db/models";
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {networkName} = req.query
@@ -12,7 +11,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const network = await Database.network.findOne({
       where:{
         name: {[Op.iLike]: networkName},
-        chain_id: {[Op.eq]: +(await chainFromHeader(req))?.chainId }
+        // chain_id: {[Op.eq]: +(await chainFromHeader(req))?.chainId }
       },
       include:[{ association: "tokens" }]
     });

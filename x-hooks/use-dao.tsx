@@ -78,17 +78,19 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    const defaultChain = state.supportedChains.find(({isDefault}) => isDefault);
-    const connectedChain = state.supportedChains.find(({chainId}) => +state?.connectedChain?.id === chainId);
+    const connectedChain = state.supportedChains?.find(({chainId}) => +state?.connectedChain?.id === chainId);
     const activeWeb3Host = state.Service?.active?.web3Host;
     const hostsDiffer = connectedChain?.chainRpc !== activeWeb3Host;
     const hasChainRpc = !!connectedChain?.chainRpc;
     const hasChainRegistry = isAddress(connectedChain?.registryAddress) && !isZeroAddress(connectedChain?.registryAddress);
 
-    console.debug(`useDao start()`, hasChainRpc && (hostsDiffer || !state.Service?.starting))
+    console.debug(`useDao start()`, connectedChain && hasChainRpc && (hostsDiffer || !state.Service?.starting))
+
+    if (!connectedChain)
+      return;
 
     if (!hasChainRpc || !hasChainRegistry) {
-      console.debug(`Chain not configured`, state.connectedChain);
+      console.debug(`Chain not configured`, connectedChain);
       if (publicRuntimeConfig.adminWallet === state.currentUser?.walletAddress && !asPath.includes(`setup`))
         replace(`/setup`).then(_ => {});
     }
@@ -98,7 +100,7 @@ export function useDao() {
 
     dispatch(changeStarting(true));
 
-    const {chainRpc: web3Host, registryAddress} = (connectedChain || defaultChain);
+    const {chainRpc: web3Host, registryAddress} = (connectedChain);
     const daoService = new DAO({web3Host, ... hasChainRegistry ? {registryAddress} : {}});
 
     console.log('web3Host',daoService?.web3Host);

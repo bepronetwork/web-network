@@ -16,7 +16,7 @@ export default function SelectNetworkDropdown({onSelect,}: SelectNetworkDropdown
   const [selected, setSelectedChain] = useState(null);
 
   async function selectSupportedChain({value}) {
-    const chain = supportedChains.find(({chainId}) => chainId === value);
+    const chain = supportedChains?.find(({chainId}) => chainId === value);
     if (!chain)
       return;
 
@@ -25,7 +25,7 @@ export default function SelectNetworkDropdown({onSelect,}: SelectNetworkDropdown
   }
 
   function updateSelectedChainMatchConnected() {
-    const chain = supportedChains.find(({chainId}) => chainId === +connectedChain.id);
+    const chain = supportedChains?.find(({chainId}) => chainId === +connectedChain.id);
     if (!chain)
       return;
 
@@ -35,7 +35,7 @@ export default function SelectNetworkDropdown({onSelect,}: SelectNetworkDropdown
   useEffect(updateSelectedChainMatchConnected, [connectedChain?.id]);
 
 
-  return <ReactSelect options={supportedChains.map(opt => ({label: opt.chainName, value: opt.chainId}))}
+  return <ReactSelect options={supportedChains?.map(opt => ({label: opt.chainName, value: opt.chainId}))}
                       value={selected}
                       onChange={selectSupportedChain}
                       placeholder={t("forms.select-placeholder")}

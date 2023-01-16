@@ -40,7 +40,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
         },
-        chain_id: {[Op.eq]: +chain?.chainId}
+        // chain_id: {[Op.eq]: +chain?.chainId}
       }
     });
 
@@ -93,7 +93,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      chain_id: {[Op.eq]: +chain?.chainId}
+      // chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 
@@ -203,7 +203,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
       name: {
         [Op.iLike]: String(customNetworkName)
       },
-      chain_id: {[Op.eq]: +chain?.chainId}
+      // chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 

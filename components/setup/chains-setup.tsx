@@ -58,7 +58,7 @@ export default function ChainsSetup() {
   }
 
   function changeExistingState() {
-    setExistingState(state?.supportedChains.map(({chainId}) => chainId));
+    setExistingState(state?.supportedChains?.map(({chainId}) => chainId));
   }
 
   function addChain(chain: MiniChainInfo) {
