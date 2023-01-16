@@ -61,7 +61,7 @@ export default function PageActions({
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
   const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isKycVerified = (state.currentBounty?.kycSteps?.length || (!state.Settings?.kyc?.tierList && state?.currentUser?.kycSession?.status !== 'VERIFIED'))
+  const isKycVerified = (state.currentBounty?.kycSteps?.length || (!state.Settings?.kyc?.tierList.length && state?.currentUser?.kycSession?.status === 'VERIFIED'))
   const isGithubConnected = !!state.currentUser?.login;
   const isFundingRequest = 
     state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
@@ -249,7 +249,7 @@ export default function PageActions({
         isStateToWorking &&
         state?.currentUser?.accessToken
         ){
-
+      debugger;
       if(state.Settings.kyc.isKycEnabled && !isKycVerified){
         return <KycSessionModal/>
       }
