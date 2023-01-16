@@ -15,6 +15,15 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    
+    Settings.init(queryInterface.sequelize);
+
+    Settings.destroy({
+      where: {
+        key: "rssTtl",
+        value: "1",
+        visibility: "public",
+        type: "string"
+      }
+    });
   }
 };
