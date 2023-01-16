@@ -11,17 +11,10 @@ import BountyTags from "components/bounty/bounty-tags";
 import DateLabel from "components/date-label";
 import Translation from "components/translation";
 
-<<<<<<< HEAD
-=======
-import {useAppState} from "contexts/app-state";
-
-import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
->>>>>>> 37e7f08d (Dev 693 add bounty tags and enable bounty creators to associate their bounty with tags (#808))
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
-<<<<<<< HEAD
 import {useAppState} from "../contexts/app-state";
 import CardItem from "./card-item";
 import IssueAmountInfo from "./issue-amount-info";
@@ -35,17 +28,6 @@ export default function IssueListItem({
   xClick?: () => void;
   size?: "sm" | "lg"
 }) {
-=======
-interface IssueListItemProps {
-  issue?: IssueBigNumberData;
-  xClick?: () => void;
-}
-
-export default function IssueListItem({
-  issue = null,
-  xClick,
-}: IssueListItemProps) {
->>>>>>> 37e7f08d (Dev 693 add bounty tags and enable bounty creators to associate their bounty with tags (#808))
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
