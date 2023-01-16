@@ -20,7 +20,7 @@ const appState: AppState = {
     spinners: {},
     transactions: [],
     toaster: [],
-    supportedChains: []
+    supportedChains: null
   },
   dispatch: () => undefined
 };

@@ -59,7 +59,7 @@ async function addNewRepo(req, res) {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      chain_id: {[Op.eq]: +chain?.chainId}
+      // chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 

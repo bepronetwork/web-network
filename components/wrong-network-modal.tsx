@@ -29,7 +29,7 @@ export default function WrongNetworkModal() {
   const {handleAddNetwork} = UseNetworkChange();
 
   function changeShowModal() {
-    if (!supportedChains.length || !connectedChain?.id || !currentUser?.walletAddress)
+    if (!supportedChains?.length || !connectedChain?.id || !currentUser?.walletAddress)
       return;
 
     if (!supportedChains.find(o => o.chainId === +option?.value))

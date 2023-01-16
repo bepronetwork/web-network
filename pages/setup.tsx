@@ -57,7 +57,7 @@ export default function SetupPage(){
   }
 
   function updateNetworkRegistryAddressForConnectedChainId() {
-    if (!currentUser?.connected || !connectedChain?.id || !supportedChains.length)
+    if (!currentUser?.connected || !connectedChain?.id || !supportedChains?.length)
       return;
 
     getSupportedChains()
@@ -90,7 +90,7 @@ export default function SetupPage(){
       eventKey: "registry",
       title: t("setup:registry.title"),
       component: (
-        !supportedChains.length
+        !supportedChains?.length
           ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> // eslint-ignore-line
           : <RegistrySetup registryAddress={networkRegistryAddress}
                            isVisible={activeTab === "registry"} />
@@ -100,7 +100,7 @@ export default function SetupPage(){
       eventKey: "network",
       title: t("setup:network.title"),
       component: (
-        !supportedChains.length
+        !supportedChains?.length
           ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> : // eslint-ignore-line
           !networkRegistryAddress
             ? <CallToAction disabled={false} executing={false} action="go to" color="info" call="Registry not setup" onClick={() => setActiveTab('registry')} />

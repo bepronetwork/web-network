@@ -234,7 +234,7 @@ export function RegistrySetup({
   }
 
   function setChainRegistry(address = registryAddress) {
-    const chain = supportedChains.find(({chainId}) => chainId === +connectedChain?.id);
+    const chain = supportedChains?.find(({chainId}) => chainId === +connectedChain?.id);
     if (!chain || !address)
       return;
 
@@ -288,7 +288,7 @@ export function RegistrySetup({
   useEffect(() => { console.log('registry', registry) }, [registry])
 
   useEffect(() => {
-    if (!supportedChains.length || !connectedChain?.id)
+    if (!supportedChains?.length || !connectedChain?.id)
       return;
 
     const chain = supportedChains.find(({chainId}) => chainId === +connectedChain?.id);

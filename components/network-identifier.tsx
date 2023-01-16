@@ -11,11 +11,11 @@ export default function NetworkIdentifier() {
   const {state, dispatch} = useAppState();
 
   function findChain(windowChainId: number) {
-    return state.supportedChains.find(({chainId}) => chainId === windowChainId)
+    return state.supportedChains?.find(({chainId}) => chainId === windowChainId)
   }
 
   useEffect(() => {
-    if (!window.ethereum && !state.supportedChains.length)
+    if (!window.ethereum && !state.supportedChains?.length)
       return;
 
     window.ethereum.removeAllListeners(`chainChanged`);

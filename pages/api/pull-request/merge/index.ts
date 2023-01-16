@@ -32,7 +32,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
         },
-        chain_id: {[Op.eq]: +chain?.chainId}
+        // chain_id: {[Op.eq]: +chain?.chainId}
       }
     });
 

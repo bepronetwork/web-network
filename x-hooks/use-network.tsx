@@ -23,8 +23,9 @@ export function useNetwork() {
   const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
 
+
   const {getNetwork, getNetworkTokens} = useApi();
-  const {pathname, query, push, replace} = useRouter();
+  const {query, replace} = useRouter();
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -35,58 +36,41 @@ export function useNetwork() {
   }
 
   function updateActiveNetwork(forceUpdate = false) {
-    const networkName = query?.network?.toString();
+    const queryNetworkName = query?.network?.toString();
 
-    if (networkName) {
-      dispatch(changeNetworkLastVisited(networkName));
-      storage.value = networkName;
+    if (queryNetworkName) {
+      const storageKey = `bepro.network:${queryNetworkName}`;
 
-      if (!forceUpdate) {
-        const cachedNetworkData = new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`);
+      if (storage.value && storage.value !== queryNetworkName)
+        storage.value = queryNetworkName;
 
-        if (storage.value === networkName) {
-          if (cachedNetworkData.value) {
-            dispatch(changeActiveNetwork(cachedNetworkData.value));
+      const cachedNetworkData = new WinStorage(storageKey, 3000, `sessionStorage`);
+      if (forceUpdate === false && cachedNetworkData.value) {
+        dispatch(changeActiveNetwork(cachedNetworkData.value));
+        return;
+      }
+
+      getNetwork({name: queryNetworkName,})
+        .then(({data}) => {
+          if (!data.isRegistered)
+            return replace(`/networks`);
+
+          if (state?.currentUser?.connected && state?.connectedChain?.id !== data?.chain_id) {
+            console.log(`Should have asked to change chains`);
             return;
           }
-        } else 
-          storage.value = networkName;
-      }
-    } else if (storage.value) dispatch(changeNetworkLastVisited(storage.value));
 
-    console.debug(`Updating active network`, networkName);
+          const newCachedData = new WinStorage(storageKey, 3600, `sessionStorage`);
+          newCachedData.value = data;
 
-    const getNetworkParams = {
-      ... networkName ? {name: networkName} : {},
-      ... !networkName ? {isDefault: true} : {},
-      chain_id: state?.connectedChain?.id || null,
+          dispatch(changeNetworkLastVisited(queryNetworkName));
+          dispatch(changeActiveNetwork(newCachedData.value));
+        })
+        .catch(e => {
+          console.log(`Failed to get network ${queryNetworkName}`, e);
+          return replace(`/networks`);
+        })
     }
-
-    getNetwork(getNetworkParams)
-      .then(({data}) => {
-        if (!data.isRegistered) {
-          if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
-            replace("/setup");
-
-          if(networkName)
-            push({pathname: `/networks`});
-
-          return;
-        }
-
-        const key = networkName || data?.name;
-
-        const storageParams = new WinStorage(`bepro.network:${key}`, 3600, `sessionStorage`);
-
-        storageParams.value = data;
-        dispatch(changeActiveNetwork(data));
-        
-        console.debug(`Updated active params`, data);
-      })
-      .catch(error => {
-        console.error(`Failed to get network`, error);
-      });
-
   }
 
   function getURLWithNetwork(href: string, _query = undefined): UrlObject {

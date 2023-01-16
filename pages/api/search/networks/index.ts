@@ -41,8 +41,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) };
 
-  console.log(`NETWORK ADDRESS`, networkAddress)
-
   if (networkAddress)
     whereCondition.networkAddress = { [Op.iLike]: String(networkAddress) };
   
