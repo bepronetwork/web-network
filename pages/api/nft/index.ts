@@ -1,10 +1,12 @@
-import { Bounty } from "@taikai/dappkit/dist/src";
+import { Bounty, ProposalDetail } from "@taikai/dappkit/dist/src";
+import BigNumber from "bignumber.js";
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
 
+import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { formatNumberToNScale } from "helpers/formatNumber";
 import {Settings} from "helpers/settings";
 
@@ -19,11 +21,19 @@ interface NftPayload {
   mergerAddress: string;
 }
 
+const NftParticipant = (githubHandle, percentage, address, distributedAmount) => ({ 
+  githubHandle, 
+  percentage, 
+  address, 
+  distributedAmount
+});
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try{
     const {
       issueContractId,
       proposalContractId,
+      mergerAddress,
       networkName
     } = req.body as NftPayload;
     
@@ -85,20 +95,57 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if(pullRequest.canceled || !pullRequest.ready)
       return res.status(404).json("PR cannot be accepted");
-
+    
     const issue = await models.issue.findOne({
       where: {
         issueId: networkBounty?.cid,
         network_id: customNetwork?.id
       },
+      include: [
+        { association: "repository" }
+      ]
     });
 
-    const token = await DAOService.getERC20TokenData(networkBounty.transactional);
+    const [{treasury}, creatorFee, proposerFee] = await Promise.all([DAOService?.getTreasury(),
+                                                                     DAOService?.getMergeCreatorFee(),
+                                                                     DAOService?.getProposerFee()
+    ])
+
+    const distributions = calculateDistributedAmounts(treasury, 
+                                                      creatorFee, 
+                                                      proposerFee,
+                                                      BigNumber(networkBounty.tokenAmount), 
+                                                      proposal.details);
+
+    if (!mergerAddress)
+      return res.status(404).json("Merger address not found");
+
+    const getNftParticipant = async (address, amounts) => {
+      const user = await models.user.findOne({ where: { address: { [Op.iLike]: String(address) } } });
+
+      return NftParticipant(user?.githubHandle || '', amounts.percentage, address, amounts.value);
+    }
+
+    const merger = await getNftParticipant(mergerAddress, distributions.mergerAmount);
+
+    const participants = await Promise.all(proposal.details.map(async(detail: ProposalDetail, i) => {
+      if(!detail.recipient) return;
+
+      return getNftParticipant(detail.recipient, distributions.proposals[i]);
+    }));
+
     
     const nft = {
-      name: `BEPRO Bounty ${issue.githubId} - ${networkBounty.title}`,
-      description: `Created on ${customNetwork.name} awarded along with ${formatNumberToNScale(networkBounty.tokenAmount)} ${token.symbol}`,
-      image: issue.seoImage? `${defaultConfig.urls.ipfs}/${issue.seoImage}`: ""
+      title: `${networkBounty.title}`,
+      description: `NFT for bounty ${issue.githubId} created on network ${customNetwork.name}`,
+      image: issue.seoImage? `${defaultConfig.urls.ipfs}/${issue.seoImage}`: "",
+      properties: {
+        price: formatNumberToNScale(networkBounty.tokenAmount),
+        merger, participants, 
+        repository: issue?.repository?.name,
+        githubId: networkBounty?.cid.split("/")[1], 
+        githubPullRequestId: pullRequest.cid.toString(),
+      }
     }
 
     const { hash } = await ipfsService.add(nft, true);
