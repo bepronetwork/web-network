@@ -16,7 +16,7 @@ interface NetworkTokenLocked {
   totalSettlerLocked: number;
 }
 
-interface NotConvertedTokens {
+export interface NotConvertedTokens {
   [address: string]: NetworkTokenLocked;
 }
 

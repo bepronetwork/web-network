@@ -20,8 +20,8 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
     updateOptions,
     clearFilters,
   ] = useFilters();
-  const router = useRouter();
-  const { state, time, repoId } = router.query;
+  const { pathname, query } = useRouter();
+  const { state, time, repoId } = query;
   const { t } = useTranslation("common");
 
   function countFilters() {
@@ -102,17 +102,19 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
           <FilterTimeFrame />
         ) : (
           <>
-            <div>
-              <IssueFilterBox
-                className="h-100 border border-right border-dark-gray"
-                title={t("filters.repository")}
-                options={repoOptions}
-                filterPlaceholder={t("filters.search-repositories")}
-                onChange={(opt, checked) =>
-                  updateOptions(repoOptions, opt, checked, "repo")
-                }
-              />
-            </div>
+            {!["/bounty-hall"].includes(pathname) && (
+              <div>
+                <IssueFilterBox
+                  className="h-100 border border-right border-dark-gray"
+                  title={t("filters.repository")}
+                  options={repoOptions}
+                  filterPlaceholder={t("filters.search-repositories")}
+                  onChange={(opt, checked) =>
+                    updateOptions(repoOptions, opt, checked, "repo")
+                  }
+                />
+              </div>
+            )}
             <div>
               <IssueFilterBox
                 title={t("filters.bounties.title")}
