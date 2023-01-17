@@ -1,24 +1,45 @@
 import {withCors} from 'middleware';
-import withJwt from "middleware/withJwt";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-async function getTotal(req: NextApiRequest, res: NextApiResponse) {
+import handleNetworkValues from 'helpers/handleNetworksValuesApi';
+
+const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 1) => (models.issue.findAll({
+  where: {
+    ...whereCondition,
+    state,
+  },
+  order: [[ String(sortBy), String(order) ]],
+  include: [ 
+    { association: "network", attributes: ['colors', 'name', 'logoIcon'] },
+    { association: "repository" },
+    { association: "mergeProposals", required: state === "proposal" ? true  : false },
+    {
+      association: "pullRequests",
+      required: state === "ready" ? true  : false,
+      where: {
+        status: {
+          [Op.not]: "canceled"
+        }
+      }
+    },
+    { association: "token" }
+  ],
+  limit
+}))
+
+async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
   const {
-    state,
-    issueId,
     repoId,
     creator,
     address,
     networkName,
+    sortBy,
+    order
   } = req.query || {};
-
-  if (state) whereCondition.state = state;
-
-  if (issueId) whereCondition.issueId = issueId;
 
   if (repoId) whereCondition.repository_id = repoId;
 
@@ -51,18 +72,18 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
   }
 
-  const issueCount = await models.issue.count({
-    where: whereCondition
-  });
-
-  return res.status(200).json(issueCount);
+  const issuesDraft = await getLastIssuesByStatus("draft", whereCondition, sortBy, order)
+  const issuesOpen = await  getLastIssuesByStatus("open", whereCondition, sortBy, order)
+  const issuesProposal = await getLastIssuesByStatus("proposal", whereCondition, sortBy, order)
+  
+  return res.status(200).json(handleNetworkValues([...issuesDraft, ...issuesOpen, ...issuesProposal]));
 }
 
 async function getAll(req: NextApiRequest,
                       res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
-    await getTotal(req, res);
+    await get(req, res);
     break;
 
   default:
@@ -72,4 +93,4 @@ async function getAll(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(withJwt(getAll))
+export default withCors(getAll)

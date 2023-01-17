@@ -88,6 +88,8 @@
       "label": "Description",
       "placeholder": "Type a description..."
     },
+    "preview-descripion": "Preview Description",
+    "tags": "Tags",
     "select-token": {
       "bounty": "{{set}} Bounty Token",
       "reward": "{{set}} Reward Token"
@@ -110,5 +112,13 @@
   },
   "create-bounty": "Create Bounty",
   "next-step": "Next Step",
-  "bounty-created": "Bounty created"
+  "bounty-created": "Bounty created",
+  "in-bounties": "in Bounties",
+  "distributed": "distributed",
+  "title-bounties": "Bounty Hall",
+  "sub-title-bounties": "A collection of the most recent bounties and MVP Networks on our ecosystem",
+  "most-active-networks": "Most Active Networks",
+  "recent-bounties": "Recent Bounties",
+  "all-bounties": "All Bounties",
+  "explore-all": "Explore All"
 }

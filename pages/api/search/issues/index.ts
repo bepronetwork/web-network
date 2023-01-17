@@ -5,6 +5,7 @@ import {Op, Sequelize, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
 
@@ -14,6 +15,7 @@ const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
+    let networks = []
     const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
     const {
       state,
@@ -28,6 +30,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pullRequesterAddress,
       proposer,
       networkName,
+      allNetworks,
       repoPath,
       tokenAddress
     } = req.query || {};
@@ -52,8 +55,24 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       });
 
       if (!network) return res.status(404).json("Invalid network");
-
+      networks = [network]
       whereCondition.network_id = network?.id;
+    } 
+    
+    if(allNetworks) {
+      networks = await models.network.findAll({
+        where: {
+          isRegistered: true,
+          isClosed: false
+        },
+        include: [
+          { association: "curators" }
+        ]
+      })
+
+      if (networks.length === 0) return res.status(404).json("Networks not found");
+
+      whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
     }
 
     if (repoPath) {
@@ -127,7 +146,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           } : {})
         }
       },
-      { association: "repository" },
+      { association: "repository", attributes: ["id", "githubPath"] },
       {
         association: "token",
         required: !!tokenAddress,
@@ -144,6 +163,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         association: "payments"
       });
 
+    if (networks.length > 1)
+      include.push({ association: "network", attributes: ["colors", "name"] });
+
     const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
                                     .replaceAll(',',`,+,`)
                                     .split(',')
@@ -152,11 +174,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (search) {
       const issues = await models.issue.findAll({
-        where: whereCondition,
-        include,
-        nest: true,
-        order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
-      });
+      where: whereCondition,
+      include,
+      nest: true,
+      order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
+      }).then(data => handleNetworkValues(data))
 
       const result = [];
 
@@ -167,17 +189,18 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       const paginatedData = paginateArray(result, 10, page || 1);
 
       return res.status(200).json({
-      count: result.length,
-      rows: paginatedData.data,
-      pages: paginatedData.pages,
-      currentPage: +paginatedData.page
+        count: result.length,
+        rows: paginatedData.data,
+        pages: paginatedData.pages,
+        currentPage: +paginatedData.page
       });
     } else {
+      
       const issues = await models.issue.findAndCountAll(paginate({ 
       where: whereCondition, 
       include, nest: true }, req.query, [
-        [...sortBy|| ["updatedAt"], req.query.order || "DESC"]
-      ]));
+        [...sortBy|| ["createdAt"], req.query.order || "DESC"]
+      ])).then(data => handleNetworkValues(data))
 
       return res.status(200).json({
       ...issues,

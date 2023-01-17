@@ -141,15 +141,15 @@ export default function CreateBountyDetails({
           <Button 
           onClick={handleShowModal}
           outline
-          className="mt-2"
+          className="mt-2 text-primary"
         >
-          Preview Description
+          {t("fields.preview-descripion")}
         </Button>
         }
       </div>
 
       <div className="form-group">
-        <label htmlFor="" className="caption-small mb-2">Tags</label>
+        <label htmlFor="" className="caption-small mb-2">{t("fields.tags")}</label>
 
         <ReactSelect
           value={selectedTags.map(tag => ({ label: tag, value: tag }))}
