@@ -1,5 +1,4 @@
 import {Analytic, EventName} from "../interfaces/analytics";
-import {error, info} from "../services/logging";
 import {event} from "nextjs-google-analytics";
 import {analyticEvents} from "../helpers/analytic-events";
 import {useAppState} from "../contexts/app-state";
@@ -16,7 +15,7 @@ export default function useAnalyticEvents() {
   function pushAnalytic(eventName: EventName, details: {[options: string]: string} = {}) {
 
     function getCallback({type}: Analytic) {
-      info(`Trying to push ${eventName} with type ${type}`, details)
+      console.info(`Trying to push ${eventName} with type ${type}`, details)
       switch (type) {
         case "ga4":
           return event;
@@ -25,11 +24,14 @@ export default function useAnalyticEvents() {
       }
     }
 
-    if (state?.currentUser)
+    if (state?.currentUser) {
+      const {walletAddress, connected, handle, login} = state.currentUser;
       details = {
         ...details,
-        ...state.currentUser,
-      } as any;
+        walletAddress: walletAddress.toString(), connected: connected.toString(), handle, login
+      };
+    }
+
 
     if (state?.connectedChain)
       details = {
@@ -42,16 +44,16 @@ export default function useAnalyticEvents() {
           analyticEvents[eventName]
             .map(getCallback)
             .map(call => {
-              info(`Pushing ${eventName}`)
+              console.info(`Pushing ${eventName}`)
               return call(eventName, details);
             })
         )
         .then(() => {
-          info(`Event published ${eventName}`, details);
+          console.info(`Event published ${eventName}`, details);
           return true;
         })
         .catch(e => {
-          error(`Failed to push events`, e?.message || e?.toString() || "could not get error");
+          console.error(`Failed to push events`, e?.message || e?.toString() || "could not get error");
           return false;
         });
 
