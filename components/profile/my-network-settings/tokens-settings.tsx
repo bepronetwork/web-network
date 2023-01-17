@@ -46,8 +46,6 @@ export default function TokensSettings({
   const tokenToAddress = ({ address } : Token) => address;
   const tokenNotInSelected = ({ address } : Token, selecteds: Token[], isTransactional) => 
     !selecteds?.find(f => f.address === address && f.isTransactional === isTransactional);
-  const isAvailable = (tokensAllowed: Token[], address: string) => !JSON.stringify(tokensAllowed).includes(address) 
-    && !!tokensAllowed.length;
 
   async function getAllowedTokensContract() {
     setIsLoadingTokens(true);
@@ -57,9 +55,7 @@ export default function TokensSettings({
 
       const { 
         dbRewardAllowed,
-        dbTransactionalAllowed,
-        availableReward,
-        availableTransactional
+        dbTransactionalAllowed
       } = dbTokens.reduce((previous, current) => {
         const tmp = { ...previous };
         const { isTransactional, isAllowed } = current;
@@ -68,19 +64,23 @@ export default function TokensSettings({
           tmp.dbTransactionalAllowed.push(current);
         else if (!isTransactional && isAllowed)
           tmp.dbRewardAllowed.push(current);
-        
-        if (isAvailable(tmp.dbRewardAllowed, current.address) && (isTransactional || !isAllowed))
-          tmp.availableReward.push(current);
-        
-        if (isAvailable(tmp.dbTransactionalAllowed, current.address) && (!isTransactional || !isAllowed))
-          tmp.availableTransactional.push(current);
 
         return tmp;
       }, { 
         dbRewardAllowed: [], 
-        dbTransactionalAllowed: [], 
-        availableReward: [], 
-        availableTransactional: []
+        dbTransactionalAllowed: []
+      });
+
+      const availableReward = {};
+      dbTokens.forEach(dbToken => {
+        if (!dbRewardAllowed.find(t => t.address === dbToken.address))
+          availableReward[dbToken.address] = dbToken;
+      });
+
+      const availableTransactional = {};
+      dbTokens.forEach(dbToken => {
+        if (!dbTransactionalAllowed.find(t => t.address === dbToken.address))
+          availableTransactional[dbToken.address] = dbToken;
       });
 
       setCurrentAllowedTokens({
@@ -92,8 +92,8 @@ export default function TokensSettings({
         setSelectedRewardTokens(dbRewardAllowed);
         setSelectedTransactionalTokens(dbTransactionalAllowed);
 
-        setAllowedRewardTokensList(availableReward);
-        setAllowedTransactionalTokensList(availableTransactional);
+        setAllowedRewardTokensList(Object.values(availableReward));
+        setAllowedTransactionalTokensList(Object.values(availableTransactional));
       } else {
         setAllowedTransactionalTokensList(dbTransactionalAllowed
           .filter(t => tokenNotInSelected(t, defaultSelectedTokens, true)));
