@@ -98,7 +98,8 @@ const updateTokens = async ({
         isTransactional
       },
       defaults: {
-        address
+        address,
+        isAllowed: true
       }
     });
 

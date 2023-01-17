@@ -65,7 +65,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     useMemo(() =>
       forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
 
-  function handlerValidateSettings(settings) {
+  async function handlerValidateSettings(settings) {
     //Treasury
     if (state.Service?.active) {
       const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" ||
@@ -73,10 +73,10 @@ export const NetworkSettingsProvider = ({ children }) => {
 
       const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
 
-      Promise.all([
-      conditionOrUndefined(state.Service?.active.isAddress(settings?.treasury?.address?.value)),
-      conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
-      conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
+      await Promise.all([
+        conditionOrUndefined(state.Service?.active.isAddress(settings?.treasury?.address?.value)),
+        conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
+        conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
       ]).then((treasuryValidator)=>{
         settings.treasury.address.validated = treasuryValidator[0];
         settings.treasury.cancelFee.validated = treasuryValidator[1]
@@ -125,7 +125,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     return settings;
   }
 
-  function handerValidateForm(newState) {
+  async function handerValidateForm(newState) {
 
     const tokensLockedValidate = [
       Fields.amount.validator(newState.tokensLocked?.locked, newState.tokensLocked?.needed)
@@ -142,7 +142,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         isCreating ? newState.github?.botPermission : true,
     ].every(condition => condition);
     
-    newState.settings = handlerValidateSettings(newState.settings)
+    newState.settings = await handlerValidateSettings(newState.settings);
 
     const settingsValidated = [
     !newState.settings?.theme?.similar?.length,
@@ -154,7 +154,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     ].every(condition => condition);
     
     const tokensValidated = [
-      newState.tokens?.settler?.trim() !== "",
+      isCreating && newState.tokens?.settler?.trim() !== "" || true,
     ].every(condition => condition);
     
     newState.tokensLocked.validated = tokensLockedValidate;
@@ -183,20 +183,18 @@ export const NetworkSettingsProvider = ({ children }) => {
     return newState;
   }
 
-  const setFields = (field: string, value: unknown) => {
+  const setFields = async (field: string, value: unknown) => {
     const method = field.split('.')
     
     if(!method) return;
 
-    setNetworkSettings((prev)=>{
-      const newValues = {...prev}
+    const newState = { ...networkSettings };
 
-      method.reduce((p,c)=> 
-          c === method[method.length-1] ? p[c] = value : p[c]
-        , newValues)
+    method.reduce((p, c)=>  c === method[method.length-1] ? p[c] = value : p[c], newState);
 
-      return handerValidateForm(newValues)
-    })
+    const valitedState = await handerValidateForm(newState);
+
+    setNetworkSettings(valitedState);
   }
   
   const Fields = {
@@ -460,6 +458,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.settings.treasury.address = {value: treasury.treasury, validated: true}
     defaultState.settings.treasury.cancelFee = { value: treasury.closeFee, validated: true };
     defaultState.settings.treasury.closeFee = { value: treasury.cancelFee, validated: true };
+    defaultState.tokens.allowedTransactions = network?.tokens?.filter(token => token.isTransactional);
+    defaultState.tokens.allowedRewards = network?.tokens?.filter(token => !token.isTransactional);
 
     defaultState.details.name = {value: network?.name, validated: true}
     defaultState.details.description = network?.description
