@@ -30,7 +30,7 @@ function ItemRow({ id, githubLogin, creator, status, children, href }: ItemRowPr
           <div className="col-1">
             <span className="label-m text-gray-500">#{id}</span>
           </div>
-          <div className="col-md-4 col-xl-3 d-flex align-items-center gap-2">
+          <div className="col-md-5 col-xl-4 d-flex align-items-center gap-2">
           {githubLogin ? (
               <>
                 <Avatar userLogin={githubLogin} />
