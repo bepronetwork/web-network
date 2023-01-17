@@ -1,14 +1,15 @@
+import { promises as fs} from "fs";
 import Handlebars from "handlebars";
 import cache from "memory-cache";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
+import path from "path";
 import { Op } from "sequelize";
 
 import models from "db/models";
 
-import { error as LogError } from 'services/logging';
 
-import { rssTemplate } from "templates/rss";
+import { error as LogError } from 'services/logging';
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -73,6 +74,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         tags: (tags || []).map( tag => ({ tag }))
       }))
     };
+
+    const rssTemplate = await fs.readFile(path.join(process.cwd(), "templates") + "/rss.hbs", "utf8");
+
+    console.log(rssTemplate)
 
     const handlebar = Handlebars.compile(rssTemplate);
 
