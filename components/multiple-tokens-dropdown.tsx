@@ -8,6 +8,8 @@ import { useTranslation } from "next-i18next";
 import ChangeTokenModal from "components/change-token-modal";
 
 
+import { truncateAddress } from "helpers/truncate-address";
+
 import { Token } from "interfaces/token";
 
 interface Option {
@@ -70,7 +72,10 @@ export default function MultipleTokensDropdown({
         {data?.__isNew__ ? (
           <div className="mx-2">{formatCreateLabel(data?.value)}</div>
         ) : (
-          <span className="mx-2">{data?.value?.symbol}</span>
+          <>
+            <span className="mx-2">{data?.value?.symbol}</span>
+            <span className="text-gray">( {truncateAddress(data?.value?.address, 8, 8)} )</span>
+          </>
         )}
       </div>
     );

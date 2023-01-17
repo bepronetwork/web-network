@@ -500,7 +500,7 @@ export default function useApi() {
   }) {
     const params = new URLSearchParams({networkName}).toString();
     return api
-      .get<Token[]>(`/search/tokens?${params}`)
+      .get<Token[]>(`/tokens?${params}`)
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
