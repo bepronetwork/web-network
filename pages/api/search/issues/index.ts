@@ -174,19 +174,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (search) {
       const issues = await models.issue.findAll({
-<<<<<<< HEAD
       where: whereCondition,
       include,
       nest: true,
       order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
       }).then(data => handleNetworkValues(data))
-=======
-        where: whereCondition,
-        include,
-        nest: true,
-        order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
-      });
->>>>>>> 37e7f08d (Dev 693 add bounty tags and enable bounty creators to associate their bounty with tags (#808))
+
 
       const result = [];
 

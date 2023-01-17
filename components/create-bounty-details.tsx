@@ -149,12 +149,7 @@ export default function CreateBountyDetails({
       </div>
 
       <div className="form-group">
-<<<<<<< HEAD
         <label htmlFor="" className="caption-small mb-2">{t("fields.tags")}</label>
-=======
-        <label htmlFor="" className="caption-small mb-2">Tags</label>
->>>>>>> 37e7f08d (Dev 693 add bounty tags and enable bounty creators to associate their bounty with tags (#808))
-
         <ReactSelect
           value={selectedTags.map(tag => ({ label: tag, value: tag }))}
           options={TAGS_OPTIONS}

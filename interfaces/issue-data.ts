@@ -55,7 +55,6 @@ export interface IssueData {
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
   payments: Payment[];
-<<<<<<< HEAD
   network?: {
     colors: {
         primary: string;
@@ -63,8 +62,6 @@ export interface IssueData {
     name: string;
     logoIcon: string;
   }
-=======
->>>>>>> 37e7f08d (Dev 693 add bounty tags and enable bounty creators to associate their bounty with tags (#808))
   tags: string[];
 }
 
