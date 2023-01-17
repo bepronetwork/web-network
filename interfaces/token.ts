@@ -14,6 +14,7 @@ export interface Token {
   totalSupply?: BigNumber;
   decimals?: number;
   isTransactional?: boolean;
+  isAllowed?: boolean;
 }
 
 export interface TokenInfo extends Partial<Token> {
