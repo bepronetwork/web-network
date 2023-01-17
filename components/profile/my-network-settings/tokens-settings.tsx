@@ -19,13 +19,6 @@ interface SelectedTokens {
    [tokenType: TokenType | string]: string[]
 }
 
-const emptyTokens = { 
-  dbRewardAllowed: [], 
-  dbTransactionalAllowed: [], 
-  availableReward: [], 
-  availableTransactional: []
-};
-
 export default function TokensSettings({
   isGovernorRegistry = false,
   defaultSelectedTokens
@@ -53,8 +46,8 @@ export default function TokensSettings({
   const tokenToAddress = ({ address } : Token) => address;
   const tokenNotInSelected = ({ address } : Token, selecteds: Token[], isTransactional) => 
     !selecteds?.find(f => f.address === address && f.isTransactional === isTransactional);
-  const pushTokenIfNotIncluded = (tokens: Token[], token: Token) => 
-    tokens.find(({ address }) => address === token.address) ? tokens : [...tokens, token];
+  const isAvailable = (tokensAllowed: Token[], address: string) => !JSON.stringify(tokensAllowed).includes(address) 
+    && !!tokensAllowed.length;
 
   async function getAllowedTokensContract() {
     setIsLoadingTokens(true);
@@ -69,18 +62,26 @@ export default function TokensSettings({
         availableTransactional
       } = dbTokens.reduce((previous, current) => {
         const tmp = { ...previous };
+        const { isTransactional, isAllowed } = current;
 
-        if (current.isTransactional && current.isAllowed)
-          tmp.dbTransactionalAllowed = pushTokenIfNotIncluded(tmp.dbTransactionalAllowed, current);
-        else if (!current.isTransactional && current.isAllowed)
-          tmp.dbRewardAllowed = pushTokenIfNotIncluded(tmp.dbRewardAllowed, current);
-        else {
-          tmp.availableReward = pushTokenIfNotIncluded(tmp.availableReward, current);
-          tmp.availableTransactional = pushTokenIfNotIncluded(tmp.availableTransactional, current);
-        }
+        if (isTransactional && isAllowed)
+          tmp.dbTransactionalAllowed.push(current);
+        else if (!isTransactional && isAllowed)
+          tmp.dbRewardAllowed.push(current);
+        
+        if (isAvailable(tmp.dbRewardAllowed, current.address) && (isTransactional || !isAllowed))
+          tmp.availableReward.push(current);
+        
+        if (isAvailable(tmp.dbTransactionalAllowed, current.address) && (!isTransactional || !isAllowed))
+          tmp.availableTransactional.push(current);
 
         return tmp;
-      }, emptyTokens);
+      }, { 
+        dbRewardAllowed: [], 
+        dbTransactionalAllowed: [], 
+        availableReward: [], 
+        availableTransactional: []
+      });
 
       setCurrentAllowedTokens({
         "transactional": dbTransactionalAllowed.map(tokenToAddress),
