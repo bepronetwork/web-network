@@ -15,7 +15,7 @@ export default function useAnalyticEvents() {
   function pushAnalytic(eventName: EventName, details: {[options: string]: string} = {}) {
 
     function getCallback({type}: Analytic) {
-      console.info(`Trying to push ${eventName} with type ${type}`, details)
+      // console.debug(`Trying to push ${eventName} with type ${type}`, details)
       switch (type) {
         case "ga4":
           return event;
@@ -44,12 +44,12 @@ export default function useAnalyticEvents() {
           analyticEvents[eventName]
             .map(getCallback)
             .map(call => {
-              console.info(`Pushing ${eventName}`)
+              // console.debug(`Pushing ${eventName}`)
               return call(eventName, details);
             })
         )
         .then(() => {
-          console.info(`Event published ${eventName}`, details);
+          // console.debug(`Event published ${eventName}`, details);
           return true;
         })
         .catch(e => {
