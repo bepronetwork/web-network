@@ -1,12 +1,12 @@
 const handleNetwork = (issues) =>
   issues
-    .filter((i) => i?.network)
     .map((issue) => {
-      issue.network.dataValues = {
-        name: issue.network.name,
-        logoIcon: issue.network.logoIcon, 
-        colors: { primary: issue.network.colors.primary }
-      }
+      if(issue.network)
+        issue.network.dataValues = {
+          name: issue.network.name,
+          logoIcon: issue.network.logoIcon, 
+          colors: { primary: issue.network.colors.primary }
+        }
       return issue
     });
 
