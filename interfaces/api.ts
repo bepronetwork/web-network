@@ -32,6 +32,15 @@ export interface SearchNetworkParams {
   isDefault?: boolean;
 }
 
+export interface SearchActiveNetworkParams {
+  page?: string;
+  creatorAddress?: string;
+  sortBy?: string;
+  order?: string;
+  isClosed?: boolean;
+  isRegistered?: boolean;
+}
+
 export interface CreatePrePullRequestParams extends RequestParams {
   repoId: string;
   issueGithubID: string;

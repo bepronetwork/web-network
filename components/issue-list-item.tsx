@@ -2,7 +2,6 @@ import React from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
 
-import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -12,34 +11,58 @@ import BountyTags from "components/bounty/bounty-tags";
 import DateLabel from "components/date-label";
 import Translation from "components/translation";
 
-import {useAppState} from "contexts/app-state";
-
-import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
-interface IssueListItemProps {
-  issue?: IssueBigNumberData;
-  xClick?: () => void;
-}
+import {useAppState} from "../contexts/app-state";
+import CardItem from "./card-item";
+import IssueAmountInfo from "./issue-amount-info";
 
 export default function IssueListItem({
-  issue = null,
-  xClick,
-}: IssueListItemProps) {
+                                        size = "lg",
+                                        issue = null,
+                                        xClick,
+                                      }: {
+  issue?: IssueBigNumberData;
+  xClick?: () => void;
+  size?: "sm" | "lg"
+}) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
   
   const {state} = useAppState();
 
-  const isFundingRequest = !!issue?.fundingAmount?.gt(0);
-  const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0"));
   const issueState = getIssueState({
     state: issue?.state,
     amount: issue?.amount,
     fundingAmount: issue?.fundingAmount,
   })
+
+  function handleClickCard() {
+    if (xClick) return xClick();
+    router.push({
+      pathname: "/[network]/bounty",
+      query: {
+        id: issue?.githubId,
+        repoId: issue?.repository_id,
+        network: issue?.network?.name
+          ? issue?.network?.name
+          : state.Service?.network?.lastVisited,
+      }
+    });
+  }
+
+  function IssueTag() {
+    const tag = issue?.network?.name;
+    const id = issue?.githubId;
+    
+    return (
+      <span className={`${tag && 'text-uppercase'} h6 text-white-40 me-2`}>
+        {tag ? `${tag}-${id}` : `#${id}`}
+      </span>
+    );
+  }
 
   function RenderIssueData({ state }: {state: IssueState}) {
     const types = {
@@ -76,94 +99,44 @@ export default function IssueListItem({
     } else return <></>;
   }
 
-  function RenderAmount() {
-    const isActive = ["closed", "canceled"].includes(issue?.state);
-    
-    const percentage =
-      BigNumber(issue?.fundedAmount?.multipliedBy(100).toFixed(2, 1))
-        .dividedBy(issue?.fundingAmount)
-        .toFixed(1, 1) || 0;
-    
+  if (size === "sm") {
     return (
-      <OverlayTrigger
-      key="bottom-amount"
-      placement="bottom"
-      overlay={
-        <Tooltip id={"tooltip-amount-bottom"} className="caption-small">
-          {formatStringToCurrency(bountyAmount?.toFixed())} 
-          {" "}
-          {issue?.token?.symbol || t("common:misc.token")}
-        </Tooltip>
-      }
-    >
-      <div
-        className={`row justify-content-md-center m-0 px-1 pb-1 rounded-5 ${
-          !isActive ? "bg-black" : "bg-dark-gray"
-        } `}
-      >
-        {isFundingRequest && isMobile ? null : (
-          <div className="px-0 pt-1 col-md-12">
-            <span
-              className={`caption-large text-opacity-1 text-white${
-                isActive && "-40"
-              }`}
-            >
-              {+bountyAmount >= 1.e-6 && formatNumberToNScale(bountyAmount?.toFixed()) || 
-                bountyAmount?.toExponential()}{" "}
-                
-              <label
-                className={`caption-small text-uppercase ${
-                  !isActive ? "text-primary" : "text-white-40"
-                }`}
-              >
-                {issue?.token?.symbol || t("common:misc.token")}
-              </label>
-            </span>
-          </div>
-        )}
-        {isFundingRequest && issue?.fundedAmount?.isLessThan(issue?.fundingAmount) && (
-          <>
-            <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "pt-1"}`}>
-              <div className="bg-dark-gray w-100 issue-funding-progress">
-                <div
-                  className={`bg-primary issue-funding-progress`}
-                  style={{ width: `${percentage}%` }}
+      <CardItem onClick={handleClickCard}>
+        <>
+          <div className="d-flex justify-content-between">
+            <div className="network-name bg-dark-gray p-1 border-radius-8">
+              {issue?.network?.logoIcon && (
+                <img
+                  src={`${state.Settings?.urls?.ipfs}/${issue?.network?.logoIcon}`}
+                  width={14}
+                  height={14}
+                  className="ms-1 me-2"
                 />
-              </div>
+              )}
+              <span className="caption-small me-1 text-uppercase">
+                {issue?.network?.name}
+              </span>
             </div>
-            <div
-              className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-2 col-md-2 text-white
-              ${isMobile && "pt-1"}`}
-            >
-              {percentage}%
-            </div>
-          </>
-        )}
-      </div>
-      </OverlayTrigger>
+
+            <BountyStatusInfo issueState={issueState} className="mt-1 px-2 " />
+          </div>
+          <div className="text-truncate mb-2 mt-4">{issue?.title}</div>
+          <div className="issue-body text-white-40 text-break text-truncate mb-3" >
+            {issue?.body}
+          </div>
+          <IssueAmountInfo issue={issue} size={size} />
+        </>
+      </CardItem>
     );
   }
 
-  return (
-    <div
-      className="bg-shadow list-item p-3"
-      onClick={() => {
-        if (xClick) return xClick();
 
-        router.push({
-          pathname: "/[network]/bounty",
-          query: {
-            id: issue?.githubId,
-            repoId: issue?.repository_id,
-            network: state.Service?.network?.lastVisited,
-          },
-        });
-      }}
-    >
+  return (
+    <CardItem onClick={handleClickCard}>
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate mb-3">
-            <span className="text-white-40 me-2">#{issue?.githubId}</span>
+            <IssueTag/>
             {(issue?.title !== null && issue?.title) || (
               <Translation ns="bounty" label={"errors.fetching"} />
             )}
@@ -188,7 +161,8 @@ export default function IssueListItem({
                         </Tooltip>
                       }
                     >
-                      <div className="bg-primary rounded-4 px-2 py-1 ml-2">
+                      <div className={`${!issue?.network?.colors?.primary && "bg-primary"} rounded-4 px-2 py-1 ml-2`}
+                        style={{backgroundColor: issue?.network?.colors?.primary}}>
                         <span className="caption-medium text-uppercase mw-github-info">
                           {issue?.repository?.githubPath.split("/")?.[1]}
                         </span>
@@ -208,9 +182,9 @@ export default function IssueListItem({
         </div>
 
         <div className="col-md-2 my-auto text-center">
-          <RenderAmount />
+          <IssueAmountInfo issue={issue} size={size} />
         </div>
       </div>
-    </div>
-  );
+    </CardItem>
+  )
 }

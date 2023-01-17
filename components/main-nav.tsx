@@ -45,11 +45,11 @@ export default function MainNav() {
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
 
-  const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
+  const noNeedNetworkInstance = ["/networks", "/new-network", "/bounty-hall", "/leaderboard"].includes(pathname);
   const fullLogoUrl = state.Service?.network?.active?.fullLogo;
 
   useEffect(() => {
-    if (!state.Service?.active || !state.currentUser?.walletAddress || !isNetworksPage) return;
+    if (!state.Service?.active || !state.currentUser?.walletAddress || !noNeedNetworkInstance) return;
 
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(async networkAddress => {
@@ -68,7 +68,7 @@ export default function MainNav() {
         });
       })
       .catch(console.log);
-  }, [state.Service?.active, state.currentUser?.walletAddress, isNetworksPage]);
+  }, [state.Service?.active, state.currentUser?.walletAddress, noNeedNetworkInstance]);
 
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true))
@@ -76,19 +76,40 @@ export default function MainNav() {
     
   } 
 
+  function LinkNetworks() {
+    return(
+      <InternalLink
+        href={"/networks"}
+        label={<Translation label={"main-nav.networks"} />}
+        nav
+        uppercase
+      />
+    )
+  }
 
-  function LeaderBoard() {
+  function LinkLeaderBoard() {
     return (
       <InternalLink
       href={"/leaderboard"}
       label={<Translation label={"main-nav.leaderboard"} />}
       nav
       uppercase
-    />
+      />
     )
   }
 
-  const brandLogo = !isNetworksPage ? (
+  function LinkBounties() {
+    return (
+      <InternalLink
+        href={"/bounty-hall"}
+        label={<Translation label={"main-nav.nav-avatar.bounties"} />}
+        nav
+        uppercase
+      />
+    )
+  }
+
+  const brandLogo = !noNeedNetworkInstance ? (
       <InternalLink
         href={getURLWithNetwork("/", {
           network: state.Service?.network?.active?.name,
@@ -137,15 +158,10 @@ export default function MainNav() {
         >
           <div className="d-flex">
             {brandLogo}
-            {(!isNetworksPage && (
+            {(!noNeedNetworkInstance && (
               <ul className="nav-links">
                 <li>
-                  <InternalLink
-                    href={getURLWithNetwork("/bounties")}
-                    label={<Translation label={"main-nav.nav-avatar.bounties"} />}
-                    nav
-                    uppercase
-                  />
+                  <LinkBounties />
                 </li>
 
                 <li>
@@ -157,28 +173,29 @@ export default function MainNav() {
                   />
                 </li>
                 <li>
-                  <InternalLink
-                    href={"/networks"}
-                    label={<Translation label={"main-nav.networks"} />}
-                    nav
-                    uppercase
-                  />
+                  <LinkNetworks/>
                 </li>
                 <li>
-                  <LeaderBoard />
+                  <LinkLeaderBoard />
                 </li>
               </ul>
             )) || (
               <ul className="nav-links">
                 <li>
-                  <LeaderBoard />
+                  <LinkBounties />
+                </li>
+                <li>
+                  <LinkNetworks/>
+                </li>
+                <li>
+                  <LinkLeaderBoard />
                 </li>
               </ul>
             )}
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">
-            {(!isNetworksPage && (
+            {(!noNeedNetworkInstance && (
               <ReadOnlyButtonWrapper>
                 <Button
                   outline

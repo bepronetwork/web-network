@@ -36,7 +36,13 @@ export interface BountyExtended extends Bounty {
     isInValidation?: boolean;
     isFundingRequest?: boolean;
     proposals: ProposalExtended[];
-
+    network?: {
+        colors: {
+            primary: string;
+        };
+        name: string;
+        logoIcon: string;
+    }
     transactionalTokenData?: Token;
     rewardTokenData?: Token;
 }

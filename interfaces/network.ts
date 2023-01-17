@@ -1,4 +1,5 @@
 import {TreasuryInfo} from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 
 import {Token} from "interfaces/token";
 
@@ -40,6 +41,8 @@ export interface Network {
   isGovernor?: boolean;
   isDefault?: boolean;
   curators?: Curator[];
+  totalValueLock?: BigNumber;
+  countIssues?: number;
 }
 
 export interface ThemeColors {
