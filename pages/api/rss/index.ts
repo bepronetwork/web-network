@@ -77,8 +77,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const rssTemplate = await fs.readFile(path.join(process.cwd(), "templates") + "/rss.hbs", "utf8");
 
-    console.log(rssTemplate)
-
     const handlebar = Handlebars.compile(rssTemplate);
 
     const result = handlebar(templateData);
