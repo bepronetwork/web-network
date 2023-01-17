@@ -34,7 +34,7 @@ function ItemRow({ id, githubLogin, creator, status, children, href }: ItemRowPr
           {githubLogin ? (
               <>
                 <Avatar userLogin={githubLogin} />
-                <span className={`text-uppercase text-white caption`}>
+                <span className={`text-uppercase text-white caption ${status?.length && 'text-truncate'}`}>
                   {githubLogin}
                 </span>
               </>
