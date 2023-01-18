@@ -154,7 +154,7 @@ export default function IssueProposalProgressBar() {
               style={labelStyle}
             >
               <label
-                className={`text-uppercase caption mb-1 text-${
+                className={`white-space text-uppercase caption mb-1 text-${
                   isCanceled ? "danger" : `${currentItem ? stepColor : "gray"}`
                 }`}
               >
