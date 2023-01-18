@@ -593,6 +593,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   max-width: 155px
 }
 
+.white-space {
+  white-space: nowrap;
+
+  @media (max-width: 1399px) {
+    white-space: normal;
+  }
+}
+
 .status {
   padding: math.div($m, 4);
   border-radius: 50px;
