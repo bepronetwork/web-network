@@ -7,7 +7,7 @@ class Network extends Model {
         creatorAddress: DataTypes.STRING,
         name: {
           type: DataTypes.STRING,
-          unique: true
+          unique: "network_chain_unique"
         },
         description: DataTypes.STRING,
         colors: DataTypes.JSON,
@@ -25,7 +25,10 @@ class Network extends Model {
         councilMembers: {
           type: DataTypes.ARRAY(DataTypes.STRING)
         },
-        chain_id: {type: DataTypes.INTEGER,},
+        chain_id: {
+          type: DataTypes.INTEGER,
+          unique: "network_chain_unique"
+        },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
         allowCustomTokens: {
