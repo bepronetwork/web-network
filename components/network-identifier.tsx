@@ -10,8 +10,6 @@ import {changeChain} from "../contexts/reducers/change-chain";
 export default function NetworkIdentifier() {
   const {state, dispatch} = useAppState();
 
-  const networkPrimaryColor = state.Service?.network?.active?.colors?.primary;
-
   function findChain(windowChainId: number) {
     return state.supportedChains?.find(({chainId}) => chainId === windowChainId)
   }
@@ -55,7 +53,7 @@ export default function NetworkIdentifier() {
   return (
     (state.connectedChain?.name && (
       <div className="ml-2 bg-transparent p-0 d-flex flex-row align-items-center justify-content-center">
-        <Indicator bg={NetworkColors[state.connectedChain?.name] || networkPrimaryColor} />
+        <Indicator bg={NetworkColors[state.connectedChain?.name] || "var(--bs-primary)" } />
         <span className="caption-small text-white-50 ">
           {state.connectedChain?.name}
         </span>
