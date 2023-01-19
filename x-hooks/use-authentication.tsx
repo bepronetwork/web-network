@@ -120,6 +120,7 @@ export function useAuthentication() {
           name: chain?.chainName || `unknown`,
           explorer: chain?.blockScanner,
           events: chain?.eventsApi,
+          registry: chain?.registryAddress
         }));
 
         sessionStorage.setItem(`currentWallet`, address || '');

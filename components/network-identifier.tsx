@@ -29,6 +29,7 @@ export default function NetworkIdentifier() {
         name: chain?.chainName || 'unknown',
         explorer: chain?.blockScanner,
         events: chain?.eventsApi,
+        registry: chain?.registryAddress
       }))
     }
 
@@ -43,6 +44,7 @@ export default function NetworkIdentifier() {
         name: chain?.chainName || 'unknown',
         explorer: chain?.blockScanner,
         events: chain?.eventsApi,
+        registry: chain?.registryAddress
       }))
     });
 

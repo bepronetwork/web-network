@@ -72,6 +72,7 @@ export interface ConnectedChain {
   name: string;
   explorer?: string;
   events?: string;
+  registry?: string;
 }
 
 export interface CurrentUserState {
