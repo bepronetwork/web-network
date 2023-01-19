@@ -46,14 +46,6 @@ export function useDao() {
    */
   function changeNetwork() {
     const networkAddress = state.Service?.network?.active?.networkAddress;
-
-    console.log({
-      networkAddress,
-      activeService: state.Service?.active,
-      loadedNetwork: state.Service?.active?.network?.contractAddress,
-      connectedChain: state?.connectedChain,
-      networkChainId: state.Service?.network?.active
-    });
     
     if (!state.Service?.active || !networkAddress)
       return;
@@ -123,8 +115,6 @@ export function useDao() {
     }
 
     const daoService = new DAO({web3Connection, web3Host, ... hasChainRegistry ? {registryAddress} : {}});
-
-    console.log('web3Host',daoService?.web3Host);
 
     daoService.start()
       .then(started => {
