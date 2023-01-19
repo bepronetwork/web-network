@@ -79,7 +79,8 @@
     "actions": {
       "deploy-registry": "Deploy Network Registry",
       "deploy-erc20": "Deploy New ERC20 Token",
-      "deploy-bounty-token": "Deploy New Bounty Token"
+      "deploy-bounty-token": "Deploy New Bounty Token",
+      "save-registry": "Save Registry"
     },
     "success": {
       "deploy": {

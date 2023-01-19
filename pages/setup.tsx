@@ -28,7 +28,7 @@ export default function SetupPage(){
   const { replace } = useRouter();
   const { t } = useTranslation(["setup", "common"])
 
-  const [activeTab, setActiveTab] = useState("registry");
+  const [activeTab, setActiveTab] = useState("githubConnection");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
   const { searchNetworks, getSupportedChains } = useApi();
@@ -74,7 +74,7 @@ export default function SetupPage(){
   const tabs = [
     {
       eventKey: 'githubConnection',
-      title: t('common:connect-github'),
+      title: t('common:misc.github'),
       component: <><ConnectGithubSetup /></>
     },
     {
@@ -142,7 +142,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "custom-network",
         "connect-wallet-button",
         "change-token-modal",
-        "setup"
+        "setup",
+        "profile"
       ])),
     },
   };
