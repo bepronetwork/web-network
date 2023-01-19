@@ -35,6 +35,8 @@ export default function SelectNetworkDropdown({onSelect,}: SelectNetworkDropdown
     if (!chain)
       return;
 
+    sessionStorage.setItem("currentChainId", chain.chainId.toString());
+
     setSelectedChain({ value: chain, label: chain.chainName })
   }
 
