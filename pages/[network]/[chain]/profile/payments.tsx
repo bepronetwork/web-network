@@ -13,6 +13,8 @@ import ProfileLayout from "components/profile/profile-layout";
 import {FlexColumn, FlexRow} from "components/profile/wallet-balance";
 import ReactSelect from "components/react-select";
 
+import {useAppState} from "contexts/app-state";
+
 import {formatNumberToCurrency} from "helpers/formatNumber";
 
 import {Payment} from "interfaces/payments";
@@ -20,8 +22,6 @@ import {Payment} from "interfaces/payments";
 import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
-
-import {useAppState} from "../../../contexts/app-state";
 
 export default function Payments() {
   const { t } = useTranslation(["common", "profile"]);

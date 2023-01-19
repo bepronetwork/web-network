@@ -8,11 +8,11 @@ import {Octokit} from "octokit";
 
 import ConnectWalletButton from "components/connect-wallet-button";
 
+import {useAppState} from "contexts/app-state";
+
 import {User} from "interfaces/api";
 
 import useApi from "x-hooks/use-api";
-
-import {useAppState} from "../../contexts/app-state";
 
 interface PropsUserList extends Partial<User> {
    created_at: string; 

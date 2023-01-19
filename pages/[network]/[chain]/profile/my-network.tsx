@@ -11,13 +11,12 @@ import MyNetworkSettings from "components/profile/my-network-settings";
 import ProfileLayout from "components/profile/profile-layout";
 
 import {useAppState} from "contexts/app-state";
+import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import {changeLoadState} from "contexts/reducers/change-load";
 
 import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
-
-import {NetworkSettingsProvider, useNetworkSettings} from "../../../contexts/network-settings";
 
 export function MyNetwork() {
   const {t} = useTranslation(["common", "custom-network"]);

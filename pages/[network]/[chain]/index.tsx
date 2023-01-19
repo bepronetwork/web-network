@@ -4,7 +4,7 @@ import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
+import PageDevelopers from "pages/[network]/[chain]/bounties";
 
 export default function Home() {
   const { getURLWithNetwork } = useNetworkTheme();

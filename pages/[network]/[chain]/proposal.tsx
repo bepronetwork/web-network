@@ -10,17 +10,17 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import CustomContainer from "components/custom-container";
 import NotMergeableModal from "components/not-mergeable-modal";
 import ProposalActionCard from "components/proposal-action-card";
+import {ProposalDisputes} from "components/proposal-disputes";
 import ProposalHero from "components/proposal-hero";
 import ProposalListDistribution from "components/proposal-list-distribution";
 import ProposalProgress from "components/proposal-progress";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 
-
 import {useAppState} from "contexts/app-state";
+import {BountyEffectsProvider} from "contexts/bounty-effects";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-
 
 import {ProposalExtended} from "interfaces/bounty";
 import {MetamaskErrors} from "interfaces/enums/Errors";
@@ -29,11 +29,7 @@ import {DistributedAmounts, Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-
-import {ProposalDisputes} from "../../components/proposal-disputes";
-import {BountyEffectsProvider} from "../../contexts/bounty-effects";
-import {useBounty} from "../../x-hooks/use-bounty";
-
+import {useBounty} from "x-hooks/use-bounty";
 
 const defaultAmount = {
   value: "0",
