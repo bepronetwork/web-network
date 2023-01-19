@@ -1,14 +1,19 @@
 import {useEffect, useState} from "react";
+
+import {isZeroAddress} from "ethereumjs-util";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
 import ConnectWalletButton from "components/connect-wallet-button";
+import {ContextualSpan} from "components/contextual-span";
 import CreatingNetworkLoader from "components/creating-network-loader";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
+import If from "components/If";
+import {CallToAction} from "components/setup/call-to-action";
 import Stepper from "components/stepper";
 
 import {useAppState} from "contexts/app-state";
@@ -27,11 +32,6 @@ import {psReadAsText} from "helpers/file-reader";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network-theme";
-
-import {ContextualSpan} from "../contextual-span";
-import If from "../If";
-import {CallToAction} from "../setup/call-to-action";
-import {isZeroAddress} from "ethereumjs-util";
 
 function NewNetwork() {
   const router = useRouter();

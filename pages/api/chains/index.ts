@@ -1,19 +1,21 @@
+import {isZeroAddress} from "ethereumjs-util";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Op} from "sequelize";
+import {isAddress} from "web3-utils";
 
 import models from "db/models";
 
-import {MiniChainInfo} from "../../../interfaces/mini-chain";
-import {withCors} from "../../../middleware";
-import {AdminRoute} from "../../../middleware/admin-route";
-import {error} from "../../../services/logging";
-import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
-import {isAddress} from "web3-utils";
-import {isZeroAddress} from "ethereumjs-util";
-import {resJsonMessage} from "../../../helpers/res-json-message";
-import {WRONG_PARAM_ADDRESS, WRONG_PARAM_URL} from "../../../helpers/contants";
+import {WRONG_PARAM_ADDRESS, WRONG_PARAM_URL} from "helpers/contants";
+import {resJsonMessage} from "helpers/res-json-message";
 
+import {MiniChainInfo} from "interfaces/mini-chain";
+
+import {withCors} from "middleware";
+import {AdminRoute} from "middleware/admin-route";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+
+import {error} from "services/logging";
 
 async function Post(req: NextApiRequest, res: NextApiResponse) {
   const body = req.body as MiniChainInfo;
@@ -149,7 +151,7 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
      ... query.chainRpc ? {chainRpc: {[Op.iLike]: query.chainRpc}} : {},
      ... query.nativeCurrencyName ? {nativeCurrencyName: {[Op.iLike]: query.nativeCurrencyName}} : {},
      ... query.nativeCurrencySymbol ? {nativeCurrencySymbol: {[Op.iLike]: query.nativeCurrencySymbol}} : {},
-     ... query.nativeCurrencyDecimals ? {nativeCurrencyDecimals: {[Op.eq]: query.nativeCurrencyDecimals}} : {},
+     ... query.nativeCurrencyDecimals ? {nativeCurrencyDecimals: {[Op.eq]: query.nativeCurrencyDecimals}} : {}
   }
 
   return models.chain.findAll({where})

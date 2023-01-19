@@ -1,4 +1,3 @@
-import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -8,6 +7,8 @@ import Database from "db/models";
 
 import {handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
 import {Settings} from "helpers/settings";
+
+import {withCors} from "middleware";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
@@ -83,7 +84,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       isDefault
     } = req.body;
 
-    const name = _name?.replaceAll(" ", "-")?.toLowerCase()
+    const name = _name?.replaceAll(" ", "-")?.toLowerCase();
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 

@@ -1,13 +1,13 @@
 import {useEffect} from "react";
 
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import {useRouter} from "next/router";
 import {GetServerSideProps} from "next/types";
 
 import ExplorePage from "./explore";
 
 import {useAppState} from "contexts/app-state";
-import getConfig from "next/config";
 
 export default function Index() {
   const { replace } = useRouter();

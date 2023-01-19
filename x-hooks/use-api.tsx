@@ -1,4 +1,6 @@
+import axios from "axios";
 import BigNumber from "bignumber.js";
+import {isZeroAddress} from "ethereumjs-util";
 import {head} from "lodash";
 
 import {useAppState} from "contexts/app-state";
@@ -29,8 +31,6 @@ import {Entities, Events} from "types/dappkit";
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
 import {SupportedChainData} from "../interfaces/supported-chain-data";
-import {isZeroAddress} from "ethereumjs-util";
-import axios from "axios";
 
 interface NewIssueParams {
   title: string;
@@ -737,8 +737,7 @@ export default function useApi() {
       .then(response =>
         response.status === 200 &&
         !!response.data?.registryAddress &&
-        !isZeroAddress(response.data?.registryAddress)
-      )
+        !isZeroAddress(response.data?.registryAddress))
       .catch((e) => {
         console.log(`error patching registry`, e)
         return false;
