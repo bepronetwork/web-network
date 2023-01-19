@@ -42,6 +42,24 @@ components:
         - draft
         - open
         - closed
+    PullRequestPayload:
+      type: object
+      properties:
+        repoId:
+          $ref: '#/components/schemas/RepositoryDbId'
+        issueGithubID:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        username:
+          type: string
+        branch:
+          type: string
+        networkName:
+          type: string
+
     PullRequest:
       type: object
       properties:
@@ -252,7 +270,6 @@ paths:
                 type: string
                 description: repository_id/githubId
                 example: 1/1
-  /issue/{id}/:
     get:
       description: retrieve bounty from database
       responses:
@@ -268,7 +285,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Bounty'
-  /issues/{id}/working:
+  /issue/working:
     put:
       description: Change working state on database
       requestBody:
@@ -311,6 +328,39 @@ paths:
                     $ref: '#/components/schemas/Date'
                   author:
                     type: string
+  /issue/{repoId}/{ghId}/{networkName}/:
+    get:
+      description: Retrieve single issue from database
+      parameters:
+        - in: path
+          name: repoId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: ghId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: networkName
+          required: true
+          schema:
+            type: string
+      responses:
+        404:
+          description: Invalid network, bounty not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bounty'
+
   /merge-proposal/{id}/:
     get:
       parameters:
@@ -332,6 +382,192 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MergeProposal'
-
-
-  
+  /nft/:
+    post:
+      description: create a nft for the given bounty
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issueContractId:
+                  type: string
+                proposalContractId:
+                  type: string
+                networkName:
+                  type: string
+      responses:
+        400:
+          description: missing parameters
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Network not found, invalid bounty, proposal invalid, pr invalid
+          content:
+            application/json:
+              schema:
+                type: string
+        500:
+          description: Failed to start chain connection, failed to create hash
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    $ref: '#/components/schemas/StringUrl'
+  /payments/:
+    get:
+      description: get User payment summary
+      parameters:
+        - in: query
+          name: wallet
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+          required: true
+        - in: query
+          name: networkName
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            $ref: '#/components/schemas/Date'
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            $ref: '#/components/schemas/Date'
+      responses:
+        404:
+          description: Invalid network, invalid date, payment not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+  /pull-request/:
+    get:
+      description: retrieve one or more pull-requests from database
+      parameters:
+        - in: query
+          name: login
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: issueId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: networkName
+          required: true
+          schema:
+            type: string
+      responses:
+        404:
+          description: Invalid network, Issue not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PullRequest'
+    post:
+      description: create new pull-request in the database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PullRequestPayload'
+      responses:
+        404:
+          description: Invalid network, Issue not found
+          content:
+            application/json:
+              schema:
+                type: string
+        422:
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bountyId:
+                    type: string
+                  originRepo:
+                    type: string
+                  originBranch:
+                    type: string
+                  originCID:
+                    type: string
+                  userRepo:
+                    type: string
+                  userBranch:
+                    type: string
+                  cid:
+                    type: string
+# DELETE operations can't have body, but we do. need to refactor so we can document it
+#    delete:
+#      description: Remove pull-request from database
+#      requestBody:
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/PullRequestPayload'
+#      responses:
+#        500:
+#          description: Failed blockchain connection
+#          content:
+#            application/json:
+#              schema:
+#                type: string
+#        404:
+#          description: Invalid network, Issue not found, PR not found
+#          content:
+#            application/json:
+#              schema:
+#                type: string
+#        200:
+#          description: OK
+#          content:
+#            application/json:
+#              schema:
+#                type: string
