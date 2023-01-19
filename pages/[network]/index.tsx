@@ -1,0 +1,24 @@
+import React from "react";
+
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {GetServerSideProps} from "next/types";
+
+import BountyHallPage from "pages/bounty-hall";
+
+export default function NetworkBountyHall() {
+  return <BountyHallPage/>;
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, [
+        "common",
+        "bounty",
+        "connect-wallet-button",
+        "custom-network",
+        "leaderboard",
+      ])),
+    },
+  };
+};
