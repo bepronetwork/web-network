@@ -180,7 +180,6 @@ export function RegistrySetup({
         ])
       })
       .then(parameters => {
-        console.log(parameters);
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
         setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
@@ -279,7 +278,7 @@ export function RegistrySetup({
     if (!registryAddress || !Service?.active || !isVisible) return;
 
     updateData();
-  }, [registryAddress, Service?.active]);
+  }, [registryAddress, Service?.active, isVisible]);
 
   useEffect(() => {
     if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);
@@ -304,7 +303,6 @@ export function RegistrySetup({
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">
-
       { hasRegistryAddress &&
         <ContextualSpan
           context="info"
