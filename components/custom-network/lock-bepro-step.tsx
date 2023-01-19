@@ -200,13 +200,13 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   useEffect(() => {
     const tokenAddress = state.Service?.active?.registry?.token?.contractAddress;
-    const registryAddress = state.Service?.active?.registryAddress;
+    const registryAddress = state.Service?.active?.registry?.contractAddress;
 
     if (tokenAddress && registryAddress) {
       registryToken.setAddress(tokenAddress);
       registryToken.setSpender(registryAddress);
     }
-  }, [state.Service?.active?.registry?.token?.contractAddress, state.Service?.active?.registryAddress]);
+  }, [state.Service?.active?.registry?.token?.contractAddress, state.Service?.active?.registry?.contractAddress]);
 
   return (
     <Step
