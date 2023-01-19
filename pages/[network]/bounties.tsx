@@ -6,16 +6,14 @@ import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {GetServerSideProps} from "next/types";
 
-
 import ListIssues from "components/list-issues";
 import PageHero, {InfosHero} from "components/page-hero";
 
+import {useAppState} from "contexts/app-state";
+import {BountyEffectsProvider} from "contexts/bounty-effects";
+
 import useApi from "x-hooks/use-api";
-
-import {useAppState} from "../../contexts/app-state";
-import {BountyEffectsProvider} from "../../contexts/bounty-effects";
-import {useBounty} from "../../x-hooks/use-bounty";
-
+import {useBounty} from "x-hooks/use-bounty";
 
 export default function BountiesPage() {
   useBounty();
@@ -79,7 +77,6 @@ export default function BountiesPage() {
 
   return (
     <BountyEffectsProvider>
-      {console.log({ state })}
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
