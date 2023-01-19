@@ -1,0 +1,337 @@
+openapi: 3.0.3
+info:
+  title: BEPRO
+  description: BEPRO API Documentation
+  version: 1.0.0
+  contact:
+    name: Hello
+    email: hello@taikai.network
+servers:
+  - url: 'https://app.bepro.network/api'
+    description: production api
+
+components:
+  schemas:
+    String:
+      type: string
+    StringUrl:
+      type: string
+      description: Url of asset
+    StringAddress:
+      type: string
+      description: wallet/contract address string
+    DbId:
+      type: integer
+      description: database id of asset
+    Date:
+      type: string
+      description: UTC format date of asset
+    NetworkDbId:
+      type: string
+      description: id of network in database
+    RepositoryDbId:
+      type: string
+      description: id of repository in database
+    TokenDbId:
+      type: string
+      description: id of token in database
+    BountyState:
+      type: string
+      enum:
+        - pending
+        - draft
+        - open
+        - closed
+    PullRequest:
+      type: object
+      properties:
+        githubId:
+          type: string
+        issueId:
+          type: integer
+        githubLogin:
+          type: string
+        userRepo:
+          type: string
+        userBranch:
+          type: string
+        userAddress:
+          type: string
+        status:
+          type: string
+        contractId:
+          type: string
+        reviewers:
+          type: array
+          items:
+            type: string
+        network_id:
+          $ref: '#/components/schemas/NetworkDbId'
+    MergeProposal:
+      type: object
+      properties:
+        issueId:
+          type: string
+        pullRequestId:
+          type: integer
+        githubLogin:
+          type: string
+        creator:
+          $ref: '#/components/schemas/StringAddress'
+        network_id:
+          $ref: '#/components/schemas/NetworkDbId'
+        contractCreationDate:
+          type: string
+        disputeWeight:
+          type: string
+        refusedByOwner:
+          type: boolean
+          default: false
+        isDisputed:
+          type: boolean
+          default: false
+    Benefactor:
+      description: Benefactor of funding
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: integer
+        address:
+          type: string
+        contractId:
+          type: string
+        issueId:
+          type: string
+    Payment:
+      description: User payment summary
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/String'
+        ammount:
+          type: integer
+        issueId:
+          $ref: '#/components/schemas/String'
+        transactionHash:
+          type: string
+          description: transaction hash of payment
+    Token:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/DbId'
+        name:
+          $ref: '#/components/schemas/String'
+        symbol:
+          $ref: '#/components/schemas/String'
+        address:
+          $ref: '#/components/schemas/String'
+        isTransactional:
+          type: boolean
+        isAllowed:
+          type: boolean
+    Bounty:
+      type: object
+      properties:
+        issueId:
+          type: integer
+          description: database bounty id
+        githubId:
+          type: string
+          description: github issue id
+        state:
+          $ref: '#/components/schemas/BountyState'
+        creatorAddress:
+          $ref: '#/components/schemas/String'
+        creatorGithub:
+          $ref: '#/components/schemas/String'
+        amount:
+          type: string
+          description: Bounty amount
+        fundingAmount:
+          type: string
+          description: 0 if not funding
+        fundedAmount:
+          type: string
+          description: total funded amount
+        title:
+          $ref: '#/components/schemas/String'
+        body:
+          $ref: '#/components/schemas/String'
+        repository_id:
+          $ref: '#/components/schemas/RepositoryDbId'
+        working:
+          type: array
+          items:
+            $ref: '#/components/schemas/String'
+        merged:
+          type: string
+          description: id of merged
+        seoImage:
+          $ref: '#/components/schemas/StringUrl'
+        network_id:
+          $ref: '#/components/schemas/NetworkDbId'
+        contractId:
+          type: string
+          description: bounty index in smart contract
+        tokenId:
+          $ref: '#/components/schemas/TokenDbId'
+        fundedAt:
+          $ref: '#/components/schemas/Date'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/String'
+
+paths:
+  /health:
+    description: API Health
+    get:
+      responses:
+        204:
+          description: Good
+  /files:
+    post:
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/String'
+        403:
+          description: Failed to upload to IPFS
+        400:
+          description: No Files
+  /issue/:
+    post:
+      description: Create new Bounty on the database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Bounty title
+                body:
+                  type: string
+                  description: Markdown body of bounty
+                repositoryId:
+                  $ref: '#/components/schemas/RepositoryDbId'
+                networkName:
+                  type: string
+                  description: network name where bounty should be created
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/String'
+      responses:
+        404:
+          description: repo not found or invalid network
+          content:
+            application/json:
+              schema:
+                type: string
+        409:
+          description: issue already exists
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: repository_id/githubId
+                example: 1/1
+  /issue/{id}/:
+    get:
+      description: retrieve bounty from database
+      responses:
+        404:
+          description: Invalid network, bounty not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bounty'
+  /issues/{id}/working:
+    put:
+      description: Change working state on database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issueId:
+                  type: string
+                githubLogin:
+                  type: string
+                networkName:
+                  type: string
+      responses:
+        404:
+          description: Invalid network, bounty not found
+          content:
+            application/json:
+              schema:
+                type: string
+        409:
+          description: Already working
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  body:
+                    type: string
+                  updatedAt:
+                    $ref: '#/components/schemas/Date'
+                  author:
+                    type: string
+  /merge-proposal/{id}/:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeProposal'
+
+
+  
