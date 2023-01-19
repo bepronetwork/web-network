@@ -2,40 +2,43 @@ import React, {useEffect, useState} from "react";
 import {Spinner} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
+import { useRouter } from "next/router";
 
+import Button from "components/button";
 import Modal from "components/modal";
+import SelectNetworkDropdown from "components/select-network-dropdown";
 
 import {useAppState} from "contexts/app-state";
 
-import {SupportedChainData} from "../interfaces/supported-chain-data";
-import useApi from "../x-hooks/use-api";
-import UseNetworkChange from "../x-hooks/use-network-change";
-import Button from "./button";
-import SelectNetworkDropdown from "./select-network-dropdown";
+import {SupportedChainData} from "interfaces/supported-chain-data";
+
+import useApi from "x-hooks/use-api";
+import UseNetworkChange from "x-hooks/use-network-change";
 
 type typeError = { code?: number; message?: string }
 
 export default function WrongNetworkModal() {
   const { t } = useTranslation("common");
-  const api = useApi();
+  const { query } = useRouter();
+
   const [error, setError] = useState<string>("");
-  const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const [_showModal, setShowModal] = useState(false);
-  const [option, setOption] = useState<{ value: string; label: string }>(null);
+  const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+  const [networkChain, setNetworkChain] = useState<SupportedChainData>(null);
   const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
-
-  const {state: { connectedChain, currentUser, Settings: settings, supportedChains },} = useAppState();
-
-  const {handleAddNetwork} = UseNetworkChange();
+  
+  const api = useApi();
+  const { handleAddNetwork } = UseNetworkChange();
+  const { state: { connectedChain, currentUser, Service, supportedChains } } = useAppState();
 
   function changeShowModal() {
-    if (!supportedChains?.length || !connectedChain?.id || !currentUser?.walletAddress)
-      return;
+    if (!connectedChain?.id) return;
 
-    if (!supportedChains.find(o => o.chainId === +option?.value))
-      setOption(null);
+    if (typeof connectedChain?.matchWithNetworkChain !== "boolean")
+      setShowModal(!supportedChains?.find(({ chainId }) => +chainId === +connectedChain.id));
+    else
+      setShowModal(!connectedChain?.matchWithNetworkChain && !!currentUser?.walletAddress);
 
-    setShowModal(!supportedChains.find(({chainId}) => chainId === +connectedChain?.id));
   }
 
   async function selectSupportedChain(chain: SupportedChainData) {
@@ -62,11 +65,24 @@ export default function WrongNetworkModal() {
       });
   }
 
+  function updateNetworkChain() {
+    if (supportedChains?.length && Service?.network?.active?.chain_id && query?.network)
+      setNetworkChain(supportedChains.find(({ chainId }) => +Service?.network?.active?.chain_id === +chainId ));
+    else
+      setNetworkChain(null);
+  }
+
   const isButtonDisabled = (): boolean =>
     [isAddingNetwork].some((values) => values);
 
   useEffect(() => { api.getSupportedChains() }, []);
-  useEffect(changeShowModal, [supportedChains, connectedChain]);
+  useEffect(updateNetworkChain, [Service?.network?.active?.chain_id, supportedChains, query?.network]);
+  useEffect(changeShowModal, [
+    currentUser?.walletAddress, 
+    connectedChain?.matchWithNetworkChain, 
+    connectedChain?.id,
+    supportedChains
+  ]);
 
   return (
     <Modal
@@ -75,6 +91,7 @@ export default function WrongNetworkModal() {
       titleClass="h4 text-white bg-opacity-100"
       show={_showModal}>
       <div className="d-flex flex-column text-center align-items-center">
+        {console.log({connectedChain})}
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}
         </strong>
@@ -84,7 +101,10 @@ export default function WrongNetworkModal() {
                    animation="border"/>
         }
 
-        <SelectNetworkDropdown onSelect={selectSupportedChain} />
+        <SelectNetworkDropdown
+          defaultChain={networkChain}
+          onSelect={selectSupportedChain}
+        />
 
         <Button className="my-3"
                 disabled={isButtonDisabled()}

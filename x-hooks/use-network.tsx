@@ -4,6 +4,7 @@ import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
 import {useAppState} from "contexts/app-state";
+import { changeMatchWithNetworkChain } from "contexts/reducers/change-chain";
 import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
@@ -176,6 +177,17 @@ export function useNetwork() {
       })
   }
 
+  function updateNetworkAndChainMatch() {
+    const connectedChainId = state.connectedChain?.id;
+    const networkChainId = state?.Service?.network?.active?.chain_id;
+    const isOnANetwork = !!query?.network;
+
+    if (connectedChainId && networkChainId && isOnANetwork)
+      dispatch(changeMatchWithNetworkChain(+connectedChainId === +networkChainId));
+    else
+      dispatch(changeMatchWithNetworkChain(null));
+  }
+
   return {
     updateActiveNetwork,
     getURLWithNetwork,
@@ -183,7 +195,8 @@ export function useNetwork() {
     loadNetworkToken,
     loadNetworkTimes,
     loadNetworkAmounts,
-    loadNetworkAllowedTokens
+    loadNetworkAllowedTokens,
+    updateNetworkAndChainMatch
   }
 
 }

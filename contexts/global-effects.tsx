@@ -31,7 +31,11 @@ export const GlobalEffectsProvider = ({children}) => {
   const transactions = useTransactions();
 
   useEffect(dao.start, [state.supportedChains, state.connectedChain]);
-  useEffect(dao.changeNetwork, [state.Service?.active, state.Service?.network?.active?.networkAddress, state?.connectedChain?.id]);
+  useEffect(dao.changeNetwork, [
+    state.Service?.active, 
+    state.Service?.network?.active?.networkAddress, 
+    state.connectedChain?.matchWithNetworkChain
+  ]);
 
   useEffect(repos.loadRepos, [query?.network , state?.Service?.network?.lastVisited]);
   useEffect(repos.updateActiveRepo, [query?.repoId, state.Service?.network?.repos]);
@@ -54,6 +58,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(network.loadNetworkTimes, [state.Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [state.Service?.active?.network]);
   useEffect(network.loadNetworkAllowedTokens, [state.Service?.active, state?.Service?.network?.active]);
+  useEffect(network.updateNetworkAndChainMatch, [state.connectedChain?.id, state?.Service?.network?.active?.chain_id]);
 
   useEffect(settings.loadSettings, []);
 

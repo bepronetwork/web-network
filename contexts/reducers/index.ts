@@ -32,7 +32,7 @@ export default function loadApplicationStateReducers() {
     changeSpinners,
     changeSettings,
     changeActiveRepoProps,
-    changeSupportedChains,
+    changeSupportedChains
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);

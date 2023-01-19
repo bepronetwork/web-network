@@ -53,7 +53,7 @@ export function useDao() {
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    if (+state.Service?.network?.active?.chain_id !== +state?.connectedChain?.id)
+    if (!state.connectedChain?.matchWithNetworkChain)
       return;
 
     const service = state.Service.active;

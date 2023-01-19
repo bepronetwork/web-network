@@ -10,42 +10,53 @@ import {SupportedChainData} from "interfaces/supported-chain-data";
 
 interface SelectNetworkDropdownProps {
   onSelect: (chain: SupportedChainData) => void;
+  defaultChain?: SupportedChainData;
 }
 
-export default function SelectNetworkDropdown({onSelect,}: SelectNetworkDropdownProps) {
+interface ChainOption {
+  label: string;
+  value: SupportedChainData;
+}
+
+export default function SelectNetworkDropdown({ defaultChain, onSelect }: SelectNetworkDropdownProps) {
   const { t } = useTranslation("common");
 
-  const [selected, setSelectedChain] = useState(null);
+  const [selected, setSelectedChain] = useState<ChainOption>(null);
   
   const { state: { supportedChains, connectedChain } } = useAppState();
 
+  const chainToOption = (chain: SupportedChainData): ChainOption => ({ value: chain, label: chain.chainName });
+
   async function selectSupportedChain({value}) {
-    const chain = supportedChains?.find(({ chainId }) => chainId === value);
+    const chain = supportedChains?.find(({ chainId }) => +chainId === +value.chainId);
 
     if (!chain)
       return;
 
     onSelect(chain);
-    setSelectedChain({value: chain, label: chain.chainName})
+    setSelectedChain(chainToOption(chain));
   }
 
   function updateSelectedChainMatchConnected() {
-    const chain = supportedChains?.find(({ chainId }) => chainId === +connectedChain.id);
+    const chain = 
+      supportedChains?.find(({ chainId }) => chainId === (defaultChain ? +defaultChain.chainId : +connectedChain.id));
 
     if (!chain)
       return;
 
     sessionStorage.setItem("currentChainId", chain.chainId.toString());
 
-    setSelectedChain({ value: chain, label: chain.chainName })
+    onSelect(chain);
+    setSelectedChain(chainToOption(chain));
   }
 
-  useEffect(updateSelectedChainMatchConnected, [supportedChains, connectedChain?.id]);
+  useEffect(updateSelectedChainMatchConnected, [defaultChain, supportedChains, connectedChain?.id]);
 
-
-  return <ReactSelect options={supportedChains?.map(opt => ({ label: opt.chainName, value: opt.chainId }))}
-                      value={selected}
-                      onChange={selectSupportedChain}
-                      placeholder={t("forms.select-placeholder")}
-                      isDisabled={!supportedChains?.length}/>
+  return <ReactSelect 
+            options={supportedChains?.map(chainToOption)}
+            value={selected}
+            onChange={selectSupportedChain}
+            placeholder={t("forms.select-placeholder")}
+            isDisabled={!supportedChains?.length || !!defaultChain}
+          />
 }
