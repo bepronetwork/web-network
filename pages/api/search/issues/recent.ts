@@ -72,11 +72,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
   }
 
+  const result = []
+
   const issuesDraft = await getLastIssuesByStatus("draft", whereCondition, sortBy, order)
   const issuesOpen = await  getLastIssuesByStatus("open", whereCondition, sortBy, order)
   const issuesProposal = await getLastIssuesByStatus("proposal", whereCondition, sortBy, order)
+
+  if(issuesDraft) result.push(...issuesDraft)
+  if(issuesOpen) result.push(...issuesOpen)
+  if(issuesProposal) result.push(...issuesProposal)
   
-  return res.status(200).json(handleNetworkValues([...issuesDraft, ...issuesOpen, ...issuesProposal]));
+  return res.status(200).json(handleNetworkValues(result));
 }
 
 async function getAll(req: NextApiRequest,
