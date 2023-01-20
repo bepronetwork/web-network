@@ -40,7 +40,7 @@
     "closed": "closed",
     "completed": "completed",
     "canceled": "canceled",
-    "until-done": "{{distance}} until done",
+    "until-open": "{{distance}} until open",
     "started-time": "started {{distance}} ago",
     "opened-time": "opened {{distance}} ago",
     "end-time": "at {{data}}",
