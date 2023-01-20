@@ -34,7 +34,7 @@ export default function WrongNetworkModal() {
   function changeShowModal() {
     if (!connectedChain?.id) return;
 
-    if (typeof connectedChain?.matchWithNetworkChain !== "boolean")
+    if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
       setShowModal(!supportedChains?.find(({ chainId }) => +chainId === +connectedChain.id));
     else
       setShowModal(!connectedChain?.matchWithNetworkChain && !!currentUser?.walletAddress);
@@ -91,14 +91,16 @@ export default function WrongNetworkModal() {
       titleClass="h4 text-white bg-opacity-100"
       show={_showModal}>
       <div className="d-flex flex-column text-center align-items-center">
-        {console.log({connectedChain})}
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}
         </strong>
+
         {!isAddingNetwork ? '' :
-          <Spinner className="text-primary align-self-center p-2 mt-1 mb-2"
-                   style={{ width: "5rem", height: "5rem" }}
-                   animation="border"/>
+          <Spinner 
+            className="text-primary align-self-center p-2 mt-1 mb-2"
+            style={{ width: "5rem", height: "5rem" }}
+            animation="border"
+          />
         }
 
         <SelectNetworkDropdown
@@ -106,11 +108,14 @@ export default function WrongNetworkModal() {
           onSelect={selectSupportedChain}
         />
 
-        <Button className="my-3"
-                disabled={isButtonDisabled()}
-                onClick={_handleAddNetwork}>
+        <Button 
+          className="my-3"
+          disabled={isButtonDisabled()}
+          onClick={_handleAddNetwork}
+        >
           {t("modals.wrong-network.change-network")}
         </Button>
+
         {error && (
           <p className="caption-small text-uppercase text-danger">{error}</p>
         )}
