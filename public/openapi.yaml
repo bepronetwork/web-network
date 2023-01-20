@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: BEPRO
   description: BEPRO API Documentation
-  version: 1.0.0
+  version: 2.7.0
   contact:
     name: Hello
     email: hello@taikai.network
@@ -14,27 +14,35 @@ components:
   schemas:
     String:
       type: string
+
     StringUrl:
       type: string
       description: Url of asset
+
     StringAddress:
       type: string
       description: wallet/contract address string
+
     DbId:
       type: integer
       description: database id of asset
+
     Date:
       type: string
       description: UTC format date of asset
+
     NetworkDbId:
       type: string
       description: id of network in database
+
     RepositoryDbId:
       type: string
       description: id of repository in database
+
     TokenDbId:
       type: string
       description: id of token in database
+
     BountyState:
       type: string
       enum:
@@ -42,6 +50,32 @@ components:
         - draft
         - open
         - closed
+
+    NetworkParameterLimit:
+      type: object
+      properties:
+        min:
+          type: integer
+        max:
+          type: integer
+
+    Curator:
+      type: object
+      properties:
+        id:
+          type: integer
+        address:
+          $ref: '#/components/schemas/StringAddress'
+        acceptedProposals:
+          type: integer
+        disputedProposals:
+          type: integer
+        tokensLocked:
+          type: integer
+        networkId:
+          $ref: '#/components/schemas/NetworkDbId'
+        isCurrentlyCurator:
+          type: boolean
     PullRequestPayload:
       type: object
       properties:
@@ -59,7 +93,15 @@ components:
           type: string
         networkName:
           type: string
-
+    Repository:
+      type: object
+      properties:
+        id:
+          type: integer
+        githubPath:
+          type: string
+        network_id:
+          $ref: '#/components/schemas/NetworkDbId'
     PullRequest:
       type: object
       properties:
@@ -202,6 +244,168 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/String'
+    LeaderboardEntry:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/StringAddress'
+        githubHandle:
+          type: string
+        numberNfts:
+          type: integer
+        ownedBountiesOpened:
+          type: integer
+        ownedBountiesClosed:
+          type: integer
+        ownedBountiesCanceled:
+          type: integer
+        ownedProposalCreated:
+          type: integer
+        ownedProposalAccepted:
+          type: integer
+        ownedProposalRejected:
+          type: integer
+    Network:
+      type: object
+      properties:
+        creatorAddress:
+          $ref: '#/components/schemas/StringAddress'
+        name:
+          type: string
+        description:
+          type: string
+        networkAddress:
+          $ref: '#/components/schemas/StringAddress'
+        logoIcon:
+          type: string
+        fullLogo:
+          type: string
+        isClosed:
+          type: boolean
+        isRegistered:
+          type: boolean
+        councilMembers:
+          type: array
+          items:
+            type: string
+        allowCustomTokens:
+          type: boolean
+        isDefault:
+          type: boolean
+        totalValueLock:
+          type: integer
+        countIssues:
+          type: integer
+    Settings:
+      type: object
+      properties:
+        chainIds:
+          type: object
+        contracts:
+          type: object
+          properties:
+            settlerToken:
+              $ref: '#/components/schemas/StringAddress'
+            network:
+              $ref: '#/components/schemas/StringAddress'
+            nftToken:
+              $ref: '#/components/schemas/StringAddress'
+            networkRegistry:
+              $ref: '#/components/schemas/StringAddress'
+            transactionalToken:
+              $ref: '#/components/schemas/StringAddress'
+        currency:
+          type: object
+          properties:
+            defaultToken:
+              type: string
+            api:
+              $ref: '#/components/schemas/StringUrl'
+            defaultFiat:
+              type: string
+            conversionList:
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                  label:
+                    type: string
+        defaultNetworkConfig:
+          type: object
+          properties:
+            name:
+              type: string
+            allowCustomTokens:
+              type: boolean
+            adminWallet:
+              type: string
+        github:
+          type: object
+          properties:
+            botUser:
+              type: string
+        networkParametersLimits:
+          type: object
+          properties:
+            draftTime:
+              $ref: '#/components/schemas/NetworkParameterLimit'
+            disputableTime:
+              $ref: '#/components/schemas/NetworkParameterLimit'
+            councilAmount:
+              $ref: '#/components/schemas/NetworkParameterLimit'
+            disputePercentage:
+              $ref: '#/components/schemas/NetworkParameterLimit'
+        requiredChain:
+          type: object
+          properties:
+            name:
+              type: string
+            id:
+              type: string
+            token:
+              type: string
+        urls:
+          type: object
+          properties:
+            blockScan:
+              $ref: '#/components/schemas/StringUrl'
+            web3Provider:
+              $ref: '#/components/schemas/StringUrl'
+            api:
+              $ref: '#/components/schemas/StringUrl'
+            nft:
+              $ref: '#/components/schemas/StringUrl'
+            home:
+              $ref: '#/components/schemas/StringUrl'
+            ipfs:
+              $ref: '#/components/schemas/StringUrl'
+        beproToken:
+          $ref: '#/components/schemas/Token'
+        minBountyValue:
+          type: string
+
+    SearchParamsTime:
+      enum: [ hour, week, month, year ]
+      type: string
+
+    Search:
+      type: object
+      properties:
+        pages:
+          type: integer
+        currentPage:
+          type: integer
+        rows:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Bounty'
+              - $ref: '#/components/schemas/Curator'
+              - $ref: '#/components/schemas/Repository'
+              - $ref: '#/components/schemas/LeaderboardEntry'
+              - $ref: '#/components/schemas/Network'
 
 paths:
   /health:
@@ -544,30 +748,775 @@ paths:
                     type: string
                   cid:
                     type: string
-# DELETE operations can't have body, but we do. need to refactor so we can document it
-#    delete:
-#      description: Remove pull-request from database
-#      requestBody:
-#        content:
-#          application/json:
-#            schema:
-#              $ref: '#/components/schemas/PullRequestPayload'
-#      responses:
-#        500:
-#          description: Failed blockchain connection
-#          content:
-#            application/json:
-#              schema:
-#                type: string
-#        404:
-#          description: Invalid network, Issue not found, PR not found
-#          content:
-#            application/json:
-#              schema:
-#                type: string
-#        200:
-#          description: OK
-#          content:
-#            application/json:
-#              schema:
-#                type: string
+  # DELETE operations can't have body, but we do. need to refactor so we can document it
+  #    delete:
+  #      description: Remove pull-request from database
+  #      requestBody:
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: '#/components/schemas/PullRequestPayload'
+  #      responses:
+  #        500:
+  #          description: Failed blockchain connection
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: string
+  #        404:
+  #          description: Invalid network, Issue not found, PR not found
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: string
+  #        200:
+  #          description: OK
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: string
+  /pull-request/merge/:
+    post:
+      description: merge the pull-request on github
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issueId:
+                  type: string
+                pullRequestId:
+                  type: string
+                mergeProposalId:
+                  type: string
+                address:
+                  $ref: '#/components/schemas/StringAddress'
+                networkName:
+                  type: string
+      responses:
+        500:
+          description: Failed blockchain connection
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Invalid network, Issue not found, PR not found
+          content:
+            application/json:
+              schema:
+                type: string
+        403:
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+  /pull-reques/review/:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issueId:
+                  type: string
+                pullRequestId:
+                  type: string
+                githubLogin:
+                  type: string
+                body:
+                  type: string
+                networkName:
+                  type: string
+                event:
+                  type: string
+      responses:
+        404:
+          description: Invalid network, Issue not found, PR not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  body:
+                    type: string
+                  updatedAt:
+                    type: string
+                  author:
+                    type: string
+  /repos/:
+    get:
+      description: get all repositories for networkName
+      parameters:
+        - in: query
+          name: networkName
+          required: true
+          schema:
+            type: string
+      responses:
+        404:
+          description: Invalid network
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Repository'
+    post:
+      description: Add new repo, can only be done if no issues on database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                owner:
+                  type: string
+                repo:
+                  type: string
+                networkName:
+                  type: string
+      responses:
+        422:
+          description: Database already has bounties
+          content:
+            application/json:
+              schema:
+                type: string
+        409:
+          description: repo already exists
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Invalid network
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "ok"
+    delete:
+      description: remove repo from database, can only be done if no bounties on database
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        422:
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Id not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /rss/:
+    get:
+      description: query rss
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            enum: [all, open, closed]
+            type: string
+            default: all
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+      responses:
+        403:
+          description: Wrong type
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            text/xml:
+              schema:
+                type: string
+  /search/curators/:
+    get:
+      parameters:
+        - in: query
+          name: address
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: networkName
+          schema:
+            type: string
+        - in: query
+          name: isCurrentlyCurator
+          schema:
+            enum: [true, false]
+            type: string
+      responses:
+        404:
+          description: Invalid network
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/issues/:
+    get:
+      parameters:
+        - in: query
+          name: state
+          schema:
+            $ref: '#/components/schemas/BountyState'
+        - in: query
+          name: issueId
+          schema:
+            type: string
+        - in: query
+          name: repoId
+          schema:
+            $ref: '#/components/schemas/RepositoryDbId'
+        - in: query
+          name: time
+          schema:
+            $ref: '#/components/schemas/SearchParamsTime'
+        - in: query
+          name: creator
+          schema:
+            type: string
+        - in: query
+          name: address
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: pullRequesterLogin
+          schema:
+            type: string
+        - in: query
+          name: pullrequesterAddress
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: proposer
+          schema:
+            type: string
+        - in: query
+          name: allNetworks
+          schema:
+            type: boolean
+        - in: query
+          name: networkName
+          schema:
+            type: string
+        - in: query
+          name: repoPath
+          schema:
+            type: string
+        - in: query
+          name: tokenAddress
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+      responses:
+        422:
+          description: Unprocessible entity
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Invalid network
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/issues/recent/:
+    get:
+      description: Get list of recent bounties
+      parameters:
+        - in: query
+          name: repoId
+          schema:
+            type: string
+        - in: query
+          name: creator
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: address
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: networkName
+          schema:
+            type: string
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: order
+          schema:
+            enum: [DESC, ASC]
+            type: string
+      responses:
+        404:
+          description: Network not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/issues/total:
+    get:
+      description: Get total number of issues
+      parameters:
+        - in: query
+          name: state
+          schema:
+            $ref: '#/components/schemas/BountyState'
+        - in: query
+          name: issueId
+          schema:
+            type: string
+        - in: query
+          name: repoId
+          schema:
+            type: string
+        - in: query
+          name: creator
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: address
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: networkName
+          schema:
+            type: string
+      responses:
+        404:
+          description: Network not found
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+  /search/leaderboard/:
+    get:
+      description: get leaderboard info
+      parameters:
+        - in: query
+          name: address
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: time
+          schema:
+            $ref: '#/components/schemas/SearchParamsTime'
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/leaderboard/points:
+    get:
+      description: get leaderboard with calculated points
+      parameters:
+        - in: query
+          name: address
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: order
+          schema:
+            enum: [DESC, ASC]
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/networks/:
+    get:
+      description: search networks in database
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: creatorAddress
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: networkAddress
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: isClosed
+          schema:
+            type: boolean
+        - in: query
+          name: isRegistered
+          schema:
+            type: boolean
+        - in: query
+          name: isDefault
+          schema:
+            type: boolean
+        - in: query
+          name: page
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/networks/active:
+    get:
+      description: search networks in database
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: creatorAddress
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: isClosed
+          schema:
+            type: boolean
+        - in: query
+          name: isRegistered
+          schema:
+            type: boolean
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: order
+          schema:
+            enum: [DESC, ASC]
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /search/networks/total:
+    get:
+      description: get total of networks
+      parameters:
+        - in: query
+          name: creatorAddress
+          schema:
+            $ref: '#/components/schemas/StringAddress'
+        - in: query
+          name: isClosed
+          schema:
+            type: boolean
+        - in: query
+          name: isRegistered
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+  /search/repositories/:
+    get:
+      description: search repos on database
+      parameters:
+        - in: query
+          name: owner
+          schema:
+            type: string
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: path
+          schema:
+            type: string
+        - in: query
+          name: networkName
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+  /seo/{id}/:
+    get:
+      description: Get SEO image url for bounty
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        500:
+          description: Missing ipfs url on settings
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          description: issue not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'null'
+        200:
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+  /settings/:
+    get:
+      description: Get settings from database
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+  /setup/registry:
+    post:
+      description: configure registry address when none exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  $ref: '#/components/schemas/StringAddress'
+                registryAddress:
+                  $ref: '#/components/schemas/StringAddress'
+      responses:
+        500:
+          description: Failed blockchain connection
+          content:
+            application/json:
+              schema:
+                type: string
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          description: Missing params, Invalid registry address, Environment already configured
+          content:
+            application/json:
+              schema:
+                type: string
+  /tokens/:
+    get:
+      description: Get available tokens on database
+      parameters:
+        - in: query
+          name: networkName
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Token'
+  /user/connect/:
+    patch:
+      description: connect wallet and github on database user must be connected on app so headers match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  $ref: '#/components/schemas/StringAddress'
+      responses:
+        409:
+          description: No actions needed
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Missing wallet address
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "success"
+  /user/reset/:
+    post:
+      description: reset user on database user has to be connected on app so headers match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  $ref: '#/components/schemas/StringAddress'
+                githubLogin:
+                  type: string
+      responses:
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: string
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: string
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
