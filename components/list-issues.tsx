@@ -23,7 +23,7 @@ import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
 import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
-import { isProposalDisputable } from "helpers/proposal";
+import {isProposalDisputable} from "helpers/proposal";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
@@ -279,7 +279,7 @@ export default function ListIssues({
       )}
       {isRenderFilter() ? (
         <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top"}
+          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-dark"}
         >
           <div className="w-100">
             <InputGroup className="border-radius-8">
