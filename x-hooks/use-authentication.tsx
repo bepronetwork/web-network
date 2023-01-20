@@ -103,7 +103,8 @@ export function useAuthentication() {
 
     console.log("updateWalletAddress service", state.Service?.active);
 
-    (state.Service?.active ? state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
+    (state.Service?.active ? 
+      state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
       .then(_address => {
         const address = Array.isArray(_address) ? _address[0] : _address;
         if (address !== state.currentUser?.walletAddress) {
@@ -117,16 +118,17 @@ export function useAuthentication() {
 
         dispatch(changeChain.update({
           id: (chain?.chainId || windowChainId).toString(),
-          name: chain?.chainName || `unknown`,
+          name: chain?.chainName || "unknown",
           explorer: chain?.blockScanner,
           events: chain?.eventsApi,
           registry: chain?.registryAddress
         }));
 
-        sessionStorage.setItem(`currentWallet`, address || '');
+        sessionStorage.setItem("currentChainId", chain?.chainId?.toString());
+        sessionStorage.setItem("currentWallet", address || '');
       })
       .catch(e => {
-        console.error(`Error getting address`, e);
+        console.error("Error getting address", e);
       })
       .finally(() => {
         dispatch(changeWalletSpinnerTo(false));
@@ -330,7 +332,6 @@ export function useAuthentication() {
         })
     else {
       sessionStorage.setItem(`currentSignature`, '');
-      sessionStorage.setItem(`currentChainId`, '');
     }
   }
 
