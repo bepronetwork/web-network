@@ -26,6 +26,10 @@ class Tokens extends Model {
           type: DataTypes.BOOLEAN,
           allowNull: false
         },
+        isReward: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
         isAllowed: {
           type: DataTypes.BOOLEAN,
           allowNull: true
