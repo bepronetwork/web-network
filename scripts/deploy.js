@@ -96,6 +96,9 @@ const networks = {
   aurora: {
     url: 'https://mainnet.aurora.dev',
   },  
+  bitgert: {
+    url: 'https://mainnet-rpc.brisescan.com',
+  },  
   bsc: {
     url: 'https://bscrpc.com',
   },   

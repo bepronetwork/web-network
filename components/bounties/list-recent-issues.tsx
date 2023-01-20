@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import CustomContainer from "components/custom-container";
 import IssueListItem from "components/issue-list-item";
+import NothingFound from "components/nothing-found";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 
@@ -21,7 +22,10 @@ export default function ListRecentIssues() {
     setLoading(true);
     searchRecentIssues({})
       .then(setBounties)
-      .catch(console.log)
+      .catch(err => {
+        console.error(err)
+        setLoading(false)
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -38,6 +42,7 @@ export default function ListRecentIssues() {
               <IssueListItem issue={bounty} key={bounty.id} size="sm" />
             </div>
           ))}
+        {bounties?.length === 0 && <NothingFound description={t("recent-bounties-empty")}/>}
       </div>
     </CustomContainer>
   );

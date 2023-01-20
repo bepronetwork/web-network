@@ -17,6 +17,7 @@ export enum NetworkColors {
   aurelius = "#29b6af",
   apollodorus = "#29b6af",
   aurora = "#29b6af",
+  brise = "#29b6af",
   bsc = "#fbd044",
   polygon = "#7950DD"
 }
