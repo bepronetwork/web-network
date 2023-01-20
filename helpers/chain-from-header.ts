@@ -1,6 +1,7 @@
 import {NextApiRequest} from "next";
-import models from "db/models";
 import {Op} from "sequelize";
+
+import models from "db/models";
 
 export async function chainFromHeader(req: NextApiRequest, force = false) {
   if (force && !req.headers.chain)

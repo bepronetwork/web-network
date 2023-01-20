@@ -4,12 +4,12 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
+import {chainFromHeader} from "helpers/chain-from-header";
+import {resJsonMessage} from "helpers/res-json-message";
 
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../helpers/res-json-message";
-import {LogAccess} from "../../../middleware/log-access";
-import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
-import WithCors from "../../../middleware/withCors";
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {wallet, networkName, startDate, endDate} = req.query;

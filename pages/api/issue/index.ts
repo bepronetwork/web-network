@@ -95,7 +95,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title: '',
     body: body,
     network_id: network.id,
-    tags
+    tags,
     chain_id: +(await chainFromHeader(req))?.chainId
   });
 

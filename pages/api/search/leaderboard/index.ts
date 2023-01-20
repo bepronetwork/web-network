@@ -6,8 +6,9 @@ import models from "db/models";
 
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {

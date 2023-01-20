@@ -9,9 +9,12 @@ import ExplorePage from "./explore";
 
 import {useAppState} from "contexts/app-state";
 
+const { publicRuntimeConfig } = getConfig();
+
 export default function Index() {
   const { replace } = useRouter();
-  const {publicRuntimeConfig} = getConfig()
+  
+  const { state } = useAppState();
 
   useEffect(() => {
     if (!state?.supportedChains)

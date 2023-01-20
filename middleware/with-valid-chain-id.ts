@@ -1,7 +1,9 @@
-import models from "db/models";
 import {NextApiHandler} from "next";
-import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "../helpers/contants";
 import {Op} from "sequelize";
+
+import models from "db/models";
+
+import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "../helpers/contants";
 import {isAdmin} from "../helpers/is-admin";
 import {resJsonMessage} from "../helpers/res-json-message";
 
@@ -17,6 +19,6 @@ export const WithValidChainId = (handler: NextApiHandler, methods: string[] = [`
     if (!foundChain && !isAdmin(req))
       return resJsonMessage(CHAIN_ID_NOT_SUPPORTED, res, 400);
 
-  return handler(req, res);
+    return handler(req, res);
   }
 }
