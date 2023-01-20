@@ -53,6 +53,12 @@ const MATIC: Currency = {
   symbol: "MATIC"
 }
 
+const BRISE: Currency = {
+  name: "BRISE",
+  ticker: "BRISE",
+  symbol: "BRISE"
+}
+
 export const NETWORKS: {
   [key: string]: Network;
 } = {
@@ -190,6 +196,15 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://eth-apollodorus.taikai.network:8080"]
+  },
+  "0x7F08": {
+    id: "32520",
+    name: "Bitgert",
+    key: "bitgert",
+    currency: BRISE,
+    decimals: 18,
+    explorerURL: "https://brisescan.com/",
+    rpcUrls: ["https://mainnet-rpc.brisescan.com"]
   },
   
 };
