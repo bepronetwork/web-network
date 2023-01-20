@@ -33,6 +33,10 @@ class Tokens extends Model {
         isAllowed: {
           type: DataTypes.BOOLEAN,
           allowNull: true
+        },
+        chain_id: {
+          type: DataTypes.INTEGER,
+          unique: "network_chain_unique"
         }
       },
       {
@@ -44,10 +48,15 @@ class Tokens extends Model {
     );
   }
   static associate(models) {
-    this.belongsToMany(models.network, { through: 'network_tokens' });
     this.hasMany(models.issue, {
       foreignKey: "tokenId",
       sourceKey: "id"
+    });
+    this.belongsToMany(models.network, { through: 'network_tokens' });
+    this.belongsTo(models.chain, {
+      foreignKey: "chain_id",
+      targetKey: "chainId",
+      as: "chain"
     });
   }
 }

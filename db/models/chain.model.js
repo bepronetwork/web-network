@@ -64,7 +64,18 @@ class Chain extends Model {
   static associate(models) {
     this.hasMany(models.network, {
       foreignKey: 'chain_id',
-      sourceKey: 'id'
+      sourceKey: 'chainId',
+      as: "networks"
+    });
+    this.hasMany(models.issue, {
+      foreignKey: 'chain_id',
+      sourceKey: 'chainId',
+      as: "issues"
+    });
+    this.hasMany(models.tokens, {
+      foreignKey: 'chain_id',
+      sourceKey: 'chainId',
+      as: "tokens"
     });
   }
 }

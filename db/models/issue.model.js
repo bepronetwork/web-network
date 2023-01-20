@@ -8,38 +8,38 @@ class Issue extends Model {
    */
   static init(sequelize) {
     super.init({
-        issueId: DataTypes.INTEGER,
-        githubId: DataTypes.STRING,
-        state: DataTypes.STRING,
-        creatorAddress: DataTypes.STRING,
-        creatorGithub: DataTypes.STRING,
-        amount: DataTypes.STRING,
-        fundingAmount: DataTypes.STRING,
-        fundedAmount: DataTypes.STRING,
-        repository_id: DataTypes.STRING,
-        title: DataTypes.TEXT,
-        body: DataTypes.TEXT,
-        branch: DataTypes.STRING,
-        working: {
-          type: DataTypes.ARRAY(DataTypes.STRING)
-        },
-        merged: DataTypes.STRING,
-        seoImage: DataTypes.STRING,
-        network_id: DataTypes.INTEGER,
-        contractId: DataTypes.INTEGER,
-        tokenId: {
-          type: DataTypes.INTEGER,
-          allowNull: true
-        },
-        fundedAt: {
-          type: DataTypes.DATE,
-          allowNull: true
-        },
-        tags: {
-          type: DataTypes.ARRAY(DataTypes.STRING)
-        },
+      issueId: DataTypes.INTEGER,
+      githubId: DataTypes.STRING,
+      state: DataTypes.STRING,
+      creatorAddress: DataTypes.STRING,
+      creatorGithub: DataTypes.STRING,
+      amount: DataTypes.STRING,
+      fundingAmount: DataTypes.STRING,
+      fundedAmount: DataTypes.STRING,
+      repository_id: DataTypes.STRING,
+      title: DataTypes.TEXT,
+      body: DataTypes.TEXT,
+      branch: DataTypes.STRING,
+      working: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
+      },
+      merged: DataTypes.STRING,
+      seoImage: DataTypes.STRING,
+      network_id: DataTypes.INTEGER,
+      contractId: DataTypes.INTEGER,
+      tokenId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      fundedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      tags: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
+      },
       chain_id: {
-          type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER
       }
     },
                {
@@ -93,6 +93,11 @@ class Issue extends Model {
       foreignKey: "tokenId",
       sourceKey: "id",
       as: "token"
+    });
+    this.belongsTo(models.chain, {
+      foreignKey: "chain_id",
+      targetKey: "chainId",
+      as: "chain"
     });
   }
 }

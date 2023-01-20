@@ -61,25 +61,32 @@ class Network extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
-    this.belongsToMany(models.tokens, {through: 'network_tokens'});
-
+    
     this.hasMany(models.pullRequest, {
       foreignKey: "network_id",
       sourceKey: "id",
       as: "pullRequests"
     });
-
+    
     this.hasMany(models.mergeProposal, {
       foreignKey: "network_id",
       sourceKey: "id",
       as: "mergeProposals"
     });
-
+    
     this.hasMany(models.curator, {
       foreignKey: "networkId",
       sourceKey: "id",
       as: "curators"
     });
+
+    this.belongsTo(models.chain, {
+      foreignKey: "chain_id",
+      targetKey: "chainId",
+      as: "chain"
+    });
+
+    this.belongsToMany(models.tokens, {through: 'network_tokens'});
   }
 }
 
