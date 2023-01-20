@@ -15,6 +15,7 @@ import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
 import NavAvatar from "components/nav-avatar";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+import SelectNetworkDropdown from "components/select-network-dropdown";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
@@ -23,10 +24,8 @@ import {useAppState} from "contexts/app-state";
 import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network-theme";
-
-import useNetworkChange from "../x-hooks/use-network-change";
-import SelectNetworkDropdown from "./select-network-dropdown";
+import { useNetwork } from "x-hooks/use-network";
+import useNetworkChange from "x-hooks/use-network-change";
 
 interface MyNetworkLink {
   href: string;
@@ -47,7 +46,7 @@ export default function MainNav() {
 
   const {state} = useAppState();
   const { searchNetworks } = useApi();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
   const {handleAddNetwork} = useNetworkChange();
 
   const noNeedNetworkInstance = ["/","/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);

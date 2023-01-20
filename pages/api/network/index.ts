@@ -5,35 +5,35 @@ import {Op} from "sequelize";
 
 import Database from "db/models";
 
-import {handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
+import {chainFromHeader} from "helpers/chain-from-header";
+import { UNAUTHORIZED } from "helpers/error-messages";
+import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
+import {isAdmin} from "helpers/is-admin";
+import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
 
 import {withCors} from "middleware";
+import { LogAccess } from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 import {Logger} from 'services/logging';
 
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {UNAUTHORIZED} from "../../../helpers/error-messages";
-import {isAdmin} from "../../../helpers/is-admin";
-import {resJsonMessage} from "../../../helpers/res-json-message";
-import {LogAccess} from "../../../middleware/log-access";
-import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
-
 const {serverRuntimeConfig} = getConfig();
 
+const isTrue = (value: string) => value === "true";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName, creator: creatorAddress, isDefault, address } = req.query;
+  const { name: networkName, creator: creatorAddress, isDefault, address, byChainId, chainName } = req.query;
 
   const chain = await chainFromHeader(req);
 
   const where = {
-    // ... chain ? {chain_id: {[Op.eq]: +chain?.chainId}} : {},
+    ... isTrue(byChainId?.toString()) && chain ? { chain_id: { [Op.eq]: +chain?.chainId } } : {},
     ... networkName && {
       name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        [Op.iLike]: String(networkName)
       }
     } || {},
     ... creatorAddress && {
@@ -42,20 +42,25 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       }
     } || {},
     ... isDefault && {
-      isDefault: isDefault === "true"
+      isDefault: isTrue(isDefault.toString())
     } || {},
     ... address && {
       networkAddress: { [Op.iLike]: String(address) },
     } || {}
   };
 
-  console.log(`GET`, where);
-
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
     include: [
       { association: "tokens" },
-      { association: "curators" }
+      { association: "curators" },
+      { 
+        association: "chain",
+        where: {
+          chainShortName: chainName
+        },
+        required: !!chainName
+      },
     ],
     where
   });

@@ -41,6 +41,7 @@ export function useNetwork() {
 
   function updateActiveNetwork(forceUpdate = false) {
     const queryNetworkName = query?.network?.toString();
+    const queryChainName = query?.chain?.toString();
 
     if (queryNetworkName) {
       const storageKey = `bepro.network:${queryNetworkName}`;
@@ -54,7 +55,7 @@ export function useNetwork() {
         return;
       }
 
-      getNetwork({name: queryNetworkName,})
+      getNetwork({name: queryNetworkName, chainName: queryChainName })
         .then(async ({data}) => {
           if (!data.isRegistered)
             return replace(`/networks`);
@@ -86,9 +87,10 @@ export function useNetwork() {
     const _network = _query?.network ? String(_query?.network)?.replaceAll(" ", "-") : undefined;
 
     return {
-      pathname: `/[network]/${href}`.replace("//", "/"),
+      pathname: `/[network]/[chain]/${href}`.replace("//", "/"),
       query: {
         ..._query,
+        chain: _query?.chain || query?.chain,
         network: _network ||
           query?.network ||
           state?.Service?.network?.active?.name

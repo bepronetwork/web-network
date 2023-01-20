@@ -3,7 +3,6 @@ import {useContext, useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
-
 import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
 import NetworkListBar from "components/network-list-bar";
@@ -45,9 +44,10 @@ export default function NetworksList() {
     setOrder(newOrder);
   }
 
-  function handleRedirect(networkName) {
+  function handleRedirect(networkName, chainName) {
     router.push(getURLWithNetwork("/", {
-        network: networkName
+        network: networkName,
+        chain: chainName
     }));
   }
 

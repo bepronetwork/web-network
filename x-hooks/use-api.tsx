@@ -10,8 +10,12 @@ import {
   CreatePrePullRequestParams,
   CreateReviewParams,
   MergeClosedIssueParams,
-  CreateReviewParams,
   SearchActiveNetworkParams,
+  PatchUserParams,
+  User,
+  PastEventsParams,
+  StartWorkingParams,
+  SearchNetworkParams
   updateIssueParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
@@ -54,6 +58,8 @@ interface GetNetworkProps {
   creator?: string;
   isDefault?: boolean;
   address?: string;
+  byChainId?: boolean;
+  chainName?: string;
 }
 
 type FileUploadReturn = {
@@ -501,13 +507,15 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork({ name, creator, isDefault, address } : GetNetworkProps) {
-    const Params = {} as Omit<GetNetworkProps, "isDefault"> & { isDefault: string };
+  async function getNetwork({ name, creator, isDefault, address, byChainId, chainName } : GetNetworkProps) {
+    const Params = {} as Omit<GetNetworkProps, "isDefault" | "byChainId"> & { isDefault: string; byChainId: string; };
     
     if (name) Params.name = name;
     if (creator) Params.creator = creator;
     if (isDefault) Params.isDefault = isDefault.toString();
+    if (byChainId) Params.byChainId = byChainId.toString();
     if (address) Params.address = address;
+    if (chainName) Params.chainName = chainName;
 
     const search = new URLSearchParams(Params).toString();
 
