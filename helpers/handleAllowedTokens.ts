@@ -17,7 +17,7 @@ export function handleAllowedTokensDatabase(allowedTokens: {
     reward: allowedTokens.reward
       ?.map((rewardToken) => {
         return tokens.find((token) =>
-            token.address === rewardToken && token.isTransactional === false);
+            token.address === rewardToken && token.isReward === true);
       })
       .filter((v) => v),
   };

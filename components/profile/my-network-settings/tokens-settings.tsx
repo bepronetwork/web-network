@@ -58,11 +58,11 @@ export default function TokensSettings({
         dbTransactionalAllowed
       } = dbTokens.reduce((previous, current) => {
         const tmp = { ...previous };
-        const { isTransactional, isAllowed } = current;
+        const { isTransactional, isAllowed, isReward } = current;
 
         if (isTransactional && isAllowed)
           tmp.dbTransactionalAllowed.push(current);
-        else if (!isTransactional && isAllowed)
+        else if (isReward && isAllowed)
           tmp.dbRewardAllowed.push(current);
 
         return tmp;
