@@ -9,6 +9,8 @@ import {paginateArray} from "helpers/paginate";
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
+import {RouteMiddleware} from "middleware";
+
 import {chainFromHeader} from "../../../../helpers/chain-from-header";
 interface includeProps {
   association: string;
@@ -20,7 +22,6 @@ interface includeProps {
     } | string;
   }
 }
-
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -36,7 +37,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     page,
   } = req.query || {};
 
-  if (name) whereCondition.name = name;
+  if (name) 
+    whereCondition.name = {
+      [Op.and]: [Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("network.name")), "=", name.toString().toLowerCase())]
+    };
 
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) };

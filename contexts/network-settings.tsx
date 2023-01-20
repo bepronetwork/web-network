@@ -212,8 +212,8 @@ export const NetworkSettingsProvider = ({ children }) => {
         if (value.trim() !== "")
           validated = /bepro|taikai/gi.test(value)
             ? false
-            : !(await getNetwork({name: value})
-              .then(({data}) => data?.name === value)
+            : !(await getNetwork({ name: value, byChainId: true })
+              .then(({data}) => data?.name?.toLowerCase() === value?.toLowerCase())
               .catch(() => false));
 
         return !!validated;

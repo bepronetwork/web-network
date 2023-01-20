@@ -1,9 +1,10 @@
 import {TreasuryInfo} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 
+import { Curator } from "interfaces/curators";
 import {Token} from "interfaces/token";
 
-import { Curator } from "./curators";
+import { SupportedChainData } from "./supported-chain-data";
 
 export interface Network {
   id: number;
@@ -45,6 +46,8 @@ export interface Network {
   totalValueLock?: BigNumber;
   totalIssues?: string;
   totalOpenIssues?: string;
+  countIssues?: number;
+  chain?: SupportedChainData;
 }
 
 export interface ThemeColors {
