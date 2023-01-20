@@ -15,6 +15,7 @@ export interface Token {
   decimals?: number;
   isTransactional?: boolean;
   isAllowed?: boolean;
+  isReward?: boolean;
 }
 
 export interface TokenInfo extends Partial<Token> {
