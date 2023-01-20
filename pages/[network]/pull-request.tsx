@@ -18,10 +18,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
-import {
-  changeCurrentBountyComments,
-  changeCurrentBountyData
-} from "contexts/reducers/change-current-bounty";
+import {changeCurrentBountyComments, changeCurrentBountyData} from "contexts/reducers/change-current-bounty";
 import {changeLoadState} from "contexts/reducers/change-load";
 import {changeSpinners} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
@@ -190,6 +187,12 @@ export default function PullRequestPage() {
     setShowModal(false);
   }
 
+  function updateNetworkPR() {
+    setNetworkPullRequest(state.currentBounty?.chainData
+                                            ?.pullRequests
+                                            ?.find(pr => +pr.id === +pullRequest?.contractId));
+  }
+
   useEffect(() => {
     if (!state.currentBounty?.data || 
         !state.currentBounty?.chainData || 
@@ -206,19 +209,15 @@ export default function PullRequestPage() {
 
         return pullRequests.find((pr) => +pr.githubId === +prId);
       })
-      .then(currentPR => {
-        const currentNetworkPR = 
-          state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
-
-        setPullRequest(currentPR);
-        setNetworkPullRequest(currentNetworkPR);
-      })
+      .then(setPullRequest)
       .finally(() => {
         dispatch(changeLoadState(false))
         dispatch(changeSpinners.update({pullRequests: false}));
       });
 
   }, [state.currentBounty?.data, state.currentBounty?.chainData, prId]);
+
+  useEffect(updateNetworkPR,[pullRequest, state.currentBounty?.chainData?.pullRequests])
 
   useEffect(() => {
     if (review && pullRequest && state.currentUser?.login) setShowModal(true);
