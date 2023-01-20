@@ -9,6 +9,14 @@ info:
 servers:
   - url: 'https://app.bepro.network/api'
     description: production api
+  - url: 'https://aurelius.taikai.network/api'
+    description: Aurelius TEST api
+  - url: 'https://seneca.taikai.network/api'
+    description: Seneca TEST api
+  - url: 'https://diogenes.taikai.network/api'
+    description: Diogenes TEST api
+  - url: 'https://apollodorus.taikai.network/api'
+    description: Apollodorus TEST api
 
 components:
   schemas:
