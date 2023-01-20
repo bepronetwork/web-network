@@ -11,4 +11,5 @@ export interface SupportedChainData {
   registryAddress: string;
   eventsApi: string
   isDefault: boolean;
+  color?: string;
 }

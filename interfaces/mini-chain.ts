@@ -13,4 +13,5 @@ export interface MiniChainInfo {
   loading?: boolean;
   explorer?: string;
   eventsApi?: string;
+  color?: string;
 }

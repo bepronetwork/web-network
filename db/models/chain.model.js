@@ -50,6 +50,10 @@ class Chain extends Model {
       isDefault: {
         type: DataTypes.BOOLEAN
       },
+      color: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE
