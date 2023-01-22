@@ -48,7 +48,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
   const { getUserRepositories } = useOctokit();
-  const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
+  const { searchNetworks, searchRepositories, repositoryHasIssues } = useApi();
 
   const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
@@ -206,17 +206,33 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: async (value: string) => {
         setFields('details.name', {value, validated: await Fields.name.validator(value)})
       },
-      validator: async (value: string) => {
-        let validated = undefined;
-  
-        if (value.trim() !== "")
-          validated = /bepro|taikai/gi.test(value)
-            ? false
-            : !(await getNetwork({ name: value, byChainId: true })
-              .then(({data}) => data?.name?.toLowerCase() === value?.toLowerCase())
-              .catch(() => false));
+      validator: async (value: string) => {  
+        if (value.trim() === "") 
+          return undefined;
 
-        return !!validated;
+        // Reserved names
+        if (/bepro|taikai/gi.test(value)) 
+          return false;
+
+        const networksWithSameName = await searchNetworks({ name: value });
+
+        // No networks with this name
+        if (networksWithSameName.count === 0) 
+          return true;
+        
+        const currentChain = +state.connectedChain?.id;
+        
+        // Network with same name on this chain
+        if (networksWithSameName.rows.find(({ chain_id }) => +chain_id === currentChain))
+          return false;
+
+        const currentWallet = state.currentUser?.walletAddress?.toLowerCase();
+
+        // Network with same name on other chain but connected with the same creator wallet
+        if (networksWithSameName.rows.find(({ creatorAddress }) => creatorAddress.toLowerCase() === currentWallet))
+          return true;
+
+        return false;
       }
     },
     description: {

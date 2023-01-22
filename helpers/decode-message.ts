@@ -1,5 +1,6 @@
 import {recoverTypedSignature,} from "@metamask/eth-sig-util";
-import {messageFor} from "./message-for";
+
+import {messageFor} from "helpers/message-for";
 
 export default function decodeMessage(chainId, message = "", signature: string, assumedOwner: string): boolean {
   if (!signature)

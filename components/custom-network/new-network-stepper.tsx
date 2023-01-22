@@ -25,13 +25,15 @@ import {
   DEFAULT_COUNCIL_AMOUNT,
   DEFAULT_DISPUTE_TIME,
   DEFAULT_DRAFT_TIME,
-  DEFAULT_PERCENTAGE_FOR_DISPUTE
+  DEFAULT_PERCENTAGE_FOR_DISPUTE,
+  WANT_TO_CREATE_NETWORK
 } from "helpers/contants";
 import {psReadAsText} from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network-theme";
+import useSignature from "x-hooks/use-signature";
 
 function NewNetwork() {
   const router = useRouter();
@@ -45,11 +47,12 @@ function NewNetwork() {
 
   const { state, dispatch } = useAppState();
 
-  const { createNetwork, processEvent, getNetwork, updateNetworkChainId } = useApi();
+  const { signMessage } = useSignature();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
-  const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
+  const { createNetwork, processEvent, getNetwork, updateNetworkChainId } = useApi();
+  const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
 
   const defaultNetworkName = state?.Service?.network?.active?.name.toLowerCase();
   const isSetupPage = router?.pathname?.toString()?.includes("setup");
@@ -67,6 +70,23 @@ function NewNetwork() {
 
   async function handleCreateNetwork() {
     if (!state.currentUser?.login || !state.currentUser?.walletAddress || !state.Service?.active) return;
+
+    const signedMessage = await signMessage(WANT_TO_CREATE_NETWORK)
+      .catch(error => {
+        console.debug("Failed to sign message", error);
+
+        dispatch(addToast({
+          type: "danger",
+          title: "Failed",
+          content: "Signed message required to proceed",
+        }));
+
+        return undefined;
+      });
+
+    if (!signedMessage)
+      return;
+
     setCreatingNetwork(0);
 
     const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
@@ -92,7 +112,8 @@ function NewNetwork() {
       githubLogin: state.currentUser.login,
       allowedTokens: tokens,
       networkAddress: deployedNetworkAddress,
-      isDefault: isSetupPage
+      isDefault: isSetupPage,
+      signedMessage
     };
 
     const networkCreated = await createNetwork(payload)

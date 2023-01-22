@@ -9,6 +9,7 @@ export const BOUNTY_TITLE_LIMIT = 131;
 export const MAX_TAGS = 3;
 export const IM_AN_ADMIN = `I'm an admin`;
 export const NOT_AN_ADMIN = `Not an admin`;
+export const WANT_TO_CREATE_NETWORK = `I want to create a network`;
 export const MISSING_ADMIN_SIGNATURE = `Missing admin signature`;
 export const NOT_ADMIN_WALLET = `Wrong wallet`;
 export const MISSING_CHAIN_ID = `Missing chain id`;

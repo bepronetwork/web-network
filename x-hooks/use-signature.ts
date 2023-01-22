@@ -1,6 +1,7 @@
-import {useAppState} from "../contexts/app-state";
-import decodeMessage from "../helpers/decode-message";
-import {messageFor} from "../helpers/message-for";
+import {useAppState} from "contexts/app-state";
+
+import decodeMessage from "helpers/decode-message";
+import {messageFor} from "helpers/message-for";
 
 export default function useSignature() {
 
@@ -23,7 +24,8 @@ export default function useSignature() {
 
       if (Service.active)
         Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, _promise);
-      else if (window.ethereum) window.ethereum.request(payload).then(v => _promise(null, {result: v})).catch(e => _promise(e, null))
+      else if (window.ethereum) 
+        window.ethereum.request(payload).then(v => _promise(null, {result: v})).catch(e => _promise(e, null));
     });
   }
 
