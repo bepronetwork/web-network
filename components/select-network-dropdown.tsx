@@ -18,11 +18,12 @@ interface SelectNetworkDropdownProps {
   defaultChain?: SupportedChainData;
   isOnNetwork?: boolean;
   className?: string;
+  isDisabled?: boolean;
 }
 
 interface ChainOption {
   label: string;
-  value: SupportedChainData;
+  value: SupportedChainData | Partial<SupportedChainData>;
   preIcon: ReactNode;
 }
 
@@ -30,7 +31,8 @@ export default function SelectNetworkDropdown({
   defaultChain,
   isOnNetwork,
   className = "text-uppercase",
-  onSelect
+  onSelect,
+  isDisabled
 }: SelectNetworkDropdownProps) {
   const { t } = useTranslation("common");
 
@@ -40,7 +42,7 @@ export default function SelectNetworkDropdown({
   const { searchNetworks } = useApi();
   const { state: { Service, supportedChains, connectedChain } } = useAppState();
 
-  const chainToOption = (chain: SupportedChainData): ChainOption => ({ 
+  const chainToOption = (chain: SupportedChainData | Partial<SupportedChainData>): ChainOption => ({ 
     value: chain, 
     label: chain.chainShortName,
     preIcon: (<Indicator bg={chain.color} />)
@@ -60,8 +62,10 @@ export default function SelectNetworkDropdown({
     const chain = 
       supportedChains?.find(({ chainId }) => chainId === (defaultChain ? +defaultChain.chainId : +connectedChain.id));
 
-    if (!chain)
+    if (!chain) {
+      setSelectedChain(chainToOption({ chainShortName: "Unknown" }));  
       return;
+    }
 
     sessionStorage.setItem("currentChainId", chain.chainId.toString());
 
@@ -90,7 +94,7 @@ export default function SelectNetworkDropdown({
   useEffect(updateChainsWithSameNetwork, [isOnNetwork, Service?.network?.active?.name]);
   useEffect(updateSelectedChainMatchConnected, [defaultChain, supportedChains, connectedChain?.id]);
 
-  if (isOnNetwork && chainsWithSameNetwork.length === 1) return <></>;
+  if (isOnNetwork && chainsWithSameNetwork?.length === 1) return <></>;
 
   return(
     <div className={className}>
@@ -99,7 +103,7 @@ export default function SelectNetworkDropdown({
         value={selected}
         onChange={selectSupportedChain}
         placeholder={t("forms.select-placeholder")}
-        isDisabled={!supportedChains?.length || !!defaultChain}
+        isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
         readOnly={true}
         components={{
           Option: IconOption,

@@ -106,6 +106,7 @@ export default function WrongNetworkModal() {
         <SelectNetworkDropdown
           defaultChain={networkChain}
           onSelect={selectSupportedChain}
+          isDisabled={isAddingNetwork}
         />
 
         <Button 
