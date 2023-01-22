@@ -1,4 +1,4 @@
-export default function Indicator({ bg = "var(--bs-primary)" }) {
+export default function Indicator({ bg = "gray" }) {
   return (
     <>
       <span
