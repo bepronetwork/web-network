@@ -56,9 +56,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       { association: "curators" },
       { 
         association: "chain",
-        where: {
-          chainShortName: chainName
-        },
+        ... chainName ? {
+          where: {
+            chainShortName: chainName
+          }
+        } : {},
         required: !!chainName
       },
     ],
@@ -86,7 +88,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       githubLogin,
       allowedTokens,
       networkAddress,
-      isDefault
+      isDefault,
+      signedMessage
     } = req.body;
 
     const name = _name?.replaceAll(" ", "-")?.toLowerCase();
@@ -120,10 +123,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           chain_id: +chain?.chainId,
         }
     });
-    
+
     if (isDefault && defaultNetwork)
       return resJsonMessage("Default Network already saved", res, 409);
-
 
     // Contract Validations
     const DAOService = new DAO({ 
@@ -131,8 +133,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       web3Host: chain.chainRpc,
       registryAddress: chain.registryAddress,
     });
-
-    console.log(`chain`, chain.chainRpc);
 
     if (!await DAOService.start())
       return resJsonMessage("Failed to connect with chain", res, 400);
