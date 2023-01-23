@@ -61,7 +61,7 @@ export function useBounty() {
 
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
-    getIssue(+query.repoId, +query.id, state.Service.network.lastVisited)
+    getIssue(+query.repoId, +query.id, query.network.toString())
       .then(async (bounty: IssueData) => {
         const fundedAmount = BigNumber(bounty?.fundedAmount || 0)
         const fundingAmount = BigNumber(bounty?.fundingAmount || 0)

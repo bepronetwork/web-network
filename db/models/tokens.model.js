@@ -25,6 +25,10 @@ class Tokens extends Model {
         isTransactional: {
           type: DataTypes.BOOLEAN,
           allowNull: false
+        },
+        isAllowed: {
+          type: DataTypes.BOOLEAN,
+          allowNull: true
         }
       },
       {

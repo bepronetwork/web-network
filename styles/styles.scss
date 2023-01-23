@@ -470,7 +470,7 @@ li {
   border-radius: math.div($m, 2);
   transition: 0.8 ease-in-out;
   margin-bottom: $m;
-
+  max-height: 193px;
   &:last-child {
     margin-bottom: 0;
   }
@@ -580,6 +580,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .button-max {
     cursor: pointer;
   }
+}
+
+.issue-body {
+  max-width: 260px;
+}
+
+.network-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 155px
 }
 
 .status {

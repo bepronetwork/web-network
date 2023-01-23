@@ -162,20 +162,24 @@ export function useNetwork() {
         network.proposerFeeShare(),
         network.percentageNeededForDispute(),
         network.oracleExchangeRate(),
-        network.treasuryInfo()
+        network.treasuryInfo(),
+        network.totalNetworkToken()
     ])
       .then(([councilAmount, 
               mergeCreatorFeeShare, 
               proposerFeeShare, 
               percentageNeededForDispute, 
-              oracleExchangeRate, treasury]) => {
+              oracleExchangeRate, 
+              treasury,
+              totalNetworkToken]) => {
         dispatch(changeActiveNetworkAmounts({
           councilAmount: councilAmount.toString(),
           oracleExchangeRate: +oracleExchangeRate,
           mergeCreatorFeeShare: +mergeCreatorFeeShare,
           proposerFeeShare: +proposerFeeShare,
           percentageNeededForDispute: +percentageNeededForDispute,
-          treasury
+          treasury,
+          totalNetworkToken
         }));
       })
   }

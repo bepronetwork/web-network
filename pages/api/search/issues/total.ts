@@ -38,6 +38,17 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
     if (!network) return res.status(404).json("Invalid network");
 
     whereCondition.network_id = network?.id;
+  } else {
+    const networks = await models.network.findAll({
+      where: {
+        isRegistered: true,
+        isClosed: false
+      }
+    })
+
+    if (networks.length === 0) return res.status(404).json("Networks not found");
+
+    whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
   }
 
   const issueCount = await models.issue.count({

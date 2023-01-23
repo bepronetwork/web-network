@@ -11,4 +11,10 @@ export interface LeaderBoard {
     address: string;
     githubHandle?: string;
     numberNfts?: number;
+    ownedBountiesOpened?: number;
+    ownedBountiesClosed?: number;
+    ownedBountiesCanceled?: number;
+    ownedProposalCreated?: number;
+    ownedProposalAccepted?: number;
+    ownedProposalRejected?: number;
 }

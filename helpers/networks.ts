@@ -188,6 +188,15 @@ export const NETWORKS: {
     explorerURL: "https://polygonscan.com/",
     rpcUrls: ["https://polygon-rpc.com"]
   },
+  "0x5e2": {
+    id: "1506",
+    name: "Apollodorus Testnet",
+    key: "apollodorus",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://eth-apollodorus.taikai.network:8080"]
+  },
   "0x7F08": {
     id: "32520",
     name: "Bitgert",
@@ -196,6 +205,6 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://brisescan.com/",
     rpcUrls: ["https://mainnet-rpc.brisescan.com"]
-  }
+  },
   
 };
