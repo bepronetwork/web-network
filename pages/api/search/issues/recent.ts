@@ -6,7 +6,7 @@ import models from "db/models";
 
 import handleNetworkValues from 'helpers/handleNetworksValuesApi';
 
-const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 1) => (models.issue.findAll({
+const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 3) => (models.issue.findAll({
   where: {
     ...whereCondition,
     state,
@@ -15,16 +15,6 @@ const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit
   include: [ 
     { association: "network", attributes: ['colors', 'name', 'logoIcon'] },
     { association: "repository" },
-    { association: "mergeProposals", required: state === "proposal" ? true  : false },
-    {
-      association: "pullRequests",
-      required: state === "ready" ? true  : false,
-      where: {
-        status: {
-          [Op.not]: "canceled"
-        }
-      }
-    },
     { association: "token" }
   ],
   limit
@@ -72,17 +62,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
   }
 
-  const result = []
-
-  const issuesDraft = await getLastIssuesByStatus("draft", whereCondition, sortBy, order)
-  const issuesOpen = await  getLastIssuesByStatus("open", whereCondition, sortBy, order)
-  const issuesProposal = await getLastIssuesByStatus("proposal", whereCondition, sortBy, order)
-
-  if(issuesDraft) result.push(...issuesDraft)
-  if(issuesOpen) result.push(...issuesOpen)
-  if(issuesProposal) result.push(...issuesProposal)
+  const issuesOpen = await getLastIssuesByStatus("open",
+                                                 whereCondition,
+                                                 sortBy,
+                                                 order).then((data) => handleNetworkValues(data));
   
-  return res.status(200).json(handleNetworkValues(result));
+  return res.status(200).json(issuesOpen);
 }
 
 async function getAll(req: NextApiRequest,
