@@ -1,4 +1,3 @@
-
 import React, {useEffect, useRef, useState} from "react";
 import {FormControl, InputGroup} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
@@ -20,7 +19,7 @@ import ScrollTopButton from "components/scroll-top-button";
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
 
-import { LeaderBoard } from "interfaces/leaderboard";
+import {LeaderBoard} from "interfaces/leaderboard";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
@@ -162,7 +161,7 @@ export default function LeaderBoardList() {
     >
       {isRenderFilter() ? (
         <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top"}
+          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-dark"}
         >
           <div className="w-100">
             <InputGroup className="border-radius-8">
