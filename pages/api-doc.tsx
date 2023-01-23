@@ -10,7 +10,7 @@ export const getStaticProps = async () => {
   const {publicRuntimeConfig} = getConfig();
   const spec =
     await
-      axios.get(`${publicRuntimeConfig.home}/openapi.yaml`)
+      axios.get(`${publicRuntimeConfig.urls.home}/openapi.yaml`)
         .then(d => {
           return d.data;
         })
