@@ -12,6 +12,7 @@ export const getStaticProps = async () => {
     await
       axios.get(`${publicRuntimeConfig.urls.home}/openapi.yaml`)
         .then(d => {
+          console.log(`got data`, d.data);
           return d.data;
         })
         .catch(e => {
