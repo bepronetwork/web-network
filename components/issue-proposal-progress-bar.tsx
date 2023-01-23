@@ -54,7 +54,7 @@ export default function IssueProposalProgressBar() {
 
     const item = (date, toAdd = 0) => ({
       Warning: {
-        text: t("bounty:status.until-done", {
+        text: t("bounty:status.until-open", {
           distance: isHigher ? '0 seconds' 
             : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date(chainTime))
         }),
