@@ -90,6 +90,7 @@
     },
     "preview-descripion": "Preview Description",
     "tags": "Tags",
+    "tags-info": "Up to 3 tags",
     "select-token": {
       "bounty": "{{set}} Bounty Token",
       "reward": "{{set}} Reward Token"
