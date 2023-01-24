@@ -63,6 +63,7 @@
     "next-i18next": "^10.5.0",
     "next-seo": "^5.1.0",
     "nextjs-cors": "^2.1.1",
+    "nextjs-google-analytics": "^2.2.2",
     "nookies": "^2.5.2",
     "octokit": "1.7.1",
     "pg": "^8.7.3",

@@ -4,6 +4,7 @@ import {GetServerSideProps} from "next";
 import {SessionProvider} from "next-auth/react";
 import {appWithTranslation} from "next-i18next";
 import {AppProps} from "next/app";
+import {GoogleAnalytics} from "nextjs-google-analytics";
 
 import CreateBountyModal from "components/create-bounty-modal";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
@@ -31,6 +32,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
   return (
     <>
+      <GoogleAnalytics trackPageViews />
       <SessionProvider session={session}>
         <RootProviders>
           <Seo />
