@@ -20,8 +20,14 @@ import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
+import {useRouter} from "next/router";
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+
+  const {asPath} = useRouter();
+
+  if (asPath.includes('api-doc'))
+    return <Component {...pageProps}></Component>
 
   return (
     <>
