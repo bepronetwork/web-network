@@ -572,7 +572,8 @@ export default function useApi() {
     isClosed = undefined,
     isRegistered = undefined,
     isDefault = undefined,
-    isNeedCountsAndTokensLocked = undefined
+    isNeedCountsAndTokensLocked = undefined,
+    chainId = ""
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -582,6 +583,7 @@ export default function useApi() {
       sortBy,
       order,
       search,
+      chainId,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
       ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {}),
@@ -827,12 +829,6 @@ export default function useApi() {
       })
   }
 
-  async function updateNetworkChainId(networkAddress: string, chainId: number) {
-    return api.put(`/network/${networkAddress}/`, {chainId})
-      .then(res => res.status === 200)
-      .catch(() => false);
-  }
-
   return {
     getSupportedChains,
     createIssue,
@@ -886,7 +882,6 @@ export default function useApi() {
     addSupportedChain,
     deleteSupportedChain,
     updateChainRegistry,
-    updateNetworkChainId,
     patchSupportedChain
   };
 }

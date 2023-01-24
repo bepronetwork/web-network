@@ -13,7 +13,6 @@ import NetworkSettingsStep from "components/custom-network/network-settings-step
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
 import If from "components/If";
-import {CallToAction} from "components/setup/call-to-action";
 import Stepper from "components/stepper";
 
 import {useAppState} from "contexts/app-state";
@@ -32,6 +31,7 @@ import {psReadAsText} from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 import useSignature from "x-hooks/use-signature";
 
@@ -40,18 +40,16 @@ function NewNetwork() {
 
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
-  const [hasChainId, setHasChainId] = useState(false);
-  const [networkAddress, setNetworkAddress] = useState('');
+  const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
 
   const { state, dispatch } = useAppState();
 
   const { signMessage } = useSignature();
-  const { handleChangeNetworkParameter } = useBepro();
-  const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
-  const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
-  const { createNetwork, processEvent, getNetwork, updateNetworkChainId } = useApi();
+  const { colorsToCSS } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
+  const { createNetwork, processEvent } = useApi();
+  const { handleDeployNetworkV2, handleAddNetworkToRegistry, handleChangeNetworkParameter } = useBepro();
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
 
   const defaultNetworkName = state?.Service?.network?.active?.name.toLowerCase();
@@ -182,24 +180,6 @@ function NewNetwork() {
         setCreatingNetwork(-1);
         console.debug("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
-
-    setCreatingNetwork(7);
-    await updateNetworkChainId(deployedNetworkAddress, +state?.connectedChain?.id)
-      .then(() => router.push(getURLWithNetwork("/", { network: payload.name.toLowerCase().replaceAll(" ", "-") })))
-      .catch((error) => {
-
-        dispatch(addToast({
-          type: "danger",
-          title: t("actions.failed"),
-          content: t("custom-network:errors.failed-to-update-network-id", {
-            error: error.message || error.toString(),
-          }),
-        }));
-
-        setCreatingNetwork(-1);
-        console.debug("Failed update networkChainId", deployedNetworkAddress, error);
-      })
-
   }
 
   function goToMyNetworkPage() {
@@ -210,13 +190,7 @@ function NewNetwork() {
     dispatch(changeLoadState(true));
     
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
-      .then(networkAddress => {
-        setHasNetwork(!isZeroAddress(networkAddress));
-        setNetworkAddress(networkAddress);
-        if (!isZeroAddress(networkAddress))
-          getNetwork({address: networkAddress})
-            .then(({data}) => setHasChainId(!!data.chain_id))
-      })
+      .then(networkAddress => setHasNetwork(!isZeroAddress(networkAddress)))
       .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)));
   }
@@ -235,20 +209,6 @@ function NewNetwork() {
       {
         (creatingNetwork > -1 && <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />)
       }
-
-
-
-      <If condition={!hasChainId && hasNetwork}>
-        <CallToAction executing={false}
-                      disabled={false}
-                      color="warning"
-                      call={"Please update the network"}
-                      action={"update"}
-                      onClick={() => {
-                        updateNetworkChainId(networkAddress, +state.connectedChain?.id)
-                          .then(success => success ? checkHasNetwork() : false);
-                      }} />
-      </If>
 
       <If condition={hasNetwork}>
         <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
