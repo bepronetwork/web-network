@@ -3,15 +3,15 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import {chainFromHeader} from "helpers/chain-from-header";
 import paginate, {calculateTotalPages} from "helpers/paginate";
+import {resJsonMessage} from "helpers/res-json-message";
 
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../../helpers/res-json-message";
-import {LogAccess} from "../../../../middleware/log-access";
-import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
-import WithCors from "../../../../middleware/withCors";
-import {error} from "../../../../services/logging";
+import {error} from "services/logging";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -27,7 +27,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
           },
-          // chain_id: {[Op.eq]: +chain?.chainId}
+          chain_id: {
+            [Op.eq]: +chain?.chainId
+          }
         },
       });
 

@@ -1,5 +1,3 @@
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -10,10 +8,13 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import {GraphQlResponse} from "types/octokit";
+import {chainFromHeader} from "helpers/chain-from-header";
 
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
+import { LogAccess } from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
+
+import {GraphQlResponse} from "types/octokit";
 
 const {serverRuntimeConfig} = getConfig();
 
@@ -28,12 +29,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const chain = await chainFromHeader(req);
 
+  if (!chain)
+    return res.status(403).json("Chain not provided");
+
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      // chain_id: {[Op.eq]: +chain?.chainId}
+      chain_id: { [Op.eq]: +chain.chainId }
     }
   });
 
@@ -96,7 +100,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     body: body,
     network_id: network.id,
     tags,
-    chain_id: +(await chainFromHeader(req))?.chainId
+    chain_id: +chain.chainId
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);

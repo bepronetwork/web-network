@@ -65,7 +65,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.signMessageIfAdmin, [currentUser?.walletAddress]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [currentUser?.walletAddress]);
-  useEffect(network.updateActiveNetwork, [query?.network]);
+  useEffect(network.updateActiveNetwork, [query?.network, query?.chain]);
   useEffect(network.loadNetworkToken, [Service?.active?.network]);
   useEffect(network.loadNetworkTimes, [Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [Service?.active?.network]);
@@ -73,6 +73,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(network.updateNetworkAndChainMatch, [
     connectedChain?.id,
     query?.network,
+    query?.chain,
     Service?.network?.active?.chain_id
   ]);
 
