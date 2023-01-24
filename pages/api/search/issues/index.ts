@@ -8,13 +8,11 @@ import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
 
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../../helpers/res-json-message";
-import {LogAccess} from "../../../../middleware/log-access";
-import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
-import WithCors from "../../../../middleware/withCors";
-import {error} from "../../../../services/logging";
+import {error} from "services/logging";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -22,7 +20,7 @@ const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
-    let networks = []
+    let networks = [];
     const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
     const {
       state,
@@ -39,7 +37,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       networkName,
       allNetworks,
       repoPath,
-      tokenAddress
+      tokenAddress,
+      chainId
     } = req.query || {};
 
     if (state) whereCondition.state = state;
@@ -58,7 +57,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
           },
-          // chain_id: {[Op.eq]: +(await chainFromHeader(req))?.chainId }
+          ... chainId ? { chain_id: +chainId } : {}
         }
       });
 
@@ -71,7 +70,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       networks = await models.network.findAll({
         where: {
           isRegistered: true,
-          isClosed: false
+          isClosed: false,
         },
         include: [
           { association: "curators" }
@@ -83,9 +82,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
     }
 
-    const chain = await chainFromHeader(req);
-    if (chain?.chainId)
-      whereCondition.chain_id = {[Op.eq]: +chain.chainId};
+    if (chainId)
+      whereCondition.chain_id = { [Op.eq]: +chainId };
 
     if (repoPath) {
       const repository = await models.repositories.findOne({

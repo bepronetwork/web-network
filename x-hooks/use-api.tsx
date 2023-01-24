@@ -111,6 +111,7 @@ export default function useApi() {
     tokenAddress = "",
     networkName = "",
     allNetworks = undefined,
+    chainId = ""
   }) {
     const params = new URLSearchParams({
       address,
@@ -126,16 +127,18 @@ export default function useApi() {
       pullRequesterAddress,
       proposer,
       tokenAddress,
+      chainId,
       networkName: networkName.replaceAll(" ", "-"),
       ... (allNetworks !== undefined && { allNetworks: allNetworks.toString() } || {}),
     }).toString();
+
     return api
       .get<{
         rows: IssueBigNumberData[];
         count: number;
         pages: number;
         currentPage: number;
-      }>(`/search/issues/`, {params})
+      }>(`/search/issues?${params}`)
       .then(({ data }) => ({
         ...data,
         rows: data.rows.map(row => ({

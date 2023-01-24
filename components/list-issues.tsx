@@ -91,12 +91,13 @@ export default function ListIssues({
 
   const isProfilePage = router?.asPath?.includes("profile");
 
-  const { repoId, time, state, sortBy, order } = router.query as {
+  const { repoId, time, state, sortBy, chain, order } = router.query as {
     repoId: string;
     time: string;
     state: string;
     sortBy: string;
     order: string;
+    chain: string;
   };
 
   const filtersByIssueState: FiltersByIssueState = [
@@ -169,7 +170,10 @@ export default function ListIssues({
 
     dispatch(changeLoadState(true));
 
-    if(allNetworks) getTotalBounties().then(setTotalBounties)
+    if(allNetworks) getTotalBounties().then(setTotalBounties);
+
+    const chainId = appState.supportedChains?.
+      find(({ chainShortName }) => chainShortName.toLowerCase() === chain.toString()).chainId.toString();
 
     searchIssues({
       page,
@@ -183,6 +187,7 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
+      chainId,
       networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
       allNetworks: allNetworks ? allNetworks : ""
     })
@@ -244,6 +249,7 @@ export default function ListIssues({
     state,
     sortBy,
     order,
+    chain,
     creator,
     proposer,
     appState.Service?.network?.active?.name,
