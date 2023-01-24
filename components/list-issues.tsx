@@ -172,7 +172,7 @@ export default function ListIssues({
 
     if(allNetworks) getTotalBounties().then(setTotalBounties);
 
-    const chainId = appState.supportedChains?.
+    const chainId = allNetworks ? "" : appState.supportedChains?.
       find(({ chainShortName }) => chainShortName.toLowerCase() === chain.toString()).chainId.toString();
 
     searchIssues({
