@@ -95,13 +95,10 @@ export function useAuthentication() {
   }
 
   function updateWalletAddress() {
-    console.log(`updateWalletAddress`, state.currentUser)
     if (state.spinners?.wallet || !state.currentUser?.connected)
       return;
 
     dispatch(changeWalletSpinnerTo(true));
-
-    console.log("updateWalletAddress service", state.Service?.active);
 
     (state.Service?.active ? 
       state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
@@ -138,8 +135,6 @@ export function useAuthentication() {
   }
 
   function connectGithub() {
-    console.debug(`connectGithub`, state.currentUser)
-
     if (!state.currentUser?.walletAddress)
       return;
 
@@ -309,9 +304,6 @@ export function useAuthentication() {
   }
 
   function signMessageIfAdmin() {
-
-    console.log(`signMessageIfAdmin()`, state.connectedChain, state.currentUser?.walletAddress)
-
     if (!state?.currentUser?.walletAddress || !state?.connectedChain?.id)
       return;
 

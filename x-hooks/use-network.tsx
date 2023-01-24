@@ -177,12 +177,6 @@ export function useNetwork() {
     const networkChainId = state?.Service?.network?.active?.chain_id;
     const isOnANetwork = !!query?.network;
 
-    console.log("deev", {
-      connectedChainId,
-      networkChainId,
-      isOnANetwork
-    })
-
     if (connectedChainId && networkChainId && isOnANetwork)
       dispatch(changeMatchWithNetworkChain(+connectedChainId === +networkChainId));
     else
