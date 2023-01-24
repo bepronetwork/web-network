@@ -3,9 +3,9 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "../helpers/contants";
-import {isAdmin} from "../helpers/is-admin";
-import {resJsonMessage} from "../helpers/res-json-message";
+import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "helpers/contants";
+import {isAdmin} from "helpers/is-admin";
+import {resJsonMessage} from "helpers/res-json-message";
 
 export const WithValidChainId = (handler: NextApiHandler, methods: string[] = [`POST`, `PATCH`, `PUT`, `DELETE`]) => {
   return async function withValidChainIdHandler(req, res) {

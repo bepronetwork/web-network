@@ -3,13 +3,13 @@ import getConfig from "next/config";
 import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
-import {useAppState} from "../contexts/app-state";
-import {changeCurrentUserConnected, changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
-import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
-import {changeConnecting} from "../contexts/reducers/change-spinners";
-import {toastError,} from "../contexts/reducers/change-toaster";
-import DAO from "../services/dao-service";
+import {useAppState} from "contexts/app-state";
+import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
+import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
+import {changeConnecting} from "contexts/reducers/change-spinners";
+import {toastError,} from "contexts/reducers/change-toaster";
 
+import DAO from "services/dao-service";
 
 export function useDao() {
 

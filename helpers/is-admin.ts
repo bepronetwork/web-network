@@ -1,7 +1,8 @@
 import {NextApiRequest} from "next";
 import getConfig from "next/config";
-import decodeMessage from "./decode-message";
-import {IM_AN_ADMIN} from "./contants";
+
+import {IM_AN_ADMIN} from "helpers/contants";
+import decodeMessage from "helpers/decode-message";
 
 export function isAdmin(req: NextApiRequest) {
   const { publicRuntimeConfig } = getConfig();
