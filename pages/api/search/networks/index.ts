@@ -35,11 +35,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     isDefault,
     isNeedCountsAndTokensLocked,
     page,
+    chainId
   } = req.query || {};
 
   if (name) 
     whereCondition.name = {
-      [Op.and]: [Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("network.name")), "=", name.toString().toLowerCase())]
+      [Op.and]: 
+        [Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("network.name")), "=", name.toString().toLowerCase())]
     };
 
   if (creatorAddress)
@@ -56,6 +58,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   
   if (isDefault)
     whereCondition.isDefault = isDefault;
+  
+  if (chainId)
+    whereCondition.chain_id = chainId;
 
   const chain = await chainFromHeader(req);
   if (chain)

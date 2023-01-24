@@ -27,20 +27,25 @@ export function MyNetwork() {
   
   const { searchNetworks } = useApi();
   const { setForcedNetwork } = useNetworkSettings()
+  
   const defaultNetworkName = state?.Service?.network?.active?.name?.toLowerCase();
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
 
+    const connectedChainId = state.connectedChain?.id;
+
     searchNetworks({
       creatorAddress: state.currentUser.walletAddress,
-      isClosed: false
+      isClosed: false,
+      chainId: connectedChainId
     })
       .then(({ count , rows }) => {
         const savedNetwork = count > 0 ? rows[0] : undefined;
 
         if (savedNetwork)
-          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}`, JSON.stringify(savedNetwork));
+          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}:${connectedChainId}`, 
+                                 JSON.stringify(savedNetwork));
 
         setMyNetwork(savedNetwork);
         setForcedNetwork(savedNetwork);

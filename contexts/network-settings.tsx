@@ -30,7 +30,7 @@ import useOctokit from "x-hooks/use-octokit";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration", "/setup"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/[chain]/profile/my-network", "/administration", "/setup"];
 const TTL = 48 * 60 * 60 // 2 day
 const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
@@ -228,7 +228,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
         const currentWallet = state.currentUser?.walletAddress?.toLowerCase();
 
-        // Network with same name on other chain but connected with the same creator wallet
+        // Network with same name on other chain and connected with the same creator wallet
         if (networksWithSameName.rows.find(({ creatorAddress }) => creatorAddress.toLowerCase() === currentWallet))
           return true;
 
@@ -437,6 +437,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
+
+    console.log("deev entrou")
 
     const service = await loadDaoService()
     const [

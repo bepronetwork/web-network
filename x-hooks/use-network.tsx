@@ -17,26 +17,27 @@ import {
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
-
-import UseNetworkChange from "./use-network-change";
+import UseNetworkChange from "x-hooks/use-network-change";
 
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
-  const {state, dispatch} = useAppState();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
-
-
-  const {getNetwork, getNetworkTokens} = useApi();
+  
+  
   const {query, replace} = useRouter();
+  const {state, dispatch} = useAppState();
+  const {getNetwork, getNetworkTokens} = useApi();
   const { handleAddNetwork } = UseNetworkChange();
 
   function clearNetworkFromStorage() {
     storage.delete();
 
     const networkName = state.Service?.network?.active?.name;
+    const chainId = state.connectedChain?.id;
+
     if (networkName)
-      new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`).delete();
+      new WinStorage(`bepro.network:${networkName}:${chainId}`, 0, `sessionStorage`).delete();
   }
 
   function updateActiveNetwork(forceUpdate = false) {
@@ -44,7 +45,8 @@ export function useNetwork() {
     const queryChainName = query?.chain?.toString();
 
     if (queryNetworkName) {
-      const storageKey = `bepro.network:${queryNetworkName}`;
+      const chainId = state.connectedChain?.id;
+      const storageKey = `bepro.network:${queryNetworkName}:${chainId}`;
 
       if (storage.value && storage.value !== queryNetworkName)
         storage.value = queryNetworkName;
@@ -85,9 +87,10 @@ export function useNetwork() {
 
   function getURLWithNetwork(href: string, _query = undefined): UrlObject {
     const _network = _query?.network ? String(_query?.network)?.replaceAll(" ", "-") : undefined;
+    const cleanHref =  href.replace("/[network]/[chain]", "");
 
     return {
-      pathname: `/[network]/[chain]/${href}`.replace("//", "/"),
+      pathname: `/[network]/[chain]/${cleanHref}`.replace("//", "/"),
       query: {
         ..._query,
         chain: _query?.chain || query?.chain,
