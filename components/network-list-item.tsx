@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 
+import Badge from "components/badge";
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
 
@@ -8,6 +9,7 @@ import {useAppState} from "contexts/app-state";
 import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Network} from "interfaces/network";
+
 
 interface NetworkListItemProps {
   network: Network;
@@ -45,6 +47,14 @@ export default function NetworkListItem({
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
+
+          <Badge
+            label={network?.chain?.chainShortName}
+            className="small-info"
+            style={{
+              backgroundColor: `${network?.chain?.color}90`
+            }}
+          />
 
           {(network?.isClosed && <PullRequestLabels label="closed" />) || ""}
         </div>
