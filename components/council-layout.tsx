@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -10,6 +11,7 @@ import PageHero, {InfosHero} from "components/page-hero";
 import {useAppState} from "contexts/app-state";
 import { changeActiveNetwork } from "contexts/reducers/change-service";
 
+import { Curator } from "interfaces/curators";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -39,7 +41,7 @@ export default function CouncilLayout({ children }) {
     },
     {
       value: 0,
-      label: t("heroes.bounties-in-network"),
+      label: t("heroes.in-network"),
       currency: t("misc.token"),
     },
   ]);
@@ -80,9 +82,7 @@ export default function CouncilLayout({ children }) {
     
     const [totalBounties, onNetwork, curators, distributed] = await Promise.all([
       getTotalBounties("ready", state.Service?.network?.active?.name),
-      state.Service?.active.getTotalNetworkToken(),
       searchCurators({
-        isCurrentlyCurator: true,
         networkName: state.Service?.network?.active?.name,
       }).then(({ rows }) => rows),
       searchIssues({
@@ -92,9 +92,19 @@ export default function CouncilLayout({ children }) {
       })
         .then(({ rows } : { rows: IssueBigNumberData[] }) => 
           rows.reduce((acc, { payments }) => acc + payments.reduce((acc, { ammount }) => acc + ammount, 0), 0))
-    ]);
+    ])
+      .then(([totalBounties, curators, distributed]) => {
+        const { onNetwork, totalCurators } = (curators as Curator[]).reduce((acc, curator) => ({
+          onNetwork: new BigNumber(acc.onNetwork).plus(curator.tokensLocked).toFixed(),
+          totalCurators: acc.totalCurators + (curator.isCurrentlyCurator ? 1 : 0 )
+        }), { onNetwork: "0", totalCurators: 0 });
+
+        return [totalBounties, onNetwork, totalCurators, distributed];
+      });
 
     dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, { curators })));
+
+    console.log("Deev", { onNetwork, curators })
 
     setInfos([
       {
@@ -102,7 +112,7 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: curators.length || 0,
+        value: curators,
         label: t("council:council-members"),
       },
       {
@@ -111,7 +121,7 @@ export default function CouncilLayout({ children }) {
         currency: state.Service?.network?.networkToken?.symbol,
       },
       {
-        value: onNetwork.toFixed(),
+        value: onNetwork,
         label: t("heroes.in-network"),
         currency: state.Service?.network?.networkToken?.symbol,
       },
