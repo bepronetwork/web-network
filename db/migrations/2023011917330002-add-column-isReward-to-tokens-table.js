@@ -15,13 +15,14 @@ module.exports = {
     });
 
     Tokens.init(queryInterface.sequelize);
-    
+
     const tokens = await Tokens.findAll();
     const removeTokens = []
     const handleFindTokens = (newId, oldId) => removeTokens.find(id => 
       (id.new === newId || id.old === newId) || (id.new === oldId || id.old === oldId)
     )
 
+    //todo: create isAllowed: false logic
     for (const token of tokens) {
       const currentTokens = tokens.filter(t => t.address === token.address && t.isAllowed === true)
       
