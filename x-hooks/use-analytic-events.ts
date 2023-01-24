@@ -19,17 +19,19 @@ export default function useAnalyticEvents() {
     function getCallback({type}: Analytic) {
       // console.debug(`Trying to push ${eventName} with type ${type}`, details)
 
-      function rejectWithMessage(params: string | string[], message?: string) {
-        return (a: string, b: any) => Promise.reject(message || `Missing Params ${JSON.stringify(params)}`)
-      }
+      const reject = (message: string) => (a: string, b: any) => Promise.reject(message)
+
+      const rejectMissingParams = (params: string | string[]) =>
+        reject(`Missing Params ${JSON.stringify(params)}`)
+
 
       switch (type) {
         case "ga4":
           if (!publicRuntimeConfig.gaMeasureID)
-            return rejectWithMessage(`publicRuntimeConfig.gaMeasureID`);
+            return rejectMissingParams(`publicRuntimeConfig.gaMeasureID`);
           return event;
         default:
-          return rejectWithMessage('', `Missing implementation for ${type}`);
+          return reject(`Missing implementation for ${type}`);
       }
     }
 
