@@ -10,7 +10,7 @@ module.exports = {
     console.log('start:', name)
     await queryInterface.addColumn("tokens", "isReward", {
       type: Sequelize.BOOLEAN,
-      allowNull: true,
+      allowNull: false,
       defaultValue: false,
     });
 
@@ -22,19 +22,20 @@ module.exports = {
       (id.new === newId || id.old === newId) || (id.new === oldId || id.old === oldId)
     )
 
-    //todo: create isAllowed: false logic
     for (const token of tokens) {
-      const currentTokens = tokens.filter(t => t.address === token.address && t.isAllowed === true)
+      const currentTokens = tokens.filter(t => t.address === token.address)
       
+      if(currentTokens.length === 0) return;
+
       if(currentTokens.length === 1){
         token.isReward = token.isTransactional === false
         await token.save()
-      }else if(!handleFindTokens(currentTokens[0].id, currentTokens[1].id)){
+      }else if(!handleFindTokens(currentTokens[0].id, currentTokens[1].id) && currentTokens[0].isAllowed === true){
         removeTokens.push({new: currentTokens[0].id, old: currentTokens[1].id})
-        if(currentTokens[0].isTransactional){
+        if(currentTokens[0].isTransactional && currentTokens[1].isAllowed === true){
           currentTokens[0].isReward = currentTokens[1].isTransactional === false
           await currentTokens[0].save()
-        }else{
+        }else if(currentTokens[1].isAllowed === true){
           currentTokens[0].isReward = true
           currentTokens[0].isTransactional = currentTokens[1].isTransactional
           await currentTokens[0].save()
