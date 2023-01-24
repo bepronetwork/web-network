@@ -66,7 +66,11 @@ export default function SetupPage(){
   }
 
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
-  useEffect(updateNetworkRegistryAddressForConnectedChainId, [currentUser?.connected, connectedChain?.id, supportedChains])
+  useEffect(updateNetworkRegistryAddressForConnectedChainId, [
+    currentUser?.connected, 
+    connectedChain?.id, 
+    supportedChains
+  ]);
 
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;
@@ -82,7 +86,14 @@ export default function SetupPage(){
       title: t('setup:chains.title'),
       component: (
         !currentUser?.login
-          ? <CallToAction disabled={false} executing={false} call="missing github configuration step" action="go to" color="info" onClick={() => setActiveTab('githubConnection')} /> // eslint-ignore-line
+          ? <CallToAction 
+              disabled={false} 
+              executing={false} 
+              call="missing github configuration step" 
+              action="go to" 
+              color="info" 
+              onClick={() => setActiveTab('githubConnection')} 
+            />
           : <ChainsSetup />
       )
     },
@@ -91,9 +102,18 @@ export default function SetupPage(){
       title: t("setup:registry.title"),
       component: (
         !supportedChains?.length
-          ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> // eslint-ignore-line
-          : <RegistrySetup registryAddress={networkRegistryAddress}
-                           isVisible={activeTab === "registry"} />
+          ? <CallToAction 
+              disabled={false} 
+              executing={false} 
+              call="missing supported chains configuration step" 
+              action="go to" 
+              color="info" 
+              onClick={() => setActiveTab('supportedChains')} 
+            />
+          : <RegistrySetup 
+              registryAddress={networkRegistryAddress}
+              isVisible={activeTab === "registry"}
+            />
       )
     },
     {
@@ -101,12 +121,27 @@ export default function SetupPage(){
       title: t("setup:network.title"),
       component: (
         !supportedChains?.length
-          ? <CallToAction disabled={false} executing={false} call="missing supported chains configuration step" action="go to" color="info" onClick={() => setActiveTab('supportedChains')} /> : // eslint-ignore-line
+          ? <CallToAction 
+              disabled={false} 
+              executing={false} 
+              call="missing supported chains configuration step" 
+              action="go to" 
+              color="info" 
+              onClick={() => setActiveTab('supportedChains')} 
+            /> :
           !networkRegistryAddress
-            ? <CallToAction disabled={false} executing={false} action="go to" color="info" call="Registry not setup" onClick={() => setActiveTab('registry')} />
-            : <NetworkSetup isVisible={activeTab === "network"}
-                            refetchNetwork={searchForNetwork}
-                            defaultNetwork={defaultNetwork}/>
+            ? <CallToAction 
+                disabled={false} 
+                executing={false} 
+                action="go to" 
+                color="info" 
+                call="Registry not setup" 
+                onClick={() => setActiveTab('registry')} 
+              />
+            : <NetworkSetup 
+                isVisible={activeTab === "network"}
+                defaultNetwork={defaultNetwork}
+              />
       )
     }
   ];
