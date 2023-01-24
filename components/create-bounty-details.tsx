@@ -162,7 +162,7 @@ export default function CreateBountyDetails({
 
         {!review &&
           <ContextualSpan context="info" className="mt-1">
-            Selected {selectedTags.length} of {MAX_TAGS}
+            {t("fields.tags-info")}
           </ContextualSpan>
         }
       </div>
