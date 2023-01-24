@@ -62,16 +62,6 @@ export function useNetwork() {
           if (!data.isRegistered)
             return replace(`/networks`);
 
-          if (state?.currentUser?.connected && state?.connectedChain?.id !== data?.chain_id) {
-            console.log(`Should have asked to change chains`);
-            const chainData = state.supportedChains?.find(({ chainId }) => chainId === +data?.chain_id);
-
-            if (chainData)
-              await handleAddNetwork(chainData);
-            else
-              return;
-          }
-
           const newCachedData = new WinStorage(storageKey, 3600, `sessionStorage`);
           newCachedData.value = data;
 

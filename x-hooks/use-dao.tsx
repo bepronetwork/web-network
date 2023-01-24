@@ -6,16 +6,19 @@ import {isAddress} from "web3-utils";
 import {useAppState} from "contexts/app-state";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
-import {changeConnecting} from "contexts/reducers/change-spinners";
+import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 import {toastError,} from "contexts/reducers/change-toaster";
 
 import DAO from "services/dao-service";
+
+import UseNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
 
   const {state, dispatch} = useAppState();
   const {publicRuntimeConfig} = getConfig();
   const {replace, asPath} = useRouter();
+  const { handleAddNetwork } = UseNetworkChange();
 
   /**
    * Enables the user/dapp to connect to the active DAOService
@@ -131,9 +134,25 @@ export function useDao() {
       })
   }
 
+  function changeChain() {
+    if (state.connectedChain?.matchWithNetworkChain !== false || 
+        !state.currentUser?.walletAddress || 
+        state.spinners?.changingChain) 
+      return;
+
+    dispatch(changeChangingChain(true));
+
+    const networkChain = state.Service?.network?.active?.chain;
+
+    if (networkChain)
+      handleAddNetwork(networkChain)
+        .catch(console.debug)
+        .finally(() => dispatch(changeChangingChain(false)));
+  }
 
   return {
     changeNetwork,
+    changeChain,
     connect,
     start,
   };
