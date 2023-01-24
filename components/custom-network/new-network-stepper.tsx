@@ -52,7 +52,6 @@ function NewNetwork() {
   const { handleDeployNetworkV2, handleAddNetworkToRegistry, handleChangeNetworkParameter } = useBepro();
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
 
-  const defaultNetworkName = state?.Service?.network?.active?.name.toLowerCase();
   const isSetupPage = router?.pathname?.toString()?.includes("setup");
     
   const creationSteps = [
@@ -167,6 +166,10 @@ function NewNetwork() {
     setCreatingNetwork(6);
     cleanStorage?.();
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
+      .then(() => router.push(getURLWithNetwork("/", { 
+        network: payload.name,
+        chain: state.connectedChain?.shortName
+      })))
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({
@@ -180,10 +183,6 @@ function NewNetwork() {
         setCreatingNetwork(-1);
         console.debug("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
-  }
-
-  function goToMyNetworkPage() {
-    router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
   }
 
   function checkHasNetwork() {

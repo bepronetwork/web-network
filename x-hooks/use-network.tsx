@@ -86,7 +86,7 @@ export function useNetwork() {
   }
 
   function getURLWithNetwork(href: string, _query = undefined): UrlObject {
-    const _network = _query?.network ? String(_query?.network)?.replaceAll(" ", "-") : undefined;
+    const _network = _query?.network ? String(_query?.network)?.toLowerCase()?.replaceAll(" ", "-") : undefined;
     const cleanHref =  href.replace("/[network]/[chain]", "");
 
     return {
