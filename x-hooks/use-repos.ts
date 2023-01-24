@@ -53,9 +53,11 @@ export function useRepos() {
         
         storage.value = repos;
         dispatch(changeNetworkReposList(repos));
-        dispatch(changeLoadState(false));
-        dispatch(changeSpinners.update({repos: false}))
       })
+      .finally(() => {
+        dispatch(changeLoadState(false));
+        dispatch(changeSpinners.update({repos: false}));
+      });
   }
 
   function updateActiveRepo(id = null) {
