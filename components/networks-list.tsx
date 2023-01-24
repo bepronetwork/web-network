@@ -125,7 +125,7 @@ export default function NetworksList() {
 
           {orderByProperty(networks, order[0], order[1]).map((networkItem) => (
             <NetworkListItem
-              key={`network-list-item-${networkItem.name}`}
+              key={`network-list-item-${networkItem.name}-${networkItem.chain.chainShortName}`}
               network={networkItem}
               handleRedirect={handleRedirect}
               tokenSymbolDefault={t("misc.token")}

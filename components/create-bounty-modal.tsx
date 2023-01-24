@@ -18,7 +18,10 @@ import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
+import {useAppState} from "contexts/app-state";
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
+import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
 import {parseTransaction} from "helpers/transactions";
@@ -35,11 +38,7 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
-
-import {useAppState} from "../contexts/app-state";
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
-import {useRepos} from "../x-hooks/use-repos";
+import {useRepos} from "x-hooks/use-repos";
 
 interface BountyPayload {
   title: string;

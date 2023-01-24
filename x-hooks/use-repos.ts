@@ -30,8 +30,6 @@ export function useRepos() {
     if (!name || state.spinners?.repos)
       return;
 
-    dispatch(changeSpinners.update({repos: true}));
-
     const key = `bepro.network:repos:${name}`
     const storage = new WinStorage(key, 3600, `sessionStorage`);
     if (storage.value && !force) {
@@ -43,6 +41,7 @@ export function useRepos() {
     }
 
     dispatch(changeLoadState(true));
+    dispatch(changeSpinners.update({repos: true}));
 
     getReposList(force, name.toString())
       .then(repos => {
@@ -50,10 +49,11 @@ export function useRepos() {
           console.error(`No repos found for`, name);
           return;
         }
-        
+
         storage.value = repos;
         dispatch(changeNetworkReposList(repos));
       })
+      .catch(error => console.debug("Failed to loadRepos", error))
       .finally(() => {
         dispatch(changeLoadState(false));
         dispatch(changeSpinners.update({repos: false}));

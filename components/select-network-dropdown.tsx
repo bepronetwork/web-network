@@ -96,7 +96,8 @@ export default function SelectNetworkDropdown({
     isOnNetwork,
     Service?.network?.active?.chain,
     supportedChains,
-    connectedChain?.id]);
+    connectedChain?.id
+  ]);
 
   return(
     <div className={className}>

@@ -44,7 +44,7 @@ export function useNetwork() {
     const queryNetworkName = query?.network?.toString();
     const queryChainName = query?.chain?.toString();
 
-    if (queryNetworkName) {
+    if (queryNetworkName && queryChainName) {
       const chainId = state.connectedChain?.id;
       const storageKey = `bepro.network:${queryNetworkName}:${chainId}`;
 
@@ -176,6 +176,12 @@ export function useNetwork() {
     const connectedChainId = state.connectedChain?.id;
     const networkChainId = state?.Service?.network?.active?.chain_id;
     const isOnANetwork = !!query?.network;
+
+    console.log("deev", {
+      connectedChainId,
+      networkChainId,
+      isOnANetwork
+    })
 
     if (connectedChainId && networkChainId && isOnANetwork)
       dispatch(changeMatchWithNetworkChain(+connectedChainId === +networkChainId));

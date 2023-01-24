@@ -24,9 +24,6 @@ export function useDao() {
    * Enables the user/dapp to connect to the active DAOService
    */
   function connect() {
-    // if (!state.Service?.active)
-    //   return;
-
     dispatch(changeConnecting(true));
 
     (state.Service?.active ? state.Service.active.connect() : window.ethereum.request({method: 'eth_requestAccounts'}))

@@ -1,4 +1,4 @@
-import {SupportedChainData} from "../interfaces/supported-chain-data";
+import {SupportedChainData} from "interfaces/supported-chain-data";
 
 export default function UseNetworkChange() {
   async function handleAddNetwork(chosenSupportedChain: SupportedChainData) {
