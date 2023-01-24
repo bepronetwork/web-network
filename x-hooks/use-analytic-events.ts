@@ -2,10 +2,12 @@ import {Analytic, EventName} from "../interfaces/analytics";
 import {event} from "nextjs-google-analytics";
 import {analyticEvents} from "../helpers/analytic-events";
 import {useAppState} from "../contexts/app-state";
+import getConfig from "next/config";
 
 export default function useAnalyticEvents() {
 
   const {state} = useAppState();
+  const {publicRuntimeConfig} = getConfig();
 
   /**
    *
@@ -16,11 +18,18 @@ export default function useAnalyticEvents() {
 
     function getCallback({type}: Analytic) {
       // console.debug(`Trying to push ${eventName} with type ${type}`, details)
+
+      function rejectWithMessage(params: string | string[], message?: string) {
+        return (a: string, b: any) => Promise.reject(message || `Missing Params ${JSON.stringify(params)}`)
+      }
+
       switch (type) {
         case "ga4":
+          if (!publicRuntimeConfig.gaMeasureID)
+            return rejectWithMessage(`publicRuntimeConfig.gaMeasureID`);
           return event;
         default:
-          return (a: string, b: any) => Promise.reject(`Missing implementation for ${type}`);
+          return rejectWithMessage('', `Missing implementation for ${type}`);
       }
     }
 
