@@ -113,7 +113,7 @@ export function useAuthentication() {
         }
 
 
-        const windowChainId = +window.ethereum.chainId
+        const windowChainId = +window.ethereum.chainId;
         const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
 
         dispatch(changeChain.update({
@@ -124,7 +124,7 @@ export function useAuthentication() {
           registry: chain?.registryAddress
         }));
 
-        sessionStorage.setItem("currentChainId", chain?.chainId?.toString());
+        sessionStorage.setItem("currentChainId", chain ? chain?.chainId?.toString() : (+windowChainId).toString());
         sessionStorage.setItem("currentWallet", address || '');
       })
       .catch(e => {
