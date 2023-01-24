@@ -32,7 +32,7 @@ export default function WrongNetworkModal() {
   const { state: { connectedChain, currentUser, Service, supportedChains } } = useAppState();
 
   function changeShowModal() {
-    if (!connectedChain?.id) return;
+    if (!connectedChain?.id || !supportedChains?.length) return;
 
     if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
       setShowModal(!supportedChains?.find(({ chainId }) => +chainId === +connectedChain.id));
@@ -66,8 +66,12 @@ export default function WrongNetworkModal() {
   }
 
   function updateNetworkChain() {
-    if (supportedChains?.length && Service?.network?.active?.chain_id && query?.network)
-      setNetworkChain(supportedChains.find(({ chainId }) => +Service?.network?.active?.chain_id === +chainId ));
+    if (supportedChains?.length && Service?.network?.active?.chain_id && query?.network) {
+      const chain = supportedChains.find(({ chainId }) => +Service?.network?.active?.chain_id === +chainId );
+      
+      setNetworkChain(chain);
+      setChosenSupportedChain(chain);
+    }
     else
       setNetworkChain(null);
   }

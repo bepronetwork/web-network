@@ -59,7 +59,7 @@ export default function SelectNetworkDropdown({
   }
 
   function updateSelectedChainMatchConnected() {
-    const chain = 
+    const chain = isOnNetwork ? Service?.network?.active?.chain :
       supportedChains?.find(({ chainId }) => chainId === (defaultChain ? +defaultChain.chainId : +connectedChain.id));
 
     if (!chain) {
@@ -69,7 +69,6 @@ export default function SelectNetworkDropdown({
 
     sessionStorage.setItem("currentChainId", chain.chainId.toString());
 
-    onSelect(chain);
     setSelectedChain(chainToOption(chain));
   }
 
@@ -92,9 +91,12 @@ export default function SelectNetworkDropdown({
   }
 
   useEffect(updateChainsWithSameNetwork, [isOnNetwork, Service?.network?.active?.name]);
-  useEffect(updateSelectedChainMatchConnected, [defaultChain, supportedChains, connectedChain?.id]);
-
-  if (isOnNetwork && chainsWithSameNetwork?.length === 1) return <></>;
+  useEffect(updateSelectedChainMatchConnected, [
+    defaultChain,
+    isOnNetwork,
+    Service?.network?.active?.chain,
+    supportedChains,
+    connectedChain?.id]);
 
   return(
     <div className={className}>

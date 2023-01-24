@@ -23,6 +23,8 @@ import WrongNetworkModal from "components/wrong-network-modal";
 import {useAppState} from "contexts/app-state";
 import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
 
+import { SupportedChainData } from "interfaces/supported-chain-data";
+
 import useApi from "x-hooks/use-api";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
@@ -34,20 +36,20 @@ interface MyNetworkLink {
 }
 
 export default function MainNav() {
-  const { pathname } = useRouter();
+  const { pathname, query, asPath, push } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
-  const {dispatch} = useAppState();
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
     icon: <PlusIcon /> 
   });
-
-  const {state} = useAppState();
+  
+  const { state } = useAppState();
+  const { dispatch } = useAppState();
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
-  const {handleAddNetwork} = useNetworkChange();
+  const { handleAddNetwork } = useNetworkChange();
 
   const noNeedNetworkInstance = ["/","/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);
   const fullLogoUrl = state.Service?.network?.active?.fullLogo;
@@ -106,8 +108,16 @@ export default function MainNav() {
       />
     )
   }
-  function handleNetworkSelected(chain) {
-    return handleAddNetwork(chain).catch(() => null)
+  function handleNetworkSelected(chain: SupportedChainData) {
+    if (noNeedNetworkInstance) {
+      handleAddNetwork(chain).catch(() => null);
+      return;
+    }
+
+    push(getURLWithNetwork(pathname, {
+      ...query,
+      chain: chain.chainShortName
+    }), asPath.replace(query.chain.toString(), chain.chainShortName));
   }
 
   function LinkLeaderBoard() {
