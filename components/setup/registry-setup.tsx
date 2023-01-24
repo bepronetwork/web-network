@@ -17,11 +17,11 @@ import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
+import {SupportedChainData} from "interfaces/supported-chain-data";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
-
-import {SupportedChainData} from "../../interfaces/supported-chain-data";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;
@@ -67,7 +67,7 @@ export function RegistrySetup({
 
   const { loadSettings } = useSettings();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
-  const { saveNetworkRegistry, patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains } = useApi();
+  const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
 
   function isEmpty(value: string) {
@@ -274,6 +274,18 @@ export function RegistrySetup({
       })
   }
 
+  function setDefaults() {
+    setErc20(defaultContractField);
+    setRegistry(defaultContractField);
+    setCloseFeePercentage("");
+    setCancelFeePercentage("");
+    setIsErc20Allowed(undefined);
+    setBountyToken(defaultContractField);
+    setBountyTokenDispatcher("");
+    setLockAmountForNetworkCreation("");
+    setNetworkCreationFeePercentage("");
+  }
+
   useEffect(() => {
     if (!registryAddress || !Service?.active || !isVisible) return;
 
@@ -284,8 +296,6 @@ export function RegistrySetup({
     if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);
   }, [currentUser?.walletAddress]);
 
-  useEffect(() => { console.log('registry', registry) }, [registry])
-
   useEffect(() => {
     if (!supportedChains?.length || !connectedChain?.id)
       return;
@@ -295,11 +305,13 @@ export function RegistrySetup({
     if (!chain)
       return;
 
-    setRegistrySaveCTA(chain?.registryAddress ? false : !!registryAddress)
+    setRegistrySaveCTA(chain?.registryAddress ? false : !!registryAddress);
+  }, [connectedChain, supportedChains, registryAddress]);
 
-  }, [connectedChain, supportedChains, registryAddress])
-
-  // AURELIUS Registry 0x27F56eb75a1EBbE7e7218e8fCa5FF51E3d655f22
+  useEffect(() => {
+    if (connectedChain?.id && !registryAddress)
+      setDefaults();
+  }, [connectedChain?.id, registryAddress]);
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">
