@@ -44,8 +44,14 @@ export default function TokensSettings({
   } = useNetworkSettings();
 
   const tokenToAddress = ({ address } : Token) => address;
-  const tokenNotInSelected = ({ address } : Token, selecteds: Token[], isTransactional) => 
-    !selecteds?.find(f => f.address === address && f.isTransactional === isTransactional);
+  const tokenNotInSelected = ({ address }: Token,
+    selecteds: Token[],
+    type: "transactional" | "reward") => {
+    const handleConditional = (t: Token) => type === "transactional" ? (t.isTransactional === true) : 
+    (t.isReward === true)
+    return (!selecteds?.find((f) => f.address === address && handleConditional(f)))
+  }
+    
 
   async function getAllowedTokensContract() {
     setIsLoadingTokens(true);
@@ -58,11 +64,11 @@ export default function TokensSettings({
         dbTransactionalAllowed
       } = dbTokens.reduce((previous, current) => {
         const tmp = { ...previous };
-        const { isTransactional, isAllowed, isReward } = current;
+        const { isTransactional, isReward, isAllowed } = current;
 
         if (isTransactional && isAllowed)
           tmp.dbTransactionalAllowed.push(current);
-        else if (isReward && isAllowed)
+        if (isReward && isAllowed)
           tmp.dbRewardAllowed.push(current);
 
         return tmp;
@@ -96,10 +102,10 @@ export default function TokensSettings({
         setAllowedTransactionalTokensList(Object.values(availableTransactional));
       } else {
         setAllowedTransactionalTokensList(dbTransactionalAllowed
-          .filter(t => tokenNotInSelected(t, defaultSelectedTokens, true)));
+          .filter(t => tokenNotInSelected(t, defaultSelectedTokens, 'transactional')));
           
         setAllowedRewardTokensList(dbRewardAllowed
-          .filter(t => tokenNotInSelected(t, defaultSelectedTokens, false)));
+          .filter(t => tokenNotInSelected(t, defaultSelectedTokens, 'reward')));
       }
     } catch (error) {
       console.debug("Failed to getAllowedTokensContract", error);
@@ -153,7 +159,7 @@ export default function TokensSettings({
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {
       setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => token.isTransactional));
-      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => !token.isTransactional));
+      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => token.isReward));
     }
   }, [defaultSelectedTokens]);
 
