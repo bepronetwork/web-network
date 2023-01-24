@@ -63,7 +63,21 @@ export default function WalletBalance() {
           registryTokenAddress === state.Service?.network?.networkToken?.address ? Promise.resolve(null) :
           state.Service.active
             .getTokenBalance(state.Service?.network?.networkToken?.address, state.currentUser.walletAddress)
-            .then(balance => ({ ...networkToken, balance, icon: <TokenIconPlaceholder />}))
+            .then(async balance => {
+              const tokenInformation = await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol);
+
+              return { 
+                ...networkToken, 
+                balance, 
+                icon: tokenInformation?.icon ? 
+                  <img 
+                    className="rounded-circle"
+                    src={tokenInformation?.icon as string}
+                    height="24px"
+                    width="24px"
+                  /> : <TokenIconPlaceholder />
+              };
+            })
         ]).then(tokens => {
           setOracleToken({
             symbol: t("$oracles",  { token: networkToken?.symbol }),
