@@ -6,6 +6,8 @@ import {Op} from "sequelize";
 import Database from "db/models";
 
 import {chainFromHeader} from "helpers/chain-from-header";
+import { WANT_TO_CREATE_NETWORK } from "helpers/contants";
+import decodeMessage from "helpers/decode-message";
 import { UNAUTHORIZED } from "helpers/error-messages";
 import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
 import {isAdmin} from "helpers/is-admin";
@@ -95,8 +97,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const name = _name?.replaceAll(" ", "-")?.toLowerCase();
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
-
+    
     const chain = await chainFromHeader(req);
+
+    const validateSignature = (assumedOwner: string) => 
+      decodeMessage(chain.chainId, WANT_TO_CREATE_NETWORK, signedMessage, assumedOwner);
+
+    if (!validateSignature(creator))
+      return res.status(403).json("Invalid signature");
 
     const hasNetwork = await Database.network.findOne({
       where: {
@@ -109,6 +117,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (hasNetwork) {
       return res.status(409).json("Already exists a network created for this wallet");
     }
+
+    const sameNameOnOtherChain = await Database.network.findOne({
+      where: {
+        isClosed: false,
+        chain_id: {
+          [Op.not]: +chain?.chainId
+        },
+        name: {
+          [Op.iLike]: name
+        }
+      }
+    });
+
+    if (sameNameOnOtherChain)
+      if (!validateSignature(sameNameOnOtherChain.creatorAddress))
+        return res.status(403).json("Network name owned by other wallet");
 
     const settings = await Database.settings.findAll({
       where: { visibility: "public" },
