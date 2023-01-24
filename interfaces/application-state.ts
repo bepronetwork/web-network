@@ -70,6 +70,7 @@ export interface ServiceState {
 export interface ConnectedChain {
   id: string;
   name: string;
+  shortName: string;
   explorer?: string;
   events?: string;
   registry?: string;

@@ -27,6 +27,7 @@ export default function NetworkIdentifier() {
       dispatch(changeChain.update({
         id: (chain?.chainId || windowChainId).toString(),
         name: chain?.chainName || 'unknown',
+        shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
         explorer: chain?.blockScanner,
         events: chain?.eventsApi,
         registry: chain?.registryAddress
@@ -42,6 +43,7 @@ export default function NetworkIdentifier() {
       dispatch(changeChain.update({
         id: (chain?.chainId || evt)?.toString(),
         name: chain?.chainName || 'unknown',
+        shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
         explorer: chain?.blockScanner,
         events: chain?.eventsApi,
         registry: chain?.registryAddress
