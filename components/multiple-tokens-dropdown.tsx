@@ -45,7 +45,6 @@ export default function MultipleTokensDropdown({
   };
 
   useEffect(() => {
-    console.log('tokens', tokens)
     if (!tokens?.length) return;
     else setOptions(tokens.map(tokenToOption));
   }, [tokens]);
