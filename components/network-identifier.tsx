@@ -14,40 +14,34 @@ export default function NetworkIdentifier() {
     return state.supportedChains?.find(({chainId}) => chainId === windowChainId)
   }
 
+  function dispatchChainUpdate(chainId: number) {
+    const chain = findChain(chainId);
+    
+    return dispatch(changeChain.update({
+      id: (chain?.chainId || chainId)?.toString(),
+      name: chain?.chainName || 'unknown',
+      shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
+      explorer: chain?.blockScanner,
+      events: chain?.eventsApi,
+      registry: chain?.registryAddress
+    }));
+  }
+
   useEffect(() => {
     if (!window.ethereum && !state.supportedChains?.length)
       return;
 
     window.ethereum.removeAllListeners(`chainChanged`);
 
-    if (window.ethereum.isConnected()) {
-      const windowChainId = +window.ethereum.chainId;
-      const chain = findChain(windowChainId);
-
-      dispatch(changeChain.update({
-        id: (chain?.chainId || windowChainId).toString(),
-        name: chain?.chainName || 'unknown',
-        shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
-        explorer: chain?.blockScanner,
-        events: chain?.eventsApi,
-        registry: chain?.registryAddress
-      }))
-    }
+    if (window.ethereum.isConnected())
+      dispatchChainUpdate(+window.ethereum.chainId);
 
     window.ethereum.on(`connected`, evt => {
       console.debug(`Metamask connected`, evt);
     });
 
     window.ethereum.on(`chainChanged`, evt => {
-      const chain = findChain(+evt);
-      dispatch(changeChain.update({
-        id: (chain?.chainId || evt)?.toString(),
-        name: chain?.chainName || 'unknown',
-        shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
-        explorer: chain?.blockScanner,
-        events: chain?.eventsApi,
-        registry: chain?.registryAddress
-      }))
+      dispatchChainUpdate(+evt);
     });
 
   }, [state.supportedChains]);

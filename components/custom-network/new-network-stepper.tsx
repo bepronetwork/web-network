@@ -68,18 +68,7 @@ function NewNetwork() {
   async function handleCreateNetwork() {
     if (!state.currentUser?.login || !state.currentUser?.walletAddress || !state.Service?.active) return;
 
-    const signedMessage = await signMessage(WANT_TO_CREATE_NETWORK)
-      .catch(error => {
-        console.debug("Failed to sign message", error);
-
-        dispatch(addToast({
-          type: "danger",
-          title: "Failed",
-          content: "Signed message required to proceed",
-        }));
-
-        return undefined;
-      });
+    const signedMessage = await signMessage(WANT_TO_CREATE_NETWORK);
 
     if (!signedMessage)
       return;
