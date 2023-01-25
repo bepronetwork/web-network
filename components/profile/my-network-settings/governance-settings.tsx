@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -44,6 +44,7 @@ export default function GovernanceSettings({
   const {
     isAbleToClosed,
   } = useNetworkSettings();
+  const [networkTokens, setNetworkTokens] = useState<Token[]>()
 
   const isCurrentNetwork = (!!network &&
     !!state.Service?.network?.active &&
@@ -89,6 +90,18 @@ export default function GovernanceSettings({
       });
   }
 
+  function handleNetworkTokens(tokens: Token[]) {
+    return tokens.map(token => ({
+        ...token,
+        isReward: token.network_tokens.isReward || false,
+        isTransactional: token.network_tokens.isTransactional || false
+    }))
+  }
+
+  useEffect(() => {
+    if(tokens.length > 0) setNetworkTokens(handleNetworkTokens(tokens))
+  }, [tokens])
+
   return (
     <>
       <Row className="mt-4">
@@ -133,7 +146,7 @@ export default function GovernanceSettings({
         <NetworkContractSettings />
       </Row>
       <Row className="mt-4">
-        <TokensSettings defaultSelectedTokens={tokens} />
+        <TokensSettings defaultSelectedTokens={networkTokens} />
       </Row>
     </>
   );
