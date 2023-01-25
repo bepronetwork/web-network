@@ -59,9 +59,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const repositoryGithubId = repositoryDetails.repository.id;
-  let draftLabelId;
+  
+  let draftLabelId = repositoryDetails.repository.labels.nodes.find(({ name }) => name.toLowerCase() === "draft")?.id;
+  let chainLabelId = repositoryDetails.repository.labels.nodes.
+    find(({ name }) => name.toLowerCase() === chain.chainName.toLowerCase())?.id;
 
-  if (!repositoryDetails.repository.labels.nodes.length) {
+  if (!draftLabelId) {
     const createdLabel = await githubAPI<GraphQlResponse>(RepositoryQueries.CreateLabel, {
       name: "draft",
       repositoryId: repositoryGithubId,
@@ -72,14 +75,26 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
 
     draftLabelId = createdLabel.createLabel.label.id;
-  } else draftLabelId = repositoryDetails.repository.labels.nodes[0].id;
+  }
 
+  if (!chainLabelId) {
+    const createdLabel = await githubAPI<GraphQlResponse>(RepositoryQueries.CreateLabel, {
+      name: chain.chainName,
+      repositoryId: repositoryGithubId,
+      color: chain.color.replace("#", ""),
+      headers: {
+        accept: "application/vnd.github.bane-preview+json"
+      }
+    });
+
+    chainLabelId = createdLabel.createLabel.label.id;
+  }
 
   const createdIssue = await githubAPI<GraphQlResponse>(IssueQueries.Create, {
     repositoryId: repositoryGithubId,
     title,
     body,
-    labelId: [draftLabelId]
+    labelId: [draftLabelId, chainLabelId]
   });
 
   const githubId = createdIssue.createIssue.issue.number;
