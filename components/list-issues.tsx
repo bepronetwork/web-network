@@ -183,7 +183,7 @@ export default function ListIssues({
       search,
       sortBy: sortBy || 'createdAt',
       order,
-      creator,
+      address: creator,
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,

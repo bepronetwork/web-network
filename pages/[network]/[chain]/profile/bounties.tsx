@@ -16,7 +16,7 @@ export default function Bounties() {
     <ProfileLayout>
       <span className="family-Regular h4 text-white text-capitalize">{t("label_other")}</span>
 
-      <ListIssues creator={state.currentUser?.login || "not-connected"} />
+      <ListIssues creator={state.currentUser?.walletAddress || "not-connected"} />
     </ProfileLayout>
   );
 }
