@@ -114,10 +114,15 @@ export default function MainNav() {
       return;
     }
 
-    push(getURLWithNetwork(pathname, {
-      ...query,
+    const needsRedirect = ["bounty", "pull-request", "proposal"].includes(pathname.replace("/[network]/[chain]/", ""));
+    const newPath = needsRedirect ? "/" : pathname;
+    const newAsPath = needsRedirect ? `/${query.network}/${chain.chainShortName}` : 
+      asPath.replace(query.chain.toString(), chain.chainShortName);
+
+    push(getURLWithNetwork(newPath, {
+      ... needsRedirect ? {} : query,
       chain: chain.chainShortName
-    }), asPath.replace(query.chain.toString(), chain.chainShortName));
+    }), newAsPath);
   }
 
   function LinkLeaderBoard() {
