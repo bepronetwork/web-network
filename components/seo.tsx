@@ -2,13 +2,13 @@ import React, {useEffect, useState} from "react";
 
 import removeMarkdown from "markdown-to-text";
 import {DefaultSeo, NextSeo} from "next-seo";
+import SEO_CONFIG from "next-seo-config";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
-import {IssueBigNumberData, IssueData} from "interfaces/issue-data";
+import {useAppState} from "contexts/app-state";
 
-import {useAppState} from "../contexts/app-state";
-import SEO_CONFIG from "../next-seo-config";
+import {IssueBigNumberData, IssueData} from "interfaces/issue-data";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -21,7 +21,9 @@ const Seo: React.FC<ISeoProps> = () => {
   const {state} = useAppState();
   const [issueMeta, setIssueMeta] = useState<IssueBigNumberData>(null);
 
-  useEffect(() => { setIssueMeta(state.currentBounty?.data)}, [state.currentBounty?.data]);
+  useEffect(() => {   
+    setIssueMeta(state.currentBounty?.data);
+  }, [state.currentBounty?.data]);
 
   if (issueMeta && query?.id && query?.repoId) {
     // eslint-disable-next-line no-unsafe-optional-chaining
