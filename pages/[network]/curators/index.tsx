@@ -15,13 +15,14 @@ export default function PageCouncil() {
   const { type } = router.query;
 
   const types = {
-    "curators-list": <CuratorsList key={"curators-list"} />,
+    "curators-list": <CuratorsList key={"curators-list"} inView={type === 'curators-list'} />,
     "ready-to-close": (
       <ListIssues
         key={"ready-to-close"}
         filterState="proposal"
         emptyMessage={t("council:empty")}
         disputableFilter="merge"
+        inView={type === 'ready-to-close'}
       />
     ),
     "ready-to-dispute": (
@@ -30,6 +31,7 @@ export default function PageCouncil() {
         filterState="proposal"
         emptyMessage={t("council:empty")}
         disputableFilter="dispute"
+        inView={type === 'ready-to-dispute'}
       />
     ),
     "ready-to-propose": (
@@ -37,6 +39,7 @@ export default function PageCouncil() {
         key={"ready-to-propose"}
         filterState="ready"
         emptyMessage={t("council:empty")}
+        inView={type === 'ready-to-propose'}
       />
     ),
   };
