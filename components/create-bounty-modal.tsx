@@ -160,7 +160,7 @@ export default function CreateBountyModal() {
         decimals: transactionalERC20?.decimals,
         amount: issueAmount,
         setAmount: setIssueAmount,
-        tokens: customTokens.filter(token => token?.isTransactional !== false),
+        tokens: customTokens.filter(token => !!token?.isTransactional),
         balance: transactionalERC20.balance,
         isFunding: false,
         label: t("bounty:fields.select-token.bounty", { set: review ? "" : t("bounty:fields.set") })
@@ -172,7 +172,7 @@ export default function CreateBountyModal() {
         decimals: transactionalERC20?.decimals,
         amount: rewardAmount,
         setAmount: setRewardAmount,
-        tokens: customTokens.filter(token => token?.isReward !== false),
+        tokens: customTokens.filter(token => !!token?.isReward),
         balance: rewardERC20.balance,
         isFunding: true,
         label: t("bounty:fields.select-token.reward", { set: review ? "" : t("bounty:fields.set") })
