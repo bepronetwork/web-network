@@ -117,7 +117,13 @@ const updateTokens = async ({
     await NetworkTokensModel.findOrCreate({
       where: {
         tokenId: token.id,
-        networkId: beproNetwork.id
+        networkId: beproNetwork.id,
+      },
+      defaults: {
+        tokenId: token.id,
+        networkId: beproNetwork.id,
+        isTransactional: true,
+        isReward: false
       }
     });
   }
