@@ -3,32 +3,35 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {NOT_AN_ADMIN} from "../../../helpers/contants";
-import {isAdmin} from "../../../helpers/is-admin";
-import {resJsonMessage} from "../../../helpers/res-json-message";
-import {LogAccess} from "../../../middleware/log-access";
-import WithCors from "../../../middleware/withCors";
+import {chainFromHeader} from "helpers/chain-from-header";
+import {NOT_AN_ADMIN} from "helpers/contants";
+import {isAdmin} from "helpers/is-admin";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function getAllRepos(req, res) {
-  const {networkName} = req.query;
+  const { networkName } = req.query;
+
+  const chain = await chainFromHeader(req);
 
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+        [Op.iLike]: networkName
+      },
+      chain_id: +chain.chainId
     }
   });
 
   if (!network) return res.status(404).json("Invalid network");
 
   return res.status(200).json(await models.repositories.findAll({
-        where: {
-          network_id: network.id
-        }
-  },
-      { raw: true }));
+    where: {
+      network_id: network.id
+    }
+  }, { raw: true }));
 }
 
 async function addNewRepo(req, res) {

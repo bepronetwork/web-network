@@ -2,18 +2,21 @@ import {useState} from "react";
 
 import {useRouter} from "next/router";
 
-import {useAppState} from "../contexts/app-state";
-import {changeLoadState} from "../contexts/reducers/change-load";
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
 import {
   changeNetworkReposActive,
   changeNetworkReposActiveViewerPerm, 
   changeNetworkReposList
-} from "../contexts/reducers/change-service";
-import {changeSpinners} from "../contexts/reducers/change-spinners";
-import {RepoInfo} from "../interfaces/repos-list";
-import {WinStorage} from "../services/win-storage";
-import useApi from "./use-api";
-import useOctokit from "./use-octokit";
+} from "contexts/reducers/change-service";
+import {changeSpinners} from "contexts/reducers/change-spinners";
+
+import {RepoInfo} from "interfaces/repos-list";
+
+import {WinStorage} from "services/win-storage";
+
+import useApi from "x-hooks/use-api";
+import useOctokit from "x-hooks/use-octokit";
 
 export function useRepos() {
   const {query} = useRouter();
@@ -26,12 +29,14 @@ export function useRepos() {
   const { getRepository, getRepositoryForks, getRepositoryBranches, getRepositoryViewerPermission } = useOctokit();
 
   function loadRepos(force = false) {
-    const name = query?.network
+    const name = query?.network;
+
     if (!name || state.spinners?.repos)
       return;
 
-    const key = `bepro.network:repos:${name}`
+    const key = `bepro.network:repos:${name}:${state.connectedChain?.id}`;
     const storage = new WinStorage(key, 3600, `sessionStorage`);
+    
     if (storage.value && !force) {
       if (!state.Service?.network?.repos?.list) {
         dispatch(changeNetworkReposList(storage.value));
@@ -79,10 +84,11 @@ export function useRepos() {
       console.log(`No repo found for repoId: ${id || query?.repoId}`)
       return;
     }
+
     getRepository(activeRepo?.githubPath, true)
       .then(info => {
         if (!info)
-          return []
+          return [];
 
         return Promise.all([
           Promise.resolve(info),
@@ -107,5 +113,5 @@ export function useRepos() {
 
   }
 
-  return {loadRepos, updateActiveRepo}
+  return {loadRepos, updateActiveRepo};
 }
