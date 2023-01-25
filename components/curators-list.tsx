@@ -24,7 +24,7 @@ interface CuratorsPages {
   page: number;
 }
 
-export default function CuratorsList() {
+export default function CuratorsList({ inView }: { inView?: boolean }) {
   const { t } = useTranslation(["common", "council"]);
 
   const [hasMore, setHasMore] = useState(false);
@@ -39,7 +39,7 @@ export default function CuratorsList() {
   const { state, dispatch } = useAppState();
 
   function handlerSearch() {
-    if (!state.Service?.network?.active) return;
+    if (!state.Service?.network?.active && inView === false) return;
 
     dispatch(changeLoadState(true));
 
@@ -78,7 +78,7 @@ export default function CuratorsList() {
       });
   }
 
-  useEffect(handlerSearch, [page, state.Service?.network?.lastVisited]);
+  useEffect(handlerSearch, [page, state.Service?.network?.lastVisited, inView]);
 
   useEffect(() => {
     if (page) {
@@ -88,6 +88,8 @@ export default function CuratorsList() {
           curatorsPage.find((el) => el.page === pageV)));
     }
   }, [page, curatorsPage]);
+
+  if(inView !== null && inView === false) return null;
 
   return (
     <CustomContainer>
