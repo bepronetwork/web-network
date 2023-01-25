@@ -23,6 +23,8 @@
 @import "components/profile-menu";
 @import "components/mini-tabs";
 
+@import "components/swagger-ui";
+
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
 }
@@ -591,6 +593,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 155px
+}
+
+.white-space {
+  white-space: nowrap;
+
+  @media (max-width: 1399px) {
+    white-space: normal;
+  }
 }
 
 .status {
@@ -1266,7 +1276,7 @@ textarea.form-control {
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.40em;
+    top: 4.30em;
   }
 
   .input-group {

@@ -209,7 +209,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: async (value: string) => {
         let validated = undefined;
   
-        if (value.trim() !== "" && !isSetup)
+        if (value.trim() !== "")
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
 
         return !!validated;

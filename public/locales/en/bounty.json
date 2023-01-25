@@ -40,7 +40,7 @@
     "closed": "closed",
     "completed": "completed",
     "canceled": "canceled",
-    "until-done": "{{distance}} until done",
+    "until-open": "{{distance}} until open",
     "started-time": "started {{distance}} ago",
     "opened-time": "opened {{distance}} ago",
     "end-time": "at {{data}}",
@@ -90,6 +90,7 @@
     },
     "preview-descripion": "Preview Description",
     "tags": "Tags",
+    "tags-info": "Up to 3 tags",
     "select-token": {
       "bounty": "{{set}} Bounty Token",
       "reward": "{{set}} Reward Token"
@@ -120,5 +121,6 @@
   "most-active-networks": "Most Active Networks",
   "recent-bounties": "Recent Bounties",
   "all-bounties": "All Bounties",
-  "explore-all": "Explore All"
+  "explore-all": "Explore All",
+  "recent-bounties-empty": "Not found recent bounties"
 }

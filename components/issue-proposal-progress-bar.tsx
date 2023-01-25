@@ -54,7 +54,7 @@ export default function IssueProposalProgressBar() {
 
     const item = (date, toAdd = 0) => ({
       Warning: {
-        text: t("bounty:status.until-done", {
+        text: t("bounty:status.until-open", {
           distance: isHigher ? '0 seconds' 
             : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date(chainTime))
         }),
@@ -154,7 +154,7 @@ export default function IssueProposalProgressBar() {
               style={labelStyle}
             >
               <label
-                className={`text-uppercase caption mb-1 text-${
+                className={`white-space text-uppercase caption mb-1 text-${
                   isCanceled ? "danger" : `${currentItem ? stepColor : "gray"}`
                 }`}
               >
