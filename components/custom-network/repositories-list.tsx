@@ -5,6 +5,8 @@ import {useTranslation} from "next-i18next";
 import {ContextualSpan} from "components/contextual-span";
 import RepositoryCheck from "components/custom-network/repository-check";
 
+import { useAppState } from "contexts/app-state";
+
 import useApi from "x-hooks/use-api";
 
 interface infoType {
@@ -22,6 +24,7 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
   const [withoutMergeCommitPerm, setWithoutMergeCommitPerm] = useState([]);
   const [withoutBotCollaborator, setWithoutBotCollaborator] = useState([]);
 
+  const { state } = useAppState();
   const { searchRepositories } = useApi();
 
   const renderInfos: infoType[] = [
@@ -62,8 +65,11 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
       text: t("steps.repositories.no-repositories-selected"),
       type: "danger"
     },
-  ]
+  ];
 
+  const activeNetworkName = state.Service?.network?.active?.name;
+  const activeNetworCreator = state.Service?.network?.active?.creatorAddress;
+  const currentWallet = state.currentUser?.walletAddress?.toLowerCase();
 
   function updateReposWithoutMergeCommitPerm() {
     setWithoutMergeCommitPerm(repositories.filter(repository => repository.checked && !repository.mergeCommitAllowed)
@@ -103,7 +109,13 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
         networkName: ""
       })
         .then(({ rows }) => {
-          setExistingRepos(rows.map((repo) => repo.githubPath));
+          const isUsedByOtherNetwork = ({ network: { name, creatorAddress }}) => 
+            (name !== activeNetworkName) ||
+            (name === activeNetworkName && 
+              creatorAddress !== activeNetworCreator && 
+              creatorAddress.toLowerCase() !== currentWallet);
+
+          setExistingRepos(rows.filter(isUsedByOtherNetwork).map((repo) => repo.githubPath));
         })
         .catch(console.log);
 

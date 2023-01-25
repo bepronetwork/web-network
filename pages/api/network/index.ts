@@ -353,7 +353,23 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const exists = await Database.repositories.findOne({
           where: {
             githubPath: { [Op.iLike]: String(repository.fullName) }
-          }
+          },
+          include: [
+            {
+              association: "network",
+              where: {
+                [Op.or]: [
+                  {
+                    name: { [Op.not]: network.name }
+                  },
+                  {
+                    name: network.name,
+                    creatorAddress: { [Op.not]: network.creatorAddress }
+                  }
+                ]
+              }
+            }
+          ]
         });
 
         if (exists)

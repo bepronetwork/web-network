@@ -4,18 +4,16 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import paginate, {calculateTotalPages} from "helpers/paginate";
+import {resJsonMessage} from "helpers/res-json-message";
 
-
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../../helpers/res-json-message";
-import {LogAccess} from "../../../../middleware/log-access";
-import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
-import WithCors from "../../../../middleware/withCors";
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const {owner, name, path, networkName, page} = req.query || {};
+  const {owner, name, path, networkName, page, chainId} = req.query || {};
 
   if (path)
     whereCondition.githubPath = {
@@ -30,7 +28,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
         },
-        // chain_id: {[Op.eq]: (await chainFromHeader(req))?.chainId }
+        ... chainId ? { chain_id: +chainId } : {}
       }
     });
 
@@ -40,7 +38,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const repositories = 
-    await models.repositories.findAndCountAll(paginate({ where: whereCondition, nest: true }, req.query, []));
+    await models.repositories.findAndCountAll(paginate({ 
+      where: whereCondition,
+      nest: true,
+      include: [{ association: "network" }]
+    }, req.query, []));
 
   return res.status(200).json({
     ...repositories,

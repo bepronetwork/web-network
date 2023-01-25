@@ -351,21 +351,24 @@ export const NetworkSettingsProvider = ({ children }) => {
 
 
       if (!isCreating){
-        const repositoryAlreadyExists =  await searchRepositories({ networkName: network?.name })
-            .then(({ rows }) =>
-            Promise.all(rows.map( async repo => {
-              const repoOnGh = filtered.find(({ fullName }) => fullName === repo.githubPath);
+        const repositoryAlreadyExists =  await searchRepositories({ 
+          networkName: network?.name,
+          chainId: state.connectedChain?.id
+        })
+          .then(({ rows }) =>
+          Promise.all(rows.map( async repo => {
+            const repoOnGh = filtered.find(({ fullName }) => fullName === repo.githubPath);
 
-              return {
-                checked: true,
-                isSaved: true,
-                name: repo.githubPath.split("/")[1],
-                fullName: repo.githubPath,
-                hasIssues: await repositoryHasIssues(repo.githubPath),
-                mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
-                collaborators: repoOnGh?.collaborators || [],
-              };
-            })))
+            return {
+              checked: true,
+              isSaved: true,
+              name: repo.githubPath.split("/")[1],
+              fullName: repo.githubPath,
+              hasIssues: await repositoryHasIssues(repo.githubPath, network?.name, state.connectedChain?.id),
+              mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
+              collaborators: repoOnGh?.collaborators || [],
+            };
+          })));
         repositories.push(...repositoryAlreadyExists)
       }
 
@@ -437,8 +440,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
-
-    console.log("deev entrou")
 
     const service = await loadDaoService()
     const [

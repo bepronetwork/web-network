@@ -185,14 +185,16 @@ export default function useApi() {
     owner = "",
     name = "",
     path = "",
-    networkName = DEFAULT_NETWORK_NAME
+    networkName = DEFAULT_NETWORK_NAME,
+    chainId = ""
   }) {
     const params = new URLSearchParams({
       page,
       owner,
       name,
       path,
-      networkName
+      networkName,
+      chainId
     }).toString();
     return api
       .get<{ rows; count: number; pages: number; currentPage: number }>(`/search/repositories?${params}`)
@@ -697,8 +699,8 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function repositoryHasIssues(repoPath) {
-    const search = new URLSearchParams({ repoPath }).toString();
+  async function repositoryHasIssues(repoPath, networkName, chainId) {
+    const search = new URLSearchParams({ repoPath, networkName, chainId }).toString();
 
     return api
       .get<{ rows: IssueData[]; count: number }>(`/search/issues/?${search}`)
