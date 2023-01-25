@@ -4,6 +4,7 @@ import {ERC20} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/dist/client/router";
 import {GetServerSideProps} from "next/types";
 
 import ListIssues from "components/list-issues";
@@ -12,15 +13,19 @@ import PageHero, {InfosHero} from "components/page-hero";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
+import { Curator } from "interfaces/curators";
+import { IssueBigNumberData } from "interfaces/issue-data";
+
 import useApi from "x-hooks/use-api";
 import {useBounty} from "x-hooks/use-bounty";
 
 export default function BountiesPage() {
   useBounty();
   const { t } = useTranslation(["common"]);
+  const { query } = useRouter();
 
   const {state} = useAppState();
-  const { getTotalUsers } = useApi();
+  const { getTotalUsers, searchCurators, searchIssues } = useApi();
 
 
   const [infos, setInfos] = useState<InfosHero[]>([
@@ -44,36 +49,49 @@ export default function BountiesPage() {
   ]);
 
   useEffect(() => {
-    if (!state.Service?.active || !state.Service?.active?.network) return;
+    if (!state.Service?.network?.active || !query?.chain) return;
 
     Promise.all([
-      state.Service?.active.getClosedBounties().catch(() => 0),
-      state.Service?.active.getOpenBounties().catch(() => 0),
-      state.Service?.active.getTotalNetworkToken().catch(() => BigNumber(0)),
+      searchIssues({
+        networkName: state.Service.network.active.name,
+        chainId: state.Service.network.active.chain_id
+      }).then(({ rows } : { rows: IssueBigNumberData[] }) => rows),
+      searchCurators({
+        networkName: state.Service?.network?.active?.name,
+      }).then(({ rows }) => rows),
       getTotalUsers(),
       (state.Service?.active?.network?.networkToken as ERC20)?.symbol(),
-    ]).then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
-      setInfos([
-        {
-          value: inProgress,
-          label: t("heroes.in-progress")
-        },
-        {
-          value: closed,
-          label: t("heroes.bounties-closed")
-        },
-        {
-          value: onNetwork.toNumber(),
-          label: t("heroes.in-network"),
-          currency: t("$oracles",{ token: symbol || t("misc.$token") })
-        },
-        {
-          value: totalUsers,
-          label: t("heroes.protocol-members")
-        }
-      ]);
-    });
-  }, [state.Service?.active?.network?.contractAddress, state.Service?.network]);
+    ])
+      .then(([bounties, curators, totalUsers, symbol]) => {
+        const closedBounties = bounties.filter(({ state }) => state === "closed").length;
+        const inProgress = bounties.filter(({ state }) => !["pending", "canceled", "closed"].includes(state)).length;
+        const onNetwork = (curators as Curator[]).reduce((acc, curator) => 
+          new BigNumber(acc).plus(curator.tokensLocked).toFixed(), "0");
+
+        return [closedBounties, inProgress, onNetwork, totalUsers, symbol];
+      })
+      .then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
+        setInfos([
+          {
+            value: inProgress,
+            label: t("heroes.in-progress")
+          },
+          {
+            value: closed,
+            label: t("heroes.bounties-closed")
+          },
+          {
+            value: onNetwork,
+            label: t("heroes.in-network"),
+            currency: t("$oracles",{ token: symbol || t("misc.$token") })
+          },
+          {
+            value: totalUsers,
+            label: t("heroes.protocol-members")
+          }
+        ]);
+      });
+  }, [state.Service?.network?.active, query?.chain]);
 
   return (
     <BountyEffectsProvider>
