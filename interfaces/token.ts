@@ -3,6 +3,7 @@ import { ReactElement } from "react";
 import BigNumber from "bignumber.js";
 
 export type TokenType = 'reward' | 'transactional';
+
 export interface Token {
   id?: number;
   address: string;
@@ -14,8 +15,17 @@ export interface Token {
   totalSupply?: BigNumber;
   decimals?: number;
   isTransactional?: boolean;
+  network_tokens?: NetworkToken;
   isAllowed?: boolean;
   isReward?: boolean;
+}
+
+export interface NetworkToken {
+  id: number;
+  networkId: number;
+  tokenId: number;
+  isTransactional: boolean;
+  isReward: boolean;
 }
 
 export interface TokenInfo extends Partial<Token> {
