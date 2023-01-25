@@ -15,6 +15,8 @@ import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
+import { useNetwork } from "x-hooks/use-network";
+
 import {useAppState} from "../contexts/app-state";
 import CardItem from "./card-item";
 import IssueAmountInfo from "./issue-amount-info";
@@ -32,6 +34,7 @@ export default function IssueListItem({
   const { t } = useTranslation(["bounty", "common"]);
   
   const {state} = useAppState();
+  const { getURLWithNetwork } = useNetwork();
 
   const issueState = getIssueState({
     state: issue?.state,
@@ -41,16 +44,13 @@ export default function IssueListItem({
 
   function handleClickCard() {
     if (xClick) return xClick();
-    router.push({
-      pathname: "/[network]/bounty",
-      query: {
-        id: issue?.githubId,
-        repoId: issue?.repository_id,
-        network: issue?.network?.name
-          ? issue?.network?.name
-          : state.Service?.network?.lastVisited,
-      }
-    });
+    router.push(getURLWithNetwork("/bounty", {
+      id: issue?.githubId,
+      repoId: issue?.repository_id,
+      network: issue?.network?.name
+        ? issue?.network?.name
+        : state.Service?.network?.lastVisited
+    }));
   }
 
   function IssueTag() {
