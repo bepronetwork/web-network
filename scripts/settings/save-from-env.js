@@ -122,8 +122,8 @@ const updateTokens = async ({
       defaults: {
         tokenId: token.id,
         networkId: beproNetwork.id,
-        isTransactional: true,
-        isReward: false
+        isTransactional: isTransactional,
+        isReward: !isTransactional
       }
     });
   }
