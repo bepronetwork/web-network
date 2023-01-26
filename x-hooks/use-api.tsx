@@ -343,8 +343,8 @@ export default function useApi() {
       });
   }
 
-  async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME) {
-    const search = new URLSearchParams({ networkName }).toString();
+  async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME, chainId: string) {
+    const search = new URLSearchParams({ networkName, chainId }).toString();
 
     if (!force && repoList.length)
       return Promise.resolve(repoList as ReposList);

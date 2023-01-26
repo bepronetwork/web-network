@@ -12,16 +12,14 @@ import {LogAccess} from "middleware/log-access";
 import WithCors from "middleware/withCors";
 
 async function getAllRepos(req, res) {
-  const { networkName } = req.query;
-
-  const chain = await chainFromHeader(req);
+  const { networkName, chainId } = req.query;
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: networkName
       },
-      chain_id: +chain.chainId
+      chain_id: +chainId
     }
   });
 

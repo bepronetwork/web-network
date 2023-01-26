@@ -49,7 +49,11 @@ export const GlobalEffectsProvider = ({children}) => {
     currentUser?.walletAddress
   ]);
 
-  useEffect(repos.loadRepos, [query?.network , Service?.network?.lastVisited]);
+  useEffect(repos.loadRepos, [
+    query?.network ,
+    Service?.network?.lastVisited,
+    state.Service?.network?.active
+  ]);
   useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
 
   useEffect(auth.validateGhAndWallet,
