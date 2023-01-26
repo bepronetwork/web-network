@@ -27,8 +27,7 @@ export default function BountiesPage() {
   const {state} = useAppState();
   const { getTotalUsers, searchCurators, searchIssues } = useApi();
 
-
-  const [infos, setInfos] = useState<InfosHero[]>([
+  const zeroInfo = [
     {
       value: 0,
       label: t("heroes.in-progress")
@@ -46,10 +45,14 @@ export default function BountiesPage() {
       value: 0,
       label: t("heroes.protocol-members")
     }
-  ]);
+  ];
+
+  const [infos, setInfos] = useState<InfosHero[]>(zeroInfo);
 
   useEffect(() => {
     if (!state.Service?.network?.active || !query?.chain) return;
+    
+    setInfos(zeroInfo);
 
     Promise.all([
       searchIssues({
@@ -58,6 +61,7 @@ export default function BountiesPage() {
       }).then(({ rows } : { rows: IssueBigNumberData[] }) => rows),
       searchCurators({
         networkName: state.Service?.network?.active?.name,
+        chainShortName: query.chain.toString()
       }).then(({ rows }) => rows),
       getTotalUsers(),
       (state.Service?.active?.network?.networkToken as ERC20)?.symbol(),

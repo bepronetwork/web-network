@@ -166,7 +166,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name || inView === false) return;
+    if (!appState.Service?.network?.active?.name || inView === false || !appState.supportedChains) return;
 
     dispatch(changeLoadState(true));
 
@@ -253,7 +253,8 @@ export default function ListIssues({
     creator,
     proposer,
     appState.Service?.network?.active?.name,
-    inView
+    inView,
+    appState.supportedChains
   ]);
 
   useEffect(() => {

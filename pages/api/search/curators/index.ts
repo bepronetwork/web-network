@@ -3,7 +3,6 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import {chainFromHeader} from "helpers/chain-from-header";
 import paginate, {calculateTotalPages} from "helpers/paginate";
 import {resJsonMessage} from "helpers/res-json-message";
 
@@ -17,20 +16,23 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, isCurrentlyCurator, networkName, page } = req.query || {};
+    const { address, isCurrentlyCurator, networkName, page, chainShortName } = req.query || {};
 
     if (networkName) {
-      const chain = await chainFromHeader(req);
-
       const network = await models.network.findOne({
         where: {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-          },
-          chain_id: {
-            [Op.eq]: +chain?.chainId
           }
         },
+        include: [
+          { 
+            association: "chain",
+            where: {
+              chainShortName: chainShortName
+            }
+          }
+        ]
       });
 
       if (!network) return resJsonMessage("Invalid network", res,404);

@@ -15,4 +15,5 @@ export interface SearchCuratorParams {
     networkName?: string;
     sortBy?: string;
     order?: string;
-  }
+    chainShortName?: string;
+}

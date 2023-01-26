@@ -649,7 +649,8 @@ export default function useApi() {
     isCurrentlyCurator = undefined,
     networkName = DEFAULT_NETWORK_NAME,
     sortBy = "updatedAt",
-    order = "DESC"
+    order = "DESC",
+    chainShortName
   }: SearchCuratorParams) {
     const params = new URLSearchParams({
       page,
@@ -657,6 +658,7 @@ export default function useApi() {
       networkName,
       sortBy,
       order,
+      chainShortName,
       ...(isCurrentlyCurator !== undefined && { isCurrentlyCurator: isCurrentlyCurator.toString()} || {})
     }).toString();
 
