@@ -157,8 +157,8 @@ export default function TokensSettings({
 
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {
-      setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => !!token.network_tokens.isTransactional));
-      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => !!token.network_tokens.isReward));
+      setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => token.isTransactional));
+      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => token.isReward));
     }
   }, [defaultSelectedTokens]);
 
