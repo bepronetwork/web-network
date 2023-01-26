@@ -18,7 +18,7 @@ import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
 export default function CouncilLayout({ children }) {
-  const { asPath, push } = useRouter();
+  const { asPath, query, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
   const { state, dispatch} = useAppState();
@@ -76,19 +76,18 @@ export default function CouncilLayout({ children }) {
   ]
 
   async function loadTotals() {
-    if (!state.Service?.active?.network ||
-        !state.Service?.network?.active?.name ||
-        !state.Service?.network?.networkToken?.address) return;
+    if (!state.Service?.network?.active?.name || !query?.chain) return;
     
     const [totalBounties, onNetwork, curators, distributed] = await Promise.all([
       getTotalBounties("ready", state.Service?.network?.active?.name),
       searchCurators({
         networkName: state.Service?.network?.active?.name,
+        chainShortName: query.chain.toString()
       }).then(({ rows }) => rows),
       searchIssues({
         state: "closed",
         networkName: state.Service.network.active.name,
-        tokenAddress: state.Service.network.networkToken.address
+        tokenAddress: state.Service?.network?.active?.networkToken?.address
       })
         .then(({ rows } : { rows: IssueBigNumberData[] }) => 
           rows.reduce((acc, { payments }) => acc + payments.reduce((acc, { ammount }) => acc + ammount, 0), 0))
@@ -104,8 +103,6 @@ export default function CouncilLayout({ children }) {
 
     dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, { curators })));
 
-    console.log("Deev", { onNetwork, curators })
-
     setInfos([
       {
         value: totalBounties,
@@ -118,28 +115,26 @@ export default function CouncilLayout({ children }) {
       {
         value: distributed,
         label: t("council:distributed-developers"),
-        currency: state.Service?.network?.networkToken?.symbol,
+        currency: state.Service?.network?.active?.networkToken?.symbol,
       },
       {
         value: onNetwork,
         label: t("heroes.in-network"),
-        currency: state.Service?.network?.networkToken?.symbol,
+        currency: state.Service?.network?.active?.networkToken?.symbol,
       },
     ]);
   }
 
   useEffect(() => {
     loadTotals();
-  }, [state.Service?.active?.network?.contractAddress,
-      state.Service?.network?.active?.name,
-      state.Service?.network?.networkToken?.address]);
+  }, [state.Service?.network?.active?.name, query?.chain]);
 
   return (
     <div>
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: state.Service?.network?.networkToken?.symbol,
+          token: state.Service?.network?.active?.networkToken?.symbol,
         })}
         infos={infos}
       />

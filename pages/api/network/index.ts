@@ -56,6 +56,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     include: [
       { association: "tokens" },
       { association: "curators" },
+      { association: "networkToken" },
       { 
         association: "chain",
         ... chainName ? {
