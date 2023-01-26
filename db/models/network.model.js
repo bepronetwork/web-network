@@ -29,6 +29,14 @@ class Network extends Model {
           type: DataTypes.INTEGER,
           unique: "network_chain_unique"
         },
+        network_token_id: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
+          references: {
+            model: "tokens",
+            key: "id"
+          }
+        },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
         allowCustomTokens: {
@@ -84,6 +92,12 @@ class Network extends Model {
       foreignKey: "chain_id",
       targetKey: "chainId",
       as: "chain"
+    });
+
+    this.belongsTo(models.tokens, {
+      foreignKey: "network_token_id",
+      sourceKey: "id",
+      as: "networkToken"
     });
 
     this.belongsToMany(models.tokens, {through: 'network_tokens'});

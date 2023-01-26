@@ -9,7 +9,6 @@ import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeActiveNetworkToken,
   changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
@@ -17,18 +16,15 @@ import {
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
-import UseNetworkChange from "x-hooks/use-network-change";
 
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   
-  
   const {query, replace} = useRouter();
   const {state, dispatch} = useAppState();
   const {getNetwork, getNetworkTokens} = useApi();
-  const { handleAddNetwork } = UseNetworkChange();
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -89,23 +85,6 @@ export function useNetwork() {
           state?.Service?.network?.active?.name
       }
     };
-  }
-
-  function loadNetworkToken() {
-    if (!state.Service?.active?.network || state.Service?.network?.networkToken)
-      return;
-
-    const activeNetworkToken: any = state.Service?.active?.network?.networkToken;
-
-    Promise.all([activeNetworkToken.name(), activeNetworkToken.symbol(),])
-      .then(([name, symbol]) => {
-        dispatch(changeActiveNetworkToken({
-          name,
-          symbol,
-          decimals: activeNetworkToken.decimals,
-          address: activeNetworkToken.contractAddress
-        }))
-      });
   }
 
   function loadNetworkAllowedTokens() {
@@ -187,7 +166,6 @@ export function useNetwork() {
     updateActiveNetwork,
     getURLWithNetwork,
     clearNetworkFromStorage,
-    loadNetworkToken,
     loadNetworkTimes,
     loadNetworkAmounts,
     loadNetworkAllowedTokens,

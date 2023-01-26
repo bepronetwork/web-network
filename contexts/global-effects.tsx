@@ -43,7 +43,6 @@ export const GlobalEffectsProvider = ({children}) => {
     Service?.network?.active?.networkAddress, 
     connectedChain?.matchWithNetworkChain
   ]);
-
   useEffect(dao.changeChain, [
     connectedChain?.matchWithNetworkChain,
     currentUser?.walletAddress
@@ -56,21 +55,15 @@ export const GlobalEffectsProvider = ({children}) => {
   ]);
   useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
 
-  useEffect(auth.validateGhAndWallet,
-            [(session?.data as CustomSession),
-              currentUser?.walletAddress,
-              // asPath.includes('developers'),
-              // asPath.includes('bounty'),
-              // asPath.includes('profile'),
-            ]);
+  useEffect(auth.validateGhAndWallet, [session?.data, currentUser?.walletAddress]);
   useEffect(auth.updateWalletAddress, [currentUser]);
   useEffect(auth.listenToAccountsChanged, [Service]);
   useEffect(auth.updateWalletBalance, [currentUser?.walletAddress, Service?.active?.network]);
   useEffect(auth.signMessageIfAdmin, [currentUser?.walletAddress]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [currentUser?.walletAddress]);
+  
   useEffect(network.updateActiveNetwork, [query?.network, query?.chain]);
-  useEffect(network.loadNetworkToken, [Service?.active?.network]);
   useEffect(network.loadNetworkTimes, [Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [Service?.active?.network]);
   useEffect(network.loadNetworkAllowedTokens, [Service?.active, Service?.network?.active]);

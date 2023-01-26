@@ -2,9 +2,8 @@ import {TreasuryInfo} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 
 import { Curator } from "interfaces/curators";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
-
-import { SupportedChainData } from "./supported-chain-data";
 
 export interface Network {
   id: number;
