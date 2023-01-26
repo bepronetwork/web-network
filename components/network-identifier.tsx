@@ -16,6 +16,8 @@ export default function NetworkIdentifier() {
 
   function dispatchChainUpdate(chainId: number) {
     const chain = findChain(chainId);
+
+    sessionStorage.setItem("currentChainId", chainId.toString());
     
     return dispatch(changeChain.update({
       id: (chain?.chainId || chainId)?.toString(),
