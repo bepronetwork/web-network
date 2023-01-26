@@ -25,6 +25,8 @@ interface ChainOption {
   label: string;
   value: SupportedChainData | Partial<SupportedChainData>;
   preIcon: ReactNode;
+  isDisabled?: boolean;
+  tooltip?: string;
 }
 
 export default function SelectNetworkDropdown({ 
@@ -36,17 +38,21 @@ export default function SelectNetworkDropdown({
 }: SelectNetworkDropdownProps) {
   const { t } = useTranslation("common");
 
+  const [options, setOptions] = useState<ChainOption[]>([]);
   const [selected, setSelectedChain] = useState<ChainOption>(null);
   const [chainsWithSameNetwork, setChainsWithSameNetwork] = useState<SupportedChainData[]>();
   
   const { searchNetworks } = useApi();
   const { state: { Service, supportedChains, connectedChain } } = useAppState();
 
-  const chainToOption = (chain: SupportedChainData | Partial<SupportedChainData>): ChainOption => ({ 
-    value: chain, 
-    label: chain.chainShortName,
-    preIcon: (<Indicator bg={chain.color} />)
-  });
+  const chainToOption = (chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption => 
+    ({ 
+      value: chain, 
+      label: chain.chainShortName,
+      preIcon: (<Indicator bg={isDisabled ? "gray" : chain.color} />),
+      isDisabled,
+      tooltip: isDisabled ? "Not available on this chain" : undefined
+    });
 
   async function selectSupportedChain({value}) {
     const chain = supportedChains?.find(({ chainId }) => +chainId === +value.chainId);
@@ -90,6 +96,17 @@ export default function SelectNetworkDropdown({
       .catch(console.debug);
   }
 
+  function updateOptions() {
+    if (!supportedChains || (isOnNetwork && !chainsWithSameNetwork)) return;
+
+    if (isOnNetwork)
+      setOptions(supportedChains.map(chain => 
+        chainToOption(chain, !chainsWithSameNetwork?.find(({ chainId }) => chainId === chain.chainId))));
+    else
+      setOptions(supportedChains.map(chain => chainToOption(chain)));
+  }
+
+  useEffect(updateOptions, [isOnNetwork, chainsWithSameNetwork, supportedChains]);
   useEffect(updateChainsWithSameNetwork, [isOnNetwork, Service?.network?.active?.name]);
   useEffect(updateSelectedChainMatchConnected, [
     defaultChain,
@@ -102,7 +119,7 @@ export default function SelectNetworkDropdown({
   return(
     <div className={className}>
       <ReactSelect 
-        options={(isOnNetwork ? chainsWithSameNetwork : supportedChains)?.map(chainToOption)}
+        options={options}
         value={selected}
         onChange={selectSupportedChain}
         placeholder={t("forms.select-placeholder")}
