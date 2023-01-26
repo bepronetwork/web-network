@@ -83,6 +83,7 @@ const updateTokens = async ({
     name,
     symbol,
     isTransactional,
+    isReward,
     address
   }) => {
     const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
@@ -95,17 +96,19 @@ const updateTokens = async ({
       where: {
         name,
         symbol,
-        isTransactional
+        isTransactional,
+        isReward
       },
       defaults: {
         address,
         isAllowed: true,
-        isReward: !isTransactional
+        isTransactional,
+        isReward
       }
     });
 
   if (!created && process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME.length)
-    await TokensModel.update({ address }, { where: { name, symbol, isTransactional }});
+    await TokensModel.update({ address }, { where: { name, symbol, isTransactional, isReward }});
 
   const beproNetwork = await NetworkModel.findOne({
     where: {
@@ -122,8 +125,8 @@ const updateTokens = async ({
       defaults: {
         tokenId: token.id,
         networkId: beproNetwork.id,
-        isTransactional: isTransactional,
-        isReward: !isTransactional
+        isTransactional,
+        isReward
       }
     });
   }

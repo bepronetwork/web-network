@@ -322,25 +322,22 @@ async function main() {
         updateTokens({
           name: await networkToken.name(),
           symbol: await networkToken.symbol(),
-          isTransactional: false,
-          address: networkToken.contractAddress
-        }),
-        updateTokens({
-          name: await networkToken.name(),
-          symbol: await networkToken.symbol(),
           isTransactional: true,
+          isReward: true,
           address: networkToken.contractAddress
         }),
         updateTokens({
           name: await rewardToken.name(),
           symbol: await rewardToken.symbol(),
           isTransactional: false,
+          isReward: true,
           address: rewardToken.contractAddress
         }),
         updateTokens({
           name: await bountyTransactional.name(),
           symbol: await bountyTransactional.symbol(),
           isTransactional: true,
+          isReward: false,
           address: bountyTransactional.contractAddress
         })
       ]);
