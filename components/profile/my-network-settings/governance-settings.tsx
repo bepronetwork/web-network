@@ -44,6 +44,7 @@ export default function GovernanceSettings({
   const {
     isAbleToClosed,
   } = useNetworkSettings();
+  const [networkToken, setNetworkToken] = useState<Token[]>();
 
   const isCurrentNetwork = (!!network &&
     !!state.Service?.network?.active &&
@@ -89,6 +90,14 @@ export default function GovernanceSettings({
       });
   }
 
+  useEffect(() => {
+    if(tokens.length > 0) setNetworkToken(tokens.map((token) => ({
+      ...token,
+      isReward: !!token.network_tokens.isReward,
+      isTransactional: !!token.network_tokens.isTransactional
+    })))
+  }, [tokens])
+
   return (
     <>
       <Row className="mt-4">
@@ -133,7 +142,7 @@ export default function GovernanceSettings({
         <NetworkContractSettings />
       </Row>
       <Row className="mt-4">
-       <TokensSettings defaultSelectedTokens={tokens} />
+       <TokensSettings defaultSelectedTokens={networkToken} />
       </Row>
     </>
   );
