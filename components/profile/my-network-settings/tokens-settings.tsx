@@ -97,15 +97,14 @@ export default function TokensSettings({
       if (isGovernorRegistry) {
         setAllowedRewardTokensList(Object.values(availableReward));
         setAllowedTransactionalTokensList(Object.values(availableTransactional));
+        setSelectedRewardTokens(dbRewardAllowed);
+        setSelectedTransactionalTokens(dbTransactionalAllowed);
       } else {
         setAllowedTransactionalTokensList(dbTransactionalAllowed
           .filter(t => tokenNotInSelected(t, defaultSelectedTokens, 'transactional')));
         setAllowedRewardTokensList(dbRewardAllowed
           .filter(t => tokenNotInSelected(t, defaultSelectedTokens, 'reward')));
       }
-
-      setSelectedRewardTokens(dbRewardAllowed);
-      setSelectedTransactionalTokens(dbTransactionalAllowed);
       
     } catch (error) {
       console.debug("Failed to getAllowedTokensContract", error);
@@ -158,8 +157,8 @@ export default function TokensSettings({
 
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {
-      setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => token.isTransactional));
-      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => token.isReward));
+      setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => !!token.network_tokens.isTransactional));
+      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => !!token.network_tokens.isReward));
     }
   }, [defaultSelectedTokens]);
 
