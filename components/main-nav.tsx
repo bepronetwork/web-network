@@ -139,9 +139,7 @@ export default function MainNav() {
   function LinkBounties() {
     return (
       <InternalLink
-        href={getURLWithNetwork("/bounties", {
-          network: state.Service?.network?.active?.name,
-        })}
+        href={noNeedNetworkInstance ? "/bounty-hall" : getURLWithNetwork("/")}
         label={<Translation label={"main-nav.nav-avatar.bounties"} />}
         nav
         uppercase
@@ -165,6 +163,7 @@ export default function MainNav() {
 
   return (
     <div className="nav-container">
+      {console.log("### mainnav", state.Service?.network?.active)}
       {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
       <div className="main-nav d-flex flex-column justify-content-center">
         <div

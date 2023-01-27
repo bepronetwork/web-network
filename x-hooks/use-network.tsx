@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
@@ -20,9 +20,11 @@ import useApi from "x-hooks/use-api";
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
+  const {query, replace} = useRouter();
+
+  const [networkName, setNetworkName] = useState<string>();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   
-  const {query, replace} = useRouter();
   const {state, dispatch} = useAppState();
   const {getNetwork, getNetworkTokens} = useApi();
 
@@ -162,7 +164,12 @@ export function useNetwork() {
       dispatch(changeMatchWithNetworkChain(null));
   }
 
+  useEffect(() => {
+    setNetworkName(query?.network?.toString());
+  }, [query?.network]);
+
   return {
+    networkName,
     updateActiveNetwork,
     getURLWithNetwork,
     clearNetworkFromStorage,

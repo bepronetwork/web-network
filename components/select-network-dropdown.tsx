@@ -12,6 +12,7 @@ import {useAppState} from "contexts/app-state";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import { useNetwork } from "x-hooks/use-network";
 
 interface SelectNetworkDropdownProps {
   onSelect: (chain: SupportedChainData) => void;
@@ -43,6 +44,7 @@ export default function SelectNetworkDropdown({
   const [chainsWithSameNetwork, setChainsWithSameNetwork] = useState<SupportedChainData[]>();
   
   const { searchNetworks } = useApi();
+  const { networkName } = useNetwork();
   const { state: { Service, supportedChains, connectedChain } } = useAppState();
 
   const chainToOption = (chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption => 
@@ -65,7 +67,7 @@ export default function SelectNetworkDropdown({
   }
 
   function updateSelectedChainMatchConnected() {
-    const chain = isOnNetwork ? Service?.network?.active?.chain :
+    const chain = isOnNetwork && Service?.network?.active?.chain ? Service?.network?.active?.chain :
       supportedChains?.find(({ chainId }) => chainId === (defaultChain ? +defaultChain.chainId : +connectedChain.id));
 
     if (!chain) {
@@ -79,13 +81,13 @@ export default function SelectNetworkDropdown({
   }
 
   function updateChainsWithSameNetwork() {
-    if (isOnNetwork !== true || !Service?.network?.active?.name) {
+    if (isOnNetwork !== true || !networkName) {
       setChainsWithSameNetwork(undefined);
       return;
     }
 
     searchNetworks({
-      name: Service?.network?.active?.name
+      name: networkName
     })
       .then(({ count, rows }) => {
         if (count === 0)
@@ -107,7 +109,7 @@ export default function SelectNetworkDropdown({
   }
 
   useEffect(updateOptions, [isOnNetwork, chainsWithSameNetwork, supportedChains]);
-  useEffect(updateChainsWithSameNetwork, [isOnNetwork, Service?.network?.active?.name]);
+  useEffect(updateChainsWithSameNetwork, [isOnNetwork, networkName]);
   useEffect(updateSelectedChainMatchConnected, [
     defaultChain,
     isOnNetwork,
