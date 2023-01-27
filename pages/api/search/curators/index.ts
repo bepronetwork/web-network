@@ -35,7 +35,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         ]
       });
 
-      if (!network) return resJsonMessage("Invalid network", res,404);
+      if (!network) return resJsonMessage("Invalid network", res, 404);
 
       whereCondition.networkId = network?.id;
     }

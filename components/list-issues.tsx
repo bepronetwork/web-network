@@ -28,6 +28,7 @@ import {isProposalDisputable} from "helpers/proposal";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
@@ -86,18 +87,19 @@ export default function ListIssues({
 
   const searchTimeout = useRef(null);
 
+  const { chain } = useChain();
   const { searchIssues, getTotalBounties } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
 
   const isProfilePage = router?.asPath?.includes("profile");
 
-  const { repoId, time, state, sortBy, chain, order } = router.query as {
+  const { network: networkName, repoId, time, state, sortBy, order } = router.query as {
+    network: string;
     repoId: string;
     time: string;
     state: string;
     sortBy: string;
     order: string;
-    chain: string;
   };
 
   const filtersByIssueState: FiltersByIssueState = [
@@ -166,14 +168,11 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name || inView === false || !appState.supportedChains) return;
+    if (!appState.Service?.network?.active?.name || inView === false || !chain) return;
 
     dispatch(changeLoadState(true));
 
     if(allNetworks) getTotalBounties().then(setTotalBounties);
-
-    const chainId = allNetworks ? "" : appState.supportedChains?.
-      find(({ chainShortName }) => chainShortName.toLowerCase() === chain.toString()).chainId.toString();
 
     searchIssues({
       page,
@@ -187,8 +186,8 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      chainId,
-      networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
+      chainId: chain.chainId.toString(),
+      networkName: allNetworks ? "" : networkName.toString(),
       allNetworks: allNetworks ? allNetworks : ""
     })
       .then(async ({ rows, pages, currentPage }) => {
@@ -252,7 +251,7 @@ export default function ListIssues({
     chain,
     creator,
     proposer,
-    appState.Service?.network?.active?.name,
+    networkName,
     inView,
     appState.supportedChains
   ]);

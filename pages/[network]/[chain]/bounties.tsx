@@ -18,12 +18,14 @@ import { IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import {useBounty} from "x-hooks/use-bounty";
+import useChain from "x-hooks/use-chain";
 
 export default function BountiesPage() {
   useBounty();
   const { t } = useTranslation(["common"]);
   const { query } = useRouter();
 
+  const { chain } = useChain();
   const {state} = useAppState();
   const { getTotalUsers, searchCurators, searchIssues } = useApi();
 
@@ -50,17 +52,17 @@ export default function BountiesPage() {
   const [infos, setInfos] = useState<InfosHero[]>(zeroInfo);
 
   useEffect(() => {
-    if (!state.Service?.network?.active || !query?.chain) return;
+    if (!state.Service?.network?.active || !chain || !query?.network) return;
     
     setInfos(zeroInfo);
 
     Promise.all([
       searchIssues({
-        networkName: state.Service.network.active.name,
-        chainId: state.Service.network.active.chain_id
+        networkName: query.network.toString(),
+        chainId: chain.chainId.toString()
       }).then(({ rows } : { rows: IssueBigNumberData[] }) => rows),
       searchCurators({
-        networkName: state.Service?.network?.active?.name,
+        networkName: query.network.toString(),
         chainShortName: query.chain.toString()
       }).then(({ rows }) => rows),
       getTotalUsers(),
@@ -95,7 +97,7 @@ export default function BountiesPage() {
           }
         ]);
       });
-  }, [state.Service?.network?.active, query?.chain]);
+  }, [state.Service?.network?.active, query?.network, chain]);
 
   return (
     <BountyEffectsProvider>
@@ -104,6 +106,7 @@ export default function BountiesPage() {
         subtitle={t("heroes.bounties.subtitle")}
         infos={infos}
       />
+
       <ListIssues />
     </BountyEffectsProvider>
   );

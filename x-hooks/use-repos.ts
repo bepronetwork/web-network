@@ -16,6 +16,7 @@ import {RepoInfo} from "interfaces/repos-list";
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import useOctokit from "x-hooks/use-octokit";
 
 export function useRepos() {
@@ -25,18 +26,17 @@ export function useRepos() {
 
   const {state, dispatch} = useAppState();
 
+  const { chain } = useChain();
   const {getReposList} = useApi();
   const { getRepository, getRepositoryForks, getRepositoryBranches, getRepositoryViewerPermission } = useOctokit();
 
   function loadRepos(force = false) {
     const name = query?.network;
 
-    if (!name || state.spinners?.repos || !state.Service?.network?.active)
+    if (!name || !chain || state.spinners?.repos || !state.Service?.network?.active || !state.supportedChains)
       return;
 
-    const chainId = state.Service?.network?.active?.chain_id;
-
-    const key = `bepro.network:repos:${name}:${chainId}`;
+    const key = `bepro.network:repos:${name}:${chain.chainId}`;
     const storage = new WinStorage(key, 3600, `sessionStorage`);
     
     if (storage.value && !force) {
@@ -50,7 +50,7 @@ export function useRepos() {
     dispatch(changeLoadState(true));
     dispatch(changeSpinners.update({repos: true}));
 
-    getReposList(force, name.toString(), chainId)
+    getReposList(force, name.toString(), chain.chainId.toString())
       .then(repos => {
         if (!repos) {
           console.error(`No repos found for`, name);
