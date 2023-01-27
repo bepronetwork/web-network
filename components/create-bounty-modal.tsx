@@ -605,7 +605,7 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!Service?.network.active.tokens || !showCreateBounty)
+    if (!Service?.network?.active?.tokens || !showCreateBounty)
       return;
 
     const tokens = Service?.network.active.tokens || [];
