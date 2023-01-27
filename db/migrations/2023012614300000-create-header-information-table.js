@@ -25,7 +25,6 @@ module.exports = {
       last_price_used: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         defaultValue: []
-
       },
       createdAt: {
         allowNull: false,
