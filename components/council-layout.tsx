@@ -15,12 +15,14 @@ import { Curator } from "interfaces/curators";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import {useNetwork} from "x-hooks/use-network";
 
 export default function CouncilLayout({ children }) {
-  const { asPath, query, push } = useRouter();
+  const { asPath, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
+  const { chain } = useChain();
   const { state, dispatch} = useAppState();
   const { getURLWithNetwork } = useNetwork();
   const { getTotalBounties, searchCurators, searchIssues } = useApi();
@@ -76,13 +78,13 @@ export default function CouncilLayout({ children }) {
   ]
 
   async function loadTotals() {
-    if (!state.Service?.network?.active?.name || !query?.chain) return;
+    if (!state.Service?.network?.active?.name || !chain) return;
     
     const [totalBounties, onNetwork, curators, distributed] = await Promise.all([
-      getTotalBounties("ready", state.Service?.network?.active?.name),
+      getTotalBounties(state.Service?.network?.active?.name, "ready"),
       searchCurators({
         networkName: state.Service?.network?.active?.name,
-        chainShortName: query.chain.toString()
+        chainShortName: chain.chainShortName
       }).then(({ rows }) => rows),
       searchIssues({
         state: "closed",
@@ -127,7 +129,7 @@ export default function CouncilLayout({ children }) {
 
   useEffect(() => {
     loadTotals();
-  }, [state.Service?.network?.active?.name, query?.chain]);
+  }, [state.Service?.network?.active?.name, chain]);
 
   return (
     <div>
