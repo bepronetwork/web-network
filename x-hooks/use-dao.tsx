@@ -15,9 +15,10 @@ import UseNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
 
-  const {state, dispatch} = useAppState();
+  const {query, replace, asPath} = useRouter();
   const {publicRuntimeConfig} = getConfig();
-  const {replace, asPath} = useRouter();
+
+  const {state, dispatch} = useAppState();
   const { handleAddNetwork } = UseNetworkChange();
 
   /**
@@ -53,7 +54,7 @@ export function useDao() {
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    if (!state.connectedChain?.matchWithNetworkChain)
+    if (!state.connectedChain?.matchWithNetworkChain || query?.chain !== state.connectedChain?.shortName)
       return;
 
     const service = state.Service.active;
