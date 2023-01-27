@@ -1,11 +1,11 @@
 import {ReactElement, ReactNode, useEffect, useState} from "react";
 
 import {Defaults} from "@taikai/dappkit";
+import clsx from "clsx";
+import { useTranslation } from "next-i18next";
 import {useRouter} from "next/router";
 
-import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
-import LogoPlaceholder from "assets/icons/logo-placeholder";
 import PlusIcon from "assets/icons/plus-icon";
 
 import Button from "components/button";
@@ -13,6 +13,7 @@ import ClosedNetworkAlert from "components/closed-network-alert";
 import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
+import BrandLogo from "components/main-nav/brand-logo";
 import NavAvatar from "components/nav-avatar";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import SelectNetworkDropdown from "components/select-network-dropdown";
@@ -29,6 +30,8 @@ import useApi from "x-hooks/use-api";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 
+import NavLinks from "./nav-links";
+
 interface MyNetworkLink {
   href: string;
   label: string | ReactElement;
@@ -37,6 +40,7 @@ interface MyNetworkLink {
 
 export default function MainNav() {
   const { pathname, query, asPath, push } = useRouter();
+  const { t } = useTranslation("common");
 
   const [showHelp, setShowHelp] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
@@ -51,8 +55,43 @@ export default function MainNav() {
   const { getURLWithNetwork } = useNetwork();
   const { handleAddNetwork } = useNetworkChange();
 
-  const noNeedNetworkInstance = ["/","/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);
-  const fullLogoUrl = state.Service?.network?.active?.fullLogo;
+  const noNeedNetworkInstance = [
+    "/",
+    "/networks", 
+    "/new-network", 
+    "/explore", 
+    "/leaderboard", 
+    "/setup"
+  ].includes(pathname);
+
+  const networkLogo = state.Service?.network?.active?.fullLogo;
+  const fullLogoUrl = networkLogo && `${state.Settings?.urls?.ipfs}/${networkLogo}`;
+  const brandHref = noNeedNetworkInstance ? "/" : getURLWithNetwork("/", {
+    network: state.Service?.network?.active?.name,
+  });
+
+  const links = [
+    {
+      href: noNeedNetworkInstance ? "/bounty-hall" : getURLWithNetwork("/"),
+      label: t("main-nav.nav-avatar.bounties"),
+      isVisible: true
+    },
+    {
+      href: getURLWithNetwork("/curators"),
+      label: t("main-nav.council"),
+      isVisible: !noNeedNetworkInstance && pathname !== "/[network]"
+    },
+    {
+      href: "/networks",
+      label: t("main-nav.networks"),
+      isVisible: true
+    },
+    {
+      href: "/leaderboard",
+      label: t("main-nav.leaderboard"),
+      isVisible: true
+    }
+  ];
 
   useEffect(() => {
     if (!state.Service?.active || !state.currentUser?.walletAddress || !noNeedNetworkInstance) return;
@@ -77,37 +116,12 @@ export default function MainNav() {
   }, [state.Service?.active, state.currentUser?.walletAddress, noNeedNetworkInstance]);
 
   function handleNewBounty () {
-    if(!window.ethereum) return dispatch(changeShowWeb3(true))
-    return dispatch(changeShowCreateBounty(true))
-    
-  }
-  
-  function LinkExplore() {
-    return (
-      <InternalLink
-        className="mt-1"
-        href={"/explore"}
-        blank={!noNeedNetworkInstance}
-        label={<Translation label={"main-nav.explorer"} />}
-        nav
-        uppercase
-        icon={!noNeedNetworkInstance ? <ExternalLinkIcon className="mb-1" width={12} height={12} />:null}
-      />
-    );
-  }
+    if(!window.ethereum) return dispatch(changeShowWeb3(true));
+
+    return dispatch(changeShowCreateBounty(true));
 
   }
 
-  function LinkNetworks() {
-    return(
-      <InternalLink
-        href={"/networks"}
-        label={<Translation label={"main-nav.networks"} />}
-        nav
-        uppercase
-      />
-    )
-  }
   function handleNetworkSelected(chain: SupportedChainData) {
     if (noNeedNetworkInstance) {
       handleAddNetwork(chain).catch(() => null);
@@ -125,95 +139,35 @@ export default function MainNav() {
     }), newAsPath);
   }
 
-  function LinkLeaderBoard() {
-    return (
-      <InternalLink
-      href={"/leaderboard"}
-      label={<Translation label={"main-nav.leaderboard"} />}
-      nav
-      uppercase
-      />
-    )
-  }
-
-  function LinkBounties() {
-    return (
-      <InternalLink
-        href={noNeedNetworkInstance ? "/bounty-hall" : getURLWithNetwork("/")}
-        label={<Translation label={"main-nav.nav-avatar.bounties"} />}
-        nav
-        uppercase
-      />
-    )
-  }
-
-  const brandLogo = !noNeedNetworkInstance ? (
-    fullLogoUrl ? (
-      <img
-        src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
-        width={104}
-        height={40}
-      />
-    ) : (
-      <LogoPlaceholder />
-    )
-  ) : (
-    <img src={`/images/Bepro_Logo_Light.svg`} width={104} height={40} />
-  );
-
   return (
     <div className="nav-container">
-      {console.log("### mainnav", state.Service?.network?.active)}
-      {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
+      <ClosedNetworkAlert
+        isVisible={state.Service?.network?.active?.isClosed}
+      />
+
       <div className="main-nav d-flex flex-column justify-content-center">
         <div
-          className={`d-flex flex-row align-items-center justify-content-between px-3 ${
+          className={clsx([
+            "d-flex flex-row align-items-center justify-content-between px-3",
             state.currentUser?.walletAddress ? "py-0" : "py-3"
-          }`}
+          ])}
         >
-          <div className="d-flex">
-            {brandLogo}
-            {(!noNeedNetworkInstance && (
-              <ul className="nav-links">
-                <li className="select-network-dropdown">
-                  <SelectNetworkDropdown onSelect={(chain) => handleNetworkSelected(chain)} />
-                </li>
-                <li>
-                  <LinkBounties />
-                </li>
-                <li>
-                  <InternalLink
-                    href={getURLWithNetwork("/curators", {
-                      type: "ready-to-propose"
-                    })}
-                    label={<Translation label={"main-nav.council"} />}
-                    nav
-                    uppercase
-                  />
-                </li>
-                <li>
-                  <LinkNetworks/>
-                </li>
-                <li>
-                  <LinkLeaderBoard />
-                </li>
-                <li>
-                  <LinkExplore />
-                </li>
-              </ul>
-            )) || (
-              <ul className="nav-links">
-                <li>
-                  <LinkNetworks/>
-                </li>
-                <li>
-                  <LinkLeaderBoard />
-                </li>
-                <li>
-                  <LinkExplore />
-                </li>
-              </ul>
-            )}
+          <div className="d-flex gap-4">
+            <BrandLogo
+              href={brandHref}
+              logoUrl={fullLogoUrl}
+              showDefaultBepro={noNeedNetworkInstance}
+            />
+
+            <SelectNetworkDropdown 
+              onSelect={(chain) => handleNetworkSelected(chain)}
+              isOnNetwork={!noNeedNetworkInstance}
+              className="select-network-dropdown"
+            />
+
+            <NavLinks
+              links={links}
+            />
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">
