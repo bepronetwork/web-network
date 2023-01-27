@@ -34,6 +34,7 @@ export interface Network {
   oracleExchangeRate?: number;
   mergeCreatorFeeShare?: number;
   proposerFeeShare?: number;
+  cancelableTime?: number;
   percentageNeededForDispute?: number;
   treasury?: TreasuryInfo;
   isRegistered?: boolean;
