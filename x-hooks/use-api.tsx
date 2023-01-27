@@ -16,6 +16,7 @@ import {
   SearchActiveNetworkParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
+import { HeaderNetworksProps } from "interfaces/header-information";
 import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
 import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 import { Network } from "interfaces/network";
@@ -485,6 +486,19 @@ export default function useApi() {
         throw error;
       });
   }
+
+  async function getHeaderNetworks() {
+    return api
+      .get<HeaderNetworksProps>(`/header/networks`)
+      .then(({ data }) => ({
+        ...data,
+        TVL: BigNumber(data.TVL),
+        last_price_used: data.last_price_used.map(v => BigNumber(v))
+      }))
+      .catch((error) => {
+        throw error;
+      });
+  }
   
   async function getTokens() {
     return api
@@ -683,6 +697,7 @@ export default function useApi() {
     getIssue,
     getPayments,
     getNetwork,
+    getHeaderNetworks,
     getPendingFor,
     getProposal,
     getPullRequestIssue,
