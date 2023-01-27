@@ -125,6 +125,7 @@ export default function TokenConfiguration({
       <NetworkTokenConfig
         onChange={fields.settlerToken.setter}
         registryToken={registryToken}
+        settlerToken={tokens?.settler}
       />
 
       <Divider />
