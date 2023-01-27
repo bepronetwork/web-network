@@ -18,6 +18,7 @@ import Curators from './curator-model'
 import Disputes from './dispute-model';
 import LeaderBoard from './leaderboard.model';
 import ProposalDistributions from './proposal-distributions.model';
+import HeaderInformation from './header-information';
 
 const Database = { sequelize: null };
 
@@ -43,6 +44,7 @@ Database.curator = Curators;
 Database.dispute = Disputes;
 Database.leaderBoard = LeaderBoard;
 Database.proposalDistributions = ProposalDistributions;
+Database.headerInformation = HeaderInformation;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {
