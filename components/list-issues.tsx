@@ -168,7 +168,8 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name || inView === false || !chain) return;
+    if (router.pathname === "/[network]" && !networkName ||
+        (router.pathname.includes("/[network]/[chain]") || !networkName || !chain || inView === false)) return;
 
     dispatch(changeLoadState(true));
 
@@ -186,8 +187,8 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      chainId: chain.chainId.toString(),
-      networkName: allNetworks ? "" : networkName.toString(),
+      chainId: chain?.chainId?.toString(),
+      networkName: networkName?.toString(),
       allNetworks: allNetworks ? allNetworks : ""
     })
       .then(async ({ rows, pages, currentPage }) => {

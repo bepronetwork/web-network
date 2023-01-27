@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
 
+import { Network } from "interfaces/network";
+import { Payment } from "interfaces/payments";
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
-
-import { Payment } from "./payments";
 
 export type IssueState =
   | "pending"
@@ -55,13 +55,7 @@ export interface IssueData {
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
   payments: Payment[];
-  network?: {
-    colors: {
-        primary: string;
-    };
-    name: string;
-    logoIcon: string;
-  }
+  network?: Network;
   tags: string[];
 }
 

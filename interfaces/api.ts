@@ -42,6 +42,7 @@ export interface SearchActiveNetworkParams {
   order?: string;
   isClosed?: boolean;
   isRegistered?: boolean;
+  name?: string;
 }
 
 export interface CreatePrePullRequestParams extends RequestParams {

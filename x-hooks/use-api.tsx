@@ -308,16 +308,18 @@ export default function useApi() {
     return api.get<number>("/search/users/total").then(({ data }) => data);
   }
   
-  async function getTotalBounties(state = "", networkName = ""): Promise<number> {
+  async function getTotalBounties(networkName = "", state = ""): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return api.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
 
-  async function getTotalNetworks(creatorAddress = "",
-                                  isClosed = undefined,
-                                  isRegistered = undefined): Promise<number> {
+  async function getTotalNetworks(name = "",
+                                  creatorAddress = "",
+                                  isClosed = false,
+                                  isRegistered = true): Promise<number> {
     const search = new URLSearchParams({ 
       creatorAddress,
+      name,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
     }).toString();
@@ -617,13 +619,15 @@ export default function useApi() {
     sortBy = "updatedAt",
     order = "DESC",
     isClosed = undefined,
-    isRegistered = undefined
+    isRegistered = undefined,
+    name = ""
   }: SearchActiveNetworkParams) {
     const params = new URLSearchParams({
       page,
       creatorAddress,
       sortBy,
       order,
+      name,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
     }).toString();
