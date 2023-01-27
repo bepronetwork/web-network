@@ -31,7 +31,8 @@ export interface SearchNetworkParams {
   isRegistered?: boolean;
   isDefault?: boolean;
   isNeedCountsAndTokensLocked?: boolean;
-  chainId?: string | number;
+  chainId?: string;
+  includeAssociations?: boolean;
 }
 
 export interface SearchActiveNetworkParams {

@@ -1,0 +1,1 @@
+export const OPEN_STATES = ["draft", "open", "ready", "proposal"];

@@ -26,16 +26,17 @@ interface includeProps {
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const {
-    name,
-    creatorAddress,
-    networkAddress,
-    isClosed,
-    isRegistered,
-    isDefault,
-    isNeedCountsAndTokensLocked,
-    page,
-    chainId
+  const { 
+    name, 
+    creatorAddress, 
+    networkAddress, 
+    isClosed, 
+    isRegistered, 
+    isDefault, 
+    page, 
+    chainId, 
+    includeAssociations,
+    isNeedCountsAndTokensLocked
   } = req.query || {};
 
   if (name) 
@@ -69,7 +70,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   console.log(`WHERE`, whereCondition);
     
   const include: includeProps[] = [
-      { association: "tokens" }
+    { association: "tokens" },
+    { association: "chain" },
+    ... includeAssociations ? [
+      { association: "networkToken"},
+      { association: "issues"},
+      { association: "curators"}
+    ] : []
   ];
 
   let group: string[] = []

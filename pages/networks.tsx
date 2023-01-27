@@ -84,8 +84,8 @@ export default function NetworksPage() {
         value: +totalConverted,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD",
-        hasConvertedTokens: !!convertedTokens,
-        setListedModalVisibility: () => setIsModalVisible(true)
+        hasNotConvertedTokens: !!Object.keys(notConvertedTokens || {}).length,
+        setNotListedModalVisibility: () => setIsModalVisible(true)
       }
     ]);    
   }, [numberOfNetworks, numberOfBounties, totalConverted, convertedTokens]);
