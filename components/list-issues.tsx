@@ -165,7 +165,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name && inView === false) return;
+    if (!appState.Service?.network?.active?.name || inView === false) return;
 
     dispatch(changeLoadState(true));
 

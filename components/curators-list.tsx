@@ -39,7 +39,7 @@ export default function CuratorsList({ inView }: { inView?: boolean }) {
   const { state, dispatch } = useAppState();
 
   function handlerSearch() {
-    if (!state.Service?.network?.active && inView === false) return;
+    if (!state.Service?.network?.active || inView === false) return;
 
     dispatch(changeLoadState(true));
 
