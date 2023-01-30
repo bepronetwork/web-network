@@ -492,8 +492,7 @@ export default function useApi() {
       .get<HeaderNetworksProps>(`/header/networks`)
       .then(({ data }) => ({
         ...data,
-        TVL: BigNumber(data.TVL),
-        last_price_used: data.last_price_used.map(v => BigNumber(v))
+        TVL: BigNumber(data.TVL)
       }))
       .catch((error) => {
         throw error;
