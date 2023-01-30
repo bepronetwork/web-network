@@ -6,6 +6,7 @@ import Sequelize, {Op} from "sequelize";
 
 import Database from "db/models";
 
+import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
 import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
@@ -13,6 +14,7 @@ import IpfsStorage from "services/ipfs-service";
 import {error as LogError} from 'services/logging';
 
 const {serverRuntimeConfig} = getConfig();
+
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName, creator: creatorAddress, isDefault } = req.query;
@@ -195,45 +197,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     //TODO: move tokens logic to new endpoint   
     if(allowedTokens?.allowedTransactions?.length > 0){
       for (const token of allowedTokens.allowedTransactions) {
-        const [networkToken, created]= await Database.networkTokens.findOrCreate({
-          where: {
-            networkId: network.id,
-            tokenId: token.id,
-          },
-          defaults: {
-            networkId: network.id,
-            tokenId: token.id,
-            isTransactional:  true,
-            isReward: false
-          }
-        })
-
-        if(!created) {
-          networkToken.isTransactional = true
-          await networkToken.save()
-        }
+        await handlefindOrCreateTokens(token.id, network.id, 'transactional')
       }
     }
 
     if(allowedTokens?.allowedRewards?.length > 0){
       for (const token of allowedTokens.allowedRewards) {
-        const [networkToken, created]= await Database.networkTokens.findOrCreate({
-          where: {
-            networkId: network.id,
-            tokenId: token.id,
-          },
-          defaults: {
-            networkId: network.id,
-            tokenId: token.id,
-            isTransactional:  false,
-            isReward: true
-          }
-        })
-
-        if(!created) {
-          networkToken.isReward = true
-          await networkToken.save()
-        }
+        await handlefindOrCreateTokens(token.id, network.id, 'reward')
       }
     }
 
@@ -442,68 +412,23 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if(allowedTokens?.transactional?.length > 0){ 
       for (const id of allowedTokens.transactional) {
-        const [networkToken, created]= await Database.networkTokens.findOrCreate({
-          where: {
-            networkId: network.id,
-            tokenId: id,
-          },
-          defaults: {
-            networkId: network.id,
-            tokenId: id,
-            isTransactional:  true,
-            isReward: false
-          }
-        })
-
-        if(!created) {
-          networkToken.isTransactional = true
-          await networkToken.save()
-        }
+        await handlefindOrCreateTokens(id, network.id, 'transactional')
       }
     }
+
     const transactionalTokens = network_tokens.filter(e => e.isTransactional)
     for (const token of transactionalTokens){
-      if(!allowedTokens.transactional.find((id) => id === token.tokenId)){
-        if(token.isReward === false){
-          await token.destroy();
-        } else {
-          token.isTransactional = false;
-          await token.save();
-        } 
-      } 
+      await handleRemoveTokens(allowedTokens.transactional, token, 'transactional')
     }
 
     if(allowedTokens?.reward?.length > 0){
       for (const id of allowedTokens.reward) {
-        const [networkToken, created]= await Database.networkTokens.findOrCreate({
-          where: {
-            networkId: network.id,
-            tokenId: id,
-          },
-          defaults: {
-            networkId: network.id,
-            tokenId: id,
-            isTransactional:  false,
-            isReward: true
-          }
-        })
-
-        if(!created) {
-          networkToken.isReward = true
-          await networkToken.save()
-        }
+        await handlefindOrCreateTokens(id, network.id, 'reward')
       }
-    }
+    } 
     const rewardTokens = network_tokens.filter(e => e.isReward)
     for (const token of rewardTokens){
-      if(!allowedTokens.reward.find((id) => id === token.tokenId)){
-        if(token.isTransactional === false){
-          await token.destroy();
-        } else {
-          token.isReward = false;
-          await token.save();
-        } 
-      }
+      await handleRemoveTokens(allowedTokens.reward, token, 'reward')
     }
 
     if (removingRepos.length && !isAdminOverriding)
