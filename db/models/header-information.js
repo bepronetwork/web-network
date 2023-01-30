@@ -24,8 +24,7 @@ class HeaderInformation extends Model {
           defaultValue: 0
         },
         last_price_used: {
-          type: DataTypes.ARRAY(DataTypes.STRING),
-          defaultValue: []
+          type: DataTypes.JSON
         }
       },
       {

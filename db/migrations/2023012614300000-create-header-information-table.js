@@ -23,8 +23,8 @@ module.exports = {
         defaultValue: 0
       },
       last_price_used: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-        defaultValue: []
+        type: Sequelize.JSON,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
