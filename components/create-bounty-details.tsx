@@ -150,7 +150,6 @@ export default function CreateBountyDetails({
 
       <div className="form-group">
         <label htmlFor="" className="caption-small mb-2">{t("fields.tags")}</label>
-
         <ReactSelect
           value={selectedTags.map(tag => ({ label: tag, value: tag }))}
           options={TAGS_OPTIONS}

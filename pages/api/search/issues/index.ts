@@ -180,6 +180,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
       }).then(data => handleNetworkValues(data))
 
+
       const result = [];
 
       result.push(...issues.filter(({ title, body, tags }) =>
