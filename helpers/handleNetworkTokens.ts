@@ -1,6 +1,6 @@
 import Database from "db/models";
 
-//
+//checks if it exists in the base, creates it if necessary and if it exists, adds the boolean for the correct value
 export const handlefindOrCreateTokens = async (tokenId: number,
                                                networkId: number,
                                                type: "transactional" | "reward") => {
@@ -24,7 +24,7 @@ export const handlefindOrCreateTokens = async (tokenId: number,
   }
 }
 
-//
+//anticipates the need to remove if both conditions are false. and changes the condition of a column to false if both are true.
 export async function handleRemoveTokens(allowedTokens,
                                          token,
                                          type: "transactional" | "reward") {
