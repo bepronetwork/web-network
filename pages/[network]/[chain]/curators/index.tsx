@@ -46,8 +46,8 @@ export default function PageCouncil() {
 
   return (
     <CouncilLayout>
-      {types[type.toString()]
-        ? types[type.toString()]
+      {types[type?.toString()]
+        ? types[type?.toString()]
         : types["ready-to-propose"]}
     </CouncilLayout>
   );
