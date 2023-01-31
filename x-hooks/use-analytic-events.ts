@@ -1,10 +1,11 @@
 import getConfig from "next/config";
 import {event} from "nextjs-google-analytics";
 
-import {useAppState} from "../contexts/app-state";
-import {analyticEvents} from "../helpers/analytic-events";
-import {Analytic, EventName} from "../interfaces/analytics";
+import {useAppState} from "contexts/app-state";
 
+import {analyticEvents} from "helpers/analytic-events";
+
+import {Analytic, EventName} from "interfaces/analytics";
 
 export default function useAnalyticEvents() {
 
@@ -16,7 +17,7 @@ export default function useAnalyticEvents() {
    * @param eventName name of the event to be sent (must exist in analyticsEvents const)
    * @param details details to be sent in that event
    */
-  function pushAnalytic(eventName: EventName, details: {[options: string]: string} = {}) {
+  function pushAnalytic(eventName: EventName, details: {[options: string]: string | boolean} = {}) {
 
     function getCallback({type}: Analytic) {
       // console.debug(`Trying to push ${eventName} with type ${type}`, details)

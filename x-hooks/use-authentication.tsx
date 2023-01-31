@@ -24,39 +24,34 @@ import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
+import {EventName} from "interfaces/analytics";
 import {CustomSession} from "interfaces/custom-session";
 
 import {WinStorage} from "services/win-storage";
 
+import useAnalyticEvents from "x-hooks/use-analytic-events";
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
+import useSignature from "x-hooks/use-signature";
 import {useTransactions} from "x-hooks/use-transactions";
-
-import {EventName} from "../interfaces/analytics";
-import useAnalyticEvents from "./use-analytic-events";
-import useSignature from "./use-signature";
-import {changeChain} from "../contexts/reducers/change-chain";
-import {IM_AN_ADMIN} from "../helpers/contants";
-import useSignature from "./use-signature";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
 export function useAuthentication() {
   const session = useSession();
-  const {publicRuntimeConfig} = getConfig()
+  const {asPath, push} = useRouter();
+  const {publicRuntimeConfig} = getConfig();
   
   const {connect} = useDao();
   const { chain } = useChain();
-  const {asPath, push} = useRouter();
   const transactions = useTransactions();
+  const { signMessage } = useSignature();
   const {state, dispatch} = useAppState();
   const { loadNetworkAmounts } = useNetwork();
-  const {publicRuntimeConfig} = getConfig()
   const { pushAnalytic } = useAnalyticEvents();
 
-  const {asPath, push} = useRouter();
   const {getUserOf, getUserWith, searchCurators} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));

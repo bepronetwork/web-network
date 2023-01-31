@@ -7,15 +7,16 @@ import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
+import {chainFromHeader} from "helpers/chain-from-header";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
+
+import {error} from "services/logging";
+
 import {GraphQlResponse} from "types/octokit";
-
-
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../../helpers/res-json-message";
-import {LogAccess} from "../../../../middleware/log-access";
-import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
-import WithCors from "../../../../middleware/withCors";
-import {error} from "../../../../services/logging";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -30,7 +31,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         name: {
           [Op.iLike]: String(networkName)
         },
-        // chain_id: {[Op.eq]: +chain?.chainId}
+        chain_id: {[Op.eq]: +chain?.chainId}
       }
     });
 
@@ -96,8 +97,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function PullRequestReview(req: NextApiRequest,
-                                 res: NextApiResponse) {
+async function PullRequestReview(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
     await put(req, res);
