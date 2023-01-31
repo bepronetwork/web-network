@@ -18,8 +18,11 @@ export const handlefindOrCreateTokens = async (tokenId: number,
   });
 
   if (!created) {
-    if(type === "transactional") networkToken.isTransactional = type === "transactional"
-    else if(type === "reward") networkToken.isReward = type === "reward"
+    if(type === "transactional") 
+      networkToken.isTransactional = true
+    else if(type === "reward") 
+      networkToken.isReward = true
+  
     await networkToken.save();
   }
 }
