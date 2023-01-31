@@ -61,7 +61,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.updateWalletAddress, [currentUser]);
   useEffect(auth.listenToAccountsChanged, [Service]);
   useEffect(auth.updateWalletBalance, [currentUser?.walletAddress, Service?.active?.network]);
-  useEffect(auth.signMessageIfAdmin, [currentUser?.walletAddress]);
+  useEffect(auth.signMessageIfAdmin, [currentUser?.walletAddress, connectedChain]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [currentUser?.walletAddress]);
   

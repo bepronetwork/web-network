@@ -36,7 +36,7 @@ export default function useSignature() {
         return res(undefined);
       };
 
-      if (Service.active)
+      if (Service.active?.web3Connection?.Web3?.currentProvider?.hasOwnProperty("sendAsync"))
         Service.active?.web3Connection.Web3.currentProvider.sendAsync(payload, _promise);
       else if (window.ethereum) 
         window.ethereum.request(payload).then(v => _promise(null, {result: v})).catch(e => _promise(e, null));
