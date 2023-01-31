@@ -7,6 +7,9 @@ import models from "db/models";
 import {Settings} from "helpers/settings";
 import {LogAccess} from "../../../middleware/log-access";
 
+import {RouteMiddleware} from "middleware";
+import {withCors} from "middleware";
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
     ids: [repoId, ghId]

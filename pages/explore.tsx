@@ -35,8 +35,10 @@ export default function ExplorePage() {
     }
   ]);
 
-  const heroTitle = networkName ? `${networkName.replace(/^\w/, c => c.toUpperCase())} Bounty Hall` : t("bounty:title-bounties");
-  const heroSubTitle = networkName ? `A collection of the most recent bounties of ${networkName} networks` : t("bounty:sub-title-bounties");
+  const heroTitle = networkName ? 
+    `${networkName.replace(/^\w/, c => c.toUpperCase())} Bounty Hall` : t("bounty:title-bounties");
+  const heroSubTitle = networkName ? 
+    `A collection of the most recent bounties of ${networkName} networks` : t("bounty:sub-title-bounties");
 
   useEffect(() => {
     getTotalNetworks(networkName).then(setNumberOfNetworks);

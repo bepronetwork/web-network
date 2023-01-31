@@ -4,6 +4,9 @@ import models from "db/models";
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
+import {RouteMiddleware} from 'middleware';
+import {withCors} from 'middleware';
+
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const userCount = await models.user.count();
 

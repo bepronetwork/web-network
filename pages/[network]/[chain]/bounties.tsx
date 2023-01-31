@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
 
-import {ERC20} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";

@@ -4,6 +4,9 @@ import {Bus} from "helpers/bus";
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
+import {RouteMiddleware} from "middleware";
+import {withCors} from "middleware";
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
     info: [login, scId, ghPrId]

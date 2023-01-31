@@ -1,5 +1,6 @@
 import {SetStateAction} from "react";
 import {Col} from "react-bootstrap";
+
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";

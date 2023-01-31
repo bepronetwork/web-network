@@ -2,19 +2,20 @@ import {useEffect, useState} from "react";
 
 import {useTranslation} from "next-i18next";
 
+import Translation from "components/translation";
+
+import {useAppState} from "contexts/app-state";
+
 import {formatNumberToNScale} from "helpers/formatNumber";
 
-import {useAppState} from "../contexts/app-state";
-import Translation from "./translation";
-
 export default function ProposalProgressBar({
-                                              isDisputed = null,
-                                              issueDisputeAmount = 0,
-                                              isFinished = false,
-                                              isMerged = false,
-                                              refused = false,
-                                              disputeMaxAmount = 0,
-                                            }) {
+  isDisputed = null,
+  issueDisputeAmount = 0,
+  isFinished = false,
+  isMerged = false,
+  refused = false,
+  disputeMaxAmount = 0,
+}) {
   const { t } = useTranslation("proposal");
 
   const {state} = useAppState();
@@ -128,7 +129,11 @@ export default function ProposalProgressBar({
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
             /{formatNumberToNScale(state.currentUser?.balance?.staked?.toNumber() || 0)}{" "}
-            <Translation label="$oracles" params={{ token: state.Service?.network?.networkToken?.symbol }}/>{" "}
+            
+            <Translation 
+              label="$oracles" 
+              params={{ token: state.Service?.network?.active?.networkToken?.symbol }}
+            />{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>
         </div>

@@ -21,9 +21,9 @@ export default function Index() {
       return;
 
     if (state?.supportedChains?.length)
-      replace(`/networks`).then(() => {});
+      replace(`/networks`);
     else if (state.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase())
-      replace(`/setup`).then(() => {});
+      replace(`/setup`);
 
   }, [state?.supportedChains]);
 

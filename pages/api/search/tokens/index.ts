@@ -1,8 +1,9 @@
-import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import Database from "db/models";
+
+import {withCors} from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {networkName} = req.query

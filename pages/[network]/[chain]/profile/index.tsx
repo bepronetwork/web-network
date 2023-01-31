@@ -25,7 +25,6 @@ export default function Profile() {
 
   const { disconnectGithub } = useAuthentication();
 
-  const isConnected = !!state.currentUser?.login && !!state.currentUser?.walletAddress;
   const addressOrUsername = 
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 

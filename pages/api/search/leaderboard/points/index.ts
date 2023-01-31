@@ -8,6 +8,9 @@ import paginate, {calculateTotalPages} from "helpers/paginate";
 import {LogAccess} from "../../../../../middleware/log-access";
 import WithCors from "../../../../../middleware/withCors";
 
+import {RouteMiddleware} from "middleware";
+import { withCors } from "middleware";
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};

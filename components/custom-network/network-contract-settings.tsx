@@ -7,11 +7,10 @@ import {useNetworkSettings} from "contexts/network-settings";
 
 import {formatNumberToCurrency} from "helpers/formatNumber";
 
-
 export default function NetworkContractSettings() {
   const {t} = useTranslation(["common", "custom-network"]);
+  
   const {state} = useAppState();
-
   const {fields, settings, LIMITS} = useNetworkSettings();
   
   const handleDraftTimeChange = value => fields.parameter.setter({ label: "draftTime", value });
@@ -22,7 +21,7 @@ export default function NetworkContractSettings() {
   const handlePercentageForDisputeChange = 
     value => fields.parameter.setter({ label: "percentageNeededForDispute", value });
 
-  const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
 
   const parameterInputs = [
     { 

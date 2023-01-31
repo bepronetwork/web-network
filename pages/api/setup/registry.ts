@@ -1,19 +1,17 @@
-import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import Database from "db/models";
 
-import {Settings} from "helpers/settings";
+import {chainFromHeader} from "helpers/chain-from-header";
+import {CHAIN_NOT_CONFIGURED, NOT_AN_ADMIN} from "helpers/contants";
+import {isAdmin} from "helpers/is-admin";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {withCors} from "middleware";
 
 import DAO from "services/dao-service";
 import {error as LogError, log as Log, Logger} from 'services/logging';
 
-import {SettingsType} from "types/settings";
-
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {CHAIN_NOT_CONFIGURED, NOT_AN_ADMIN} from "../../../helpers/contants";
-import {isAdmin} from "../../../helpers/is-admin";
-import {resJsonMessage} from "../../../helpers/res-json-message";
 import {LogAccess} from "../../../middleware/log-access";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
