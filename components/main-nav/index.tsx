@@ -1,6 +1,5 @@
 import {ReactElement, ReactNode, useEffect, useState} from "react";
 
-import {Defaults} from "@taikai/dappkit";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import {useRouter} from "next/router";
@@ -14,6 +13,7 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
 import BrandLogo from "components/main-nav/brand-logo";
+import NavLinks from "components/main-nav/nav-links";
 import NavAvatar from "components/nav-avatar";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import SelectNetworkDropdown from "components/select-network-dropdown";
@@ -30,8 +30,6 @@ import useApi from "x-hooks/use-api";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 
-import NavLinks from "./nav-links";
-
 interface MyNetworkLink {
   href: string;
   label: string | ReactElement;
@@ -39,15 +37,17 @@ interface MyNetworkLink {
 }
 
 export default function MainNav() {
-  const { pathname, query, asPath, push } = useRouter();
   const { t } = useTranslation("common");
+  const { pathname, query, asPath, push } = useRouter();
 
-  const [showHelp, setShowHelp] = useState(false);
-  const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
+  const newNetworkObj = { 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
     icon: <PlusIcon /> 
-  });
+  };
+
+  const [showHelp, setShowHelp] = useState(false);
+  const [myNetwork, setMyNetwork] = useState<MyNetworkLink>(newNetworkObj);
   
   const { state } = useAppState();
   const { dispatch } = useAppState();
@@ -94,28 +94,24 @@ export default function MainNav() {
   ];
 
   useEffect(() => {
-    if (!state.Service?.active ||
-        !state.currentUser?.walletAddress ||
-        !noNeedNetworkInstance) return;
+    if (!state.currentUser?.walletAddress || !noNeedNetworkInstance)
+      return;
 
-    state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
-      .then(async networkAddress => {
-        if (networkAddress === Defaults.nativeZeroAddress) 
-          return setMyNetwork({ 
-            label: <Translation label={"main-nav.new-network"} />, 
-            href: "/new-network", 
-            icon: <PlusIcon /> 
+    searchNetworks({
+      creatorAddress: state.currentUser?.walletAddress,
+      chainId: state.connectedChain?.id
+    })
+      .then(({ count, rows }) => {
+        if (count === 0)
+          setMyNetwork(newNetworkObj);
+        else
+          setMyNetwork({ 
+            label: <Translation label={"main-nav.my-network"} />, 
+            href: `/${rows[0]?.name?.toLowerCase()}${rows[0]?.isRegistered ? "" : "/profile/my-network"}`
           });
-
-        const network = await searchNetworks({ networkAddress }).then(({ rows }) => rows[0]);
-
-        setMyNetwork({ 
-          label: <Translation label={"main-nav.my-network"} />, 
-          href: `/${network?.name?.toLowerCase()}${network?.isRegistered ? "" : "/profile/my-network"}`
-        });
       })
       .catch(error => console.debug("Failed to get network address by wallet", error));
-  }, [state.Service?.active, state.currentUser?.walletAddress, noNeedNetworkInstance]);
+  }, [state.currentUser?.walletAddress, state.connectedChain, noNeedNetworkInstance]);
 
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true));
