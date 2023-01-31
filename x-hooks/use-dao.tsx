@@ -9,8 +9,11 @@ import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service"
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 import {toastError,} from "contexts/reducers/change-toaster";
 
+import { SupportedChainData } from "interfaces/supported-chain-data";
+
 import DAO from "services/dao-service";
 
+import useChain from "x-hooks/use-chain";
 import UseNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
@@ -18,8 +21,13 @@ export function useDao() {
   const {query, replace, asPath} = useRouter();
   const {publicRuntimeConfig} = getConfig();
 
+  const { chain } = useChain();
   const {state, dispatch} = useAppState();
   const { handleAddNetwork } = UseNetworkChange();
+
+  function isChainConfigured(chain: SupportedChainData) {
+    return isAddress(chain?.registryAddress) && !isZeroAddress(chain?.registryAddress);
+  }
 
   /**
    * Enables the user/dapp to connect to the active DAOService
@@ -46,20 +54,20 @@ export function useDao() {
    * @param networkAddress
    */
   function changeNetwork() {
-    const networkAddress = state.Service?.network?.active?.networkAddress;
+    const { networkAddress, chain_id } = state.Service?.network?.active || {};
     
-    if (!state.Service?.active || !networkAddress)
+    if (!state.Service?.active || !networkAddress || !chain)
       return;
 
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    if (!state.connectedChain?.matchWithNetworkChain || query?.chain !== state.connectedChain?.shortName)
-      return;
-
     const service = state.Service.active;
 
-    console.debug("starting network")
+    if (+chain_id !== +chain.chainId || chain.chainRpc !== state.Service?.active?.web3Host)
+      return;
+
+    console.debug("Starting network");
 
     dispatch(changeStarting(true));
 
@@ -67,13 +75,14 @@ export function useDao() {
         .loadNetwork(networkAddress)
         .then(started => {
           if (!started) {
-            console.error(`Failed to load network`, networkAddress);
+            console.error("Failed to load network", networkAddress);
             return;
           }
           dispatch(changeActiveDAO(service));
+          console.debug("Network started");
         })
         .catch(error => {
-          console.error(`Error loading network`, error);
+          console.error("Error loading network", error);
         })
         .finally(() => {
           dispatch(changeStarting(false));
@@ -85,43 +94,59 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   function start() {
-    const connectedChain = state.supportedChains?.find(({chainId}) => +state?.connectedChain?.id === chainId);
-    const activeWeb3Host = state.Service?.active?.web3Host;
-    const hostsDiffer = connectedChain?.chainRpc !== activeWeb3Host;
-    const hasChainRpc = !!connectedChain?.chainRpc;
-    const hasChainRegistry = 
-      isAddress(connectedChain?.registryAddress) && !isZeroAddress(connectedChain?.registryAddress);
+    const supportedChains = state.supportedChains;
 
-    if (!connectedChain)
+    if (!supportedChains?.length) {
+      console.debug("No supported chains found");
       return;
-
-    if (!hasChainRpc || !hasChainRegistry) {
-      console.debug(`Chain not configured`, connectedChain);
-      if (publicRuntimeConfig.adminWallet === state.currentUser?.walletAddress && !asPath.includes(`setup`))
-        replace(`/setup`).then(_ => {});
     }
 
-    if (!hostsDiffer || state.Service?.starting)
+    const activeNetwork = state.Service?.network?.active;
+    const connectedChain = state.connectedChain;
+
+    const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
+      activeNetwork || connectedChain ? +(activeNetwork?.chain_id || connectedChain?.id) === +chainId : isDefault);
+
+    if (!chainToConnect) {
+      console.debug("No default or network chain found");
       return;
+    }
+
+    const isConfigured = isChainConfigured(chainToConnect);
+
+    if (!isConfigured) {
+      console.debug("Chain not configured", chainToConnect);
+
+      if (publicRuntimeConfig.adminWallet === state.currentUser?.walletAddress && !asPath.includes("setup")) {
+        replace("/setup");
+
+        return;
+      }
+    }
+
+    const isSameWeb3Host = chainToConnect.chainRpc === state.Service?.active?.web3Host;
+
+    if (isSameWeb3Host || state.Service?.starting) {
+      console.debug("Already connected to this web3Host or the service is still starting");
+      return;
+    }
+
+    console.debug("Starting DAOService");
 
     dispatch(changeStarting(true));
 
-    const {chainRpc: web3Host, registryAddress} = (connectedChain);
-    
-    let web3Connection = undefined;
+    const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
-    if (state.Service?.active) {
-      web3Connection = state.Service.active.web3Connection;
-      web3Connection.options.web3Host = web3Host;
-    }
+    const registryAddress = isConfigured ? _registry : undefined;
 
-    const daoService = new DAO({web3Connection, web3Host, ... hasChainRegistry ? {registryAddress} : {}});
+    const daoService = new DAO({ web3Host, registryAddress });
 
     daoService.start()
       .then(started => {
         if (started) {
           window.DAOService = daoService;
           dispatch(changeActiveDAO(daoService));
+          console.debug("DAOService started");
         }
       })
       .catch(error => {

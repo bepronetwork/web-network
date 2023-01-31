@@ -185,6 +185,32 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       Logger.error(error, 'Failed to store ipfs');
     }
 
+    const networkToken = await Database.tokens.findOne({
+      where: {
+        address: allowedTokens.settler,
+        chain_id: chain.chainId
+      }
+    });
+
+    let networkTokenId = null;
+
+    if (networkToken)
+      networkTokenId = networkToken.id;
+    else {
+      const { name, symbol } = await DAOService.getERC20TokenData(allowedTokens.settler);
+
+      const createdToken = await Database.tokens.create({
+        address: allowedTokens.settler,
+        chain_id: chain.chainId,
+        isTransactional: false,
+        isAllowed: false,
+        name,
+        symbol
+      });
+
+      networkTokenId = createdToken.id;
+    }
+
     const network = await Database.network.create({
       creatorAddress: creator,
       name: name,
@@ -195,6 +221,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       networkAddress,
       isDefault: isDefault || false,
       chain_id: +chain?.chainId,
+      network_token_id: networkTokenId
     });
 
     const repos = JSON.parse(repositories);

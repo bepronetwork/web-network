@@ -547,9 +547,11 @@ export default function useApi() {
       });
   }
   
-  async function getTokens() {
+  async function getTokens(chainId?: string) {
+    const params = new URLSearchParams({chainId}).toString();
+
     return api
-      .get<Token[]>(`/tokens`)
+      .get<Token[]>(`/tokens?${params}`)
       .then(({ data }) => data)
       .catch((error) => {
         throw error;

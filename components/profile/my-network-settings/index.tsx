@@ -97,6 +97,82 @@ export default function MyNetworkSettings({
 
     setIsUpdating(true);
 
+    const {
+      parameters: {
+        draftTime: { value: draftTime },
+        disputableTime: { value: disputableTime },
+        councilAmount: { value: councilAmount },
+        percentageNeededForDispute: { value: percentageForDispute },
+      },
+    } = settings;
+
+    const networkAddress = network?.networkAddress;
+    const failed = [];
+    const success = {};
+
+    const promises = await Promise.allSettled([
+      ...(draftTime !== forcedNetwork.draftTime
+        ? [
+            handleChangeNetworkParameter("draftTime",
+                                         draftTime,
+                                         networkAddress)
+              .then(() => ({ param: "draftTime", value: draftTime })),
+        ]
+        : []),
+      ...(disputableTime !== forcedNetwork.disputableTime
+        ? [
+            handleChangeNetworkParameter("disputableTime",
+                                         disputableTime,
+                                         networkAddress)
+              .then(() => ({ param: "disputableTime", value: disputableTime })),
+        ]
+        : []),
+      ...(councilAmount !== +forcedNetwork.councilAmount
+        ? [
+            handleChangeNetworkParameter("councilAmount",
+                                         councilAmount,
+                                         networkAddress)
+              .then(() => ({ param: "councilAmount", value: councilAmount })),
+        ]
+        : []),
+      ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
+        ? [
+            handleChangeNetworkParameter("percentageNeededForDispute",
+                                         percentageForDispute,
+                                         networkAddress)
+              .then(() => ({ param: "percentageNeededForDispute", value: percentageForDispute })),
+        ]
+        : []),
+    ]);
+
+    promises.forEach((promise) => {
+      if (promise.status === "fulfilled") success[promise.value.param] = promise.value.value;
+      else failed.push(promise.reason);
+    });
+
+    if (failed.length) {
+      dispatch(toastError(t("custom-network:errors.updated-parameters", {
+            failed: failed.length,
+      }),
+                          t("custom-network:errors.updating-values")));
+      console.error(failed);
+    }
+
+    const successQuantity = Object.keys(success);
+
+    if (successQuantity){
+      if(draftTime !== forcedNetwork.draftTime)
+        Promise.all([
+          await processEvent("bounty","update-draft-time", network.name),
+          await processEvent("bounty","moved-to-open", network.name)
+        ])
+
+      dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
+          updated: successQuantity,
+          total: promises.length,
+      })));
+    }
+
     const json = {
       description: details?.description || "",
       colors: JSON.stringify(settings.theme.colors),
@@ -120,82 +196,11 @@ export default function MyNetworkSettings({
        transactional: tokens?.allowedTransactions.map((token) => token?.id).filter((v) => v),
        reward: tokens?.allowedRewards.map((token) => token?.id).filter((v) => v)
       }
+      parameters: success
     };
 
     updateNetwork(json)
       .then(async () => {
-        const {
-          parameters: {
-            draftTime: { value: draftTime },
-            disputableTime: { value: disputableTime },
-            councilAmount: { value: councilAmount },
-            percentageNeededForDispute: { value: percentageForDispute },
-          },
-        } = settings;
-
-        const networkAddress = network?.networkAddress;
-
-        const promises = await Promise.allSettled([
-          ...(draftTime !== forcedNetwork.draftTime
-            ? [
-                handleChangeNetworkParameter("draftTime",
-                                             draftTime,
-                                             networkAddress),
-            ]
-            : []),
-          ...(disputableTime !== forcedNetwork.disputableTime
-            ? [
-                handleChangeNetworkParameter("disputableTime",
-                                             disputableTime,
-                                             networkAddress),
-            ]
-            : []),
-          ...(councilAmount !== +forcedNetwork.councilAmount
-            ? [
-                handleChangeNetworkParameter("councilAmount",
-                                             councilAmount,
-                                             networkAddress),
-            ]
-            : []),
-          ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
-            ? [
-                handleChangeNetworkParameter("percentageNeededForDispute",
-                                             percentageForDispute,
-                                             networkAddress),
-            ]
-            : []),
-        ]);
-
-        const failed = [];
-        const success = [];
-
-        promises.forEach((promise) => {
-          if (promise.status === "fulfilled") success.push(promise.value);
-          else failed.push(promise.reason);
-        });
-
-        if (failed.length) {
-          dispatch(toastError(t("custom-network:errors.updated-parameters", {
-                failed: failed.length,
-          }),
-                              t("custom-network:errors.updating-values")));
-          console.error(failed);
-        }
-
-        if (success.length){
-          if(draftTime !== forcedNetwork.draftTime)
-            Promise.all([
-              await processEvent("bounty","update-draft-time", network.name),
-              await processEvent("bounty","moved-to-open", network.name)
-            ])
-
-          dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
-              updated: success.length,
-              total: promises.length,
-          })));
-        }
-          
-
         if (isCurrentNetwork) updateActiveNetwork(true);
 
         return updateEditingNetwork();

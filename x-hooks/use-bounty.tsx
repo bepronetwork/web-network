@@ -25,8 +25,8 @@ import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {IssueData, pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import { useNetwork } from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
-
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 
@@ -37,8 +37,9 @@ export function useBounty() {
 
   const {state, dispatch} = useAppState();
 
-  const {query} = useRouter();
   const {getIssue} = useApi();
+  const {query, replace} = useRouter();
+  const { getURLWithNetwork } = useNetwork();
   const { getIssueOrPullRequestComments, getPullRequestDetails, getPullRequestReviews } = useOctokit();
 
   function isCurrentBountyCached() {
@@ -114,8 +115,12 @@ export function useBounty() {
       .then(pullRequests => {
         const extendedPrs = pullRequests.slice(1) as pullRequest[];
         dispatch(changeCurrentBountyData({ ...pullRequests[0], pullRequests: extendedPrs }));
-      });
-
+      })
+      .catch(error => {
+        console.debug("Failed to get database data", error);
+        replace(getURLWithNetwork("/"));
+      })
+      .finally(() => dispatch(changeSpinners.update({bountyDatabase: false})));
   }
 
   function getChainBounty(force = false) {
@@ -147,11 +152,11 @@ export function useBounty() {
         dispatch(changeCurrentBountyDataChain.update(bounty));
 
         state.Service.active.getERC20TokenData(bounty.transactional)
-          .then(token => dispatch(changeCurrentBountyDataTransactional(token)))
+          .then(token => dispatch(changeCurrentBountyDataTransactional(token)));
 
-        if(bounty.rewardToken !== Defaults.nativeZeroAddress)
+        if(bounty.rewardToken && bounty.rewardToken !== Defaults.nativeZeroAddress)
           state.Service.active.getERC20TokenData(bounty.rewardToken)
-              .then(token => dispatch(changeCurrentBountyDataReward(token)))
+              .then(token => dispatch(changeCurrentBountyDataReward(token)));
 
         state.Service.active.isBountyInDraftChain(bounty.creationDate)
           .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));
@@ -164,8 +169,8 @@ export function useBounty() {
           .catch(() => -1)
           .then(value => {
             dispatch(changeCurrentBountyDataIsFinished(value !== 0));
-            dispatch(changeCurrentBountyDataIsInValidation([2].includes(value)))
-            dispatch(changeSpinners.update({bountyChain: false}))
+            dispatch(changeCurrentBountyDataIsInValidation([2].includes(value)));
+            dispatch(changeSpinners.update({bountyChain: false}));
           });
 
       }).catch(error => console.debug("getChainBounty", error));

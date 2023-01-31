@@ -1,7 +1,9 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op, Sequelize} from "sequelize";
+import {Op, Sequelize, WhereOptions} from "sequelize";
 
 import Database from "db/models";
+
+import {RouteMiddleware} from "middleware";
 
 import {error as logError, Logger} from 'services/logging';
 import {LogAccess} from "../../../middleware/log-access";
@@ -10,12 +12,19 @@ import WithCors from "../../../middleware/withCors";
 const colToLower = (colName: string) => Sequelize.fn("LOWER", Sequelize.col(colName));
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { networkName } = req.query;
+  const { networkName, chainId } = req.query;
   
   try {
+    const whereCondition: WhereOptions = {};
+
     let queryParams = {};
 
-    if (networkName)
+    if (chainId)
+      whereCondition.chain_id = +chainId;
+
+    if (networkName) {
+      whereCondition.isAllowed = true;
+
       queryParams = {
         where: {
           [Op.or]: [{ isTransactional: true }, { isReward: true }]
@@ -31,8 +40,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           }
         ]
       };
+    }
+      
 
     const tokens = await Database.tokens.findAll({
+      where: whereCondition,
       ...queryParams
     });
 

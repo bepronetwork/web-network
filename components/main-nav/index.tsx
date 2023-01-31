@@ -94,7 +94,9 @@ export default function MainNav() {
   ];
 
   useEffect(() => {
-    if (!state.Service?.active || !state.currentUser?.walletAddress || !noNeedNetworkInstance) return;
+    if (!state.Service?.active ||
+        !state.currentUser?.walletAddress ||
+        !noNeedNetworkInstance) return;
 
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(async networkAddress => {
@@ -112,7 +114,7 @@ export default function MainNav() {
           href: `/${network?.name?.toLowerCase()}${network?.isRegistered ? "" : "/profile/my-network"}`
         });
       })
-      .catch(console.log);
+      .catch(error => console.debug("Failed to get network address by wallet", error));
   }, [state.Service?.active, state.currentUser?.walletAddress, noNeedNetworkInstance]);
 
   function handleNewBounty () {
