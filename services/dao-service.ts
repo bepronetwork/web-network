@@ -90,7 +90,6 @@ export default class DAO {
 
       const registry = new NetworkRegistry(this.web3Connection, registryAddress || this.registryAddress);
 
-      console.log(`reg`, registryAddress, this.web3Connection.options, this.registryAddress)
       await registry.loadContract();
 
       if (!skipAssignment) this._registry = registry;
@@ -725,7 +724,7 @@ export default class DAO {
       const time = await this.getTimeChain();
       const redeemTime = await this.network.draftTime();
 
-      return (new Date(time) < new Date(creationDateIssue + redeemTime))
+      return (new Date(time) < new Date(creationDateIssue + redeemTime));
     } catch (e) {
       console.error(`Failed to calculate isDraft bounty`, e);
       return null;

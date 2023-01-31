@@ -123,7 +123,7 @@ export function useNetwork() {
     if (!state?.Service?.active?.network)
       return;
 
-    const network: any = state.Service.active?.network;
+    const network = state.Service.active?.network;
 
     Promise.all([
         network.councilAmount(),

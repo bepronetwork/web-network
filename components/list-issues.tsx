@@ -169,7 +169,7 @@ export default function ListIssues({
 
   function handlerSearch() {
     if (router.pathname === "/[network]" && !networkName ||
-        (router.pathname.includes("/[network]/[chain]") || !networkName || !chain || inView === false)) return;
+        router.pathname.includes("/[network]/[chain]") && (!networkName || !chain || inView === false)) return;
 
     dispatch(changeLoadState(true));
 

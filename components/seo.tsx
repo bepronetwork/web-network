@@ -25,7 +25,7 @@ const Seo: React.FC<ISeoProps> = () => {
     setIssueMeta(state.currentBounty?.data);
   }, [state.currentBounty?.data]);
 
-  if (issueMeta && query?.id && query?.repoId) {
+  if (issueMeta?.issueId) {
     // eslint-disable-next-line no-unsafe-optional-chaining
     const homeUrl = publicRuntimeConfig?.urls?.home;
     // eslint-disable-next-line no-unsafe-optional-chaining

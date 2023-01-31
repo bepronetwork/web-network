@@ -4,19 +4,23 @@ import {Col, FormControl, InputGroup, Row} from "react-bootstrap";
 import axios from "axios";
 import {useTranslation} from "next-i18next";
 
-import CloseIcon from "../../assets/icons/close-icon";
-import LoadingDots from "../../assets/icons/loading-dots";
-import PlusIcon from "../../assets/icons/plus-icon";
-import SearchIcon from "../../assets/icons/search-icon";
-import {useAppState} from "../../contexts/app-state";
-import {changeLoadState} from "../../contexts/reducers/change-load";
-import {toastError, toastSuccess} from "../../contexts/reducers/change-toaster";
-import {MiniChainInfo} from "../../interfaces/mini-chain";
-import useApi from "../../x-hooks/use-api";
-import Button from "../button";
-import {ContextualSpan} from "../contextual-span";
-import AddChainModal from "./add-chain-modal";
-import AddCustomChainModal from "./add-custom-chain-modal";
+import CloseIcon from "assets/icons/close-icon";
+import LoadingDots from "assets/icons/loading-dots";
+import PlusIcon from "assets/icons/plus-icon";
+import SearchIcon from "assets/icons/search-icon";
+
+import Button from "components/button";
+import {ContextualSpan} from "components/contextual-span";
+import AddChainModal from "components/setup/add-chain-modal";
+import AddCustomChainModal from "components/setup/add-custom-chain-modal";
+
+import {useAppState} from "contexts/app-state";
+import {changeLoadState} from "contexts/reducers/change-load";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
+
+import {MiniChainInfo} from "interfaces/mini-chain";
+
+import useApi from "x-hooks/use-api";
 
 export default function ChainsSetup() {
   const {state, dispatch} = useAppState();
@@ -77,7 +81,7 @@ export default function ChainsSetup() {
   }
 
   function makeAddRemoveButton(chain: MiniChainInfo) {
-    const exists = existingState.includes(chain.chainId);
+    const exists = existingState?.includes(chain.chainId);
 
     if (chain.loading)
       return <Button outline><LoadingDots /></Button>;

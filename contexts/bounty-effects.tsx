@@ -18,7 +18,7 @@ export const BountyEffectsProvider = ({children}) => {
 
   useEffect(bounty.getDatabaseBounty, [state.Service?.network?.active, query?.id, query?.repoId]);
   useEffect(bounty.getChainBounty, [
-    state.Service?.active?.network, 
+    state.Service?.active?.network?.contractAddress, 
     state.Service?.network?.active?.networkAddress, 
     state.currentBounty?.data?.contractId,
     state.currentUser?.walletAddress 
