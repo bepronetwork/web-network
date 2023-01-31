@@ -53,11 +53,11 @@ class Network extends Model {
           allowNull: true
         },
         disputableTime: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.BIGINT,
           allowNull: true
         },
         draftTime: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.BIGINT,
           allowNull: true
         },
         oracleExchangeRate: {
@@ -73,7 +73,7 @@ class Network extends Model {
           allowNull: true
         },
         cancelableTime: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.BIGINT,
           allowNull: true
         },
         proposerFeeShare: {

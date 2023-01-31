@@ -3,7 +3,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     const integerParam = {
-      type: Sequelize.INTEGER,
+      type: Sequelize.BIGINT,
       allowNull: true
     };
 
