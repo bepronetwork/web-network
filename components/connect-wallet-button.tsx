@@ -90,7 +90,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
             <div
               className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center
                         justify-content-center align-items-center w-75 cursor-pointer"
-              onClick={handleLogin}
+              onClick={() => handleLogin()}
             >
               <Image src={metamaskLogo} width={15} height={15} />
               <span className="text-white text-uppercase ms-2 caption-large">
