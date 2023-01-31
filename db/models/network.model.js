@@ -3,11 +3,6 @@ const {Model, DataTypes} = require("sequelize");
 
 class Network extends Model {
   static init(sequelize) {
-    const parameter = {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    };
-
     super.init({
         creatorAddress: DataTypes.STRING,
         name: {
@@ -57,13 +52,34 @@ class Network extends Model {
           type: DataTypes.STRING,
           allowNull: true
         },
-        disputableTime: parameter,
-        draftTime: parameter,
-        oracleExchangeRate: parameter,
-        mergeCreatorFeeShare: parameter,
-        percentageNeededForDispute: parameter,
-        cancelableTime: parameter,
-        proposerFeeShare: parameter
+        disputableTime: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        draftTime: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        oracleExchangeRate: {
+          type: DataTypes.FLOAT,
+          allowNull: true
+        },
+        mergeCreatorFeeShare: {
+          type: DataTypes.FLOAT,
+          allowNull: true
+        },
+        percentageNeededForDispute: {
+          type: DataTypes.FLOAT,
+          allowNull: true
+        },
+        cancelableTime: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
+        proposerFeeShare: {
+          type: DataTypes.FLOAT,
+          allowNull: true
+        }
       },
       {
         sequelize,

@@ -2,8 +2,13 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const parameter = {
+    const integerParam = {
       type: Sequelize.INTEGER,
+      allowNull: true
+    };
+
+    const floatParam = {
+      type: Sequelize.FLOAT,
       allowNull: true
     };
 
@@ -12,13 +17,13 @@ module.exports = {
       allowNull: true
     });
 
-    await queryInterface.addColumn("networks", "disputableTime", parameter);
-    await queryInterface.addColumn("networks", "draftTime", parameter);
-    await queryInterface.addColumn("networks", "oracleExchangeRate", parameter);
-    await queryInterface.addColumn("networks", "mergeCreatorFeeShare", parameter);
-    await queryInterface.addColumn("networks", "percentageNeededForDispute", parameter);
-    await queryInterface.addColumn("networks", "cancelableTime", parameter);
-    await queryInterface.addColumn("networks", "proposerFeeShare", parameter);
+    await queryInterface.addColumn("networks", "disputableTime", integerParam);
+    await queryInterface.addColumn("networks", "draftTime", integerParam);
+    await queryInterface.addColumn("networks", "oracleExchangeRate", floatParam);
+    await queryInterface.addColumn("networks", "mergeCreatorFeeShare", floatParam);
+    await queryInterface.addColumn("networks", "percentageNeededForDispute", floatParam);
+    await queryInterface.addColumn("networks", "cancelableTime", integerParam);
+    await queryInterface.addColumn("networks", "proposerFeeShare", floatParam);
   },
 
   async down (queryInterface, Sequelize) {
