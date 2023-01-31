@@ -36,6 +36,7 @@ import {getCoinInfoByContract} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useChain from "x-hooks/use-chain";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 import {useRepos} from "x-hooks/use-repos";
@@ -83,13 +84,13 @@ export default function CreateBountyModal() {
   const [selectedTags, setSelectedTags]= useState<string[]>([]);
 
   const rewardERC20 = useERC20();
-
   const transactionalERC20 = useERC20();
 
+  const { chain } = useChain();
+  const {updateActiveRepo} = useRepos();
   const { handleApproveToken } = useBepro();
   const { getURLWithNetwork } = useNetwork();
   const { createPreBounty, processEvent } = useApi();
-  const {updateActiveRepo} = useRepos();
 
   const {
     dispatch,
@@ -388,6 +389,20 @@ export default function CreateBountyModal() {
 
   }
 
+  function cleanFields() {
+    setFiles([]);
+    setSelectedTags([]);
+    setBountyTitle("");
+    setBountyDescription("");
+    setIssueAmount(ZeroNumberFormatValues);
+    setRewardAmount(ZeroNumberFormatValues);
+    setRepository(undefined);
+    setBranch(null);
+    setCurrentSection(0);
+    rewardERC20.setAddress(undefined);
+    transactionalERC20.setAddress(undefined);
+  }
+
   function handleCancelAndBack() {
     if (currentSection === 0) {
       cleanFields();
@@ -402,17 +417,6 @@ export default function CreateBountyModal() {
     setProgressPercentage(progress[steps.findIndex((value) => value === steps[currentSection])]);
   }
 
-  function cleanFields() {
-    setFiles([]);
-    setSelectedTags([]);
-    setBountyTitle("");
-    setBountyDescription("");
-    setIssueAmount(ZeroNumberFormatValues);
-    setRewardAmount(ZeroNumberFormatValues);
-    setRepository(undefined);
-    setBranch(null);
-    setCurrentSection(0);
-  }
 
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
@@ -585,14 +589,6 @@ export default function CreateBountyModal() {
 
   useEffect(() => {
     if(!showCreateBounty) return;
-    if(customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0])
-      setRewardToken(customTokens[0])
-    }
-  }, [customTokens, showCreateBounty]);
-
-  useEffect(() => {
-    if(!showCreateBounty) return;
     let approved = true
 
     if (isBountyType)
@@ -604,17 +600,27 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!Service?.network?.active?.tokens || !showCreateBounty)
+    if (!Service?.network?.active?.tokens || !showCreateBounty || !chain) {
+      setTransactionalToken(undefined);
+      setRewardToken(undefined);
+      setCustomTokens([]);
+      transactionalERC20.setAddress(undefined);
+      rewardERC20.setAddress(undefined);
       return;
+    }
 
     const tokens = Service?.network.active.tokens || [];
 
     if (tokens.length === customTokens.length)
       return;
 
-    setCustomTokens(tokens);
+    if (tokens.length === 1) {
+      setTransactionalToken(tokens[0]);
+      setRewardToken(tokens[0]);
+    }
 
-  }, [Service?.network?.active?.tokens, showCreateBounty]);
+    setCustomTokens(tokens);
+  }, [Service?.network?.active?.tokens, showCreateBounty, chain]);
 
   useEffect(()=>{
     cleanFields();
@@ -624,7 +630,7 @@ export default function CreateBountyModal() {
   },[showCreateBounty])
 
   if(!showCreateBounty)
-    return <></>
+    return <></>;
 
   if (showCreateBounty && !currentUser?.walletAddress)
     return <ConnectWalletButton asModal={true} />;
