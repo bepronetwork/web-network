@@ -8,22 +8,23 @@ import {useRouter} from "next/router";
 
 import WebThreeUnavailable from "assets/web3-unavailable";
 
+import Button from "components/button";
 import MobileNotSupported from "components/mobile-not-supported";
 
-import useNetwork from "x-hooks/use-network-theme";
+import {useAppState} from "contexts/app-state";
+import {changeShowWeb3} from "contexts/reducers/update-show-prop";
 
-import {useAppState} from "../contexts/app-state";
-import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
-import Button from "./button";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function WebThreeDialog() {
   const router = useRouter();
-  const {getURLWithNetwork} = useNetwork();
+  const {t} = useTranslation("common");
+
+  const { getURLWithNetwork } = useNetwork();
   const {
     dispatch,
     state: {show: {web3Dialog: showWeb3Dialog}},
   } = useAppState();
-  const {t} = useTranslation("common");
 
   function handleClickTryAgain() {
     window.location.reload();

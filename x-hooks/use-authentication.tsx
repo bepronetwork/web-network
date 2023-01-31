@@ -6,6 +6,7 @@ import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
+import {changeChain} from "contexts/reducers/change-chain";
 import {
   changeCurrentUser,
   changeCurrentUserAccessToken,
@@ -28,6 +29,7 @@ import {CustomSession} from "interfaces/custom-session";
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
 import {useTransactions} from "x-hooks/use-transactions";
@@ -42,18 +44,20 @@ import useSignature from "./use-signature";
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
 export function useAuthentication() {
-
   const session = useSession();
-  const {state, dispatch} = useAppState();
+  const {publicRuntimeConfig} = getConfig()
+  
   const {connect} = useDao();
+  const { chain } = useChain();
+  const {asPath, push} = useRouter();
   const transactions = useTransactions();
+  const {state, dispatch} = useAppState();
   const { loadNetworkAmounts } = useNetwork();
   const {publicRuntimeConfig} = getConfig()
   const { pushAnalytic } = useAnalyticEvents();
 
   const {asPath, push} = useRouter();
   const {getUserOf, getUserWith, searchCurators} = useApi();
-  const {signMessage, decodeMessage} = useSignature();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -202,7 +206,7 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
-    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service?.active?.network)
+    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service?.active?.network || !chain)
       return;
 
     const update = newBalance => {
@@ -220,7 +224,11 @@ export function useAuthentication() {
       state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
       state.Service.active.getBalance('settler', state.currentUser.walletAddress),
-      searchCurators({ address: state.currentUser.walletAddress, networkName: state.Service?.network?.active?.name })
+      searchCurators({ 
+        address: state.currentUser.walletAddress, 
+        networkName: state.Service?.network?.active?.name,
+        chainShortName: chain.chainShortName
+      })
       .then(v => v?.rows[0]?.tokensLocked || 0).then(value => new BigNumber(value)),
       // not balance, but related to address, no need for a second useEffect()
       state.Service.active.isCouncil(state.currentUser.walletAddress),

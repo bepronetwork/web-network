@@ -559,9 +559,10 @@ export default function useApi() {
   }
 
   async function getNetworkTokens({
-    networkName = DEFAULT_NETWORK_NAME
+    networkName = DEFAULT_NETWORK_NAME,
+    chainId = ""
   }) {
-    const params = new URLSearchParams({networkName}).toString();
+    const params = new URLSearchParams({networkName, chainId}).toString();
     return api
       .get<Token[]>(`/tokens?${params}`)
       .then(({ data }) => data)

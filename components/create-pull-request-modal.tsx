@@ -9,9 +9,9 @@ import IconSingleValue from "components/icon-single-value";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
-import useOctokit from "x-hooks/use-octokit";
+import {useAppState} from "contexts/app-state";
 
-import {useAppState} from "../contexts/app-state";
+import useOctokit from "x-hooks/use-octokit";
 
 interface props {
   show: boolean,

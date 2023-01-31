@@ -8,18 +8,17 @@ import models from "db/models";
 import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 
+import {chainFromHeader} from "helpers/chain-from-header";
 import paginate from "helpers/paginate";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
 
 import {GraphQlResponse} from "types/octokit";
-
-
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../helpers/res-json-message";
-import {LogAccess} from "../../../middleware/log-access";
-import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
-import WithCors from "../../../middleware/withCors";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -96,7 +95,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      // chain_id: {[Op.eq]: +chain?.chainId}
+      chain_id: { [Op.eq]: +chain?.chainId }
     }
   });
 

@@ -8,15 +8,16 @@ import models from "db/models";
 import * as CommentsQueries from "graphql/comments";
 import * as IssueQueries from "graphql/issue";
 
+import {chainFromHeader} from "helpers/chain-from-header";
 import {getPropertyRecursively} from "helpers/object";
 
-import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
-import {LogAccess} from "../../../../middleware/log-access";
-import {WithValidChainId} from "../../../../middleware/with-valid-chain-id";
-import WithCors from "../../../../middleware/withCors";
-import {Logger} from "../../../../services/logging";
+import {Logger} from "services/logging";
+
+import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -31,7 +32,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
         },
-        // chain_id: {[Op.eq]: +chain?.chainId}
+        chain_id: { [Op.eq]: +chain?.chainId }
       }
     });
 

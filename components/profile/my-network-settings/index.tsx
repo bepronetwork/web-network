@@ -158,7 +158,7 @@ export default function MyNetworkSettings({
       console.error(failed);
     }
 
-    const successQuantity = Object.keys(success);
+    const successQuantity = Object.keys(success).length;
 
     if (successQuantity){
       if(draftTime !== forcedNetwork.draftTime)

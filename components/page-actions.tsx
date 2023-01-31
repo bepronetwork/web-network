@@ -132,10 +132,10 @@ export default function PageActions({
   }, [state.Service?.active, state.currentBounty?.chainData])
 
   async function handlePullrequest({
-                                     title: prTitle,
-                                     description: prDescription,
-                                     branch
-                                   }): Promise<void> {
+    title: prTitle,
+    description: prDescription,
+    branch
+  }): Promise<void> {
     if (!state.Service?.network?.repos?.active?.ghVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 

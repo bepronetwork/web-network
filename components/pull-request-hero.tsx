@@ -4,16 +4,16 @@ import {useRouter} from "next/router";
 import ArrowLeft from "assets/icons/arrow-left";
 
 import Avatar from "components/avatar";
+import CustomContainer from "components/custom-container";
+import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
+import PriceConversor from "components/price-conversor";
+
+import {useAppState} from "contexts/app-state";
 
 import {pullRequest} from "interfaces/issue-data";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
-
-import {useAppState} from "../contexts/app-state";
-import CustomContainer from "./custom-container";
-import DateLabel from "./date-label";
-import PriceConversor from "./price-conversor";
+import { useNetwork } from "x-hooks/use-network";
 
 interface IPullRequestHeroProps {
   currentPullRequest: pullRequest;
@@ -24,8 +24,8 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
   
   const router = useRouter();
   
-  const { getURLWithNetwork } = useNetworkTheme()
   const { state } = useAppState();
+  const { getURLWithNetwork } = useNetwork();
 
   return (
     <div className="banner-shadow">

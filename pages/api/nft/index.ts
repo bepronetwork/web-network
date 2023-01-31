@@ -1,23 +1,23 @@
 import {Bounty, ProposalDetail,} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
+import {chainFromHeader} from "helpers/chain-from-header";
 import {formatNumberToNScale} from "helpers/formatNumber";
+import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
+
+import { LogAccess } from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
 import {error as LogError} from "services/logging";
-
-import {chainFromHeader} from "../../../helpers/chain-from-header";
-import {resJsonMessage} from "../../../helpers/res-json-message";
-import {WithValidChainId} from "../../../middleware/with-valid-chain-id";
 
 interface NftPayload { 
   issueContractId: number;
@@ -46,7 +46,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       [networkName, 'Missing network name'],
       [proposalContractId, 'Missing proposal contract id'],
       [issueContractId, 'Missing bounty contract Id']
-    ].filter(([v,]) => !v).map(([,m]) => m as string)
+    ].filter(([v,]) => !["string", "number"].includes(typeof v)).map(([,m]) => m as string);
 
     if (missingParams.length)
       return resJsonMessage(missingParams, res, 400);
@@ -64,7 +64,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-")
           },
-          // chain_id: {[Op.eq]: +chain?.chainId}
+          chain_id: { [Op.eq]: +chain?.chainId }
         }
     });
     
@@ -79,8 +79,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!await DAOService.start())
       return resJsonMessage(`Failed to connect to chainRpc ${chain?.chainRpc} for id ${chain?.chainId}`, res, 500);
 
-    if(!await DAOService.loadNetwork(customNetwork.networkAddress))
-      return resJsonMessage(`Failed to load networks on chainRpc ${chain?.chainRpc} for address ${customNetwork.networkAddress}`,res, 500);
+    const { networkAddress } = customNetwork;
+
+    if(!await DAOService.loadNetwork(networkAddress))
+      return resJsonMessage(`Failed to load networks on chainRpc ${chain?.chainRpc} for address ${networkAddress}`, 
+                            res,
+                            500);
 
     const network = DAOService.network;
 

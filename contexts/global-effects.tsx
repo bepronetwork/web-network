@@ -68,7 +68,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(network.updateActiveNetwork, [query?.network, query?.chain]);
   useEffect(network.loadNetworkTimes, [Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [Service?.active?.network]);
-  useEffect(network.loadNetworkAllowedTokens, [Service?.active, Service?.network?.active]);
+  useEffect(network.loadNetworkAllowedTokens, [Service?.network?.active, chain]);
   useEffect(network.updateNetworkAndChainMatch, [
     connectedChain?.id,
     query?.network,

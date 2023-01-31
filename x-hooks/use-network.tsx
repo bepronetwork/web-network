@@ -16,6 +16,7 @@ import {
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
@@ -25,6 +26,7 @@ export function useNetwork() {
   const [networkName, setNetworkName] = useState<string>();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   
+  const { chain } = useChain();
   const {state, dispatch} = useAppState();
   const {getNetwork, getNetworkTokens} = useApi();
 
@@ -90,10 +92,13 @@ export function useNetwork() {
   }
 
   function loadNetworkAllowedTokens() {
-    if (!state.Service?.active || !state?.Service?.network?.active)
+    if (!state?.Service?.network?.active || !chain)
       return;
 
-    getNetworkTokens({networkName: state?.Service?.network?.active?.name}).then(tokens => {
+    getNetworkTokens({
+      networkName: state?.Service?.network?.active?.name,
+      chainId: chain.chainId.toString()
+    }).then(tokens => {
       const transactional = [];
       const reward = [];
 

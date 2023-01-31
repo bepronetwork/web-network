@@ -59,7 +59,7 @@ export default function TabbedNavigation({
 
   useEffect(() => {
     if (!defaultActiveKey) setActiveKey(getDefaultActiveTab());
-  }, []);
+  }, [tabs]);
 
   useEffect(() => {
     setActiveKey(forceActiveKey);
