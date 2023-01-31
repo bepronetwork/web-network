@@ -40,7 +40,7 @@ export default function CardBecomeCouncil() {
           {formatNumberToNScale(+state.Service?.network?.amounts?.councilAmount)}
         </span>{" "}
         <span className="text-primary">
-          {state.Service?.network?.networkToken?.symbol}
+          {state.Service?.network?.active?.networkToken?.symbol}
         </span>{" "}
         {t("become-council-description-part-two")}
       </div>

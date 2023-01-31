@@ -111,9 +111,9 @@ export default function NetworksList() {
               const settlerLocked = new BigNumber(tokensLocked);
 
               const isConvertedOrLockedZero = settlerConverted.gt(0) || settlerLocked.eq(0);
-              const tokenEntry = [networkToken.address, {
-                name: networkToken.name,
-                symbol: networkToken.symbol,
+              const tokenEntry = [networkToken?.address, {
+                name: networkToken?.name,
+                symbol: networkToken?.symbol,
                 totalSettlerLocked: tokensLocked
               }]
               

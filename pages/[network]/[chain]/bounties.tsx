@@ -66,7 +66,7 @@ export default function BountiesPage() {
         chainShortName: query.chain.toString()
       }).then(({ rows }) => rows),
       getTotalUsers(),
-      (state.Service?.active?.network?.networkToken as ERC20)?.symbol(),
+      state.Service?.network?.active?.networkToken?.symbol,
     ])
       .then(([bounties, curators, totalUsers, symbol]) => {
         const closedBounties = bounties.filter(({ state }) => state === "closed").length;

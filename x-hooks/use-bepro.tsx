@@ -2,6 +2,9 @@ import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core"
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
+import {useAppState} from "contexts/app-state";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
+
 import {parseTransaction} from "helpers/transactions";
 
 import {TransactionStatus} from "interfaces/enums/transaction-status";
@@ -14,9 +17,6 @@ import {NetworkParameters} from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
 
-import {useAppState} from "../contexts/app-state";
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-
 const DIVISOR = 1000000;
 
 export default function useBepro() {
@@ -24,9 +24,8 @@ export default function useBepro() {
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
-  // const {getDatabaseBounty, getChainBounty} = useBounty();
 
-  const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
 
   const failTx = (err, tx, reject?) => {
 
