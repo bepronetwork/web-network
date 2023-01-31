@@ -105,7 +105,7 @@ export function useAuthentication() {
         const address = Array.isArray(_address) ? _address[0] : _address;
         if (address !== state.currentUser?.walletAddress) {
           dispatch(changeCurrentUserWallet(address))
-          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address.toString()})
+          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()})
         }
 
 
@@ -307,7 +307,7 @@ export function useAuthentication() {
   }
 
   function signMessageIfAdmin() {
-    if (!state?.currentUser?.walletAddress || !state?.connectedChain?.id)
+    if (!state?.currentUser?.walletAddress || !state?.connectedChain?.id || state.Service?.starting)
       return;
 
     if (decodeMessage(state?.connectedChain?.id,
