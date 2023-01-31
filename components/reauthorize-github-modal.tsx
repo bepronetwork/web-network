@@ -1,11 +1,11 @@
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 
 export default function ReAuthorizeGithubModal() {
   const { t } = useTranslation("common");
@@ -30,9 +30,7 @@ export default function ReAuthorizeGithubModal() {
       </p>
 
       <div className="d-flex flex-row justify-content-center">
-        <Button
-          onClick={connectGithub}
-        >
+        <Button onClick={() => connectGithub()}>
           {t("modals.reauthorize-github.button-label")}
         </Button>
       </div>

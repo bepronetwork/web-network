@@ -6,6 +6,7 @@ import Sequelize, {Op} from "sequelize";
 
 import Database from "db/models";
 
+import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
 import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
@@ -13,6 +14,7 @@ import IpfsStorage from "services/ipfs-service";
 import {error as LogError} from 'services/logging';
 
 const {serverRuntimeConfig} = getConfig();
+
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName, creator: creatorAddress, isDefault } = req.query;
@@ -195,19 +197,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     //TODO: move tokens logic to new endpoint   
     if(allowedTokens?.allowedTransactions?.length > 0){
       for (const token of allowedTokens.allowedTransactions) {
-        await Database.networkTokens.create({
-          networkId: network.id,
-          tokenId: token.id
-        })
+        await handlefindOrCreateTokens(token.id, network.id, 'transactional')
       }
     }
 
     if(allowedTokens?.allowedRewards?.length > 0){
       for (const token of allowedTokens.allowedRewards) {
-        await Database.networkTokens.create({
-          networkId: network.id,
-          tokenId: token.id
-        })
+        await handlefindOrCreateTokens(token.id, network.id, 'reward')
       }
     }
 
@@ -234,7 +230,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       networkAddress,
       repositoriesToAdd,
       repositoriesToRemove,
-      allAllowedTokens
+      allowedTokens
     } = req.body;
 
     const isAdminOverriding = !!override;
@@ -408,42 +404,31 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         }
       }
     }
-    
     const network_tokens = await Database.networkTokens.findAll({
       where: {
         networkId: network.id
       }
     });
 
-    const addTokens = allAllowedTokens?.map(tokenId => {
-      const valid = network_tokens.find(networkToken => networkToken.tokenId === tokenId)
-      if(!valid) return tokenId
-    }).filter(v => v)
-
-    const removeTokens = network_tokens.map(networkToken => {
-      const valid = allAllowedTokens?.find(number => number === networkToken.tokenId)
-      if(!valid) return networkToken.tokenId
-    }).filter(v => v)
-
-    if(addTokens?.length > 0){
-      for (const id of addTokens) {
-        await Database.networkTokens.create({
-          networkId: network.id,
-          tokenId: id
-        });
+    if(allowedTokens?.transactional?.length > 0){ 
+      for (const id of allowedTokens.transactional) {
+        await handlefindOrCreateTokens(id, network.id, 'transactional')
       }
     }
 
-    if(removeTokens?.length > 0){
-      for (const id of removeTokens) {
-        const exists = await Database.networkTokens.findOne({
-          where: {
-            networkId: network.id,
-            tokenId: id
-          }
-        });
-        if (exists) await exists.destroy();
+    const transactionalTokens = network_tokens.filter(e => e.isTransactional)
+    for (const token of transactionalTokens){
+      await handleRemoveTokens(allowedTokens.transactional, token, 'transactional')
+    }
+
+    if(allowedTokens?.reward?.length > 0){
+      for (const id of allowedTokens.reward) {
+        await handlefindOrCreateTokens(id, network.id, 'reward')
       }
+    } 
+    const rewardTokens = network_tokens.filter(e => e.isReward)
+    for (const token of rewardTokens){
+      await handleRemoveTokens(allowedTokens.reward, token, 'reward')
     }
 
     if (removingRepos.length && !isAdminOverriding)

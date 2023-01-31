@@ -1,6 +1,6 @@
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 
 import Database from "db/models";
 
@@ -17,7 +17,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     if (networkName)
       queryParams = {
         where: {
-          isAllowed: true
+          [Op.or]: [{ isTransactional: true }, { isReward: true }]
         },
         include: [
           {

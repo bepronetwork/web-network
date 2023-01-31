@@ -9,15 +9,14 @@ export function handleAllowedTokensDatabase(allowedTokens: {
     transactional: allowedTokens.transactional
       ?.map((transactionalToken) => {
         return tokens.find((token) =>
-            token.address === transactionalToken &&
-            token.isTransactional === true);
+            token.address === transactionalToken && !!token.isTransactional);
       })
       .filter((v) => v),
 
     reward: allowedTokens.reward
       ?.map((rewardToken) => {
         return tokens.find((token) =>
-            token.address === rewardToken && token.isTransactional === false);
+            token.address === rewardToken && !!token.isReward);
       })
       .filter((v) => v),
   };

@@ -16,7 +16,7 @@ import {
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
-import { changeReAuthorizeGithub } from "contexts/reducers/update-show-prop";
+import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
 import {CustomSession} from "interfaces/custom-session";
 
@@ -24,8 +24,10 @@ import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
-import { useNetwork } from "x-hooks/use-network";
-import { useTransactions } from "x-hooks/use-transactions";
+import {useNetwork} from "x-hooks/use-network";
+import {useTransactions} from "x-hooks/use-transactions";
+import useAnalyticEvents from "./use-analytic-events";
+import {EventName} from "../interfaces/analytics";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
@@ -36,6 +38,7 @@ export function useAuthentication() {
   const {connect} = useDao();
   const transactions = useTransactions();
   const { loadNetworkAmounts } = useNetwork();
+  const { pushAnalytic } = useAnalyticEvents();
 
   const {asPath, push} = useRouter();
   const {getUserOf, getUserWith, searchCurators} = useApi();
@@ -90,8 +93,11 @@ export function useAuthentication() {
 
     state.Service.active.getAddress()
       .then(address => {
-        if (address !== state.currentUser?.walletAddress)
+        if (address !== state.currentUser?.walletAddress) {
           dispatch(changeCurrentUserWallet(address))
+          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address.toString()})
+        }
+
         sessionStorage.setItem(`currentWallet`, address);
       })
       .catch(e => {
@@ -223,6 +229,9 @@ export function useAuthentication() {
     dispatch(changeCurrentUserHandle(session.data.user.name));
     dispatch(changeCurrentUserLogin(sessionUser.login));
     dispatch(changeCurrentUserAccessToken((sessionUser.accessToken)));
+
+    pushAnalytic(EventName.USER_LOGGED_IN, {username: session.data.user.name, login: sessionUser.login});
+
   }
 
   function verifyReAuthorizationNeed() {

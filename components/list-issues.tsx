@@ -50,6 +50,7 @@ interface ListIssuesProps {
   proposer?: string;
   disputableFilter?: "dispute" | "merge";
   allNetworks?: boolean;
+  inView?: boolean;
 }
 
 interface IssuesPage {
@@ -67,7 +68,8 @@ export default function ListIssues({
   proposer,
   redirect,
   disputableFilter,
-  allNetworks = false
+  allNetworks = false,
+  inView
 }: ListIssuesProps) {
   const {dispatch, state: appState} = useAppState();
 
@@ -163,7 +165,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name) return;
+    if (!appState.Service?.network?.active?.name || inView === false) return;
 
     dispatch(changeLoadState(true));
 
@@ -244,7 +246,8 @@ export default function ListIssues({
     order,
     creator,
     proposer,
-    appState.Service?.network?.active?.name
+    appState.Service?.network?.active?.name,
+    inView
   ]);
 
   useEffect(() => {
@@ -263,6 +266,8 @@ export default function ListIssues({
 
     return (!isListEmpy() || (isListEmpy() && hasFilter()))
   }
+  
+  if(inView !== null && inView === false) return null;
 
   return (
     <CustomContainer 

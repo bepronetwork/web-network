@@ -116,10 +116,10 @@ export default function MyNetworkSettings({
       githubLogin: state.currentUser.login,
       networkAddress: network.networkAddress,
       accessToken: state.currentUser.accessToken,
-      allAllowedTokens: tokens?.allowedTransactions
-        .concat(tokens?.allowedRewards)
-        .map((token) => token?.id)
-        .filter((v) => v),
+      allowedTokens: {
+       transactional: tokens?.allowedTransactions.map((token) => token?.id).filter((v) => v),
+       reward: tokens?.allowedRewards.map((token) => token?.id).filter((v) => v)
+      }
     };
 
     updateNetwork(json)
