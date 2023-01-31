@@ -31,7 +31,8 @@ export const handlefindOrCreateTokens = async (tokenId: number,
 export async function handleRemoveTokens(allowedTokens,
                                          token,
                                          type: "transactional" | "reward") {
-  if (!allowedTokens.find((id) => id === token.tokenId)) {
+  const exist = (id) => id === token.tokenId
+  if (!allowedTokens.some(exist)) {
     if (
         (type === "transactional" && token.isReward === false) ||
         (type === "reward" && token.isTransactional === false)
