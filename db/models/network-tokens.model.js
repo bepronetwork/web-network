@@ -25,7 +25,15 @@ class NetworkTokens extends Model {
             model: "tokens",
             key: "id"
           }
-        }
+        },
+        isTransactional: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
+        isReward: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
       },
       {
         sequelize,
