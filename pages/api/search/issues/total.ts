@@ -28,16 +28,14 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   if (creator) whereCondition.creatorGithub = creator;
 
   if (address) whereCondition.creatorAddress = address;
-  
-  if (networkName) 
-    whereCondition.name = {
-      [Op.iLike]: String(networkName)
-    };
 
   const networks = await models.network.findAll({
     where: {
       isRegistered: true,
-      isClosed: false
+      isClosed: false,
+      ... networkName ? {
+        name: { [Op.iLike]: String(networkName) }
+      } : {}
     }
   })
 

@@ -8,12 +8,13 @@ import OracleIcon from "assets/icons/oracle-icon";
 import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 import InfoTooltip from "components/info-tooltip";
+import TokenBalance, {TokenBalanceType} from "components/profile/token-balance";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
-import {useAppState} from "../../contexts/app-state";
-import {getCoinInfoByContract} from "../../services/coingecko";
-import TokenBalance, {TokenBalanceType} from "./token-balance";
+import {getCoinInfoByContract} from "services/coingecko";
 
 export const FlexRow = ({children, className = ""}) =>
   <div className={`d-flex flex-row ${className}`}>{children}</div>;
@@ -35,12 +36,12 @@ export default function WalletBalance() {
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber(0);
 
   function loadBalances() {
-    const networkTokenAddress = state.Service?.network?.networkToken?.address;
+    const networkTokenAddress = state.Service?.network?.active?.networkToken?.address;
 
     if (!state.currentUser?.walletAddress || !state.Service?.active || !networkTokenAddress)
       return;
 
-    const { networkToken } = state.Service?.network || {};
+    const { networkToken } = state.Service?.network?.active || {};
 
     state.Service.active.loadRegistry()
       .then(registry => {
@@ -60,11 +61,11 @@ export default function WalletBalance() {
                 icon: tokenInformation?.icon ? <img className="rounded-circle" src={tokenInformation?.icon as string} height="24px" width="24px" /> : <BeProBlue width={24} height={24} /> // eslint-disable-line
               }
             }),
-          registryTokenAddress === state.Service?.network?.networkToken?.address ? Promise.resolve(null) :
+          registryTokenAddress === networkToken?.address ? Promise.resolve(null) :
           state.Service.active
-            .getTokenBalance(state.Service?.network?.networkToken?.address, state.currentUser.walletAddress)
+            .getTokenBalance(networkToken?.address, state.currentUser.walletAddress)
             .then(async balance => {
-              const tokenInformation = await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol);
+              const tokenInformation = await getCoinInfoByContract(networkToken?.symbol);
 
               return { 
                 ...networkToken, 
@@ -93,7 +94,7 @@ export default function WalletBalance() {
   useEffect(loadBalances, [
     state.currentUser?.walletAddress, 
     state.Service?.active, 
-    state.Service?.network?.networkToken?.address
+    state.Service?.network?.active?.networkToken?.address
   ]);
 
   useEffect(() => {

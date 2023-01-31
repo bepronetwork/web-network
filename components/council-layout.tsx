@@ -89,7 +89,8 @@ export default function CouncilLayout({ children }) {
       searchIssues({
         state: "closed",
         networkName: state.Service.network.active.name,
-        tokenAddress: state.Service?.network?.active?.networkToken?.address
+        tokenAddress: state.Service?.network?.active?.networkToken?.address,
+        chainId: chain.chainId.toString()
       })
         .then(({ rows } : { rows: IssueBigNumberData[] }) => 
           rows.reduce((acc, { payments }) => acc + payments.reduce((acc, { ammount }) => acc + ammount, 0), 0))
