@@ -195,7 +195,7 @@ export default function MyNetworkSettings({
       allowedTokens: {
        transactional: tokens?.allowedTransactions.map((token) => token?.id).filter((v) => v),
        reward: tokens?.allowedRewards.map((token) => token?.id).filter((v) => v)
-      }
+      },
       parameters: success
     };
 
