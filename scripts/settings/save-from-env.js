@@ -45,7 +45,7 @@ const publicSettings = [
   PublicSettingItem("1287", "moonbase", "string", "chainIds"),
   PublicSettingItem("disputableTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("draftTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
-  PublicSettingItem("councilAmount", `{ "min": 100001, "max": 50000000 }`, "json", "networkParametersLimits"),
+  PublicSettingItem("councilAmount", `{ "min": 100001, "max": 100000000000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("disputePercentage", `{ "max": 15 }`, "json", "networkParametersLimits"),
   PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS || 0, "boolean", "defaultNetworkConfig"),
   PublicSettingItem("minBountyValue", process.env.NEXT_MIN_BOUNTY_VALUE_WEI || "0.000000000000000100", "string"),
