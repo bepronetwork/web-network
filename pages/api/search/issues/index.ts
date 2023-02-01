@@ -166,6 +166,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           } : {})
         }
       },
+      {
+        association: "network",
+        include: [
+          { association: "chain" }
+        ]
+      }
     ];
 
     if (state === "closed")
@@ -181,8 +187,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                                     .split(',')
                                     .map((value)=> value === '+' ? Sequelize.literal('+') : 
                                       (COLS_TO_CAST.includes(value) ? castToDecimal(value) : value));
-
-    console.log(`WHERE`, whereCondition);
 
     if (search) {
       const issues = await models.issue.findAll({
