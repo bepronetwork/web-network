@@ -125,8 +125,10 @@ export function useDao() {
     }
 
     const isSameWeb3Host = chainToConnect.chainRpc === state.Service?.active?.web3Host;
+    const isSameRegistry = 
+      connectedChain?.registry?.toLowerCase() === state.Service?.active?.registryAddress?.toLowerCase();
 
-    if (isSameWeb3Host || state.Service?.starting) {
+    if (isSameWeb3Host && isSameRegistry || state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
       return;
     }

@@ -675,7 +675,7 @@ export default class DAO {
   }
 
   async deployNetworkV2(networkToken: string): Promise<TransactionReceipt> {
-    const registryAddress: string = this._registryAddress
+    const registryAddress: string = this._registryAddress;
 
     const newNetwork = new Network_v2(this.web3Connection);
     await newNetwork.loadAbi();
