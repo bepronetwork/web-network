@@ -38,7 +38,6 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
-  const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
   const { state, dispatch } = useAppState();
   const registryToken = useERC20();
@@ -63,7 +62,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const maxValue = BigNumber.minimum(balance.beproAvailable, amountNeeded?.minus(amountLocked));
   const textAmountClass = amount?.gt(balance.beproAvailable) ? "danger" : "primary";
   const amountsClass = amount?.gt(maxValue) ? "danger" : "success";
-  const needsAllowance = amount?.gt(settlerAllowance);
+  const needsAllowance = amount?.gt(registryToken.allowance);
   const isLockBtnDisabled = [
     !amount,
     amount?.isZero(),
@@ -98,7 +97,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     state.Service?.active.lockInRegistry(amount.toFixed())
       .then((tx) => {
         updateWalletBalance();
-        updateAllowance();
+        registryToken.updateAllowanceAndBalance();
         setAmount(BigNumber(0));
         dispatch(updateTx([parseTransaction(tx, lockTxAction.payload[0] as SimpleBlockTransactionPayload)]));
         return updateTokenBalance()
@@ -124,7 +123,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     state.Service?.active.unlockFromRegistry()
       .then((tx) => {
         updateWalletBalance();
-        updateAllowance();
+        registryToken.updateAllowanceAndBalance();
         setAmount(BigNumber(0));
         dispatch(updateTx([parseTransaction(tx, unlockTxAction.payload[0] as SimpleBlockTransactionPayload)]));
         return updateTokenBalance();
@@ -164,39 +163,19 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     const approveTxAction = addTx([{ type: TransactionTypes.approveTransactionalERC20Token }] as TxList);
     
-    dispatch(approveTxAction)
-    setIsApproving(true)
+    dispatch(approveTxAction);
+    setIsApproving(true);
 
     state.Service?.active.approveTokenInRegistry(amount?.toFixed())
       .then((tx) => {
+        registryToken.updateAllowanceAndBalance();
         dispatch(updateTx([parseTransaction(tx, approveTxAction.payload[0] as SimpleBlockTransactionPayload)]));
-        return updateAllowance()
       })
       .catch((err) => {
         failTx(err, approveTxAction);
       })
       .finally(()=> setIsApproving(false));
   }
-
-  function updateAllowance() {
-    if (!state.Service?.active ||
-        !state.currentUser?.walletAddress ||
-        !registryToken.address) return;
-    
-    const { address } = registryToken;
-    const { walletAddress} = state.currentUser;
-    const networkRegistry = state?.Service.active?.registryAddress;
-
-    state.Service.active.getAllowance(address, walletAddress, networkRegistry)
-      .then(setSettlerAllowance).catch(() => BigNumber(0));
-  }
-
-  useEffect(() => {
-    updateAllowance();
-  }, [state.Service?.active,
-      state.currentUser?.walletAddress,
-      registryToken.address,
-      state.Settings?.contracts?.networkRegistry]);
 
   useEffect(() => {
     const tokenAddress = state.Service?.active?.registry?.token?.contractAddress;
@@ -205,6 +184,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     if (tokenAddress && registryAddress) {
       registryToken.setAddress(tokenAddress);
       registryToken.setSpender(registryAddress);
+    } else {
+      registryToken.setAddress(undefined);
+      registryToken.setSpender(undefined);
     }
   }, [state.Service?.active?.registry?.token?.contractAddress, state.Service?.active?.registry?.contractAddress]);
 

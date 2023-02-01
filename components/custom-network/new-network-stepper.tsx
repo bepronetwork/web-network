@@ -81,6 +81,11 @@ function NewNetwork() {
 
     const deployedNetworkAddress = deployNetworkTX.contractAddress;
 
+    const draftTime = settings.parameters.draftTime.value;
+    const disputableTime = settings.parameters.disputableTime.value;
+    const councilAmount = settings.parameters.councilAmount.value;
+    const percentageForDispute = settings.parameters.percentageNeededForDispute.value;
+
     const payload = {
       name: details.name.value,
       description: details.description,
@@ -118,11 +123,6 @@ function NewNetwork() {
 
     if (!networkCreated) return;
 
-    const draftTime = settings.parameters.draftTime.value;
-    const disputableTime = settings.parameters.disputableTime.value;
-    const councilAmount = settings.parameters.councilAmount.value;
-    const percentageForDispute = settings.parameters.percentageNeededForDispute.value;
-
     if (draftTime !== DEFAULT_DRAFT_TIME) {
       setCreatingNetwork(1);
       await handleChangeNetworkParameter("draftTime", draftTime, deployedNetworkAddress);
@@ -144,6 +144,11 @@ function NewNetwork() {
     }
 
     setCreatingNetwork(5);
+
+    await processEvent("network", "parameters", payload.name.toLowerCase(), {
+      chainId: state.connectedChain?.id
+    })
+      .catch(error => console.debug("Failed to update network parameters", error));
 
     const registrationTx = await handleAddNetworkToRegistry(deployedNetworkAddress)
       .catch(error => {

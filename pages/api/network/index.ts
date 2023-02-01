@@ -145,6 +145,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const defaultNetwork = await Database.network.findOne({
         where: {
           isDefault: true,
+          isClosed: false,
           chain_id: +chain?.chainId,
         }
     });

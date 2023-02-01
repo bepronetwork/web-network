@@ -1,6 +1,7 @@
-import {State} from "../../interfaces/application-state";
-import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
-import {SimpleAction} from "./reducer";
+import {SimpleAction} from "contexts/reducers/reducer";
+
+import {State} from "interfaces/application-state";
+import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 
 interface Spinners {
   proposals: boolean;
@@ -15,6 +16,7 @@ interface Spinners {
   connectingGH: boolean;
   repos: boolean;
   changingChain: boolean;
+  signingMessage: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {

@@ -3,20 +3,20 @@ import {Col, Row} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import {useNetworkSettings} from "contexts/network-settings";
+import Button from "components/button";
+import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
+import {WarningSpan} from "components/warning-span";
+
+import {useAppState} from "contexts/app-state";
+import { useNetworkSettings } from "contexts/network-settings";
 
 import {Token, TokenType} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
-
-import {useAppState} from "../../../contexts/app-state";
-import useBepro from "../../../x-hooks/use-bepro";
-import Button from "../../button";
-import MultipleTokensDropdown from "../../multiple-tokens-dropdown";
-import {WarningSpan} from "../../warning-span";
+import useBepro from "x-hooks/use-bepro";
 
 interface SelectedTokens {
-   [tokenType: TokenType | string]: string[]
+  [tokenType: TokenType | string]: string[];
 }
 
 export default function TokensSettings({
@@ -58,7 +58,7 @@ export default function TokensSettings({
     setIsLoadingTokens(true);
 
     try {
-      const dbTokens = await getTokens();
+      const dbTokens = await getTokens(state.connectedChain?.id);
 
       const { 
         dbRewardAllowed,
@@ -151,11 +151,11 @@ export default function TokensSettings({
 
 
   useEffect(() => {
-    if (!state.Service?.active) return;
+    if (!state.Service?.active || !state.connectedChain?.id) return;
 
     getAllowedTokensContract();
       
-  }, [state.Service?.active, isGovernorRegistry]);
+  }, [state.Service?.active, state.connectedChain?.id, isGovernorRegistry]);
 
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {

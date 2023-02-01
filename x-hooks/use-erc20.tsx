@@ -4,16 +4,15 @@ import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core"
 import BigNumber from "bignumber.js";
 
 import {useAppState} from "contexts/app-state";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
 import {parseTransaction} from "helpers/transactions";
 
+import {MetamaskErrors} from "interfaces/enums/Errors";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useBepro from "x-hooks/use-bepro";
-
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {MetamaskErrors} from "../interfaces/enums/Errors";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
@@ -109,6 +108,16 @@ export default function useERC20() {
     });
   }
 
+  function _setAddress(_address: string) {
+    if (_address?.toLowerCase() !== address?.toLowerCase())
+      setAddress(_address);
+  }
+
+  function _setSpender(_address: string) {
+    if (_address?.toLowerCase() !== address?.toLowerCase())
+      setSpender(_address);
+  }
+
   return {
     name,
     symbol,
@@ -119,8 +128,8 @@ export default function useERC20() {
     allowance,
     totalSupply,
     approve,
-    setAddress,
-    setSpender,
+    setAddress: _setAddress,
+    setSpender: _setSpender,
     deploy,
     updateAllowanceAndBalance
   };

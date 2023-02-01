@@ -17,6 +17,7 @@ export interface PastEventsParams {
   id? :number;
   fromBlock?: number;
   toBlock?: number;
+  chainId?: string;
 }
 
 export interface SearchNetworkParams {

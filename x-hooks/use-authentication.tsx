@@ -113,7 +113,7 @@ export function useAuthentication() {
         const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
 
         dispatch(changeChain.update({
-          id: (chain?.chainId || windowChainId).toString(),
+          id: (chain?.chainId || windowChainId)?.toString(),
           name: chain?.chainName || "unknown",
           shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
           explorer: chain?.blockScanner,
@@ -121,7 +121,7 @@ export function useAuthentication() {
           registry: chain?.registryAddress
         }));
 
-        sessionStorage.setItem("currentChainId", chain ? chain?.chainId?.toString() : (+windowChainId).toString());
+        sessionStorage.setItem("currentChainId", chain ? chain?.chainId?.toString() : (+windowChainId)?.toString());
         sessionStorage.setItem("currentWallet", address || '');
       })
       .catch(e => {
@@ -307,7 +307,10 @@ export function useAuthentication() {
   }
 
   function signMessageIfAdmin() {
-    if (!state?.currentUser?.walletAddress || !state?.connectedChain?.id || state.Service?.starting)
+    if (!state?.currentUser?.walletAddress ||
+        !state?.connectedChain?.id ||
+        state.Service?.starting ||
+        state.spinners?.signingMessage)
       return;
 
     if (decodeMessage(state?.connectedChain?.id,
@@ -316,7 +319,8 @@ export function useAuthentication() {
                       publicRuntimeConfig?.adminWallet))
       return;
 
-    if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase())
+    if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase()) {
+      dispatch(changeSpinners.update({ signingMessage: true }));
       signMessage(IM_AN_ADMIN)
         .then((r) => {
           dispatch(changeCurrentUserSignature(r));
@@ -326,9 +330,9 @@ export function useAuthentication() {
         .catch(e => {
           console.error(`ERROR`, e);
         })
-    else {
+        .finally(() => dispatch(changeSpinners.update({ signingMessage: false })));
+    } else
       sessionStorage.setItem(`currentSignature`, '');
-    }
   }
 
   return {

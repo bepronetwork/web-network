@@ -104,11 +104,15 @@ export default function MainNav() {
       .then(({ count, rows }) => {
         if (count === 0)
           setMyNetwork(newNetworkObj);
-        else
+        else {
+          const networkName = rows[0]?.name?.toLowerCase();
+          const chainShortName = rows[0]?.chain?.chainShortName?.toLowerCase();
+
           setMyNetwork({ 
             label: <Translation label={"main-nav.my-network"} />, 
-            href: `/${rows[0]?.name?.toLowerCase()}${rows[0]?.isRegistered ? "" : "/profile/my-network"}`
+            href: `/${networkName}/${chainShortName}${rows[0]?.isRegistered ? "" : "/profile/my-network"}`
           });
+        }
       })
       .catch(error => console.debug("Failed to get network address by wallet", error));
   }, [state.currentUser?.walletAddress, state.connectedChain, noNeedNetworkInstance]);

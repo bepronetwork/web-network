@@ -160,12 +160,17 @@ export default function MyNetworkSettings({
 
     const successQuantity = Object.keys(success).length;
 
-    if (successQuantity){
+    if (successQuantity) {
       if(draftTime !== forcedNetwork.draftTime)
         Promise.all([
           await processEvent("bounty","update-draft-time", network.name),
           await processEvent("bounty","moved-to-open", network.name)
-        ])
+        ]);
+
+      await processEvent("network", "parameters", network.name.toLowerCase(), {
+        chainId: state.connectedChain?.id
+      })
+        .catch(error => console.debug("Failed to update network parameters", error));
 
       dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
           updated: successQuantity,
