@@ -4,6 +4,12 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
+import { ContainerTab } from "components/profile/my-network-settings/container-tab";
+import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
+import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
+import RegistrySettings from "components/profile/my-network-settings/registry-settings";
+import RepositoriesListSettings from "components/profile/my-network-settings/repositories-list-settings";
+import WarningGithub from "components/profile/my-network-settings/warning-github";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TabbedNavigation from "components/tabbed-navigation";
 
@@ -23,12 +29,6 @@ import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import { ContainerTab } from "./container-tab";
-import GovernanceSettings from "./governance-settings";
-import LogoAndColoursSettings from "./logo-and-colours-settings";
-import RegistrySettings from "./registry-settings";
-import RepositoriesListSettings from "./repositories-list-settings";
-import WarningGithub from "./warning-github";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -235,12 +235,14 @@ export default function MyNetworkSettings({
   }, [details?.fullLogo, details?.iconLogo]);
 
   useEffect(() => {
-    if (!state.Service?.active || !state.currentUser?.walletAddress) return;
+    if (!state.Service?.active?.registry?.contractAddress ||
+        !state.currentUser?.walletAddress ||
+        !state.connectedChain?.id) return;
 
     state.Service?.active
       .isRegistryGovernor(state.currentUser?.walletAddress)
       .then(setIsGovernorRegistry);
-  }, [state.currentUser?.walletAddress]);
+  }, [state.currentUser?.walletAddress, state.Service?.active?.registry?.contractAddress, state.connectedChain?.id]);
 
   useEffect(() => {
     if(!network) return;

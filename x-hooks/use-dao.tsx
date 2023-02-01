@@ -142,8 +142,12 @@ export function useDao() {
     const daoService = new DAO({ web3Host, registryAddress });
 
     daoService.start()
-      .then(started => {
+      .then(async started => {
         if (started) {
+          if (registryAddress)
+            await daoService.loadRegistry()
+              .catch(error => console.debug("Failed to load registry", error));
+
           window.DAOService = daoService;
           dispatch(changeActiveDAO(daoService));
           console.debug("DAOService started");

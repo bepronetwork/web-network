@@ -287,8 +287,14 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
   };
 
+  function toLower(str: string) {
+    return str?.toLowerCase();
+  }
+
   async function loadDaoService(): Promise<DAO> {
-    if (!forcedNetwork) return state.Service?.active;
+    if (!forcedNetwork ||
+        toLower(state.Service?.active?.network?.contractAddress) === toLower(forcedNetwork?.networkAddress)) 
+      return state.Service?.active;
 
     const networkAddress = network?.networkAddress;
     const dao = new DAO({
@@ -441,7 +447,10 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
 
-    const service = await loadDaoService()
+    const service = await loadDaoService();
+
+    if (!service?.network) return;
+
     const [
         treasury,
         councilAmount,
@@ -543,31 +552,36 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(()=>{
     if(state.Service?.active && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
       loadDaoService()
-      .then((service)=>
-       Promise.all([
-                service.getTotalNetworkToken(),
-                0,
-                service.getNetworkParameter("councilAmount"),
-                service.getNetworkParameter("disputableTime"),
-                service.getNetworkParameter("draftTime"),
-                service.getNetworkParameter("percentageNeededForDispute")
-       ]))
-       .then(([
-        tokensLocked,
-        tokensStaked,
-        councilAmount,
-        disputableTime,
-        draftTime,
-        percentageNeededForDispute, ])=>
-         setForcedNetwork((prev)=>({
-          ...prev,
-          tokensLocked: tokensLocked.toFixed(),
-          tokensStaked: tokensStaked.toFixed(),
-          councilAmount: councilAmount.toString(),
-          disputableTime: +disputableTime / 1000,
-          draftTime: +draftTime / 1000,
-          percentageNeededForDispute: +percentageNeededForDispute,
-         })))
+        .then(service => {
+          if (!service?.network)
+            return [BigNumber(0), 0, 0, 0, 0, 0] as 
+              [BigNumber, number, string | number, string | number, string | number, string | number];
+
+          return Promise.all([
+            service.getTotalNetworkToken(),
+            0,
+            service.getNetworkParameter("councilAmount"),
+            service.getNetworkParameter("disputableTime"),
+            service.getNetworkParameter("draftTime"),
+            service.getNetworkParameter("percentageNeededForDispute")
+          ]);
+        })
+        .then(([
+          tokensLocked,
+          tokensStaked,
+          councilAmount,
+          disputableTime,
+          draftTime,
+          percentageNeededForDispute])=>
+          setForcedNetwork((prev)=>({
+            ...prev,
+            tokensLocked: tokensLocked.toFixed(),
+            tokensStaked: tokensStaked.toFixed(),
+            councilAmount: councilAmount.toString(),
+            disputableTime: +disputableTime / 1000,
+            draftTime: +draftTime / 1000,
+            percentageNeededForDispute: +percentageNeededForDispute,
+          })))
   },[forcedNetwork, state.Service?.active])
 
   useEffect(() => {
