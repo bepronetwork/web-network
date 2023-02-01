@@ -369,8 +369,6 @@ export default function useApi() {
                               networkName: string = DEFAULT_NETWORK_NAME,
                               params: PastEventsParams = {}) {
 
-    console.log(`processEvent`, state.connectedChain?.events);
-
     if (!state.connectedChain?.events)
       return;
 

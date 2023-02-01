@@ -91,13 +91,12 @@ export default function GovernanceSettings({
   }
 
   useEffect(() => {
-    console.log('tokens', tokens)
     if(tokens.length > 0) setNetworkToken(tokens.map((token) => ({
       ...token,
       isReward: !!token.network_tokens.isReward,
       isTransactional: !!token.network_tokens.isTransactional
-    })))
-  }, [tokens])
+    })));
+  }, [tokens]);
 
   return (
     <>
