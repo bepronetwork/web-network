@@ -103,31 +103,18 @@ export default function NetworksList() {
 
           setNetworks(processed);
 
-          const { totalBounties, totalSettlerConverted, notConvertedTokens } =
+          const { totalBounties, totalSettlerConverted } =
             processed.reduce((acc, curr) => {
-              const { networkToken, tokensLocked } = curr;
-
               const settlerConverted = new BigNumber(curr.totalSettlerConverted);
-              const settlerLocked = new BigNumber(tokensLocked);
-
-              const isConvertedOrLockedZero = settlerConverted.gt(0) || settlerLocked.eq(0);
-              const tokenEntry = [networkToken?.address, {
-                name: networkToken?.name,
-                symbol: networkToken?.symbol,
-                totalSettlerLocked: tokensLocked
-              }]
               
               return {
                 totalBounties: acc.totalBounties + curr.totalBounties,
-                totalSettlerConverted: acc.totalSettlerConverted.plus(settlerConverted),
-                notConvertedTokens: isConvertedOrLockedZero ? 
-                  acc.notConvertedTokens : [...acc.notConvertedTokens, tokenEntry]
+                totalSettlerConverted: acc.totalSettlerConverted.plus(settlerConverted)
               };
-            }, { totalBounties: 0, totalSettlerConverted: new BigNumber("0"), notConvertedTokens: [] });
+            }, { totalBounties: 0, totalSettlerConverted: new BigNumber("0") });
 
           setNumberOfBounties(totalBounties);
           setTotalConverted(totalSettlerConverted.toFixed());
-          setNotConvertedTokens(Object.fromEntries(notConvertedTokens));
         }
       })
       .catch((error) => {
