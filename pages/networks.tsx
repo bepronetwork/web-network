@@ -8,12 +8,9 @@ import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
 import PageHero, {InfosHero} from "components/page-hero";
 
-import {useAppState} from "../contexts/app-state";
-
 interface price_used {
   [name: string]: number;
 }
-
 export interface ConvertedTokens {
   [symbol: string]: price_used;
 }
@@ -42,8 +39,6 @@ export const NetworksPageContext = createContext<NetworksPageProps>({
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const {state} = useAppState();
-
   const [totalConverted, setTotalConverted] = useState("");
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
@@ -66,10 +61,6 @@ export default function NetworksPage() {
     }
   ]);
 
-  useEffect(() => {
-    if (state.Service?.active) state.Service?.active.loadRegistry();
-  }, [state.Service?.active]);
-
   useEffect(() => {    
     setInfos([
       {
@@ -84,8 +75,8 @@ export default function NetworksPage() {
         value: +totalConverted,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD",
-        hasNotConvertedTokens: !!Object.keys(notConvertedTokens || {}).length,
-        setNotListedModalVisibility: () => setIsModalVisible(true)
+        hasConvertedTokens: !!convertedTokens,
+        setListedModalVisibility: () => setIsModalVisible(true)
       }
     ]);    
   }, [numberOfNetworks, numberOfBounties, totalConverted, convertedTokens]);

@@ -158,27 +158,24 @@ export function RegistrySetup({
 
     setRegistry(updatedValue(forcedValue || registryAddress));
 
-    Service.active.loadRegistry(true, forcedValue || registryAddress)
-      .then(loaded => {
-        if (!loaded) throw new Error("Not Loaded");
+    const registryObj = Service?.active?.registry;
 
-        setErc20(updatedValue(loaded.token.contractAddress));
-        setBountyToken(updatedValue(loaded.bountyToken.contractAddress));
+    setErc20(updatedValue(registryObj.token.contractAddress));
+    setBountyToken(updatedValue(registryObj.bountyToken.contractAddress));
 
-        const getParameterWithoutProxy = param => loaded.callTx(loaded.contract.methods[param]());
-
-        return Promise.all([
-          loaded.treasury(),
-          loaded.lockAmountForNetworkCreation(),
-          loaded.networkCreationFeePercentage(),
-          getParameterWithoutProxy("closeFeePercentage"),
-          getParameterWithoutProxy("cancelFeePercentage"),
-          loaded.bountyToken.dispatcher(),
-          loaded.divisor,
-          loaded.token.contractAddress,
-          loaded.getAllowedTokens()
-        ])
-      })
+    const getParameterWithoutProxy = param => registryObj.callTx(registryObj.contract.methods[param]());
+    
+    Promise.all([
+      registryObj.treasury(),
+      registryObj.lockAmountForNetworkCreation(),
+      registryObj.networkCreationFeePercentage(),
+      getParameterWithoutProxy("closeFeePercentage"),
+      getParameterWithoutProxy("cancelFeePercentage"),
+      registryObj.bountyToken.dispatcher(),
+      registryObj.divisor,
+      registryObj.token.contractAddress,
+      registryObj.getAllowedTokens()
+    ])
       .then(parameters => {
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
@@ -192,7 +189,7 @@ export function RegistrySetup({
 
         setIsErc20Allowed({ transactional, reward });
       })
-      .catch(console.debug);
+      .catch(console.debug);      
   }
 
   function setDispatcher() {
@@ -287,10 +284,10 @@ export function RegistrySetup({
   }
 
   useEffect(() => {
-    if (!registryAddress || !Service?.active || !isVisible) return;
+    if (!registryAddress || !Service?.active?.registry?.contractAddress || !isVisible) return;
 
     updateData();
-  }, [registryAddress, Service?.active, isVisible]);
+  }, [registryAddress, Service?.active?.registry?.contractAddress, isVisible]);
 
   useEffect(() => {
     if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);

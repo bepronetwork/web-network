@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import {useTranslation} from "next-i18next";
 
 import {ContextualSpan} from "components/contextual-span";
@@ -22,12 +20,6 @@ export function NetworkSetup({
   const { t } = useTranslation("setup");
 
   const {state} = useAppState();
-
-  useEffect(() => {
-    if (!state.connectedChain?.registry || state.Service?.active?.registry?.contractAddress) return;
-
-    state.Service?.active?.loadRegistry(false, state.connectedChain?.registry);
-  }, [state.Service?.active?.registry?.contractAddress, state.connectedChain?.registry]);
 
   if (!isVisible)
     return <></>;

@@ -30,13 +30,11 @@ export default function SetupPage(){
   const [activeTab, setActiveTab] = useState("githubConnection");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
-  const { searchNetworks, getSupportedChains } = useApi();
+  const { searchNetworks } = useApi();
   const { state: { currentUser, supportedChains, connectedChain } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
   const isAdmin = adminWallet?.toLowerCase() === currentUser?.walletAddress?.toLowerCase();
-
-  const [networkRegistryAddress, setNetworkRegistryAddress] = useState<string>('');
 
   useEffect(() => {
     if (isConnected && adminWallet && !isAdmin)
@@ -55,21 +53,7 @@ export default function SetupPage(){
       });
   }
 
-  function updateNetworkRegistryAddressForConnectedChainId() {
-    if (!currentUser?.connected || !connectedChain?.id || !supportedChains?.length)
-      return;
-
-    getSupportedChains()
-      .then(chains => chains.find(c => c.chainId === +connectedChain.id))
-      .then(chain => setNetworkRegistryAddress(chain?.registryAddress || ''))
-  }
-
   useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
-  useEffect(updateNetworkRegistryAddressForConnectedChainId, [
-    currentUser?.connected, 
-    connectedChain?.id, 
-    supportedChains
-  ]);
 
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;
@@ -110,7 +94,7 @@ export default function SetupPage(){
               onClick={() => setActiveTab('supportedChains')} 
             />
           : <RegistrySetup 
-              registryAddress={networkRegistryAddress}
+              registryAddress={connectedChain?.registry}
               isVisible={activeTab === "registry"}
             />
       )
@@ -128,7 +112,7 @@ export default function SetupPage(){
               color="info" 
               onClick={() => setActiveTab('supportedChains')} 
             /> :
-          !networkRegistryAddress
+          !connectedChain?.registry
             ? <CallToAction 
                 disabled={false} 
                 executing={false} 
