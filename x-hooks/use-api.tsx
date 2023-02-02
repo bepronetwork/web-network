@@ -186,18 +186,21 @@ export default function useApi() {
     name = "",
     path = "",
     networkName = DEFAULT_NETWORK_NAME,
-    chainId = ""
+    chainId = "",
+    includeIssues = ""
   }) {
-    const params = new URLSearchParams({
+    const params = {
       page,
       owner,
       name,
       path,
       networkName,
-      chainId
-    }).toString();
+      chainId,
+      includeIssues
+    };
+
     return api
-      .get<{ rows; count: number; pages: number; currentPage: number }>(`/search/repositories?${params}`)
+      .get<{ rows; count: number; pages: number; currentPage: number }>("/search/repositories", { params })
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }

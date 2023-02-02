@@ -48,7 +48,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
   const { getUserRepositories } = useOctokit();
-  const { searchNetworks, searchRepositories, repositoryHasIssues } = useApi();
+  const { searchNetworks, searchRepositories } = useApi();
 
   const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
@@ -333,7 +333,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadGHRepos(){
     const repositories = [];
 
-    if(state.currentUser?.login){
+    if(state.currentUser?.login) {
       const botUser = !isCreating ? state.Settings?.github?.botUser : undefined
       const githubRepositories = await getUserRepositories(state.currentUser?.login, botUser);
 
@@ -342,7 +342,7 @@ export const NetworkSettingsProvider = ({ children }) => {
             const isOwner = state.currentUser.login === repo?.nameWithOwner.split("/")[0];
 
             if((!repo?.isFork && isOwner || repo?.isInOrganization) && !repo?.isArchived)
-              return repo
+              return repo;
           })
           .map(repo => ({
             checked: false,
@@ -355,11 +355,11 @@ export const NetworkSettingsProvider = ({ children }) => {
             collaborators: repo.collaborators
           }));
 
-
-      if (!isCreating){
+      if (!isCreating) {
         const repositoryAlreadyExists =  await searchRepositories({ 
           networkName: network?.name,
-          chainId: state.connectedChain?.id
+          chainId: state.connectedChain?.id,
+          includeIssues: "true"
         })
           .then(({ rows }) =>
           Promise.all(rows.map( async repo => {
@@ -370,12 +370,13 @@ export const NetworkSettingsProvider = ({ children }) => {
               isSaved: true,
               name: repo.githubPath.split("/")[1],
               fullName: repo.githubPath,
-              hasIssues: await repositoryHasIssues(repo.githubPath, network?.name, state.connectedChain?.id),
+              hasIssues: !!repo.issues.length,
               mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
               collaborators: repoOnGh?.collaborators || [],
             };
           })));
-        repositories.push(...repositoryAlreadyExists)
+
+        repositories.push(...repositoryAlreadyExists);
       }
 
       repositories.push(...filtered.filter(repo => !repositories.find((repoB) => repoB.fullName === repo.fullName)));
@@ -582,7 +583,7 @@ export const NetworkSettingsProvider = ({ children }) => {
             draftTime: +draftTime / 1000,
             percentageNeededForDispute: +percentageNeededForDispute,
           })))
-  },[forcedNetwork, state.Service?.active])
+  },[forcedNetwork, state.Service?.active]);
 
   useEffect(() => {
     if (state.Service?.active?.registry?.contractAddress)
@@ -590,6 +591,29 @@ export const NetworkSettingsProvider = ({ children }) => {
         .then(setRegistryToken)
         .catch(error => console.debug("Failed to load registry token", error));
   }, [state.Service?.active?.registry?.contractAddress]);
+
+  // Pre Select same network on other chain repositories
+  useEffect(() => {
+    const creatingName = networkSettings?.details?.name?.value;
+    const currentAddress = state.currentUser?.walletAddress;
+    const connectedChainId = state.connectedChain?.id;
+
+    if (!creatingName || !currentAddress || !connectedChainId || !isCreating) return;
+
+    searchRepositories({
+      networkName: creatingName
+    })
+      .then(({ count, rows }) => {
+        if (count === 0) return;
+
+        const reposToSelect = rows.filter(({ network: { name, creatorAddress, chain_id } }) => 
+          toLower(name) === toLower(creatingName) &&
+          creatorAddress === currentAddress &&
+          chain_id !== connectedChainId);
+
+        reposToSelect.forEach(({ githubPath }) => Fields.repository.setter(githubPath));
+      });
+  }, [networkSettings?.details?.name?.value, state.currentUser?.walletAddress, state.connectedChain?.id, isCreating]);
 
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({

@@ -15,7 +15,14 @@ interface infoType {
   text: string
 }
 
-export default function RepositoriesList({ withLabel = true, repositories, botUser = undefined, onClick }) {
+export default function RepositoriesList({ 
+  withLabel = true,
+  repositories,
+  botUser = undefined,
+  onClick,
+  networkName = undefined,
+  networkCreator = undefined
+}) {
   const { t } = useTranslation("custom-network");
 
   const [existingRepos, setExistingRepos] = useState([]);
@@ -67,9 +74,11 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
     },
   ];
 
-  const activeNetworkName = state.Service?.network?.active?.name;
-  const activeNetworCreator = state.Service?.network?.active?.creatorAddress;
-  const currentWallet = state.currentUser?.walletAddress?.toLowerCase();
+  const toLower = (str: string) => str?.toLowerCase();
+
+  const activeNetworkName = toLower(networkName || state.Service?.network?.active?.name);
+  const activeNetworCreator = toLower(networkCreator || state.Service?.network?.active?.creatorAddress);
+  const currentWallet = toLower(state.currentUser?.walletAddress);
 
   function updateReposWithoutMergeCommitPerm() {
     setWithoutMergeCommitPerm(repositories.filter(repository => repository.checked && !repository.mergeCommitAllowed)
@@ -110,10 +119,10 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
       })
         .then(({ rows }) => {
           const isUsedByOtherNetwork = ({ network: { name, creatorAddress }}) => 
-            (name !== activeNetworkName) ||
-            (name === activeNetworkName && 
-              creatorAddress !== activeNetworCreator && 
-              creatorAddress.toLowerCase() !== currentWallet);
+            (toLower(name) !== activeNetworkName) ||
+            (toLower(name) === activeNetworkName && 
+            creatorAddress !== activeNetworCreator && 
+            creatorAddress !== currentWallet);
 
           setExistingRepos(rows.filter(isUsedByOtherNetwork).map((repo) => repo.githubPath));
         })
@@ -129,7 +138,7 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
 
     updateReposWithoutMergeCommitPerm();
     updateReposWithoutBotCollaborator();
-  }, [repositories]);
+  }, [repositories, activeNetworkName, activeNetworCreator]);
 
   useEffect(updateReposWithoutBotCollaborator, [botUser]);
 
