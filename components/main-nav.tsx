@@ -3,6 +3,7 @@ import {ReactElement, ReactNode, useEffect, useState} from "react";
 import {Defaults} from "@taikai/dappkit";
 import {useRouter} from "next/router";
 
+import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
 import LogoPlaceholder from "assets/icons/logo-placeholder";
 import PlusIcon from "assets/icons/plus-icon";
@@ -45,7 +46,7 @@ export default function MainNav() {
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
 
-  const noNeedNetworkInstance = ["/networks", "/new-network", "/bounty-hall", "/leaderboard"].includes(pathname);
+  const noNeedNetworkInstance = ["/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);
   const fullLogoUrl = state.Service?.network?.active?.fullLogo;
 
   useEffect(() => {
@@ -74,7 +75,21 @@ export default function MainNav() {
     if(!window.ethereum) return dispatch(changeShowWeb3(true))
     return dispatch(changeShowCreateBounty(true))
     
-  } 
+  }
+  
+  function LinkExplore() {
+    return (
+      <InternalLink
+        className="mt-1"
+        href={"/explore"}
+        blank={true}
+        label={<Translation label={"main-nav.explorer"} />}
+        nav
+        uppercase
+        icon={<ExternalLinkIcon className="mb-1" width={12} height={12} />}
+      />
+    );
+  }
 
   function LinkNetworks() {
     return(
@@ -101,7 +116,9 @@ export default function MainNav() {
   function LinkBounties() {
     return (
       <InternalLink
-        href={"/bounty-hall"}
+        href={getURLWithNetwork("/bounties", {
+          network: state.Service?.network?.active?.name,
+        })}
         label={<Translation label={"main-nav.nav-avatar.bounties"} />}
         nav
         uppercase
@@ -163,7 +180,6 @@ export default function MainNav() {
                 <li>
                   <LinkBounties />
                 </li>
-
                 <li>
                   <InternalLink
                     href={getURLWithNetwork("/curators", {
@@ -180,17 +196,20 @@ export default function MainNav() {
                 <li>
                   <LinkLeaderBoard />
                 </li>
+                <li>
+                  <LinkExplore />
+                </li>
               </ul>
             )) || (
               <ul className="nav-links">
-                <li>
-                  <LinkBounties />
-                </li>
                 <li>
                   <LinkNetworks/>
                 </li>
                 <li>
                   <LinkLeaderBoard />
+                </li>
+                <li>
+                  <LinkExplore />
                 </li>
               </ul>
             )}
