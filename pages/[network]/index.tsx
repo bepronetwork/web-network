@@ -1,12 +1,22 @@
-import React from "react";
+import { useEffect } from "react";
 
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import PageDevelopers from "pages/[network]/bounties";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function Home() {
-  return <PageDevelopers/>;
+  const { getURLWithNetwork } = useNetworkTheme();
+  const { replace, query } = useRouter();
+
+  useEffect(() => {
+    replace(getURLWithNetwork(`/bounties`, {
+      network: query?.network
+    }));
+  }, []);
+
+  return null;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
