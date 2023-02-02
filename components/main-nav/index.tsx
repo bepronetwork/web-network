@@ -208,13 +208,12 @@ export default function MainNav() {
             <WrongNetworkModal />
 
             <ConnectWalletButton>
-              <>
-                <TransactionsStateIndicator />
+              <TransactionsStateIndicator />
 
-                <NavAvatar />
-              </>
+              <NavAvatar />
             </ConnectWalletButton>
           </div>
+
           <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
         </div>
       </div>

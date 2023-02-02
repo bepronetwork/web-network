@@ -204,6 +204,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         address: allowedTokens.settler,
         chain_id: chain.chainId,
         isTransactional: false,
+        isReward: false,
         isAllowed: false,
         name,
         symbol

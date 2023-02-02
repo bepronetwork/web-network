@@ -75,7 +75,10 @@ function NewNetwork() {
 
     setCreatingNetwork(0);
 
-    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => {
+      console.debug("Failed to deploy network", error);
+      return error;
+    });
 
     if (!deployNetworkTX?.contractAddress) return setCreatingNetwork(-1);
 

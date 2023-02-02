@@ -30,7 +30,7 @@ export default function NetworkIdentifier() {
   }
 
   useEffect(() => {
-    if (!window.ethereum && !state.supportedChains?.length)
+    if (!window.ethereum || !state.supportedChains?.length)
       return;
 
     window.ethereum.removeAllListeners(`chainChanged`);
