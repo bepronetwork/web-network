@@ -7,9 +7,8 @@ import {useRouter} from "next/router";
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
-import Avatar from "components/avatar";
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
-import Identicon from "components/identicon";
 
 import {useAppState} from "contexts/app-state";
 
@@ -17,7 +16,6 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
-
 
 export default function NavAvatar() {
   const { t } = useTranslation("common");
@@ -29,10 +27,6 @@ export default function NavAvatar() {
 
   const { getURLWithNetwork } = useNetwork();
   const { disconnectWallet } = useAuthentication();
-
-  const avatar = () => state.currentUser?.login &&
-    <Avatar userLogin={state.currentUser.login} className="border-primary" size="md" /> ||
-    <Identicon address={state.currentUser?.walletAddress} />;
   
   const username = 
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
@@ -93,20 +87,13 @@ export default function NavAvatar() {
 
   const internalLinks = [
     Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.oracles"),
-         getURLWithNetwork("/profile/bepro-votes")),
-    Link(t("main-nav.nav-avatar.payments"),
-         getURLWithNetwork("/profile/payments")),
-    Link(t("main-nav.nav-avatar.bounties"),
-         getURLWithNetwork("/profile/bounties")),
-    Link(t("main-nav.nav-avatar.pull-requests"),
-         getURLWithNetwork("/profile/pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"),
-         getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.my-network"),
-         getURLWithNetwork("/profile/my-network")),
+    Link(t("main-nav.nav-avatar.oracles"), getURLWithNetwork("/profile/bepro-votes")),
+    Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/profile/payments")),
+    Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/profile/bounties")),
+    Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/profile/pull-requests")),
+    Link(t("main-nav.nav-avatar.proposals"), getURLWithNetwork("/profile/proposals")),
+    Link(t("main-nav.nav-avatar.my-network"), getURLWithNetwork("/profile/my-network"))
   ];
-
 
   const externalLinks = [
     Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
@@ -120,7 +107,11 @@ export default function NavAvatar() {
       <Popover.Body className="bg-shadow pt-3 px-4">
         <div className="row align-items-center border-bottom border-light-gray pb-2">
           <div className="col-3 px-0">
-            {avatar()}
+            <AvatarOrIdenticon
+              user={state.currentUser?.login}
+              address={state.currentUser?.walletAddress}
+              size="md"
+            />
           </div>
 
           <div className="col-9 p-0">
@@ -172,7 +163,11 @@ export default function NavAvatar() {
         overlay={overlay}
       >
         <div>
-          {avatar()} 
+          <AvatarOrIdenticon
+            user={state.currentUser?.login}
+            address={state.currentUser?.walletAddress}
+            size="md"
+          />
         </div>
       </OverlayTrigger>
     </div>

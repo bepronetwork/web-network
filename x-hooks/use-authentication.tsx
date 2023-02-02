@@ -39,10 +39,11 @@ import {useTransactions} from "x-hooks/use-transactions";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
+const { publicRuntimeConfig } = getConfig();
+
 export function useAuthentication() {
   const session = useSession();
   const {asPath, push} = useRouter();
-  const {publicRuntimeConfig} = getConfig();
   
   const {connect} = useDao();
   const { chain } = useChain();
@@ -104,7 +105,7 @@ export function useAuthentication() {
       .then(_address => {
         const address = Array.isArray(_address) ? _address[0] : _address;
         if (address !== state.currentUser?.walletAddress) {
-          dispatch(changeCurrentUserWallet(address))
+          dispatch(changeCurrentUserWallet(address?.toLowerCase()))
           pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()})
         }
 

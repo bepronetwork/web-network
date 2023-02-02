@@ -3,16 +3,17 @@ import {useEffect, useState} from "react";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
-import BeProBlue from "assets/icons/bepro-blue";
 import OracleIcon from "assets/icons/oracle-icon";
-import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 import InfoTooltip from "components/info-tooltip";
 import TokenBalance, {TokenBalanceType} from "components/profile/token-balance";
+import TokenIcon from "components/token-icon";
 
 import {useAppState} from "contexts/app-state";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
+
+import { Token } from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
@@ -35,65 +36,49 @@ export default function WalletBalance() {
   const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber(0);
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber(0);
 
-  function loadBalances() {
-    const networkTokenAddress = state.Service?.network?.active?.networkToken?.address;
+  const getAddress = (token: string | Token) => typeof token === "string" ? token : token?.address;
 
-    if (!state.currentUser?.walletAddress || !state.Service?.active || !networkTokenAddress)
+  async function processToken(token: string | Token) {
+    const [tokenData, balance] = await Promise.all([
+      typeof token === "string" ? state.Service.active.getERC20TokenData(token) : token,
+      state.Service.active.getTokenBalance(getAddress(token), state.currentUser.walletAddress)
+    ]);
+    
+    const tokenInformation = await getCoinInfoByContract(tokenData.symbol);
+
+    return {
+      balance,
+      ...tokenData,
+      icon: <TokenIcon src={tokenInformation?.icon as string} />
+    };
+  }
+
+  function loadBalances() {
+    const networkToken = state.Service?.network?.active?.networkToken;
+    const registryTokenAddress = state.Service?.active?.registry?.token?.contractAddress?.toLowerCase();
+
+    if (!state.currentUser?.walletAddress || !registryTokenAddress || !networkToken?.address)
       return;
 
-    const { networkToken } = state.Service?.network?.active || {};
+    const isSameToken = registryTokenAddress === networkToken.address;
 
-    state.Service.active.loadRegistry()
-      .then(registry => {
-        if (!registry) return;
+    Promise.all([
+      processToken(registryTokenAddress),
+      isSameToken ? Promise.resolve(null) : processToken(networkToken.address)
+    ]).then(tokens => {
+      setOracleToken({
+        symbol: t("$oracles",  { token: networkToken?.symbol }),
+        name: networkToken?.name,
+        icon: <OracleIcon />
+      })
 
-        const registryTokenAddress = registry.token.contractAddress;
-
-        Promise.all([
-          state.Service.active.getTokenBalance(registryTokenAddress, state.currentUser.walletAddress)
-            .then(async (balance) => {
-              const tokenData = await state.Service.active.getERC20TokenData(registryTokenAddress);
-              const tokenInformation = await getCoinInfoByContract(tokenData.symbol);
-
-              return {
-                balance,
-                ...tokenData,
-                icon: tokenInformation?.icon ? <img className="rounded-circle" src={tokenInformation?.icon as string} height="24px" width="24px" /> : <BeProBlue width={24} height={24} /> // eslint-disable-line
-              }
-            }),
-          registryTokenAddress === networkToken?.address ? Promise.resolve(null) :
-          state.Service.active
-            .getTokenBalance(networkToken?.address, state.currentUser.walletAddress)
-            .then(async balance => {
-              const tokenInformation = await getCoinInfoByContract(networkToken?.symbol);
-
-              return { 
-                ...networkToken, 
-                balance, 
-                icon: tokenInformation?.icon ? 
-                  <img 
-                    className="rounded-circle"
-                    src={tokenInformation?.icon as string}
-                    height="24px"
-                    width="24px"
-                  /> : <TokenIconPlaceholder />
-              };
-            })
-        ]).then(tokens => {
-          setOracleToken({
-            symbol: t("$oracles",  { token: networkToken?.symbol }),
-            name: networkToken?.name,
-            icon: <OracleIcon />
-          })
-    
-          setTokens(tokens.filter(v => !!v));
-        });
-      });
+      setTokens(tokens.filter(v => !!v));
+    });
   }
 
   useEffect(loadBalances, [
     state.currentUser?.walletAddress, 
-    state.Service?.active, 
+    state.Service?.active?.registry?.token?.contractAddress, 
     state.Service?.network?.active?.networkToken?.address
   ]);
 

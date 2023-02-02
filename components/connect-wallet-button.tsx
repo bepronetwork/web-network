@@ -8,10 +8,10 @@ import metamaskLogo from "assets/metamask.png";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import {useAuthentication} from "x-hooks/use-authentication";
+import {useAppState} from "contexts/app-state";
+import {changeShowWeb3} from "contexts/reducers/update-show-prop";
 
-import {useAppState} from "../contexts/app-state";
-import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
+import {useAuthentication} from "x-hooks/use-authentication";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
@@ -34,7 +34,6 @@ export default function ConnectWalletButton({children = null, asModal = false, f
     connectWallet();
   }
 
-
   function onWalletChange() {
     setShowModal(!state.currentUser?.walletAddress);
   }
@@ -48,7 +47,6 @@ export default function ConnectWalletButton({children = null, asModal = false, f
   }, [state.Service?.active, forceLogin]);
 
   useEffect(onWalletChange, [state.currentUser?.walletAddress]);
-
 
   if (asModal) {
     if (state?.loading?.isLoading) return <></>;
@@ -113,5 +111,5 @@ export default function ConnectWalletButton({children = null, asModal = false, f
       </Button>
     );
 
-  return children;
+  return <>{children}</>;
 }
