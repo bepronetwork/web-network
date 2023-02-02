@@ -6,7 +6,6 @@ import { useRouter } from "next/router";
 
 import CardItem from "components/card-item";
 import CustomContainer from "components/custom-container";
-import { ExternalLink } from "components/external-link";
 
 import { useAppState } from "contexts/app-state";
 
@@ -44,7 +43,14 @@ export default function ListActiveNetworks() {
     <CustomContainer className="mb-3">
       <div className="d-flex mt-2 p-1 justify-content-between">
         <h4 className="mt-1">{t("most-active-networks")}</h4>
-        <ExternalLink label={t("explore-all")} href={"/networks"} />
+        <Link href={"/networks"}>
+          <a
+            className="text-decoration-none text-primary mt-2"
+            rel="noreferrer"
+          >
+            {t("explore-all")}
+          </a>
+        </Link>
       </div>
       <LoadingList  loading={loading} />
       <div className="row mt-3">
