@@ -13,7 +13,11 @@ class User extends Model {
         githubLogin: DataTypes.STRING,
         address: { 
           type: DataTypes.STRING, 
-          unique: true 
+          unique: true,
+          get() {
+            const rawValue = this.getDataValue("address");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
         },
         resetedAt: {
           type: DataTypes.DATE,

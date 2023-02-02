@@ -4,7 +4,13 @@ const { Model, DataTypes } = require("sequelize");
 class UserPayments extends Model {
   static init(sequelize) {
     super.init({
-        address: DataTypes.STRING,
+        address: {
+          type: DataTypes.STRING,
+          get() {
+            const rawValue = this.getDataValue("address");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
+        },
         ammount: DataTypes.INTEGER,
         issueId:  DataTypes.STRING,
         transactionHash: DataTypes.STRING

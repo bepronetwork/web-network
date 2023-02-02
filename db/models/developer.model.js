@@ -9,7 +9,13 @@ class Developer extends Model {
   static init(sequelize) {
     super.init({
         githubHandle: DataTypes.STRING,
-        address: DataTypes.STRING,
+        address: {
+          type: DataTypes.STRING,
+          get() {
+            const rawValue = this.getDataValue("address");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
+        },
         issueId: DataTypes.INTEGER
     },
                {

@@ -12,8 +12,12 @@ class ProposalDistributions extends Model {
         },
       address: {
         type: DataTypes.STRING(255),
-        allowNull: false
-        },
+        allowNull: false,
+        get() {
+          const rawValue = this.getDataValue("address");
+          return rawValue ? rawValue.toLowerCase() : null;
+        }
+      },
       percentage: {
           type: DataTypes.INTEGER,
           allowNull: false

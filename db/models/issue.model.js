@@ -11,7 +11,13 @@ class Issue extends Model {
       issueId: DataTypes.INTEGER,
       githubId: DataTypes.STRING,
       state: DataTypes.STRING,
-      creatorAddress: DataTypes.STRING,
+      creatorAddress: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("address");
+          return rawValue ? rawValue.toLowerCase() : null;
+        }
+      },
       creatorGithub: DataTypes.STRING,
       amount: DataTypes.STRING,
       fundingAmount: DataTypes.STRING,

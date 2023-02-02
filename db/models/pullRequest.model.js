@@ -21,7 +21,11 @@ class PullRequest extends Model {
         },
         userAddress: {
           type: DataTypes.STRING,
-          allowNull: true
+          allowNull: true,
+          get() {
+            const rawValue = this.getDataValue("userAddress");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
         },
         status: {
           type: DataTypes.STRING,

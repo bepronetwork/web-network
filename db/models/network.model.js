@@ -4,14 +4,26 @@ const {Model, DataTypes} = require("sequelize");
 class Network extends Model {
   static init(sequelize) {
     super.init({
-        creatorAddress: DataTypes.STRING,
+        creatorAddress: {
+          type: DataTypes.STRING,
+          get() {
+            const rawValue = this.getDataValue("creatorAddress");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
+        },
         name: {
           type: DataTypes.STRING,
           unique: "network_chain_unique"
         },
         description: DataTypes.STRING,
         colors: DataTypes.JSON,
-        networkAddress: DataTypes.STRING,
+        networkAddress: {
+          type: DataTypes.STRING,
+          get() {
+            const rawValue = this.getDataValue("networkAddress");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
+        },
         logoIcon: DataTypes.STRING,
         fullLogo: DataTypes.STRING,
         isClosed: {

@@ -12,7 +12,13 @@ class MergeProposal extends Model {
         pullRequestId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
         contractId: DataTypes.INTEGER,
-        creator: DataTypes.STRING,
+        creator: {
+          type: DataTypes.STRING,
+          get() {
+            const rawValue = this.getDataValue("creator");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
+        },
         network_id: DataTypes.INTEGER,
         contractCreationDate: {
           type: DataTypes.STRING(255),

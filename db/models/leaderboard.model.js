@@ -13,7 +13,11 @@ class LeaderBoard extends Model {
         address: {
           type: DataTypes.STRING,
           allowNull: false,
-          unique: true
+          unique: true,
+          get() {
+            const rawValue = this.getDataValue("address");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
         },
         numberNfts: {
           type: DataTypes.INTEGER,

@@ -17,6 +17,10 @@ class Benefactors extends Model {
         address: {
           type: DataTypes.STRING,
           allowNull: false,
+          get() {
+            const rawValue = this.getDataValue("address");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
         },
         contractId: {
           type: DataTypes.INTEGER,

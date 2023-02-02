@@ -20,7 +20,11 @@ class Tokens extends Model {
         },
         address: {
           type: DataTypes.STRING,
-          allowNull: false
+          allowNull: false,
+          get() {
+            const rawValue = this.getDataValue("address");
+            return rawValue ? rawValue.toLowerCase() : null;
+          }
         },
         isTransactional: {
           type: DataTypes.BOOLEAN,
