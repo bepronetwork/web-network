@@ -27,7 +27,6 @@ export default function useAnalyticEvents() {
       const rejectMissingParams = (params: string | string[]) =>
         reject(`Missing Params ${JSON.stringify(params)}`)
 
-
       switch (type) {
       case "ga4":
         if (!publicRuntimeConfig.gaMeasureID)

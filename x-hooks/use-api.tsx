@@ -550,7 +550,7 @@ export default function useApi() {
   
   async function getTokens(chainId?: string) {
     return api
-      .get<Token[]>("/tokens", { params: {chainId} })
+      .get<Token[]>("/search/tokens", { params: {chainId} })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -562,7 +562,7 @@ export default function useApi() {
     chainId = ""
   }) {
     return api
-      .get<Token[]>("/tokens", { params: {networkName, chainId}})
+      .get<Token[]>("/search/tokens", { params: {networkName, chainId}})
       .then(({ data }) => data)
       .catch((error) => {
         throw error;

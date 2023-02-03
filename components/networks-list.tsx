@@ -32,8 +32,8 @@ export default function NetworksList() {
   const [order, setOrder] = useState(["name", "asc"]);
   const [networks, setNetworks] = useState<Network[]>([]);
 
-  const { searchNetworks, getHeaderNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
+  const { searchNetworks, getHeaderNetworks } = useApi();
 
   const { state, dispatch } = useAppState();
   const { 
@@ -41,8 +41,6 @@ export default function NetworksList() {
     setNumberOfBounties, 
     setTotalConverted, 
   } = useContext(NetworksPageContext);
-
-  const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
 
   function handleOrderChange(newOrder) {
     setOrder(newOrder);
@@ -66,9 +64,9 @@ export default function NetworksList() {
 
     const tokensLocked = curators.reduce((acc, curr) => acc.plus(curr.tokensLocked), new BigNumber("0"));
 
-    const coinInfo = await getCoinPrice(networkToken?.symbol).catch(() => ({ prices: {} }));
+    const coinPrice = await getCoinPrice(networkToken?.symbol).catch(() => 0);
 
-    const totalSettlerConverted = tokensLocked.multipliedBy(coinInfo.prices[mainCurrency] || 0).toFixed();
+    const totalSettlerConverted = tokensLocked.multipliedBy(coinPrice).toFixed();
 
     return { 
       ...network,

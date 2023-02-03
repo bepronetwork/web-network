@@ -11,7 +11,7 @@ export default function Loading() {
 
   return (
     <Modal
-      show={state.loading?.isLoading || Object.values(state.spinners).some(c => c)}
+      show={state.loading?.isLoading}
       size="sm"
       backdrop="static"
       aria-labelledby="loading-modal"

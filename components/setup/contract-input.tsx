@@ -2,6 +2,8 @@ import {SetStateAction} from "react";
 import {Col} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
+import { isAddress } from "web3-utils";
+
 
 import Button from "components/button";
 import {ExternalLink} from "components/external-link";
@@ -58,7 +60,7 @@ export function ContractInput({
 
     if (mustBeAddress)
       return onChange(previous =>
-        ({ ...previous, validated: value?.trim().length ? Service?.active?.isAddress(field?.value) : null }));
+        ({ ...previous, validated: value?.trim().length ? isAddress(field?.value) : null }));
 
     if (!validator)
       return;
@@ -66,7 +68,7 @@ export function ContractInput({
     if (!Service?.active || value.trim() === "") 
       return onChange(previous => ({ ...previous, validated: null }));
 
-    if (!Service?.active?.isAddress(value))
+    if (!isAddress(value))
       return onChange(previous => ({ ...previous, validated: false }));
 
     Service.active[validator](value)

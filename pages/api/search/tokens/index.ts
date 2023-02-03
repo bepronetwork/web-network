@@ -1,30 +1,59 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op} from "sequelize";
+import { Op, Sequelize, WhereOptions } from "sequelize";
 
 import Database from "db/models";
 
 import {withCors} from "middleware";
 
+import { error as logError } from 'services/logging';
+
+const colToLower = (colName: string) => Sequelize.fn("LOWER", Sequelize.col(colName));
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {networkName} = req.query
+  const { networkName, chainId } = req.query;
   
   try {
-    const network = await Database.network.findOne({
-      where:{
-        name: {[Op.iLike]: networkName},
-        // chain_id: {[Op.eq]: +(await chainFromHeader(req))?.chainId }
-      },
-      include:[{ association: "tokens" }]
+    const whereCondition: WhereOptions = {};
+
+    let queryParams = {};
+
+    if (chainId)
+      whereCondition.chain_id = +chainId;
+
+    if (networkName) {
+      whereCondition.isAllowed = true;
+
+      queryParams = {
+        where: {
+          [Op.or]: [{ isTransactional: true }, { isReward: true }]
+        },
+        include: [
+          {
+            association: "networks",
+            attributes: [],
+            required: true,
+            where: {
+              name: Sequelize.where(colToLower("networks.name"), "=", (networkName as string).toLowerCase())
+            }
+          }
+        ]
+      };
+    }
+      
+
+    const tokens = await Database.tokens.findAll({
+      where: whereCondition,
+      ...queryParams
     });
 
-    return res.status(200).json(network?.tokens || []);
+    return res.status(200).json(tokens);
   } catch (error) {
-    console.log(error)
-    return res.status(500)
+    logError(error);
+    return res.status(500);
   }
 }
 
-async function tokensEndPoint(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -37,4 +66,4 @@ async function tokensEndPoint(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(tokensEndPoint);
+export default withCors(handler);

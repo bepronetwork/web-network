@@ -328,16 +328,16 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       include: [{ association: "repositories" }]
     });
 
-    if (!network) return res.status(404).json("Invalid network");
+    if (!network) return resJsonMessage("Invalid network", res, 404);
     if (network.isClosed && !isAdminOverriding)
-      return res.status(404).json("Invalid network");
+      return resJsonMessage("Invalid network", res, 404);
 
     if (isClosed !== undefined) {
       network.isClosed = isClosed;
 
       await network.save();
 
-      return res.status(200).json("Network closed");
+      return resJsonMessage("Network closed", res, 200);
     }
 
     const settings = await Database.settings.findAll({
@@ -350,10 +350,10 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     const chain = await chainFromHeader(req);
 
     if (!chain.chainRpc)
-      return resJsonMessage(`Missing chainRpc`, res, 400);
+      return resJsonMessage("Missing chainRpc", res, 400);
 
     if (!chain.registryAddress)
-      return resJsonMessage(`Missing registryAddress`, res, 400);
+      return resJsonMessage("Missing registryAddress", res, 400);
 
     // Contract Validations
     const DAOService = new DAO({ 
@@ -362,18 +362,18 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       registryAddress: chain.registryAddress,
     });
 
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");
+    if (!await DAOService.start()) return resJsonMessage("Failed to connect with chain", res, 500);
+    if (!await DAOService.loadRegistry()) return resJsonMessage("Failed to load registry contract", res, 500);
 
     if (!isAdminOverriding) {
       const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
-
+      
       if (checkingNetworkAddress?.toLowerCase() !== networkAddress?.toLowerCase())
-        return res.status(403).json("Creator and network addresses do not match");
+        return resJsonMessage("Creator and network addresses do not match", res, 403);
     } else {
       const isRegistryGovernor = await DAOService.isRegistryGovernor(creator);
 
-      if (!isRegistryGovernor) return res.status(403).json({message: UNAUTHORIZED});
+      if (!isRegistryGovernor) return resJsonMessage("Unauthorized", res, 403);
     }
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
@@ -403,9 +403,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         });
 
         if (exists)
-          return res
-            .status(403)
-            .json(`Repository ${repository.fullName} is already in use by another network `);
+          return resJsonMessage(`Repository ${repository.fullName} is already in use by another network `, res, 403);
       }
 
     const removingRepos = repositoriesToRemove
@@ -420,7 +418,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           }
         });
 
-        if (!exists) return res.status(404).json("Invalid repository");
+        if (!exists) return resJsonMessage("Invalid repository", res, 404);
 
         const hasIssues = await Database.issue.findOne({
           where: {
@@ -429,9 +427,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         });
 
         if (hasIssues)
-          return res
-            .status(403)
-            .json(`Repository ${repository.fullName} already has bounties and cannot be removed`);
+          return resJsonMessage(`Repository ${repository.fullName} already has bounties and cannot be removed`, 
+                                res,
+                                403);
       }
 
     if (isAdminOverriding && name) network.name = name;
@@ -463,8 +461,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       });
 
       const invitations = [];
-  
-      if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
+
+      if (!publicSettings?.github?.botUser) return resJsonMessage("Missing github bot user", res, 500);
 
       for (const repository of addingRepos) {
         const [owner, repo] = repository.fullName.split("/");
@@ -543,7 +541,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         if (exists) await exists.destroy();
       }
 
-    return res.status(200).json("Network updated");
+    return resJsonMessage("Network updated", res, 200);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
