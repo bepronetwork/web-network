@@ -35,7 +35,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
 
     if (
         +state.connectedChain?.id === +state.Settings?.requiredChain?.id ||
-        +window.ethereum.chainId === +state.Settings?.requiredChain?.id
+        +window?.ethereum?.chainId === +state.Settings?.requiredChain?.id
       ) {
       connectWallet();
     } else {
