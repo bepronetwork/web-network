@@ -17,6 +17,7 @@ interface Spinners {
   repos: boolean;
   changingChain: boolean;
   signingMessage: boolean;
+  switchingChain: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {

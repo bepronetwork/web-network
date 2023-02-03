@@ -318,12 +318,17 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     
     if (!accessToken && !isAdminOverriding) return resJsonMessage("Unauthorized user", res, 401);
 
+    const chain = await chainFromHeader(req);
+
     const network = await Database.network.findOne({
       where: {
         ...(isAdminOverriding ? {} : {
           creatorAddress: {[Op.iLike]: creator}
         }),
-        networkAddress
+        networkAddress: {
+          [Op.iLike]: networkAddress
+        },
+        chain_id: chain.chainId
       },
       include: [{ association: "repositories" }]
     });
@@ -346,8 +351,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     });
 
     const publicSettings = (new Settings(settings)).raw();
-
-    const chain = await chainFromHeader(req);
 
     if (!chain.chainRpc)
       return resJsonMessage("Missing chainRpc", res, 400);

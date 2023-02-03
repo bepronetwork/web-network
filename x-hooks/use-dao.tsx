@@ -56,7 +56,7 @@ export function useDao() {
   function changeNetwork() {
     const { networkAddress, chain_id } = state.Service?.network?.active || {};
     
-    if (!state.Service?.active || !networkAddress || !chain)
+    if (!state.Service?.active || !networkAddress || !chain || state.spinners.switchingChain)
       return;
 
     if (state.Service?.active?.network?.contractAddress === networkAddress)

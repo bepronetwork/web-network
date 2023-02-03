@@ -314,6 +314,8 @@ export function useAuthentication() {
         state.spinners?.signingMessage)
       return;
 
+    if (state.connectedChain?.name === "unknown") return;
+
     if (decodeMessage(state?.connectedChain?.id,
                       IM_AN_ADMIN,
                       state?.currentUser?.signature,
