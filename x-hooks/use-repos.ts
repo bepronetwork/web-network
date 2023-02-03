@@ -33,7 +33,7 @@ export function useRepos() {
   function loadRepos(force = false) {
     const name = query?.network;
 
-    if (!name || !chain || state.spinners?.repos || !state.Service?.network?.active || !state.supportedChains)
+    if (!name || !chain || state.spinners?.repos || !state.Service?.network?.active)
       return;
 
     const key = `bepro.network:repos:${name}:${chain.chainId}`;

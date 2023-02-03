@@ -20,7 +20,7 @@ import {Network} from "interfaces/network";
 
 import {NetworksPageContext} from "pages/networks";
 
-import {getCoinInfoByContract} from "services/coingecko";
+import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
@@ -66,7 +66,7 @@ export default function NetworksList() {
 
     const tokensLocked = curators.reduce((acc, curr) => acc.plus(curr.tokensLocked), new BigNumber("0"));
 
-    const coinInfo = await getCoinInfoByContract(networkToken?.symbol).catch(() => ({ prices: {} }));
+    const coinInfo = await getCoinPrice(networkToken?.symbol).catch(() => ({ prices: {} }));
 
     const totalSettlerConverted = tokensLocked.multipliedBy(coinInfo.prices[mainCurrency] || 0).toFixed();
 

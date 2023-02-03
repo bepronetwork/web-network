@@ -549,10 +549,8 @@ export default function useApi() {
   }
   
   async function getTokens(chainId?: string) {
-    const params = new URLSearchParams({chainId}).toString();
-
     return api
-      .get<Token[]>(`/tokens?${params}`)
+      .get<Token[]>("/tokens", { params: {chainId} })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -563,9 +561,8 @@ export default function useApi() {
     networkName = DEFAULT_NETWORK_NAME,
     chainId = ""
   }) {
-    const params = new URLSearchParams({networkName, chainId}).toString();
     return api
-      .get<Token[]>(`/tokens?${params}`)
+      .get<Token[]>("/tokens", { params: {networkName, chainId}})
       .then(({ data }) => data)
       .catch((error) => {
         throw error;

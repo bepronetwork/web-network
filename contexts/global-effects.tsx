@@ -51,9 +51,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(repos.loadRepos, [
     query?.network,
     query?.chain,
-    Service?.network?.lastVisited,
-    state.Service?.network?.active,
-    supportedChains
+    state.Service?.network?.active
   ]);
   useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
 

@@ -13,7 +13,7 @@ import {useAppState} from "contexts/app-state";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
-import UseNetworkChange from "x-hooks/use-network-change";
+import useNetworkChange from "x-hooks/use-network-change";
 
 type typeError = { code?: number; message?: string }
 
@@ -28,7 +28,7 @@ export default function WrongNetworkModal() {
   const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
   
   const api = useApi();
-  const { handleAddNetwork } = UseNetworkChange();
+  const { handleAddNetwork } = useNetworkChange();
   const { state: { connectedChain, currentUser, Service, supportedChains, loading, spinners } } = useAppState();
 
   function changeShowModal() {

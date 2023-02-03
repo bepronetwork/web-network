@@ -223,7 +223,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         const currentChain = +state.connectedChain?.id;
         
         // Network with same name on this chain
-        if (networksWithSameName.rows.find(({ chain_id }) => +chain_id === currentChain))
+        if (networksWithSameName.rows.some(({ chain_id }) => +chain_id === currentChain))
           return false;
 
         const currentWallet = state.currentUser?.walletAddress?.toLowerCase();

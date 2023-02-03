@@ -1,8 +1,10 @@
+import {toHex} from "web3-utils";
+
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
-export default function UseNetworkChange() {
+export default function useNetworkChange() {
   async function handleAddNetwork(chosenSupportedChain: SupportedChainData) {
-    const chainId = `0x${Number(chosenSupportedChain.chainId).toString(16)}`;
+    const chainId = toHex(chosenSupportedChain.chainId);
 
     return window.ethereum.request({
       method: "wallet_switchEthereumChain",

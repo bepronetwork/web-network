@@ -3,18 +3,15 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     const integerParam = {
-      type: Sequelize.BIGINT,
-      allowNull: true
+      type: Sequelize.BIGINT
     };
 
     const floatParam = {
-      type: Sequelize.FLOAT,
-      allowNull: true
+      type: Sequelize.FLOAT
     };
 
     await queryInterface.addColumn("networks", "councilAmount", {
-      type: Sequelize.STRING,
-      allowNull: true
+      type: Sequelize.STRING
     });
 
     await queryInterface.addColumn("networks", "disputableTime", integerParam);

@@ -1,8 +1,9 @@
 import {useContext} from "react";
 
-import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
+import {isZeroAddress} from "ethereumjs-util";
 import {useRouter} from "next/router";
+import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsContext} from "contexts/bounty-effects";
@@ -154,7 +155,7 @@ export function useBounty() {
         state.Service.active.getERC20TokenData(bounty.transactional)
           .then(token => dispatch(changeCurrentBountyDataTransactional(token)));
 
-        if(bounty.rewardToken && bounty.rewardToken !== Defaults.nativeZeroAddress)
+        if(isAddress(bounty.rewardToken) && !isZeroAddress(bounty.rewardToken))
           state.Service.active.getERC20TokenData(bounty.rewardToken)
               .then(token => dispatch(changeCurrentBountyDataReward(token)));
 

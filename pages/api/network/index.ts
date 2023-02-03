@@ -94,10 +94,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       isDefault,
       signedMessage
     } = req.body;
-
-    const name = _name?.replaceAll(" ", "-")?.toLowerCase();
-
-    if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
+   
+    const name = _name.replaceAll(" ", "-").toLowerCase();
+    
+    if (!botPermission) return resJsonMessage("Bepro-bot authorization needed", res, 403);
     
     const chain = await chainFromHeader(req);
 
@@ -105,7 +105,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       decodeMessage(chain.chainId, WANT_TO_CREATE_NETWORK, signedMessage, assumedOwner);
 
     if (!validateSignature(creator))
-      return res.status(403).json("Invalid signature");
+      return resJsonMessage("Invalid signature", res, 403);
 
     const hasNetwork = await Database.network.findOne({
       where: {
@@ -116,7 +116,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
 
     if (hasNetwork) {
-      return res.status(409).json("Already exists a network created for this wallet");
+      return resJsonMessage("Already exists a network created for this wallet", res, 409);
     }
 
     const sameNameOnOtherChain = await Database.network.findOne({
@@ -133,7 +133,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (sameNameOnOtherChain)
       if (!validateSignature(sameNameOnOtherChain.creatorAddress))
-        return res.status(403).json("Network name owned by other wallet");
+        return resJsonMessage("Network name owned by other wallet", res, 403);
 
     const settings = await Database.settings.findAll({
       where: { visibility: "public" },
@@ -235,8 +235,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
-    if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
-    if (!serverRuntimeConfig?.github?.token) return res.status(500).json("Missing github bot token");
+    if (!publicSettings?.github?.botUser) return resJsonMessage("Missing github bot user", res, 500);
+    if (!serverRuntimeConfig?.github?.token) return resJsonMessage("Missing github bot token", res, 500);
 
     const octokitUser = new Octokit({
       auth: accessToken
@@ -315,9 +315,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     } = req.body;
 
     const isAdminOverriding = isAdmin(req) && !!override;
-
-    if (!accessToken && !isAdminOverriding) return res.status(401).json({message: "Unauthorized user"});
     
+    if (!accessToken && !isAdminOverriding) return resJsonMessage("Unauthorized user", res, 401);
+
     const network = await Database.network.findOne({
       where: {
         ...(isAdminOverriding ? {} : {

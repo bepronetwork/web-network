@@ -14,7 +14,7 @@ import { SupportedChainData } from "interfaces/supported-chain-data";
 import DAO from "services/dao-service";
 
 import useChain from "x-hooks/use-chain";
-import UseNetworkChange from "x-hooks/use-network-change";
+import useNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
 
@@ -23,7 +23,7 @@ export function useDao() {
 
   const { chain } = useChain();
   const {state, dispatch} = useAppState();
-  const { handleAddNetwork } = UseNetworkChange();
+  const { handleAddNetwork } = useNetworkChange();
 
   function isChainConfigured(chain: SupportedChainData) {
     return isAddress(chain?.registryAddress) && !isZeroAddress(chain?.registryAddress);

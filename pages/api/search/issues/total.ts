@@ -3,6 +3,8 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import { resJsonMessage } from "helpers/res-json-message";
+
 import { WithJwt } from "middleware";
 import {LogAccess} from "middleware/log-access";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
@@ -39,7 +41,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
     }
   })
 
-  if (networks.length === 0) return res.status(404).json("Networks not found");
+  if (networks.length === 0) return resJsonMessage("Networks not found", res, 404);
 
   whereCondition.network_id = { [Op.in]: networks.map(network => network.id) };
 
@@ -50,8 +52,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issueCount);
 }
 
-async function getAll(req: NextApiRequest,
-                      res: NextApiResponse) {
+async function getAll(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getTotal(req, res);
