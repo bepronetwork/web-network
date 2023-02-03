@@ -33,7 +33,10 @@ export default function ConnectWalletButton({children = null, asModal = false, f
     if (!state.Service?.active)
       return;
 
-    if (+window.ethereum.chainId === +state.Settings?.requiredChain?.id) {
+    if (
+        +state.connectedChain.id === +state.Settings?.requiredChain?.id ||
+        +window.ethereum.chainId === +state.Settings?.requiredChain?.id
+      ) {
       connectWallet();
     } else {
       console.log('no connected chain?', state.connectedChain, state.Settings?.requiredChain);
