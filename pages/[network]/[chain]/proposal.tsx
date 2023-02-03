@@ -78,7 +78,7 @@ export default function PageProposal() {
           return processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } );
         })
         .then(() => {
-          getChainBounty(true);
+          getChainBounty();
           getDatabaseBounty(true);
           dispatch(addToast({
               type: "success",
@@ -108,7 +108,7 @@ export default function PageProposal() {
       })
       .then(() => {
         getDatabaseBounty(true);
-        getChainBounty(true);
+        getChainBounty();
       })
       .catch(error => {
         if (error?.code === MetamaskErrors.UserRejected) return;
@@ -132,7 +132,7 @@ export default function PageProposal() {
     })
     .then(() => {
       getDatabaseBounty(true);
-      getChainBounty(true);
+      getChainBounty();
       
       dispatch(addToast({
         type: "success",

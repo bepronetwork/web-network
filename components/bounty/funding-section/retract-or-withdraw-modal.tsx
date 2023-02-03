@@ -58,7 +58,7 @@ export default function RetractOrWithdrawModal({
                                      rewardTokenSymbol)
       .then(() => {
         onCloseClick();
-        getChainBounty(true);
+        getChainBounty();
         dispatch(toastSuccess(t("funding:modals.reward.withdraw-x-symbol", {
           amount: retractOrWithdrawAmount,
           symbol: rewardTokenSymbol
@@ -80,7 +80,7 @@ export default function RetractOrWithdrawModal({
       })
       .then(() => {
         onCloseClick();
-        getChainBounty(true);
+        getChainBounty();
         getDatabaseBounty(true);
         dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
           amount: retractOrWithdrawAmount,

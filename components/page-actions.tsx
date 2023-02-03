@@ -98,7 +98,7 @@ export default function PageActions({
 
     if(["both","database"].includes(methods)) getDatabaseBounty(force);
     
-    if(["both","chain"].includes(methods)) getChainBounty(force);
+    if(["both","chain"].includes(methods)) getChainBounty();
   }
 
   async function handleRedeem() {

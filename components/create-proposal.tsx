@@ -297,7 +297,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       handleClose();
       setExecuting(false);
       currentBounty.getDatabaseBounty(true);
-      currentBounty.getChainBounty(true);
+      currentBounty.getChainBounty();
     })
   }
 

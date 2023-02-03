@@ -4,10 +4,12 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import FundingProgress from "components/bounty/funding-section/funding-progress";
+import {Amount, CaptionMedium, RowWithTwoColumns} from "components/bounty/funding-section/minimals";
 import Button from "components/button";
 import InputWithBalance from "components/input-with-balance";
 import Modal from "components/modal";
 
+import {useAppState} from "contexts/app-state";
 import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
 import {formatNumberToCurrency} from "helpers/formatNumber";
@@ -19,14 +21,10 @@ import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
 import useERC20 from "x-hooks/use-erc20";
 
-import {useAppState} from "../../../contexts/app-state";
-import {Amount, CaptionMedium, RowWithTwoColumns} from "./minimals";
-
-
 export default function FundModal({
-                                    show = false,
-                                    onCloseClick,
-                                  }) {
+  show = false,
+  onCloseClick,
+}) {
   const {t} = useTranslation(["common", "funding", "bounty"]);
   const {state, dispatch} = useAppState();
 
@@ -89,7 +87,7 @@ export default function FundModal({
       .then(() => {
         const amountFormatted = formatNumberToCurrency(amountToFund.toFixed());
         getDatabaseBounty(true);
-        getChainBounty(true);
+        getChainBounty();
         handleClose();
 
         dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {

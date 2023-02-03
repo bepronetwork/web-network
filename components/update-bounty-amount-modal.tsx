@@ -73,7 +73,7 @@ export default function UpdateBountyAmountModal({
       })
       .then(() => {
         getDatabaseBounty(true) 
-        getChainBounty(true)
+        getChainBounty()
         resetValues();
         handleClose();
       })
