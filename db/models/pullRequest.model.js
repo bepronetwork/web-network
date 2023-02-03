@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 class PullRequest extends Model {
   /**
@@ -23,8 +24,7 @@ class PullRequest extends Model {
           type: DataTypes.STRING,
           allowNull: true,
           get() {
-            const rawValue = this.getDataValue("userAddress");
-            return rawValue ? rawValue.toLowerCase() : null;
+            return getValueToLowerCase(this, "userAddress");
           }
         },
         status: {

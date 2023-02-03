@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 class Developer extends Model {
   /**
@@ -12,8 +13,7 @@ class Developer extends Model {
         address: {
           type: DataTypes.STRING,
           get() {
-            const rawValue = this.getDataValue("address");
-            return rawValue ? rawValue.toLowerCase() : null;
+            return getValueToLowerCase(this, "address");
           }
         },
         issueId: DataTypes.INTEGER

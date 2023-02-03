@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 class MergeProposal extends Model {
   /**
@@ -15,8 +16,7 @@ class MergeProposal extends Model {
         creator: {
           type: DataTypes.STRING,
           get() {
-            const rawValue = this.getDataValue("creator");
-            return rawValue ? rawValue.toLowerCase() : null;
+            return getValueToLowerCase(this, "creator");
           }
         },
         network_id: DataTypes.INTEGER,

@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 
 class ProposalDistributions extends Model {
@@ -14,8 +15,7 @@ class ProposalDistributions extends Model {
         type: DataTypes.STRING(255),
         allowNull: false,
         get() {
-          const rawValue = this.getDataValue("address");
-          return rawValue ? rawValue.toLowerCase() : null;
+          return getValueToLowerCase(this, "address");
         }
       },
       percentage: {

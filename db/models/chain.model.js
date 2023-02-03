@@ -1,3 +1,4 @@
+const { getValueToLowerCase } = require("helpers/db/getters");
 const {Model, DataTypes} = require("sequelize");
 
 class Chain extends Model {
@@ -40,6 +41,9 @@ class Chain extends Model {
       },
       registryAddress: {
         type: DataTypes.STRING,
+        get() {
+          return getValueToLowerCase(this, "registryAddress");
+        }
       },
       eventsApi: {
         type: DataTypes.STRING,

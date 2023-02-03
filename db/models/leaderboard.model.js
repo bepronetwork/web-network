@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 
 class LeaderBoard extends Model {
@@ -15,8 +16,7 @@ class LeaderBoard extends Model {
           allowNull: false,
           unique: true,
           get() {
-            const rawValue = this.getDataValue("address");
-            return rawValue ? rawValue.toLowerCase() : null;
+            return getValueToLowerCase(this, "address");
           }
         },
         numberNfts: {

@@ -1,5 +1,6 @@
 "use strict";
 const {Model, DataTypes} = require("sequelize");
+const {getValueToLowerCase} = require("helpers/db/getters");
 
 class Network extends Model {
   static init(sequelize) {
@@ -7,8 +8,7 @@ class Network extends Model {
         creatorAddress: {
           type: DataTypes.STRING,
           get() {
-            const rawValue = this.getDataValue("creatorAddress");
-            return rawValue ? rawValue.toLowerCase() : null;
+            return getValueToLowerCase(this, "creatorAddress");
           }
         },
         name: {
@@ -20,8 +20,7 @@ class Network extends Model {
         networkAddress: {
           type: DataTypes.STRING,
           get() {
-            const rawValue = this.getDataValue("networkAddress");
-            return rawValue ? rawValue.toLowerCase() : null;
+            return getValueToLowerCase(this, "networkAddress");
           }
         },
         logoIcon: DataTypes.STRING,
