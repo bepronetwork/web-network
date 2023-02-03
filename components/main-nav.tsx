@@ -82,11 +82,11 @@ export default function MainNav() {
       <InternalLink
         className="mt-1"
         href={"/explore"}
-        blank={true}
+        blank={!noNeedNetworkInstance}
         label={<Translation label={"main-nav.explorer"} />}
         nav
         uppercase
-        icon={<ExternalLinkIcon className="mb-1" width={12} height={12} />}
+        icon={!noNeedNetworkInstance ? <ExternalLinkIcon className="mb-1" width={12} height={12} />:null}
       />
     );
   }
@@ -127,41 +127,17 @@ export default function MainNav() {
   }
 
   const brandLogo = !noNeedNetworkInstance ? (
-      <InternalLink
-        href={getURLWithNetwork("/", {
-          network: state.Service?.network?.active?.name,
-        })}
-        icon={
-          fullLogoUrl ? (
-            <img
-              src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
-              width={104}
-              height={40}
-            />
-          ) : (
-            <LogoPlaceholder />
-          )
-        }
-        className="brand"
-        nav
-        active
-        brand
+    fullLogoUrl ? (
+      <img
+        src={`${state.Settings?.urls?.ipfs}/${fullLogoUrl}`}
+        width={104}
+        height={40}
       />
-    ): (
-      <InternalLink
-        href={'/'}
-        icon={                  
-            <img
-              src={`/images/Bepro_Logo_Light.svg`}
-              width={104}
-              height={40}
-            />                  
-        }
-        className="brand"
-        nav
-        active
-        brand
-      />
+    ) : (
+      <LogoPlaceholder />
+    )
+  ) : (
+    <img src={`/images/Bepro_Logo_Light.svg`} width={104} height={40} />
   );
 
   return (
