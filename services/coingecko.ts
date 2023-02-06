@@ -100,12 +100,12 @@ async function getCoinPrice(search: string, fiat = settings?.currency.defaultFia
   if (!coinEntry)
     return 0;
 
-  const price = await COINGECKO_API.get(`/simple/price?ids=digitalprice&vs_currencies=${fiat || 'eur'}`);
+  const price = await COINGECKO_API.get(`/simple/price?ids=${coinEntry.id}&vs_currencies=${fiat || 'eur'}`);
 
-  if (!price?.data?.digitalprice)
+  if (!price?.data?.[coinEntry.id])
     return 0;
 
-  return price?.data?.digitalprice[fiat || 'eur'];
+  return price?.data?.[coinEntry.id]?.[fiat || 'eur'];
 }
 
 export {
