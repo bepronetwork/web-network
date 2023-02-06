@@ -32,7 +32,7 @@ export default function NetworksList() {
   const [order, setOrder] = useState(["name", "asc"]);
   const [networks, setNetworks] = useState<Network[]>([]);
 
-  const { searchNetworks } = useApi();
+  const { searchNetworks, getHeaderNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
 
   const { state, dispatch } = useAppState();
@@ -40,7 +40,6 @@ export default function NetworksList() {
     setNumberOfNetworks, 
     setNumberOfBounties, 
     setTotalConverted, 
-    setNotConvertedTokens 
   } = useContext(NetworksPageContext);
 
   function handleOrderChange(newOrder) {
@@ -56,6 +55,13 @@ export default function NetworksList() {
   useEffect(() => {    
     dispatch(changeLoadState(true));
 
+    getHeaderNetworks().then(({ TVL, bounties, number_of_network }) => {
+      setTotalConverted(TVL.toFixed())
+      setNumberOfNetworks(number_of_network)
+      setNumberOfBounties(bounties)
+    })
+    .catch(error => console.log("Failed to retrieve header data", error))
+
     searchNetworks({
       isRegistered: true,
       sortBy: "name",
@@ -63,8 +69,6 @@ export default function NetworksList() {
     })
       .then(async ({ count, rows }) => {
         if (count > 0) {
-          setNumberOfNetworks(count);
-
           setNetworks(rows);
         }
       })
@@ -78,21 +82,6 @@ export default function NetworksList() {
 
   useEffect(() => {
     if (!networks.length) return;
-
-    setNumberOfBounties(networks.reduce((acc, el) => acc + (el?.totalBounties || 0), 0));
-    setTotalConverted(networks.reduce((acc, el) => acc + (+el?.totalSettlerConverted || 0), 0));
-
-    const networkWithNotConvertedToken = 
-      networks.filter(network => +network?.tokensLocked > 0 && +network?.totalSettlerConverted === 0);
-
-    const notConvertedEntries = 
-      networkWithNotConvertedToken.map(({ tokensLocked, networkToken }) => [networkToken.address, {
-        name: networkToken.name,
-        symbol: networkToken.symbol,
-        totalSettlerLocked: tokensLocked
-      }]);
-
-    setNotConvertedTokens(Object.fromEntries(notConvertedEntries));
 
     if (!state.Service?.active || networks?.every(network => network?.openBounties !== undefined)) return;
 

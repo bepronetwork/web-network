@@ -4,6 +4,7 @@ import {GetServerSideProps} from "next";
 import {SessionProvider} from "next-auth/react";
 import {appWithTranslation} from "next-i18next";
 import {AppProps} from "next/app";
+import {GoogleAnalytics} from "nextjs-google-analytics";
 
 import CreateBountyModal from "components/create-bounty-modal";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
@@ -20,11 +21,18 @@ import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
+import {useRouter} from "next/router";
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
+  const {asPath} = useRouter();
+
+  if (asPath.includes('api-doc'))
+    return <Component {...pageProps}></Component>
+
   return (
     <>
+      <GoogleAnalytics trackPageViews />
       <SessionProvider session={session}>
         <RootProviders>
           <Seo />

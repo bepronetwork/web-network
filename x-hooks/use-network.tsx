@@ -55,8 +55,6 @@ export function useNetwork() {
       }
     } else if (storage.value) dispatch(changeNetworkLastVisited(storage.value));
 
-    console.debug(`Updating active network`, networkName);
-
     getNetwork({
       ... networkName && {
         name: networkName

@@ -160,7 +160,7 @@ export default function CreateBountyModal() {
         decimals: transactionalERC20?.decimals,
         amount: issueAmount,
         setAmount: setIssueAmount,
-        tokens: customTokens.filter(token => token?.isTransactional !== false),
+        tokens: customTokens.filter(token => !!token?.network_tokens?.isTransactional),
         balance: transactionalERC20.balance,
         isFunding: false,
         label: t("bounty:fields.select-token.bounty", { set: review ? "" : t("bounty:fields.set") })
@@ -172,7 +172,7 @@ export default function CreateBountyModal() {
         decimals: transactionalERC20?.decimals,
         amount: rewardAmount,
         setAmount: setRewardAmount,
-        tokens: customTokens.filter(token => token?.isTransactional !== true),
+        tokens: customTokens.filter(token => !!token?.network_tokens?.isReward),
         balance: rewardERC20.balance,
         isFunding: true,
         label: t("bounty:fields.select-token.reward", { set: review ? "" : t("bounty:fields.set") })
@@ -605,15 +605,15 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!Service?.network?.tokens || !showCreateBounty)
+    if (!Service?.network?.active?.tokens || !showCreateBounty)
       return;
 
-    const {transactional, reward} = Service?.network?.tokens || {};
+    const tokens = Service?.network.active.tokens || [];
 
-    if (transactional.length + reward.length === customTokens.length)
+    if (tokens.length === customTokens.length)
       return;
 
-    setCustomTokens([...transactional, ...reward]);
+    setCustomTokens(tokens);
 
   }, [Service?.network?.active?.tokens, showCreateBounty]);
 

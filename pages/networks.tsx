@@ -10,35 +10,33 @@ import PageHero, {InfosHero} from "components/page-hero";
 
 import {useAppState} from "../contexts/app-state";
 
-interface NetworkTokenLocked {
-  name: string;
-  symbol: string;
-  totalSettlerLocked: number;
+interface price_used {
+  [name: string]: number;
 }
 
-export interface NotConvertedTokens {
-  [address: string]: NetworkTokenLocked;
+export interface ConvertedTokens {
+  [symbol: string]: price_used;
 }
 
 interface NetworksPageProps {
   numberOfNetworks: number;
   numberOfBounties: number;
-  totalConverted: number;
-  notConvertedTokens?: NotConvertedTokens;
+  totalConverted: string;
+  convertedTokens?: ConvertedTokens;
   setNumberOfNetworks: (quantity: number) => void;
   setNumberOfBounties: (quantity: number) => void;
-  setTotalConverted: (amount: number) => void;
-  setNotConvertedTokens: (tokens: NotConvertedTokens) => void;
+  setTotalConverted: (amount: string) => void;
+  setConvertedTokens: (tokens: ConvertedTokens) => void;
 }
 
 export const NetworksPageContext = createContext<NetworksPageProps>({
   numberOfNetworks: 0,
   numberOfBounties: 0,
-  totalConverted: 0,
+  totalConverted: "0",
   setNumberOfNetworks: (quantity: number) => console.log("incrementNumberOfNetworks", quantity),
   setNumberOfBounties: (quantity: number) => console.log("incrementNumberOfBounties", quantity),
-  setTotalConverted: (amount: number) => console.log("incrementTotalConverted", amount),
-  setNotConvertedTokens: (tokens: NotConvertedTokens) => console.log("includeNotConvertedToken", tokens)
+  setTotalConverted: (amount: string) => console.log("incrementTotalConverted", amount),
+  setConvertedTokens: (tokens: ConvertedTokens) => console.log("includeNotConvertedToken", tokens)
 });
 
 export default function NetworksPage() {
@@ -46,11 +44,11 @@ export default function NetworksPage() {
 
   const {state} = useAppState();
 
-  const [totalConverted, setTotalConverted] = useState(0);
+  const [totalConverted, setTotalConverted] = useState("");
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [notConvertedTokens, setNotConvertedTokens] = useState<NotConvertedTokens>();
+  const [convertedTokens, setConvertedTokens] = useState<ConvertedTokens>();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -62,7 +60,7 @@ export default function NetworksPage() {
       label: t("custom-network:hero.number-of-bounties")
     },
     {
-      value: 0,
+      value: "0",
       label: t("custom-network:hero.in-the-network"),
       currency: "USD"
     }
@@ -86,21 +84,21 @@ export default function NetworksPage() {
         value: totalConverted,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD",
-        hasNotConvertedTokens: !!notConvertedTokens,
-        setNotListedModalVisibility: () => setIsModalVisible(true)
+        hasConvertedTokens: !!convertedTokens,
+        setListedModalVisibility: () => setIsModalVisible(true)
       }
     ]);    
-  }, [numberOfNetworks, numberOfBounties, totalConverted, notConvertedTokens]);
+  }, [numberOfNetworks, numberOfBounties, totalConverted, convertedTokens]);
 
   const contextValue = {
     totalConverted,
     numberOfNetworks,
     numberOfBounties,
-    notConvertedTokens,
+    convertedTokens,
     setNumberOfNetworks,
     setNumberOfBounties,
     setTotalConverted,
-    setNotConvertedTokens
+    setConvertedTokens
   }
 
   return (
@@ -120,7 +118,7 @@ export default function NetworksPage() {
       <NotListedTokens 
         isVisible={isModalVisible} 
         handleClose={() => setIsModalVisible(false)} 
-        networks={notConvertedTokens && Object.entries(notConvertedTokens).map(e => e[1]) || []} 
+        networks={convertedTokens && Object.entries(convertedTokens).map(e => e[1]) || []} 
       />
     </NetworksPageContext.Provider>
   );

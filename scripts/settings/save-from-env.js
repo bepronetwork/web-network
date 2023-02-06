@@ -45,7 +45,7 @@ const publicSettings = [
   PublicSettingItem("1287", "moonbase", "string", "chainIds"),
   PublicSettingItem("disputableTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("draftTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
-  PublicSettingItem("councilAmount", `{ "min": 100001, "max": 50000000 }`, "json", "networkParametersLimits"),
+  PublicSettingItem("councilAmount", `{ "min": 100001, "max": 100000000000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("disputePercentage", `{ "max": 15 }`, "json", "networkParametersLimits"),
   PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS || 0, "boolean", "defaultNetworkConfig"),
   PublicSettingItem("minBountyValue", process.env.NEXT_MIN_BOUNTY_VALUE_WEI || "0.000000000000000100", "string"),
@@ -83,6 +83,7 @@ const updateTokens = async ({
     name,
     symbol,
     isTransactional,
+    isReward,
     address
   }) => {
     const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
@@ -95,16 +96,19 @@ const updateTokens = async ({
       where: {
         name,
         symbol,
-        isTransactional
+        isTransactional,
+        isReward
       },
       defaults: {
         address,
-        isAllowed: true
+        isAllowed: true,
+        isTransactional,
+        isReward
       }
     });
 
   if (!created && process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME.length)
-    await TokensModel.update({ address }, { where: { name, symbol, isTransactional }});
+    await TokensModel.update({ address }, { where: { name, symbol, isTransactional, isReward }});
 
   const beproNetwork = await NetworkModel.findOne({
     where: {
@@ -116,7 +120,13 @@ const updateTokens = async ({
     await NetworkTokensModel.findOrCreate({
       where: {
         tokenId: token.id,
-        networkId: beproNetwork.id
+        networkId: beproNetwork.id,
+      },
+      defaults: {
+        tokenId: token.id,
+        networkId: beproNetwork.id,
+        isTransactional,
+        isReward
       }
     });
   }

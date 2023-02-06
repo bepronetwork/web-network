@@ -7,7 +7,8 @@ import TabbedNavigation from "components/tabbed-navigation";
 
 export function NetworkTokenConfig({
   onChange,
-  registryToken
+  registryToken,
+  settlerToken
 }) {
   const { t } = useTranslation("custom-network");
 
@@ -73,8 +74,8 @@ export function NetworkTokenConfig({
   }
 
   useEffect(() => {
-    if (registryToken?.address) onChange(registryToken?.address);
-  }, [registryToken?.address]);
+    if (registryToken?.address && !settlerToken) onChange(registryToken?.address);
+  }, [registryToken?.address, settlerToken]);
 
   return(
     <>

@@ -21,7 +21,8 @@ const publicRuntimeConfig = {
     proposalCreated: process.env.NEXT_PUBLIC_PROPOSAL_CREATED || 0.5,
     proposalAccepted: process.env.NEXT_PUBLIC_PROPOSAL_ACCEPTED || 0.3,
     proposalRejected: process.env.NEXT_PUBLIC_PROPOSAL_REJECTED || -0.5
-  }
+  },
+  gaMeasureID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 }
 
 // Will only be available on the server-side

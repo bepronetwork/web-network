@@ -456,10 +456,10 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
 
     defaultState.settings.treasury.address = {value: treasury.treasury, validated: true}
-    defaultState.settings.treasury.cancelFee = { value: treasury.closeFee, validated: true };
-    defaultState.settings.treasury.closeFee = { value: treasury.cancelFee, validated: true };
+    defaultState.settings.treasury.cancelFee = { value: treasury.cancelFee, validated: true };
+    defaultState.settings.treasury.closeFee = { value: treasury.closeFee, validated: true };
     defaultState.tokens.allowedTransactions = network?.tokens?.filter(token => token.isTransactional);
-    defaultState.tokens.allowedRewards = network?.tokens?.filter(token => !token.isTransactional);
+    defaultState.tokens.allowedRewards = network?.tokens?.filter(token => token.isReward);
 
     defaultState.details.name = {value: network?.name, validated: true}
     defaultState.details.description = network?.description

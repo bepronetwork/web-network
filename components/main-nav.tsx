@@ -166,7 +166,9 @@ export default function MainNav() {
 
                 <li>
                   <InternalLink
-                    href={getURLWithNetwork("/curators")}
+                    href={getURLWithNetwork("/curators", {
+                      type: "ready-to-propose"
+                    })}
                     label={<Translation label={"main-nav.council"} />}
                     nav
                     uppercase

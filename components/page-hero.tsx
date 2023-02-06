@@ -14,8 +14,8 @@ export interface InfosHero {
   value: number | string;
   label: string;
   currency?: Currency;
-  hasNotConvertedTokens?: boolean;
-  setNotListedModalVisibility?: (visible: boolean) => void;
+  hasConvertedTokens?: boolean;
+  setListedModalVisibility?: (visible: boolean) => void;
 }
 
 export interface PageHeroProps {
@@ -31,7 +31,7 @@ function InfoComponent(info: InfosHero) {
         <div className="border-top border-2 mb-2"></div>
         <div className="d-flex flex-row align-items-top">
           <span className="h4 text-white">
-            { info.hasNotConvertedTokens && "~ "}
+            { info.hasConvertedTokens && "~ "}
             {formatNumberToNScale(info.value)}
           </span>
           
@@ -39,8 +39,8 @@ function InfoComponent(info: InfosHero) {
             {info.currency}
           </span>
 
-          { info.hasNotConvertedTokens && 
-            <Button transparent className="p-0 ml-1" onClick={() => info?.setNotListedModalVisibility?.(true)}>
+          { info.hasConvertedTokens && 
+            <Button transparent className="p-0 ml-1" onClick={() => info?.setListedModalVisibility?.(true)}>
               <InfoIcon width={14} height={14} color="text-white-10" />
             </Button>
           }

@@ -44,26 +44,32 @@ export default function CouncilLayout({ children }) {
     },
   ]);
 
+  function handleUrlCurators (type: string) {
+    return push(getURLWithNetwork("/curators", {
+      type
+    }), undefined, { shallow: true  })
+  }
+
   const internalLinks = [
     {
-      onClick: () => push(getURLWithNetwork("/curators/ready-to-propose")),
+      onClick: () => handleUrlCurators("ready-to-propose"),
       label: t("council:ready-to-propose"),
-      active: asPath.endsWith("/curators") || asPath.endsWith("/ready-to-propose")
+      active: asPath.endsWith("/curators") || asPath.endsWith("ready-to-propose")
     },
     {
-      onClick: () => push(getURLWithNetwork("/curators/ready-to-dispute")),
+      onClick: () => handleUrlCurators("ready-to-dispute"),
       label: t("council:ready-to-dispute"),
-      active: asPath.endsWith("/ready-to-dispute")
+      active: asPath.endsWith("ready-to-dispute")
     },
     {
-      onClick: () => push(getURLWithNetwork("/curators/ready-to-close")),
+      onClick: () => handleUrlCurators("ready-to-close"),
       label: t("council:ready-to-close"),
-      active: asPath.endsWith("/ready-to-close")
+      active: asPath.endsWith("ready-to-close")
     },
     {
-      onClick: () => push(getURLWithNetwork("/curators/curators-list")),
+      onClick: () => handleUrlCurators("curators-list"),
       label: t("council:council-list"),
-      active: asPath.endsWith("/curators-list")
+      active: asPath.endsWith("curators-list")
     }
   ]
 
