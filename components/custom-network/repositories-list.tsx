@@ -7,6 +7,8 @@ import RepositoryCheck from "components/custom-network/repository-check";
 
 import { useAppState } from "contexts/app-state";
 
+import { Repository } from "interfaces/issue-data";
+
 import useApi from "x-hooks/use-api";
 
 interface infoType {
@@ -27,6 +29,7 @@ export default function RepositoriesList({
 
   const [existingRepos, setExistingRepos] = useState([]);
   const [reposWithIssues, setReposWithIssues] = useState([]);
+  const [reposWithNetwork, setReposWithNetwork] = useState<Repository[]>();
   const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
   const [withoutMergeCommitPerm, setWithoutMergeCommitPerm] = useState([]);
   const [withoutBotCollaborator, setWithoutBotCollaborator] = useState([]);
@@ -117,15 +120,7 @@ export default function RepositoriesList({
         path: paths,
         networkName: ""
       })
-        .then(({ rows }) => {
-          const isUsedByOtherNetwork = ({ network: { name, creatorAddress }}) => 
-            (toLower(name) !== activeNetworkName) ||
-            (toLower(name) === activeNetworkName && 
-            creatorAddress !== activeNetworCreator && 
-            creatorAddress !== currentWallet);
-
-          setExistingRepos(rows.filter(isUsedByOtherNetwork).map((repo) => repo.githubPath));
-        })
+        .then(({ rows }) => setReposWithNetwork(rows))
         .catch(console.log);
 
     setReposWithIssues(repositories.filter(repository => repository.hasIssues)
@@ -138,9 +133,20 @@ export default function RepositoriesList({
 
     updateReposWithoutMergeCommitPerm();
     updateReposWithoutBotCollaborator();
-  }, [repositories, activeNetworkName, activeNetworCreator]);
+  }, [repositories]);
 
   useEffect(updateReposWithoutBotCollaborator, [botUser]);
+  useEffect(() => {
+    if (!reposWithNetwork) return;
+    
+    const isUsedByOtherNetwork = ({ network: { name, creatorAddress }} : Repository) => 
+            (toLower(name) !== activeNetworkName) ||
+            (toLower(name) === activeNetworkName && 
+            creatorAddress !== activeNetworCreator && 
+            creatorAddress !== currentWallet);
+
+    setExistingRepos(reposWithNetwork.filter(isUsedByOtherNetwork).map((repo) => repo.githubPath));
+  }, [reposWithNetwork, activeNetworkName, activeNetworCreator]);
 
   function renderInfo({
     text,
