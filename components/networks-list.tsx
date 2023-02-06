@@ -19,7 +19,6 @@ import {Network} from "interfaces/network";
 
 import {NetworksPageContext} from "pages/networks";
 
-import {getCoinInfoByContract} from "services/coingecko";
 import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";
@@ -83,7 +82,7 @@ export default function NetworksList() {
   useEffect(() => {
     if (!networks.length) return;
 
-    if (!state.Service?.active || networks?.every(network => network?.openBounties !== undefined)) return;
+    if (!state.Service?.active) return;
 
     const web3Host = state.Settings?.urls?.web3Provider;
     const dao = new DAO({web3Host, skipWindowAssignment: true});
@@ -93,59 +92,16 @@ export default function NetworksList() {
         const networkAddress = network?.networkAddress;
         await dao.loadNetwork(networkAddress);
 
-        const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+        const [settlerTokenData] = await Promise.all([
             dao.getSettlerTokenData().catch(() => undefined),
-            dao.getTotalNetworkToken().catch(() => 0),
-            dao.getOpenBounties().catch(() => 0),
-            dao.getTotalBounties().catch(() => 0)
         ]);
 
-        const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
-
-        const coinInfo = await getCoinInfoByContract(settlerTokenData?.symbol).catch(() => ({ prices: {} }));
-
-        const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
-
         return { ...network,
-                 openBounties,
-                 totalBounties,
-                 networkToken: settlerTokenData,
-                 tokensLocked: totalSettlerLocked.toFixed(),
-                 totalSettlerConverted: totalSettlerConverted.toFixed()
+                 networkToken: settlerTokenData
         }
       })))
       .then(setNetworks)
       .catch(error => console.log("Failed to load network data", error, state.Service?.network?.active));
-
-    // Promise.all(networks.map(async (network: Network) => {
-    //   const networkAddress = network?.networkAddress;
-    //
-    //
-    //   await dao.loadNetwork(networkAddress);
-    //
-    //   const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
-    //     dao.getSettlerTokenData().catch(() => undefined),
-    //     dao.getTotalNetworkToken().catch(() => 0),
-    //     dao.getOpenBounties().catch(() => 0),
-    //     dao.getTotalBounties().catch(() => 0)
-    //   ]);
-    //
-    //   const mainCurrency = state.Settings?.currency?.defaultFiat || "eur";
-    //
-    //   const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
-    //
-    //   const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
-    //
-    //   return { ...network,
-    //            openBounties,
-    //            totalBounties,
-    //            networkToken: settlerTokenData,
-    //            tokensLocked: totalSettlerLocked.toFixed(),
-    //            totalSettlerConverted: totalSettlerConverted.toFixed()
-    //   }
-    // }))
-    //   .then(setNetworks)
-    //   .catch(error => console.log("Failed to load network data", error, state.Service?.network?.active));
   }, [networks, state.Service?.active]);
 
   return (
