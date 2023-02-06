@@ -15,7 +15,8 @@ import {
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
-  changeCurrentUserWallet
+  changeCurrentUserWallet,
+  changeCurrentUserisAdmin
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
@@ -104,11 +105,13 @@ export function useAuthentication() {
       state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
       .then(_address => {
         const address = Array.isArray(_address) ? _address[0] : _address;
+        
         if (address !== state.currentUser?.walletAddress) {
-          dispatch(changeCurrentUserWallet(address?.toLowerCase()))
-          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()})
+          dispatch(changeCurrentUserWallet(address?.toLowerCase()));
+          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()});
         }
 
+        dispatch(changeCurrentUserisAdmin(publicRuntimeConfig.adminWallet.toLowerCase() === address?.toLowerCase()));
 
         const windowChainId = +window.ethereum.chainId;
         const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
@@ -316,11 +319,17 @@ export function useAuthentication() {
 
     if (state.connectedChain?.name === "unknown") return;
 
+    const storedSignature = sessionStorage.getItem("currentSignature");
+
     if (decodeMessage(state?.connectedChain?.id,
                       IM_AN_ADMIN,
-                      state?.currentUser?.signature,
-                      publicRuntimeConfig?.adminWallet))
+                      storedSignature || state?.currentUser?.signature,
+                      publicRuntimeConfig?.adminWallet)) {
+      if (storedSignature)
+        sessionStorage.setItem("currentSignature", storedSignature);
+
       return;
+    }
 
     if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase()) {
       dispatch(changeSpinners.update({ signingMessage: true }));

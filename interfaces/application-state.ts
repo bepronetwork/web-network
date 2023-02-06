@@ -88,6 +88,7 @@ export interface CurrentUserState {
   accessToken?: string;
   connected?: boolean;
   signature?: string;
+  isAdmin?: boolean;
 }
 
 export interface CurrentBounty {

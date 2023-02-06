@@ -44,3 +44,6 @@ export const changeCurrentUserConnected = (connected: boolean) =>
 
 export const changeCurrentUserSignature = (signature: string) =>
   changeCurrentUser.update({signature});
+
+export const changeCurrentUserisAdmin = (isAdmin: boolean) =>
+  changeCurrentUser.update({isAdmin});
