@@ -552,7 +552,13 @@ export default function useApi() {
         pages: number;
         currentPage: number;
       }>(`/search/networks/?${params}`)
-      .then(({ data }) => data)
+      .then(({ data }) => ({
+        ...data,
+        rows: data.rows.map(network => ({
+          ...network,
+          totalValueLock: BigNumber(network?.totalValueLock)
+        }))
+      }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
