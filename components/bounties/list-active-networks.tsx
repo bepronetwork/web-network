@@ -45,7 +45,6 @@ export default function ListActiveNetworks() {
         <h4 className="mt-1">{t("most-active-networks")}</h4>
         <Link href={"/networks"}>
           <a
-            target="_blank"
             className="text-decoration-none text-primary mt-2"
             rel="noreferrer"
           >
