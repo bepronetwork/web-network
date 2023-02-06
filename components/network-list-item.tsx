@@ -45,19 +45,23 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.totalBounties) ? formatNumberToNScale(network?.totalBounties, 0) : <Spinner />}
+          {isNotUndefined(network?.countIssues) ? formatNumberToNScale(network?.countIssues, 0) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.openBounties) ? formatNumberToNScale(network?.openBounties, 0) : <Spinner />}
+          {isNotUndefined(network?.countOpenIssues) ? formatNumberToNScale(network?.countOpenIssues, 0) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
         <span className="caption-medium text-white ml-3">
-          {isNotUndefined(network?.tokensLocked) ? formatNumberToNScale(+network?.tokensLocked) : <Spinner />}
+        {isNotUndefined(network?.totalValueLock) ? (
+            formatNumberToNScale(network?.totalValueLock.toFixed())
+          ) : (
+            <Spinner />
+          )}
         </span>
 
         <span
