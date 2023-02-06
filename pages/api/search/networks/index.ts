@@ -1,10 +1,11 @@
+import BigNumber from "bignumber.js";
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import paginate, {calculateTotalPages} from "helpers/paginate";
+import {paginateArray} from "helpers/paginate";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -29,24 +30,43 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.isDefault = isDefault;
     
   const include = [
-    { association: "tokens" }
+    { association: "tokens" },
+    { association: "curators", required: false },
+    { association: "issues", required: false,
+      where: { 
+        state: {[Op.not]: "pending" }
+      }
+    }
   ];
 
-  const networks = await models.network.findAndCountAll(paginate({
+  const networks = await models.network.findAll({
         attributes: {
           exclude: ["id", "creatorAddress"]
         },
         where: whereCondition,
         include,
+        order: [[String(req.query.sortBy) ||["createdAt"], String(req.query.order) || "DESC"]],
         nest: true
-  },
-                                                                 req.query,
-      [[req.query.sortBy || "createdAt", req.query.order || "DESC"]]));
+  }).then(networks => networks.map(network => {
+    const result = ({
+      ...network.dataValues,
+      totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
+                                                BigNumber(0)).toFixed(),
+      countOpenIssues: network?.issues?.filter(b => b.state === "open").length || 0,
+      countIssues: network?.issues.length || 0
+    })
+    delete result.issues
+    return result
+  }))
+
+
+  const paginatedData = paginateArray(networks, 10, +page || 1)
 
   return res.status(200).json({
-    ...networks,
-    currentPage: +page || 1,
-    pages: calculateTotalPages(networks.count)
+    count: networks.length,
+    rows: paginatedData.data,
+    pages: paginatedData.pages,
+    currentPage: +paginatedData.page
   });
 }
 
