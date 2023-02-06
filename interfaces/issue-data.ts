@@ -88,6 +88,7 @@ export interface IssueSearch {
 export interface Repository {
   id: number;
   githubPath: string;
+  network?: Network;
 }
 
 export interface pullRequest {
