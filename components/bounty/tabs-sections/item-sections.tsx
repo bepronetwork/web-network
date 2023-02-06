@@ -78,6 +78,9 @@ function ItemSections({ data, isProposal }: ItemProps) {
             const approvalsCurrentPr = item?.approvals?.total || 0;
             const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
             const itemId = isProposal ? item?.id : item?.githubId;
+            const totalToBeDisputed = BigNumber(state.Service?.network?.amounts?.percentageNeededForDispute)
+              .multipliedBy(state.Service?.network?.amounts?.totalNetworkToken)
+              .dividedBy(100);
 
             return (
               <ItemRow 
@@ -93,7 +96,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                       <ProposalProgressSmall
                         color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
                         value={proposal?.disputeWeight}
-                        total={BigNumber(state.Service?.network?.amounts?.totalNetworkToken)}
+                        total={totalToBeDisputed}
                       />
                     </div>
                   </>
