@@ -182,7 +182,7 @@ export function RegistrySetup({
         setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
         setCloseFeePercentage((+parameters[3]/+parameters[6]).toString());
         setCancelFeePercentage((+parameters[4]/+parameters[6]).toString());
-        setBountyTokenDispatcher(parameters[5].toString());
+        setBountyTokenDispatcher(parameters[5].toString().toLowerCase());
 
         const transactional = !!parameters[8].transactional.find(address => parameters[7] = address);
         const reward = !!parameters[8].reward.find(address => parameters[7] = address);
