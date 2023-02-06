@@ -39,8 +39,6 @@ export default function ConnectWalletButton({children = null, asModal = false, f
       ) {
       connectWallet();
     } else {
-      console.log('no connected chain?', state.connectedChain, state.Settings?.requiredChain);
-
       dispatch(changeChain.update({...state.connectedChain, id: state.Settings?.requiredChain?.id}));
       setShowModal(false);
     }
