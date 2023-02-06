@@ -1,5 +1,4 @@
 import {isZeroAddress} from "ethereumjs-util";
-import getConfig from "next/config";
 import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
@@ -17,9 +16,7 @@ import useChain from "x-hooks/use-chain";
 import useNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
-
-  const {query, replace, asPath} = useRouter();
-  const {publicRuntimeConfig} = getConfig();
+  const { replace, asPath } = useRouter();
 
   const { chain } = useChain();
   const {state, dispatch} = useAppState();
@@ -117,7 +114,7 @@ export function useDao() {
     if (!isConfigured) {
       console.debug("Chain not configured", chainToConnect);
 
-      if (publicRuntimeConfig.adminWallet === state.currentUser?.walletAddress && !asPath.includes("setup")) {
+      if (state.currentUser?.isAdmin && !asPath.includes("setup")) {
         replace("/setup");
 
         return;
