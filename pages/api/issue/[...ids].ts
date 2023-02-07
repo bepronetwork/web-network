@@ -15,7 +15,8 @@ import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {ids: [repoId, ghId, networkName]} = req.query;
+  const { ids: [repoId, ghId, networkName], chainId } = req.query;
+
   const issueId = [repoId, ghId].join("/");
 
   const include = [
@@ -35,7 +36,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      chain_id: {[Op.eq]: chain.chainId}
+      chain_id: { [Op.eq]: chainId || chain.chainId }
     }
   });
 

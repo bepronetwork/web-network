@@ -31,7 +31,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const auth = useAuthentication();
   const transactions = useTransactions();
 
-  const { supportedChains, connectedChain, currentUser, Service, transactions: stateTransactions } = state;
+  const { supportedChains, connectedChain, currentUser, Service } = state;
 
   function updateLoadingState() {
     dispatch(changeLoadState(Object.values(state.spinners).some(v => v)));
@@ -41,12 +41,12 @@ export const GlobalEffectsProvider = ({children}) => {
 
   useEffect(dao.start, [
     supportedChains,
-    Service?.network?.active,
+    Service?.network?.active?.chain_id,
     connectedChain
   ]);
 
   useEffect(dao.changeNetwork, [
-    Service?.active?.web3Host,
+    Service?.active,
     Service?.network?.active?.networkAddress,
     chain
   ]);
@@ -72,7 +72,7 @@ export const GlobalEffectsProvider = ({children}) => {
   
   useEffect(network.updateActiveNetwork, [query?.network, query?.chain]);
   useEffect(network.loadNetworkTimes, [Service?.active?.network]);
-  useEffect(network.loadNetworkAmounts, [Service?.active?.network]);
+  useEffect(network.loadNetworkAmounts, [Service?.active?.network?.contractAddress, chain]);
   useEffect(network.loadNetworkAllowedTokens, [Service?.network?.active, chain]);
   useEffect(network.updateNetworkAndChainMatch, [
     connectedChain?.id,

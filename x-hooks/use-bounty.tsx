@@ -26,6 +26,7 @@ import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {IssueData, pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import { useNetwork } from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
 
@@ -34,12 +35,12 @@ const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 export function useBounty() {
 
   if (!useContext(BountyEffectsContext))
-    throw new Error(`useBounty() depends on <BountyEffectsProvider />`)
+    throw new Error(`useBounty() depends on <BountyEffectsProvider />`);
 
-  const {state, dispatch} = useAppState();
-
-  const {getIssue} = useApi();
-  const {query, replace} = useRouter();
+  const { chain } = useChain();
+  const { getIssue } = useApi();
+  const { query, replace } = useRouter();
+  const { state, dispatch } = useAppState();
   const { getURLWithNetwork } = useNetwork();
   const { getIssueOrPullRequestComments, getPullRequestDetails, getPullRequestReviews } = useOctokit();
 
@@ -55,7 +56,7 @@ export function useBounty() {
   }
 
   function getDatabaseBounty(force = false) {
-    if (!state.Service?.network?.active || !query?.id || !query.repoId)
+    if (!query?.id || !query.repoId || !chain)
       return;
 
     if (!force && isCurrentBountyCached() || state.spinners?.bountyDatabase)
@@ -63,7 +64,7 @@ export function useBounty() {
 
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
-    getIssue(+query.repoId, +query.id, query.network.toString())
+    getIssue(+query.repoId, +query.id, query.network.toString(), chain.chainId)
       .then(async (bounty: IssueData) => {
         const fundedAmount = BigNumber(bounty?.fundedAmount || 0)
         const fundingAmount = BigNumber(bounty?.fundingAmount || 0)
@@ -124,14 +125,13 @@ export function useBounty() {
       .finally(() => dispatch(changeSpinners.update({bountyDatabase: false})));
   }
 
-  function getChainBounty(force = false) {
-
-    if (
-      !state.Service?.active?.network ||
-      !state.currentBounty?.data?.contractId ||
-      state.spinners?.bountyChain ||
-      query?.id !== state.currentBounty?.data?.githubId
-    )
+  function getChainBounty() {
+    if (!state.Service?.active?.network?.contractAddress ||
+        !state.currentBounty?.data ||
+        state.spinners?.bountyChain ||
+        !query?.id ||
+        !query?.repoId ||
+        !state.connectedChain?.matchWithNetworkChain)
       return;
 
     dispatch(changeSpinners.update({bountyChain: true}))

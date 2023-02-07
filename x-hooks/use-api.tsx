@@ -205,9 +205,12 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string | number, ghId: string | number, networkName = DEFAULT_NETWORK_NAME) {
+  async function getIssue(repoId: string | number, 
+                          ghId: string | number,
+                          networkName = DEFAULT_NETWORK_NAME,
+                          chainId?: string | number) {
     return api
-      .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
+      .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`, { params: { chainId } })
       .then(({ data }) => data)
       .catch(() => null);
   }
