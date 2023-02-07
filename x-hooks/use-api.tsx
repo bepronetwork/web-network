@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
-import { head } from "lodash";
+import {head} from "lodash";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
 import { 
   PastEventsParams, 
@@ -16,19 +16,19 @@ import {
   SearchActiveNetworkParams,
   updateIssueParams
 } from "interfaces/api";
-import { Curator, SearchCuratorParams } from "interfaces/curators";
-import { HeaderNetworksProps } from "interfaces/header-information";
-import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
-import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
-import { Network } from "interfaces/network";
-import { PaginatedData } from "interfaces/paginated-data";
-import { Proposal } from "interfaces/proposal";
-import { ReposList } from "interfaces/repos-list";
-import { Token } from "interfaces/token";
+import {Curator, SearchCuratorParams} from "interfaces/curators";
+import {HeaderNetworksProps} from "interfaces/header-information";
+import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
+import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
+import {Network} from "interfaces/network";
+import {PaginatedData} from "interfaces/paginated-data";
+import {Proposal} from "interfaces/proposal";
+import {ReposList} from "interfaces/repos-list";
+import {Token} from "interfaces/token";
 
-import { api, eventsApi } from "services/api";
+import {api, eventsApi} from "services/api";
 
-import { Entities, Events } from "types/dappkit";
+import {Entities, Events} from "types/dappkit";
 
 interface NewIssueParams {
   title: string;
@@ -47,7 +47,6 @@ interface CreateBounty {
   tags: string[];
   isKyc?: boolean;
   tierList?: number[];
-  tags: string[];
 }
 
 interface GetNetworkProps {

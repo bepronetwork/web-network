@@ -4,7 +4,6 @@ import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
-import getConfig from "next/config";
 import router from "next/router";
 
 import BranchsDropdown from "components/branchs-dropdown";
@@ -21,14 +20,14 @@ import ReposDropdown from "components/repos-dropdown";
 
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import {BODY_CHARACTERES_LIMIT} from "helpers/contants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Token} from "interfaces/token";
-import { SimpleBlockTransactionPayload } from "interfaces/transaction";
+import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
@@ -527,7 +526,6 @@ export default function CreateBountyModal() {
         tags: selectedTags,
         isKyc: isBountyType ? isKyc : false,
         tierList: isBountyType ? tierList : null,
-        tags: selectedTags
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 

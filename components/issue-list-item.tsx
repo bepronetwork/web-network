@@ -16,7 +16,6 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import {useAppState} from "../contexts/app-state";
-import AvatarOrIdenticon from "./avatar-or-identicon";
 import Badge from "./badge";
 import CardItem from "./card-item";
 import IssueAmountInfo from "./issue-amount-info";

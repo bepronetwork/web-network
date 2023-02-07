@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
 
-import { Proposal, INetworkProposal } from "interfaces/proposal";
-import { Token } from "interfaces/token";
+import {INetworkProposal, Proposal} from "interfaces/proposal";
+import {Token} from "interfaces/token";
 
-import { Payment } from "./payments";
+import {Payment} from "./payments";
 
 export type IssueState =
   | "pending"
@@ -65,7 +65,6 @@ export interface IssueData {
   tags: string[];
   isKyc: boolean;
   kycTierList: number[];
-  tags: string[];
 }
 
 export interface Disputes {
