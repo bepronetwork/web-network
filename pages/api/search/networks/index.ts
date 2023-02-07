@@ -1,16 +1,47 @@
 import BigNumber from "bignumber.js";
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op, WhereOptions} from "sequelize";
+import { Op, WhereOptions } from "sequelize";
 
 import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
 
+interface includeProps {
+  association: string;
+  required?: boolean;
+  where?: {
+    state?: {
+      [Op.not]?: string
+    }
+  }
+}
+
+const handleNetworksResult = (networks) => networks.map(network => {
+  const result = ({
+    ...network.dataValues,
+    totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
+                                              BigNumber(0)).toFixed(),
+    countOpenIssues: network?.issues?.filter(b => b.state === "open").length || 0,
+    countIssues: network?.issues.length || 0
+  })
+  delete result.issues
+  return result
+})
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const {name, creatorAddress, networkAddress, isClosed, isRegistered, isDefault, page} = req.query || {};
+  const {
+    name,
+    creatorAddress,
+    networkAddress,
+    isClosed,
+    isRegistered,
+    isDefault,
+    isNeedCountsAndTotalLock,
+    page,
+  } = req.query || {};
 
   if (name) whereCondition.name = name;
 
@@ -29,16 +60,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (isDefault)
     whereCondition.isDefault = isDefault;
     
-  const include = [
-    { association: "tokens" },
-    { association: "curators", required: false },
-    { association: "issues", required: false,
-      where: { 
-        state: {[Op.not]: "pending" }
-      }
-    }
+  const include: includeProps[] = [
+      { association: "tokens" }
   ];
 
+  if (isNeedCountsAndTotalLock) {
+    include.push({ association: "curators", required: false })
+    include.push({ association: "issues", required: false,
+                   where: { 
+                        state: {[Op.not]: "pending" }
+                   }
+    })
+  }
+  
   const networks = await models.network.findAll({
         attributes: {
           exclude: ["id", "creatorAddress"]
@@ -47,17 +81,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         include,
         order: [[String(req.query.sortBy) ||["createdAt"], String(req.query.order) || "DESC"]],
         nest: true
-  }).then(networks => networks.map(network => {
-    const result = ({
-      ...network.dataValues,
-      totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
-                                                BigNumber(0)).toFixed(),
-      countOpenIssues: network?.issues?.filter(b => b.state === "open").length || 0,
-      countIssues: network?.issues.length || 0
-    })
-    delete result.issues
-    return result
-  }))
+  }).then(networks => {
+    if(isNeedCountsAndTotalLock)
+      return handleNetworksResult(networks)
+    else
+      return networks
+  })
 
 
   const paginatedData = paginateArray(networks, 10, +page || 1)
