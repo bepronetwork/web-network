@@ -56,7 +56,9 @@ export function TransactionIcon({ type } : TransactionIconProps) {
     [TransactionTypes.configFees]: <SettingsIcon />,
     [TransactionTypes.deployNetworkRegistry]: <CurrencyIcon />,
     [TransactionTypes.changeAllowedTokens]: <SettingsIcon />,
-    [TransactionTypes.closeNetwork]: <CancelIcon />
+    [TransactionTypes.closeNetwork]: <CancelIcon />,
+    [TransactionTypes.amountForNetworkCreation]: <SettingsIcon />,
+    [TransactionTypes.feeForNetworkCreation]: <SettingsIcon />
   };
 
   if (icons[type]) return icons[type];
