@@ -77,6 +77,46 @@ export default function useBepro() {
     });
   }
 
+  async function handleAmountNetworkCreation(amount: string | number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTx([{
+        type: TransactionTypes.amountForNetworkCreation,
+        network: state.Service?.network?.active
+      } as any]);
+
+      dispatch(transaction);
+
+      await state.Service?.active.updateAmountNetworkCreation(amount)
+        .then((txInfo: TransactionReceipt) => {
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]))
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          failTx(err, transaction, reject);
+        });
+    });
+  }
+
+  async function handleFeeNetworkCreation(amount: number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTx([{
+        type: TransactionTypes.feeForNetworkCreation,
+        network: state.Service?.network?.active
+      } as any]);
+
+      dispatch(transaction);
+
+      await state.Service?.active.updateFeeNetworkCreation(amount)
+        .then((txInfo: TransactionReceipt) => {
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]))
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          failTx(err, transaction, reject);
+        });
+    });
+  }
+
   async function handleCloseIssue(bountyId: number,
                                   proposalContractId: number, 
                                   tokenUri: string): Promise<TransactionReceipt | Error> {
@@ -624,6 +664,8 @@ export default function useBepro() {
     handleFeeSettings,
     handleDeployRegistry,
     handleAddAllowedTokens,
-    handleCloseNetwork
+    handleCloseNetwork,
+    handleFeeNetworkCreation,
+    handleAmountNetworkCreation
   };
 }
