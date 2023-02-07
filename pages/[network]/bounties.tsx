@@ -17,7 +17,7 @@ import {BountyEffectsProvider} from "../../contexts/bounty-effects";
 import {useBounty} from "../../x-hooks/use-bounty";
 
 
-export default function PageDevelopers() {
+export default function BountiesPage() {
   useBounty();
   const { t } = useTranslation(["common"]);
 

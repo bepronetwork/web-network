@@ -31,12 +31,12 @@ export default function WebThreeDialog() {
 
   useEffect(() => {
     if (![
+      "/explore",
+      "/leaderboard",
+      "/networks",
       getURLWithNetwork("/").pathname,
       getURLWithNetwork("/bounties").pathname,
       getURLWithNetwork("/curators").pathname,
-      getURLWithNetwork("/oracle").pathname,
-      getURLWithNetwork("/oracle/new-bounties").pathname,
-      getURLWithNetwork("/oracle/ready-to-merge").pathname,
       "/[network]/bounty",
       "/[network]",
     ].includes(router.pathname))
