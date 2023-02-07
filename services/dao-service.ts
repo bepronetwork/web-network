@@ -399,6 +399,20 @@ export default class DAO {
     return this.registry.changeGlobalFees(closeFee, cancelFee)
   }
 
+  async updateAmountNetworkCreation(amount: string | number) {
+    if (!this.registry) await this.loadRegistry();
+
+    return this.registry.changeAmountForNetworkCreation(amount)
+  }
+
+  async updateFeeNetworkCreation(amount: number) {
+    if (!this.registry) await this.loadRegistry();
+
+    return this.registry.changeNetworkCreationFee(amount)
+  }
+
+
+
   async getTreasuryRegistry(): Promise<string> {
     if (!this.registry) await this.loadRegistry();
 
@@ -451,6 +465,15 @@ export default class DAO {
     const creatorAmount = await this.registry.lockAmountForNetworkCreation();
       
     return new BigNumber(creatorAmount);
+  }
+
+  async getRegistryCreatorFee(): Promise<number> {
+    if (!this.registry) await this.loadRegistry();
+
+    const creatorFee = await this.registry.networkCreationFeePercentage();
+    
+    // networkCreationFeePercentage is aready dived per divisor on sdk
+    return (creatorFee * 100)
   }
 
   async isRegistryGovernor(address: string): Promise<boolean> {
