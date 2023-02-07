@@ -14,7 +14,7 @@ import { BountyEffectsProvider } from "contexts/bounty-effects";
 import useApi from "x-hooks/use-api";
 
 
-export default function BountyHallPage() {
+export default function ExplorePage() {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
