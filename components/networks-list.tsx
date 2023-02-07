@@ -64,7 +64,8 @@ export default function NetworksList() {
     searchNetworks({
       isRegistered: true,
       sortBy: "name",
-      order: "asc"
+      order: "asc",
+      isNeedCountsAndTotalLock: true
     })
       .then(async ({ count, rows }) => {
         if (count > 0) {
