@@ -20,10 +20,10 @@ import useApi from "x-hooks/use-api";
 const DIVISOR = 1000000;
 
 export default function useBepro() {
-  const { dispatch, state } = useAppState();
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
+  const { dispatch, state } = useAppState();
 
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
 

@@ -31,7 +31,7 @@ interface OraclesActionsProps {
 }
 
 function OraclesActions({
-                          wallet,
+  wallet,
   updateWalletBalance
 } : OraclesActionsProps) {
   const { t } = useTranslation(["common", "my-oracles"]);
