@@ -19,7 +19,7 @@ import useChain from "x-hooks/use-chain";
 import {useNetwork} from "x-hooks/use-network";
 
 export default function CouncilLayout({ children }) {
-  const { asPath, push } = useRouter();
+  const { asPath, query, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
   const { chain } = useChain();
@@ -51,29 +51,29 @@ export default function CouncilLayout({ children }) {
   function handleUrlCurators (type: string) {
     return push(getURLWithNetwork("/curators", {
       type
-    }), undefined, { shallow: true  })
+    }), asPath, { shallow: true  });
   }
 
   const internalLinks = [
     {
       onClick: () => handleUrlCurators("ready-to-propose"),
       label: t("council:ready-to-propose"),
-      active: asPath.endsWith("/curators") || asPath.endsWith("ready-to-propose")
+      active: query?.type === "ready-to-propose" || !query?.type
     },
     {
       onClick: () => handleUrlCurators("ready-to-dispute"),
       label: t("council:ready-to-dispute"),
-      active: asPath.endsWith("ready-to-dispute")
+      active: query?.type === "ready-to-dispute"
     },
     {
       onClick: () => handleUrlCurators("ready-to-close"),
       label: t("council:ready-to-close"),
-      active: asPath.endsWith("ready-to-close")
+      active: query?.type === "ready-to-close"
     },
     {
       onClick: () => handleUrlCurators("curators-list"),
       label: t("council:council-list"),
-      active: asPath.endsWith("curators-list")
+      active: query?.type === "curators-list"
     }
   ]
 
