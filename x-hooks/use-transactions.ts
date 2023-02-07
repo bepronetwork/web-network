@@ -1,49 +1,47 @@
 import { useAppState } from "contexts/app-state";
 import { setTxList } from "contexts/reducers/change-tx-list";
 
+import { BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction } from "interfaces/transaction";
+
 import { WinStorage } from "services/win-storage";
 
 export function useTransactions() {
-  const { state, dispatch } = useAppState();
+  const { dispatch } = useAppState();
 
-  const getStorageKey = (walletAddress: string) => `bepro.transactions:${walletAddress}`;
+  const getStorageKey = (walletAddress: string, chainId: string) => `bepro.transactions:${walletAddress}:${chainId}`;
 
-  function checkRequirements(fn: (wallet) => void) {
-    const walletAddress = state.currentUser?.walletAddress;
+  function checkRequirements(fn: (wallet, chainId) => void) {
+    const walletAddress = sessionStorage.getItem("currentWallet");
+    const chainId = sessionStorage.getItem("currentChainId");
 
     if (!walletAddress) return;
 
-    fn(walletAddress);
+    fn(walletAddress, chainId);
   }
 
-
   function deleteFromStorage() {
-    checkRequirements((walletAddress) => {
-      const storage = new WinStorage(getStorageKey(walletAddress), 0, 'localStorage');
+    checkRequirements((walletAddress, chainId) => {
+      const storage = new WinStorage(getStorageKey(walletAddress, chainId), 0, 'localStorage');
 
       storage.value = undefined;
     });
   }
 
   function loadFromStorage() {
-    checkRequirements((walletAddress) => {
-      const storage = new WinStorage(getStorageKey(walletAddress), 0, 'localStorage');
+    checkRequirements((walletAddress, chainId) => {
+      const storage = new WinStorage(getStorageKey(walletAddress, chainId), 0, 'localStorage');
 
-      if (!storage.value) return;
-
-      const transactions = JSON.parse(storage.value);
+      const transactions = JSON.parse(storage.value || "[]");
 
       dispatch(setTxList(transactions));
     });
   }
 
-  function saveToStorage() {
-    checkRequirements((walletAddress) => {
-      const transactions = state.transactions;
-
+  function saveToStorage(transactions: (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[]) {
+    checkRequirements((walletAddress, chainId) => {
       const SEVEN_DAYS_IN_MS = 60 * 60 * 24 * 7 * 1000;
 
-      const storage = new WinStorage(getStorageKey(walletAddress), SEVEN_DAYS_IN_MS, 'localStorage');
+      const storage = new WinStorage(getStorageKey(walletAddress, chainId), SEVEN_DAYS_IN_MS, 'localStorage');
 
       if (JSON.stringify(transactions) === JSON.stringify(storage.value)) return;
 
