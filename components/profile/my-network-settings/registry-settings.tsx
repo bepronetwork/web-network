@@ -102,14 +102,6 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             onChange={fields.closeFee.setter}
           />
         </Col>
-
-        {!isGovernorRegistry && (
-          <Row className="mb-4">
-            <WarningSpan
-              text={t("custom-network:steps.network-settings.fields.other-settings.warning-registry")}
-            />
-          </Row>
-        )}
         {isGovernorRegistry && (
           <Col xs={4}>
             <Button onClick={saveFeeSettings} className="mt-4">
@@ -162,6 +154,13 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
           </Col>
         )}
       </Row>
+      {!isGovernorRegistry && (
+          <Row className="mb-4">
+            <WarningSpan
+              text={t("custom-network:steps.network-settings.fields.other-settings.warning-registry")}
+            />
+          </Row>
+        )}
 
       {isGovernorRegistry && <TokensSettings isGovernorRegistry={true} />}
     </>
