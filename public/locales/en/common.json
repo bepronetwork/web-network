@@ -388,7 +388,9 @@
       "config-fees": "Config Fees",
       "deploy-registry": "Deploy Network Registry",
       "change-allowed-tokens": "Change Allowed Tokens",
-      "close-network": "Close Network"
+      "close-network": "Close Network",
+      "amount-for-network-creation": "Amount For Network Creation",
+      "fee-for-network-creation": "Fee For Network Creation"
     }
   },
   "sort": {
