@@ -10,24 +10,24 @@ import {
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserHandle,
+  changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
-  changeCurrentUserWallet,
-  changeCurrentUserKycSession
+  changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
-import { changeReAuthorizeGithub } from "contexts/reducers/update-show-prop";
+import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
 import {CustomSession} from "interfaces/custom-session";
-import { kycSession } from "interfaces/kyc-session";
+import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
-import { useNetwork } from "x-hooks/use-network";
-import { useTransactions } from "x-hooks/use-transactions";
+import {useNetwork} from "x-hooks/use-network";
+import {useTransactions} from "x-hooks/use-transactions";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
@@ -234,7 +234,8 @@ export function useAuthentication() {
   }
 
   function updateKycSession(){
-    if(!state?.currentUser?.login 
+    if(!state?.currentUser?.login
+        || !state?.currentUser?.match
         || !state?.currentUser?.accessToken
         || !state?.currentUser?.walletAddress 
         || !state?.Settings?.kyc?.isKycEnabled) 
