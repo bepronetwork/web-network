@@ -10,11 +10,11 @@ import {
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserHandle,
+  changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
-  changeCurrentUserWallet,
-  changeCurrentUserKycSession
+  changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
@@ -24,14 +24,14 @@ import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
 import {CustomSession} from "interfaces/custom-session";
-import { kycSession } from "interfaces/kyc-session";
+import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
-import { useNetwork } from "x-hooks/use-network";
-import { useTransactions } from "x-hooks/use-transactions";
+import {useNetwork} from "x-hooks/use-network";
+import {useTransactions} from "x-hooks/use-transactions";
 import {EventName} from "../interfaces/analytics";
 import useAnalyticEvents from "./use-analytic-events";
 import useSignature from "./use-signature";
@@ -290,6 +290,7 @@ export function useAuthentication() {
 
   function updateKycSession(){
     if(!state?.currentUser?.login
+        || !state?.currentUser?.match
         || !state?.currentUser?.accessToken
         || !state?.currentUser?.walletAddress
         || !state?.Settings?.kyc?.isKycEnabled)
