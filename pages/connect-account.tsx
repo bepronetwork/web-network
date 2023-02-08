@@ -56,8 +56,10 @@ export default function ConnectAccount() {
   function redirectToProfile() {
     const lastNetworkVisited = new WinStorage(`lastNetworkVisited`, 0, 'localStorage');
 
+    const toNetworks = state.Service?.active?.network ? "/networks" : "/setup"
+
     const redirectTo = 
-    lastNetworkVisited.value ? `${lastNetworkVisited.value}/profile` : "/networks";
+    lastNetworkVisited.value ? `${lastNetworkVisited.value}/profile` : toNetworks;
 
     router.push(redirectTo);
   }
@@ -131,6 +133,7 @@ export default function ConnectAccount() {
                   
                   
                 </div>
+                {    console.log('use', state)}
                 <div className="col-6">
                   <ConnectionButton
                     type="wallet"
