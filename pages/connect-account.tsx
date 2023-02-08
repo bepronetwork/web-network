@@ -133,7 +133,7 @@ export default function ConnectAccount() {
                   
                   
                 </div>
-                {    console.log('use', state)}
+
                 <div className="col-6">
                   <ConnectionButton
                     type="wallet"
