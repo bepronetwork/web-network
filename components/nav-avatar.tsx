@@ -17,7 +17,13 @@ import {truncateAddress} from "helpers/truncate-address";
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
-export default function NavAvatar() {
+interface NavAvatarProps {
+  onNetwork?: boolean;
+}
+
+export default function NavAvatar({
+  onNetwork
+} : NavAvatarProps) {
   const { t } = useTranslation("common");
   const router = useRouter();
 
@@ -119,18 +125,21 @@ export default function NavAvatar() {
                 <span className="caption-large text-white mb-1 text-capitalize font-weight-normal">{username}</span>
               </div>
 
-              <div className="d-flex flex-row justify-content-left">
-                <ProfileInternalLink 
-                  href={getURLWithNetwork("/profile")} 
-                  label={t("main-nav.nav-avatar.view-profile")} 
-                  className="text-gray p family-Regular"
-                />
-              </div>
+              { onNetwork && 
+                <div className="d-flex flex-row justify-content-left">
+                  <ProfileInternalLink 
+                    href={getURLWithNetwork("/profile")} 
+                    label={t("main-nav.nav-avatar.view-profile")} 
+                    className="text-gray p family-Regular"
+                  />
+                </div>
+              }
           </div>
         </div>
 
         <LinksSession>
-          {internalLinks.map(ProfileInternalLink)}
+          { onNetwork && internalLinks.map(ProfileInternalLink) || 
+           <span className="p family-Regular text-center" >Please access a network to see your profile</span> }
         </LinksSession>
 
         <LinksSession>

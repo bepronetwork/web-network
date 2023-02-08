@@ -210,7 +210,7 @@ export default function MainNav() {
             <ConnectWalletButton>
               <TransactionsStateIndicator />
 
-              <NavAvatar />
+              <NavAvatar onNetwork={!noNeedNetworkInstance} />
             </ConnectWalletButton>
           </div>
 
