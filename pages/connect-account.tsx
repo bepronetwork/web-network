@@ -130,10 +130,7 @@ export default function ConnectAccount() {
                     isLoading={state.spinners?.connectingGH}
                     isDisabled={!state.currentUser?.walletAddress || state.spinners?.connectingGH}
                   />
-                  
-                  
                 </div>
-
                 <div className="col-6">
                   <ConnectionButton
                     type="wallet"
