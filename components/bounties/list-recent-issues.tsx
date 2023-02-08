@@ -38,7 +38,7 @@ export default function ListRecentIssues() {
       <div className="row mt-3">
         {bounties &&
           bounties?.map((bounty) => (
-            <div className="col mb-1" key={bounty.id}>
+            <div className="col-md-4 col mb-1" key={bounty.id}>
               <IssueListItem issue={bounty} key={bounty.id} size="sm" />
             </div>
           ))}
