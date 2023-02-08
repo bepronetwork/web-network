@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import { Op, WhereOptions } from "sequelize";
+import { Op, Sequelize, WhereOptions } from "sequelize";
 
 import models from "db/models";
 
@@ -72,6 +72,32 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                    }
     })
   }
+  try{
+    const result = await models.network.findAll({
+    include: [
+      { association: "tokens" },
+      { association: 'curators', required: false, attributes: [] },
+      { association: 'issues', required: false, attributes: [], where: {state: {[Op.ne]: 'pending'}}}
+    ],
+    attributes: {
+      include: [
+        "network.id",
+        "network.name",
+        [Sequelize.fn('sum', Sequelize.cast(Sequelize.col('curators.tokensLocked'), 'int')), 'tokensLocked'],
+        [Sequelize.fn('count', Sequelize.col('issues.id')), 'totalIssues']
+      ],
+    },
+    group: ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id", "issues.id" ],
+    where: {
+      isRegistered: true,
+      isClosed: false
+    }});
+
+    console.log('result', result)
+  }catch(e) {
+    console.log('error',e)
+  }
+ 
   
   const networks = await models.network.findAll({
         attributes: {
