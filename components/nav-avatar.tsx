@@ -137,10 +137,11 @@ export default function NavAvatar({
           </div>
         </div>
 
-        <LinksSession>
-          { onNetwork && internalLinks.map(ProfileInternalLink) || 
-           <span className="p family-Regular text-center" >Please access a network to see your profile</span> }
-        </LinksSession>
+        { onNetwork &&
+          <LinksSession>
+            {internalLinks.map(ProfileInternalLink)}
+          </LinksSession>
+        }
 
         <LinksSession>
           {externalLinks.map(ProfileExternalLink)}
