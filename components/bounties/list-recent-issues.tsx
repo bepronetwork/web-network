@@ -30,7 +30,7 @@ export default function ListRecentIssues() {
   }, []);
 
   return (
-    <CustomContainer className="mb-3">
+    <CustomContainer>
       <div className="d-flex mt-2 p-1">
         <h4 className="mt-1">{t("recent-bounties")}</h4>
       </div>
@@ -38,7 +38,7 @@ export default function ListRecentIssues() {
       <div className="row mt-3">
         {bounties &&
           bounties?.map((bounty) => (
-            <div className="col-md-4 col mb-1" key={bounty.id}>
+            <div className="col-md-4 col mb-3" key={bounty.id}>
               <IssueListItem issue={bounty} key={bounty.id} size="sm" />
             </div>
           ))}
