@@ -24,7 +24,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
     { association: "mergeProposals", include: [{ association: "distributions" }]  },
     { association: "repository" },
-    { association: "token" },
+    { association: "transactionalToken" },
+    { association: "rewardToken" },
     { association: "benefactors" },
     { association: "disputes" }
   ];

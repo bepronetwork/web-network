@@ -18,7 +18,7 @@ const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit
       include: [ { association: "chain" }]
     },
     { association: "repository" },
-    { association: "token" }
+    { association: "transactionalToken" }
   ],
   limit
 }))

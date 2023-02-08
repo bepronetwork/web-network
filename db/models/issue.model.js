@@ -2,11 +2,6 @@
 const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 class Issue extends Model {
-  /**
-   * Helper method for defining associations.
-   * This method is not a part of Sequelize lifecycle.
-   * The `models/index` file will call this method automatically.
-   */
   static init(sequelize) {
     super.init({
       issueId: DataTypes.INTEGER,
@@ -22,6 +17,10 @@ class Issue extends Model {
       amount: DataTypes.STRING,
       fundingAmount: DataTypes.STRING,
       fundedAmount: DataTypes.STRING,
+      rewardAmount: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       repository_id: DataTypes.STRING,
       title: DataTypes.TEXT,
       body: DataTypes.TEXT,
@@ -33,7 +32,11 @@ class Issue extends Model {
       seoImage: DataTypes.STRING,
       network_id: DataTypes.INTEGER,
       contractId: DataTypes.INTEGER,
-      tokenId: {
+      transactionalTokenId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      rewardTokenId: {
         type: DataTypes.INTEGER,
         allowNull: true
       },
@@ -48,10 +51,10 @@ class Issue extends Model {
         type: DataTypes.INTEGER
       }
     },
-               {
-        sequelize,
-        modelName: "issue"
-               });
+    {
+      sequelize,
+      modelName: "issue"
+    });
   }
 
   static associate(models) {
@@ -96,9 +99,14 @@ class Issue extends Model {
       sourceKey: "id"
     });
     this.belongsTo(models.tokens, {
-      foreignKey: "tokenId",
+      foreignKey: "transactionalTokenId",
       sourceKey: "id",
-      as: "token"
+      as: "transactionalToken"
+    });
+    this.belongsTo(models.tokens, {
+      foreignKey: "rewardTokenId",
+      sourceKey: "id",
+      as: "rewardToken"
     });
     this.belongsTo(models.chain, {
       foreignKey: "chain_id",

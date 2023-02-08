@@ -25,6 +25,7 @@ export interface IssueData {
   amount?: string;
   fundingAmount?: string;
   fundedAmount?: string;
+  rewardAmount?: string;
   body: string;
   branch?: string;
   createdAt: Date;
@@ -49,7 +50,8 @@ export interface IssueData {
   updatedAt?: Date;
   url?: string;
   contractId?: number;
-  token?: Token;
+  transactionalToken?: Token;
+  rewardToken?: Token;
   working: string[];
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
@@ -66,11 +68,12 @@ export interface Disputes {
   proposalId: number;
 }
 
-export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
+export interface IssueBigNumberData 
+  extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount" | "rewardAmount"> {
   amount: BigNumber;
   fundingAmount: BigNumber;
   fundedAmount: BigNumber;
-  fundedPercent: BigNumber;
+  rewardAmount: BigNumber;
 }
 
 export interface IssueNetwork extends IssueBigNumberData {

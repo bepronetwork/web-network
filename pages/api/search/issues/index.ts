@@ -158,7 +158,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       },
       { association: "repository", attributes: ["id", "githubPath"] },
       {
-        association: "token",
+        association: "transactionalToken",
         required: !!tokenAddress,
         where: {
           ...(tokenAddress ? {

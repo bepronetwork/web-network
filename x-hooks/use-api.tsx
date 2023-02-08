@@ -5,6 +5,8 @@ import {head} from "lodash";
 
 import {useAppState} from "contexts/app-state";
 
+import { parseAmountsToBN } from "helpers/issue";
+
 import {
   CancelPrePullRequestParams,
   CreatePrePullRequestParams,
@@ -134,19 +136,14 @@ export default function useApi() {
 
     return api
       .get<{
-        rows: IssueBigNumberData[];
+        rows: IssueData[];
         count: number;
         pages: number;
         currentPage: number;
       }>(`/search/issues?${params}`)
       .then(({ data }) => ({
         ...data,
-        rows: data.rows.map(row => ({
-          ...row,
-          amount: BigNumber(row.amount),
-          fundingAmount: BigNumber(row.fundingAmount),
-          fundedAmount: BigNumber(row.fundedAmount)
-        }))
+        rows: data.rows.map(parseAmountsToBN)
       }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -168,14 +165,8 @@ export default function useApi() {
       networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
-      .get<IssueBigNumberData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => 
-        (data.map(bounty => ({
-          ...bounty,
-          amount: BigNumber(bounty.amount),
-          fundingAmount: BigNumber(bounty.fundingAmount),
-          fundedAmount: BigNumber(bounty.fundedAmount)
-        }))))
+      .get<IssueData[]>(`/search/issues/recent/?${params}`)
+      .then(({ data }): IssueBigNumberData[] => (data.map(parseAmountsToBN)))
       .catch((): IssueBigNumberData[] => ([]));
   }
   
