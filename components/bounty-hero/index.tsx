@@ -3,6 +3,7 @@ import {isMobile} from "react-device-detect";
 import {useTranslation} from "next-i18next";
 
 import Avatar from "components/avatar";
+import CountInfo from "components/bounty-hero/count-info";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
 import CustomContainer from "components/custom-container";
@@ -86,39 +87,25 @@ export default function BountyHero() {
                 </div>
 
                 <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
-                  <div>
-                    <span className="caption-small mr-1 text-white">
-                      {state.currentBounty?.data?.working?.length || 0}
-                    </span>
-                    <span className="caption-small text-white-40 text-uppercase">
-                      {t("info.working")}
-                    </span>
-                  </div>
+                  <CountInfo 
+                    type="working"
+                    count={state.currentBounty?.data?.working?.length}
+                  />
 
-                  <div>
-                    <span className="caption-small mr-1 text-white">
-                      {state.currentBounty?.data?.pullRequests?.length || 0}
-                    </span>
-                    <span className="caption-small text-white-40 text-uppercase">
-                      {t("info.pull-requests", {count: state.currentBounty?.data?.pullRequests?.length})}
-                    </span>
-                  </div>
+                  <CountInfo 
+                    type="pull-requests"
+                    count={state.currentBounty?.data?.pullRequests?.length}
+                  />
 
-                  <div>
-                    <span className="caption-small mr-1 text-white">
-                      {state.currentBounty?.data?.mergeProposals?.length || 0}
-                    </span>
-                    <span className="caption-small text-white-40 text-uppercase">
-                      {t("info.proposals", {count: state.currentBounty?.data?.mergeProposals?.length})}
-                    </span>
-                  </div>
+                  <CountInfo 
+                    type="proposals"
+                    count={state.currentBounty?.data?.mergeProposals?.length}
+                  />
 
-                  {state.currentBounty?.chainData?.creationDate && (
-                    <DateLabel
-                      date={state.currentBounty?.chainData?.creationDate}
-                      className="text-white"
-                    />
-                  )}
+                  <DateLabel
+                    date={state.currentBounty?.data?.createdAt}
+                    className="text-white"
+                  />
                 </div>
 
                 { !!state.currentBounty?.data?.tags?.length &&
