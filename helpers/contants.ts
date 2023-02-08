@@ -18,6 +18,7 @@ export const NO_NETWORKS_FOR_GIVEN_CHAIN_ID = `No networks for given chain id`;
 export const CHAIN_NOT_CONFIGURED = `Chain not configured`;
 export const WRONG_PARAM_URL = name => `Url ${name} was malformed`;
 export const WRONG_PARAM_ADDRESS = name => `Address ${name} is malformed or 0 address`;
+export const SEVEN_DAYS_IN_MS = 60 * 60 * 24 * 7 * 1000;
 export const IM_AM_CREATOR_ISSUE = `I am the owner of this bounty`;
 export const NOT_AN_CREATOR_ISSUE = `Not an creator issue`;
 export const MISSING_CREATOR_ISSUE_SIGNATURE = `Missing creator issue signature`;

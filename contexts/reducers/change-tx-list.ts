@@ -2,13 +2,13 @@ import {v4 as uuidv4} from "uuid";
 
 import {SimpleAction} from "contexts/reducers/reducer";
 
+import { saveTransactionsToStorage } from "helpers/transactions";
+
 import {State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "interfaces/transaction";
-
-import { useTransactions } from "x-hooks/use-transactions";
 
 type Tx = Partial<(SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)>;
 export type TxList = Tx[];
@@ -21,7 +21,6 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
   }
 
   reducer(state: State, payload: TxList, subAction): State {   
-    const { saveToStorage } = useTransactions();
     let transformed;
 
     const addMapper = (_tx) => ({
@@ -62,7 +61,7 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
       break;
     }
 
-    saveToStorage(transformed);
+    saveTransactionsToStorage(transformed);
 
     return super.reducer(state, transformed);
   }
