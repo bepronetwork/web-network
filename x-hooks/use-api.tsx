@@ -531,7 +531,7 @@ export default function useApi() {
     isClosed = undefined,
     isRegistered = undefined,
     isDefault = undefined,
-    isNeedCountsAndTotalLock = undefined
+    isNeedCountsAndTokensLocked = undefined
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -544,8 +544,8 @@ export default function useApi() {
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
       ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {}),
-      ...((isNeedCountsAndTotalLock !== undefined && {
-        isNeedCountsAndTotalLock: isNeedCountsAndTotalLock.toString(),
+      ...((isNeedCountsAndTokensLocked !== undefined && {
+        isNeedCountsAndTokensLocked: isNeedCountsAndTokensLocked.toString(),
       }) ||
         {}),
     }).toString();
@@ -557,13 +557,7 @@ export default function useApi() {
         pages: number;
         currentPage: number;
       }>(`/search/networks/?${params}`)
-      .then(({ data }) => ({
-        ...data,
-        rows: data.rows.map(network => ({
-          ...network,
-          totalValueLock: BigNumber(network?.totalValueLock)
-        }))
-      }))
+      .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
