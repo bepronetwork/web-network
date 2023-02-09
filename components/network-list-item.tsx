@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
 
@@ -45,20 +47,20 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.countIssues) ? formatNumberToNScale(network?.countIssues, 0) : <Spinner />}
+          {isNotUndefined(network?.totalIssues) ? formatNumberToNScale(network?.totalIssues, 0) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {isNotUndefined(network?.countOpenIssues) ? formatNumberToNScale(network?.countOpenIssues, 0) : <Spinner />}
+          {isNotUndefined(network?.totalOpenIssues) ? formatNumberToNScale(network?.totalOpenIssues, 0) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
         <span className="caption-medium text-white ml-3">
-        {isNotUndefined(network?.totalValueLock) ? (
-            formatNumberToNScale(network?.totalValueLock.toFixed())
+        {isNotUndefined(network?.tokensLocked) ? (
+            formatNumberToNScale(BigNumber(network?.tokensLocked || 0).toFixed())
           ) : (
             <Spinner />
           )}
