@@ -30,7 +30,7 @@ export interface SearchNetworkParams {
   isClosed?: boolean;
   isRegistered?: boolean;
   isDefault?: boolean;
-  isNeedCountsAndTotalLock?: boolean;
+  isNeedCountsAndTokensLocked?: boolean;
 }
 
 export interface SearchActiveNetworkParams {
