@@ -13,7 +13,6 @@ import {useAppState} from "contexts/app-state";
 
 import {isProposalDisputable} from "helpers/proposal";
 
-import {ProposalExtended} from "interfaces/bounty";
 import {pullRequest} from "interfaces/issue-data";
 import {DistributedAmounts, Proposal} from "interfaces/proposal";
 
@@ -21,7 +20,6 @@ import useOctokit from "x-hooks/use-octokit";
 
 interface IProposalActionCardProps {
   proposal: Proposal;
-  networkProposal: ProposalExtended;
   currentPullRequest: pullRequest;
   distributedAmounts: DistributedAmounts;
   onMerge: () => Promise<void>;
@@ -31,7 +29,6 @@ interface IProposalActionCardProps {
 
 export default function ProposalActionCard({
   proposal,
-  networkProposal,
   currentPullRequest,
   onMerge,
   onDispute,
@@ -44,12 +41,13 @@ export default function ProposalActionCard({
   const [isRefusing, setIsRefusing] = useState(false);
   const [chaintime, setChainTime] = useState<number>();
   const [isDisputing, setIsDisputing] = useState(false);
+  const [canUserDispute, setCanUserDispute] = useState(false);
   const [allowMergeCommit, setAllowMergeCommit] = useState<boolean>();
   const [chainDisputable, setChainDisputable] = useState<boolean>(false);
   const [missingDisputableTime, setMissingDisputableTime] = useState<string>('');
 
-  const {getRepository} = useOctokit();
-  const {state} = useAppState();
+  const { state } = useAppState();
+  const { getRepository } = useOctokit();
 
   const bountyAmount = 
     BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
@@ -64,20 +62,20 @@ export default function ProposalActionCard({
     isProposalDisputable(proposal?.createdAt, 
                          BigNumber(state.Service?.network.times?.disputableTime).toNumber(),
                          chaintime),
-    networkProposal?.canUserDispute,
+    canUserDispute,
     !proposal?.isDisputed,
     !proposal?.refusedByBountyOwner,
-    !state.currentBounty?.chainData?.closed,
+    !state.currentBounty?.data?.isClosed,
     !proposal?.isDisputed,
     !proposal?.isMerged
   ].every(c => c);
 
   const isRefusable = () => [
-    !state.currentBounty?.chainData?.closed,
-    !state.currentBounty?.chainData?.canceled,
+    !state.currentBounty?.data?.isClosed,
+    !state.currentBounty?.data?.isCanceled,
     !proposal?.isDisputed,
     !proposal?.refusedByBountyOwner,
-    state.currentBounty?.chainData?.creator === state.currentUser?.walletAddress
+    state.currentBounty?.data?.creatorAddress === state.currentUser?.walletAddress
   ].every(v => v);
 
   const canMerge = () => [
@@ -137,6 +135,14 @@ export default function ProposalActionCard({
         .catch(console.debug);
   }, [state?.currentBounty?.data]);
 
+  useEffect(() => {
+    if (!proposal || !state.currentUser?.walletAddress) 
+      setCanUserDispute(false);
+    else
+      setCanUserDispute(!proposal.disputes.some(({ address, weight }) => 
+        address === state.currentUser.walletAddress && weight.gt(0)));
+  }, [proposal, state.currentUser?.walletAddress]);
+
   return (
     <div className="col-md-6">
       <div className="bg-shadow rounded-5 p-3">
@@ -145,7 +151,7 @@ export default function ProposalActionCard({
             issueDisputeAmount={proposal?.disputeWeight?.toNumber()}
             disputeMaxAmount={+state.Service?.network?.amounts?.percentageNeededForDispute || 0}
             isDisputed={proposal?.isDisputed}
-            isFinished={state.currentBounty?.chainData?.closed}
+            isFinished={state.currentBounty?.data?.isClosed}
             isMerged={proposal?.isMerged}
             refused={proposal?.refusedByBountyOwner}
           />
@@ -160,7 +166,7 @@ export default function ProposalActionCard({
           <div className="d-flex flex-row justify-content-between mt-3">
             <ProposalMerge 
               amountTotal={bountyAmount} 
-              tokenSymbol={state.currentBounty?.data?.token?.symbol}
+              tokenSymbol={state.currentBounty?.data?.transactionalToken?.symbol}
               proposal={proposal}
               isMerging={isMerging}
               idBounty={state.currentBounty?.data?.id}

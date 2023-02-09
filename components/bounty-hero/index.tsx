@@ -9,6 +9,7 @@ import BountyTags from "components/bounty/bounty-tags";
 import CustomContainer from "components/custom-container";
 import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
+import If from "components/If";
 import PriceConversor from "components/price-conversor";
 import Translation from "components/translation";
 
@@ -27,7 +28,7 @@ export default function BountyHero() {
     <div className={`${isMobile ? 'col-12 mt-2' : 'col-1' } d-flex align-items-center justify-content-center`}>
       <PriceConversor
         currentValue={state.currentBounty?.data?.amount?.toFixed() || "0"}
-        currency={state.currentBounty?.data?.token?.symbol || t("common:misc.token")}
+        currency={state.currentBounty?.data?.transactionalToken?.symbol || t("common:misc.token")}
       />
     </div>
     )
@@ -70,14 +71,13 @@ export default function BountyHero() {
                   </div>
 
                   <span className="caption-small">
-                    {(state.currentBounty?.data?.repository && (
+                    <If condition={!!state.currentBounty?.data?.repository}>
                       <GithubInfo
                         parent="list"
                         variant="repository"
                         label={state.currentBounty?.data?.repository?.githubPath}
                       />
-                    )) ||
-                      ""}
+                    </If>
                   </span>
 
                   <span className="caption-small text-light-gray text-uppercase">
@@ -102,17 +102,19 @@ export default function BountyHero() {
                     count={state.currentBounty?.data?.mergeProposals?.length}
                   />
 
-                  <DateLabel
-                    date={state.currentBounty?.data?.createdAt}
-                    className="text-white"
-                  />
+                  <If condition={!!state.currentBounty?.data?.createdAt}>
+                    <DateLabel
+                      date={state.currentBounty?.data?.createdAt}
+                      className="text-white"
+                      />
+                  </If>
                 </div>
 
-                { !!state.currentBounty?.data?.tags?.length &&
+                <If condition={!!state.currentBounty?.data?.tags?.length}>
                   <div className="mt-3">
-                    <BountyTags tags={state.currentBounty.data.tags} />
+                    <BountyTags tags={state.currentBounty?.data?.tags} />
                   </div>
-                }
+                </If>
               </>
             )}
           </div>

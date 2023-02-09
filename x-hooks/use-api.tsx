@@ -5,7 +5,7 @@ import {head} from "lodash";
 
 import {useAppState} from "contexts/app-state";
 
-import { parseAmountsToBN } from "helpers/issue";
+import { issueParser } from "helpers/issue";
 
 import {
   CancelPrePullRequestParams,
@@ -143,7 +143,7 @@ export default function useApi() {
       }>(`/search/issues?${params}`)
       .then(({ data }) => ({
         ...data,
-        rows: data.rows.map(parseAmountsToBN)
+        rows: data.rows.map(issueParser)
       }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -166,7 +166,7 @@ export default function useApi() {
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => (data.map(parseAmountsToBN)))
+      .then(({ data }): IssueBigNumberData[] => (data.map(issueParser)))
       .catch((): IssueBigNumberData[] => ([]));
   }
   
@@ -202,7 +202,7 @@ export default function useApi() {
                           chainId?: string | number) {
     return api
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`, { params: { chainId } })
-      .then(({ data }) => data)
+      .then(({ data }) => issueParser(data))
       .catch(() => null);
   }
 

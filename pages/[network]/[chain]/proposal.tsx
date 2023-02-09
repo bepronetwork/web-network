@@ -45,7 +45,6 @@ export default function PageProposal() {
   
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
-  const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
 
   const [distributedAmounts, setDistributedAmounts] =
     useState<DistributedAmounts>({
@@ -55,7 +54,7 @@ export default function PageProposal() {
       proposals: [],
     });
   
-  const {getChainBounty, getDatabaseBounty} = useBounty();
+  const { getDatabaseBounty } = useBounty();
   const { getUserOf, processEvent, createNFT } = useApi();
 
   const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
@@ -74,11 +73,12 @@ export default function PageProposal() {
         .then(async txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
           
-          await processEvent("bountyToken", "transfer", state.Service?.network?.lastVisited, { fromBlock } )
-          return processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } );
+          return Promise.all([
+            processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } ),
+            processEvent("bountyToken", "transfer", state.Service?.network?.lastVisited, { fromBlock } )
+          ]);
         })
         .then(() => {
-          getChainBounty();
           getDatabaseBounty(true);
           dispatch(addToast({
               type: "success",
@@ -106,10 +106,7 @@ export default function PageProposal() {
 
         return processEvent("proposal", "disputed", state.Service?.network?.lastVisited, { fromBlock } );
       })
-      .then(() => {
-        getDatabaseBounty(true);
-        getChainBounty();
-      })
+      .then(() => getDatabaseBounty(true))
       .catch(error => {
         if (error?.code === MetamaskErrors.UserRejected) return;
 
@@ -125,36 +122,34 @@ export default function PageProposal() {
 
   async function handleRefuse() {
     return handleRefuseByOwner(+state.currentBounty?.data?.contractId, +proposal.contractId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+      .then(txInfo => {
+        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "refused", state.Service?.network?.lastVisited, { fromBlock } );
-    })
-    .then(() => {
-      getDatabaseBounty(true);
-      getChainBounty();
-      
-      dispatch(addToast({
-        type: "success",
-        title: t("actions.success"),
-        content: t("proposal:messages.proposal-refused")
-      }));
-    })
-    .catch(error => {
-      if (error?.code === MetamaskErrors.UserRejected) return;
-      
-      console.log("Failed to refuse proposal", error);
+        return processEvent("proposal", "refused", state.Service?.network?.lastVisited, { fromBlock } );
+      })
+      .then(() => getDatabaseBounty(true))
+      .then( () => {
+        dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("proposal:messages.proposal-refused")
+        }))
+      })
+      .catch(error => {
+        if (error?.code === MetamaskErrors.UserRejected) return;
+        
+        console.log("Failed to refuse proposal", error);
 
-      dispatch(addToast({
-          type: "danger",
-          title: t("actions.failed"),
-          content: error?.response?.data?.message
-      }));
-    });
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: error?.response?.data?.message
+        }));
+      });
   }
 
   async function getDistributedAmounts() {
-    if (!networkProposal?.details || !state?.Service?.network?.amounts) return;
+    if (!proposal?.distributions || !state?.Service?.network?.amounts) return;
     
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
 
@@ -162,7 +157,7 @@ export default function PageProposal() {
                                                       mergeCreatorFeeShare,
                                                       proposerFeeShare,
                                                       amountTotal,
-                                                      networkProposal.details);
+                                                      proposal.distributions);
 
     Promise.all(distributions.proposals.map(async({recipient, ...rest}) => {
       let githubLogin = null
@@ -178,23 +173,21 @@ export default function PageProposal() {
   }
 
   useEffect(() => {
-    if (!networkProposal?.details?.length) return;
+    if (!proposal?.distributions?.length) return;
     getDistributedAmounts();
-  }, [networkProposal, state?.Service?.network?.amounts]);
+  }, [proposal?.distributions, state?.Service?.network?.amounts]);
 
   useEffect(() => {
-    if (!state.currentBounty?.data || !state.currentBounty?.chainData) return;
+    if (!state.currentBounty?.data) return;
 
     const { proposalId } = router.query;
 
     const mergeProposal = state.currentBounty?.data?.mergeProposals?.find((p) => +p.id === +proposalId);
-    const networkProposals = state.currentBounty?.chainData?.proposals?.[+mergeProposal?.contractId];
     const pullRequest = state.currentBounty?.data?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 
     setProposal(mergeProposal);
     setPullRequest(pullRequest);
-    setNetworkProposal(networkProposals);
-  }, [router.query, state.currentBounty?.data, state.currentBounty?.chainData]);
+  }, [router.query, state.currentBounty?.data]);
 
   return (
     <BountyEffectsProvider>
@@ -216,7 +209,6 @@ export default function PageProposal() {
           </div>
           <ProposalActionCard
             proposal={proposal}
-            networkProposal={networkProposal}
             currentPullRequest={pullRequest}
             onMerge={closeIssue}
             onDispute={disputeProposal}
@@ -230,7 +222,6 @@ export default function PageProposal() {
       <NotMergeableModal
         pullRequest={pullRequest}
         proposal={proposal}
-        networkProposal={networkProposal}
       />
 
       <ConnectWalletButton asModal={true} />

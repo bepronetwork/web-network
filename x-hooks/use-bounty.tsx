@@ -1,28 +1,17 @@
 import {useContext} from "react";
 
-import BigNumber from "bignumber.js";
-import {isZeroAddress} from "ethereumjs-util";
 import {useRouter} from "next/router";
-import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsContext} from "contexts/bounty-effects";
 import {
   changeCurrentBountyComments,
-  changeCurrentBountyData,
-  changeCurrentBountyDataChain,
-  changeCurrentBountyDataIsDraft,
-  changeCurrentBountyDataIsFinished,
-  changeCurrentBountyDataIsInValidation,
-  changeCurrentBountyDataProposals,
-  changeCurrentBountyDataReward,
-  changeCurrentBountyDataTransactional,
+  changeCurrentBountyData
 } from "contexts/reducers/change-current-bounty";
 import {changeSpinners} from "contexts/reducers/change-spinners";
 
-import {bountyReadyPRsHasNoInvalidProposals} from "helpers/proposal";
+import { issueParser } from "helpers/issue";
 
-import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {IssueData, pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -65,38 +54,14 @@ export function useBounty() {
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
     getIssue(+query.repoId, +query.id, query.network.toString(), chain.chainId)
-      .then(async (bounty: IssueData) => {
-        const fundedAmount = BigNumber(bounty?.fundedAmount || 0)
-        const fundingAmount = BigNumber(bounty?.fundingAmount || 0)
-        const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(fundingAmount)
+      .then((bounty: IssueData) => {
+        const parsedBounty = issueParser(bounty);
 
-        const bigNumbers = {
-          amount: BigNumber(bounty?.amount),
-          fundingAmount,
-          fundedAmount,
-          fundedPercent
-        }
-
-        const mergeProposalMapper = (proposal) => ({
-          ...proposal,
-          disputeWeight: BigNumber(proposal?.disputeWeight || 0),
-          contractCreationDate: BigNumber(proposal.contractCreationDate).toNumber(),
-          isMerged: bounty.merged !== null && +proposal?.contractId === +bounty.merged
-        })
-
-        if(bounty?.benefactors)
-          bounty.benefactors = bounty?.benefactors.map((benefactor) => 
-          ({...benefactor, amount: BigNumber(benefactor?.amount)}))
-
-        
-        const mergeProposals = bounty?.mergeProposals.map(mergeProposalMapper);
-        const extendedBounty = {...bounty, mergeProposals, ...bigNumbers};
-
-        dispatch(changeCurrentBountyData(extendedBounty));
+        dispatch(changeCurrentBountyData(parsedBounty));
 
         return Promise.all([
           getIssueOrPullRequestComments(bounty?.repository?.githubPath, +bounty?.githubId),
-          extendedBounty
+          parsedBounty
         ]);
       })
       .then(([comments, bounty]) => {
@@ -123,86 +88,6 @@ export function useBounty() {
         replace(getURLWithNetwork("/"));
       })
       .finally(() => dispatch(changeSpinners.update({bountyDatabase: false})));
-  }
-
-  function getChainBounty() {
-    if (!state.Service?.active?.network?.contractAddress ||
-        !state.currentBounty?.data ||
-        state.spinners?.bountyChain ||
-        !query?.id ||
-        !query?.repoId ||
-        !state.connectedChain?.matchWithNetworkChain)
-      return;
-
-    dispatch(changeSpinners.update({bountyChain: true}))
-    state.Service.active.getBounty(state.currentBounty.data.contractId)
-      .then(bounty => {
-
-        if(!bounty?.id) return;
-        
-        const pullRequestsMapper = (pullRequest) => ({
-          ...pullRequest,
-          isCancelable: !bounty.proposals.find(proposal => proposal.prId === pullRequest.id)
-        });
-
-        bounty.pullRequests = bounty?.pullRequests?.filter(pr => !pr.canceled).map(pullRequestsMapper);
-        bounty.fundedAmount = bounty?.funding?.reduce((p, c) => p.plus(c.amount), BigNumber(0))
-        bounty.fundedPercent = bounty?.fundedAmount?.multipliedBy(100).dividedBy(bounty?.fundingAmount);
-        bounty.isFundingRequest = bounty?.fundingAmount.gt(0);
-
-        dispatch(changeCurrentBountyDataChain.update(bounty));
-
-        state.Service.active.getERC20TokenData(bounty.transactional)
-          .then(token => dispatch(changeCurrentBountyDataTransactional(token)));
-
-        if(isAddress(bounty.rewardToken) && !isZeroAddress(bounty.rewardToken))
-          state.Service.active.getERC20TokenData(bounty.rewardToken)
-              .then(token => dispatch(changeCurrentBountyDataReward(token)));
-
-        state.Service.active.isBountyInDraftChain(bounty.creationDate)
-          .then(bool => dispatch(changeCurrentBountyDataIsDraft(bool)));
-
-        getExtendedProposalsForCurrentBounty(bounty)
-          .then(proposals => dispatch(changeCurrentBountyDataProposals(proposals)))
-          .catch(error => console.debug("Failed to getExtendedProposalsForCurrentBounty", error));
-
-        bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.active.network)
-          .catch(() => -1)
-          .then(value => {
-            dispatch(changeCurrentBountyDataIsFinished(value !== 0));
-            dispatch(changeCurrentBountyDataIsInValidation([2].includes(value)));
-            dispatch(changeSpinners.update({bountyChain: false}));
-          });
-
-      }).catch(error => console.debug("getChainBounty", error));
-
-  }
-
-  /**
-   *  todo: getExtendedProposalsForCurrentBounty() should happen on webnetwork-events
-   *
-   *  MAKE SURE that these functions (getExtendedProposalsForCurrentBounty, getExtendedPullRequestsForCurrentBounty)
-   *  are only called once, since they ignore cached information
-   */
-
-  function getExtendedProposalsForCurrentBounty(bounty: BountyExtended): Promise<ProposalExtended[]> {
-    if (!state.currentBounty?.chainData || !state.Service?.active)
-      return Promise.reject([]);
-
-    const wallet = state.currentUser?.walletAddress;
-
-    return Promise.all(bounty.proposals.map(proposal =>
-          !wallet
-            ? ({...proposal})
-            : state.Service.active.getDisputesOf(wallet, +bounty.id, +proposal.id)
-              .then(value => ({...proposal, canUserDispute: !value.gt(0)}))))
-      .then(proposals => {
-        return Promise.resolve(proposals)
-      })
-      .catch(e => {
-        console.error(`Failed to get extended proposals`, e);
-        return Promise.reject(e)
-      });
   }
 
   function getExtendedPullRequestsForCurrentBounty() {
@@ -236,9 +121,7 @@ export function useBounty() {
   }
 
   return {
-    getExtendedProposalsForCurrentBounty,
     getExtendedPullRequestsForCurrentBounty,
-    getDatabaseBounty,
-    getChainBounty,
+    getDatabaseBounty
   }
 }

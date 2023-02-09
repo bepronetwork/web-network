@@ -1,20 +1,16 @@
-import { intervalToDuration } from "date-fns";
+import { useEffect, useState } from "react";
+
+import { Duration, intervalToDuration } from "date-fns";
 import { useTranslation } from "next-i18next";
 
 interface IDataLabelProps {
-  date: Date | number;
+  date: Date;
   className?: string;
 }
 export default function DateLabel({ date, className }: IDataLabelProps) {
   const { t } = useTranslation("common");
 
-  const start = new Date(date);
-  const end = new Date();
-
-  const duration = intervalToDuration({
-    start: start > end ? end : start,
-    end: end
-  });
+  const [duration, setDuration] = useState<Duration>();
 
   const translated = (measure: string, count = 0) =>
     `${count} ${t(`info-data.${measure}`, { count })}`;
@@ -44,9 +40,21 @@ export default function DateLabel({ date, className }: IDataLabelProps) {
     return _string;
   }
 
+  useEffect(() => {
+    if (!date) return;
+
+    const start = date;
+    const end = new Date();
+
+    setDuration(intervalToDuration({
+      start: start > end ? end : start,
+      end: end
+    }));
+  }, [date]);
+
   return (
     <span className={`caption-small ${className || "text-light-gray"}`}>
-      {date &&
+      {duration &&
         t("info-data.text-data", {
           value: handleDurationTranslation().join(" ")
         })}

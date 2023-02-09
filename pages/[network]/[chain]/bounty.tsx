@@ -8,6 +8,8 @@ import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
 import IssueBody from "components/bounty/issue-body";
 import TabSections from "components/bounty/tabs-sections";
+import CustomContainer from "components/custom-container";
+import If from "components/If";
 import IssueComments from "components/issue-comments";
 import PageActions from "components/page-actions";
 
@@ -92,7 +94,9 @@ export default function PageIssue() {
     <BountyEffectsProvider>
       <BountyHero />
 
-      { state.currentBounty?.data?.fundingAmount.gt(0) ? <FundingSection /> : null}
+      <If condition={!!state.currentBounty?.data?.isFundingRequest}>
+        <FundingSection /> 
+      </If>
 
       <PageActions
         isRepoForked={!!isRepoForked}
@@ -101,10 +105,9 @@ export default function PageIssue() {
         isEditIssue={isEditIssue}
       />
 
-      {(state.currentUser?.walletAddress)
-        ? <TabSections/>
-        : null
-      }
+      <If condition={!!state.currentUser?.walletAddress}>
+        <TabSections/>
+      </If>
 
       <IssueBody 
         isEditIssue={isEditIssue} 

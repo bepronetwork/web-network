@@ -86,7 +86,7 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
               currentValue={state.currentBounty?.data?.amount?.toFixed() || "0"}
-              currency={state.currentBounty?.chainData?.transactionalTokenData?.symbol || t("misc.token")}
+              currency={state.currentBounty?.data?.transactionalToken?.symbol || t("misc.token")}
             />
           </div>
         </div>

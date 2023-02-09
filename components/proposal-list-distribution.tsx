@@ -41,7 +41,7 @@ export default function ProposalListDistribution({
       .toFixed(4);
 
   const currentTokenSymbol =
-    state.currentBounty?.data?.token?.symbol || t("common:misc.token");
+    state.currentBounty?.data?.transactionalToken?.symbol || t("common:misc.token");
 
   useEffect(() => {
     if (state.Service?.network?.amounts) getCoinInfo();

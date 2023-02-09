@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 
-import {PullRequest} from "@taikai/dappkit";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {useRouter} from "next/router";
@@ -41,13 +40,12 @@ export default function PullRequestPage() {
   const [isMakingReady, setIsMakingReady] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [isCreatingReview, setIsCreatingReview] = useState(false);
-  const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
   
   const { state, dispatch } = useAppState();
   
+  const { getDatabaseBounty } = useBounty();
   const { getURLWithNetwork } = useNetwork();
   const { createReviewForPR, processEvent } = useApi();
-  const { getDatabaseBounty, getChainBounty } = useBounty();
   const { getExtendedPullRequestsForCurrentBounty } = useBounty();
   const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
 
@@ -56,11 +54,10 @@ export default function PullRequestPage() {
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isGithubConnected = !!state.currentUser?.login;
   const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
-  const isPullRequestReady = !!networkPullRequest?.ready;
-  const isPullRequestCanceled = !!networkPullRequest?.canceled;
-  const isPullRequestCancelable = !!networkPullRequest?.isCancelable;
-  const isPullRequestCreator = 
-    networkPullRequest?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+  const isPullRequestReady = !!pullRequest?.isReady;
+  const isPullRequestCanceled = !!pullRequest?.isCanceled;
+  const isPullRequestCancelable = !!pullRequest?.isCancelable;
+  const isPullRequestCreator = pullRequest?.userAddress === state.currentUser?.walletAddress;
   const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
   const approvalsRequired = 
     branchProtectionRules ? 
@@ -121,7 +118,7 @@ export default function PullRequestPage() {
         return processEvent("pull-request", "ready", state.Service?.network?.lastVisited, {fromBlock});
       })
       .then(() => {
-        return Promise.all([getDatabaseBounty(true), getChainBounty()]);
+        return getDatabaseBounty(true);
       })
       .then(() => {
         setIsMakingReady(false);
@@ -187,15 +184,8 @@ export default function PullRequestPage() {
     setShowModal(false);
   }
 
-  function updateNetworkPR() {
-    setNetworkPullRequest(state.currentBounty?.chainData
-                                            ?.pullRequests
-                                            ?.find(pr => +pr.id === +pullRequest?.contractId));
-  }
-
   useEffect(() => {
-    if (!state.currentBounty?.data || 
-        !state.currentBounty?.chainData || 
+    if (!state.currentBounty?.data ||
         !prId || 
         state?.spinners?.pullRequests ||
         !!pullRequest) return;
@@ -215,9 +205,7 @@ export default function PullRequestPage() {
         dispatch(changeSpinners.update({pullRequests: false}));
       });
 
-  }, [state.currentBounty?.data, state.currentBounty?.chainData, prId]);
-
-  useEffect(updateNetworkPR,[pullRequest, state.currentBounty?.chainData?.pullRequests])
+  }, [state.currentBounty?.data, prId]);
 
   useEffect(() => {
     if (review && pullRequest && state.currentUser?.login) setShowModal(true);
