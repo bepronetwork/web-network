@@ -1,7 +1,7 @@
-import BigNumber from "bignumber.js";
 import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import { Op, Sequelize, WhereOptions } from "sequelize";
+import { Fn, Literal } from "sequelize/types/utils";
 
 import models from "db/models";
 
@@ -10,24 +10,13 @@ import {paginateArray} from "helpers/paginate";
 interface includeProps {
   association: string;
   required?: boolean;
+  attributes?: string[];
   where?: {
     state?: {
-      [Op.not]?: string
-    }
+      [Op.ne]?: string;
+    } | string;
   }
 }
-
-const handleNetworksResult = (networks) => networks.map(network => {
-  const result = ({
-    ...network.dataValues,
-    totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
-                                              BigNumber(0)).toFixed(),
-    countOpenIssues: network?.issues?.filter(b => b.state === "open").length || 0,
-    countIssues: network?.issues.length || 0
-  })
-  delete result.issues
-  return result
-})
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -39,7 +28,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     isClosed,
     isRegistered,
     isDefault,
-    isNeedCountsAndTotalLock,
+    isNeedCountsAndTokensLocked,
     page,
   } = req.query || {};
 
@@ -64,54 +53,40 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       { association: "tokens" }
   ];
 
-  if (isNeedCountsAndTotalLock) {
-    include.push({ association: "curators", required: false })
-    include.push({ association: "issues", required: false,
+  let group: string[] = []
+
+  const attributes: { include?: (string | [Fn,string] | [Literal,string])[]; exclude: string[] } = {
+    exclude: ["creatorAddress", "id"]
+  }
+
+  if (isNeedCountsAndTokensLocked) {
+    include.push({ association: "curators", required: false, attributes: [] })
+    include.push({ association: "issues", required: false, attributes: [],
                    where: { 
-                        state: {[Op.not]: "pending" }
+                        state: {[Op.ne]: "pending" }
                    }
     })
-  }
-  try{
-    const result = await models.network.findAll({
-    include: [
-      { association: "tokens" },
-      { association: 'curators', required: false, attributes: [] },
-      { association: 'issues', required: false, attributes: [], where: {state: {[Op.ne]: 'pending'}}}
-    ],
-    attributes: {
-      include: [
-        "network.id",
-        "network.name",
-        [Sequelize.fn('sum', Sequelize.cast(Sequelize.col('curators.tokensLocked'), 'int')), 'tokensLocked'],
-        [Sequelize.fn('count', Sequelize.col('issues.id')), 'totalIssues']
+    include.push({ association: 'openIssues', required: false, attributes: [], where: {state: 'open'}},)
+    attributes.include = [
+      "network.id",
+      "network.name",
+      [
+        Sequelize.literal('sum(cast("curators"."tokensLocked" as INT)) / COUNT(distinct("issues".id)) / case when count(distinct "openIssues".id) = 0 then 1 else count(distinct "openIssues".id) end'), // eslint-disable-line
+        "tokensLocked",
       ],
-    },
-    group: ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id", "issues.id" ],
-    where: {
-      isRegistered: true,
-      isClosed: false
-    }});
-
-    console.log('result', result)
-  }catch(e) {
-    console.log('error',e)
+      [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],
+      [Sequelize.literal('COUNT(DISTINCT("openIssues".id))'), 'totalOpenIssues']
+    ]
+    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id"]
   }
  
-  
   const networks = await models.network.findAll({
-        attributes: {
-          exclude: ["id", "creatorAddress"]
-        },
-        where: whereCondition,
-        include,
-        order: [[String(req.query.sortBy) ||["createdAt"], String(req.query.order) || "DESC"]],
-        nest: true
-  }).then(networks => {
-    if(isNeedCountsAndTotalLock)
-      return handleNetworksResult(networks)
-    else
-      return networks
+    include,
+    attributes,
+    group,
+    order: [[String(req.query.sortBy) ||["createdAt"], String(req.query.order) || "DESC"]],
+    where: whereCondition,
+    nest: true,
   })
 
 
@@ -123,6 +98,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     pages: paginatedData.pages,
     currentPage: +paginatedData.page
   });
+
 }
 
 async function SearchNetworks(req: NextApiRequest,
