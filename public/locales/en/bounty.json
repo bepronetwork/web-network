@@ -62,6 +62,9 @@
       "title": "Start Working",
       "success": "To start working on this bounty",
       "error": "To start working on this bounty"
+    },
+    "kyc": {
+      "identify-to-start": "Identify to start working"
     }
   },
   "errors": {
@@ -135,6 +138,7 @@
     "refresh": "Refresh Session",
     "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
     "identify-to-start": "Identify to start working",
+    "identify-kyc": "Identify with KYC",
     "label": "KYC",
     "steps": "{{current}} of {{total}} steps"
   }

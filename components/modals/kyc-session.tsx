@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import {useEffect, useState} from 'react';
+import {Button, Col, Row} from 'react-bootstrap';
 
 import Synaps from '@synaps-io/react-verify'
 
@@ -7,11 +7,11 @@ import Modal from 'components/modal';
 import ReadOnlyButtonWrapper from 'components/read-only-button-wrapper';
 import Translation from "components/translation";
 
-import { useAppState } from 'contexts/app-state';
-import { changeCurrentUserKycSession } from 'contexts/reducers/change-current-user';
+import {useAppState} from 'contexts/app-state';
+import {changeCurrentUserKycSession} from 'contexts/reducers/change-current-user';
 
 
-import { Tier } from 'types/settings';
+import {Tier} from 'types/settings';
 
 import useApi from 'x-hooks/use-api';
 
@@ -53,36 +53,44 @@ export function KycSessionModal() {
 
   if(!session) return null
 
-  return (
-    <ReadOnlyButtonWrapper>
-      <Button
-        color="danger"
-        className="read-only-button me-1"
-        onClick={() => setShow(true)}
-      >
-        <Translation ns="bounty" label="kyc.identify-to-start" />
-      </Button>
+  return <>
+    <Row className="mb-3">
+      <h6><Translation ns="bounty" label="kyc.label" /></h6>
+      <span className="p-small text-gray trans">{state?.currentUser?.kycSession?.status}</span>
+    </Row>
+    <Row>
+      <Col>
+        <ReadOnlyButtonWrapper>
+          <Button
+            color="danger"
+            className="read-only-button me-1"
+            disabled={state?.currentUser?.kycSession?.status === "VERIFIED"}
+            onClick={() => setShow(true)}>
+            <Translation ns="bounty" label="kyc.identify-kyc" />
+          </Button>
 
-      <Modal show={show} onCloseClick={() => setShow(false)} scrollable={false}>
-        <div className='d-flex flex-column align-items-center justify-content-center'>
-        {isLoading ? <span className="spinner-border spinner-border-md" /> : null}
-          {session ? (
-            <>
-              <Synaps
-              sessionId={session?.session_id}
-              tier={+currentTier?.id || null}
-              className={`${isLoading ? 'd-none' : ''} kyc-modal-body`}
-              onReady={() => setIsLoading(false)}
-              onFinish={() => setShow(false)}
-              service={'individual'}
-              lang={'en'}
-            /> 
-          </>
-          ): null}
-        </div>
-      </Modal>
-    </ReadOnlyButtonWrapper>
-  )
+          <Modal show={show} onCloseClick={() => setShow(false)} scrollable={false}>
+            <div className='d-flex flex-column align-items-center justify-content-center'>
+              {isLoading ? <span className="spinner-border spinner-border-md" /> : null}
+              {session ? (
+                <>
+                  <Synaps
+                    sessionId={session?.session_id}
+                    tier={+currentTier?.id || null}
+                    className={`${isLoading ? 'd-none' : ''} kyc-modal-body`}
+                    onReady={() => setIsLoading(false)}
+                    onFinish={() => setShow(false)}
+                    service={'individual'}
+                    lang={'en'}
+                  />
+                </>
+              ): null}
+            </div>
+          </Modal>
+        </ReadOnlyButtonWrapper>
+      </Col>
+    </Row>
+  </>
 }
 
 export default KycSessionModal;

@@ -11,7 +11,6 @@ import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
-import KycSessionModal from "components/modals/kyc-session";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
@@ -28,8 +27,10 @@ import useBepro from "x-hooks/use-bepro";
 import {BountyEffectsProvider} from "../contexts/bounty-effects";
 import {useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
-import { ContextualSpan } from "./contextual-span";
+import {ContextualSpan} from "./contextual-span";
 import Modal from "./modal";
+import Link from "next/link";
+import useNetworkTheme from "../x-hooks/use-network-theme";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -239,8 +240,7 @@ export default function PageActions({
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
           hrefPath="fork"
-          color="primary"
-        >
+          color="primary">
           <Translation label="actions.fork-repository"/>
         </GithubLink>);
   }
@@ -257,7 +257,11 @@ export default function PageActions({
         ){
 
       if(state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
-        return <KycSessionModal/>
+        return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
+          <Button>
+            <Translation ns="bounty" label="kyc.identify-to-start" />
+          </Button>
+        </Link>
       }
       else{
         return (
