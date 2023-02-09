@@ -35,10 +35,10 @@ export default function ListRecentIssues() {
         <h4 className="mt-1">{t("recent-bounties")}</h4>
       </div>
       <LoadingList loading={loading} />
-      <div className="row mt-3">
+      <div className="row gy-3">
         {bounties &&
           bounties?.map((bounty) => (
-            <div className="col-md-4 col mb-3" key={bounty.id}>
+            <div className="col-md-4 col" key={bounty.id}>
               <IssueListItem issue={bounty} key={bounty.id} size="sm" />
             </div>
           ))}
