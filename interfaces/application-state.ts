@@ -95,7 +95,6 @@ export interface CurrentBounty {
   comments: IssueDataComment[];
   lastUpdated: number;
   data: IssueBigNumberData;
-  chainData: BountyExtended;
 }
 
 export interface State {

@@ -59,6 +59,12 @@ export interface IssueData {
   payments: Payment[];
   network?: Network;
   tags: string[];
+  isDraft: boolean;
+  isClosed: boolean;
+  isFundingRequest: boolean;
+  isFunded: boolean;
+  isCanceled: boolean;
+  fundedPercent: number;
 }
 
 export interface Disputes {
@@ -157,5 +163,5 @@ export interface fundingBenefactor {
   address: string;
   contractId: number;
   issueId: number;
-  isWithdrawn?: boolean
+  withdrawn?: boolean
 }
