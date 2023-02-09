@@ -65,7 +65,7 @@ export default function NetworksList() {
       isRegistered: true,
       sortBy: "name",
       order: "asc",
-      isNeedCountsAndTotalLock: true
+      isNeedCountsAndTokensLocked: true
     })
       .then(async ({ count, rows }) => {
         if (count > 0) {
