@@ -48,6 +48,11 @@ class Network extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
+    this.hasMany(models.issue, {
+      foreignKey: "network_id",
+      sourceKey: "id",
+      as: "openIssues"
+    });
     this.hasMany(models.repositories, {
       foreignKey: "network_id",
       sourceKey: "id"
