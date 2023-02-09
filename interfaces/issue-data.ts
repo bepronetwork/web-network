@@ -64,6 +64,7 @@ export interface IssueData {
   isFundingRequest: boolean;
   isFunded: boolean;
   isCanceled: boolean;
+  isReady?: boolean;
   fundedPercent: number;
 }
 
@@ -108,6 +109,7 @@ export interface pullRequest {
   isMergeable: boolean;
   issueId: number;
   state: string;
+  userAddress: string;
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
@@ -122,7 +124,10 @@ export interface pullRequest {
   hash?: string;
   approvals?: {
     total: number;
-  }
+  };
+  isCanceled: boolean;
+  isReady: boolean;
+  isCancelable: boolean;
 }
 
 export interface developer {

@@ -37,13 +37,13 @@ class MergeProposal extends Model {
           type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false
-        },
+        }
     },
-               {
-        sequelize,
-        modelName: "mergeProposal",
-        tableName: "merge_proposals"
-               });
+    {
+      sequelize,
+      modelName: "mergeProposal",
+      tableName: "merge_proposals"
+    });
   }
 
   static associate(models) {
@@ -52,6 +52,12 @@ class MergeProposal extends Model {
       foreignKey: "proposalId",
       sourceKey: "id",
       as: "distributions"
+    });
+
+    this.hasMany(models.dispute, {
+      foreignKey: "proposalId",
+      sourceKey: "id",
+      as: "disputes"
     });
 
     this.belongsTo(models.issue, {

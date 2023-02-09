@@ -11,11 +11,11 @@ class ProposalDistributions extends Model {
           primaryKey: true,
           unique: true
         },
-      address: {
+      recipient: {
         type: DataTypes.STRING(255),
         allowNull: false,
         get() {
-          return getValueToLowerCase(this, "address");
+          return getValueToLowerCase(this, "recipient");
         }
       },
       percentage: {

@@ -40,12 +40,24 @@ class PullRequest extends Model {
           defaultValue: []
         },
         network_id: DataTypes.INTEGER,
+        isCanceled: {
+          type: DataTypes.VIRTUAL,
+          get() {
+            return this.status === "canceled";
+          }
+        },
+        isReady: {
+          type: DataTypes.VIRTUAL,
+          get() {
+            return this.status === "ready";
+          }
+        }
     },
-               {
-        sequelize,
-        modelName: "pullRequest",
-        tableName: "pull_requests"
-               });
+    {
+      sequelize,
+      modelName: "pullRequest",
+      tableName: "pull_requests"
+    });
   }
 
   static associate(models) {
