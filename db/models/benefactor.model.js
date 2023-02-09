@@ -33,6 +33,10 @@ class Benefactors extends Model {
             model: "issue",
             key: "id"
           }
+        },
+        withdrawn: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
         }
       },
       {

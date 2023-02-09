@@ -1,6 +1,7 @@
 "use strict";
 const { getValueToLowerCase } = require("helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
+const { BigNumber } = require("bignumber.js");
 class Issue extends Model {
   static init(sequelize) {
     super.init({
@@ -49,6 +50,42 @@ class Issue extends Model {
       },
       chain_id: {
         type: DataTypes.INTEGER
+      },
+      isDraft: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.state === "draft";
+        }
+      },
+      isClosed: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.state === "closed";
+        }
+      },
+      isCanceled: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.state === "canceled";
+        }
+      },
+      isFundingRequest: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.fundingAmount).gt(0);
+        }
+      },
+      isFunded: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.fundedAmount).gte(this.fundingAmount);
+        }
+      },
+      fundedPercent: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.fundedAmount).dividedBy(this.fundingAmount).multipliedBy(100).toNumber();
+        }
       }
     },
     {
