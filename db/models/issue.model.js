@@ -16,41 +16,32 @@ class Issue extends Model {
       },
       creatorGithub: DataTypes.STRING,
       amount: DataTypes.STRING,
-      fundingAmount: DataTypes.STRING,
-      fundedAmount: DataTypes.STRING,
+      fundingAmount: {
+        type: DataTypes.STRING,
+        defaultValue: "0"
+      },
+      fundedAmount: {
+        type: DataTypes.STRING,
+        defaultValue: "0"
+      },
       rewardAmount: {
         type: DataTypes.STRING,
-        allowNull: true
+        defaultValue: "0"
       },
       repository_id: DataTypes.STRING,
       title: DataTypes.TEXT,
       body: DataTypes.TEXT,
       branch: DataTypes.STRING,
-      working: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-      },
+      working: DataTypes.ARRAY(DataTypes.STRING),
       merged: DataTypes.STRING,
       seoImage: DataTypes.STRING,
       network_id: DataTypes.INTEGER,
       contractId: DataTypes.INTEGER,
-      transactionalTokenId: {
-        type: DataTypes.INTEGER,
-        allowNull: true
-      },
-      rewardTokenId: {
-        type: DataTypes.INTEGER,
-        allowNull: true
-      },
-      fundedAt: {
-        type: DataTypes.DATE,
-        allowNull: true
-      },
-      tags: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-      },
-      chain_id: {
-        type: DataTypes.INTEGER
-      },
+      transactionalTokenId: DataTypes.INTEGER,
+      rewardTokenId: DataTypes.INTEGER,
+      fundedAt: DataTypes.DATE,
+      tags: DataTypes.ARRAY(DataTypes.STRING),
+      chain_id: DataTypes.INTEGER,
       isDraft: {
         type: DataTypes.VIRTUAL,
         get() {
