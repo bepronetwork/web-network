@@ -36,4 +36,5 @@ export type Events = "created" |
   "registered"|
   "moved-to-open" |
   "update-draft-time" |
-  "parameters";
+  "parameters" |
+  "withdraw";

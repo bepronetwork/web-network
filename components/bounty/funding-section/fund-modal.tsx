@@ -85,8 +85,10 @@ export default function FundModal({
         
         return processEvent("bounty", "funded", state.Service?.network?.lastVisited, {fromBlock});
       })
-      .then(() => {
+      .then(async () => {
         const amountFormatted = formatNumberToCurrency(amountToFund.toFixed());
+        
+        updateAllowanceAndBalance();
         getDatabaseBounty(true);
         handleClose();
 
@@ -162,6 +164,7 @@ export default function FundModal({
           balance={balance}
           decimals={transactionalToken?.decimals || 18}
           max={BigNumber.minimum(amountNotFunded, balance)}
+          disabled={isExecuting}
         />
 
         {BigNumber(state.currentBounty?.data?.rewardAmount || 0).gt(0) && (

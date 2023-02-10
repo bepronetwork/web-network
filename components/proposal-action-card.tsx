@@ -59,8 +59,8 @@ export default function ProposalActionCard({
   const prsNeedsApproval = approvalsCurrentPr < approvalsRequired;
 
   const proposalCanBeDisputed = () => [
-    isProposalDisputable(proposal?.createdAt, 
-                         BigNumber(state.Service?.network.times?.disputableTime).toNumber(),
+    isProposalDisputable(proposal?.contractCreationDate, 
+                         BigNumber(state.Service?.network?.times?.disputableTime).toNumber(),
                          chaintime),
     canUserDispute,
     !proposal?.isDisputed,
@@ -83,7 +83,8 @@ export default function ProposalActionCard({
     !proposal?.isMerged,
     !proposal?.isDisputed,
     !proposal?.refusedByBountyOwner,
-    !isProposalDisputable(proposal?.createdAt, BigNumber(state.Service?.network.times?.disputableTime).toNumber()),
+    !isProposalDisputable(proposal?.contractCreationDate,
+                          BigNumber(state.Service?.network?.times?.disputableTime).toNumber()),
     !isMerging,
     !isRefusing,
     !isDisputing,
@@ -107,10 +108,10 @@ export default function ProposalActionCard({
   }
 
   function changeMissingDisputableTime() {
-    if (!chaintime || !state.Service?.network?.times?.disputableTime || !proposal)
+    if (!chaintime || !state.Service?.network?.times?.disputableTime || !proposal?.contractCreationDate)
       return;
 
-    const target = addSeconds(new Date(proposal?.createdAt), +state.Service?.network.times.disputableTime);
+    const target = addSeconds(new Date(proposal?.contractCreationDate), +state.Service?.network.times.disputableTime);
     const missingTime = formatDistance(new Date(chaintime), target, {includeSeconds: true});
 
     setMissingDisputableTime(missingTime);
@@ -118,7 +119,7 @@ export default function ProposalActionCard({
   }
 
   useEffect(changeMissingDisputableTime, [
-    proposal?.createdAt, 
+    proposal?.contractCreationDate, 
     chaintime, 
     state.Service?.network?.times?.disputableTime
   ]);
@@ -139,7 +140,7 @@ export default function ProposalActionCard({
     if (!proposal || !state.currentUser?.walletAddress) 
       setCanUserDispute(false);
     else
-      setCanUserDispute(!proposal.disputes.some(({ address, weight }) => 
+      setCanUserDispute(!proposal.disputes?.some(({ address, weight }) => 
         address === state.currentUser.walletAddress && weight.gt(0)));
   }, [proposal, state.currentUser?.walletAddress]);
 

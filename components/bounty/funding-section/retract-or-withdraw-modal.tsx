@@ -55,6 +55,12 @@ export default function RetractOrWithdrawModal({
                                      retractOrWithdrawAmount,
                                      rewardTokenSymbol)
       .then(() => {
+        return processEvent("bounty", "withdraw", state.Service?.network?.lastVisited, {
+          issueId: state.currentBounty?.data?.issueId
+        });
+      })
+      .then(() => {
+        getDatabaseBounty(true);
         onCloseClick();
         dispatch(toastSuccess(t("funding:modals.reward.withdraw-x-symbol", {
           amount: retractOrWithdrawAmount,
@@ -70,6 +76,8 @@ export default function RetractOrWithdrawModal({
       handleRetractFundBounty(state.currentBounty?.data?.contractId, funding.contractId)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+
+        getDatabaseBounty(true);
         
         return processEvent("bounty", "funded", state.Service?.network?.lastVisited, {
           fromBlock
@@ -77,7 +85,6 @@ export default function RetractOrWithdrawModal({
       })
       .then(() => {
         onCloseClick();
-        getDatabaseBounty(true);
         dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
           amount: retractOrWithdrawAmount,
           symbol: tokenSymbol

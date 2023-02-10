@@ -15,6 +15,7 @@ interface InputWithBalanceProps {
   max?: BigNumber;
   decimals?: number;
   onChange: (value: BigNumber) => void;
+  disabled?: boolean;
 }
 
 export default function InputWithBalance({
@@ -23,7 +24,8 @@ export default function InputWithBalance({
   symbol,
   balance,
   max,
-  decimals = 18
+  decimals = 18,
+  disabled
 } : InputWithBalanceProps) {
   const { t } = useTranslation("common");
 
@@ -47,6 +49,7 @@ export default function InputWithBalance({
           decimalScale={decimals}
           onValueChange={handleAmountChange}
           isAllowed={isAllowed}
+          disabled={disabled}
         />
 
       <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">

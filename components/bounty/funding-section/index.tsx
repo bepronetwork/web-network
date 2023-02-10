@@ -42,6 +42,8 @@ export default function FundingSection() {
   
   const futureRewards = fundsGiven.multipliedBy(state.currentBounty?.data?.rewardAmount)
     .dividedBy(state.currentBounty?.data?.fundingAmount).toFixed();
+
+  const collapseAction = isBountyClosed ? t("funding:rewards") :  t("funding:actions.manage-funding");
   
   const isCanceled = getIssueState({
     state: state.currentBounty?.data?.state,
@@ -156,8 +158,8 @@ export default function FundingSection() {
 
               <Row className="mx-0">
                 <Collapsable
-                  labelShow={t("funding:actions.manage-funding")}
-                  labelHide={t("funding:actions.manage-funding")}
+                  labelShow={collapseAction}
+                  labelHide={collapseAction}
                   labelColor="gray"
                   activeColor="white"
                   className="gap-2"
