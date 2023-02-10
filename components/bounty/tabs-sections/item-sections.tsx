@@ -125,6 +125,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                             review: true
                           }))
                         }}
+                        disabled={item?.status === "draft" ? true : false}
                       >
                         <span className="label-m text-white">
                           <Translation label={isProposal ? "actions.view-proposal" : "actions.review"} />
