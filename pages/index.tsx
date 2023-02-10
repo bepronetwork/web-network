@@ -5,9 +5,9 @@ import getConfig from "next/config";
 import {useRouter} from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import ExplorePage from "./explore";
-
 import {useAppState} from "contexts/app-state";
+
+import ExplorePage from "pages/explore";
 
 const { publicRuntimeConfig } = getConfig();
 

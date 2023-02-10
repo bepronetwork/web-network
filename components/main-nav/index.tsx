@@ -72,9 +72,9 @@ export default function MainNav() {
 
   const links = [
     {
-      href: noNeedNetworkInstance ? "/bounty-hall" : getURLWithNetwork("/"),
+      href: getURLWithNetwork("/"),
       label: t("main-nav.nav-avatar.bounties"),
-      isVisible: true
+      isVisible: !noNeedNetworkInstance
     },
     {
       href: getURLWithNetwork("/curators"),
@@ -90,6 +90,13 @@ export default function MainNav() {
       href: "/leaderboard",
       label: t("main-nav.leaderboard"),
       isVisible: true
+    },
+    {
+      href: "/explore",
+      label: t("main-nav.explore"),
+      isVisible: true,
+      blank: !noNeedNetworkInstance,
+      icon: !noNeedNetworkInstance ? <ExternalLinkIcon className="mb-1" width={12} height={12} /> : null
     }
   ];
 

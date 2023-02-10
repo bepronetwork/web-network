@@ -4,11 +4,12 @@ import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import PageDevelopers from "pages/[network]/[chain]/bounties";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function Home() {
-  const { getURLWithNetwork } = useNetworkTheme();
   const { replace, query } = useRouter();
+  
+  const { getURLWithNetwork } = useNetwork();
 
   useEffect(() => {
     replace(getURLWithNetwork(`/bounties`, {

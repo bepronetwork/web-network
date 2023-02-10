@@ -14,7 +14,6 @@ import { BountyEffectsProvider } from "contexts/bounty-effects";
 import useApi from "x-hooks/use-api";
 import { useNetwork } from "x-hooks/use-network";
 
-
 export default function ExplorePage() {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
 

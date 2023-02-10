@@ -3,10 +3,10 @@ import React from "react";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {GetServerSideProps} from "next/types";
 
-import BountyHallPage from "pages/bounty-hall";
+import ExplorePage from "pages/explore";
 
 export default function NetworkBountyHall() {
-  return <BountyHallPage/>;
+  return <ExplorePage/>;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {

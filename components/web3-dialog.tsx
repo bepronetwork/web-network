@@ -38,8 +38,8 @@ export default function WebThreeDialog() {
       getURLWithNetwork("/").pathname,
       getURLWithNetwork("/bounties").pathname,
       getURLWithNetwork("/curators").pathname,
-      "/[network]/bounty",
-      "/[network]",
+      "/[network]/[chain]/bounty",
+      "/[network]/[chain]",
     ].includes(router.pathname))
       dispatch(changeShowWeb3(!window?.ethereum));
   }, [router.pathname]);

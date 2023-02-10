@@ -16,10 +16,8 @@ import {useAuthentication} from "x-hooks/use-authentication";
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
-  const {dispatch, state} = useAppState();
   const [showModal, setShowModal] = useState(false);
 
-  const {signMessage} = useSignature();
   const {dispatch, state} = useAppState();
 
   const { connectWallet } = useAuthentication();
