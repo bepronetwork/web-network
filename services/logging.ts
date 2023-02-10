@@ -58,13 +58,20 @@ export class Logger {
   static action: string = ``;
   static changeActionName(action: string) { this.action = action; }
 
-  static info(..._args) { info(Logger.action, ..._args) }
-  static log(..._args) { log(Logger.action, ..._args) }
-  static warn(..._args) { warn(Logger.action, ..._args) }
-  static debug(..._args) { debug(Logger.action, ..._args) }
-  static trace(..._args) { trace(Logger.action, ..._args) }
+  static _args(...v): [string?, ...any[]] {
+    return [
+      ... Logger.action ? [Logger.action] : [],
+      ...v
+    ]
+  }
+
+  static info(..._args) { info(...this._args(..._args)) }
+  static log(..._args) { log(...this._args(..._args)) }
+  static warn(..._args) { warn(...this._args(..._args)) }
+  static debug(..._args) { debug(...this._args(..._args)) }
+  static trace(..._args) { trace(...this._args(..._args)) }
   static error(e: Error, ..._args) {
-    error(Logger.action, e.toString(), ..._args);
-    trace(Logger.action, `Code: ${(e as any).code || `NO_OPCODE`}`, e.stack);
+    error(...this._args(...[e?.toString(), ..._args]))
+    trace(...this._args(...[`Code: ${(e as any).code || `NO_OPCODE`}\n`, e.stack || `NO_STACK_TRACE`, ..._args]));
   }
 }
