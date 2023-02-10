@@ -22,7 +22,6 @@ import {addToast} from "contexts/reducers/change-toaster";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 
-import {ProposalExtended} from "interfaces/bounty";
 import {MetamaskErrors} from "interfaces/enums/Errors";
 import {pullRequest} from "interfaces/issue-data";
 import {DistributedAmounts, Proposal} from "interfaces/proposal";

@@ -77,7 +77,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
 
             const approvalsCurrentPr = item?.approvals?.total || 0;
             const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
-            const itemId = isProposal ? item?.id : item?.githubId;
+            const itemId = isProposal ? item?.contractId + 1 : item?.githubId;
             const totalToBeDisputed = BigNumber(state.Service?.network?.amounts?.percentageNeededForDispute)
               .multipliedBy(state.Service?.network?.amounts?.totalNetworkToken)
               .dividedBy(100);

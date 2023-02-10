@@ -21,7 +21,7 @@ export const mergeProposalParser = (issue: IssueData) =>
     isMerged: issue.merged !== null && +proposal?.contractId === +issue.merged,
     createdAt: new Date(proposal.createdAt),
     updatedAt: new Date(proposal.updatedAt),
-    contractCreationDate: new Date(proposal.contractCreationDate),
+    contractCreationDate: new Date(+proposal.contractCreationDate),
     distributions: proposal.distributions?.map(distribution => ({
       ...distribution,
       createdAt: new Date(distribution.createdAt),
