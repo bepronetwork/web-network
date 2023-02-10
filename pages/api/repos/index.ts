@@ -3,7 +3,6 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {chainFromHeader} from "helpers/chain-from-header";
 import {NOT_AN_ADMIN} from "helpers/contants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
@@ -52,8 +51,6 @@ async function addNewRepo(req, res) {
   });
 
   if (found) return res.status(409).json("Path already exists");
-
-  const chain = await chainFromHeader(req);
 
   const network = await models.network.findOne({
     where: {

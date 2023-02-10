@@ -35,8 +35,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (login) where.githubLogin = login;
 
   if (issueId) {
-    const chain = await chainFromHeader(req);
-
     const network = await models.network.findOne({
       where: {
         name: {

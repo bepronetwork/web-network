@@ -41,7 +41,7 @@ export function ContractInput({
   action,
   validator,
   readOnly,
-  mustBeAddress, decimalScale
+  mustBeAddress
 } : ContractInputProps) {
   const { t } = useTranslation(["common", "setup"]);
   const { state: { Service } } = useAppState();

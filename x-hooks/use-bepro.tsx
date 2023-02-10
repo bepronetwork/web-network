@@ -45,7 +45,7 @@ export default function useBepro() {
         network: state.Service?.network?.active,
       }] as any);
       dispatch(disputeTxAction);
-      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalContractId)
+      await state.Service?.active.disputeProposal(+state.currentBounty?.data?.contractId, +proposalContractId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, disputeTxAction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve?.(txInfo);
@@ -167,16 +167,16 @@ export default function useBepro() {
 
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.cancelBounty(state.currentBounty?.chainData?.id, funding)
+      await state.Service?.active.cancelBounty(state.currentBounty?.data?.contractId, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty",
                               "canceled",
                               state.Service?.network?.lastVisited,
-            {fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id});
+            {fromBlock: txInfo.blockNumber, id: state.currentBounty?.data?.contractId});
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
+          if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(tx)
           // todo should force these two after action, but we can't have it here or it will fall outside of context
@@ -198,17 +198,17 @@ export default function useBepro() {
       dispatch(transaction);
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.hardCancel(state.currentBounty?.chainData?.id)
+      await state.Service?.active.hardCancel(state.currentBounty?.data?.contractId)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           
           return processEvent("bounty", "canceled", state.Service?.network?.lastVisited, {
             fromBlock: txInfo.blockNumber, 
-            id: state.currentBounty?.chainData?.id
+            id: state.currentBounty?.data?.contractId
           });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
+          if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
           // getChainBounty(true);
           // getDatabaseBounty(true);

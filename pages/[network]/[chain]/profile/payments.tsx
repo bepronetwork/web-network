@@ -74,9 +74,9 @@ export default function Payments() {
     if (!payments?.length) return;
 
     Promise.all(payments.map(async (payment) => ({
-        tokenAddress: payment.issue.token.address,
+        tokenAddress: payment.issue.transactionalToken.address,
         value: payment.ammount,
-        price: await getCoinPrice(payment.issue.token.symbol, state?.Settings.currency.defaultFiat),
+        price: await getCoinPrice(payment.issue.transactionalToken.symbol, state?.Settings.currency.defaultFiat),
     }))).then((tokens) => {
       const totalConverted = tokens.reduce((acc, token) => acc + token.value * (token.price || 0),
                                            0);
