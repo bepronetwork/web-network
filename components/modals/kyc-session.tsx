@@ -51,8 +51,6 @@ export function KycSessionModal() {
   useEffect(getCurrentStep,[bountyMissSteps])
   useEffect(handlerValidateSession,[show])
 
-  if(!session) return null
-
   return <>
     <Row className="mb-3">
       <h6><Translation ns="bounty" label="kyc.label" /></h6>
