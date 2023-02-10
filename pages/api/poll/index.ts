@@ -1,6 +1,7 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
 import {Bus} from "helpers/bus";
+import {RouteMiddleware} from "../../../middleware";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { eventName, ...rest } = req.body;
@@ -34,7 +35,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function PollBody(req: NextApiRequest,
+export default RouteMiddleware(async function PollBody(req: NextApiRequest,
                                        res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
@@ -44,4 +45,4 @@ export default async function PollBody(req: NextApiRequest,
   default:
     res.status(405);
   }
-}
+})

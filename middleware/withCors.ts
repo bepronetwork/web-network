@@ -1,8 +1,6 @@
 import Cors from 'cors'
 import getConfig from "next/config";
 
-import { info, error } from 'services/logging';
-
 const { publicRuntimeConfig } = getConfig();
 
 const cors = Cors({
@@ -10,43 +8,20 @@ const cors = Cors({
   origin: [publicRuntimeConfig?.urls?.home || 'http://localhost:3000'],
 })
 
-const ignorePaths = ['health', 'ip'];
 
-function runMiddleware(req, res, fn) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) {
-        return reject(result)
+const WithCors = (handler) =>
+  (req, res) =>
+    new Promise((resolve, reject) => {
+
+      const next = (e) => {
+        if (e instanceof Error)
+          reject(e);
+        resolve(null)
       }
 
-      return resolve(result)
-    })
-  })
-}
+      cors(req, res, next);
 
-function runLogger(req, e = null) {
-  const {url, method} = req as any;
-  const search = Object(new URLSearchParams(url.split('?')[1]));
-  const pathname = url.split('/api')[1].replace(/\?.+/g, '');
+    }).then(() => handler(req, res))
 
-  if (!ignorePaths.some(k => pathname.includes(k)))
-    info('Access', {method, pathname, search,});
 
-  if (e)
-    error(e?.message);
-}
-
-const withCors = (handler) => {
-  return async (req, res) => {
-    runLogger(req);
-    runMiddleware(req, res, cors)
-    .then(()=>{
-      return handler(req, res);
-    }).catch((e)=>{
-      runLogger(req, e?.message || e.toString());
-      return res.status(401).write('Unautorized');
-    })
-  };
-};
-
-export default withCors;
+export default WithCors;

@@ -9,6 +9,7 @@ import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
 import {GraphQlResponse} from "types/octokit";
+import {RouteMiddleware} from "../../../middleware";
 
 const {serverRuntimeConfig} = getConfig();
 
@@ -93,7 +94,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(`${repository.id}/${githubId}`);
 }
 
-export default async function Issue(req: NextApiRequest, res: NextApiResponse) {
+export default RouteMiddleware(async function Issue(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -104,4 +105,4 @@ export default async function Issue(req: NextApiRequest, res: NextApiResponse) {
   }
 
   res.end();
-}
+})

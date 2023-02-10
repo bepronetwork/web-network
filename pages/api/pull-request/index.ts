@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -289,4 +289,4 @@ async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default  withCors(PullRequest);
+export default  RouteMiddleware(PullRequest);

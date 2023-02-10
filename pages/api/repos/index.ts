@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
@@ -103,4 +103,4 @@ async function RepoRoute(req: NextApiRequest,
 
   res.end();
 }
-export default withCors(RepoRoute)
+export default RouteMiddleware(RepoRoute)

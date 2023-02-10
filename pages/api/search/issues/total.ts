@@ -1,4 +1,4 @@
-import {withCors} from 'middleware';
+import {RouteMiddleware} from 'middleware';
 import withJwt from "middleware/withJwt";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
@@ -72,4 +72,4 @@ async function getAll(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(withJwt(getAll))
+export default RouteMiddleware(withJwt(getAll))

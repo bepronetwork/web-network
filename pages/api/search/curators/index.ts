@@ -1,10 +1,10 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op, WhereOptions } from "sequelize";
+import {RouteMiddleware} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import paginate, { calculateTotalPages } from "helpers/paginate";
+import paginate, {calculateTotalPages} from "helpers/paginate";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -76,4 +76,4 @@ async function SearchCurators(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withCors(SearchCurators);
+export default RouteMiddleware(SearchCurators);

@@ -1,4 +1,4 @@
-import {withCors} from 'middleware';
+import {RouteMiddleware} from 'middleware';
 import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
@@ -23,4 +23,4 @@ async function getAll(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(getAll)
+export default RouteMiddleware(getAll)

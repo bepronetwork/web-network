@@ -1,7 +1,10 @@
 import {NextApiRequest, NextApiResponse} from "next";
+import {Logger} from "services/logging";
 
-export default async function Health(req: NextApiRequest,
-                                     res: NextApiResponse) {
-  res.status(204);
-  res.end();
-}
+Logger.changeActionName(`Health`);
+
+export default function Health(req: NextApiRequest,
+                  res: NextApiResponse) {
+    res.status(200);
+    res.end();
+  }

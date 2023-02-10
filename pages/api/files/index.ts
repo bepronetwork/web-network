@@ -1,9 +1,10 @@
 import formidable from "formidable";
 import fs from "fs";
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import IpfsStorage from "services/ipfs-service";
+import {Logger} from "../../../services/logging";
 
 export const config = {
   api: {
@@ -49,4 +50,5 @@ async function FilesMethods (req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(FilesMethods)
+Logger.changeActionName(`Files`);
+export default RouteMiddleware(FilesMethods)

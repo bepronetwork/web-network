@@ -1,12 +1,12 @@
-import { subMonths, subWeeks, subYears, subHours } from "date-fns";
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Op, WhereOptions } from "sequelize";
+import {subHours, subMonths, subWeeks, subYears} from "date-fns";
+import {RouteMiddleware} from "middleware";
+import {NextApiRequest, NextApiResponse} from "next";
+import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
-import { searchPatternInText } from "helpers/string";
+import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
+import {searchPatternInText} from "helpers/string";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -110,4 +110,4 @@ async function SearchLeaderBoard(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withCors(SearchLeaderBoard);
+export default RouteMiddleware(SearchLeaderBoard);

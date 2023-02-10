@@ -1,5 +1,5 @@
 import {endOfDay, isAfter, parseISO, startOfDay} from "date-fns";
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
@@ -74,4 +74,4 @@ async function Payments(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withCors(Payments)
+export default RouteMiddleware(Payments)

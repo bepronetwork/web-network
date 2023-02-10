@@ -1,5 +1,5 @@
 import {subHours, subMonths, subWeeks, subYears} from "date-fns";
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, Sequelize, WhereOptions} from "sequelize";
 
@@ -227,4 +227,4 @@ async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
-export default withCors(SearchIssues)
+export default RouteMiddleware(SearchIssues)

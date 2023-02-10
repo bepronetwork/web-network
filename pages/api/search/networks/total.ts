@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
@@ -39,4 +39,4 @@ async function GetAll(req: NextApiRequest,
 
   res.end();
 }
-export default withCors(GetAll)
+export default RouteMiddleware(GetAll)
