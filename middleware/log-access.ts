@@ -1,8 +1,8 @@
-import {NextApiHandler, NextApiRequest} from "next";
+import {NextApiHandler, NextApiRequest, NextApiResponse} from "next";
 import {debug, log, Logger} from "../services/logging";
 
 export const LogAccess = (handler: NextApiHandler) => {
-  return async (req: NextApiRequest, res) => {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
     const {url, method} = req as any;
     const _query = Object.fromEntries(new URLSearchParams(url.split('?')[1]));
     const query = Object.keys(_query).length ? _query : null;
@@ -12,18 +12,17 @@ export const LogAccess = (handler: NextApiHandler) => {
 
     const rest = (query || body) ? ({ ... query ? {query} : {}, ... body ? {body} : {}}) : '';
 
-    log(`${method} access`, pathname, rest);
+    log(`${method} access`, pathname);
     if (rest)
       debug(`${method} access-payload`, pathname, rest);
 
     try {
       await handler(req, res);
-      if (res.error)
-        throw Error(res.error);
-      if (res.statusCode >= 400)
-        Logger.warn(`Answered with ${res.statusCode}`, res.statusMessage, res.body ? JSON.stringify(res.body) : '')
 
-      debug(`${method} access-end`, pathname, rest)
+      if (res.statusCode >= 400)
+        Logger.warn(`Answered with ${res.statusCode}`, res.statusMessage)
+
+      debug(`${method} access-end`, pathname)
     } catch (e) {
       Logger.error(e, `${method}`, pathname, e?.toString(), rest);
     }
