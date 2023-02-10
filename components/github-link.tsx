@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { MouseEvent, ReactNode } from "react";
 
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
@@ -7,7 +7,7 @@ interface GithubLinkParams {
   forcePath?: string;
   hrefPath: string;
   children: ReactNode;
-  onClick?: (e?:any) => void;
+  onClick?: (e: MouseEvent) => void;
   color?: string;
 }
 

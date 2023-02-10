@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import {FormGroup} from "components/form-group";
@@ -23,7 +23,6 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
   const [currencyDecimals, setCurrencyDecimals] = useState('');
   const [eventsApi, setEventsApi] = useState('');
 
-
   function getChainModel(): MiniChainInfo {
     return {
       name,
@@ -42,7 +41,7 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
     }
   }
 
-  const forms: [string, string, any, any][] = [
+  const forms: [string, string, string,  Dispatch<SetStateAction<string>>][] = [
     ['chain id', '1', chainId, setChainId],
     ['chain name', 'Ethereum Mainnet', name, setName],
     ['chain short name', 'Ethereum', shortName, setShortName],

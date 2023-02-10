@@ -18,7 +18,7 @@ import {WithValidChainId} from "middleware/with-valid-chain-id";
 import {error} from "services/logging";
 
 async function Post(req: NextApiRequest, res: NextApiResponse) {
-  const body = req.body as MiniChainInfo;
+  const body = req.body as MiniChainInfo & { isDefault: boolean; };
 
   const missingValues = [
     [body.chainId, 'no chain id'],
@@ -40,7 +40,6 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
   if (missingValues.length)
     return res.status(400).json({message: missingValues});
 
-
   const model = {
     chainId: body.chainId,
     chainRpc: body.activeRPC,
@@ -49,7 +48,7 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
     chainCurrencySymbol: body.nativeCurrency?.symbol,
     chainCurrencyName: body.nativeCurrency?.name,
     chainCurrencyDecimals: body.nativeCurrency?.decimals,
-    isDefault: (body as any).isDefault,
+    isDefault: body.isDefault,
     blockScanner: body.explorer,
     eventsApi: body.eventsApi
   }
