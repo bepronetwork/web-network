@@ -65,6 +65,7 @@ export interface IssueData {
   isFunded: boolean;
   isCanceled: boolean;
   isReady?: boolean;
+  hasReward?: boolean;
   fundedPercent: number;
 }
 

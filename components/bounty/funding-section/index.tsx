@@ -31,7 +31,7 @@ export default function FundingSection() {
   const {state} = useAppState();
 
   const isConnected = !!state.currentUser?.walletAddress;
-  const hasReward = state.currentBounty?.data?.rewardAmount?.gt(0);
+  const hasReward = state.currentBounty?.data?.hasReward;
   const isBountyClosed = !!state.currentBounty?.data?.isClosed;
   const isBountyFunded = !!state.currentBounty?.data?.isFunded;
   const isBountyInDraft = !!state.currentBounty?.data?.isDraft;

@@ -72,6 +72,12 @@ class Issue extends Model {
           return BigNumber(this.fundedAmount).gte(this.fundingAmount);
         }
       },
+      hasReward: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.rewardAmount).gt(0);
+        }
+      },
       fundedPercent: {
         type: DataTypes.VIRTUAL,
         get() {
