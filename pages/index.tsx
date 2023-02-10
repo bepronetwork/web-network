@@ -1,20 +1,11 @@
-import { useEffect } from "react";
-
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
 
-import LoadingGlobal from "components/loading-global";
+import ExplorePage from "./explore";
 
 export default function Index() {
-  const { replace } = useRouter();
-
-  useEffect(() => {
-    replace(`/explore`);
-  }, []);
-
   return(
-    <LoadingGlobal show={true} />
+   <ExplorePage />
   );
 }
 
