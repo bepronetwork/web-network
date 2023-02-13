@@ -48,7 +48,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             logoIcon: network?.logoIcon,
             totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
                                                       BigNumber(0)),
-            countIssues: network?.issues?.length || 0
+            totalIssues: network?.issues?.length || 0
     };
   })
 

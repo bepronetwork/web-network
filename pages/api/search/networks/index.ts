@@ -1,15 +1,36 @@
 import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op, WhereOptions} from "sequelize";
+import { Op, Sequelize, WhereOptions } from "sequelize";
+import { Fn, Literal } from "sequelize/types/utils";
 
 import models from "db/models";
 
-import paginate, {calculateTotalPages} from "helpers/paginate";
+import {paginateArray} from "helpers/paginate";
+
+interface includeProps {
+  association: string;
+  required?: boolean;
+  attributes?: string[];
+  where?: {
+    state?: {
+      [Op.ne]?: string;
+    } | string;
+  }
+}
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const {name, creatorAddress, networkAddress, isClosed, isRegistered, isDefault, page} = req.query || {};
+  const {
+    name,
+    creatorAddress,
+    networkAddress,
+    isClosed,
+    isRegistered,
+    isDefault,
+    isNeedCountsAndTokensLocked,
+    page,
+  } = req.query || {};
 
   if (name) whereCondition.name = name;
 
@@ -28,26 +49,56 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (isDefault)
     whereCondition.isDefault = isDefault;
     
-  const include = [
-    { association: "tokens" }
+  const include: includeProps[] = [
+      { association: "tokens" }
   ];
 
-  const networks = await models.network.findAndCountAll(paginate({
-        attributes: {
-          exclude: ["id", "creatorAddress"]
-        },
-        where: whereCondition,
-        include,
-        nest: true
-  },
-                                                                 req.query,
-      [[req.query.sortBy || "createdAt", req.query.order || "DESC"]]));
+  let group: string[] = []
+
+  const attributes: { include?: (string | [Fn,string] | [Literal,string])[]; exclude: string[] } = {
+    exclude: ["creatorAddress", "id"]
+  }
+
+  if (isNeedCountsAndTokensLocked) {
+    include.push({ association: "curators", required: false, attributes: [] })
+    include.push({ association: "issues", required: false, attributes: [],
+                   where: { 
+                        state: {[Op.ne]: "pending" }
+                   }
+    })
+    include.push({ association: 'openIssues', required: false, attributes: [], where: {state: 'open'}},)
+    attributes.include = [
+      "network.id",
+      "network.name",
+      [
+        Sequelize.literal('sum(cast("curators"."tokensLocked" as INT)) / COUNT(distinct("issues".id)) / case when count(distinct "openIssues".id) = 0 then 1 else count(distinct "openIssues".id) end'), // eslint-disable-line
+        "tokensLocked",
+      ],
+      [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],
+      [Sequelize.literal('COUNT(DISTINCT("openIssues".id))'), 'totalOpenIssues']
+    ]
+    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id"]
+  }
+ 
+  const networks = await models.network.findAll({
+    include,
+    attributes,
+    group,
+    order: [[String(req.query.sortBy) ||["createdAt"], String(req.query.order) || "DESC"]],
+    where: whereCondition,
+    nest: true,
+  })
+
+
+  const paginatedData = paginateArray(networks, 10, +page || 1)
 
   return res.status(200).json({
-    ...networks,
-    currentPage: +page || 1,
-    pages: calculateTotalPages(networks.count)
+    count: networks.length,
+    rows: paginatedData.data,
+    pages: paginatedData.pages,
+    currentPage: +paginatedData.page
   });
+
 }
 
 async function SearchNetworks(req: NextApiRequest,

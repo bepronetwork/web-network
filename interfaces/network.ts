@@ -42,7 +42,8 @@ export interface Network {
   isDefault?: boolean;
   curators?: Curator[];
   totalValueLock?: BigNumber;
-  countIssues?: number;
+  totalIssues?: string;
+  totalOpenIssues?: string;
 }
 
 export interface ThemeColors {
