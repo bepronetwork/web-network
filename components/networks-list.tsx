@@ -80,12 +80,13 @@ export default function NetworksList() {
   useEffect(() => {    
     dispatch(changeLoadState(true));
 
-    getHeaderNetworks().then(({ TVL, bounties, number_of_network }) => {
-      setTotalConverted(TVL.toFixed() || "0")
-      setNumberOfNetworks(number_of_network || 0)
-      setNumberOfBounties(bounties || 0)
-    })
-    .catch(error => console.log("Failed to retrieve header data", error))
+    getHeaderNetworks()
+      .then(({ TVL, bounties, number_of_network }) => {
+        setTotalConverted(TVL.toFixed() || "0");
+        setNumberOfNetworks(number_of_network || 0);
+        setNumberOfBounties(bounties || 0);
+      })
+      .catch(error => console.log("Failed to retrieve header data", error));
 
     searchNetworks({
       isRegistered: true,
