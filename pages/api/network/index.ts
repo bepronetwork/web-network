@@ -12,8 +12,9 @@ import {Settings} from "helpers/settings";
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 import {Logger} from 'services/logging';
-import {LogAccess} from "../../../middleware/log-access";
+
 import {UNAUTHORIZED} from "../../../helpers/error-messages";
+import {LogAccess} from "../../../middleware/log-access";
 
 const {serverRuntimeConfig} = getConfig();
 

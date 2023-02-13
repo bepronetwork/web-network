@@ -5,8 +5,9 @@ import {Op, Sequelize} from "sequelize";
 import models from "db/models";
 
 import {error as LogError} from "services/logging";
-import {RouteMiddleware} from "../../../../middleware";
+
 import {UNAUTHORIZED} from "../../../../helpers/error-messages";
+import {RouteMiddleware} from "../../../../middleware";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {address, githubLogin} = req.body;

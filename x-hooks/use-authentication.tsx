@@ -26,8 +26,9 @@ import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
 import {useTransactions} from "x-hooks/use-transactions";
-import useAnalyticEvents from "./use-analytic-events";
+
 import {EventName} from "../interfaces/analytics";
+import useAnalyticEvents from "./use-analytic-events";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 

@@ -1,8 +1,10 @@
-import {Analytic, EventName} from "../interfaces/analytics";
-import {event} from "nextjs-google-analytics";
-import {analyticEvents} from "../helpers/analytic-events";
-import {useAppState} from "../contexts/app-state";
 import getConfig from "next/config";
+import {event} from "nextjs-google-analytics";
+
+import {useAppState} from "../contexts/app-state";
+import {analyticEvents} from "../helpers/analytic-events";
+import {Analytic, EventName} from "../interfaces/analytics";
+
 
 export default function useAnalyticEvents() {
 
@@ -26,12 +28,12 @@ export default function useAnalyticEvents() {
 
 
       switch (type) {
-        case "ga4":
-          if (!publicRuntimeConfig.gaMeasureID)
-            return rejectMissingParams(`publicRuntimeConfig.gaMeasureID`);
-          return event;
-        default:
-          return reject(`Missing implementation for ${type}`);
+      case "ga4":
+        if (!publicRuntimeConfig.gaMeasureID)
+          return rejectMissingParams(`publicRuntimeConfig.gaMeasureID`);
+        return event;
+      default:
+        return reject(`Missing implementation for ${type}`);
       }
     }
 
@@ -51,14 +53,12 @@ export default function useAnalyticEvents() {
       }
 
     if (eventName in analyticEvents)
-      return Promise.all(
-          analyticEvents[eventName]
+      return Promise.all(analyticEvents[eventName]
             .map(getCallback)
             .map(call => {
               // console.debug(`Pushing ${eventName}`)
               return call(eventName, details);
-            })
-        )
+            }))
         .then(() => {
           // console.debug(`Event published ${eventName}`, details);
           return true;

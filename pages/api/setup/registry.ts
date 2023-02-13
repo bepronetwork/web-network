@@ -8,6 +8,7 @@ import DAO from "services/dao-service";
 import {error as LogError, log as Log, Logger} from 'services/logging';
 
 import {SettingsType} from "types/settings";
+
 import {LogAccess} from "../../../middleware/log-access";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {

@@ -3,6 +3,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import models from "db/models";
 
 import {Settings} from "helpers/settings";
+
 import {RouteMiddleware} from "../../../middleware";
 import {Logger} from "../../../services/logging";
 

@@ -2,6 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
+
 import {RouteMiddleware} from "../../../middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {

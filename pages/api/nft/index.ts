@@ -6,8 +6,8 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {formatNumberToNScale} from "helpers/formatNumber";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
+import {formatNumberToNScale} from "helpers/formatNumber";
 import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";

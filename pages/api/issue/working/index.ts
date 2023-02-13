@@ -12,6 +12,7 @@ import * as IssueQueries from "graphql/issue";
 import {getPropertyRecursively} from "helpers/object";
 
 import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
+
 import {Logger} from "../../../../services/logging";
 
 const { serverRuntimeConfig } = getConfig();

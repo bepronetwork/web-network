@@ -9,6 +9,7 @@ import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
 import {GraphQlResponse} from "types/octokit";
+
 import {RouteMiddleware} from "../../../middleware";
 
 const {serverRuntimeConfig} = getConfig();

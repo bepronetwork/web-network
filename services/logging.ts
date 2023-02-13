@@ -1,6 +1,6 @@
 import {Client} from "@elastic/elasticsearch";
-import getConfig from "next/config";
 import {format} from "date-fns";
+import getConfig from "next/config";
 
 const { serverRuntimeConfig } = getConfig();
 

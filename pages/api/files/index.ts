@@ -4,6 +4,7 @@ import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import IpfsStorage from "services/ipfs-service";
+
 import {Logger} from "../../../services/logging";
 
 export const config = {
