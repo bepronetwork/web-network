@@ -10,3 +10,6 @@ export const NOT_AN_ADMIN = `Not an admin`;
 export const MISSING_ADMIN_SIGNATURE = `Missing admin signature`;
 export const NOT_ADMIN_WALLET = `Wrong wallet`;
 export const MISSING_CHAIN_ID = `Missing chain id`;
+export const IM_AM_CREATOR_ISSUE = `I am the owner of this bounty`;
+export const NOT_AN_CREATOR_ISSUE = `Not an creator issue`;
+export const MISSING_CREATOR_ISSUE_SIGNATURE = `Missing creator issue signature`;
