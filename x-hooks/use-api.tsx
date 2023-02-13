@@ -13,7 +13,8 @@ import {
   PatchUserParams, 
   MergeClosedIssueParams,
   CreateReviewParams,
-  SearchActiveNetworkParams
+  SearchActiveNetworkParams,
+  updateIssueParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
 import { HeaderNetworksProps } from "interfaces/header-information";
@@ -176,6 +177,13 @@ export default function useApi() {
     return api
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
+      .catch(() => null);
+  }
+
+  async function updateIssue({repoId, ghId, networkName = DEFAULT_NETWORK_NAME, ...rest}: updateIssueParams) {
+    return api
+      .put<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`, { ...rest })
+      .then((response) => response)
       .catch(() => null);
   }
 
@@ -692,6 +700,7 @@ export default function useApi() {
 
   return {
     createIssue,
+    updateIssue,
     createNetwork,
     createPrePullRequest,
     createRepo,
