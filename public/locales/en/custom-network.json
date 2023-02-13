@@ -23,7 +23,9 @@
   "registry": {
     "title-governor": "Registry Governor",
     "config-fees": "Config Fees",
-    "save-fees-config": "Save fees config"
+    "save-fees-config": "Save fees config",
+    "save-create-network-fee": "Save Create Network Fee",
+    "save-create-network-amount": "Save Create Network Amount"
   },
   "network-info": "Network info",
   "network-address": "Network Address",

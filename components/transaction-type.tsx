@@ -41,6 +41,8 @@ export default function TransactionType({ type }) {
     [TransactionTypes.deployNetworkRegistry]: t("transactions.types.deploy-registry"),
     [TransactionTypes.changeAllowedTokens]: t("transactions.types.change-allowed-tokens"),
     [TransactionTypes.closeNetwork]: t("transactions.types.close-network"),
+    [TransactionTypes.amountForNetworkCreation]: t("transactions.types.amount-for-network-creation"),
+    [TransactionTypes.feeForNetworkCreation]: t("transactions.types.fee-for-network-creation"),
   };
 
   return (
