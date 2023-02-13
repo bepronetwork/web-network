@@ -1,14 +1,15 @@
-import { withCors } from "middleware";
-import { NextApiRequest, NextApiResponse } from "next";
+import {NextApiRequest, NextApiResponse} from "next";
 
 import Database from "db/models";
 
-import { Settings } from "helpers/settings";
+import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
-import {error as LogError, log as Log} from 'services/logging';
+import {error as LogError, log as Log, Logger} from 'services/logging';
 
-import { SettingsType } from "types/settings";
+import {SettingsType} from "types/settings";
+
+import {LogAccess} from "../../../middleware/log-access";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -86,4 +87,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(handler)
+Logger.changeActionName(`Setup`);
+
+export default LogAccess(handler)

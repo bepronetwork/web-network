@@ -3,6 +3,8 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
+import {RouteMiddleware} from "../../../middleware";
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
     ids: [repoId, ghId, networkName]
@@ -42,7 +44,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issue);
 }
 
-export default async function GetIssues(req: NextApiRequest,
+export default RouteMiddleware(async function GetIssues(req: NextApiRequest,
                                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -54,4 +56,4 @@ export default async function GetIssues(req: NextApiRequest,
   }
 
   res.end();
-}
+})

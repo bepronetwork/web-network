@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -12,6 +12,8 @@ import * as IssueQueries from "graphql/issue";
 import {getPropertyRecursively} from "helpers/object";
 
 import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
+
+import {Logger} from "../../../../services/logging";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -27,13 +29,13 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    if (!network) return res.status(404).json("Invalid network");
+    if (!network) return res.status(404).json({message: "Invalid network"});
 
     const issue = await models.issue.findOne({
       where: { issueId, network_id: network.id }
     });
 
-    if (!issue) return res.status(404).json("Issue not found");
+    if (!issue) return res.status(404).json({message: "Issue not found"});
 
     if (!issue.working.find((el) => el === String(githubLogin))) {
       const repository = await models.repositories.findOne({
@@ -71,7 +73,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json(comment);
     }
 
-    return res.status(409).json("Already working");
+    return res.status(409).json({message: "Already working"});
   } catch (error) {
     return res
       .status(error.response?.status || 500)
@@ -93,4 +95,5 @@ async function Working(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(Working)
+Logger.changeActionName(`Issue/Working`);
+export default RouteMiddleware(Working)

@@ -4,6 +4,9 @@ import models from "db/models";
 
 import {Settings} from "helpers/settings";
 
+import {RouteMiddleware} from "../../../middleware";
+import {Logger} from "../../../services/logging";
+
 async function get(_req: NextApiRequest, res: NextApiResponse) {
   const settings = await models.settings.findAll({
     where: { visibility: "public" },
@@ -15,7 +18,9 @@ async function get(_req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(settingsList.raw());
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+Logger.changeActionName(`Settings`);
+
+export default RouteMiddleware(async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
   case "GET":
     await get(req, res);
@@ -26,4 +31,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   res.end();
-}
+})

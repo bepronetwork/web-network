@@ -1,13 +1,13 @@
 import {Bounty, ProposalDetail,} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {formatNumberToNScale} from "helpers/formatNumber";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
+import {formatNumberToNScale} from "helpers/formatNumber";
 import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
@@ -178,4 +178,4 @@ async function NftMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(NftMethods);
+export default RouteMiddleware(NftMethods);

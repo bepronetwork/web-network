@@ -19,6 +19,7 @@ import {toastInfo} from "contexts/reducers/change-toaster";
 import {CopyValue} from "helpers/copy-value";
 import {formatStringToCurrency} from "helpers/formatNumber";
 import {truncateAddress} from "helpers/truncate-address";
+import { isValidUrl } from "helpers/validateUrl";
 
 import {BlockTransaction, Transaction} from "interfaces/transaction";
 
@@ -99,7 +100,9 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `${state.Settings?.urls?.blockScan}/${tx}`;
+    const url = state.Settings?.urls?.blockScan
+    const validUrl = isValidUrl(url) ? url : `https://${url}`
+    return `${validUrl}/${tx}`;
   }
 
   return (

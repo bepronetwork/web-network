@@ -1,5 +1,5 @@
 import axios from "axios";
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
@@ -59,4 +59,4 @@ async function Seo(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withCors(Seo)
+export default RouteMiddleware(Seo)

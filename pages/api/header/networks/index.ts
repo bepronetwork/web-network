@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
@@ -22,8 +22,9 @@ async function SearchNetworks(req: NextApiRequest,
 
   default:
     res.status(405);
+    break;
   }
 
   res.end();
 }
-export default withCors(SearchNetworks)
+export default RouteMiddleware(SearchNetworks)

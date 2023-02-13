@@ -1,15 +1,17 @@
-import { promises as fs} from "fs";
+import {promises as fs} from "fs";
 import Handlebars from "handlebars";
 import cache from "memory-cache";
-import { NextApiRequest, NextApiResponse } from "next";
+import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import path from "path";
-import { Op } from "sequelize";
+import {Op} from "sequelize";
 
 import models from "db/models";
 
 
-import { error as LogError } from 'services/logging';
+import {error as LogError} from 'services/logging';
+
+import {LogAccess} from "../../../middleware/log-access";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -103,7 +105,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default LogAccess(async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -114,4 +116,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   res.end();
-}
+})

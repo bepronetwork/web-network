@@ -6,6 +6,8 @@ import models from "db/models";
 
 import {error as LogError} from "services/logging";
 
+import {RouteMiddleware} from "../../../../middleware";
+
 enum Actions {
   REGISTER = "register",
   RESET = "reset"
@@ -56,7 +58,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function ConnectUser(req: NextApiRequest, res: NextApiResponse) {
+export default RouteMiddleware(async function ConnectUser(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "patch":
     await patch(req, res);
@@ -67,4 +69,4 @@ export default async function ConnectUser(req: NextApiRequest, res: NextApiRespo
   }
 
   res.end();
-}
+})

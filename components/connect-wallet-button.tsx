@@ -19,10 +19,8 @@ import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
-  const {dispatch, state: { loading, connectedChain },} = useAppState();
+  const {dispatch, state} = useAppState();
   const [showModal, setShowModal] = useState(false);
-
-  const {state} = useAppState();
 
   const { connectWallet } = useAuthentication();
 
@@ -35,11 +33,12 @@ export default function ConnectWalletButton({children = null, asModal = false, f
     if (!state.Service?.active)
       return;
 
-    if (+state.connectedChain?.id === +state.Settings?.requiredChain?.id) {
+    if (
+      (+state.connectedChain?.id || +window?.ethereum?.chainId) ===
+      +state.Settings?.requiredChain?.id
+      ) {
       connectWallet();
     } else {
-      console.log('no connected chain?', connectedChain, state.Settings?.requiredChain);
-
       dispatch(changeChain.update({...state.connectedChain, id: state.Settings?.requiredChain?.id}));
       setShowModal(false);
     }
@@ -64,7 +63,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
 
 
   if (asModal) {
-    if (loading?.isLoading) return <></>;
+    if (state?.loading?.isLoading) return <></>;
 
     return (
       <Modal

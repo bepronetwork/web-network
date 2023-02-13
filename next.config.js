@@ -55,7 +55,8 @@ const serverRuntimeConfig = {
   },
   e2eEnabled: process.env.NEXT_E2E_TESTNET || false,
   scheduleInterval: process.env.NEXT_E2E_TESTNET || 60,
-  logLevel: process.env.LOG_LEVEL
+  logLevel: process.env.LOG_LEVEL,
+  logStackTrace: process.env.ELASTIC_INDEX_STACK_TRACE === "true"
 }
 
 module.exports = () => {

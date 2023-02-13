@@ -1,10 +1,10 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import { Op, Sequelize } from "sequelize";
+import {Op, Sequelize} from "sequelize";
 
 import Database from "db/models";
 
-import { error as logError } from 'services/logging';
+import {error as logError, Logger} from 'services/logging';
 
 const colToLower = (colName: string) => Sequelize.fn("LOWER", Sequelize.col(colName));
 
@@ -55,4 +55,5 @@ async function tokensEndPoint(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(tokensEndPoint);
+Logger.changeActionName(`Tokens`);
+export default RouteMiddleware(tokensEndPoint);

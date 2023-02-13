@@ -22,17 +22,19 @@ import RootProviders from "contexts";
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
 import {useRouter} from "next/router";
+import getConfig from "next/config";
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
   const {asPath} = useRouter();
+  const {publicRuntimeConfig} = getConfig();
 
   if (asPath.includes('api-doc'))
     return <Component {...pageProps}></Component>
 
   return (
     <>
-      <GoogleAnalytics trackPageViews />
+      <GoogleAnalytics gaMeasurementId={publicRuntimeConfig.gaMeasureID} trackPageViews />
       <SessionProvider session={session}>
         <RootProviders>
           <Seo />

@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import {Bus} from "helpers/bus";
@@ -27,4 +27,4 @@ async function PollMergeProposal(req: NextApiRequest,
   }
 }
 
-export default withCors(PollMergeProposal)
+export default RouteMiddleware(PollMergeProposal)

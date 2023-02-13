@@ -6,6 +6,9 @@ import models from "db/models";
 
 import {error as LogError} from "services/logging";
 
+import {UNAUTHORIZED} from "../../../../helpers/error-messages";
+import {RouteMiddleware} from "../../../../middleware";
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {address, githubLogin} = req.body;
 
@@ -23,7 +26,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const token = await getToken({req});
 
     if ( headerWallet !== user.address || !token || token?.login !== githubLogin )
-      return res.status(401).json("Unauthorized");
+      return res.status(401).json({message: UNAUTHORIZED});
 
     const issuesWithPullRequestsByAccount = await models.issue.findAndCountAll({
       where: {
@@ -58,7 +61,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function ResetUser(req: NextApiRequest, res: NextApiResponse) {
+export default RouteMiddleware(async function ResetUser(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -69,4 +72,4 @@ export default async function ResetUser(req: NextApiRequest, res: NextApiRespons
   }
 
   res.end();
-}
+})

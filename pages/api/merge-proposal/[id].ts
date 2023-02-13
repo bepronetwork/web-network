@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
@@ -24,4 +24,4 @@ async function MergeProposal(req: NextApiRequest,
   }
 }
 
-export default withCors(MergeProposal)
+export default RouteMiddleware(MergeProposal)

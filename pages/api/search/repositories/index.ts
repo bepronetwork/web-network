@@ -1,4 +1,4 @@
-import {withCors} from "middleware";
+import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
@@ -56,4 +56,4 @@ async function SearchRepositories(req: NextApiRequest,
   res.end();
 }
 
-export default withCors(SearchRepositories)
+export default RouteMiddleware(SearchRepositories)

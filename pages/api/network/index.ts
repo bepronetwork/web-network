@@ -6,12 +6,15 @@ import Sequelize, {Op} from "sequelize";
 
 import Database from "db/models";
 
-import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
+import {handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
 import {Settings} from "helpers/settings";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
-import {error as LogError} from 'services/logging';
+import {Logger} from 'services/logging';
+
+import {UNAUTHORIZED} from "../../../helpers/error-messages";
+import {LogAccess} from "../../../middleware/log-access";
 
 const {serverRuntimeConfig} = getConfig();
 
@@ -67,7 +70,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       isDefault
     } = req.body;
 
-    const name = _name.replaceAll(" ", "-").toLowerCase()
+    const name = _name?.replaceAll(" ", "-")?.toLowerCase()
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
@@ -78,7 +81,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    if(hasNetwork){
+    if(hasNetwork) {
       return res.status(409).json("Already exists a network created for this wallet");
     }
 
@@ -92,7 +95,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
     if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
     if (isDefault && creator !== publicSettings?.defaultNetworkConfig?.adminWallet)
-      return res.status(401).json("Unauthorized");
+      return res.status(401).json({message: UNAUTHORIZED});
 
     const defaultNetwork = await Database.network.findOne({
         where: {
@@ -131,7 +134,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       if (logo?.hash) logoIconHash = logo.hash;
 
     } catch (error) {
-      console.error('Failed to store ipfs', error);
+      Logger.error(error, 'Failed to store ipfs');
     }
 
     const network = await Database.network.create({
@@ -174,7 +177,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       })
       .then(({data}) => invitations.push(data?.id))
       .catch((e) => {
-        LogError('[GH Add Colaborator Fail]', {e})
+        Logger.error(e, 'Add Collaborator Fail')
         return e;
       });
     }
@@ -189,7 +192,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           invitation_id
         })
           .catch((e)=>{
-            LogError('[GH Accpet Invitation Fail]', {e})
+            Logger.error(e, 'Accept Invitation Fail')
             return e;
           });
     }
@@ -209,7 +212,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json("Network created");
   } catch (error) {
-    LogError("Failed to create network", { error, req });
+    Logger.error(error, "Failed to create network", req.body);
     return res.status(500).json(error);
   }
 }
@@ -235,7 +238,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const isAdminOverriding = !!override;
 
-    if (!accessToken && !isAdminOverriding) return res.status(401).json("Unauthorized user");
+    if (!accessToken && !isAdminOverriding) return res.status(401).json({message: "Unauthorized user"});
     
     const network = await Database.network.findOne({
       where: {
@@ -288,7 +291,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     } else {
       const isRegistryGovernor = await DAOService.isRegistryGovernor(creator);
 
-      if (!isRegistryGovernor) return res.status(403).json("Unauthorized");
+      if (!isRegistryGovernor) return res.status(403).json({message: UNAUTHORIZED});
     }
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
@@ -350,7 +353,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         if (logo?.hash) network.fullLogo = full?.hash;
 
       } catch (error) {
-        console.error('Failed to store ipfs', error);
+        Logger.error(error, 'Failed to store ipfs');
       }
     }
 
@@ -375,7 +378,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           ...(githubLogin !== owner  && { permission: "maintain"} || {})
         })
           .catch((e) => {
-            LogError('[GH Add Colaborator Fail]', {e})
+            Logger.error(e, 'Add collaborator fail')
             return e;
           });
 
@@ -398,7 +401,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
               invitation_id
             })
               .catch((e)=>{
-                LogError('[GH Accpet Invitation Fail]', {e})
+                Logger.error(e, 'Accept invitation fail', {e})
                 return e;
               });
         }
@@ -470,4 +473,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(handler)
+Logger.changeActionName(`Network`);
+export default LogAccess(withCors(handler));
