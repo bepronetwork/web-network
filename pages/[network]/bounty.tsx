@@ -6,6 +6,7 @@ import {GetServerSideProps} from "next/types";
 
 import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
+import IssueEditTag from "components/bounty/issue-edit-tag";
 import TabSections from "components/bounty/tabs-sections";
 import CustomContainer from "components/custom-container";
 import IssueComments from "components/issue-comments";
@@ -25,12 +26,24 @@ export default function PageIssue() {
 
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState<boolean>();
+  const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
 
   const {state} = useAppState();
 
   const { getUserRepository } = useOctokit();
 
   const { id } = router.query;
+
+  function handleEditIssue() {
+    const bounty = state.currentBounty?.data
+
+    const isCreator =
+    bounty?.creatorAddress?.toLowerCase() ===
+    state.currentUser?.walletAddress?.toLowerCase();
+    console.log('isCreator', isCreator, bounty.state)
+    if(isCreator && bounty.state === 'draft')
+      setIsEditIssue(!isEditIssue)
+  }
 
   function checkForks(){
     if (!state.Service?.network?.repos?.active?.githubPath || isRepoForked !== undefined) return;
@@ -84,6 +97,7 @@ export default function PageIssue() {
       <PageActions
         isRepoForked={!!isRepoForked}
         addNewComment={addNewComment}
+        handleEditIssue={handleEditIssue}
       />
 
       {(state.currentUser?.walletAddress)
@@ -95,8 +109,14 @@ export default function PageIssue() {
         <div className="container mb-1">
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
-              <div className="container">
-                <IssueDescription description={state.currentBounty?.data?.body || ""} />
+            <div className="content-wrapper mb-3">
+                <IssueEditTag isEdit={isEditIssue} />
+                <div className="container">
+                  <IssueDescription 
+                  description={state.currentBounty?.data?.body || ""} 
+                  isEdit={isEditIssue}
+                  />
+                </div>
               </div>
             </div>
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
@@ -108,7 +128,9 @@ export default function PageIssue() {
         </div>
       ) : (
         <CustomContainer>
-          <IssueDescription description={state.currentBounty?.data?.body || ""} />
+          <div className="content-wrapper mb-3">
+            <IssueDescription description={state.currentBounty?.data?.body || ""} />
+          </div>
         </CustomContainer>
       )}
 
