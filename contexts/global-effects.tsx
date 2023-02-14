@@ -51,10 +51,10 @@ export const GlobalEffectsProvider = ({children}) => {
     chain,
     connectedChain
   ]);
-  useEffect(dao.changeChain, [
-    connectedChain?.matchWithNetworkChain,
-    currentUser?.walletAddress
-  ]);
+  // useEffect(dao.changeChain, [
+  //   connectedChain?.matchWithNetworkChain,
+  //   currentUser?.walletAddress
+  // ]);
 
   useEffect(repos.loadRepos, [
     query?.network,
