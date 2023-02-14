@@ -6,12 +6,9 @@ import {GetServerSideProps} from "next/types";
 
 import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
-import IssueEditTag from "components/bounty/issue-edit-tag";
+import IssueBody from "components/bounty/issue-body";
 import TabSections from "components/bounty/tabs-sections";
-import CustomContainer from "components/custom-container";
 import IssueComments from "components/issue-comments";
-import IssueDescription from "components/issue-description";
-import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
 import PageActions from "components/page-actions";
 
 import {useAppState} from "contexts/app-state";
@@ -92,7 +89,8 @@ export default function PageIssue() {
     <BountyEffectsProvider>
       <BountyHero />
 
-      { state.currentBounty?.chainData?.isFundingRequest ? <FundingSection /> : null}
+      { state.currentBounty?.chainData?.isFundingRequest && state.currentBounty?.data?.fundingAmount ? 
+      <FundingSection /> : null}
 
       <PageActions
         isRepoForked={!!isRepoForked}
@@ -105,34 +103,7 @@ export default function PageIssue() {
         : null
       }
 
-      { state.currentUser?.walletAddress ? (
-        <div className="container mb-1">
-          <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
-            <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
-            <div className="content-wrapper mb-3">
-                <IssueEditTag isEdit={isEditIssue} />
-                <div className="container">
-                  <IssueDescription 
-                  description={state.currentBounty?.data?.body || ""} 
-                  isEdit={isEditIssue}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
-              <div className="sticky-bounty">
-                <IssueProposalProgressBar />
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <CustomContainer>
-          <div className="content-wrapper mb-3">
-            <IssueDescription description={state.currentBounty?.data?.body || ""} />
-          </div>
-        </CustomContainer>
-      )}
+      <IssueBody isEditIssue={isEditIssue} />
 
       <IssueComments
         comments={commentsIssue}
