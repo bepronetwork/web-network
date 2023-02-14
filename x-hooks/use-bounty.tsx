@@ -120,7 +120,12 @@ export function useBounty() {
 
   function getChainBounty(force = false) {
 
-    if (!state.Service?.active?.network || !state.currentBounty?.data?.contractId || state.spinners?.bountyChain)
+    if (
+      !state.Service?.active?.network ||
+      !state.currentBounty?.data?.contractId ||
+      state.spinners?.bountyChain ||
+      query?.id !== state.currentBounty?.data?.githubId
+    )
       return;
 
     dispatch(changeSpinners.update({bountyChain: true}))
