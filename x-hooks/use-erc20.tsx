@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
@@ -11,8 +11,10 @@ import {parseTransaction} from "helpers/transactions";
 import {MetamaskErrors} from "interfaces/enums/Errors";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
+import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
+import { useDao } from "x-hooks/use-dao";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
@@ -25,6 +27,7 @@ export default function useERC20() {
   const [allowance, setAllowance] = useState(BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
+  const { isServiceReady } = useDao();
   const { state, dispatch } = useAppState();
   const { handleApproveToken } = useBepro();
 
@@ -34,8 +37,10 @@ export default function useERC20() {
     network: state.Service?.active?.network?.contractAddress
   };
 
-  const updateAllowanceAndBalance = useCallback(() => {
-    if (!state.currentUser?.walletAddress || !address) return;
+  const updateAllowanceAndBalance = () => {
+    if (!state.currentUser?.walletAddress ||
+        !address ||
+        !isServiceReady()) return;
 
     state.Service?.active.getTokenBalance(address, state.currentUser.walletAddress)
       .then(setBalance)
@@ -47,7 +52,7 @@ export default function useERC20() {
       state.Service?.active.getAllowance(address, state.currentUser.walletAddress, realSpender)
         .then(setAllowance)
         .catch(error => console.debug("useERC20:getAllowance", logData, error));
-  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
+  }
 
   function approve(amount: string) {
     if (!state.currentUser?.walletAddress || !state.Service?.active || !address || !amount) return;
@@ -67,7 +72,7 @@ export default function useERC20() {
   useEffect(() => {
     if (!address) setLoadError(undefined);
     if (!address && name) setDefaults();
-    if (state.Service?.active && address)
+    if (state.Service?.active && address && isServiceReady())
       state.Service?.active.getERC20TokenData(address)
         .then(({ name, symbol, decimals, totalSupply }) => {
           setName(name);
@@ -89,13 +94,13 @@ export default function useERC20() {
       const transaction = addTx([{
         type: TransactionTypes.deployERC20Token,
         network: state.Service?.network?.active
-      } as any]);
+      }]);
 
       dispatch(transaction);
 
       await state.Service?.active.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as any)]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err) => {

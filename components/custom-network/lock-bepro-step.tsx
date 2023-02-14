@@ -28,7 +28,6 @@ import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useERC20 from "x-hooks/use-erc20";
 
-
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
 
@@ -39,8 +38,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [isApproving, setIsApproving] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
 
-  const { state, dispatch } = useAppState();
   const registryToken = useERC20();
+  const { state, dispatch } = useAppState();
   const { updateWalletBalance } = useAuthentication();
   const { tokensLocked, updateTokenBalance } = useNetworkSettings();
 

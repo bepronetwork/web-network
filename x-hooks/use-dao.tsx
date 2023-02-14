@@ -26,6 +26,10 @@ export function useDao() {
     return isAddress(chain?.registryAddress) && !isZeroAddress(chain?.registryAddress);
   }
 
+  function isServiceReady() {
+    return !state.Service?.starting && !state.spinners?.switchingChain;
+  }
+
   /**
    * Enables the user/dapp to connect to the active DAOService
    */
@@ -149,7 +153,7 @@ export function useDao() {
 
           window.DAOService = daoService;
           dispatch(changeActiveDAO(daoService));
-          console.debug("DAOService started");
+          console.debug("DAOService started", { web3Host, registryAddress });
         }
       })
       .catch(error => {
@@ -181,5 +185,6 @@ export function useDao() {
     changeChain,
     connect,
     start,
+    isServiceReady
   };
 }
