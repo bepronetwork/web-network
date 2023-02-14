@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
-import { useTranslation } from "next-i18next";
+import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
-import { ContextualSpan } from "components/contextual-span";
-import { FormGroup } from "components/form-group";
-import { CallToAction } from "components/setup/call-to-action";
-import { ContractField, ContractInput } from "components/setup/contract-input";
-import { DeployBountyTokenModal } from "components/setup/deploy-bounty-token-modal";
-import { DeployERC20Modal } from "components/setup/deploy-erc20-modal";
+import {ContextualSpan} from "components/contextual-span";
+import {FormGroup} from "components/form-group";
+import {CallToAction} from "components/setup/call-to-action";
+import {ContractField, ContractInput} from "components/setup/contract-input";
+import {DeployBountyTokenModal} from "components/setup/deploy-bounty-token-modal";
+import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 
-import { useAppState } from "contexts/app-state";
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import { useSettings } from "x-hooks/use-settings";
+import {useSettings} from "x-hooks/use-settings";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;
@@ -63,7 +63,7 @@ export function RegistrySetup({
   const { loadSettings } = useSettings();
   const { saveNetworkRegistry, processEvent } = useApi();
   const { dispatch, state: { currentUser, Service } } = useAppState();
-  const { handleDeployRegistry, handleSetDispatcher, handleAddAllowedTokens } = useBepro();
+  const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
 
   function isEmpty(value: string) {
     return value.trim() === "";
@@ -201,7 +201,7 @@ export function RegistrySetup({
   }
 
   function allowToken(isTransactional: boolean) {
-    handleAddAllowedTokens([erc20.value], isTransactional)
+    handleChangeAllowedTokens([erc20.value], isTransactional)
       .then(txInfo => Promise.all([
         updateData(),
         processEvent("registry", "changed", "", { fromBlock: (txInfo as { blockNumber: number }).blockNumber })

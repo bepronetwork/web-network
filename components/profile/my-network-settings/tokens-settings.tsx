@@ -3,10 +3,9 @@ import {Col, Row} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import { useNetworkSettings } from "contexts/network-settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import {Token} from "interfaces/token";
-import {TokenType} from 'interfaces/token'
+import {Token, TokenType} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
@@ -14,6 +13,7 @@ import {useAppState} from "../../../contexts/app-state";
 import Button from "../../button";
 import MultipleTokensDropdown from "../../multiple-tokens-dropdown";
 import {WarningSpan} from "../../warning-span";
+import useBepro from "../../../x-hooks/use-bepro";
 
 interface SelectedTokens {
    [tokenType: TokenType | string]: string[]
@@ -38,6 +38,7 @@ export default function TokensSettings({
   const [allowedTransactionalTokensList, setAllowedTransactionalTokensList] = useState<Token[]>();
 
   const { getTokens, processEvent } = useApi();
+  const { handleChangeAllowedTokens } = useBepro();
 
   const {
     fields
@@ -130,17 +131,18 @@ export default function TokensSettings({
     const selectedTokensAddress = selectedTokens.map(({address})=> address)
     
     const toAdd = selectedTokensAddress.filter((address)=> !currentTokens.includes(address))
-
     const toRemove = currentTokens.filter((address)=> !selectedTokensAddress.includes(address))
 
     const transactions = []
 
-    if(toAdd.length) transactions.push(state.Service?.active.addAllowedTokens(toAdd, isTransactional))
-    if(toRemove.length) transactions.push(state.Service?.active.removeAllowedTokens(toRemove, isTransactional))
+    if (toAdd.length)
+      transactions.push(handleChangeAllowedTokens(toAdd, isTransactional))
+    if (toRemove.length)
+      transactions.push(handleChangeAllowedTokens(toRemove, isTransactional, false))
 
     Promise.all(transactions).then(async (txs : { blockNumber: number }[]) => {
       const fromBlock = txs.reduce((acc, tx) => Math.min(acc, tx.blockNumber), Number.MAX_SAFE_INTEGER)
-      
+
       await processEvent("registry", "changed", state.Service?.network?.active.name, { fromBlock });
 
       await getAllowedTokensContract();
