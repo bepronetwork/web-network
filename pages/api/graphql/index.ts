@@ -4,11 +4,10 @@ import {getToken} from "next-auth/jwt";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
 
-import {RouteMiddleware} from "middleware";
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 import {Logger} from "services/logging";
-import {LogAccess} from "../../../middleware/log-access";
-import WithCors from "../../../middleware/withCors";
 
 const {serverRuntimeConfig: {authSecret, github: {token: botToken}}} = getConfig();
 

@@ -73,8 +73,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issuesOpen);
 }
 
-async function getAll(req: NextApiRequest,
-                      res: NextApiResponse) {
+async function getAll(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

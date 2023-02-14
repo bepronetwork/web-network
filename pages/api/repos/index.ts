@@ -97,8 +97,7 @@ async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
     .json(!deleted ? `Couldn't delete entry ${id}` : "ok");
 }
 
-async function RepoRoute(req: NextApiRequest,
-                         res: NextApiResponse) {
+async function RepoRoute(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getAllRepos(req, res);

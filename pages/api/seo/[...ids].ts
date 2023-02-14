@@ -5,9 +5,8 @@ import {Op} from "sequelize";
 import models from "db/models";
 
 import {Settings} from "helpers/settings";
-import {LogAccess} from "../../../middleware/log-access";
 
-import {RouteMiddleware} from "middleware";
+import {LogAccess} from "middleware/log-access";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {

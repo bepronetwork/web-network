@@ -88,8 +88,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function Working(req: NextApiRequest,
-                       res: NextApiResponse) {
+async function Working(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
     await put(req, res);

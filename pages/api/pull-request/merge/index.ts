@@ -118,8 +118,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function PullRequest(req: NextApiRequest,
-                           res: NextApiResponse) {
+async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
