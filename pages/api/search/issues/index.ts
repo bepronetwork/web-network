@@ -49,7 +49,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (creator) whereCondition.creatorGithub = creator;
 
-    if (address) whereCondition.creatorAddress = address;
+    if (address) 
+      whereCondition.creatorAddress = {
+        [Op.iLike]: address.toString()
+      };
 
     if (networkName) {
       const network = await models.network.findOne({
@@ -212,12 +215,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         currentPage: +paginatedData.page
       });
     } else {
-      
       const issues = await models.issue.findAndCountAll(paginate({ 
-      where: whereCondition, 
-      include, nest: true }, req.query, [
+        where: whereCondition, 
+        include, 
+        nest: true 
+      }, req.query, [
         [...sortBy|| ["createdAt"], req.query.order || "DESC"]
-      ])).then(data => handleNetworkValues(data))
+      ]))
+        .then(data => handleNetworkValues(data));
 
       return res.status(200).json({
       ...issues,
