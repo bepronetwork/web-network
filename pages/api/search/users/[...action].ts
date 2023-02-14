@@ -1,4 +1,5 @@
-import {RouteMiddleware} from "middleware";
+import { LogAccess } from "middleware/log-access";
+import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
@@ -51,4 +52,4 @@ async function SearchUsers(req: NextApiRequest,
 
   res.end();
 }
-export default  RouteMiddleware(SearchUsers)
+export default  LogAccess(WithCors(SearchUsers));

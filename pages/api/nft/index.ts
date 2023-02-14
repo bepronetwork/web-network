@@ -1,6 +1,7 @@
 import {Bounty, ProposalDetail,} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import {RouteMiddleware} from "middleware";
+import { LogAccess } from "middleware/log-access";
+import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
@@ -178,4 +179,4 @@ async function NftMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default RouteMiddleware(NftMethods);
+export default LogAccess(WithCors(NftMethods));
