@@ -78,9 +78,8 @@ export default function PageIssue() {
   return (
     <BountyEffectsProvider>
       <BountyHero />
-      {state.currentBounty?.chainData?.isFundingRequest ? (
-        <FundingSection />
-      ) : null}
+
+      { state.currentBounty?.chainData?.isFundingRequest ? <FundingSection /> : null}
 
       <PageActions
         isRepoForked={!!isRepoForked}
