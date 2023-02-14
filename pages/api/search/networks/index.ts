@@ -105,7 +105,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],
       [Sequelize.literal('COUNT(DISTINCT("openIssues".id))'), 'totalOpenIssues']
     ]
-    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id"]
+    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id", "network.chain_id"]
   }
  
   const networks = await models.network.findAll({
