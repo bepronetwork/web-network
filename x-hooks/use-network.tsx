@@ -59,8 +59,15 @@ export function useNetwork() {
 
       getNetwork({name: queryNetworkName, chainName: queryChainName })
         .then(async ({data}) => {
-          if (!data.isRegistered)
-            return replace(`/networks`);
+          if (!data.isRegistered) {
+            if (state.currentUser?.walletAddress === data.creatorAddress)
+              return replace(getURLWithNetwork("/profile/my-network", {
+                network: data.name,
+                chain: data.chain.chainShortName
+              }));
+            else
+              return replace(`/networks`);
+          }
 
           const newCachedData = new WinStorage(storageKey, 3600, `sessionStorage`);
           newCachedData.value = data;
@@ -113,7 +120,7 @@ export function useNetwork() {
     if (!state?.Service?.active?.network)
       return;
 
-    const network: any = state.Service.active?.network;
+    const network = state.Service.active?.network;
 
     Promise.all([network.draftTime(), network.disputableTime()])
       .then(([draftTime, disputableTime]) => {
