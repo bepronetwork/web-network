@@ -90,7 +90,7 @@ export function useNetwork() {
       pathname: `/[network]/[chain]/${cleanHref}`.replace("//", "/"),
       query: {
         ..._query,
-        chain: _query?.chain || query?.chain,
+        chain: _query?.chain || query?.chain || state?.Service?.network?.active?.chain?.chainShortName,
         network: _network ||
           query?.network ||
           state?.Service?.network?.active?.name
