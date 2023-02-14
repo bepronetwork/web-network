@@ -78,9 +78,7 @@ export default function PageIssue() {
   return (
     <BountyEffectsProvider>
       <BountyHero />
-      
-      {state.currentBounty?.chainData?.isFundingRequest &&
-      state.currentBounty?.data?.fundingAmount.gt(0) ? (
+      {state.currentBounty?.chainData?.isFundingRequest ? (
         <FundingSection />
       ) : null}
 
