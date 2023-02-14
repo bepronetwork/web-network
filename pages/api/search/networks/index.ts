@@ -6,12 +6,11 @@ import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
 
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
-import {RouteMiddleware} from "middleware";
+import { Logger } from "services/logging";
 
-import {chainFromHeader} from "../../../../helpers/chain-from-header";
 interface includeProps {
   association: string;
   required?: boolean;
@@ -34,8 +33,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     isRegistered, 
     isDefault, 
     page, 
-    chainId, 
-    includeAssociations,
+    chainId,
     isNeedCountsAndTokensLocked
   } = req.query || {};
 
@@ -63,20 +61,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (chainId)
     whereCondition.chain_id = chainId;
 
-  const chain = await chainFromHeader(req);
-  if (chain)
-    whereCondition.chain_id = {[Op.eq]: chain.chainId};
-
-  console.log(`WHERE`, whereCondition);
-    
   const include: includeProps[] = [
     { association: "tokens" },
     { association: "chain" },
-    ... includeAssociations ? [
-      { association: "networkToken"},
-      { association: "issues"},
-      { association: "curators"}
-    ] : []
+    { association: "networkToken"}
   ];
 
   let group: string[] = []
@@ -89,10 +77,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const caseZeroThen1 = (clause: string) => `case when ${clause} = 0 then 1 else ${clause} end`;
 
     include.push({ association: "curators", required: false, attributes: [] })
-    include.push({ association: "issues", required: false, attributes: [],
-                   where: { 
-                        state: {[Op.ne]: "pending" }
-                   }
+    include.push({ 
+      association: "issues",
+      required: false,
+      attributes: [],
+      where: { 
+          state: {[Op.ne]: "pending" }
+      }
     })
     include.push({ association: 'openIssues', required: false, attributes: [], where: {state: 'open'}},)
     attributes.include = [
@@ -105,7 +96,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],
       [Sequelize.literal('COUNT(DISTINCT("openIssues".id))'), 'totalOpenIssues']
     ]
-    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id", "network.chain_id"]
+    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id", "chain.id", "networkToken.id"]
   }
  
   const networks = await models.network.findAll({
@@ -114,7 +105,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     group,
     order: [[req.query.sortBy || "createdAt", req.query.order || "DESC"]],
     where: whereCondition,
-    nest: true,
+    nest: true
   })
 
 
@@ -126,11 +117,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     pages: paginatedData.pages,
     currentPage: +paginatedData.page
   });
-
 }
 
-async function SearchNetworks(req: NextApiRequest,
-                              res: NextApiResponse) {
+async function SearchNetworks(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -142,4 +131,7 @@ async function SearchNetworks(req: NextApiRequest,
 
   res.end();
 }
+
+Logger.changeActionName(`SearchNetworks`);
 export default LogAccess(WithCors(SearchNetworks));
+

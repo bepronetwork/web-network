@@ -575,8 +575,7 @@ export default function useApi() {
     isRegistered = undefined,
     isDefault = undefined,
     isNeedCountsAndTokensLocked = undefined,
-    chainId = "",
-    includeAssociations = undefined
+    chainId = ""
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -593,8 +592,7 @@ export default function useApi() {
       ...((isNeedCountsAndTokensLocked !== undefined && {
         isNeedCountsAndTokensLocked: isNeedCountsAndTokensLocked.toString(),
       }) ||
-        {}),
-      ... (includeAssociations && { includeAssociations: includeAssociations.toString() } || {})
+        {})
     }).toString();
 
     return api
