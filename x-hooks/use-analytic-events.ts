@@ -38,10 +38,12 @@ export default function useAnalyticEvents() {
     }
 
     if (state?.currentUser) {
-      const {walletAddress, connected, handle, login} = state.currentUser;
       details = {
         ...details,
-        walletAddress: walletAddress.toString(), connected: connected.toString(), handle, login
+        walletAddress: state.currentUser?.walletAddress?.toString(),
+        connected: state.currentUser?.connected?.toString(),
+        handle: state.currentUser?.handle,
+        login: state.currentUser?.login
       };
     }
 

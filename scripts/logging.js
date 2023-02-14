@@ -1,4 +1,5 @@
 const {Client} = require("@elastic/elasticsearch");
+const {format} = require("date-fns");
 require('dotenv').config();
 
 const Levels = {none: '', log: 'log', info: 'info', error: 'error', DEBUG: 'debug'};
@@ -12,10 +13,6 @@ let DebugLevel;
   DebugLevel[DebugLevel["log"] = 4] = "log";
 })(DebugLevel || (DebugLevel = {}))
 
-const node = process.env.NEXT_ELASTIC_SEARCH_URL;
-const username = process.env.NEXT_ELASTIC_SEARCH_USERNAME;
-const password = process.env.NEXT_ELASTIC_SEARCH_PASSWORD;
-
 const LOG_LEVEL = process.env.LOG_LEVEL ? parseInt(process.env.LOG_LEVEL, 10) : DebugLevel.log;
 
 const output = (level, message, ...rest) => { // eslint-disable-line
@@ -24,17 +21,11 @@ const output = (level, message, ...rest) => { // eslint-disable-line
   if (rest.some(v => v !== undefined))
     _rest = rest;
 
-  const string = `(${level.toUpperCase()}) (${new Date().toISOString()}) ${message}\n`;
+  const string = `(${level.toUpperCase()}) (${format(new Date(), `dd/MM HH:mm:ss`)}) ${message}`;
 
   if (LOG_LEVEL && LOG_LEVEL >= +DebugLevel[level])
     console[level](string, _rest ? _rest : "");
 
-  if (node && username && password) {
-    const client = new Client({node, auth: {username, password} })
-
-    client?.index({ index: "web-network", document: {level, timestamp: new Date(), message, rest: _rest}})
-      .catch(e => console.log(e))
-  }
 }
 /* eslint-disable */
 const info = (message, rest) => output(Levels.info, message, rest);

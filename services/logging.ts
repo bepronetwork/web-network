@@ -41,7 +41,9 @@ export const output = (_level: LogLevel, message, ...rest) => { // eslint-disabl
 
     const client = new Client({node, auth: {username, password} })
 
-    client?.index({ index: "web-network-app", document: {level, timestamp: new Date(), message, rest}})
+    const info = Array.isArray(rest) || rest !== null && typeof rest === "object" ? rest : {info: {rest: rest || ''}};
+
+    client?.index({ index: "web-network-ui", document: {level, timestamp: new Date(), message, rest}})
       .catch(e => console.log(e))
   }
 }
@@ -65,13 +67,13 @@ export class Logger {
     ]
   }
 
-  static info(..._args) { info(...this._args(..._args)) }
-  static log(..._args) { log(...this._args(..._args)) }
-  static warn(..._args) { warn(...this._args(..._args)) }
-  static debug(..._args) { debug(...this._args(..._args)) }
-  static trace(..._args) { trace(...this._args(..._args)) }
-  static error(e: Error, ..._args) {
-    error(...this._args(...[e?.toString(), ..._args]))
-    trace(...this._args(...[`Code: ${(e as any).code || `NO_OPCODE`}\n`, e.stack || `NO_STACK_TRACE`, ..._args]));
+  static info(message,..._args) { info(...this._args(message,..._args)) }
+  static log(message,..._args) { log(...this._args(message,..._args)) }
+  static warn(message,..._args) { warn(...this._args(message,..._args)) }
+  static debug(message,..._args) { debug(...this._args(message,..._args)) }
+  static trace(message,..._args) { trace(...this._args(message,..._args)) }
+  static error(e: Error, message, ..._args) {
+    error(message, ...this._args(...[e?.toString(), ..._args]))
+    trace(`Code: ${(e as any).code || `NO_OPCODE`}\n`, e.stack || `NO_STACK_TRACE`);
   }
 }
