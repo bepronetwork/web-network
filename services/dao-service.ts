@@ -164,7 +164,6 @@ export default class DAO {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTransaction = (tx: any) => {
-      debugger;
       if (!tx) {
         if (tries === maxTries)
           reject({

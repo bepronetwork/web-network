@@ -608,8 +608,6 @@ export default function useBepro() {
         network: state.Service?.network?.active
       } as any]);
 
-      debugger;
-
       dispatch(transaction);
 
       await state.Service?.active[( add ? 'addAllowedTokens' : 'removeAllowedTokens')](addresses, isTransactional)

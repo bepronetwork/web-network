@@ -10,10 +10,10 @@ import {Token, TokenType} from "interfaces/token";
 import useApi from "x-hooks/use-api";
 
 import {useAppState} from "../../../contexts/app-state";
+import useBepro from "../../../x-hooks/use-bepro";
 import Button from "../../button";
 import MultipleTokensDropdown from "../../multiple-tokens-dropdown";
 import {WarningSpan} from "../../warning-span";
-import useBepro from "../../../x-hooks/use-bepro";
 
 interface SelectedTokens {
    [tokenType: TokenType | string]: string[]
