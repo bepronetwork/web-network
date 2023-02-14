@@ -6,7 +6,7 @@ import { PROGRAMMING_LANGUAGES } from "assets/bounty-labels";
 
 import { useAppState } from "contexts/app-state";
 
-const MAX_TAGS = 3;
+import { MAX_TAGS } from "helpers/contants";
 
 export default function IssueEditTag({ isEdit = false }) {
   const {state} = useAppState();
