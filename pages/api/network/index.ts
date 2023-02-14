@@ -8,7 +8,6 @@ import Database from "db/models";
 import {chainFromHeader} from "helpers/chain-from-header";
 import { WANT_TO_CREATE_NETWORK } from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
-import { UNAUTHORIZED } from "helpers/error-messages";
 import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";

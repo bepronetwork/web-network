@@ -5,11 +5,12 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
+
+import {RouteMiddleware} from "middleware";
+
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
-import {RouteMiddleware} from "middleware";
-import {withCors} from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};

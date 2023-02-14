@@ -3,7 +3,6 @@ import {NextApiRequest, NextApiResponse} from "next";
 import models from "db/models";
 
 import {RouteMiddleware} from "middleware";
-import {withCors} from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {id} = req.query;
@@ -14,8 +13,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(merge);
 }
 
-async function MergeProposal(req: NextApiRequest,
-                             res: NextApiResponse) {
+async function MergeProposal(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -26,4 +24,4 @@ async function MergeProposal(req: NextApiRequest,
   }
 }
 
-export default RouteMiddleware(MergeProposal)
+export default RouteMiddleware(MergeProposal);

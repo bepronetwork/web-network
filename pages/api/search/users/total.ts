@@ -1,11 +1,9 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
 
-import {RouteMiddleware} from 'middleware';
-import {withCors} from 'middleware';
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const userCount = await models.user.count();

@@ -6,8 +6,7 @@ import { LogAccess } from "middleware/log-access";
 import WithCors from "middleware/withCors";
 
 import IpfsStorage from "services/ipfs-service";
-
-import {Logger} from "../../../services/logging";
+import {Logger} from "services/logging";
 
 export const config = {
   api: {

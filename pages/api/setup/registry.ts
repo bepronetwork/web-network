@@ -7,12 +7,10 @@ import {CHAIN_NOT_CONFIGURED, NOT_AN_ADMIN} from "helpers/contants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 
-import {withCors} from "middleware";
+import {LogAccess} from "middleware/log-access";
 
 import DAO from "services/dao-service";
-import {error as LogError, log as Log, Logger} from 'services/logging';
-
-import {LogAccess} from "../../../middleware/log-access";
+import {error as LogError, Logger} from 'services/logging';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {wallet, registryAddress} = req.body;
@@ -83,4 +81,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 Logger.changeActionName(`Setup`);
 
-export default LogAccess(handler)
+export default LogAccess(handler);
