@@ -89,6 +89,7 @@ export interface CurrentUserState {
   connected?: boolean;
   signature?: string;
   isAdmin?: boolean;
+  hasRegisteredNetwork?: boolean;
 }
 
 export interface CurrentBounty {

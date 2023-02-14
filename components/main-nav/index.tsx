@@ -22,6 +22,7 @@ import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import {useAppState} from "contexts/app-state";
+import { changeCurrentUserHasRegisteredNetwork } from "contexts/reducers/change-current-user";
 import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
@@ -101,19 +102,26 @@ export default function MainNav() {
   ];
 
   useEffect(() => {
-    if (!state.currentUser?.walletAddress || !noNeedNetworkInstance)
+    if (!state.currentUser?.walletAddress || !state.connectedChain?.id)
       return;
 
     searchNetworks({
       creatorAddress: state.currentUser?.walletAddress,
-      chainId: state.connectedChain?.id
+      chainId: state.connectedChain?.id,
+      isClosed: false
     })
       .then(({ count, rows }) => {
-        if (count === 0)
+        const changeIfDifferent = (has: boolean) => state.currentUser?.hasRegisteredNetwork !== has && 
+          dispatch(changeCurrentUserHasRegisteredNetwork(has));
+
+        if (count === 0) {
           setMyNetwork(newNetworkObj);
-        else {
+          changeIfDifferent(false);
+        } else {
           const networkName = rows[0]?.name?.toLowerCase();
           const chainShortName = rows[0]?.chain?.chainShortName?.toLowerCase();
+
+          changeIfDifferent(!!rows[0]?.isRegistered);
 
           setMyNetwork({ 
             label: <Translation label={"main-nav.my-network"} />, 
@@ -122,7 +130,7 @@ export default function MainNav() {
         }
       })
       .catch(error => console.debug("Failed to get network address by wallet", error));
-  }, [state.currentUser?.walletAddress, state.connectedChain, noNeedNetworkInstance]);
+  }, [state.currentUser?.walletAddress, state.connectedChain]);
 
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true));

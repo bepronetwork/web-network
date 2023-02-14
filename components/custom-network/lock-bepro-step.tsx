@@ -69,7 +69,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     lockedPercent?.gte(100),
     amount?.gt(maxValue)
   ].some(c => c);
-  const isUnlockBtnDisabled = lockedPercent?.isZero() || lockedPercent?.isNaN();
+  const isUnlockBtnDisabled = 
+    lockedPercent?.isZero() || lockedPercent?.isNaN() || !!state.currentUser?.hasRegisteredNetwork;
 
   const failTx = (err, tx) => {
 

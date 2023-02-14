@@ -1,8 +1,8 @@
-import {CurrentUserState, State} from "../../interfaces/application-state";
-import {Balance} from "../../interfaces/balance-state";
-import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
-import {SimpleAction} from "./reducer";
+import {SimpleAction} from "contexts/reducers/reducer";
 
+import {CurrentUserState, State} from "interfaces/application-state";
+import {Balance} from "interfaces/balance-state";
+import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 
 export class ChangeCurrentUser<T = CurrentUserState|Partial<CurrentUserState>> extends SimpleAction<T> {
   constructor(id = AppStateReduceId.CurrentUser) {
@@ -47,3 +47,6 @@ export const changeCurrentUserSignature = (signature: string) =>
 
 export const changeCurrentUserisAdmin = (isAdmin: boolean) =>
   changeCurrentUser.update({isAdmin});
+
+export const changeCurrentUserHasRegisteredNetwork = (hasRegisteredNetwork: boolean) =>
+  changeCurrentUser.update({hasRegisteredNetwork});
