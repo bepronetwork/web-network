@@ -1,6 +1,5 @@
 import {useContext, useEffect, useState} from "react";
 
-import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -14,13 +13,10 @@ import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
 
 import {orderByProperty} from "helpers/array";
-import { OPEN_STATES } from "helpers/issue";
 
 import {Network} from "interfaces/network";
 
 import {NetworksPageContext} from "pages/networks";
-
-import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
@@ -53,30 +49,6 @@ export default function NetworksList() {
     }));
   }
 
-  async function processNetwork(network: Network) {
-    const { issues, networkToken, curators } = network;
-
-    const { openBounties, totalBounties } = 
-      issues.reduce((acc, curr) => ({
-        openBounties: acc.openBounties + (OPEN_STATES.includes(curr.state) ? 1 : 0),
-        totalBounties: acc.totalBounties + (curr.state !== "pending" ? 1 : 0),
-      }), { openBounties: 0, totalBounties: 0 });
-
-    const tokensLocked = curators.reduce((acc, curr) => acc.plus(curr.tokensLocked), new BigNumber("0"));
-
-    const coinPrice = await getCoinPrice(networkToken?.symbol).catch(() => 0);
-
-    const totalSettlerConverted = tokensLocked.multipliedBy(coinPrice).toFixed();
-
-    return { 
-      ...network,
-      openBounties,
-      totalBounties,
-      tokensLocked: tokensLocked.toFixed(),
-      totalSettlerConverted: totalSettlerConverted
-    };
-  }
-
   useEffect(() => {    
     dispatch(changeLoadState(true));
 
@@ -94,28 +66,7 @@ export default function NetworksList() {
       order: "asc",
       isNeedCountsAndTokensLocked: true
     })
-      .then(async ({ count, rows }) => {
-        if (count > 0) {
-          setNetworks(rows);
-
-          const processed = await Promise.all(rows.map(processNetwork));
-
-          setNetworks(processed);
-
-          const { totalBounties, totalSettlerConverted } =
-            processed.reduce((acc, curr) => {
-              const settlerConverted = new BigNumber(curr.totalSettlerConverted);
-              
-              return {
-                totalBounties: acc.totalBounties + curr.totalBounties,
-                totalSettlerConverted: acc.totalSettlerConverted.plus(settlerConverted)
-              };
-            }, { totalBounties: 0, totalSettlerConverted: new BigNumber("0") });
-
-          setNumberOfBounties(totalBounties);
-          setTotalConverted(totalSettlerConverted.toFixed());
-        }
-      })
+      .then(({ rows }) => setNetworks(rows))
       .catch((error) => {
         console.log("Failed to retrieve networks list", error);
       })
