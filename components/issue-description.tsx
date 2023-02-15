@@ -11,15 +11,25 @@ import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
 
 import DragAndDrop, { IFilesProps } from "./drag-and-drop";
 
-interface DescriptionProps { description: string; isEdit?: boolean}
+interface DescriptionProps { 
+  body: string; 
+  setBody: (v: string) => void;
+  onUpdateFiles: (files: IFilesProps[]) => void;
+  onUploading: (v: boolean) => void;
+  files: IFilesProps[];
+  isEdit?: boolean;
+}
 
-export default function IssueDescription({ description, isEdit = false }: DescriptionProps) {
+export default function IssueDescription({ 
+  body, 
+  setBody,
+  onUpdateFiles,
+  onUploading,
+  files, 
+  isEdit = false }: DescriptionProps) {
   const { t } = useTranslation(["common", "bounty"]);
-  const [body, setBody] = useState<string>();
   const [bodyLength, setBodyLength] = useState<number>(0);
-  const [files, setFiles] = useState<IFilesProps[]>([]);
   const [strFiles, setStrFiles] = useState<string[]>();
-  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const {
     state: { Settings },
@@ -52,11 +62,6 @@ export default function IssueDescription({ description, isEdit = false }: Descri
   }, [files]);
 
 
-  useEffect(() => {
-    setBody(description)
-  },[description])
-
-
   function handleChangeBody(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setBody(e.target.value)
   }
@@ -85,13 +90,13 @@ export default function IssueDescription({ description, isEdit = false }: Descri
             )}
             <DragAndDrop
               externalFiles={files}
-              onUpdateFiles={setFiles}
-              onUploading={setIsUploading}
+              onUpdateFiles={onUpdateFiles}
+              onUploading={onUploading}
             />
           </>
           ):
           (
-            <MarkedRender source={description} />
+            <MarkedRender source={body} />
           )}
         </div>
       </div>
