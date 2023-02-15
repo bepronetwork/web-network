@@ -173,7 +173,10 @@ export default function ListIssues({
 
     dispatch(changeLoadState(true));
 
-    if(allNetworks) getTotalBounties().then(setTotalBounties);
+    if(allNetworks) 
+      getTotalBounties()
+        .then(setTotalBounties)
+        .catch(error => console.debug("Failed to getTotalBounties", error));
 
     searchIssues({
       page,
@@ -213,7 +216,7 @@ export default function ListIssues({
         setHasMore(currentPage < pages);
       })
       .catch((error) => {
-        console.error("Error fetching issues", error);
+        console.debug("Error fetching issues", error);
       })
       .finally(() => {
         dispatch(changeLoadState(false));

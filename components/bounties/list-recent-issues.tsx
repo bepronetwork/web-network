@@ -26,8 +26,8 @@ export default function ListRecentIssues() {
     searchRecentIssues({ networkName })
       .then(setBounties)
       .catch(err => {
-        console.error(err)
-        setLoading(false)
+        console.debug(err);
+        setLoading(false);
       })
       .finally(() => setLoading(false));
   }, [networkName]);

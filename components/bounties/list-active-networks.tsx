@@ -40,7 +40,8 @@ export default function ListActiveNetworks() {
       .then((data) => {
         data?.rows && setNetworks(data.rows);
       })
-      .catch(console.log).finally(() => setLoading(false))
+      .catch(error => console.debug("Failed to searchActiveNetworks", error))
+      .finally(() => setLoading(false));
   }, [router.query?.network]);
 
   return (

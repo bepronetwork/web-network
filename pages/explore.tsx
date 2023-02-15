@@ -40,8 +40,13 @@ export default function ExplorePage() {
     `A collection of the most recent bounties of ${networkName} networks` : t("bounty:sub-title-bounties");
 
   useEffect(() => {
-    getTotalNetworks(networkName).then(setNumberOfNetworks);
-    getTotalBounties(networkName).then(setNumberOfBounties);
+    getTotalNetworks(networkName)
+      .then(setNumberOfNetworks)
+      .catch(error => console.debug("Failed to getTotalNetworks", error));
+
+    getTotalBounties(networkName)
+      .then(setNumberOfBounties)
+      .catch(error => console.debug("Failed to getTotalBounties", error));
   },[networkName])
 
   useEffect(() => {    
@@ -76,10 +81,10 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       ...(await serverSideTranslations(locale, [
         "common",
+        "custom-network",
         "bounty",
         "connect-wallet-button",
-        "custom-network",
-        "leaderboard",
+        "leaderboard"
       ])),
     },
   };
