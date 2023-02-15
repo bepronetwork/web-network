@@ -1,4 +1,3 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -9,6 +8,8 @@ import models from "db/models";
 import * as PullRequestQueries from "graphql/pull-request";
 
 import {GraphQlResponse} from "types/octokit";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -100,4 +101,4 @@ async function PullRequestReview(req: NextApiRequest,
   res.end();
 }
 
-export default  RouteMiddleware(PullRequestReview)
+export default  LogAccess(WithCors(PullRequestReview));

@@ -2,8 +2,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
-
-import {RouteMiddleware} from "../../../middleware";
+import {LogAccess} from "../../../middleware/log-access";
+import WithCors from "../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -44,7 +44,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issue);
 }
 
-export default RouteMiddleware(async function GetIssues(req: NextApiRequest,
+export default LogAccess(WithCors(async function GetIssues(req: NextApiRequest,
                                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -56,4 +56,4 @@ export default RouteMiddleware(async function GetIssues(req: NextApiRequest,
   }
 
   res.end();
-})
+}))

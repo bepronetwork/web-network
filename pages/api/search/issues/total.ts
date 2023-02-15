@@ -1,9 +1,9 @@
-import {RouteMiddleware} from 'middleware';
-import withJwt from "middleware/withJwt";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
@@ -72,4 +72,4 @@ async function getAll(req: NextApiRequest,
   res.end();
 }
 
-export default RouteMiddleware(withJwt(getAll))
+export default LogAccess(WithCors(getAll));

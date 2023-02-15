@@ -1,11 +1,12 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import { Op, Sequelize, WhereOptions } from "sequelize";
-import { Fn, Literal } from "sequelize/types/utils";
+import {Op, Sequelize, WhereOptions} from "sequelize";
+import {Fn, Literal} from "sequelize/types/utils";
 
 import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 interface includeProps {
   association: string;
@@ -114,4 +115,4 @@ async function SearchNetworks(req: NextApiRequest,
 
   res.end();
 }
-export default RouteMiddleware(SearchNetworks)
+export default LogAccess(WithCors(SearchNetworks));

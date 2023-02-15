@@ -1,4 +1,3 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
@@ -6,6 +5,8 @@ import models from "db/models";
 
 import {calculateLeaderboardScore} from "helpers/leaderboard-score";
 import paginate, {calculateTotalPages} from "helpers/paginate";
+import {LogAccess} from "../../../../../middleware/log-access";
+import WithCors from "../../../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -64,4 +65,4 @@ async function SearchLeaderBoardPoints(req: NextApiRequest, res: NextApiResponse
 
   res.end();
 }
-export default RouteMiddleware(SearchLeaderBoardPoints);
+export default LogAccess(WithCors(SearchLeaderBoardPoints));

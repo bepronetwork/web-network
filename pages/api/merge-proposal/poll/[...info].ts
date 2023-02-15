@@ -1,7 +1,8 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import {Bus} from "helpers/bus";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -27,4 +28,4 @@ async function PollMergeProposal(req: NextApiRequest,
   }
 }
 
-export default RouteMiddleware(PollMergeProposal)
+export default LogAccess(WithCors(PollMergeProposal));
