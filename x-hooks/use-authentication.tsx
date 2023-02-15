@@ -20,9 +20,11 @@ import {
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
+import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
 import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
+import {IM_AN_ADMIN, NOT_AN_ADMIN} from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
 import {EventName} from "interfaces/analytics";
@@ -49,7 +51,7 @@ export function useAuthentication() {
   const {connect} = useDao();
   const { chain } = useChain();
   const transactions = useTransactions();
-  const { signMessage } = useSignature();
+  const { signMessage: _signMessage } = useSignature();
   const {state, dispatch} = useAppState();
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
@@ -291,7 +293,7 @@ export function useAuthentication() {
           state?.currentUser?.walletAddress?.toLowerCase() ===
           state?.currentBounty?.data?.creatorAddress?.toLowerCase()
         )
-        signMessage(IM_AM_CREATOR_ISSUE)
+        _signMessage(IM_AM_CREATOR_ISSUE)
         .then((r) => {
           dispatch(changeCurrentUserSignature(r));
           sessionStorage.setItem(`currentSignature`, r || '');
@@ -310,41 +312,52 @@ export function useAuthentication() {
     })
   }
 
-  function signMessageIfAdmin() {
+  function signMessage(message?: string) {
     if (!state?.currentUser?.walletAddress ||
         !state?.connectedChain?.id ||
         state.Service?.starting ||
         state.spinners?.signingMessage)
       return;
 
-    if (state.connectedChain?.name === "unknown") return;
-
-    const storedSignature = sessionStorage.getItem("currentSignature");
-
-    if (decodeMessage(state?.connectedChain?.id,
-                      IM_AN_ADMIN,
-                      storedSignature || state?.currentUser?.signature,
-                      publicRuntimeConfig?.adminWallet)) {
-      if (storedSignature)
-        sessionStorage.setItem("currentSignature", storedSignature);
+    if (state.connectedChain?.name === "unknown") {
+      dispatch(addToast({
+        type: "warning",
+        title: "Unsupported chain",
+        content: "To sign a message, connect to a supported chain",
+      }));
 
       return;
     }
 
-    if (state?.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig?.adminWallet?.toLowerCase()) {
-      dispatch(changeSpinners.update({ signingMessage: true }));
-      signMessage(IM_AN_ADMIN)
-        .then((r) => {
-          dispatch(changeCurrentUserSignature(r));
-          sessionStorage.setItem(`currentSignature`, r || '');
-          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id || '0');
-        })
-        .catch(e => {
-          console.error(`ERROR`, e);
-        })
-        .finally(() => dispatch(changeSpinners.update({ signingMessage: false })));
-    } else
-      sessionStorage.setItem(`currentSignature`, '');
+    const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
+    const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+    const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
+
+    const storedSignature = sessionStorage.getItem("currentSignature");
+
+    if (decodeMessage(state?.connectedChain?.id,
+                      messageToSign,
+                      storedSignature || state?.currentUser?.signature,
+                      currentWallet)) {
+      if (storedSignature)
+        dispatch(changeCurrentUserSignature(storedSignature));
+      else
+        sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
+
+      return;
+    }
+
+    dispatch(changeSpinners.update({ signingMessage: true }));
+
+    _signMessage(messageToSign)
+      .then(r => {
+        dispatch(changeCurrentUserSignature(r));
+        sessionStorage.setItem(`currentSignature`, r || '');
+      })
+      .catch(e => {
+        console.error(`ERROR`, e);
+      })
+      .finally(() => dispatch(changeSpinners.update({ signingMessage: false })));
   }
 
   return {
@@ -358,7 +371,7 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    signMessageIfCreatorIssue
-    signMessageIfAdmin,
+    signMessageIfCreatorIssue,
+    signMessage
   }
 }
