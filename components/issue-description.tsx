@@ -13,11 +13,12 @@ import DragAndDrop, { IFilesProps } from "./drag-and-drop";
 
 interface DescriptionProps { 
   body: string; 
-  setBody: (v: string) => void;
-  onUpdateFiles: (files: IFilesProps[]) => void;
-  onUploading: (v: boolean) => void;
-  files: IFilesProps[];
+  setBody?: (v: string) => void;
+  onUpdateFiles?: (files: IFilesProps[]) => void;
+  onUploading?: (v: boolean) => void;
+  files?: IFilesProps[];
   isEdit?: boolean;
+  preview?: boolean;
 }
 
 export default function IssueDescription({ 
@@ -26,7 +27,8 @@ export default function IssueDescription({
   onUpdateFiles,
   onUploading,
   files, 
-  isEdit = false }: DescriptionProps) {
+  isEdit = false,
+  preview = false }: DescriptionProps) {
   const { t } = useTranslation(["common", "bounty"]);
   const [bodyLength, setBodyLength] = useState<number>(0);
   const [strFiles, setStrFiles] = useState<string[]>();
@@ -37,7 +39,6 @@ export default function IssueDescription({
 
   useEffect(() => {
     if (body?.length > 0 && strFiles) {
-      console.log('str', strFiles)
       const description = `${body}\n\n${strFiles
         .toString()
         .replace(",![", "![")
@@ -56,7 +57,6 @@ export default function IssueDescription({
           `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
             Settings?.urls?.ipfs
           }/${file.hash}) \n\n`);
-      console.log('strFiles', strFiles)
       setStrFiles(strFiles);
     }
   }, [files]);
@@ -71,7 +71,7 @@ export default function IssueDescription({
       <h3 className="caption-large mb-3">{t("misc.description")}</h3>
       <div className="bg-dark-gray p-3 rounded">
         <div className="p p-1">
-          {isEdit ? (
+          {isEdit && !preview ? (
             <>
             <textarea
               className={clsx("form-control", {

@@ -12,16 +12,20 @@ import { useAppState } from "contexts/app-state";
 
 import { MAX_TAGS } from "helpers/contants";
 
+import BountyTags from "./bounty-tags";
+
 interface IssueEditTagProps {
   isEdit: boolean;
   selectedTags: string[];
   setSelectedTags: (v: string[]) => void;
+  preview?: boolean;
 }
 
 export default function IssueEditTag({
   selectedTags,
   setSelectedTags,
   isEdit = false,
+  preview = false,
 }: IssueEditTagProps) {
   const { t } = useTranslation(["bounty"]);
   const { state } = useAppState();
@@ -37,7 +41,7 @@ export default function IssueEditTag({
 
   useEffect(() => {
     setSelectedTags(TAGS_OPTIONS.filter((tag) =>
-        state.currentBounty?.data?.tags.includes(tag.value)).map((e) => e.value));
+        state.currentBounty?.data?.tags?.includes(tag.value)).map((e) => e.value));
   }, [state.currentBounty?.data?.tags]);
 
   if (isEdit)
@@ -45,21 +49,28 @@ export default function IssueEditTag({
       <div className="cointainer mb-4 form-group">
         <h3 className="caption-large ms-2 mb-2">{t("tags")}</h3>
         <Row className="justify-content-center p-0 m-0 form-group">
-          <Col className="col-12">
-            {console.log("tags", state.currentBounty?.data?.tags, TAGS_OPTIONS)}
-            <ReactSelect
-              value={selectedTags?.map((tag) => ({ label: tag, value: tag }))}
-              options={TAGS_OPTIONS}
-              onChange={handleChangeTags}
-              isOptionDisabled={() => selectedTags.length >= MAX_TAGS}
-              isMulti
-            />
-          </Col>
-          <Col>
-            <ContextualSpan context="info" className="mt-1">
-              {t("fields.tags-info")}
-            </ContextualSpan>
-          </Col>
+          {preview ? (
+            <Col className="col-12">
+              <BountyTags tags={selectedTags} />
+            </Col>
+          ): (
+            <>
+              <Col className="col-12">
+                <ReactSelect
+                  value={selectedTags?.map((tag) => ({ label: tag, value: tag }))}
+                  options={TAGS_OPTIONS}
+                  onChange={handleChangeTags}
+                  isOptionDisabled={() => selectedTags.length >= MAX_TAGS}
+                  isMulti
+                />
+              </Col>
+              <Col>
+                <ContextualSpan context="info" className="mt-1">
+                  {t("fields.tags-info")}
+                </ContextualSpan>
+              </Col>
+            </>
+          )}
         </Row>
       </div>
     );
