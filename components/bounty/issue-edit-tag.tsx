@@ -55,7 +55,7 @@ export default function IssueEditTag({
             </Col>
           ): (
             <>
-              <Col className="col-12">
+              <Col className="col-12 text-black">
                 <ReactSelect
                   value={selectedTags?.map((tag) => ({ label: tag, value: tag }))}
                   options={TAGS_OPTIONS}
@@ -65,7 +65,7 @@ export default function IssueEditTag({
                 />
               </Col>
               <Col>
-                <ContextualSpan context="info" className="mt-1">
+                <ContextualSpan context="info" className="mt-2">
                   {t("fields.tags-info")}
                 </ContextualSpan>
               </Col>
