@@ -14,6 +14,7 @@ import PageActions from "components/page-actions";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
+import { useAuthentication } from "x-hooks/use-authentication";
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
 
@@ -24,6 +25,7 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState<boolean>();
   const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
+  const { signMessageIfCreatorIssue } = useAuthentication();
 
   const {state} = useAppState();
 
@@ -32,14 +34,18 @@ export default function PageIssue() {
   const { id } = router.query;
 
   function handleEditIssue() {
+    signMessageIfCreatorIssue()
     const bounty = state.currentBounty?.data
 
     const isCreator =
     bounty?.creatorAddress?.toLowerCase() ===
     state.currentUser?.walletAddress?.toLowerCase();
-    console.log('isCreator', isCreator, bounty.state)
     if(isCreator && bounty.state === 'draft')
-      setIsEditIssue(!isEditIssue)
+      setIsEditIssue(true)
+  }
+
+  function handleCancelEditIssue() {
+    setIsEditIssue(false)
   }
 
   function checkForks(){
@@ -103,7 +109,11 @@ export default function PageIssue() {
         : null
       }
 
-      <IssueBody isEditIssue={isEditIssue} />
+      <IssueBody 
+        isEditIssue={isEditIssue} 
+        description={state.currentBounty?.data?.body}
+        cancelEditIssue={handleCancelEditIssue}
+        />
 
       <IssueComments
         comments={commentsIssue}
