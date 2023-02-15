@@ -12,8 +12,6 @@ import { getPropertyRecursively } from "helpers/object";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
-import {RouteMiddleware} from "../../../middleware";
-
 const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -133,4 +131,4 @@ async function IssuesMethods(req: NextApiRequest,
   res.end();
 }
 
-export default IssueRoute(RouteMiddleware(IssuesMethods))
+export default IssueRoute(IssuesMethods)
