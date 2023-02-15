@@ -89,12 +89,12 @@ export default function NotMergeableModal({
   }
 
   useEffect(() => {
-    if (!pullRequest || !state.currentBounty?.data?.pullRequests?.length || mergeState === "success") return;
+    if (!pullRequest?.state || !state.currentBounty?.data?.pullRequests?.length || mergeState === "success") return;
 
     if (whenNotShow) {
       setVisible(false);
     } else if (isIssueOwner || isPullRequestOwner || state.Service?.network?.active?.isCouncil || isProposer) {
-      setVisible(pullRequest.state === "open");
+      setVisible(pullRequest.state.toLowerCase() === "open");
     }
   }, [
     state.currentBounty?.data,
