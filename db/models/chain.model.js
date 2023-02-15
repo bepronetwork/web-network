@@ -1,4 +1,4 @@
-const { getValueToLowerCase } = require("helpers/db/getters");
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const {Model, DataTypes} = require("sequelize");
 
 class Chain extends Model {

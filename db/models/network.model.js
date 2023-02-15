@@ -1,6 +1,6 @@
 "use strict";
 const {Model, DataTypes} = require("sequelize");
-const {getValueToLowerCase} = require("helpers/db/getters");
+const {getValueToLowerCase} = require("../../helpers/db/getters");
 
 class Network extends Model {
   static init(sequelize) {
