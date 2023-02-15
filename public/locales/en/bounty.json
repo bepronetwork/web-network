@@ -125,5 +125,7 @@
   "explore-all": "Explore All",
   "recent-bounties-empty": "Not found recent bounties",
   "edit-text": "You are currently editing a bounty",
-  "save-changes": "Save Changes"
+  "save-changes": "Save Changes",
+  "cancel-changes": "Cancel Changes",
+  "preview": "preview"
 }
