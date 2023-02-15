@@ -233,7 +233,7 @@ export default function ListIssues({
   }
 
   useEffect(() => {
-    if (page) {
+    if (page && !!issuesPages.length) {
       const pagesToValidate = [...Array(+page).keys()].map((i) => i + 1);
 
       setTruncatedData(!pagesToValidate.every((pageV) =>
