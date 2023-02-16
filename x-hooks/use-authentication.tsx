@@ -247,33 +247,44 @@ export function useAuthentication() {
     dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
-  function signMessageIfCreatorIssue() {
+  async function signMessageIfCreatorIssue() {
+    return new Promise(async (resolve, reject) => { 
+      console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
 
-    console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
+      if (
+        !state?.currentUser?.walletAddress ||
+        !state?.connectedChain?.id ||
+        !state?.currentBounty?.data?.creatorAddress
+      )
+        return reject("error to get data");
 
-    if (!state?.currentUser?.walletAddress || !state?.connectedChain?.id || !state?.currentBounty?.data?.creatorAddress)
-      return;
+      if (decodeMessage(state?.connectedChain?.id,
+                        IM_AM_CREATOR_ISSUE,
+                        state?.currentUser?.signature,
+                        state?.currentBounty?.data?.creatorAddress))
+        return resolve(true)
 
-    if (decodeMessage(state?.connectedChain?.id,
-                      IM_AM_CREATOR_ISSUE,
-                      state?.currentUser?.signature,
-                      state?.currentBounty?.data?.creatorAddress))
-      return;
-
-    if (state?.currentUser?.walletAddress?.toLowerCase() === state?.currentBounty?.data?.creatorAddress?.toLowerCase())
-      signMessage(IM_AM_CREATOR_ISSUE)
+      if (
+          state?.currentUser?.walletAddress?.toLowerCase() ===
+          state?.currentBounty?.data?.creatorAddress?.toLowerCase()
+        )
+        signMessage(IM_AM_CREATOR_ISSUE)
         .then((r) => {
           dispatch(changeCurrentUserSignature(r));
           sessionStorage.setItem(`currentSignature`, r || '');
           sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id || '0');
+          resolve(true)
         })
         .catch(e => {
           console.error(`ERROR`, e);
+          reject(e)
         })
-    else {
-      sessionStorage.setItem(`currentSignature`, '');
-      sessionStorage.setItem(`currentChainId`, '');
-    }
+      else {
+        sessionStorage.setItem(`currentSignature`, '');
+        sessionStorage.setItem(`currentChainId`, '');
+        return reject('error not owner of this bounty')
+      }
+    })
   }
 
   return {
