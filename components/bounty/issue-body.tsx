@@ -9,6 +9,7 @@ import IssueDescription from "components/issue-description";
 import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
 
 import { useAppState } from "contexts/app-state";
+import { addToast } from "contexts/reducers/change-toaster";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
 
@@ -35,7 +36,7 @@ export default function IssueBody({
   const [selectedTags, setSelectedTags] = useState<string[]>();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { getDatabaseBounty } = useBounty();
-  const { state } = useAppState();
+  const { state, dispatch } = useAppState();
 
   const { updateIssue } = useApi();
 
@@ -75,6 +76,11 @@ export default function IssueBody({
       tags: selectedTags,
     })
       .then(() => {
+        dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("bounty:actions.edit-bounty")
+        }));
         getDatabaseBounty(true);
         cancelEditIssue();
         setIsPreview(false);
@@ -89,7 +95,7 @@ export default function IssueBody({
   }
 
   function isDisableUpdateIssue() {
-    return (isUploading || addFilesInDescription(body).length > BODY_CHARACTERES_LIMIT || body.length === 0)
+    return (isUploading || addFilesInDescription(body)?.length > BODY_CHARACTERES_LIMIT || body?.length === 0)
   }
 
   if (state.currentUser?.walletAddress)
