@@ -158,6 +158,7 @@ export function useBounty() {
 
         getExtendedProposalsForCurrentBounty(bounty)
           .then(proposals => dispatch(changeCurrentBountyDataProposals(proposals)))
+          .catch(error => console.debug("Failed to getExtendedProposalsForCurrentBounty", error));
 
         bountyReadyPRsHasNoInvalidProposals(bounty, state.Service.active.network)
           .catch(() => -1)
