@@ -74,18 +74,19 @@ export default function IssueDescription({
           {isEdit && !preview ? (
             <>
             <textarea
-              className={clsx("form-control", {
-                "border border-1 border-danger border-radius-8": (bodyLength > BODY_CHARACTERES_LIMIT),
-              })}
+                className={clsx("form-control", {
+                  "border border-1 border-danger border-radius-8":
+                    (bodyLength || body.length)> BODY_CHARACTERES_LIMIT || body.length === 0,
+                })}
               placeholder={t("bounty:fields.description.placeholder")}
               value={body}
               rows={24}
               wrap="soft"
               onChange={handleChangeBody}
             />
-            {(bodyLength > BODY_CHARACTERES_LIMIT) && (
+            {((bodyLength || body.length) > BODY_CHARACTERES_LIMIT) && (
               <span className="caption-small text-danger bg-opacity-100">
-                {t("bounty:errors.description-limit", { value: bodyLength })}
+                {t("bounty:errors.description-limit", { value: (bodyLength || body.length) })}
               </span>
             )}
             <DragAndDrop
