@@ -32,5 +32,7 @@ export enum TransactionTypes {
   configFees,
   deployNetworkRegistry,
   changeAllowedTokens,
-  closeNetwork
+  closeNetwork,
+  amountForNetworkCreation,
+  feeForNetworkCreation
 }

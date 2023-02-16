@@ -1,4 +1,3 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -15,6 +14,8 @@ import {Settings} from "helpers/settings";
 import DAO from "services/dao-service";
 
 import {GraphQlResponse} from "types/octokit";
+import {LogAccess} from "../../../middleware/log-access";
+import WithCors from "../../../middleware/withCors";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -289,4 +290,4 @@ async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default  RouteMiddleware(PullRequest);
+export default  LogAccess(WithCors(PullRequest));

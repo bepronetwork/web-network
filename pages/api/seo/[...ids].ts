@@ -1,11 +1,11 @@
 import axios from "axios";
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
 
 import {Settings} from "helpers/settings";
+import {LogAccess} from "../../../middleware/log-access";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -59,4 +59,4 @@ async function Seo(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default RouteMiddleware(Seo)
+export default LogAccess(Seo)

@@ -1,7 +1,8 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -27,4 +28,4 @@ async function SearchNetworks(req: NextApiRequest,
 
   res.end();
 }
-export default RouteMiddleware(SearchNetworks)
+export default LogAccess(WithCors(SearchNetworks))

@@ -84,7 +84,7 @@ export default function ListActiveNetworks() {
                         </span>
                       </span>
                       <span className="bg-dark-gray p-1 border-radius-8 px-2">
-                        {network?.countIssues || 0}{" "}
+                        {network?.totalIssues || 0}{" "}
                         <span className="text-uppercase text-white-40">
                           {t("label_other")}
                         </span>

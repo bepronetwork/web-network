@@ -5,8 +5,7 @@ import {Op} from "sequelize";
 import models from "db/models";
 
 import {error as LogError} from "services/logging";
-
-import {RouteMiddleware} from "../../../../middleware";
+import {LogAccess} from "../../../../middleware/log-access";
 
 enum Actions {
   REGISTER = "register",
@@ -53,12 +52,12 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json("Success");
   } catch (error) {
-    LogError(`Failed to ${action || "no action"} user`, { req, error });
-    return res.status(500).json(error);
+    LogError(`Failed to ${action || "no action"} user`, { req, error: error?.toString() });
+    return res.status(500).json(error?.toString());
   }
 }
 
-export default RouteMiddleware(async function ConnectUser(req: NextApiRequest, res: NextApiResponse) {
+export default LogAccess(async function ConnectUser(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "patch":
     await patch(req, res);

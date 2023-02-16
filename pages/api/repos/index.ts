@@ -1,8 +1,9 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
+import {LogAccess} from "../../../middleware/log-access";
+import WithCors from "../../../middleware/withCors";
 
 async function getAllRepos(req, res) {
   const {networkName} = req.query;
@@ -103,4 +104,4 @@ async function RepoRoute(req: NextApiRequest,
 
   res.end();
 }
-export default RouteMiddleware(RepoRoute)
+export default LogAccess(WithCors(RepoRoute))

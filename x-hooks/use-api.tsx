@@ -530,7 +530,8 @@ export default function useApi() {
     search = "",
     isClosed = undefined,
     isRegistered = undefined,
-    isDefault = undefined
+    isDefault = undefined,
+    isNeedCountsAndTokensLocked = undefined
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -542,7 +543,11 @@ export default function useApi() {
       search,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
-      ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {})
+      ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {}),
+      ...((isNeedCountsAndTokensLocked !== undefined && {
+        isNeedCountsAndTokensLocked: isNeedCountsAndTokensLocked.toString(),
+      }) ||
+        {}),
     }).toString();
 
     return api

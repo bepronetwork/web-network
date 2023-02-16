@@ -1,11 +1,12 @@
 // import { error as LogError } from "services/logging";
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {getToken} from "next-auth/jwt";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
 
 import {Logger} from "services/logging";
+import {LogAccess} from "../../../middleware/log-access";
+import WithCors from "../../../middleware/withCors";
 
 const {serverRuntimeConfig: {authSecret, github: {token: botToken}}} = getConfig();
 
@@ -37,7 +38,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   default:
     return res.status(405).json({ statusCode: 405, message: "Method Not Allowed" });
   }
+
+  res.end();
 }
 
 Logger.changeActionName(`GraphQL`);
-export default RouteMiddleware(handler);
+export default LogAccess(WithCors(handler));

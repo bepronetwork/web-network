@@ -1,8 +1,9 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -39,4 +40,4 @@ async function GetAll(req: NextApiRequest,
 
   res.end();
 }
-export default RouteMiddleware(GetAll)
+export default LogAccess(WithCors(GetAll));

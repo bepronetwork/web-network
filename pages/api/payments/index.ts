@@ -1,9 +1,10 @@
 import {endOfDay, isAfter, parseISO, startOfDay} from "date-fns";
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
+import {LogAccess} from "../../../middleware/log-access";
+import WithCors from "../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {wallet, networkName, startDate, endDate} = req.query;
@@ -74,4 +75,4 @@ async function Payments(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default RouteMiddleware(Payments)
+export default LogAccess(WithCors(Payments));

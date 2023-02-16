@@ -1,6 +1,7 @@
 import formidable from "formidable";
 import fs from "fs";
-import {RouteMiddleware} from "middleware";
+import { LogAccess } from "middleware/log-access";
+import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 
 import IpfsStorage from "services/ipfs-service";
@@ -52,4 +53,4 @@ async function FilesMethods (req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`Files`);
-export default RouteMiddleware(FilesMethods)
+export default LogAccess(WithCors(FilesMethods));

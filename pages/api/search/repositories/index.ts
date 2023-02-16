@@ -1,10 +1,11 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
 import paginate, {calculateTotalPages} from "helpers/paginate";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -56,4 +57,4 @@ async function SearchRepositories(req: NextApiRequest,
   res.end();
 }
 
-export default RouteMiddleware(SearchRepositories)
+export default LogAccess(WithCors(SearchRepositories));
