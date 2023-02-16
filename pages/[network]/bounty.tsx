@@ -33,15 +33,12 @@ export default function PageIssue() {
 
   const { id } = router.query;
 
-  function handleEditIssue() {
-    signMessageIfCreatorIssue()
-    const bounty = state.currentBounty?.data
+  async function handleEditIssue() {
+    const isCreator = await signMessageIfCreatorIssue()
 
-    const isCreator =
-    bounty?.creatorAddress?.toLowerCase() ===
-    state.currentUser?.walletAddress?.toLowerCase();
-    if(isCreator && bounty.state === 'draft')
+    if(isCreator){
       setIsEditIssue(true)
+    }
   }
 
   function handleCancelEditIssue() {
