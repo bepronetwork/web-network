@@ -10,6 +10,8 @@ import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
 
 import { useAppState } from "contexts/app-state";
 
+import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+
 import useApi from "x-hooks/use-api";
 import { useBounty } from "x-hooks/use-bounty";
 
@@ -86,6 +88,10 @@ export default function IssueBody({
     cancelEditIssue();
   }
 
+  function isDisableUpdateIssue() {
+    return (isUploading || addFilesInDescription(body).length > BODY_CHARACTERES_LIMIT || body.length === 0)
+  }
+
   if (state.currentUser?.walletAddress)
     return (
       <div className="container mb-1">
@@ -138,7 +144,7 @@ export default function IssueBody({
                       <Button
                         className="d-flex flex-shrink-0 w-40 btn-block"
                         onClick={handleUpdateIssue}
-                        disabled={isUploading}
+                        disabled={isDisableUpdateIssue()}
                         isLoading={isUploading}
                       >
                         {t("bounty:save-changes")}
