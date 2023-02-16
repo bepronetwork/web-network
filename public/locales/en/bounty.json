@@ -127,5 +127,6 @@
   "edit-text": "You are currently editing a bounty",
   "save-changes": "Save Changes",
   "cancel-changes": "Cancel Changes",
-  "preview": "preview"
+  "preview": "preview",
+  "edit": "edit"
 }

@@ -145,7 +145,7 @@ export default function IssueBody({
                         onClick={() => setIsPreview(!isPreview)}
                         disabled={isUploading}
                       >
-                        {t("bounty:preview")}
+                        {!isPreview ? t("bounty:preview") : t("bounty:edit")}
                       </Button>
                       <Button
                         className="d-flex flex-shrink-0 w-40 btn-block"
