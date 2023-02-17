@@ -20,13 +20,11 @@ import IssueEditTag from "./issue-edit-tag";
 
 interface issueBodyProps {
   isEditIssue: boolean;
-  description: string;
   cancelEditIssue: () => void;
 }
 
 export default function IssueBody({
   isEditIssue,
-  description,
   cancelEditIssue,
 }: issueBodyProps) {
   const { t } = useTranslation(["common", "bounty"]);
@@ -41,8 +39,10 @@ export default function IssueBody({
   const { updateIssue } = useApi();
 
   useEffect(() => {
-    setBody(description);
-  }, [description]);
+    if(!state.currentBounty?.data?.body) return;
+
+    setBody(state.currentBounty?.data?.body);
+  }, [state.currentBounty?.data]);
 
   function onUpdateFiles(files: IFilesProps[]) {
     return setFiles(files);
@@ -62,7 +62,7 @@ export default function IssueBody({
 
   function handleUpdateIssue() {
     if (
-      (addFilesInDescription(body) === description &&
+      (addFilesInDescription(body) === state.currentBounty?.data?.body &&
         selectedTags === state.currentBounty?.data?.tags) ||
       !state.currentBounty.data
     )

@@ -109,7 +109,6 @@ export default function PageIssue() {
 
       <IssueBody 
         isEditIssue={isEditIssue} 
-        description={state.currentBounty?.data?.body}
         cancelEditIssue={handleCancelEditIssue}
         />
 
