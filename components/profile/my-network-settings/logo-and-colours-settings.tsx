@@ -48,6 +48,9 @@ export default function LogoAndColoursSettings({
   const { processEvent } = useApi();
   const { handleAddNetworkToRegistry } = useBepro();
   const { updateActiveNetwork } = useNetwork();
+  const isObjectEmpty = (objectName) => {
+    return Object.keys(objectName).length === 0
+  }
 
   const {
     details,
@@ -199,6 +202,7 @@ export default function LogoAndColoursSettings({
           <ImageUploader
             name="logoIcon"
             value={details?.iconLogo?.value}
+            isLoading={!details?.iconLogo?.value?.preview}
             className="bg-shadow"
             error={details?.iconLogo?.validated === false}
             onChange={handleIconChange}
@@ -215,6 +219,7 @@ export default function LogoAndColoursSettings({
           <ImageUploader
             name="fullLogo"
             value={details?.fullLogo?.value}
+            isLoading={!details?.fullLogo?.value?.preview}
             className="bg-shadow"
             error={details?.fullLogo?.validated === false}
             onChange={handleFullChange}
@@ -246,12 +251,17 @@ export default function LogoAndColoursSettings({
           <span className="caption-medium text-white mb-3">
             {t("custom-network:steps.network-settings.fields.colors.label")}
           </span>
-
-          <ThemeColors
-            colors={settings?.theme?.colors}
-            similar={settings?.theme?.similar}
-            setColor={handleColorChange}
-          />
+          {!isObjectEmpty(settings?.theme?.colors) ? (
+            <ThemeColors
+              colors={settings?.theme?.colors}
+              similar={settings?.theme?.similar}
+              setColor={handleColorChange}
+            />
+          ) : (
+            <div className="row justify-content-center">
+              <span className="spinner-border spinner-border-md ml-1" />
+            </div>
+          )}
         </Col>
       </Row>
     </>
