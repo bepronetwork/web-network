@@ -18,7 +18,8 @@ import useApi from 'x-hooks/use-api';
 export function KycSessionModal() {
   const [show, setShow] = useState<boolean>(false);
   const [currentTier, setCurrentTier] = useState<Tier>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [timer, setTimer] = useState(null);
 
   const { validateKycSession } = useApi()
   const { state, dispatch } = useAppState()
@@ -39,14 +40,15 @@ export function KycSessionModal() {
     if(bountyMissSteps?.length)
       setCurrentTier(bountyMissSteps[0])
   }
-  
-  useEffect(() => {
-    if(!show) return
 
-    const intervalId = setInterval(handlerValidateSession, 30000) // 30 seconds
+  function updateSessionStateTimer() {
+    if (!timer)
+      setTimer(setInterval(handlerValidateSession, 30000));
+    if (!show)
+      clearInterval(timer);
+  }
   
-    return () => clearInterval(intervalId);
-  }, [show, session?.status])
+  useEffect(updateSessionStateTimer, [show])
 
   useEffect(getCurrentStep,[bountyMissSteps])
   useEffect(handlerValidateSession,[show])
@@ -59,13 +61,17 @@ export function KycSessionModal() {
     <Row>
       <Col>
         <ReadOnlyButtonWrapper>
-          <Button
-            color="danger"
-            className="read-only-button me-1"
-            disabled={state?.currentUser?.kycSession?.status === "VERIFIED"}
-            onClick={() => setShow(true)}>
-            <Translation ns="bounty" label="kyc.identify-kyc" />
-          </Button>
+          {
+            state?.currentUser?.kycSession?.status !== "VERIFIED"
+              ? <Button
+                color="danger"
+                className="read-only-button me-1"
+                onClick={() => setShow(true)}>
+                <Translation ns="bounty" label="kyc.identify-kyc" />
+              </Button>
+              : null
+          }
+
 
           <Modal show={show} onCloseClick={() => setShow(false)} scrollable={false}>
             <div className='d-flex flex-column align-items-center justify-content-center'>
