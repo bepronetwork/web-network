@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 
 import CardItem from "components/card-item";
 import CustomContainer from "components/custom-container";
+import NothingFound from "components/nothing-found";
 
 import { useAppState } from "contexts/app-state";
 
@@ -95,6 +96,7 @@ export default function ListActiveNetworks() {
               </CardItem>
             </div>
           ))}
+        {networks?.length === 0 && <NothingFound description={t("most-active-network-empty")}/>}
       </div>
     </CustomContainer>
   );
