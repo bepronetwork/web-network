@@ -1,4 +1,3 @@
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -14,6 +13,8 @@ import {getPropertyRecursively} from "helpers/object";
 import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
 
 import {Logger} from "../../../../services/logging";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -96,4 +97,4 @@ async function Working(req: NextApiRequest,
 }
 
 Logger.changeActionName(`Issue/Working`);
-export default RouteMiddleware(Working)
+export default LogAccess(WithCors(Working))

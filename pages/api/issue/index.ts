@@ -1,3 +1,5 @@
+import { LogAccess } from "middleware/log-access";
+import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -9,8 +11,6 @@ import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
 import {GraphQlResponse} from "types/octokit";
-
-import {RouteMiddleware} from "../../../middleware";
 
 const {serverRuntimeConfig} = getConfig();
 
@@ -95,7 +95,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(`${repository.id}/${githubId}`);
 }
 
-export default RouteMiddleware(async function Issue(req: NextApiRequest, res: NextApiResponse) {
+export default LogAccess(WithCors(async function Issue(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -106,4 +106,4 @@ export default RouteMiddleware(async function Issue(req: NextApiRequest, res: Ne
   }
 
   res.end();
-})
+}))

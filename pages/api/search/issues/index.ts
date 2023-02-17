@@ -1,5 +1,4 @@
 import {subHours, subMonths, subWeeks, subYears} from "date-fns";
-import {RouteMiddleware} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, Sequelize, WhereOptions} from "sequelize";
 
@@ -8,6 +7,8 @@ import models from "db/models";
 import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
+import {LogAccess} from "../../../../middleware/log-access";
+import WithCors from "../../../../middleware/withCors";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -227,4 +228,4 @@ async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
-export default RouteMiddleware(SearchIssues)
+export default LogAccess(WithCors(SearchIssues))

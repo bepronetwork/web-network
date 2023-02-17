@@ -11,11 +11,11 @@ export const LogAccess = (handler: NextApiHandler) => {
 
     const pathname = url.split('/api')[1].replace(/\?.+/g, '');
 
-    const rest = (query || body) ? ({ ... query ? {query} : {}, ... body ? {body} : {}}) : '';
+    const payload = (query || body) ? ({ ... query ? {query} : {}, ... body ? {body} : {}}) : '';
 
-    log(`${method} access`, pathname);
-    if (rest)
-      debug(`${method} access-payload`, pathname, rest);
+    log(`access`, {pathname, method});
+    if (payload)
+      debug(`access-payload`, {pathname, payload, method});
 
     try {
       await handler(req, res);
@@ -25,7 +25,7 @@ export const LogAccess = (handler: NextApiHandler) => {
 
       debug(`${method} access-end`, pathname)
     } catch (e) {
-      Logger.error(e, `${method}`, pathname, e?.toString(), rest);
+      Logger.error(e, `access-error`, {method, pathname, payload});
     }
     Logger.changeActionName(``); // clean action just in case;
   }

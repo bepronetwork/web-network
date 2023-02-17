@@ -7,7 +7,7 @@ import models from "db/models";
 import {error as LogError} from "services/logging";
 
 import {UNAUTHORIZED} from "../../../../helpers/error-messages";
-import {RouteMiddleware} from "../../../../middleware";
+import {LogAccess} from "../../../../middleware/log-access";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {address, githubLogin} = req.body;
@@ -61,7 +61,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default RouteMiddleware(async function ResetUser(req: NextApiRequest, res: NextApiResponse) {
+export default LogAccess(async function ResetUser(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);

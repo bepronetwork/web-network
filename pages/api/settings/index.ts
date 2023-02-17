@@ -3,9 +3,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 import models from "db/models";
 
 import {Settings} from "helpers/settings";
-
-import {RouteMiddleware} from "../../../middleware";
 import {Logger} from "../../../services/logging";
+import {LogAccess} from "../../../middleware/log-access";
 
 async function get(_req: NextApiRequest, res: NextApiResponse) {
   const settings = await models.settings.findAll({
@@ -20,7 +19,7 @@ async function get(_req: NextApiRequest, res: NextApiResponse) {
 
 Logger.changeActionName(`Settings`);
 
-export default RouteMiddleware(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default LogAccess(async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
   case "GET":
     await get(req, res);

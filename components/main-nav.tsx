@@ -46,7 +46,7 @@ export default function MainNav() {
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
 
-  const noNeedNetworkInstance = ["/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);
+  const noNeedNetworkInstance = ["/","/networks", "/new-network", "/explore", "/leaderboard"].includes(pathname);
   const fullLogoUrl = state.Service?.network?.active?.fullLogo;
 
   useEffect(() => {
