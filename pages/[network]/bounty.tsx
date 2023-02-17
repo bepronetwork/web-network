@@ -99,6 +99,7 @@ export default function PageIssue() {
         isRepoForked={!!isRepoForked}
         addNewComment={addNewComment}
         handleEditIssue={handleEditIssue}
+        isEditIssue={isEditIssue}
       />
 
       {(state.currentUser?.walletAddress)

@@ -4,6 +4,8 @@ import {isMobile} from "react-device-detect";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
+import EditIcon from "assets/icons/transactions/edit";
+
 import Button from "components/button";
 import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
@@ -27,18 +29,19 @@ import {useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
 import { ContextualSpan } from "./contextual-span";
 import Modal from "./modal";
-import EditIcon from "assets/icons/transactions/edit";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
   addNewComment?: (comment: string) => void;
   handleEditIssue?: () => void;
+  isEditIssue?: boolean;
 }
 
 export default function PageActions({
                                       isRepoForked = false,
                                       addNewComment,
-                                      handleEditIssue
+                                      handleEditIssue,
+                                      isEditIssue
                                     }: PageActionsProps) {
   const {t} = useTranslation(["common", "pull-request", "bounty"]);
 
@@ -303,7 +306,7 @@ export default function PageActions({
   function renderCancelButton() {
     const isDraftOrNotFunded = isFundingRequest ? !isBountyFunded : isBountyInDraft;
 
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded && !isEditIssue)
       return (
         <ReadOnlyButtonWrapper>
           <Button
@@ -317,7 +320,7 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest && !isEditIssue)
       return (
         <ReadOnlyButtonWrapper>
           <Button
