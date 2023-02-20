@@ -17,34 +17,36 @@ import {changeLoadState} from "contexts/reducers/change-load";
 import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 
 export function MyNetwork() {
-  const {t} = useTranslation(["common", "custom-network"]);
+  const { t } = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 
   const { state, dispatch } = useAppState();
   
+  const { chain } = useChain();
   const { searchNetworks } = useApi();
-  const { setForcedNetwork } = useNetworkSettings()
+  const { setForcedNetwork } = useNetworkSettings();
   
   const defaultNetworkName = state?.Service?.network?.active?.name?.toLowerCase();
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
 
-    const connectedChainId = state.connectedChain?.id;
+    const chainId = chain.chainId.toString();
 
     searchNetworks({
       creatorAddress: state.currentUser.walletAddress,
       isClosed: false,
-      chainId: connectedChainId
+      chainId: chainId
     })
       .then(({ count , rows }) => {
         const savedNetwork = count > 0 ? rows[0] : undefined;
 
         if (savedNetwork)
-          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}:${connectedChainId}`, 
+          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}:${chainId}`, 
                                  JSON.stringify(savedNetwork));
 
         setMyNetwork(savedNetwork);
@@ -55,10 +57,10 @@ export function MyNetwork() {
   }
 
   useEffect(() => {
-    if (!state.currentUser?.walletAddress) return;
+    if (!state.currentUser?.walletAddress || !chain) return;
 
     updateEditingNetwork();
-  }, [state.currentUser?.walletAddress]);
+  }, [state.currentUser?.walletAddress, chain]);
   
   return(
     <ProfileLayout>
