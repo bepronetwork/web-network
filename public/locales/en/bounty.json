@@ -139,6 +139,8 @@
     "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
     "identify-to-start": "Identify to start working",
     "identify-kyc": "Start KYC",
+    "identified": "Successfully identified, you can close this modal",
+    "identifying": "Identifying..",
     "label": "KYC",
     "steps": "{{current}} of {{total}} steps"
   }
