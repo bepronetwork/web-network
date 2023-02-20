@@ -55,9 +55,9 @@ export default function NetworksList() {
     dispatch(changeLoadState(true));
 
     getHeaderNetworks().then(({ TVL, bounties, number_of_network }) => {
-      setTotalConverted(TVL.toFixed())
-      setNumberOfNetworks(number_of_network)
-      setNumberOfBounties(bounties)
+      setTotalConverted(TVL.toFixed() || "0")
+      setNumberOfNetworks(number_of_network || 0)
+      setNumberOfBounties(bounties || 0)
     })
     .catch(error => console.log("Failed to retrieve header data", error))
 
@@ -81,9 +81,9 @@ export default function NetworksList() {
   }, []);
 
   useEffect(() => {
-    if (!networks.length) return;
-
     if (!state.Service?.active) return;
+    if (!networks.length) return;
+    if (networks[0]?.networkToken?.address) return;
 
     const web3Host = state.Settings?.urls?.web3Provider;
     const dao = new DAO({web3Host, skipWindowAssignment: true});
@@ -93,12 +93,11 @@ export default function NetworksList() {
         const networkAddress = network?.networkAddress;
         await dao.loadNetwork(networkAddress);
 
-        const [settlerTokenData] = await Promise.all([
-            dao.getSettlerTokenData().catch(() => undefined),
-        ]);
+        const settlerTokenData = await dao.getSettlerTokenData().catch(() => undefined);
 
-        return { ...network,
-                 networkToken: settlerTokenData
+        return { 
+          ...network,
+          networkToken: settlerTokenData
         }
       })))
       .then(setNetworks)
