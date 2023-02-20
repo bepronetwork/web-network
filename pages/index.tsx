@@ -13,22 +13,22 @@ const { publicRuntimeConfig } = getConfig();
 
 export default function Index() {
   const { replace } = useRouter();
-  
+
   const { state } = useAppState();
 
   useEffect(() => {
-    if (!state?.supportedChains)
-      return;
+    const isAdmin = state.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase();
+    const hasSupportedChains = !!state?.supportedChains?.length;
 
-    if (state?.supportedChains?.length)
-      replace(`/networks`);
-    else if (state.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase())
-      replace(`/setup`);
+    if (isAdmin && !hasSupportedChains)
+      replace("/setup");
+    else
+      replace("/networks");
 
-  }, [state?.supportedChains]);
+  }, [state?.supportedChains, state.currentUser?.walletAddress]);
 
   return(
-   <ExplorePage />
+    <ExplorePage />
   );
 }
 
