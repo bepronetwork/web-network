@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import {useRouter} from "next/router";
 
+import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
 import PlusIcon from "assets/icons/plus-icon";
 
