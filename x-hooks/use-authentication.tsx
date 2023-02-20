@@ -319,7 +319,10 @@ export function useAuthentication() {
         state.spinners?.signingMessage)
       return;
 
-    if (state.connectedChain?.name === "unknown") {
+    const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
+    const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+
+    if (!isAdminUser && state.connectedChain?.name === "unknown") {
       dispatch(addToast({
         type: "warning",
         title: "Unsupported chain",
@@ -329,8 +332,6 @@ export function useAuthentication() {
       return;
     }
 
-    const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
-    const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
     const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
 
     const storedSignature = sessionStorage.getItem("currentSignature");
@@ -344,18 +345,20 @@ export function useAuthentication() {
       else
         sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
 
-      return;
+      return storedSignature || state?.currentUser?.signature;
     }
 
     dispatch(changeSpinners.update({ signingMessage: true }));
 
-    _signMessage(messageToSign)
+    return _signMessage(messageToSign)
       .then(r => {
         dispatch(changeCurrentUserSignature(r));
         sessionStorage.setItem(`currentSignature`, r || '');
+
+        return r;
       })
       .catch(e => {
-        console.error(`ERROR`, e);
+        console.debug("Failed to sign message", e);
       })
       .finally(() => dispatch(changeSpinners.update({ signingMessage: false })));
   }

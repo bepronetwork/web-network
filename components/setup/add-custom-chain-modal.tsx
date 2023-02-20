@@ -1,6 +1,7 @@
 import {Dispatch, SetStateAction, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 
+import ColorInput from "components/color-input";
 import {FormGroup} from "components/form-group";
 import Modal from "components/modal";
 
@@ -22,6 +23,7 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
   const [currencyName, setCurrencyName] = useState('');
   const [currencyDecimals, setCurrencyDecimals] = useState('');
   const [eventsApi, setEventsApi] = useState('');
+  const [color, setColor] = useState('');
 
   function getChainModel(): MiniChainInfo {
     return {
@@ -31,6 +33,7 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
       activeRPC,
       explorer,
       eventsApi,
+      color,
       nativeCurrency: {
         name: currencyName,
         symbol: currencySymbol,
@@ -70,6 +73,15 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
                 onOkClick={() => add(getChainModel())}
                 onCloseClick={() => add(null)}>
 
-    {forms.map(makeRowColInput)}
+    <>
+      {forms.map(makeRowColInput)}
+
+      <ColorInput
+        label="Chain Color"
+        code={color}
+        onChange={setColor}
+        onlyColorCode
+      />
+    </>
   </Modal>
 }

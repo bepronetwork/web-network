@@ -21,18 +21,21 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import {MiniChainInfo} from "interfaces/mini-chain";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 export default function ChainsSetup() {
-  const {state, dispatch} = useAppState();
   const { t } = useTranslation(["common"]);
-  const [chains, setChains] = useState<MiniChainInfo[]>([]);
-  const [filteredChains, setFilteredChains] = useState<MiniChainInfo[]>([]);
+  
   const [search, setSearch] = useState('');
+  const [chains, setChains] = useState<MiniChainInfo[]>([]);
   const [existingState, setExistingState] = useState<number[]>([]);
-  const [showChainModal, setShowChainModal] = useState<MiniChainInfo|null>(null);
   const [showCustomAdd, setShowCustomAdd] = useState<boolean>(false);
-
+  const [filteredChains, setFilteredChains] = useState<MiniChainInfo[]>([]);
+  const [showChainModal, setShowChainModal] = useState<MiniChainInfo|null>(null);
+  
   const api = useApi();
+  const {state, dispatch} = useAppState();
+  const { signMessage } = useAuthentication();
 
   function updateMiniChainInfo() {
     if (chains.length)
@@ -72,12 +75,17 @@ export default function ChainsSetup() {
       return;
     }
 
-    api.addSupportedChain(chain)
-      .then(success => {
-        dispatch(success ? toastSuccess(`added chain ${chain.name}`) : toastError(`Failed to add chain ${chain.name}`));
-        if (success)
-          setShowChainModal(null);
-      })
+    signMessage()
+      .then(() => {
+        api.addSupportedChain(chain)
+          .then(success => {
+            if (success) {
+              dispatch(toastSuccess(`added chain ${chain.name}`));
+              setShowChainModal(null);
+            } else 
+            dispatch(toastError(`Failed to add chain ${chain.name}`));
+          });
+      });
   }
 
   function makeAddRemoveButton(chain: MiniChainInfo) {

@@ -13,7 +13,6 @@ import {MiniChainInfo} from "interfaces/mini-chain";
 
 import {withCors} from "middleware";
 import {AdminRoute} from "middleware/admin-route";
-import {WithValidChainId} from "middleware/with-valid-chain-id";
 
 import {error} from "services/logging";
 
@@ -50,7 +49,8 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
     chainCurrencyDecimals: body.nativeCurrency?.decimals,
     isDefault: body.isDefault,
     blockScanner: body.explorer,
-    eventsApi: body.eventsApi
+    eventsApi: body.eventsApi,
+    color: body.color
   }
 
   const chain = await models.chain.findOne({where: {chainId: {[Op.eq]: model.chainId}}});
@@ -163,9 +163,6 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
-
-  console.log(req.method, `ChainMethods`);
-
   switch (req.method.toLowerCase()) {
   case "post":
     await Post(req, res);
@@ -190,4 +187,4 @@ async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(WithValidChainId(AdminRoute(ChainMethods)));
+export default withCors(AdminRoute(ChainMethods));

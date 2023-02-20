@@ -20,6 +20,7 @@ import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toas
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
 
@@ -66,6 +67,7 @@ export function RegistrySetup({
   const [registrySaveCTA, setRegistrySaveCTA] = useState(false);
 
   const { loadSettings } = useSettings();
+  const { signMessage } = useAuthentication();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
   const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
@@ -131,11 +133,13 @@ export function RegistrySetup({
                           closeFeePercentage,
                           cancelFeePercentage,
                           bountyToken.value )
-      .then(tx => {
+      .then(async tx => {
         const { contractAddress } = tx as TransactionReceipt;
         setRegistry(previous => ({ ...previous, value: contractAddress}));
 
         Service?.active?.loadRegistry(false, contractAddress);
+
+        await signMessage();
 
         return setChainRegistry(contractAddress);
       })
