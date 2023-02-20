@@ -57,7 +57,19 @@ export default function WalletBalance() {
     const networkToken = state.Service?.network?.active?.networkToken;
     const registryTokenAddress = state.Service?.active?.registry?.token?.contractAddress?.toLowerCase();
 
-    if (!state.currentUser?.walletAddress || !registryTokenAddress || !networkToken?.address)
+    console.log("###", {
+      wallet: state.currentUser?.walletAddress,
+      registryTokenAddress,
+      networkTokenAddress: networkToken?.address,
+      switchingChain: state.spinners?.switchingChain,
+      starting: state.Service?.starting
+    })
+
+    if (!state.currentUser?.walletAddress || 
+        !registryTokenAddress || 
+        !networkToken?.address || 
+        state.spinners?.switchingChain ||
+        state.Service?.starting)
       return;
 
     const isSameToken = registryTokenAddress === networkToken.address;
@@ -78,8 +90,8 @@ export default function WalletBalance() {
 
   useEffect(loadBalances, [
     state.currentUser?.walletAddress, 
-    state.Service?.active?.registry?.token?.contractAddress, 
-    state.Service?.network?.active?.networkToken?.address
+    state.Service?.active?.registry?.token?.contractAddress,
+    state.Service?.active?.network?.contractAddress
   ]);
 
   useEffect(() => {

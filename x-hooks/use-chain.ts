@@ -19,7 +19,8 @@ export default function useChain() {
   const { state: { supportedChains } } = useAppState();
 
   function findSupportedChain({ chainId, chainShortName } : FindSupportedChainProps) {
-    return supportedChains?.find(e => e.chainId === chainId || e.chainShortName === chainShortName);
+    return supportedChains?.find(e => e.chainId === chainId || 
+      e.chainShortName?.toLowerCase() === chainShortName?.toLowerCase());
   }
 
   function getChainFromUrl() {

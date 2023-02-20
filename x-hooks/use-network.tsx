@@ -26,7 +26,7 @@ export function useNetwork() {
   const [networkName, setNetworkName] = useState<string>();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   
-  const { chain } = useChain();
+  const { chain, findSupportedChain } = useChain();
   const {state, dispatch} = useAppState();
   const {getNetwork, getNetworkTokens} = useApi();
 
@@ -45,7 +45,7 @@ export function useNetwork() {
     const queryChainName = query?.chain?.toString();
 
     if (queryNetworkName && queryChainName) {
-      const chainId = state.connectedChain?.id;
+      const chainId = findSupportedChain({ chainShortName: queryChainName })?.chainId;
       const storageKey = `bepro.network:${queryNetworkName}:${chainId}`;
 
       if (storage.value && storage.value !== queryNetworkName)
