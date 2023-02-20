@@ -41,15 +41,13 @@ export const GlobalEffectsProvider = ({children}) => {
 
   useEffect(dao.start, [
     supportedChains,
-    Service?.network?.active?.chain_id,
-    connectedChain
+    Service?.network?.active?.chain_id
   ]);
 
   useEffect(dao.changeNetwork, [
     Service?.active,
     Service?.network?.active?.networkAddress,
-    chain,
-    connectedChain
+    chain
   ]);
 
   useEffect(repos.loadRepos, [

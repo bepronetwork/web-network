@@ -17,6 +17,7 @@ import {
   DEFAULT_PERCENTAGE_FOR_DISPUTE
 } from "helpers/contants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
+import { toLower } from "helpers/string";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 import {Token} from "interfaces/token";
@@ -44,6 +45,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const [networkSettings, setNetworkSettings] = useState(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [registryToken, setRegistryToken] = useState<Token>();
+  const [forcedService, setForcedService] = useState<DAO>();
 
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
@@ -287,22 +289,20 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
   };
 
-  function toLower(str: string) {
-    return str?.toLowerCase();
-  }
-
-  async function loadDaoService(): Promise<DAO> {
+  async function loadForcedService(): Promise<DAO> {
     if (!forcedNetwork ||
         toLower(state.Service?.active?.network?.contractAddress) === toLower(forcedNetwork?.networkAddress)) 
       return state.Service?.active;
+    
+    if (toLower(forcedService?.network?.contractAddress) === toLower(forcedNetwork?.networkAddress))
+      return forcedService;
 
-    const networkAddress = network?.networkAddress;
     const dao = new DAO({
       web3Connection: state.Service?.active.web3Connection,
       skipWindowAssignment: true
     });
 
-    await dao.loadNetwork(networkAddress);
+    await dao.loadNetwork(network?.networkAddress);
 
     return dao;
   }
@@ -448,9 +448,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
 
-    const service = await loadDaoService();
-
-    if (!service?.network) return;
+    if (!forcedService?.network) return;
 
     const [
         treasury,
@@ -459,13 +457,15 @@ export const NetworkSettingsProvider = ({ children }) => {
         draftTime,
         percentageNeededForDispute,
         isNetworkAbleToBeClosed,
+        tokensLocked
       ] = await Promise.all([
-        service.network.treasuryInfo(),
-        service.getNetworkParameter("councilAmount"),
-        service.getNetworkParameter("disputableTime"),
-        service.getNetworkParameter("draftTime"),
-        service.getNetworkParameter("percentageNeededForDispute"),
-        service.isNetworkAbleToBeClosed(),
+        forcedService.network.treasuryInfo(),
+        forcedService.getNetworkParameter("councilAmount"),
+        forcedService.getNetworkParameter("disputableTime"),
+        forcedService.getNetworkParameter("draftTime"),
+        forcedService.getNetworkParameter("percentageNeededForDispute"),
+        forcedService.isNetworkAbleToBeClosed(),
+        forcedService.getTotalNetworkToken()
       ])
 
     defaultState.settings.parameters = {
@@ -515,15 +515,33 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
     defaultState.github.repositories = await loadGHRepos();
 
-    setNetworkSettings(defaultState)
+    setForcedNetwork((prev)=>({
+      ...prev,
+      tokensLocked: tokensLocked.toFixed(),
+      tokensStaked: "0",
+      councilAmount: councilAmount.toString(),
+      disputableTime: +disputableTime / 1000,
+      draftTime: +draftTime / 1000,
+      percentageNeededForDispute: +percentageNeededForDispute,
+    }));
+
+    setNetworkSettings(defaultState);
+    
     return defaultState;
   }
 
   useEffect(() => {
+    if (!network) 
+      setForcedService(undefined);
+    else 
+      loadForcedService()
+        .then(setForcedService);
+  }, [network]);
+
+  useEffect(() => {
     if ([
-      !state.Service?.active,
       !state.currentUser?.walletAddress,
-      !isCreating && !network?.name && !network?.councilAmount,
+      !isCreating && (!network?.name || !network?.councilAmount || !forcedService),
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad,
       !state.Settings
@@ -539,51 +557,14 @@ export const NetworkSettingsProvider = ({ children }) => {
   }, [
     state.currentUser?.login,
     state.currentUser?.walletAddress,
-    state.Service?.active,
+    forcedService,
     network,
     isCreating,
-    forcedNetwork,
     needsToLoad,
     router.pathname,
     state.Service?.active?.registry?.token?.contractAddress,
     state.Settings
   ]);
-
-  // NOTE -  Load Forced/User Network
-  useEffect(()=>{
-    if(state.Service?.active && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
-      loadDaoService()
-        .then(service => {
-          if (!service?.network)
-            return [BigNumber(0), 0, 0, 0, 0, 0] as 
-              [BigNumber, number, string | number, string | number, string | number, string | number];
-
-          return Promise.all([
-            service.getTotalNetworkToken(),
-            0,
-            service.getNetworkParameter("councilAmount"),
-            service.getNetworkParameter("disputableTime"),
-            service.getNetworkParameter("draftTime"),
-            service.getNetworkParameter("percentageNeededForDispute")
-          ]);
-        })
-        .then(([
-          tokensLocked,
-          tokensStaked,
-          councilAmount,
-          disputableTime,
-          draftTime,
-          percentageNeededForDispute])=>
-          setForcedNetwork((prev)=>({
-            ...prev,
-            tokensLocked: tokensLocked.toFixed(),
-            tokensStaked: tokensStaked.toFixed(),
-            councilAmount: councilAmount.toString(),
-            disputableTime: +disputableTime / 1000,
-            draftTime: +draftTime / 1000,
-            percentageNeededForDispute: +percentageNeededForDispute,
-          })))
-  },[forcedNetwork, state.Service?.active]);
 
   useEffect(() => {
     if (state.Service?.active?.registry?.contractAddress)
