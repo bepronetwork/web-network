@@ -5,6 +5,7 @@ import {Fn, Literal} from "sequelize/types/utils";
 import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
+
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
@@ -61,6 +62,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (isNeedCountsAndTokensLocked) {
+    const caseZeroThen1 = (clause: string) => `case when ${clause} = 0 then 1 else ${clause} end`;
+
     include.push({ association: "curators", required: false, attributes: [] })
     include.push({ association: "issues", required: false, attributes: [],
                    where: { 
@@ -72,7 +75,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       "network.id",
       "network.name",
       [
-        Sequelize.literal('sum(cast("curators"."tokensLocked" as INT)) / COUNT(distinct("issues".id)) / case when count(distinct "openIssues".id) = 0 then 1 else count(distinct "openIssues".id) end'), // eslint-disable-line
+        Sequelize.literal(`sum(cast("curators"."tokensLocked" as FLOAT)) / ${caseZeroThen1('COUNT(distinct("issues".id))')} / ${caseZeroThen1('COUNT(distinct("openIssues".id))')}`), // eslint-disable-line
         "tokensLocked",
       ],
       [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],
