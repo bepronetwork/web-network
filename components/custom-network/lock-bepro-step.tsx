@@ -71,6 +71,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   ].some(c => c);
   const isUnlockBtnDisabled = 
     lockedPercent?.isZero() || lockedPercent?.isNaN() || !!state.currentUser?.hasRegisteredNetwork;
+  const isAmountInputDisabled = !!lockedPercent?.gte(100) || !!state.currentUser?.hasRegisteredNetwork;
 
   const failTx = (err, tx) => {
 
@@ -155,7 +156,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function handleSetMaxValue() {
-    if (lockedPercent?.lt(100)) setAmount(maxValue);
+    if (lockedPercent?.lt(100) && !isAmountInputDisabled) setAmount(maxValue);
   }
 
   function handleApproval() {
@@ -234,7 +235,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           setMaxValue={handleSetMaxValue}
                           min={0}
                           placeholder={"0"}
-                          disabled={!!lockedPercent?.gte(100)}
+                          disabled={isAmountInputDisabled}
                           thousandSeparator
                           decimalSeparator="."
                           decimalScale={18}

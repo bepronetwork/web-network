@@ -70,7 +70,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   let group: string[] = []
 
   const attributes: { include?: (string | [Fn,string] | [Literal,string])[]; exclude: string[] } = {
-    exclude: ["creatorAddress", "id"]
+    exclude: ["id"]
   }
 
   if (isNeedCountsAndTokensLocked) {

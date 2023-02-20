@@ -207,11 +207,12 @@ function NewNetwork() {
       }
 
       <If condition={hasNetwork}>
-        <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
+        <div className="d-flex flex-col align-items-center justify-content-center mb-3">
+          <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
+        </div>
       </If>
 
-      <div>
-        <Stepper dark={isSetupPage}>
+      <Stepper dark={isSetupPage}>
           <LockBeproStep validated={tokensLocked?.validated} />
 
           <NetworkInformationStep validated={details?.validated} />
@@ -226,7 +227,6 @@ function NewNetwork() {
             finishLabel={t("custom-network:steps.repositories.submit-label")}
           />
         </Stepper>
-      </div>
 
       {/*<AlreadyHasNetworkModal show={hasNetwork} onOkClick={goToMyNetworkPage} />*/}
     </div>
