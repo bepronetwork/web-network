@@ -8,7 +8,7 @@ module.exports = {
 
   host: process.env.NEXT_DB_HOST || "localhost",
   port: +process.env.NEXT_DB_PORT || 54320,
-  ... (process.env.NEXT_DB_LOG ? {
+  ... (process.env.NEXT_DB_LOG === "true" ? {
     logging: (sql) => { console.log(sql) },
   } : {
     logging: false
