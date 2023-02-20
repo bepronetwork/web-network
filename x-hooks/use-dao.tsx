@@ -103,10 +103,9 @@ export function useDao() {
     }
 
     const activeNetwork = state.Service?.network?.active;
-    const connectedChain = state.connectedChain;
 
     const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
-      activeNetwork || connectedChain ? +(activeNetwork?.chain_id || connectedChain?.id) === +chainId : isDefault);
+      activeNetwork ? +activeNetwork?.chain_id === +chainId : isDefault);
 
     if (!chainToConnect) {
       console.debug("No default or network chain found");
@@ -126,8 +125,7 @@ export function useDao() {
     }
 
     const isSameWeb3Host = chainToConnect.chainRpc === state.Service?.active?.web3Host;
-    const isSameRegistry = 
-      connectedChain?.registry?.toLowerCase() === state.Service?.active?.registryAddress?.toLowerCase();
+    const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
 
     if (isSameWeb3Host && isSameRegistry || state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
