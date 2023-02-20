@@ -57,19 +57,9 @@ export default function WalletBalance() {
     const networkToken = state.Service?.network?.active?.networkToken;
     const registryTokenAddress = state.Service?.active?.registry?.token?.contractAddress?.toLowerCase();
 
-    console.log("###", {
-      wallet: state.currentUser?.walletAddress,
-      registryTokenAddress,
-      networkTokenAddress: networkToken?.address,
-      switchingChain: state.spinners?.switchingChain,
-      starting: state.Service?.starting
-    })
-
     if (!state.currentUser?.walletAddress || 
         !registryTokenAddress || 
-        !networkToken?.address || 
-        state.spinners?.switchingChain ||
-        state.Service?.starting)
+        !networkToken?.address)
       return;
 
     const isSameToken = registryTokenAddress === networkToken.address;
