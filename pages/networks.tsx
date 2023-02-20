@@ -81,7 +81,7 @@ export default function NetworksPage() {
         label: t("custom-network:hero.number-of-bounties")
       },
       {
-        value: totalConverted,
+        value: +totalConverted,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD",
         hasConvertedTokens: !!convertedTokens,
