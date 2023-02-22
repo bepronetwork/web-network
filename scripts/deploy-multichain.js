@@ -4,6 +4,11 @@ const StagingAccounts = require('./staging-accounts');
 
 const {Network_v2, Web3Connection, NetworkRegistry, ERC20, BountyToken} = require("@taikai/dappkit");
 const {nativeZeroAddress} = require("@taikai/dappkit/dist/src/utils/constants");
+const {Sequelize} = require("sequelize");
+const SettingsModel = require("../db/models/settings.model");
+const NetworkModel = require("../db/models/network.model");
+const NetworkTokensModel = require("../db/models/network-tokens.model");
+const RepositoryModel = require("../db/models/repositories.model");
 
 const xNetworks = {
   seneca: 'https://eth-seneca.taikai.network:8080',
@@ -108,20 +113,34 @@ async function main(option = 0) {
 
     const tokenInfo =
       async (isTransactional, isReward, address) =>
-        ({...nameSymbol(address), isTransactional, isReward, address})
+        ({...await nameSymbol(address), isTransactional, isReward, address})
 
-    return {
+    const result = {
+      network: networkAddress,
       registry: network.registry.contractAddress,
       payment: await tokenInfo(true, false, tokens[0]),
       governance: await tokenInfo(true, false, tokens[1]),
       reward: tokens[2] !== nativeZeroAddress ? await tokenInfo(true, false, tokens[2]) : {},
-      bounty: await tokenInfo(true, false, tokens[3])
+      bounty: await nameSymbol(tokens[3])
     }
+
+    console.debug(`Deploying and Configurations finished`);
+    console.debug(JSON.stringify(result, null, 2));
+
+    return result;
   }
 
   async function saveSettingsToDb({registry, payment, governance, reward, bounty},) {
     const env = require('dotenv').config({path: options.envFile[option]});
-    const {}
+    const {NEXT_DB_USERNAME: username, NEXT_DB_PASSWORD: password, NEXT_DB_DATABASE: database, NEXT_DB_HOST, NEXT_DB_PORT} = env;
+
+    const dbConfig = {
+      dialect: 'postgres',
+      username, password, database, host: NEXT_DB_HOST || 'localhost', port: NEXT_DB_PORT || 54320,
+      ... NEXT_DB_HOST ? {dialectOptions: {ssl: {required: true, rejectUnauthorized: false}}} : {}
+    }
+
+    /* todo: use DB config to save needed information */
   }
 
   const saveTokens = [];
@@ -152,6 +171,12 @@ async function main(option = 0) {
   if (!saveTokens.length)
     saveTokens.push(...[options.paymentToken[option], options.governanceToken[option], nativeZeroAddress, options.bountyNFT[option]]);
 
-  await changeNetworkOptions(await deployNetwork(saveTokens[0], await deployRegistry(saveTokens[1], saveTokens[3])));
+  await saveSettingsToDb(await changeNetworkOptions(await deployNetwork(saveTokens[0], await deployRegistry(saveTokens[1], saveTokens[3]))));
 
 }
+
+(async () => {
+  for (let index = 0; index <= options.network.length - 1; index--)
+    await main(index);
+})()
+
