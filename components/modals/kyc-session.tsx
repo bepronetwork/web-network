@@ -70,7 +70,9 @@ export function KycSessionModal() {
           }
 
 
-          <Modal show={show} onCloseClick={() => setShow(false)} scrollable={false}>
+          <Modal show={show} onCloseClick={() => setShow(false)} scrollable={false}
+                 footer={
+            <div className="d-flex justify-content-end"><Button onClick={() => setShow(false)}>Close</Button></div>}>
             <div className='d-flex flex-column align-items-center justify-content-center'>
               {isLoading ? <span className="spinner-border spinner-border-md"/> : null}
               {session ? (
