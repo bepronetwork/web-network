@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Col, FormControl, Row} from "react-bootstrap";
 
+import ColorInput from "components/color-input";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
@@ -23,6 +24,7 @@ export default function AddChainModal({
   const [activeRPC, setActiveRPC] = useState(chain?.rpc?.[0]);
   const [eventsApi, setEventsApi] = useState('');
   const [explorer, setExplorer] = useState('');
+  const [color, setColor] = useState('');
 
   function validUrl(url: string) {
     try { return new URL(url)?.protocol?.search(/https?:/) > -1}
@@ -31,7 +33,7 @@ export default function AddChainModal({
 
   return <Modal show={show} okLabel={'add chain'}
                 title="Configure RPC"
-                onOkClick={() => add({...chain, activeRPC, eventsApi, explorer})}
+                onOkClick={() => add({...chain, activeRPC, eventsApi, explorer, color})}
                 okDisabled={!validUrl(activeRPC) || !validUrl(eventsApi) || !validUrl(explorer)}
                 onCloseClick={() => add(null)}>
     <Row>
@@ -81,6 +83,16 @@ export default function AddChainModal({
           value={explorer}
           className="p-2"
           onChange={e => setExplorer(e?.target?.value)} />
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+        <ColorInput
+          label="Chain Color"
+          code={color}
+          onChange={setColor}
+          onlyColorCode
+        />
       </Col>
     </Row>
   </Modal>
