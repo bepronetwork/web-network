@@ -27,7 +27,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (!network) return resJsonMessage("Invalid network", res, 404);
 
-  let filter: Date[] | Date = null
+  let filter: any = {};
 
   if (startDate && endDate) {
     const initialDate = parseISO(startDate?.toString())
@@ -36,9 +36,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     if (isAfter(initialDate, finalDate))
       return resJsonMessage("Invalid date", res, 400);
 
-    filter = [startOfDay(initialDate), endOfDay(finalDate)]
+    filter = {
+      createdAt: {
+        [Op.between]: [startOfDay(initialDate), endOfDay(finalDate)]
+      }
+    };
   } else if (endDate) {
-    filter = parseISO(endDate?.toString())
+    filter = {
+      createdAt: {
+        [Op.lte]: parseISO(endDate?.toString())
+      }
+    };
   }
 
   const payments = await models.userPayments.findAll({
@@ -46,15 +54,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       { 
         association: "issue", 
         where: { network_id: network.id },
-        include:[{ association: "token" }] 
+        include:[{ association: "transactionalToken" }] 
       }
     ],
     where: {
-      address: wallet,
-      transactionHash:{
+      address: {
+        [Op.iLike]: wallet
+      },
+      transactionHash: {
         [Op.not]: null
       },
-      ... filter ? {[Array.isArray(filter) ? Op.between : Op.lte]: filter} : {},
+      ...filter
     }
   });
 

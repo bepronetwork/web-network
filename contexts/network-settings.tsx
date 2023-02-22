@@ -293,13 +293,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     if (!network ||
         toLower(state.Service?.active?.network?.contractAddress) === toLower(network?.networkAddress)) 
       return state.Service?.active;
-
-    console.log("### passou 1")
     
     if (toLower(forcedService?.network?.contractAddress) === toLower(network?.networkAddress))
       return forcedService;
-
-    console.log("### passou 2")
 
     const dao = new DAO({
       web3Connection: state.Service?.active?.web3Connection,
