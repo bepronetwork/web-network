@@ -290,17 +290,23 @@ export const NetworkSettingsProvider = ({ children }) => {
   };
 
   async function loadForcedService(): Promise<DAO> {
-    if (!forcedNetwork ||
-        toLower(state.Service?.active?.network?.contractAddress) === toLower(forcedNetwork?.networkAddress)) 
+    if (!network ||
+        toLower(state.Service?.active?.network?.contractAddress) === toLower(network?.networkAddress)) 
       return state.Service?.active;
+
+    console.log("### passou 1")
     
-    if (toLower(forcedService?.network?.contractAddress) === toLower(forcedNetwork?.networkAddress))
+    if (toLower(forcedService?.network?.contractAddress) === toLower(network?.networkAddress))
       return forcedService;
 
+    console.log("### passou 2")
+
     const dao = new DAO({
-      web3Connection: state.Service?.active.web3Connection,
+      web3Connection: state.Service?.active?.web3Connection,
       skipWindowAssignment: true
     });
+
+    await dao.start();
 
     await dao.loadNetwork(network?.networkAddress);
 
@@ -531,12 +537,12 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (!network) 
+    if (!network || !state.Service?.active || state.Service?.starting)
       setForcedService(undefined);
-    else 
+    else if (network.chain.chainRpc === state.Service?.active?.web3Connection?.options?.web3Host)
       loadForcedService()
         .then(setForcedService);
-  }, [network]);
+  }, [network, state.Service?.active, state.Service?.starting]);
 
   useEffect(() => {
     if ([
