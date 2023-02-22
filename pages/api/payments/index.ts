@@ -27,7 +27,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (!network) return resJsonMessage("Invalid network", res, 404);
 
-  let filter: any = {};
+  let filter: {
+    createdAt?: {
+      [key: symbol]: Date | Date[]
+    }
+  } = {};
 
   if (startDate && endDate) {
     const initialDate = parseISO(startDate?.toString())
