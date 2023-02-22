@@ -317,7 +317,7 @@ export function useAuthentication() {
         !state?.connectedChain?.id ||
         state.Service?.starting ||
         state.spinners?.signingMessage)
-      return;
+      return undefined;
 
     const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
     const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
@@ -329,7 +329,7 @@ export function useAuthentication() {
         content: "To sign a message, connect to a supported chain",
       }));
 
-      return;
+      return undefined;
     }
 
     const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
@@ -351,16 +351,20 @@ export function useAuthentication() {
     dispatch(changeSpinners.update({ signingMessage: true }));
 
     return _signMessage(messageToSign)
-      .then(r => {
-        dispatch(changeCurrentUserSignature(r));
-        sessionStorage.setItem(`currentSignature`, r || '');
+      .then(signature => {
+        dispatch(changeSpinners.update({ signingMessage: false }));
 
-        return r;
-      })
-      .catch(e => {
-        console.debug("Failed to sign message", e);
-      })
-      .finally(() => dispatch(changeSpinners.update({ signingMessage: false })));
+        if (signature) {
+          dispatch(changeCurrentUserSignature(signature));
+          sessionStorage.setItem("currentSignature", signature);
+          
+          return signature;
+        }
+
+        dispatch(changeCurrentUserSignature(undefined));
+        sessionStorage.removeItem("currentSignature");
+        throw new Error("Message not signed");
+      });
   }
 
   return {

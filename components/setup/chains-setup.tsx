@@ -85,6 +85,9 @@ export default function ChainsSetup() {
             } else 
             dispatch(toastError(`Failed to add chain ${chain.name}`));
           });
+      })
+      .catch(() => {
+        dispatch(toastError(`Failed to add chain ${chain.name}`));
       });
   }
 
