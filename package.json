@@ -97,6 +97,7 @@
     "@types/react": "17.0.40",
     "@types/react-select": "^5.0.1",
     "@types/uuid": "^8.3.4",
+    "@types/yargs": "^17.0.22",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "cross-env": "^7.0.3",
