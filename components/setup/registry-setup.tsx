@@ -373,14 +373,10 @@ export function RegistrySetup({
           onChange={_setRegistry}
           mustBeAddress
           docsLink="https://sdk.dappkit.dev/classes/Network_Registry.html"
-          action={
-          {... registry?.value && isAddress(registry?.value) && !isZeroAddress(registry?.value)
-                ? {
-                  label: t("registry.actions.save-registry"),
-                  executing: false, disabled: false,
-                  onClick: () => _patchSupportedChain({registryAddress: registry.value})
-                } : null }
-                
+          action={registry?.value && isAddress(registry?.value) && !isZeroAddress(registry?.value) ? {
+              label: t("registry.actions.save-registry"),
+              executing: false, disabled: false,
+              onClick: () => _patchSupportedChain({registryAddress: registry.value}) } : null 
           }
         />
       </Row>
