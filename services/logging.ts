@@ -1,4 +1,3 @@
-import {Client} from "@elastic/elasticsearch";
 import {format} from "date-fns";
 import getConfig from "next/config";
 
@@ -35,22 +34,22 @@ export const output = (_level: LogLevel, message, ...rest) => { // eslint-disabl
 
   console[method](string, ...rest); // eslint-disable-line
 
-  if (node && username && password) {
-    if (!INDEX_STACK_TRACE && _level === LogLevel.trace)
-      return; // optionally disable indexing stack traces
-
-    const client = new Client({node, auth: {username, password} })
-
-    const info = {restArray: [], restObject: {}, restSimple: ''};
-    if (Array.isArray(rest))
-      info.restArray = rest;
-    else if (rest !== null && typeof rest === "object")
-      info.restObject = rest;
-    else info.restSimple = rest;
-
-    client?.index({ index: "web-network-ui", document: {level, timestamp: new Date(), message, info}})
-      .catch(e => console.log(e))
-  }
+  // if (node && username && password) {
+  //   if (!INDEX_STACK_TRACE && _level === LogLevel.trace)
+  //     return; // optionally disable indexing stack traces
+  //
+  //   const client = new Client({node, auth: {username, password} })
+  //
+  //   const info = {restArray: [], restObject: {}, restSimple: ''};
+  //   if (Array.isArray(rest))
+  //     info.restArray = rest;
+  //   else if (rest !== null && typeof rest === "object")
+  //     info.restObject = rest;
+  //   else info.restSimple = rest;
+  //
+  //   client?.index({ index: "web-network-ui", document: {level, timestamp: new Date(), message, info}})
+  //     .catch(e => console.log(e))
+  // }
 }
 /* eslint-disable */
 export const info = (message, ...rest) => output(LogLevel.info, message, ...rest);
