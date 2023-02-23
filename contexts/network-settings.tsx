@@ -543,7 +543,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if ([
       !state.currentUser?.walletAddress,
-      !isCreating && (!network?.name || !network?.councilAmount || !forcedService),
+      !isCreating && (!network?.name || !forcedService),
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad,
       !state.Settings
