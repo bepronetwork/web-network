@@ -122,5 +122,6 @@
   "recent-bounties": "Recent Bounties",
   "all-bounties": "All Bounties",
   "explore-all": "Explore All",
-  "recent-bounties-empty": "Not found recent bounties"
+  "recent-bounties-empty": "Not found recent bounties",
+  "most-active-network-empty": "Not found active networks"
 }
