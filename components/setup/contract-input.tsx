@@ -47,7 +47,7 @@ export function ContractInput({
   const { state: { Service } } = useAppState();
 
   function isInvalid(validated, name) {
-    return validated === false ? t("setup:errors.invalid-contract-address", { contract: name }) : "";
+    return validated === false ? t("setup:registry.errors.invalid-contract-address", { contract: name }) : "";
   }
 
   function handleChange(value: string) {
