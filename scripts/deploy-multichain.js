@@ -154,21 +154,26 @@ async function main(option = 0) {
 
     const transfers = async ([payment, governance, rwd]) => {
       for (const address of StagingAccounts) {
-        console.debug(`10M to ${address}`);
-        await payment.transferTokenAmount(address, 10000000);
-        await governance.transferTokenAmount(address, 10000000);
-        await rwd.transferTokenAmount(address, 10000000);
+        console.debug(`Sending tokens to ${address}...`);
+        await Promise.all([payment, governance, rwd].map(t => t.transferTokenAmount(address, 10000000)));
       }
+
+      console.debug(`All tokens sent!`);
     }
 
-    Promise.all(saveTokens.slice(0, 2).map(mapper)).then(transfers)
+    /** Slice the BountyNFT from the saveTokens array and send transfers */
+    Promise.all(saveTokens.slice(0, 2).map(mapper)).then(transfers);
+
   } else if (!hasGovernance || !hasPayment || !hasBountyNFT)
     throw new Error(`Missing options.governanceToken and/or options.hasPayment`);
 
   if (!saveTokens.length)
     saveTokens.push(...[options.paymentToken[option], options.governanceToken[option], nativeZeroAddress, options.bountyNFT[option]]);
 
-  await saveSettingsToDb(await changeNetworkOptions(await deployNetwork(saveTokens[0], await deployRegistry(saveTokens[1], saveTokens[3]))));
+  await saveSettingsToDb( /** grab the result from having changed the network options and save it to db */
+    await changeNetworkOptions( /** Load networkAddress and change settings on chain, return result */
+      await deployNetwork(saveTokens[0], /** deploy a network, return contractAddress */
+        await deployRegistry(saveTokens[1], saveTokens[3])))); /** Deploy Registry, return contractAddress */
 
 }
 
