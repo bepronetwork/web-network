@@ -102,10 +102,13 @@ export function useDao() {
       return;
     }
 
-    const activeNetwork = state.Service?.network?.active;
+    const { connectedChain } = state;
+
+    const chainIdToConnect =
+      state.Service?.network?.active?.chain_id || connectedChain?.name === "unknown" ? undefined : connectedChain?.id;
 
     const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
-      activeNetwork ? +activeNetwork?.chain_id === +chainId : isDefault);
+      chainIdToConnect ? chainIdToConnect === chainId.toString() : isDefault);
 
     if (!chainToConnect) {
       console.debug("No default or network chain found");

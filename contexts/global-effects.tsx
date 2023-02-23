@@ -41,7 +41,8 @@ export const GlobalEffectsProvider = ({children}) => {
 
   useEffect(dao.start, [
     supportedChains,
-    Service?.network?.active?.chain_id
+    Service?.network?.active?.chain_id,
+    connectedChain
   ]);
 
   useEffect(dao.changeNetwork, [
