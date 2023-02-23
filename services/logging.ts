@@ -19,9 +19,9 @@ const consoleMethods = {
 };
 
 const LOG_LEVEL = serverRuntimeConfig.logLevel ? parseInt(serverRuntimeConfig.logLevel, 10) : LogLevel.debug;
-const INDEX_STACK_TRACE = serverRuntimeConfig.logStackTrace;
+// const INDEX_STACK_TRACE = serverRuntimeConfig.logStackTrace;
 
-const {url: node, username, password} = serverRuntimeConfig.elasticSearch;
+// const {url: node, username, password} = serverRuntimeConfig.elasticSearch;
 
 export const output = (_level: LogLevel, message, ...rest) => { // eslint-disable-line
   const level = LogLevel[_level];
