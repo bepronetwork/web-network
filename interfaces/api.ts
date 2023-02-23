@@ -88,3 +88,11 @@ export interface PatchUserParams extends RequestParams {
   migrate?: boolean;
   reset?: boolean;
 }
+
+export interface updateIssueParams extends RequestParams {
+  repoId: string | number;
+  ghId: string | number;
+  networkName: string;
+  body?: string;
+  tags?: string[];
+}

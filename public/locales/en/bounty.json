@@ -53,6 +53,7 @@
   "actions": {
     "redeem": "Redeem",
     "update-amount": "Update Amount",
+    "edit-bounty": "Edit Bounty",
     "recognize-finished": {
       "title": "Recognize as finished",
       "error": "Failed to mark bounty as finished"
@@ -123,5 +124,10 @@
   "all-bounties": "All Bounties",
   "explore-all": "Explore All",
   "recent-bounties-empty": "Not found recent bounties",
+  "edit-text": "You are currently editing a bounty",
+  "save-changes": "Save Changes",
+  "cancel-changes": "Cancel Changes",
+  "preview": "preview",
+  "edit": "edit",
   "most-active-network-empty": "Not found active networks"
 }

@@ -13,7 +13,7 @@ import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT, BOUNTY_TITLE_LIMIT, MAX_TAGS } from "helpers/contants";
 
 export default function CreateBountyDetails({
   bountyTitle,
@@ -37,9 +37,6 @@ export default function CreateBountyDetails({
     state: { Settings },
   } = useAppState();
 
-  
-  const titleLimit = 131;
-  const MAX_TAGS = 3;
   const TAGS_OPTIONS = PROGRAMMING_LANGUAGES.map(({ tag }) => ({ label: tag, value: tag }));
 
   function handleShowModal() {
@@ -96,14 +93,14 @@ export default function CreateBountyDetails({
             <input
               type="text"
               className={clsx("form-control rounded-lg", {
-                "border border-1 border-danger border-radius-8": bountyTitle.length >= titleLimit
+                "border border-1 border-danger border-radius-8": bountyTitle.length >= BOUNTY_TITLE_LIMIT
               })}
               placeholder={t("fields.title.placeholder")}
               value={bountyTitle}
               onChange={handleChangeTitle}
               disabled={review}
             />
-            {bountyTitle.length >= titleLimit && (
+            {bountyTitle.length >= BOUNTY_TITLE_LIMIT && (
               <span className="caption-small mt-3 text-danger bg-opacity-100">
                 {t("errors.title-character-limit", {value: bountyTitle?.length})}
               </span>
