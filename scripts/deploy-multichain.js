@@ -19,14 +19,6 @@ const xNetworks = {
   apollodorus: 'https://eth-apollodorus.taikai.network:8080',
 }
 
-const DEPLOY_DRAFT_TIME = 60 * 5;
-const DEPLOY_DISPUTABLE_TIME = 60 * 5;
-const DEPLOY_COUNCIL_AMOUNT = 1;
-const DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION = 1;
-const DEPLOY_LOCK_FEE_PERCENTAGE = 1;
-const DEPLOY_CLOSE_BOUNTY_FEE = 1;
-const DEPLOY_TOKENS_CAP_AMOUNT = 100000;
-
 const options = yargs(hideBin(process.argv))
   .option(`network`, {alias: `n`, type: `array`, desc: `ids of network to deploy to, as seen on https://chainid.network/ or custom known one`})
   .option(`deployTestTokens`, {alias: `d`, type: `boolean`, desc: `deploys contracts (-d takes precedence over -pgb`})
@@ -47,6 +39,7 @@ async function main(option = 0) {
       .then(data => data.find(d => d.networkId === +options.network[option]))
       .then(chain => chain.rpc[0]);
 
+  const env = require('dotenv').config({path: options.envFile[option]});
   const privateKey = options.privateKey[option] || options.privateKey[0];
 
   const connection = new Web3Connection({web3Host, privateKey});
@@ -74,10 +67,12 @@ async function main(option = 0) {
   }
 
   async function deployRegistry(governanceToken, bountyToken) {
+    const {DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION, DEPLOY_LOCK_FEE_PERCENTAGE, DEPLOY_CLOSE_BOUNTY_FEE} = env;
     return Deploy(NetworkRegistry, governanceToken, DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION, treasury, DEPLOY_LOCK_FEE_PERCENTAGE, DEPLOY_CLOSE_BOUNTY_FEE, bountyToken);
   }
 
   async function deployERC20(name, symbol) {
+    const {DEPLOY_TOKENS_CAP_AMOUNT} = env;
     return Deploy(ERC20, name, symbol, DEPLOY_TOKENS_CAP_AMOUNT)
   }
 
@@ -92,6 +87,7 @@ async function main(option = 0) {
   }
 
   async function changeNetworkOptions(networkAddress, tokens) {
+    const {DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION, DEPLOY_DRAFT_TIME, DEPLOY_DISPUTABLE_TIME, DEPLOY_COUNCIL_AMOUNT} = env;
     const network = new Network_v2(connection, networkAddress);
     await network.loadContract();
     await Promise.all([
@@ -133,7 +129,6 @@ async function main(option = 0) {
   }
 
   async function saveSettingsToDb({registry, payment, governance, reward, bounty},) {
-    const env = require('dotenv').config({path: options.envFile[option]});
     const {NEXT_DB_USERNAME: username, NEXT_DB_PASSWORD: password, NEXT_DB_DATABASE: database, NEXT_DB_HOST, NEXT_DB_PORT} = env;
 
     const dbConfig = {
