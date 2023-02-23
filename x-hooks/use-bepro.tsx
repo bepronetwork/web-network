@@ -600,8 +600,9 @@ export default function useBepro() {
     });
   }
 
-  async function handleAddAllowedTokens(addresses: string[], isTransactional: boolean) {
+  async function handleChangeAllowedTokens(addresses: string[], isTransactional: boolean, add = true) {
     return new Promise(async (resolve, reject) => {
+
       const transaction = addTx([{
         type: TransactionTypes.changeAllowedTokens,
         network: state.Service?.network?.active
@@ -609,7 +610,7 @@ export default function useBepro() {
 
       dispatch(transaction);
 
-      await state.Service?.active.addAllowedTokens(addresses, isTransactional)
+      await state.Service?.active[( add ? 'addAllowedTokens' : 'removeAllowedTokens')](addresses, isTransactional)
         .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
@@ -663,7 +664,7 @@ export default function useBepro() {
     handleWithdrawFundRewardBounty,
     handleFeeSettings,
     handleDeployRegistry,
-    handleAddAllowedTokens,
+    handleChangeAllowedTokens,
     handleCloseNetwork,
     handleFeeNetworkCreation,
     handleAmountNetworkCreation
