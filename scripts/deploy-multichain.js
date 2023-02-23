@@ -123,7 +123,7 @@ async function main(option = 0) {
       payment: await tokenInfo(true, false, tokens[0]),
       governance: await tokenInfo(true, false, tokens[1]),
       reward: tokens[2] !== nativeZeroAddress ? await tokenInfo(true, false, tokens[2]) : {},
-      bounty: await nameSymbol(tokens[3])
+      bounty: {...await nameSymbol(tokens[3]), address: tokens[3]}
     }
 
     console.debug(`Deploying and Configurations finished`);
