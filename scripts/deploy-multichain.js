@@ -47,7 +47,9 @@ async function main(option = 0) {
       .then(data => data.find(d => d.networkId === +options.network[option]))
       .then(chain => chain.rpc[0]);
 
-  const connection = new Web3Connection({web3Host, privateKey: options.privateKey[option]});
+  const privateKey = options.privateKey[option] || options.privateKey[0];
+
+  const connection = new Web3Connection({web3Host, privateKey});
   connection.start();
 
   const treasury = options.treasury || await connection.getAddress();
