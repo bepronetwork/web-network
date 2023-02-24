@@ -22,11 +22,11 @@ const xNetworks = {
 const options = yargs(hideBin(process.argv))
   .option(`network`, {alias: `n`, type: `array`, desc: `ids of network to deploy to, as seen on https://chainid.network/ or custom known one`})
   .option(`deployTestTokens`, {alias: `d`, type: `boolean`, desc: `deploys contracts (-d takes precedence over -pgb`})
-  .option(`paymentToken`, {alias: `p`, type: `array`, desc: `use this address as transactional token`})
-  .option(`governanceToken`, {alias: `g`, type: `array`, desc: `use this address as governance token`})
-  .option(`bountyNFT`, {alias: `b`, type: `array`, desc: `use this address as bounty token`})
+  .option(`paymentToken`, {alias: `p`, type: `array`, desc: `use these addresses as transactional token`})
+  .option(`governanceToken`, {alias: `g`, type: `array`, desc: `use these addresses as governance token`})
+  .option(`bountyNFT`, {alias: `b`, type: `array`, desc: `use these addresses as bounty token`})
   .option(`privateKey`, {alias: `k`, type: `array`, desc: `Owner private key`})
-  .option(`treasury`, {alias: `t`, type: `array`, desc: `custom treasury address (defaults to owner private key if not provided)`})
+  .option(`treasury`, {alias: `t`, type: `string`, desc: `custom treasury address (defaults to owner private key if not provided)`})
   .option(`envFile`, {alias: `e`, type: `array`, desc: `env-file names to load`})
   .demandOption([`n`, `k`])
   .parseSync();
@@ -45,8 +45,7 @@ async function main(option = 0) {
   const connection = new Web3Connection({web3Host, privateKey});
   connection.start();
 
-  const treasury = options.treasury || await connection.getAddress();
-  const should_deployTokens = options.deployTestTokens[option];
+  const treasury = options.treasury[option] || await connection.getAddress();
   const hasPayment = !!options.paymentToken[option];
   const hasGovernance = !!options.governanceToken[option];
   const hasBountyNFT = !!options.bountyNFT[option];
@@ -140,11 +139,15 @@ async function main(option = 0) {
     /* todo: use DB config to save needed information */
   }
 
-  const saveTokens = [];
+  async function getTokens() {
+    if (!options.deployTestTokens) {
+      if (!hasGovernance || !hasPayment || !hasBountyNFT)
+        throw new Error(`Missing one of (or all): governanceToken, paymentToken, bountyNFT`);
 
-  /** Deploy or use provided tokens */
-  if (should_deployTokens) {
-    saveTokens.push(...Object.values(await deployTokens()), await deployBountyToken());
+      return [options.paymentToken[option], options.governanceToken[option], nativeZeroAddress, options.bountyNFT[option]];
+    }
+
+    const tokens = [...Object.values(await deployTokens()), await deployBountyToken()];
 
     const mapper = async (address) => {
       const _token = new ERC20(connection, address);
@@ -162,18 +165,17 @@ async function main(option = 0) {
     }
 
     /** Slice the BountyNFT from the saveTokens array and send transfers */
-    Promise.all(saveTokens.slice(0, 2).map(mapper)).then(transfers);
+    Promise.all(tokens.slice(0, 2).map(mapper)).then(transfers);
 
-  } else if (!hasGovernance || !hasPayment || !hasBountyNFT)
-    throw new Error(`Missing options.governanceToken and/or options.hasPayment`);
+    return tokens;
+  }
 
-  if (!saveTokens.length)
-    saveTokens.push(...[options.paymentToken[option], options.governanceToken[option], nativeZeroAddress, options.bountyNFT[option]]);
+  const tokensToUse = await getTokens();
 
   await saveSettingsToDb( /** grab the result from having changed the network options and save it to db */
     await changeNetworkOptions( /** Load networkAddress and change settings on chain, return result */
-      await deployNetwork(saveTokens[0], /** deploy a network, return contractAddress */
-        await deployRegistry(saveTokens[1], saveTokens[3])))); /** Deploy Registry, return contractAddress */
+      await deployNetwork(tokensToUse[0], /** deploy a network, return contractAddress */
+        await deployRegistry(tokensToUse[1], tokensToUse[3])))); /** Deploy Registry, return contractAddress */
 
 }
 
