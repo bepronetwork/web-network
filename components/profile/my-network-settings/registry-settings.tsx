@@ -13,21 +13,54 @@ import { WarningSpan } from "components/warning-span";
 import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 
+import { ParameterValidator } from "helpers/registry";
+
+import { RegistryParameters } from "types/dappkit";
+
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 
+type Executing = "bountyFees" | "creationFee" | "creationAmount" | "transactional" | "reward" ;
+
 export default function RegistrySettings({ isGovernorRegistry = false }) {
   const { t } = useTranslation(["common", "custom-network", "setup"]);
-  const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState<string>()
-  const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState<string>()
-  const { fields, settings } = useNetworkSettings();
+
+  const [executingTx, setExecutingTx] = useState<Executing>();
+  const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState<string>();
+  const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState<string>();
+  
   const {state} = useAppState();
   const { updateActiveNetwork } = useNetwork();
+  const { fields, settings } = useNetworkSettings();
   const { handleFeeSettings, handleAmountNetworkCreation, handleFeeNetworkCreation } = useBepro();
 
+  const isExecutingBountyFees = executingTx === "bountyFees";
+  const isExecutingCreationFee = executingTx === "creationFee";
+  const isExecutingCreationAmount = executingTx === "creationAmount";
+  const isExecutingTransactional = executingTx === "transactional";
+  const isExecutingReward = executingTx === "reward";
+
+  const isExecuting = [
+    isExecutingBountyFees,
+    isExecutingCreationFee,
+    isExecutingCreationAmount,
+    isExecutingTransactional,
+    isExecutingReward
+  ].some(c => c);
+
+  const isSaveFeedBtnDisabled = [
+    settings?.treasury?.cancelFee?.validated === false,
+    settings?.treasury?.closeFee?.validated === false,
+    isExecuting
+  ].some(c => c);
+
   async function saveFeeSettings() {
-    await handleFeeSettings(settings?.treasury?.closeFee?.value,
-                            settings?.treasury?.cancelFee?.value).then(() => updateActiveNetwork(true));
+    setExecutingTx("bountyFees");
+
+    handleFeeSettings(settings?.treasury?.closeFee?.value, settings?.treasury?.cancelFee?.value)
+      .then(() => updateActiveNetwork(true))
+      .catch(console.debug)
+      .finally(() => setExecutingTx(undefined));
   }
 
   async function saveCreateNetworkFee() {
@@ -46,8 +79,8 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
     
   },[state.Service.active])
 
-  function exceedsFeesLimitsError(fee) {
-    if (+fee < 0 || +fee > 100)
+  function exceedsFeesLimitsError(param: RegistryParameters, value: string | number) {
+    if (ParameterValidator(param, value))
       return t("setup:registry.errors.exceeds-limit");
 
     return undefined;
@@ -84,6 +117,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             disabled={!isGovernorRegistry}
             key="cancel-fee"
             label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
+            description={t("custom-network:steps.treasury.fields.cancel-fee.description")}
             symbol="%"
             value={settings?.treasury?.cancelFee?.value}
             error={settings?.treasury?.cancelFee?.validated === false}
@@ -96,6 +130,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             disabled={!isGovernorRegistry}
             key="close-fee"
             label={t("custom-network:steps.treasury.fields.close-fee.label")}
+            description={t("custom-network:steps.treasury.fields.close-fee.description")}
             symbol="%"
             value={settings?.treasury?.closeFee?.value}
             error={settings?.treasury?.closeFee?.validated === false}
@@ -104,7 +139,13 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
         {isGovernorRegistry && (
           <Col xs={4}>
-            <Button onClick={saveFeeSettings} className="mt-4">
+            <Button 
+              onClick={saveFeeSettings} 
+              className="mt-4"
+              disabled={isSaveFeedBtnDisabled}
+              withLockIcon={isSaveFeedBtnDisabled && !isExecutingBountyFees}
+              isLoading={isExecutingBountyFees}
+            >
               <span>{t("custom-network:registry.save-fees-config")}</span>
             </Button>
           </Col>
@@ -120,7 +161,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             onChange={setNetworkCreationFeePercentage}
             variant="numberFormat"
             description={t("setup:registry.fields.network-creation-fee.description")}
-            error={exceedsFeesLimitsError(networkCreationFeePercentage)}
+            error={exceedsFeesLimitsError("networkCreationFeePercentage", networkCreationFeePercentage)}
             readOnly={!isGovernorRegistry}
           />
         </Col>
@@ -129,7 +170,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             <Button 
             className="mt-4" 
             onClick={saveCreateNetworkFee} 
-            disabled={exceedsFeesLimitsError(networkCreationFeePercentage) ? true : false}
+            disabled={exceedsFeesLimitsError("networkCreationFeePercentage", networkCreationFeePercentage) ? true : false}
             >
               <span>{t("custom-network:registry.save-create-network-fee")}</span>
             </Button>

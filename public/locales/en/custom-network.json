@@ -198,10 +198,12 @@
           "info": "Not mandatory field, it can be blank if a treasury is not required."
         },
         "cancel-fee": {
-          "label": "Cancel Fee"
+          "label": "Cancel Fee",
+          "description": "Percentage of bounty amount charged when a bounty is canceled. Minimum 0 and Maximum 100"
         },
         "close-fee": {
-          "label": "Close Fee"
+          "label": "Close Fee",
+          "description": "Percentage of bounty amount charged when a bounty is closed. Minimum 0 and Maximum 90"
         }
       }
     }
