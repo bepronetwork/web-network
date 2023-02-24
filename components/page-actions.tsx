@@ -68,7 +68,7 @@ export default function PageActions({
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
   const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isKycVerified = (state.currentBounty?.kycSteps?.length || (!state.Settings?.kyc?.tierList.length && state?.currentUser?.kycSession?.status === 'VERIFIED'))
+  const isKycVerified = state?.currentUser?.kycSession?.status === 'VERIFIED';
   const isGithubConnected = !!state.currentUser?.login;
   const isFundingRequest = 
     state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
@@ -256,7 +256,7 @@ export default function PageActions({
         state?.currentUser?.accessToken
         ){
 
-      if(state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
+      if (state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
         return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
           <Button>
             <Translation ns="bounty" label="kyc.identify-to-start" />
