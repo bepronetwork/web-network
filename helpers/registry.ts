@@ -9,12 +9,13 @@ type StrOrNmb = string | number;
 const betweenIn = 
   (value: StrOrNmb, min: StrOrNmb, max: StrOrNmb) => BigNumber(value).gte(min) && BigNumber(value).lte(max);
 
-const limits = (min: StrOrNmb, max: StrOrNmb) => ({ min, max });
+const limits = (min?: StrOrNmb, max?: StrOrNmb) => ({ min, max });
 
 export const REGISTRY_LIMITS = {
   closeFeePercentage: limits(0, 90),
   cancelFeePercentage: limits(0, 100),
-  networkCreationFeePercentage: limits(0, 100)
+  networkCreationFeePercentage: limits(0, 100),
+  lockAmountForNetworkCreation: limits(0)
 }
 
 export const ParameterValidator = (param: RegistryParameters, value: StrOrNmb) => {
@@ -24,7 +25,8 @@ export const ParameterValidator = (param: RegistryParameters, value: StrOrNmb) =
     closeFeePercentage: betweenIn(value, min, max),
     cancelFeePercentage: betweenIn(value, min, max),
     treasury: isAddress(value?.toString()) && !isZeroAddress(value?.toString()),
-    networkCreationFeePercentage: betweenIn(value, min, max)
+    networkCreationFeePercentage: betweenIn(value, min, max),
+    lockAmountForNetworkCreation: BigNumber(value).gt(0)
   }
 
   return validators[param];
