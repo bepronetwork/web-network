@@ -199,11 +199,11 @@
         },
         "cancel-fee": {
           "label": "Cancel Fee",
-          "description": "Percentage of bounty amount charged when a bounty is canceled. Minimum 0 and Maximum 100"
+          "description": "Percentage of bounty amount charged when a bounty is canceled. Minimum {{min}} and Maximum {{max}}"
         },
         "close-fee": {
           "label": "Close Fee",
-          "description": "Percentage of bounty amount charged when a bounty is closed. Minimum 0 and Maximum 90"
+          "description": "Percentage of bounty amount charged when a bounty is closed. Minimum {{min}} and Maximum {{max}}"
         }
       }
     }

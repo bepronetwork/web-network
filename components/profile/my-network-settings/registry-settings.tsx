@@ -136,7 +136,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             disabled={!isGovernorRegistry}
             key="cancel-fee"
             label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
-            description={t("custom-network:steps.treasury.fields.cancel-fee.description")}
+            description={
+              t("custom-network:steps.treasury.fields.cancel-fee.description", REGISTRY_LIMITS["cancelFeePercentage"])
+            }
             symbol="%"
             value={settings?.treasury?.cancelFee?.value}
             error={settings?.treasury?.cancelFee?.validated === false}
@@ -149,7 +151,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             disabled={!isGovernorRegistry}
             key="close-fee"
             label={t("custom-network:steps.treasury.fields.close-fee.label")}
-            description={t("custom-network:steps.treasury.fields.close-fee.description")}
+            description={
+              t("custom-network:steps.treasury.fields.close-fee.description", REGISTRY_LIMITS["closeFeePercentage"])
+            }
             symbol="%"
             value={settings?.treasury?.closeFee?.value}
             error={settings?.treasury?.closeFee?.validated === false}
