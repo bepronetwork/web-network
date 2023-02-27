@@ -37,7 +37,7 @@ export function KycSessionModal() {
     let _timer;
 
     if (!timer)
-      _timer = setInterval(handlerValidateSession, 30000);
+      _timer = setInterval(() => handlerValidateSession(), 3000);
     if (!show)
       clearInterval(_timer);
 
