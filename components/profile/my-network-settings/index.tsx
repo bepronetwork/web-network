@@ -4,6 +4,12 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
+import { ContainerTab } from "components/profile/my-network-settings/container-tab";
+import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
+import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
+import RegistrySettings from "components/profile/my-network-settings/registry-settings";
+import RepositoriesListSettings from "components/profile/my-network-settings/repositories-list-settings";
+import WarningGithub from "components/profile/my-network-settings/warning-github";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TabbedNavigation from "components/tabbed-navigation";
 
@@ -22,13 +28,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
-
-import { ContainerTab } from "./container-tab";
-import GovernanceSettings from "./governance-settings";
-import LogoAndColoursSettings from "./logo-and-colours-settings";
-import RegistrySettings from "./registry-settings";
-import RepositoriesListSettings from "./repositories-list-settings";
-import WarningGithub from "./warning-github";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -53,12 +52,10 @@ export default function MyNetworkSettings({
   const [tabs, setTabs] = useState<TabsProps[]>([])
 
   const { state, dispatch } = useAppState();
-
   const { colorsToCSS } = useNetworkTheme();
+  const { updateActiveNetwork } = useNetwork();
   const { updateNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
-
-  const { updateActiveNetwork } = useNetwork();
   const {
     details,
     github,
@@ -130,40 +127,40 @@ export default function MyNetworkSettings({
             disputableTime: { value: disputableTime },
             councilAmount: { value: councilAmount },
             percentageNeededForDispute: { value: percentageForDispute },
+            oracleExchangeRate: { value: oracleExchangeRate },
+            mergeCreatorFeeShare: { value: mergeCreatorFeeShare },
+            proposerFeeShare: { value: proposerFeeShare },
+            cancelableTime: { value: cancelableTime }
           },
         } = settings;
 
         const networkAddress = network?.networkAddress;
 
         const promises = await Promise.allSettled([
-          ...(draftTime !== forcedNetwork.draftTime
-            ? [
-                handleChangeNetworkParameter("draftTime",
-                                             draftTime,
-                                             networkAddress),
-            ]
-            : []),
-          ...(disputableTime !== forcedNetwork.disputableTime
-            ? [
-                handleChangeNetworkParameter("disputableTime",
-                                             disputableTime,
-                                             networkAddress),
-            ]
-            : []),
-          ...(councilAmount !== +forcedNetwork.councilAmount
-            ? [
-                handleChangeNetworkParameter("councilAmount",
-                                             councilAmount,
-                                             networkAddress),
-            ]
-            : []),
-          ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
-            ? [
-                handleChangeNetworkParameter("percentageNeededForDispute",
-                                             percentageForDispute,
-                                             networkAddress),
-            ]
-            : []),
+          ...(draftTime !== forcedNetwork.draftTime ? [
+            handleChangeNetworkParameter("draftTime", draftTime, networkAddress)
+          ] : []),
+          ...(disputableTime !== forcedNetwork.disputableTime ? [
+            handleChangeNetworkParameter("disputableTime", disputableTime, networkAddress)
+          ] : []),
+          ...(councilAmount !== +forcedNetwork.councilAmount ? [
+            handleChangeNetworkParameter("councilAmount", councilAmount, networkAddress)
+          ] : []),
+          ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute ? [
+            handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, networkAddress)
+          ] : []),
+          ...(oracleExchangeRate !== forcedNetwork.oracleExchangeRate ? [
+            handleChangeNetworkParameter("oracleExchangeRate", oracleExchangeRate, networkAddress)
+          ] : []),
+          ...(mergeCreatorFeeShare !== forcedNetwork.mergeCreatorFeeShare ? [
+            handleChangeNetworkParameter("mergeCreatorFeeShare", mergeCreatorFeeShare, networkAddress)
+          ] : []),
+          ...(proposerFeeShare !== forcedNetwork.proposerFeeShare ? [
+            handleChangeNetworkParameter("proposerFeeShare", proposerFeeShare, networkAddress)
+          ] : []),
+          ...(cancelableTime !== +forcedNetwork.cancelableTime ? [
+            handleChangeNetworkParameter("cancelableTime", cancelableTime, networkAddress)
+          ] : [])
         ]);
 
         const failed = [];
@@ -176,9 +173,8 @@ export default function MyNetworkSettings({
 
         if (failed.length) {
           dispatch(toastError(t("custom-network:errors.updated-parameters", {
-                failed: failed.length,
-          }),
-                              t("custom-network:errors.updating-values")));
+            failed: failed.length,
+          }), t("custom-network:errors.updating-values")));
           console.error(failed);
         }
 
@@ -288,19 +284,22 @@ export default function MyNetworkSettings({
     isGovernorRegistry,
     networkNeedRegistration,
     errorBigImages
-  ])
+  ]);
 
   return (
     <>
       {isCurrentNetwork && (
         <style>{colorsToCSS(settings?.theme?.colors)}</style>
       )}
+
       {!state.currentUser?.login && <WarningGithub />}
+
       <TabbedNavigation
         className="my-network-tabs border border-dark-gray"
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
+
       {settings?.validated &&
         github?.validated &&
         !network?.isClosed &&

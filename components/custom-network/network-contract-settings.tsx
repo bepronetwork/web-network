@@ -7,20 +7,15 @@ import {useNetworkSettings} from "contexts/network-settings";
 
 import {formatNumberToCurrency} from "helpers/formatNumber";
 
-
 export default function NetworkContractSettings() {
   const {t} = useTranslation(["common", "custom-network"]);
-  const {state} = useAppState();
 
+  const {state} = useAppState();
   const {fields, settings, LIMITS} = useNetworkSettings();
-  
-  const handleDraftTimeChange = value => fields.parameter.setter({ label: "draftTime", value });
-  const handleDisputeTimeChange = 
-    value => fields.parameter.setter({ label: "disputableTime", value });
-  const handleCouncilAmountChange = 
-    value => fields.parameter.setter({ label: "councilAmount", value });
-  const handlePercentageForDisputeChange = 
-    value => fields.parameter.setter({ label: "percentageNeededForDispute", value });
+
+  function onChange(label, value) {
+    fields.parameter.setter({ label, value })
+  }
 
   const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
 
@@ -35,7 +30,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.disputableTime?.value,
       error: settings?.parameters?.disputableTime?.validated === false,
       decimals: 0,
-      onChange: handleDisputeTimeChange
+      onChange: value => onChange("disputableTime", value)
     },
     { 
       label: t("custom-network:percentage-for-dispute"), 
@@ -45,7 +40,7 @@ export default function NetworkContractSettings() {
       symbol: "%", 
       value: settings?.parameters?.percentageNeededForDispute?.value,
       error: settings?.parameters?.percentageNeededForDispute?.validated === false,
-      onChange: handlePercentageForDisputeChange
+      onChange: value => onChange("percentageNeededForDispute", value)
     },
     { 
       label: t("custom-network:redeem-time"), 
@@ -57,7 +52,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.draftTime?.value,
       error: settings?.parameters?.draftTime?.validated === false,
       decimals: 0,
-      onChange: handleDraftTimeChange
+      onChange: value => onChange("draftTime", value)
     },
     { 
       label: t("custom-network:council-amount"), 
@@ -69,12 +64,48 @@ export default function NetworkContractSettings() {
       symbol: networkTokenSymbol || "Token", 
       value: settings?.parameters?.councilAmount?.value,
       error: settings?.parameters?.councilAmount?.validated === false,
-      onChange: handleCouncilAmountChange
+      onChange: value => onChange("councilAmount", value)
+    },
+    { 
+      label: t("custom-network:cancelable-time.label"), 
+      description: t("custom-network:cancelable-time.description"),
+      symbol: t("misc.seconds"), 
+      value: settings?.parameters?.cancelableTime?.value,
+      error: settings?.parameters?.cancelableTime?.validated === false,
+      decimals: 0,
+      onChange: value => onChange("cancelableTime", value)
+    },
+    { 
+      label: t("custom-network:oracle-exchange-rate.label"), 
+      description: t("custom-network:oracle-exchange-rate.description"),
+      symbol: "%", 
+      value: settings?.parameters?.oracleExchangeRate?.value,
+      error: settings?.parameters?.oracleExchangeRate?.validated === false,
+      decimals: 4,
+      onChange: value => onChange("oracleExchangeRate", value)
+    },
+    { 
+      label: t("custom-network:merger-fee.label"), 
+      description: t("custom-network:merger-fee.description"),
+      symbol: "%", 
+      value: settings?.parameters?.mergeCreatorFeeShare?.value,
+      error: settings?.parameters?.mergeCreatorFeeShare?.validated === false,
+      decimals: 4,
+      onChange: value => onChange("mergeCreatorFeeShare", value)
+    },
+    { 
+      label: t("custom-network:proposer-fee.label"), 
+      description: t("custom-network:proposer-fee.description"),
+      symbol: "%", 
+      value: settings?.parameters?.proposerFeeShare?.value,
+      error: settings?.parameters?.proposerFeeShare?.validated === false,
+      decimals: 4,
+      onChange: value => onChange("proposerFeeShare", value)
     }
   ];
   
   return (
-    <div className="d-flex flex-row border-radius-8 justify-content-center gap-20 mt-2">
+    <div className="row border-radius-8 mt-2">
       { parameterInputs.map(input => <NetworkParameterInput  key={input.label} {...input} />) }
     </div>
   );
