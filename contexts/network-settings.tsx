@@ -22,6 +22,7 @@ import {
   UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
+import { toLower } from "helpers/string";
 import { NetworkValidator } from "helpers/network";
 import { RegistryValidator } from "helpers/registry";
 import { toLower } from "helpers/string";

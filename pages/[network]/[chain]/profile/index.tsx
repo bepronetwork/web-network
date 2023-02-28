@@ -17,7 +17,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-import KycSessionModal from "../../../components/modals/kyc-session";
+
 export default function Profile() {
   const { t } = useTranslation("profile");
 
