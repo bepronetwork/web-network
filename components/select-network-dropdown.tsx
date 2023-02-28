@@ -42,6 +42,7 @@ export default function SelectNetworkDropdown({
   const [options, setOptions] = useState<ChainOption[]>([]);
   const [selected, setSelectedChain] = useState<ChainOption>(null);
   const [chainsWithSameNetwork, setChainsWithSameNetwork] = useState<SupportedChainData[]>();
+  const [placeHolderText, setPlaceHolderText] = useState<string>(t("forms.select-placeholder"))
   
   const { searchNetworks } = useApi();
   const { networkName } = useNetwork();
@@ -81,7 +82,7 @@ export default function SelectNetworkDropdown({
         options?.find(({ value: { chainId } }) => chainId === +(defaultChain?.chainId || connectedChain.id))?.value;
 
     if (!chain) {
-      setSelectedChain(chainToOption({ chainShortName: "Unknown" }));  
+      setPlaceHolderText(t("forms.select-placeholder-chain"))
       return;
     }
 
@@ -134,7 +135,7 @@ export default function SelectNetworkDropdown({
         options={options}
         value={selected}
         onChange={selectSupportedChain}
-        placeholder={t("forms.select-placeholder")}
+        placeholder={placeHolderText}
         isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
         readOnly={true}
         components={{
