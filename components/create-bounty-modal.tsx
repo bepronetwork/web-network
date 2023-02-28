@@ -42,13 +42,6 @@ import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 import {useRepos} from "x-hooks/use-repos";
 
-import {useAppState} from "../contexts/app-state";
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
-import {useRepos} from "../x-hooks/use-repos";
-import DropDown from "./dropdown";
-import InfoTooltip from "./info-tooltip";
-
 interface BountyPayload {
   title: string;
   cid: string | boolean;

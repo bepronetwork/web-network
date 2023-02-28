@@ -86,11 +86,11 @@ class Issue extends Model {
       },
         isKyc:{
           type: DataTypes.BOOLEAN,
-          default: false
+          defaultValue: false
         },
         kycTierList:{
           type: DataTypes.ARRAY(DataTypes.INTEGER),
-          default: []
+          defaultValue: []
         },
     },
     {

@@ -20,6 +20,7 @@ import {
 import {DefaultNetworkSettings} from "helpers/custom-network";
 import { toLower } from "helpers/string";
 import { ParameterValidator } from "helpers/registry";
+import { toLower } from "helpers/string";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 import {Token} from "interfaces/token";

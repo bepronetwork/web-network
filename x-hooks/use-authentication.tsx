@@ -337,6 +337,61 @@ export function useAuthentication() {
     });
   }
 
+  async function signMessage(message?: string) {
+    if (!state?.currentUser?.walletAddress ||
+        !state?.connectedChain?.id ||
+        state.Service?.starting ||
+        state.spinners?.signingMessage)
+      return undefined;
+
+    const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
+    const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+
+    if (!isAdminUser && state.connectedChain?.name === "unknown") {
+      dispatch(addToast({
+        type: "warning",
+        title: "Unsupported chain",
+        content: "To sign a message, connect to a supported chain",
+      }));
+
+      return undefined;
+    }
+
+    const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
+
+    const storedSignature = sessionStorage.getItem("currentSignature");
+
+    if (decodeMessage(state?.connectedChain?.id,
+                      messageToSign,
+                      storedSignature || state?.currentUser?.signature,
+                      currentWallet)) {
+      if (storedSignature)
+        dispatch(changeCurrentUserSignature(storedSignature));
+      else
+        sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
+
+      return storedSignature || state?.currentUser?.signature;
+    }
+
+    dispatch(changeSpinners.update({ signingMessage: true }));
+
+    return _signMessage(messageToSign)
+      .then(signature => {
+        dispatch(changeSpinners.update({ signingMessage: false }));
+
+        if (signature) {
+          dispatch(changeCurrentUserSignature(signature));
+          sessionStorage.setItem("currentSignature", signature);
+          
+          return signature;
+        }
+
+        dispatch(changeCurrentUserSignature(undefined));
+        sessionStorage.removeItem("currentSignature");
+        throw new Error("Message not signed");
+      });
+  }
+
   function updateKycSession(){
     if(!state?.currentUser?.login
         || !state?.currentUser?.match
