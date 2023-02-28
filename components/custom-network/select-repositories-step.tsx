@@ -6,17 +6,16 @@ import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
+import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 
 import {StepWrapperProps} from "interfaces/stepper";
-
-import {useAppState} from "../../contexts/app-state";
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");
 
   const {state} = useAppState();
-  const { github, fields } = useNetworkSettings();
+  const { details, github, fields } = useNetworkSettings();
 
   function handleRepositoryCheck(fullName: string) {
     fields.repository.setter(fullName);
@@ -36,7 +35,12 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
     >
       {(state.currentUser?.login && (
         <div>
-          <RepositoriesList repositories={github.repositories} onClick={handleRepositoryCheck} />
+          <RepositoriesList
+            repositories={github.repositories}
+            networkName={details?.name?.value}
+            networkCreator={state.currentUser?.walletAddress}
+            onClick={handleRepositoryCheck}
+          />
 
           <span className="caption-small text-gray px-0 mt-3">
             {state.Settings?.github?.botUser}

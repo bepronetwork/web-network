@@ -1,6 +1,6 @@
 import {  useRef, useState } from "react";
 
-export default function ColorInput({ label, code, onChange, error = false }) {
+export default function ColorInput({ label, code, onChange, onlyColorCode = false, error = false }) {
   const [color, setColor] = useState(code);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounce = useRef(null)
@@ -9,7 +9,7 @@ export default function ColorInput({ label, code, onChange, error = false }) {
     if (event.target.value === "#000000") {
       event.preventDefault();
       event.stopPropagation();
-    } else onChange({ label, code: color });
+    } else onChange(onlyColorCode ? color : { label, code: color });
   }
 
   function handleChange(event) {
@@ -18,7 +18,7 @@ export default function ColorInput({ label, code, onChange, error = false }) {
     clearTimeout(debounce.current)
     
     debounce.current = setTimeout(() => {
-      onChange({ label, code: event.target.value.toUpperCase() });
+      onChange(onlyColorCode ? color : { label, code: event.target.value.toUpperCase() });
     }, 500)
   }
 

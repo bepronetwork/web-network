@@ -1,11 +1,6 @@
 "use strict";
 const { Model, DataTypes } = require("sequelize");
 class Repositories extends Model {
-  /**
-   * Helper method for defining associations.
-   * This method is not a part of Sequelize lifecycle.
-   * The `models/index` file will call this method automatically.
-   */
   static init(sequelize) {
     super.init({
         id: {
@@ -17,23 +12,21 @@ class Repositories extends Model {
         githubPath: {
           type: DataTypes.STRING,
           allowNull: false,
-          unique: true
+          unique: "repositories_networks_unique"
         },
-        network_id: DataTypes.INTEGER
+        network_id: {
+          type: DataTypes.INTEGER,
+          unique: "repositories_networks_unique"
+        }
     },
-               {
-        sequelize,
-        modelName: "repositories",
-        tableName: "repositories",
-        timestamps: false
-               });
+    {
+      sequelize,
+      modelName: "repositories",
+      tableName: "repositories",
+      timestamps: false
+    });
   }
   static associate(models) {
-    // this.belongsTo(models.issue, {
-    //   foreignKey: 'issueId',
-    //   sourceKey: 'id'
-    // });
-    //
     this.hasMany(models.issue, {
       foreignKey: "repository_id",
       sourceKey: "id"

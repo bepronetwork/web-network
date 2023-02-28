@@ -3,57 +3,72 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
-import {LogAccess} from "../../../middleware/log-access";
-import WithCors from "../../../middleware/withCors";
+
+import {chainFromHeader} from "helpers/chain-from-header";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {wallet, networkName, startDate, endDate} = req.query;
+
+  const chain = await chainFromHeader(req);
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 
-  if (!network) return res.status(404).json("Invalid network");
+  if (!network) return resJsonMessage("Invalid network", res, 404);
 
-  let filter: Date[] | Date = null
+  let filter: {
+    createdAt?: {
+      [key: symbol]: Date | Date[]
+    }
+  } = {};
 
-  if(startDate && endDate){
+  if (startDate && endDate) {
     const initialDate = parseISO(startDate?.toString())
     const finalDate = parseISO(endDate?.toString())
   
-    if(isAfter(initialDate, finalDate)) return res.status(404).json("Invalid date");
+    if (isAfter(initialDate, finalDate))
+      return resJsonMessage("Invalid date", res, 400);
 
-    filter = [startOfDay(initialDate), endOfDay(finalDate)]
-  }else if(endDate){
-    filter = parseISO(endDate?.toString())
+    filter = {
+      createdAt: {
+        [Op.between]: [startOfDay(initialDate), endOfDay(finalDate)]
+      }
+    };
+  } else if (endDate) {
+    filter = {
+      createdAt: {
+        [Op.lte]: parseISO(endDate?.toString())
+      }
+    };
   }
 
-  function handleOpFilter(Op) {
-    if(Array.isArray(filter)) {
-      return {[Op.between]: filter}
-    }else {
-      return {[Op.lte]: filter}
-    }
-    
-  }
   const payments = await models.userPayments.findAll({
     include: [
       { 
         association: "issue", 
         where: { network_id: network.id },
-        include:[{ association: "token" }] 
+        include:[{ association: "transactionalToken" }] 
       }
     ],
     where: {
-      address: wallet,
-      transactionHash:{
+      address: {
+        [Op.iLike]: wallet
+      },
+      transactionHash: {
         [Op.not]: null
       },
-      createdAt: filter && handleOpFilter(Op)
+      ...filter
     }
   });
 
@@ -75,4 +90,4 @@ async function Payments(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(Payments));
+export default LogAccess(WithCors(WithValidChainId(Payments)));

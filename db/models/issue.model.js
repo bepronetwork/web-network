@@ -1,54 +1,89 @@
 "use strict";
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
+const { BigNumber } = require("bignumber.js");
 class Issue extends Model {
-  /**
-   * Helper method for defining associations.
-   * This method is not a part of Sequelize lifecycle.
-   * The `models/index` file will call this method automatically.
-   */
   static init(sequelize) {
     super.init({
-        issueId: DataTypes.INTEGER,
-        githubId: DataTypes.STRING,
-        state: DataTypes.STRING,
-        creatorAddress: DataTypes.STRING,
-        creatorGithub: DataTypes.STRING,
-        amount: DataTypes.STRING,
-        fundingAmount: DataTypes.STRING,
-        fundedAmount: DataTypes.STRING,
-        repository_id: DataTypes.STRING,
-        title: DataTypes.TEXT,
-        body: DataTypes.TEXT,
-        branch: DataTypes.STRING,
-        working: {
-          type: DataTypes.ARRAY(DataTypes.STRING)
-        },
-        merged: DataTypes.STRING,
-        seoImage: DataTypes.STRING,
-        network_id: DataTypes.INTEGER,
-        contractId: DataTypes.INTEGER,
-        tokenId: {
-          type: DataTypes.INTEGER,
-          allowNull: true
-        },
-        fundedAt: {
-          type: DataTypes.DATE,
-          allowNull: true
-        },
-        tags: {
-          type: DataTypes.ARRAY(DataTypes.STRING)
-        },
-        isKyc:{
-          type: DataTypes.BOOLEAN,
-          default: false
-        },
-        kycTierList:{
-          type: DataTypes.ARRAY(DataTypes.INTEGER),
-          default: []
-        },
-        tags: {
-          type: DataTypes.ARRAY(DataTypes.STRING)
-        },
+      issueId: DataTypes.INTEGER,
+      githubId: DataTypes.STRING,
+      state: DataTypes.STRING,
+      creatorAddress: {
+        type: DataTypes.STRING,
+        get() {
+          return getValueToLowerCase(this, "creatorAddress");
+        }
+      },
+      creatorGithub: DataTypes.STRING,
+      amount: DataTypes.STRING,
+      fundingAmount: {
+        type: DataTypes.STRING,
+        defaultValue: "0"
+      },
+      fundedAmount: {
+        type: DataTypes.STRING,
+        defaultValue: "0"
+      },
+      rewardAmount: {
+        type: DataTypes.STRING,
+        defaultValue: "0"
+      },
+      repository_id: DataTypes.STRING,
+      title: DataTypes.TEXT,
+      body: DataTypes.TEXT,
+      branch: DataTypes.STRING,
+      working: DataTypes.ARRAY(DataTypes.STRING),
+      merged: DataTypes.STRING,
+      seoImage: DataTypes.STRING,
+      network_id: DataTypes.INTEGER,
+      contractId: DataTypes.INTEGER,
+      transactionalTokenId: DataTypes.INTEGER,
+      rewardTokenId: DataTypes.INTEGER,
+      fundedAt: DataTypes.DATE,
+      tags: DataTypes.ARRAY(DataTypes.STRING),
+      chain_id: DataTypes.INTEGER,
+      isDraft: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.state === "draft";
+        }
+      },
+      isClosed: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.state === "closed";
+        }
+      },
+      isCanceled: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.state === "canceled";
+        }
+      },
+      isFundingRequest: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.fundingAmount).gt(0);
+        }
+      },
+      isFunded: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.fundedAmount).gte(this.fundingAmount);
+        }
+      },
+      hasReward: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.rewardAmount).gt(0);
+        }
+      },
+      fundedPercent: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return BigNumber(this.fundedAmount).dividedBy(this.fundingAmount).multipliedBy(100).toNumber();
+        }
+      },
         isKyc:{
           type: DataTypes.BOOLEAN,
           defaultValue: false
@@ -58,10 +93,10 @@ class Issue extends Model {
           default: []
         }
     },
-               {
-        sequelize,
-        modelName: "issue"
-               });
+    {
+      sequelize,
+      modelName: "issue"
+    });
   }
 
   static associate(models) {
@@ -106,9 +141,19 @@ class Issue extends Model {
       sourceKey: "id"
     });
     this.belongsTo(models.tokens, {
-      foreignKey: "tokenId",
+      foreignKey: "transactionalTokenId",
       sourceKey: "id",
-      as: "token"
+      as: "transactionalToken"
+    });
+    this.belongsTo(models.tokens, {
+      foreignKey: "rewardTokenId",
+      sourceKey: "id",
+      as: "rewardToken"
+    });
+    this.belongsTo(models.chain, {
+      foreignKey: "chain_id",
+      targetKey: "chainId",
+      as: "chain"
     });
   }
 }

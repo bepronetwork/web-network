@@ -1,13 +1,14 @@
 import { useTranslation } from "next-i18next";
 
-import { pullRequest } from "interfaces/issue-data";
+import Avatar from "components/avatar";
+import DateLabel from "components/date-label";
+import GithubInfo from "components/github-info";
+import PullRequestLabels from "components/pull-request-labels";
+import Translation from "components/translation";
 
-import { useAppState } from "../contexts/app-state";
-import Avatar from "./avatar";
-import DateLabel from "./date-label";
-import GithubInfo from "./github-info";
-import PullRequestLabels from "./pull-request-labels";
-import Translation from "./translation";
+import { useAppState } from "contexts/app-state";
+
+import { pullRequest } from "interfaces/issue-data";
 
 interface IProposalPRDetailsProps {
   currentPullRequest: pullRequest;

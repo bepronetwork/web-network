@@ -1,17 +1,19 @@
-import { SetStateAction } from "react";
-import { Col } from "react-bootstrap";
+import {SetStateAction} from "react";
+import {Col} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
+import { isAddress } from "web3-utils";
+
 
 import Button from "components/button";
-import { ExternalLink } from "components/external-link";
-import { FormGroup } from "components/form-group";
+import {ExternalLink} from "components/external-link";
+import {FormGroup} from "components/form-group";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
 export interface ContractField {
   value: string;
-  validated: boolean;
+  validated: boolean|null;
 }
 
 interface ContractInputProps {
@@ -21,6 +23,8 @@ interface ContractInputProps {
   onChange?: (value: SetStateAction<ContractField>) => void;
   docsLink: string;
   readOnly?: boolean;
+  mustBeAddress?: boolean;
+  decimalScale?: number;
   action?: {
     disabled: boolean;
     executing: boolean;
@@ -36,13 +40,14 @@ export function ContractInput({
   docsLink,
   action,
   validator,
-  readOnly
+  readOnly,
+  mustBeAddress
 } : ContractInputProps) {
   const { t } = useTranslation(["common", "setup"]);
   const { state: { Service } } = useAppState();
 
   function isInvalid(validated, name) {
-    return validated === false ? t("setup:errors.invalid-contract-address", { contract: name }) : undefined;
+    return validated === false ? t("setup:registry.errors.invalid-contract-address", { contract: name }) : "";
   }
 
   function handleChange(value: string) {
@@ -50,16 +55,22 @@ export function ContractInput({
   }
 
   function validateContractField() {
-    if (!validator) return;
 
     const { value } = field;
 
-    if (!Service?.active || value.trim() === "") 
-      return onChange(previous => ({ ...previous, validated: undefined }));
+    if (mustBeAddress)
+      return onChange(previous =>
+        ({ ...previous, validated: value?.trim().length ? isAddress(field?.value) : null }));
 
-    if (!Service.active.isAddress(value))
+    if (!validator)
+      return;
+
+    if (!Service?.active || value.trim() === "") 
+      return onChange(previous => ({ ...previous, validated: null }));
+
+    if (!isAddress(value))
       return onChange(previous => ({ ...previous, validated: false }));
-    
+
     Service.active[validator](value)
       .then(loaded => onChange(previous => ({ ...previous, validated: !!loaded })));
   }

@@ -36,7 +36,8 @@ export default function InfiniteScroll({
     if (childs.length) observer.observe(childs[childs.length - 1]);
 
     return () => {
-      observer.unobserve(childs[childs.length - 1]);
+      if (childs.length)
+        observer.unobserve(childs[childs.length - 1]);
     };
   }, [hasMore, isLoading]);
 

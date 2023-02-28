@@ -75,16 +75,16 @@ function OraclesActions({
       description: 
              t("my-oracles:actions.lock.description", { 
                currency: networkTokenSymbol, 
-               token: Service?.network?.networkToken?.symbol
+               token: Service?.network?.active?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
         amount: formatNumberToNScale(oracleAmount),
-        token: Service?.network?.networkToken?.symbol
+        token: Service?.network?.active?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-purple">
-                            {t("$oracles", { token: Service?.network?.networkToken?.symbol })}
+                            {t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })}
                           </span>{" "}
           {t("misc.from")} <span className="text-primary">
             {networkTokenSymbol}
@@ -96,7 +96,7 @@ function OraclesActions({
           amount: formatNumberToNScale(tokenAmount),
           oracleAmount: formatNumberToNScale(oracleAmount),
           currency: networkTokenSymbol,
-          token: Service?.network?.networkToken?.symbol
+          token: Service?.network?.active?.networkToken?.symbol
         }),
       params() {
         return { tokenAmount };
@@ -108,19 +108,19 @@ function OraclesActions({
       description: 
         t("my-oracles:actions.unlock.description", { 
           currency: networkTokenSymbol,
-          token: Service?.network?.networkToken?.symbol
+          token: Service?.network?.active?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
         amount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
-        token: Service?.network?.networkToken?.symbol
+        token: Service?.network?.active?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-primary">
             { networkTokenSymbol}</span>{" "}
           {t("misc.from")} <span className="text-purple">
-                            {t("$oracles", { token: Service?.network?.networkToken?.symbol })}
+                            {t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })}
                            </span>
         </>
       ),
@@ -128,7 +128,7 @@ function OraclesActions({
         amount: formatNumberToNScale(tokenAmount),
         oracleAmount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
-        token: Service?.network?.networkToken?.symbol
+        token: Service?.network?.active?.networkToken?.symbol
       }),
       params(from: string) {
         return { tokenAmount, from };
@@ -204,7 +204,7 @@ function OraclesActions({
   function getCurrentLabel() {
     return action === t("my-oracles:actions.lock.label")
       ? networkTokenSymbol
-      : t("$oracles", { token: Service?.network?.networkToken?.symbol });
+      : t("$oracles", { token: Service?.network?.active?.networkToken?.symbol });
   }
 
   function getMaxAmount(trueValue = false): string {
@@ -260,7 +260,7 @@ function OraclesActions({
             })}
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${
-              getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol })
+              getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })
                 ? "text-purple"
                 : "text-primary"
             }`}
@@ -282,7 +282,7 @@ function OraclesActions({
                 {getCurrentLabel()} {t("misc.available")}
                 <span onClick={setMaxAmount}
                       className={`caption-small ml-1 cursor-pointer text-uppercase ${(
-                        getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol }) 
+                        getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol }) 
                           ? "text-purple" 
                           : "text-primary"
                       )}`}>

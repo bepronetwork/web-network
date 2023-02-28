@@ -3,7 +3,7 @@ import { Modal, Spinner } from "react-bootstrap";
 
 import Translation from "components/translation";
 
-import {useAppState} from "../contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
 export default function Loading() {
 

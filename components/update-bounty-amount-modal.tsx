@@ -18,10 +18,10 @@ import { useBounty } from "x-hooks/use-bounty";
 import useERC20 from "x-hooks/use-erc20";
 
 export default function UpdateBountyAmountModal({
-                                                  show,
-                                                  transactionalAddress,
+  show,
+  transactionalAddress,
   handleClose = undefined,
-  bountyId,
+  bountyId
 }) {
   const { t } = useTranslation("common");
 
@@ -34,8 +34,8 @@ export default function UpdateBountyAmountModal({
   const { processEvent } = useApi();
   const transactionalERC20 = useERC20();
 
+  const { getDatabaseBounty } = useBounty();
   const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
-  const {getDatabaseBounty, getChainBounty} = useBounty();
   
   const handleChange = params => setNewAmount(BigNumber(params.value));
 
@@ -72,8 +72,7 @@ export default function UpdateBountyAmountModal({
         });
       })
       .then(() => {
-        getDatabaseBounty(true) 
-        getChainBounty(true)
+        getDatabaseBounty(true);
         resetValues();
         handleClose();
       })

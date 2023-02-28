@@ -46,7 +46,7 @@ export default function DelegationItem({
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const oracleToken = {
-    symbol: t("$oracles", {token: state.Service?.network?.networkToken?.symbol}),
+    symbol: t("$oracles", {token: state.Service?.network?.active?.networkToken?.symbol}),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -95,7 +95,7 @@ export default function DelegationItem({
           <span className="me-2">{t("actions.take-back")}</span>
           <span className="text-purple me-2">
             {formatStringToCurrency(delegationAmount)} {t("$oracles", {
-              token: state.Service?.network?.networkToken?.symbol
+              token: state.Service?.network?.active?.networkToken?.symbol
             })}
           </span>
           <span>

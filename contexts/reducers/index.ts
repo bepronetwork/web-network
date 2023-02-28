@@ -1,14 +1,15 @@
-import {changeChain} from "./change-chain";
-import {changeCurrentBounty, changeCurrentBountyDataChain} from "./change-current-bounty";
-import {changeCurrentUser} from "./change-current-user";
-import {changeLoad} from "./change-load";
-import {changeActiveRepoProps, changeNetwork, changeRepos, changeServiceProp} from "./change-service";
-import {changeSettings,} from "./change-settings";
-import {changeSpinners} from "./change-spinners";
-import {changeToaster} from "./change-toaster";
-import {changeTxList} from "./change-tx-list";
-import {Actions, addReducer} from "./main";
-import {changeShowProp} from "./update-show-prop";
+import {changeChain} from "contexts/reducers/change-chain";
+import {changeCurrentBounty} from "contexts/reducers/change-current-bounty";
+import {changeCurrentUser} from "contexts/reducers/change-current-user";
+import {changeLoad} from "contexts/reducers/change-load";
+import {changeActiveRepoProps, changeNetwork, changeRepos, changeServiceProp} from "contexts/reducers/change-service";
+import {changeSettings,} from "contexts/reducers/change-settings";
+import {changeSpinners} from "contexts/reducers/change-spinners";
+import {changeSupportedChains} from "contexts/reducers/change-supported-chains";
+import {changeToaster} from "contexts/reducers/change-toaster";
+import {changeTxList} from "contexts/reducers/change-tx-list";
+import {Actions, addReducer} from "contexts/reducers/main";
+import {changeShowProp} from "contexts/reducers/update-show-prop";
 
 let loaded = false;
 
@@ -27,10 +28,10 @@ export default function loadApplicationStateReducers() {
     changeNetwork,
     changeRepos,
     changeCurrentBounty,
-    changeCurrentBountyDataChain,
     changeSpinners,
     changeSettings,
-    changeActiveRepoProps
+    changeActiveRepoProps,
+    changeSupportedChains
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);

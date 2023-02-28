@@ -8,14 +8,17 @@ import models from "db/models";
 import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 
+import {chainFromHeader} from "helpers/chain-from-header";
 import paginate from "helpers/paginate";
-import {Settings} from "helpers/settings";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
 
 import {GraphQlResponse} from "types/octokit";
-import {LogAccess} from "../../../middleware/log-access";
-import WithCors from "../../../middleware/withCors";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -36,18 +39,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       where: {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+        },
+        // chain_id: {[Op.eq]: +chain?.chainId}
       }
     });
 
-    if (!network) return res.status(404).json("Invalid network");
-    if (network.isClosed) return res.status(404).json("Invalid network");
+    if (!network || network?.isClosed) return resJsonMessage("Invalid network", res, 404);
+
 
     const issue = await models.issue.findOne({
       where: { issueId, network_id: network.id }
     });
 
-    if (!issue) return res.status(404).json("Issue not found");
+    if (!issue) return resJsonMessage("Issue not found", res, 404);
 
     where.issueId = issue.id;
   }
@@ -82,15 +86,19 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     networkName
   } = req.body;
 
+  const chain = await chainFromHeader(req);
+
   const customNetwork = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: { [Op.eq]: +chain?.chainId }
     }
   });
 
-  if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid");
+  if (!customNetwork || customNetwork?.isClosed)
+    return resJsonMessage("Invalid network", res, !customNetwork ? 404 : 400);
 
   const issue = await models.issue.findOne({
     where: { githubId, repository_id }
@@ -105,6 +113,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
+  // todo move this to a setup script on webnetwork-e2e project instead
   if(serverRuntimeConfig?.e2eEnabled === true) {
 
     await models.pullRequest.create({
@@ -187,15 +196,20 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
     userBranch
   } = req.body;
 
+  const chain = await chainFromHeader(req);
+
   const customNetwork = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(customNetworkName)
-      }
+      },
+      // chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 
-  if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid");
+  if (!customNetwork || customNetwork?.isClosed)
+    return resJsonMessage("Invalid", res, 404);
+
   const issue = await models.issue.findOne({
     where: {
       issueId,
@@ -221,26 +235,17 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (!pullRequest) return res.status(404).json("Invalid");
-
-  const settings = await models.settings.findAll({
-    where: { visibility: "public" },
-    raw: true,
-  });
-
-  const publicSettings = (new Settings(settings)).raw();
-
-  if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+  if (!pullRequest) return resJsonMessage("Invalid", res, 404);
 
   const DAOService = new DAO({ 
     skipWindowAssignment: true,
-    web3Host: publicSettings.urls.web3Provider
+    web3Host: chain?.chainRpc
   });
 
-  if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+  if (!await DAOService.start()) return resJsonMessage("Failed to connect with chain", res, 400);
 
   if (!await DAOService.loadNetwork(customNetwork.networkAddress))
-    return res.status(500).json("Failed to load network contract");
+    return resJsonMessage("Failed to load network contract", res, 400);
 
   const network = DAOService.network;
 
@@ -248,7 +253,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   const networkBounty = await network.getBounty(contractId);
   
-  if (!networkBounty) return res.status(404).json("Invalid");
+  if (!networkBounty) return resJsonMessage("Bounty not found", res, 404);
 
   
   const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
@@ -290,4 +295,4 @@ async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default  LogAccess(WithCors(PullRequest));
+export default  LogAccess(WithCors(WithValidChainId(PullRequest)));

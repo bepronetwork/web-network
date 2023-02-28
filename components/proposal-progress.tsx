@@ -2,12 +2,12 @@ import React from "react";
 
 import { useTranslation } from "next-i18next";
 
+import Avatar from "components/avatar";
+import InfoTooltip from "components/info-tooltip";
+
 import { formatNumberToString } from "helpers/formatNumber";
 
 import { DistributedAmounts } from "interfaces/proposal";
-
-import Avatar from "./avatar";
-import InfoTooltip from "./info-tooltip";
 
 interface IProposalProgressProps {
   distributedAmounts: DistributedAmounts;

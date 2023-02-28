@@ -5,7 +5,12 @@ const handleNetwork = (issues) =>
         issue.network.dataValues = {
           name: issue.network.name,
           logoIcon: issue.network.logoIcon, 
-          colors: { primary: issue.network.colors?.primary }
+          colors: { primary: issue.network.colors.primary },
+          chain: {
+            chainId: issue.network.chain.chainId,
+            chainShortName: issue.network.chain.chainShortName,
+            color: issue.network.chain.color
+          }
         }
       return issue
     });

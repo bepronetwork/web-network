@@ -12,6 +12,8 @@ import Button from "components/button";
 import CustomContainer from "components/custom-container";
 import InfiniteScroll from "components/infinite-scroll";
 import IssueFilters from "components/issue-filters";
+import LeaderBoardListBar from "components/leaderboard/leaderboard-list-bar";
+import LeaderBoardListItem from "components/leaderboard/leaderboard-list-item";
 import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
 import ScrollTopButton from "components/scroll-top-button";
@@ -24,9 +26,6 @@ import {LeaderBoard} from "interfaces/leaderboard";
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
-
-import LeaderBoardListBar from "./leaderboard-list-bar";
-import LeaderBoardListItem from "./leaderboard-list-item";
 
 interface LeaderBoardPage {
   page: number;
@@ -135,7 +134,7 @@ export default function LeaderBoardList() {
     time,
     sortBy,
     order
-  ])
+  ]);
 
   useEffect(() => {
     clearTimeout(searchTimeout.current);
@@ -254,7 +253,7 @@ export default function LeaderBoardList() {
           hasMore={hasMore}>
           {leaderBoardPages.map(({ leadBoard }) => {
             return leadBoard?.map((item) => (
-              <LeaderBoardListItem user={item}/>
+              <LeaderBoardListItem key={item?.address} user={item}/>
             ));
           })}
         </InfiniteScroll>

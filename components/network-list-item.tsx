@@ -1,32 +1,38 @@
 import BigNumber from "bignumber.js";
 
+import ChainBadge from "components/chain-badge";
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Network} from "interfaces/network";
 
-import {useAppState} from "../contexts/app-state";
-
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
-  handleRedirect: (networkName: string) => void;
+  handleRedirect: (networkName: string, chainName: string) => void;
 }
 
 export default function NetworkListItem({
-                                          network,
-                                          tokenSymbolDefault,
+  network,
+  tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
-  const {state: {Settings: settings}} = useAppState();
+  const { state: { supportedChains, Settings: settings } } = useAppState();
 
   const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
   const isNotUndefined = value => value !== undefined;
 
   function onClick() {
-    handleRedirect(network?.name);
+    const chainName = 
+      supportedChains?.
+        find(({ chainId }) => +chainId === +network?.chain_id)?.chainShortName?.
+        toLowerCase();
+
+    handleRedirect(network?.name, chainName);
   }
 
   return (
@@ -40,6 +46,8 @@ export default function NetworkListItem({
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
+
+          <ChainBadge chain={network?.chain} />
 
           {(network?.isClosed && <PullRequestLabels label="closed" />) || ""}
         </div>

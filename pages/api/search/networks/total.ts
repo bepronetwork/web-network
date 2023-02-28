@@ -2,13 +2,14 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const { creatorAddress, isClosed, isRegistered } = req.query || {};
+  const { creatorAddress, name, isClosed, isRegistered } = req.query || {};
 
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) };
@@ -18,17 +19,18 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (isRegistered)
     whereCondition.isRegistered = isRegistered;
-    
+
+  if (name)
+    whereCondition.name = name;
 
   const networksCount = await models.network.count({
-        where: whereCondition
+    where: whereCondition
   });
 
   return res.status(200).json(networksCount);
 }
 
-async function GetAll(req: NextApiRequest,
-                      res: NextApiResponse) {
+async function GetAll(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

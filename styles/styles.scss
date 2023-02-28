@@ -415,7 +415,6 @@ li {
     margin: 0px;
     padding: 0px;
     list-style: none;
-    margin-left: $m * 2;
     li {
       margin-left: $m * 2;
     }
@@ -1756,4 +1755,11 @@ input[type="color"] {
 
 .kyc-modal-body{
   min-height: 630px !important;
+}
+
+.select-network-dropdown {
+  width: 140px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500px;
 }

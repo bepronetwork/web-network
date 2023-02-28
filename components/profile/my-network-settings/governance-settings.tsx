@@ -95,7 +95,7 @@ export default function GovernanceSettings({
       ...token,
       isReward: !!token.network_tokens.isReward,
       isTransactional: !!token.network_tokens.isTransactional
-    })))
+    })));
   }, [tokens]);
 
   return (

@@ -1,121 +1,134 @@
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Spinner} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
+import { useRouter } from "next/router";
 
+import Button from "components/button";
 import Modal from "components/modal";
+import SelectNetworkDropdown from "components/select-network-dropdown";
 
 import {useAppState} from "contexts/app-state";
 
-import {NETWORKS} from "helpers/networks";
+import {SupportedChainData} from "interfaces/supported-chain-data";
 
-import {NetworkColors} from "interfaces/enums/network-colors";
-
-import Button from "./button";
+import useApi from "x-hooks/use-api";
+import useNetworkChange from "x-hooks/use-network-change";
 
 type typeError = { code?: number; message?: string }
 
-export default function WrongNetworkModal({
-  requiredNetworkId = null,
-}: {
-  requiredNetworkId: string | number;
-}) {
+export default function WrongNetworkModal() {
   const { t } = useTranslation("common");
+  const { query } = useRouter();
 
   const [error, setError] = useState<string>("");
+  const [_showModal, setShowModal] = useState(false);
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+  const [networkChain, setNetworkChain] = useState<SupportedChainData>(null);
+  const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
+  
+  const api = useApi();
+  const { handleAddNetwork } = useNetworkChange();
+  const { state: { connectedChain, currentUser, Service, supportedChains, loading, spinners } } = useAppState();
 
-  const {state: { connectedChain, Settings: settings },} = useAppState();
+  function changeShowModal() {
+    if (!connectedChain?.id || 
+        !supportedChains?.length ||
+        loading?.isLoading ||
+        spinners?.changingChain) {
+      setShowModal(false);
+      return;
+    }
 
-  function showModal() {
-    return (
-      !!connectedChain?.id &&
-      !!requiredNetworkId &&
-      +connectedChain?.id !== +requiredNetworkId
-    );
+    if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
+      setShowModal(!supportedChains?.find(({ chainId }) => +chainId === +connectedChain.id));
+    else
+      setShowModal(!connectedChain?.matchWithNetworkChain && !!currentUser?.walletAddress);
+
   }
 
-  async function handleAddNetwork() {
+  async function selectSupportedChain(chain: SupportedChainData) {
+    if (!chain)
+      return;
+
+    setChosenSupportedChain(chain);
+  }
+
+  async function _handleAddNetwork() {
     setIsAddingNetwork(true);
     setError("");
-    const chainId = `0x${Number(settings?.requiredChain?.id).toString(16)}`;
-    const currencyNetwork = NETWORKS[chainId];
-    try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [
-          {
-            chainId: chainId,
-          },
-        ],
-      });
-    } catch (error) {
-      if ((error as typeError)?.message?.indexOf('wallet_addEthereumChain') > -1) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: chainId,
-                chainName: currencyNetwork.name,
-                nativeCurrency: {
-                  name: currencyNetwork.currency.name,
-                  symbol: currencyNetwork.currency.symbol,
-                  decimals: currencyNetwork.decimals,
-                },
-                rpcUrls: currencyNetwork.rpcUrls,
-                blockExplorerUrls: [currencyNetwork.explorerURL],
-              },
-            ],
-          });
-        } catch (error) {
-          if ((error as typeError).code === -32602) {
-            setError(t("modals.wrong-network.error-invalid-rpcUrl"));
-          }
-          if ((error as typeError).code === -32603) {
-            setError(t("modals.wrong-network.error-failed-rpcUrl"));
-          }
+    handleAddNetwork(chosenSupportedChain)
+      .catch(error => {
+        if ((error as typeError).code === -32602) {
+          setError(t("modals.wrong-network.error-invalid-rpcUrl"));
         }
-      }
-    } finally {
-      setIsAddingNetwork(false);
+        if ((error as typeError).code === -32603) {
+          setError(t("modals.wrong-network.error-failed-rpcUrl"));
+        }
+      })
+      .finally(() => {
+        setIsAddingNetwork(false);
+      });
+  }
+
+  function updateNetworkChain() {
+    if (supportedChains?.length && Service?.network?.active?.chain_id && query?.network) {
+      const chain = supportedChains.find(({ chainId }) => +Service?.network?.active?.chain_id === +chainId );
+      
+      setNetworkChain(chain);
+      setChosenSupportedChain(chain);
     }
+    else
+      setNetworkChain(null);
   }
 
   const isButtonDisabled = (): boolean =>
     [isAddingNetwork].some((values) => values);
+
+  useEffect(() => { api.getSupportedChains() }, []);
+  useEffect(updateNetworkChain, [Service?.network?.active?.chain_id, supportedChains, query?.network]);
+  useEffect(changeShowModal, [
+    currentUser?.walletAddress, 
+    connectedChain?.matchWithNetworkChain, 
+    connectedChain?.id,
+    supportedChains,
+    loading,
+    spinners
+  ]);
 
   return (
     <Modal
       title={t("modals.wrong-network.change-network")}
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
-      show={showModal()}
-    >
+      show={_showModal}>
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-          {t("modals.wrong-network.please-connect")}{" "}
-          <span style={{ color: NetworkColors[settings?.chainIds && settings?.chainIds[requiredNetworkId] || ""] }}>
-          <span>{settings?.chainIds && settings?.chainIds[requiredNetworkId] || ""}</span>{" "}
-            {t("modals.wrong-network.network")}
-          </span>
-          <br /> {t("modals.wrong-network.on-your-wallet")}
+          {t("modals.wrong-network.please-connect")}
         </strong>
-        {(isAddingNetwork && (
-          <Spinner
+
+        {!isAddingNetwork ? '' :
+          <Spinner 
             className="text-primary align-self-center p-2 mt-1 mb-2"
             style={{ width: "5rem", height: "5rem" }}
             animation="border"
           />
-        )) ||
-          ""}
-        <Button
+        }
+
+        <SelectNetworkDropdown
+          defaultChain={networkChain}
+          onSelect={selectSupportedChain}
+          isDisabled={isAddingNetwork}
+        />
+
+        <Button 
           className="my-3"
           disabled={isButtonDisabled()}
-          onClick={handleAddNetwork}
+          onClick={_handleAddNetwork}
         >
           {t("modals.wrong-network.change-network")}
         </Button>
+
         {error && (
           <p className="caption-small text-uppercase text-danger">{error}</p>
         )}
