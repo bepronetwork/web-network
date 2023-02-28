@@ -17,7 +17,7 @@ import {
   User,
   PastEventsParams,
   StartWorkingParams,
-  SearchNetworkParams
+  SearchNetworkParams,
   updateIssueParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
