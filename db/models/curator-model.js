@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 
 class Curators extends Model {
@@ -13,6 +14,9 @@ class Curators extends Model {
         address: {
           type: DataTypes.STRING,
           allowNull: false,
+          get() {
+            return getValueToLowerCase(this, "address");
+          }
         },
         acceptedProposals: {
           type: DataTypes.INTEGER,

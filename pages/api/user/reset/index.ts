@@ -4,10 +4,11 @@ import {Op, Sequelize} from "sequelize";
 
 import models from "db/models";
 
-import {error as LogError} from "services/logging";
+import {UNAUTHORIZED} from "helpers/error-messages";
 
-import {UNAUTHORIZED} from "../../../../helpers/error-messages";
-import {LogAccess} from "../../../../middleware/log-access";
+import {LogAccess} from "middleware/log-access";
+
+import {error as LogError} from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {address, githubLogin} = req.body;

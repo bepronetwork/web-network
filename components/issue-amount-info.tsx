@@ -29,7 +29,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
       overlay={
         <Tooltip id={"tooltip-amount-bottom"} className="caption-small">
           {formatStringToCurrency(bountyAmount?.toFixed())}{" "}
-          {issue?.token?.symbol || t("common:misc.token")}
+          {issue?.transactionalToken?.symbol || t("common:misc.token")}
         </Tooltip>
       }
     >
@@ -58,7 +58,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
                 }`}
                 style={{ color: issue?.network?.colors?.primary }}
               >
-                {issue?.token?.symbol || t("common:misc.token")}
+                {issue?.transactionalToken?.symbol || t("common:misc.token")}
               </label>
             </span>
           </div>

@@ -79,7 +79,8 @@
     "actions": {
       "deploy-registry": "Deploy Network Registry",
       "deploy-erc20": "Deploy New ERC20 Token",
-      "deploy-bounty-token": "Deploy New Bounty Token"
+      "deploy-bounty-token": "Deploy New Bounty Token",
+      "save-registry": "Save Registry"
     },
     "success": {
       "deploy": {
@@ -103,5 +104,8 @@
     "errors": {
       "network-already-saved": "Default Network already saved, please visit {{network}} settings page."
     }
+  },
+  "chains": {
+    "title": "Chains"
   }
 }

@@ -7,15 +7,19 @@ import {useRouter} from "next/router";
 import EditIcon from "assets/icons/transactions/edit";
 
 import Button from "components/button";
+import ConnectGithub from "components/connect-github";
+import { ContextualSpan } from "components/contextual-span";
 import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
+import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import {useAppState} from "contexts/app-state";
+import {BountyEffectsProvider} from "contexts/bounty-effects";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {getIssueState} from "helpers/handleTypeIssue";
@@ -23,12 +27,7 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
-
-import {BountyEffectsProvider} from "../contexts/bounty-effects";
-import {useBounty} from "../x-hooks/use-bounty";
-import ConnectGithub from "./connect-github";
-import { ContextualSpan } from "./contextual-span";
-import Modal from "./modal";
+import {useBounty} from "x-hooks/use-bounty";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -45,7 +44,7 @@ export default function PageActions({
                                     }: PageActionsProps) {
   const {t} = useTranslation(["common", "pull-request", "bounty"]);
 
-  const {query: {repoId,}} = useRouter();
+  const { query: { repoId } } = useRouter();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
@@ -55,23 +54,21 @@ export default function PageActions({
 
   const [isCancelable, setIsCancelable] = useState(false);
 
-  const {state, dispatch} = useAppState();
-  const {handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest} = useBepro();
-  const {updateWalletBalance} = useAuthentication();
-  const {getDatabaseBounty, getChainBounty} = useBounty();
-  const {createPrePullRequest, cancelPrePullRequest, startWorking, processEvent} = useApi();
+  const { state, dispatch } = useAppState();
+  const { getDatabaseBounty } = useBounty();
+  const { updateWalletBalance } = useAuthentication();
+  const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
+  const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
-  const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
-  const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
+  const isBountyInDraft = !!state.currentBounty?.data?.isDraft;
+  const isBountyReadyToPropose = !!state.currentBounty?.data?.isReady;
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isGithubConnected = !!state.currentUser?.login;
-  const isFundingRequest = 
-    state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
+  const isFundingRequest = !!state.currentBounty?.data?.isFundingRequest;
   const isWorkingOnBounty = !!state.currentBounty?.data?.working?.find((login) => login === state.currentUser?.login);
-  const isBountyOpen = 
-    state.currentBounty?.chainData?.closed === false && state.currentBounty?.chainData?.canceled === false;
+  const isBountyOpen = state.currentBounty?.data?.isClosed === false && state.currentBounty?.data?.isCanceled === false;
   const issueState = getIssueState({
     state: state.currentBounty?.data?.state,
     amount: state.currentBounty?.data?.amount,
@@ -82,8 +79,8 @@ export default function PageActions({
 
   const isBountyOwner =
     isWalletConnected &&
-    state.currentBounty?.chainData?.creator &&
-    state.currentBounty?.chainData?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+    state.currentBounty?.data?.creatorAddress &&
+    state.currentBounty?.data?.creatorAddress === state.currentUser?.walletAddress;
 
   const hasPullRequests =
     !!state.currentBounty?.data?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
@@ -92,50 +89,41 @@ export default function PageActions({
     !!state.currentBounty?.data?.pullRequests?.find(pullRequest => 
       pullRequest?.githubLogin === state.currentUser?.login && pullRequest?.status !== "canceled");
 
-
-  async function updateBountyData(force = false, methods: "both" | "database" | "chain") {
-    // todo this must be done by the actor so it wont fall out of context
-
-    if(["both","database"].includes(methods)) getDatabaseBounty(force);
-    
-    if(["both","chain"].includes(methods)) getChainBounty(force);
-  }
-
   async function handleRedeem() {
     handleReedemIssue(getIssueState({
-    state: state.currentBounty?.data?.state,
-    amount: state.currentBounty?.data?.amount,
-    fundingAmount: state.currentBounty?.data?.fundingAmount
+      state: state.currentBounty?.data?.state,
+      amount: state.currentBounty?.data?.amount,
+      fundingAmount: state.currentBounty?.data?.fundingAmount
     }) === "funding")
       .then(() => {
         updateWalletBalance(true);
-        updateBountyData(true, 'both');
-      })
+        getDatabaseBounty(true);
+      });
   }
 
   async function handleHardCancel() {
-    setShowHardCancelModal(false)
+    setShowHardCancelModal(false);
     handleHardCancelBounty()
       .then(() => {
         updateWalletBalance();
-        updateBountyData(true, 'both');
+        getDatabaseBounty(true);
       });
   }
 
   useEffect(() => {
-    if (state.Service?.active && state.currentBounty?.chainData)
+    if (state.Service?.active && state.currentBounty?.data)
       (async () => {
         const cancelableTime = await state.Service?.active.getCancelableTime();
-        const canceable = +new Date() >= +new Date(state.currentBounty?.chainData.creationDate + cancelableTime)
+        const canceable = +new Date() >= +new Date(+state.currentBounty?.data.createdAt + cancelableTime)
         setIsCancelable(canceable)
       })()
-  }, [state.Service?.active, state.currentBounty?.chainData])
+  }, [state.Service?.active, state.currentBounty?.data])
 
   async function handlePullrequest({
-                                     title: prTitle,
-                                     description: prDescription,
-                                     branch
-                                   }): Promise<void> {
+    title: prTitle,
+    description: prDescription,
+    branch
+  }): Promise<void> {
     if (!state.Service?.network?.repos?.active?.ghVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
@@ -176,7 +164,7 @@ export default function PageActions({
           content: t("pull-request:actions.create.success")
         }));
 
-        return updateBountyData(true, 'both');
+        return getDatabaseBounty(true);
       })
       .catch((err) => {
         if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
@@ -203,7 +191,7 @@ export default function PageActions({
     setIsExecuting(true);
 
     startWorking({
-      issueId: state.currentBounty?.chainData?.cid,
+      issueId: state.currentBounty?.data?.issueId,
       githubLogin: state.currentUser?.login,
       networkName: state.Service?.network?.active?.name,
       wallet: state.currentUser.walletAddress
@@ -216,7 +204,7 @@ export default function PageActions({
         }));
 
         addNewComment(response.data);
-        return updateBountyData(true, 'database');
+        return getDatabaseBounty(true);
       })
       .then(() => setIsExecuting(false))
       .catch((error) => {
@@ -232,7 +220,7 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (isGithubConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+    if (isGithubConnected && !isBountyInDraft && isBountyOpen && !isRepoForked)
       return (
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
@@ -334,10 +322,12 @@ export default function PageActions({
   }
 
   function renderCreateProposalButton() {
-    if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
+    if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyReadyToPropose && hasPullRequests)
       return (
-        <NewProposal amountTotal={state.currentBounty?.chainData?.tokenAmount}
-                     pullRequests={state.currentBounty?.data?.pullRequests}/>
+        <NewProposal 
+          amountTotal={state.currentBounty?.data?.amount}
+          pullRequests={state.currentBounty?.data?.pullRequests}
+        />
       );
   }
 
@@ -443,8 +433,8 @@ export default function PageActions({
 
           <UpdateBountyAmountModal
             show={showUpdateAmount}
-            transactionalAddress={state.currentBounty?.chainData?.transactional}
-            bountyId={state.currentBounty?.chainData?.id}
+            transactionalAddress={state.currentBounty?.data?.transactionalToken?.address}
+            bountyId={state.currentBounty?.data?.contractId}
             handleClose={() => setShowUpdateAmount(false)}
           />
         </>

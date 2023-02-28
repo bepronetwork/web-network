@@ -44,8 +44,8 @@ function OraclesDelegate({
 
   const { processEvent } = useApi();
 
-  const networkTokenDecimals = Service?.network?.networkToken?.decimals || 18;
-  const networkTokenSymbol = Service?.network?.networkToken?.symbol;
+  const networkTokenDecimals = Service?.network?.active?.networkToken?.decimals || 18;
+  const networkTokenSymbol = Service?.network?.active?.networkToken?.symbol;
 
   function handleChangeOracles(params: NumberFormatValues) {
     if (params.value === "") return setTokenAmount("");

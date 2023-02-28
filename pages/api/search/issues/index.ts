@@ -7,8 +7,12 @@ import models from "db/models";
 import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
+
+import {error} from "services/logging";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
@@ -16,7 +20,7 @@ const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
-    let networks = []
+    let networks = [];
     const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
     const {
       state,
@@ -33,7 +37,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       networkName,
       allNetworks,
       repoPath,
-      tokenAddress
+      tokenAddress,
+      chainId
     } = req.query || {};
 
     if (state) whereCondition.state = state;
@@ -44,15 +49,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (creator) whereCondition.creatorGithub = creator;
 
-    if (address) whereCondition.creatorAddress = address;
+    if (address) 
+      whereCondition.creatorAddress = {
+        [Op.iLike]: address.toString()
+      };
 
     if (networkName) {
       const network = await models.network.findOne({
-      where: {
-        name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        where: {
+          name: {
+            [Op.iLike]: String(networkName).replaceAll(" ", "-"),
+          },
+          ... chainId ? { chain_id: +chainId } : {}
         }
-      }
       });
 
       if (!network) return res.status(404).json("Invalid network");
@@ -64,7 +73,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       networks = await models.network.findAll({
         where: {
           isRegistered: true,
-          isClosed: false
+          isClosed: false,
         },
         include: [
           { association: "curators" }
@@ -75,6 +84,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
       whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
     }
+
+    if (chainId)
+      whereCondition.chain_id = { [Op.eq]: +chainId };
 
     if (repoPath) {
       const repository = await models.repositories.findOne({
@@ -149,7 +161,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       },
       { association: "repository", attributes: ["id", "githubPath"] },
       {
-        association: "token",
+        association: "transactionalToken",
         required: !!tokenAddress,
         where: {
           ...(tokenAddress ? {
@@ -157,6 +169,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           } : {})
         }
       },
+      {
+        association: "network",
+        include: [
+          { association: "chain" }
+        ]
+      }
     ];
 
     if (state === "closed")
@@ -197,12 +215,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         currentPage: +paginatedData.page
       });
     } else {
-      
       const issues = await models.issue.findAndCountAll(paginate({ 
-      where: whereCondition, 
-      include, nest: true }, req.query, [
+        where: whereCondition, 
+        include, 
+        nest: true 
+      }, req.query, [
         [...sortBy|| ["createdAt"], req.query.order || "DESC"]
-      ])).then(data => handleNetworkValues(data))
+      ]))
+        .then(data => handleNetworkValues(data));
 
       return res.status(200).json({
       ...issues,
@@ -210,13 +230,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pages: calculateTotalPages(issues.count)
       })}
   } catch(e){
-    console.error(e)
+    error(e);
     return res.status(500)
   }
 }
 
-async function SearchIssues(req: NextApiRequest,
-                            res: NextApiResponse) {
+async function SearchIssues(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -228,4 +247,4 @@ async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
-export default LogAccess(WithCors(SearchIssues))
+export default LogAccess(WithCors(WithValidChainId(SearchIssues)));

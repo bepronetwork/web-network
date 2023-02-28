@@ -5,13 +5,14 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const { creatorAddress, isClosed, isRegistered, page, sortBy, order} = req.query || {};
+  const { name, creatorAddress, isClosed, isRegistered, page, sortBy, order} = req.query || {};
 
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) };
@@ -21,6 +22,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (isRegistered)
     whereCondition.isRegistered = isRegistered;
+
+  if (name)
+    whereCondition.name = name;
     
   const include = [
     { association: "tokens" },
@@ -29,7 +33,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         state: {[Op.not]: "pending" }
       }
     },
-    { association: "curators" }
+    { association: "curators" },
+    { association: "chain" }
   ];
 
   const networks = await models.network.findAll({
@@ -49,7 +54,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             logoIcon: network?.logoIcon,
             totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
                                                       BigNumber(0)),
-            totalIssues: network?.issues?.length || 0
+            totalIssues: network?.issues?.length || 0,
+            countIssues: network?.issues?.length || 0,
+            chain: network?.chain
     };
   })
 
@@ -71,8 +78,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-async function SearchNetworks(req: NextApiRequest,
-                              res: NextApiResponse) {
+async function SearchNetworks(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -84,4 +90,5 @@ async function SearchNetworks(req: NextApiRequest,
 
   res.end();
 }
+
 export default LogAccess(WithCors(SearchNetworks));

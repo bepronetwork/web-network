@@ -1,14 +1,14 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
 import {useAppState} from "contexts/app-state";
+import { changeMatchWithNetworkChain } from "contexts/reducers/change-chain";
 import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeActiveNetworkToken, 
   changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
@@ -16,84 +16,81 @@ import {
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
-  const {state, dispatch} = useAppState();
-  const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
+  const {query, replace} = useRouter();
 
+  const [networkName, setNetworkName] = useState<string>();
+  const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
+  
+  const { chain, findSupportedChain } = useChain();
+  const {state, dispatch} = useAppState();
   const {getNetwork, getNetworkTokens} = useApi();
-  const {pathname, query, push, replace} = useRouter();
 
   function clearNetworkFromStorage() {
     storage.delete();
 
     const networkName = state.Service?.network?.active?.name;
+    const chainId = state.connectedChain?.id;
+
     if (networkName)
-      new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`).delete();
+      new WinStorage(`bepro.network:${networkName}:${chainId}`, 0, `sessionStorage`).delete();
   }
 
   function updateActiveNetwork(forceUpdate = false) {
-    const networkName = query?.network?.toString();
+    const queryNetworkName = query?.network?.toString();
+    const queryChainName = query?.chain?.toString();
 
-    if (networkName) {
-      dispatch(changeNetworkLastVisited(networkName));
-      storage.value = networkName;
+    if (queryNetworkName && queryChainName) {
+      const chainId = findSupportedChain({ chainShortName: queryChainName })?.chainId;
+      const storageKey = `bepro.network:${queryNetworkName}:${chainId}`;
 
-      if (!forceUpdate) {
-        const cachedNetworkData = new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`);
+      if (storage.value && storage.value !== queryNetworkName)
+        storage.value = queryNetworkName;
 
-        if (storage.value === networkName) {
-          if (cachedNetworkData.value) {
-            dispatch(changeActiveNetwork(cachedNetworkData.value));
+      const cachedNetworkData = new WinStorage(storageKey, 3000, `sessionStorage`);
+      if (forceUpdate === false && cachedNetworkData.value) {
+        dispatch(changeActiveNetwork(cachedNetworkData.value));
+        return;
+      }
 
-            return;
+      getNetwork({name: queryNetworkName, chainName: queryChainName })
+        .then(async ({data}) => {
+          if (!data.isRegistered) {
+            if (state.currentUser?.walletAddress === data.creatorAddress)
+              return replace(getURLWithNetwork("/profile/my-network", {
+                network: data.name,
+                chain: data.chain.chainShortName
+              }));
+            else
+              return replace(`/networks`);
           }
-        } else 
-          storage.value = networkName;
-      }
-    } else if (storage.value) dispatch(changeNetworkLastVisited(storage.value));
 
-    getNetwork({
-      ... networkName && {
-        name: networkName
-      } || {
-        isDefault: true
-      }
-    })
-      .then(({data}) => {
-        if (!data.isRegistered)
-          throw new Error("Network not registered");
+          const newCachedData = new WinStorage(storageKey, 3600, `sessionStorage`);
+          newCachedData.value = data;
 
-        const key = networkName || data?.name;
-
-        const storageParams = new WinStorage(`bepro.network:${key}`, 3600, `sessionStorage`);
-
-        storageParams.value = data;
-        dispatch(changeActiveNetwork(data));
-        
-        console.debug(`Updated active params`, data);
-      })
-      .catch(error => {
-        console.error(`Failed to get network`, error);
-
-        if (!networkName && !URLS_WITHOUT_NETWORK.includes(pathname))
-          replace("/setup");
-        
-        if(networkName)
-          push({pathname: `/networks`});
-      });
-
+          dispatch(changeNetworkLastVisited(queryNetworkName));
+          dispatch(changeActiveNetwork(newCachedData.value));
+        })
+        .catch(e => {
+          console.log(`Failed to get network ${queryNetworkName}`, e);
+          return replace(`/networks`);
+        })
+    }
   }
 
   function getURLWithNetwork(href: string, _query = undefined): UrlObject {
-    const _network = _query?.network ? String(_query?.network)?.replaceAll(" ", "-") : undefined;
+    const _network = _query?.network ? String(_query?.network)?.toLowerCase()?.replaceAll(" ", "-") : undefined;
+    const cleanHref =  href.replace("/[network]/[chain]", "");
 
     return {
-      pathname: `/[network]/${href}`.replace("//", "/"),
+      pathname: `/[network]/[chain]/${cleanHref}`.replace("//", "/"),
       query: {
         ..._query,
+        chain: _query?.chain || query?.chain || state?.Service?.network?.active?.chain?.chainShortName,
         network: _network ||
           query?.network ||
           state?.Service?.network?.active?.name
@@ -101,28 +98,14 @@ export function useNetwork() {
     };
   }
 
-  function loadNetworkToken() {
-    if (!state.Service?.active?.network || state.Service?.network?.networkToken)
-      return;
-
-    const activeNetworkToken: any = state.Service?.active?.network?.networkToken;
-
-    Promise.all([activeNetworkToken.name(), activeNetworkToken.symbol(),])
-      .then(([name, symbol]) => {
-        dispatch(changeActiveNetworkToken({
-          name,
-          symbol,
-          decimals: activeNetworkToken.decimals,
-          address: activeNetworkToken.contractAddress
-        }))
-      });
-  }
-
   function loadNetworkAllowedTokens() {
-    if (!state.Service?.active || !state?.Service?.network?.active)
+    if (!state?.Service?.network?.active || !chain)
       return;
 
-    getNetworkTokens({networkName: state?.Service?.network?.active?.name}).then(tokens => {
+    getNetworkTokens({
+      networkName: state?.Service?.network?.active?.name,
+      chainId: chain.chainId.toString()
+    }).then(tokens => {
       const transactional = [];
       const reward = [];
 
@@ -137,7 +120,7 @@ export function useNetwork() {
     if (!state?.Service?.active?.network)
       return;
 
-    const network: any = state.Service.active?.network;
+    const network = state.Service.active?.network;
 
     Promise.all([network.draftTime(), network.disputableTime()])
       .then(([draftTime, disputableTime]) => {
@@ -152,7 +135,7 @@ export function useNetwork() {
     if (!state?.Service?.active?.network)
       return;
 
-    const network: any = state.Service.active?.network;
+    const network = state.Service.active?.network;
 
     Promise.all([
         network.councilAmount(),
@@ -182,14 +165,30 @@ export function useNetwork() {
       })
   }
 
+  function updateNetworkAndChainMatch() {
+    const connectedChainId = state.connectedChain?.id;
+    const networkChainId = state?.Service?.network?.active?.chain_id;
+    const isOnANetwork = !!query?.network;
+
+    if (connectedChainId && networkChainId && isOnANetwork)
+      dispatch(changeMatchWithNetworkChain(+connectedChainId === +networkChainId));
+    else
+      dispatch(changeMatchWithNetworkChain(null));
+  }
+
+  useEffect(() => {
+    setNetworkName(query?.network?.toString());
+  }, [query?.network]);
+
   return {
+    networkName,
     updateActiveNetwork,
     getURLWithNetwork,
     clearNetworkFromStorage,
-    loadNetworkToken,
     loadNetworkTimes,
     loadNetworkAmounts,
-    loadNetworkAllowedTokens
+    loadNetworkAllowedTokens,
+    updateNetworkAndChainMatch
   }
 
 }

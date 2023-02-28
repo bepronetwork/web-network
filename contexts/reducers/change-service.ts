@@ -77,7 +77,7 @@ export const changeNetwork = new ChangeServiceNetworkProp();
 export const changeRepos = new ChangeServiceNetworkReposProp();
 export const changeActiveRepoProps = new ChangeServiceNetworkActiveRepoProp();
 
-export const changeStarting = (starting: boolean) => changeServiceProp.update({starting}, 'starting');
+export const changeStarting = (starting: boolean) => changeServiceProp.update(starting as any, 'starting');
 
 export const changeMicroServiceReady = (microReady: boolean) =>
   changeServiceProp.update({microReady}, 'microReady');
@@ -88,7 +88,6 @@ export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.u
 export const changeNoDefaultNetwork = (noDefaultNetwork: boolean) => changeNetwork.update({noDefaultNetwork});
 
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
-export const changeActiveNetworkToken = (networkToken: Token) => changeNetwork.update({networkToken});
 export const changeActiveNetworkTimes = (times: NetworkTimes) => changeNetwork.update({times});
 export const changeActiveNetworkAmounts = (amounts: NetworkAmounts) => changeNetwork.update({amounts});
 

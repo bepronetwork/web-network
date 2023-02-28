@@ -22,10 +22,10 @@ interface TransactionListProps {
 }
 
 export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
-  const {dispatch, state: {transactions}} = useAppState();
-  const {t} = useTranslation("common");
-  const {deleteFromStorage} = useTransactions();
-  
+  const { t } = useTranslation("common");
+
+  const { deleteFromStorage } = useTransactions();
+  const { dispatch, state: { transactions } } = useAppState();
 
   function renderTransactionRow(item: Transaction) {
     const className = "h-100 w-100 px-3 py-2 tx-row mt-2 cursor-pointer";
@@ -51,7 +51,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
           <div className="ms-3 me-auto">
             <TransactionType type={item.type} />
 
-            {(item.amount > 0 && (
+            {(+item.amount > 0 && (
               <span className="caption-medium text-gray text-uppercase">
                 {formatStringToCurrency(amount)} {item.currency}
               </span>
@@ -84,7 +84,6 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
     <div className="transaction-list w-100">
       <div className="d-flex flex-row justify-content-between">
         <h4 className="h4 m-0 text-white">{t("transactions.title_other")}</h4>
-
         { 
           transactions.length &&
           <Button 

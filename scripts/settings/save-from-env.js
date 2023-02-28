@@ -23,7 +23,7 @@ const publicSettings = [
   //PublicSettingItem("networkRegistry", process.env.NEXT_PUBLIC_NETWORK_REGISTRY_ADDRESS, "string", "contracts"),
   PublicSettingItem("botUser", process.env.NEXT_PUBLIC_GH_USER, "string", "github"),
   PublicSettingItem("token", process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME, "string", "requiredChain"),
-  PublicSettingItem("id", process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID, "string", "requiredChain"),
+  PublicSettingItem("id", process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID || "", "string", "requiredChain"),
   PublicSettingItem("name", process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME, "string", "requiredChain"),
   PublicSettingItem("api", process.env.NEXT_PUBLIC_CURRENCY_API || '', "string", "currency"),
   PublicSettingItem("defaultFiat", process.env.NEXT_PUBLIC_CURRENCY_MAIN || '', "string", "currency"),

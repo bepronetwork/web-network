@@ -5,8 +5,9 @@ import models from "db/models";
 
 import {calculateLeaderboardScore} from "helpers/leaderboard-score";
 import paginate, {calculateTotalPages} from "helpers/paginate";
-import {LogAccess} from "../../../../../middleware/log-access";
-import WithCors from "../../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {

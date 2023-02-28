@@ -8,6 +8,7 @@
   "scripts": {
     "prestart": "npm run migrate",
     "db:reset": "sequelize db:drop && sequelize db:create",
+    "db:create": "sequelize db:create",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "clean": "npm cache clean --force && rm -rf .next",

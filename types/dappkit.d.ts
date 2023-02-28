@@ -21,7 +21,7 @@ export type RegistryParameters = "networkCreationFeePercentage" |
   "MAX_LOCK_PERCENTAGE_FEE" |
   "DIVISOR" 
 
-export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles" | "bountyToken";
+export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles" | "bountyToken" | "network";
 
 export type Events = "created" | 
   "canceled" | 
@@ -34,5 +34,7 @@ export type Events = "created" |
   "changed" |
   "transfer" |
   "registered"|
-  'moved-to-open'|
-  'update-draft-time';
+  "moved-to-open" |
+  "update-draft-time" |
+  "parameters" |
+  "withdraw";

@@ -2,31 +2,39 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
 import models from "db/models";
-import {LogAccess} from "../../../middleware/log-access";
-import WithCors from "../../../middleware/withCors";
+
+import {NOT_AN_ADMIN} from "helpers/contants";
+import {isAdmin} from "helpers/is-admin";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function getAllRepos(req, res) {
-  const {networkName} = req.query;
+  const { networkName, chainId } = req.query;
 
   const network = await models.network.findOne({
     where: {
       name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+        [Op.iLike]: networkName
+      },
+      chain_id: +chainId
     }
   });
 
   if (!network) return res.status(404).json("Invalid network");
 
   return res.status(200).json(await models.repositories.findAll({
-        where: {
-          network_id: network.id
-        }
-  },
-      { raw: true }));
+    where: {
+      network_id: network.id
+    }
+  }, { raw: true }));
 }
 
 async function addNewRepo(req, res) {
+  if (!isAdmin(req))
+    return res.status(401).json({message: NOT_AN_ADMIN});
+
   const issues = (await models.issue.findAndCountAll())?.count;
   if (issues)
     return res
@@ -41,18 +49,20 @@ async function addNewRepo(req, res) {
   const found = await models.repositories.findOne({
     where: { githubPath: `${owner}/${repo}` }
   });
+
   if (found) return res.status(409).json("Path already exists");
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      // chain_id: {[Op.eq]: +chain?.chainId}
     }
   });
 
-  if (!network) return res.status(404).json("Invalid network");
-  if (network.isClosed) return res.status(404).json("Invalid network");
+  if (!network || network?.isClosed)
+    return resJsonMessage("Invalid network", res, 404);
 
   const created = await models.repositories
     .create({ githubPath: `${owner}/${repo}`, network_id: network.id })
@@ -65,6 +75,10 @@ async function addNewRepo(req, res) {
 }
 
 async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
+
+  if (!isAdmin(req))
+    return res.status(401).json({message: NOT_AN_ADMIN});
+
   const issues = (await models.issue.findAndCountAll())?.count;
   if (issues)
     return res
@@ -83,8 +97,7 @@ async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
     .json(!deleted ? `Couldn't delete entry ${id}` : "ok");
 }
 
-async function RepoRoute(req: NextApiRequest,
-                         res: NextApiResponse) {
+async function RepoRoute(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getAllRepos(req, res);

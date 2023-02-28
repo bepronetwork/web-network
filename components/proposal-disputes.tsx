@@ -3,12 +3,12 @@ import {useTranslation} from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 
+import {CaptionMedium} from "components/bounty/funding-section/minimals";
+
+import {useAppState} from "contexts/app-state";
+
 import { formatNumberToNScale } from "helpers/formatNumber";
-
-import {useAppState} from "../contexts/app-state";
-import {truncateAddress} from "../helpers/truncate-address";
-import {CaptionMedium} from "./bounty/funding-section/minimals";
-
+import {truncateAddress} from "helpers/truncate-address";
 
 export function ProposalDisputes({proposalId}: { proposalId: number}) {
   const {state} = useAppState();
@@ -53,7 +53,7 @@ export function ProposalDisputes({proposalId}: { proposalId: number}) {
                   {formatNumberToNScale(weight)}{" "}
                   <span className="text-purple">
                     {t("common:$oracles", {
-                      token: state.Service?.network?.networkToken?.symbol,
+                      token: state.Service?.network?.active?.networkToken?.symbol,
                     })}
                   </span>
                 </span>

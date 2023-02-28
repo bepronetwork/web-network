@@ -1,13 +1,8 @@
-import {PullRequest} from "@taikai/dappkit";
+import {SimpleAction} from "contexts/reducers/reducer";
 
 import {CurrentBounty, State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
-import { Token } from "interfaces/token";
-
-import {BenefactorExtended, BountyExtended, ProposalExtended} from "../../interfaces/bounty";
-import {IssueBigNumberData, IssueDataComment} from "../../interfaces/issue-data";
-import {SimpleAction} from "./reducer";
-
+import {IssueBigNumberData, IssueDataComment} from "interfaces/issue-data";
 
 export class ChangeCurrentBounty<T = CurrentBounty|Partial<CurrentBounty>, A = keyof CurrentBounty & 'clear'>
   extends SimpleAction<T, A> {
@@ -35,24 +30,6 @@ export class ChangeCurrentBounty<T = CurrentBounty|Partial<CurrentBounty>, A = k
   }
 }
 
-export class ChangeCurrentBountyChainData extends ChangeCurrentBounty<BountyExtended | Partial<BountyExtended>, null> {
-  constructor() {
-    super(AppStateReduceId.CurrentBountyChainData);
-  }
-
-  reducer(state: State, payload: BountyExtended | Partial<BountyExtended>): State {
-    const transformed = {
-      ...state.currentBounty,
-      chainData: {
-        ...state.currentBounty?.chainData,
-        ...payload
-      }
-    };
-
-    return super.reducer(state, transformed, 'chainData');
-  }
-}
-
 export const changeCurrentBounty = new ChangeCurrentBounty();
 
 export const changeCurrentBountyComments = (comments: IssueDataComment[]) =>
@@ -63,32 +40,3 @@ export const changeCurrentBountyData = (data: IssueBigNumberData) =>
 
 export const clearCurrentBountyData = () =>
   changeCurrentBounty.update(null, 'clear');
-
-export const changeCurrentBountyDataChain = new ChangeCurrentBountyChainData();
-
-export const changeCurrentBountyDataIsDraft = (isDraft: boolean) =>
-  changeCurrentBountyDataChain.update({isDraft});
-
-export const changeCurrentBountyDataIsFinished = (isFinished: boolean) =>
-  changeCurrentBountyDataChain.update({isFinished});
-
-export const changeCurrentBountyDataIsInValidation = (isInValidation: boolean) =>
-  changeCurrentBountyDataChain.update({isInValidation});
-
-export const changeCurrentBountyDataIsFundingRequest = (isFundingRequest: boolean) =>
-  changeCurrentBountyDataChain.update({isFundingRequest});
-
-export const changeCurrentBountyDataProposals = (proposals: ProposalExtended[]) =>
-  changeCurrentBountyDataChain.update({proposals});
-
-export const changeCurrentBountyDataPullRequests = (pullRequests: PullRequest[]) =>
-  changeCurrentBountyDataChain.update({pullRequests});
-
-export const changeCurrentBountyDataFunding = (funding: BenefactorExtended[]) =>
-  changeCurrentBountyDataChain.update({funding});
-
-export const changeCurrentBountyDataTransactional = (transactionalTokenData: Token) =>
-  changeCurrentBountyDataChain.update({transactionalTokenData});  
-
-export const changeCurrentBountyDataReward = (rewardTokenData: Token) =>
-  changeCurrentBountyDataChain.update({rewardTokenData}); 

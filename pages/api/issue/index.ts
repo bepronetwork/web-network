@@ -1,5 +1,3 @@
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
@@ -9,6 +7,12 @@ import models from "db/models";
 
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
+
+import {chainFromHeader} from "helpers/chain-from-header";
+
+import { LogAccess } from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 import {GraphQlResponse} from "types/octokit";
 
@@ -23,11 +27,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     tags
   } = req.body;
 
+  const chain = await chainFromHeader(req);
+
+  if (!chain)
+    return res.status(403).json("Chain not provided");
+
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: { [Op.eq]: +chain.chainId }
     }
   });
 
@@ -49,9 +59,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const repositoryGithubId = repositoryDetails.repository.id;
-  let draftLabelId;
+  
+  let draftLabelId = repositoryDetails.repository.labels.nodes.find(({ name }) => name.toLowerCase() === "draft")?.id;
+  let chainLabelId = repositoryDetails.repository.labels.nodes.
+    find(({ name }) => name.toLowerCase() === chain.chainName.toLowerCase())?.id;
 
-  if (!repositoryDetails.repository.labels.nodes.length) {
+  if (!draftLabelId) {
     const createdLabel = await githubAPI<GraphQlResponse>(RepositoryQueries.CreateLabel, {
       name: "draft",
       repositoryId: repositoryGithubId,
@@ -62,14 +75,26 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
 
     draftLabelId = createdLabel.createLabel.label.id;
-  } else draftLabelId = repositoryDetails.repository.labels.nodes[0].id;
+  }
 
+  if (!chainLabelId) {
+    const createdLabel = await githubAPI<GraphQlResponse>(RepositoryQueries.CreateLabel, {
+      name: chain.chainName,
+      repositoryId: repositoryGithubId,
+      color: chain.color.replace("#", ""),
+      headers: {
+        accept: "application/vnd.github.bane-preview+json"
+      }
+    });
+
+    chainLabelId = createdLabel.createLabel.label.id;
+  }
 
   const createdIssue = await githubAPI<GraphQlResponse>(IssueQueries.Create, {
     repositoryId: repositoryGithubId,
     title,
     body,
-    labelId: [draftLabelId]
+    labelId: [draftLabelId, chainLabelId]
   });
 
   const githubId = createdIssue.createIssue.issue.number;
@@ -89,13 +114,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title: '',
     body: body,
     network_id: network.id,
-    tags
+    tags,
+    chain_id: +chain.chainId
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);
 }
 
-export default LogAccess(WithCors(async function Issue(req: NextApiRequest, res: NextApiResponse) {
+export default LogAccess(WithCors(WithValidChainId(async function Issue(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -106,4 +132,4 @@ export default LogAccess(WithCors(async function Issue(req: NextApiRequest, res:
   }
 
   res.end();
-}))
+})))

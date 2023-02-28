@@ -17,6 +17,8 @@ export interface PastEventsParams {
   id? :number;
   fromBlock?: number;
   toBlock?: number;
+  chainId?: string;
+  issueId?: string;
 }
 
 export interface SearchNetworkParams {
@@ -31,6 +33,7 @@ export interface SearchNetworkParams {
   isRegistered?: boolean;
   isDefault?: boolean;
   isNeedCountsAndTokensLocked?: boolean;
+  chainId?: string;
 }
 
 export interface SearchActiveNetworkParams {
@@ -40,6 +43,7 @@ export interface SearchActiveNetworkParams {
   order?: string;
   isClosed?: boolean;
   isRegistered?: boolean;
+  name?: string;
 }
 
 export interface CreatePrePullRequestParams extends RequestParams {

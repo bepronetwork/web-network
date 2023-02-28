@@ -207,7 +207,7 @@ export default class DAO {
     try {
       await this.web3Connection.connect();
 
-      await this.loadNetwork(this.network?.contractAddress);
+      //await this.loadNetwork(this.network?.contractAddress);
 
       return true;
     } catch (error) {
@@ -480,13 +480,13 @@ export default class DAO {
 
     const governor = await this.registry.governed._governor();
 
-    return governor === address;
+    return governor.toLowerCase() === address.toLowerCase();
   }
 
   async isNetworkGovernor(address: string): Promise<boolean> {
     const governor = await this.network.governed._governor();
 
-    return governor === address;
+    return governor.toLowerCase() === address.toLowerCase();
   }
 
   async isNetworkAbleToBeClosed(): Promise<boolean> {
@@ -675,7 +675,7 @@ export default class DAO {
   }
 
   async deployNetworkV2(networkToken: string): Promise<TransactionReceipt> {
-    const registryAddress: string = this._registryAddress
+    const registryAddress: string = this._registryAddress;
 
     const newNetwork = new Network_v2(this.web3Connection);
     await newNetwork.loadAbi();
@@ -724,7 +724,7 @@ export default class DAO {
       const time = await this.getTimeChain();
       const redeemTime = await this.network.draftTime();
 
-      return (new Date(time) < new Date(creationDateIssue + redeemTime))
+      return (new Date(time) < new Date(creationDateIssue + redeemTime));
     } catch (e) {
       console.error(`Failed to calculate isDraft bounty`, e);
       return null;

@@ -4,6 +4,12 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
+import { ContainerTab } from "components/profile/my-network-settings/container-tab";
+import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
+import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
+import RegistrySettings from "components/profile/my-network-settings/registry-settings";
+import RepositoriesListSettings from "components/profile/my-network-settings/repositories-list-settings";
+import WarningGithub from "components/profile/my-network-settings/warning-github";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TabbedNavigation from "components/tabbed-navigation";
 
@@ -23,12 +29,6 @@ import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
-import { ContainerTab } from "./container-tab";
-import GovernanceSettings from "./governance-settings";
-import LogoAndColoursSettings from "./logo-and-colours-settings";
-import RegistrySettings from "./registry-settings";
-import RepositoriesListSettings from "./repositories-list-settings";
-import WarningGithub from "./warning-github";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -97,6 +97,87 @@ export default function MyNetworkSettings({
 
     setIsUpdating(true);
 
+    const {
+      parameters: {
+        draftTime: { value: draftTime },
+        disputableTime: { value: disputableTime },
+        councilAmount: { value: councilAmount },
+        percentageNeededForDispute: { value: percentageForDispute },
+      },
+    } = settings;
+
+    const networkAddress = network?.networkAddress;
+    const failed = [];
+    const success = {};
+
+    const promises = await Promise.allSettled([
+      ...(draftTime !== forcedNetwork.draftTime
+        ? [
+            handleChangeNetworkParameter("draftTime",
+                                         draftTime,
+                                         networkAddress)
+              .then(() => ({ param: "draftTime", value: draftTime })),
+        ]
+        : []),
+      ...(disputableTime !== forcedNetwork.disputableTime
+        ? [
+            handleChangeNetworkParameter("disputableTime",
+                                         disputableTime,
+                                         networkAddress)
+              .then(() => ({ param: "disputableTime", value: disputableTime })),
+        ]
+        : []),
+      ...(councilAmount !== +forcedNetwork.councilAmount
+        ? [
+            handleChangeNetworkParameter("councilAmount",
+                                         councilAmount,
+                                         networkAddress)
+              .then(() => ({ param: "councilAmount", value: councilAmount })),
+        ]
+        : []),
+      ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
+        ? [
+            handleChangeNetworkParameter("percentageNeededForDispute",
+                                         percentageForDispute,
+                                         networkAddress)
+              .then(() => ({ param: "percentageNeededForDispute", value: percentageForDispute })),
+        ]
+        : []),
+    ]);
+
+    promises.forEach((promise) => {
+      if (promise.status === "fulfilled") success[promise.value.param] = promise.value.value;
+      else failed.push(promise.reason);
+    });
+
+    if (failed.length) {
+      dispatch(toastError(t("custom-network:errors.updated-parameters", {
+            failed: failed.length,
+      }),
+                          t("custom-network:errors.updating-values")));
+      console.error(failed);
+    }
+
+    const successQuantity = Object.keys(success).length;
+
+    if (successQuantity) {
+      if(draftTime !== forcedNetwork.draftTime)
+        Promise.all([
+          await processEvent("bounty","update-draft-time", network.name),
+          await processEvent("bounty","moved-to-open", network.name)
+        ]);
+
+      await processEvent("network", "parameters", network.name.toLowerCase(), {
+        chainId: state.connectedChain?.id
+      })
+        .catch(error => console.debug("Failed to update network parameters", error));
+
+      dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
+          updated: successQuantity,
+          total: promises.length,
+      })));
+    }
+
     const json = {
       description: details?.description || "",
       colors: JSON.stringify(settings.theme.colors),
@@ -119,83 +200,12 @@ export default function MyNetworkSettings({
       allowedTokens: {
        transactional: tokens?.allowedTransactions.map((token) => token?.id).filter((v) => v),
        reward: tokens?.allowedRewards.map((token) => token?.id).filter((v) => v)
-      }
+      },
+      parameters: success
     };
 
     updateNetwork(json)
       .then(async () => {
-        const {
-          parameters: {
-            draftTime: { value: draftTime },
-            disputableTime: { value: disputableTime },
-            councilAmount: { value: councilAmount },
-            percentageNeededForDispute: { value: percentageForDispute },
-          },
-        } = settings;
-
-        const networkAddress = network?.networkAddress;
-
-        const promises = await Promise.allSettled([
-          ...(draftTime !== forcedNetwork.draftTime
-            ? [
-                handleChangeNetworkParameter("draftTime",
-                                             draftTime,
-                                             networkAddress),
-            ]
-            : []),
-          ...(disputableTime !== forcedNetwork.disputableTime
-            ? [
-                handleChangeNetworkParameter("disputableTime",
-                                             disputableTime,
-                                             networkAddress),
-            ]
-            : []),
-          ...(councilAmount !== +forcedNetwork.councilAmount
-            ? [
-                handleChangeNetworkParameter("councilAmount",
-                                             councilAmount,
-                                             networkAddress),
-            ]
-            : []),
-          ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
-            ? [
-                handleChangeNetworkParameter("percentageNeededForDispute",
-                                             percentageForDispute,
-                                             networkAddress),
-            ]
-            : []),
-        ]);
-
-        const failed = [];
-        const success = [];
-
-        promises.forEach((promise) => {
-          if (promise.status === "fulfilled") success.push(promise.value);
-          else failed.push(promise.reason);
-        });
-
-        if (failed.length) {
-          dispatch(toastError(t("custom-network:errors.updated-parameters", {
-                failed: failed.length,
-          }),
-                              t("custom-network:errors.updating-values")));
-          console.error(failed);
-        }
-
-        if (success.length){
-          if(draftTime !== forcedNetwork.draftTime)
-            Promise.all([
-              await processEvent("bounty","update-draft-time", network.name),
-              await processEvent("bounty","moved-to-open", network.name)
-            ])
-
-          dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
-              updated: success.length,
-              total: promises.length,
-          })));
-        }
-          
-
         if (isCurrentNetwork) updateActiveNetwork(true);
 
         return updateEditingNetwork();
@@ -225,12 +235,14 @@ export default function MyNetworkSettings({
   }, [details?.fullLogo, details?.iconLogo]);
 
   useEffect(() => {
-    if (!state.Service?.active || !state.currentUser?.walletAddress) return;
+    if (!state.Service?.active?.registry?.contractAddress ||
+        !state.currentUser?.walletAddress ||
+        !state.connectedChain?.id) return;
 
     state.Service?.active
       .isRegistryGovernor(state.currentUser?.walletAddress)
       .then(setIsGovernorRegistry);
-  }, [state.currentUser?.walletAddress]);
+  }, [state.currentUser?.walletAddress, state.Service?.active?.registry?.contractAddress, state.connectedChain?.id]);
 
   useEffect(() => {
     if(!network) return;
@@ -295,12 +307,15 @@ export default function MyNetworkSettings({
       {isCurrentNetwork && (
         <style>{colorsToCSS(settings?.theme?.colors)}</style>
       )}
+      
       {!state.currentUser?.login && <WarningGithub />}
+      
       <TabbedNavigation
         className="my-network-tabs border border-dark-gray"
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
+      
       {settings?.validated &&
         github?.validated &&
         !network?.isClosed &&

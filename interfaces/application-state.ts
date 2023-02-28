@@ -1,20 +1,24 @@
 import {Dispatch} from "react";
 
-import { TreasuryInfo } from "@taikai/dappkit";
+import {TreasuryInfo} from "@taikai/dappkit";
 
-import {XReducerAction} from "../contexts/reducers/reducer";
-import DAO from "../services/dao-service";
-import {SettingsType} from "../types/settings";
-import {Balance} from "./balance-state";
-import {BountyExtended} from "./bounty";
-import {BranchesList} from "./branches-list";
-import {IssueBigNumberData, IssueDataComment} from "./issue-data";
-import {LoadingState} from "./loading-state";
-import {Network} from "./network";
-import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
-import {ToastNotification} from "./toast-notification";
-import {Token} from "./token";
-import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
+import {XReducerAction} from "contexts/reducers/reducer";
+
+import {Balance} from "interfaces/balance-state";
+import {BountyExtended} from "interfaces/bounty";
+import {BranchesList} from "interfaces/branches-list";
+import {IssueBigNumberData, IssueDataComment} from "interfaces/issue-data";
+import {LoadingState} from "interfaces/loading-state";
+import {Network} from "interfaces/network";
+import {ForkInfo, ForksList, RepoInfo, ReposList} from "interfaces/repos-list";
+import {SupportedChainData} from "interfaces/supported-chain-data";
+import {ToastNotification} from "interfaces/toast-notification";
+import {Token} from "interfaces/token";
+import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "interfaces/transaction";
+
+import DAO from "services/dao-service";
+
+import {SettingsType} from "types/settings";
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];
@@ -52,7 +56,6 @@ export interface ServiceNetwork {
   lastVisited: string;
   active: Network | null;
   repos: ServiceNetworkRepos | null;
-  networkToken: Token;
   times: NetworkTimes;
   amounts: NetworkAmounts;
   noDefaultNetwork?: boolean;
@@ -68,7 +71,12 @@ export interface ServiceState {
 
 export interface ConnectedChain {
   id: string;
-  name: string
+  name: string;
+  shortName: string;
+  explorer?: string;
+  events?: string;
+  registry?: string;
+  matchWithNetworkChain?: boolean;
 }
 
 export interface CurrentUserState {
@@ -80,13 +88,14 @@ export interface CurrentUserState {
   accessToken?: string;
   connected?: boolean;
   signature?: string;
+  isAdmin?: boolean;
+  hasRegisteredNetwork?: boolean;
 }
 
 export interface CurrentBounty {
   comments: IssueDataComment[];
   lastUpdated: number;
   data: IssueBigNumberData;
-  chainData: BountyExtended;
 }
 
 export interface State {
@@ -98,6 +107,7 @@ export interface State {
   currentUser: CurrentUserState | null,
   connectedChain: ConnectedChain | null,
   currentBounty: CurrentBounty | null,
+  supportedChains: SupportedChainData[] | null,
   show: {
     [key: string]: boolean;
   }

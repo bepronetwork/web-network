@@ -30,7 +30,7 @@ export interface NetworkToken {
 
 export interface TokenInfo extends Partial<Token> {
     icon: string | ReactElement;
-    prices: TokenPrice
+    prices: TokenPrice;
 }
 
 export interface TokenPrice {

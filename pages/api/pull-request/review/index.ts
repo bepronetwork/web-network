@@ -7,26 +7,36 @@ import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
+import {chainFromHeader} from "helpers/chain-from-header";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
+
+import {error} from "services/logging";
+
 import {GraphQlResponse} from "types/octokit";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
 
 const { serverRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, githubLogin, body, networkName, event } = req.body;
 
+  const chain = await chainFromHeader(req);
+
   try {
     const network = await models.network.findOne({
       where: {
         name: {
           [Op.iLike]: String(networkName)
-        }
+        },
+        chain_id: {[Op.eq]: +chain?.chainId}
       }
     });
 
-    if (!network) return res.status(404).json("Invalid network");
-    if (network.isClosed) return res.status(404).json("Invalid network");
+    if (!network || network?.isClosed)
+      return resJsonMessage("Invalid network", res, 404);
 
     const issue = await models.issue.findOne({
       where: { issueId, network_id: network.id }
@@ -78,17 +88,16 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     }
 
     return res.status(200).json(review);
-  } catch (error) {
-    console.log(error);
-    return res.status(error.status || 500).json(error?.errors && { 
-      data: error.response?.data, 
-      errors: error.response?.error 
-    } || error);
+  } catch (e) {
+    error(e);
+    return res.status(e.status || 500).json(e?.errors && {
+      data: e.response?.data,
+      errors: e.response?.error
+    } || e);
   }
 }
 
-async function PullRequestReview(req: NextApiRequest,
-                                 res: NextApiResponse) {
+async function PullRequestReview(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
     await put(req, res);
@@ -101,4 +110,4 @@ async function PullRequestReview(req: NextApiRequest,
   res.end();
 }
 
-export default  LogAccess(WithCors(PullRequestReview));
+export default  LogAccess(WithCors(WithValidChainId(PullRequestReview)));

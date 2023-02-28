@@ -3,43 +3,39 @@ import {useEffect, useState} from "react";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
+import {NetworkTokenConfig} from "components/custom-network/network-token-config";
 import {Divider} from "components/divider";
 import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import Step from "components/step";
 
+import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
-
-import {handleAllowedTokensDatabase} from "helpers/handleAllowedTokens";
 
 import {StepWrapperProps} from "interfaces/stepper";
 import {Token} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 
-import {useAppState} from "../../contexts/app-state";
-import {NetworkTokenConfig} from "./network-token-config";
-
 export default function TokenConfiguration({
-                                             activeStep,
-                                             index,
-                                             validated,
-                                             handleClick,
-                                             finishLabel,
-                                             handleFinish
-                                           }: StepWrapperProps) {
+  activeStep,
+  index,
+  validated,
+  handleClick,
+  finishLabel,
+  handleFinish
+}: StepWrapperProps) {
   const {t} = useTranslation(["common", "custom-network"]);
-
-  const {state} = useAppState();
-
-  const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
+  
+  const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
   const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>([]);
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>([]);
+  const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
-  const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
-
-  const {getTokens} = useApi();
-
+  
+  const { getTokens } = useApi();
+  const { state } = useAppState();
   const { tokens, fields, tokensLocked, registryToken } = useNetworkSettings();
+
   const networkTokenSymbol = state.Settings?.beproToken?.symbol || t("misc.$token");
 
   function addTransactionalToken(newToken: Token) {
@@ -83,19 +79,23 @@ export default function TokenConfiguration({
   }, [selectedTransactionalTokens])
 
   useEffect(() => {
-    if(!state.currentUser?.walletAddress || !state.Service?.active?.registryAddress) return;
+    if(!state.currentUser?.walletAddress || !state.connectedChain?.id) return;
     
-    state.Service?.active.getAllowedTokens()
-      .then((allowedTokens) => {
-        getTokens()
-          .then((tokens) => {
-            const { transactional, reward } = handleAllowedTokensDatabase(allowedTokens, tokens)
-            setAllowedTransactionalTokens(transactional);
-            setAllowedRewardTokens(reward);
-          })
-          .catch((err) => console.log("error to get tokens database ->", err));
-      }).catch((err) => console.log("error to get allowed tokens contract ->", err));
-  }, [state.currentUser?.walletAddress, state.Service?.active?.registryAddress]);
+    getTokens(state.connectedChain?.id)
+      .then(tokens => {
+        const { transactional, reward } = tokens.reduce((acc, curr) => ({
+          transactional: curr.isTransactional ? [...acc.transactional, curr]: acc.transactional,
+          reward: curr.isReward ? [...acc.reward, curr]: acc.reward,
+        }), {
+          transactional: [],
+          reward: []
+        });
+        
+        setAllowedTransactionalTokens(transactional);
+        setAllowedRewardTokens(reward);
+      })
+      .catch(err => console.log("error to get tokens database ->", err));
+  }, [state.currentUser?.walletAddress, state.connectedChain?.id]);
 
   useEffect(() => {
     if(!state?.currentUser?.walletAddress || !state?.Service?.active || !BigNumber(tokensLocked.needed).gt(0)) return

@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
 
+import { Network } from "interfaces/network";
+import { Payment } from "interfaces/payments";
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
-
-import { Payment } from "./payments";
 
 export type IssueState =
   | "pending"
@@ -25,6 +25,7 @@ export interface IssueData {
   amount?: string;
   fundingAmount?: string;
   fundedAmount?: string;
+  rewardAmount?: string;
   body: string;
   branch?: string;
   createdAt: Date;
@@ -49,20 +50,23 @@ export interface IssueData {
   updatedAt?: Date;
   url?: string;
   contractId?: number;
-  token?: Token;
+  transactionalToken?: Token;
+  rewardToken?: Token;
   working: string[];
   fundedAt?: Date;
   benefactors?: fundingBenefactor[];
   disputes?: Disputes[];
   payments: Payment[];
-  network?: {
-    colors: {
-        primary: string;
-    };
-    name: string;
-    logoIcon: string;
-  }
+  network?: Network;
   tags: string[];
+  isDraft: boolean;
+  isClosed: boolean;
+  isFundingRequest: boolean;
+  isFunded: boolean;
+  isCanceled: boolean;
+  isReady?: boolean;
+  hasReward?: boolean;
+  fundedPercent: number;
 }
 
 export interface Disputes {
@@ -72,11 +76,12 @@ export interface Disputes {
   proposalId: number;
 }
 
-export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
+export interface IssueBigNumberData 
+  extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount" | "rewardAmount"> {
   amount: BigNumber;
   fundingAmount: BigNumber;
   fundedAmount: BigNumber;
-  fundedPercent: BigNumber;
+  rewardAmount: BigNumber;
 }
 
 export interface IssueNetwork extends IssueBigNumberData {
@@ -94,6 +99,7 @@ export interface IssueSearch {
 export interface Repository {
   id: number;
   githubPath: string;
+  network?: Network;
 }
 
 export interface pullRequest {
@@ -104,6 +110,7 @@ export interface pullRequest {
   isMergeable: boolean;
   issueId: number;
   state: string;
+  userAddress: string;
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
@@ -118,7 +125,10 @@ export interface pullRequest {
   hash?: string;
   approvals?: {
     total: number;
-  }
+  };
+  isCanceled: boolean;
+  isReady: boolean;
+  isCancelable: boolean;
 }
 
 export interface developer {
@@ -159,5 +169,5 @@ export interface fundingBenefactor {
   address: string;
   contractId: number;
   issueId: number;
-  isWithdrawn?: boolean
+  withdrawn?: boolean
 }

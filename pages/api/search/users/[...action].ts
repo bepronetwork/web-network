@@ -1,5 +1,3 @@
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op} from "sequelize";
 
@@ -7,8 +5,10 @@ import models from "db/models";
 
 import paginate from "helpers/paginate";
 
-import {error as LogError} from "services/logging";
+import { LogAccess } from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
+import {error as LogError} from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -39,8 +39,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function SearchUsers(req: NextApiRequest,
-                           res: NextApiResponse) {
+async function SearchUsers(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);

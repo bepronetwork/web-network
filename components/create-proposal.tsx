@@ -15,17 +15,16 @@ import PullRequestLabels from "components/pull-request-labels";
 import ReactSelect from "components/react-select";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
+import {useAppState} from "contexts/app-state";
+
 import sumObj from "helpers/sumObj";
 
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
-
-import {useAppState} from "../contexts/app-state";
-import {useBounty} from "../x-hooks/use-bounty";
-
 
 interface participants {
   githubHandle: string;
@@ -128,8 +127,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     });
   }
 
-  function isSameProposal(currentDistrbuition: SameProposal,
-                          currentProposals: SameProposal[]) {
+  function isSameProposal(currentDistrbuition: SameProposal, currentProposals: SameProposal[]) {
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
@@ -140,7 +138,6 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       }
     });
   }
-
 
   function handleCheckDistrib(obj: object) {
     const currentAmount = sumObj(obj);
@@ -163,13 +160,12 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         }))
       };
 
-      const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
+      const currentProposals = state.currentBounty?.data?.mergeProposals?.map((item) => {
         return {
-          currentPrId: 
-            Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
-          prAddressAmount: item.details.map(detail => ({
-            amount: Number(detail.percentage),
-            address: detail.recipient
+          currentPrId: item.pullRequestId,
+          prAddressAmount: item.distributions.map(distribution => ({
+            amount: distribution.percentage,
+            address: distribution.recipient
           }))
         };
       });
@@ -287,7 +283,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
     setExecuting(true);
 
-    handleProposeMerge(+state.currentBounty?.chainData.id, +currentPullRequest.contractId, prAddresses, prAmounts)
+    handleProposeMerge(+state.currentBounty?.data.contractId, +currentPullRequest.contractId, prAddresses, prAmounts)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -297,7 +293,6 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       handleClose();
       setExecuting(false);
       currentBounty.getDatabaseBounty(true);
-      currentBounty.getChainBounty(true);
     })
   }
 
