@@ -21,6 +21,7 @@ import {
   UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
+import { toLower } from "helpers/string";
 import { NetworkValidator } from "helpers/network";
 import { RegistryValidator } from "helpers/registry";
 import { toLower } from "helpers/string";
@@ -473,16 +474,17 @@ export const NetworkSettingsProvider = ({ children }) => {
         isNetworkAbleToBeClosed,
         tokensLocked
       ] = await Promise.all([
-        service.network.treasuryInfo(),
-        service.getNetworkParameter("councilAmount"),
-        service.getNetworkParameter("disputableTime"),
-        service.getNetworkParameter("draftTime"),
-        service.getNetworkParameter("percentageNeededForDispute"),
-        service.getNetworkParameter("mergeCreatorFeeShare"),
-        service.getNetworkParameter("proposerFeeShare"),
-        service.getNetworkParameter("oracleExchangeRate"),
-        service.getNetworkParameter("cancelableTime"),
-        service.isNetworkAbleToBeClosed(),
+        forcedService.network.treasuryInfo(),
+        forcedService.getNetworkParameter("councilAmount"),
+        forcedService.getNetworkParameter("disputableTime"),
+        forcedService.getNetworkParameter("draftTime"),
+        forcedService.getNetworkParameter("percentageNeededForDispute"),
+        forcedService.getNetworkParameter("mergeCreatorFeeShare"),
+        forcedService.getNetworkParameter("proposerFeeShare"),
+        forcedService.getNetworkParameter("oracleExchangeRate"),
+        forcedService.getNetworkParameter("cancelableTime"),
+        forcedService.isNetworkAbleToBeClosed(),
+        forcedService.getTotalNetworkToken()
       ]);
 
     const validatedParameter = value => ({ value, validated: true });
