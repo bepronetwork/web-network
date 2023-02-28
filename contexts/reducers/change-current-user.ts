@@ -41,3 +41,6 @@ export const changeCurrentUserBalance = (balance: Balance | Partial<Balance>) =>
 
 export const changeCurrentUserConnected = (connected: boolean) =>
   changeCurrentUser.update({connected})
+
+export const changeCurrentUserSignature = (signature: string) =>
+  changeCurrentUser.update({signature});

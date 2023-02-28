@@ -51,3 +51,18 @@ export const RemoveLabel =
     }
   }
 }`;
+
+export const Update = 
+`mutation UpdateIssue($body: String!, $issueId: ID!) {
+  updateIssue(
+    input: {
+      body: $body,
+      id: $issueId
+    }
+  ) {
+    issue {
+      id
+      number
+    }
+  }
+}`
