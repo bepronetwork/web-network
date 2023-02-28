@@ -314,7 +314,7 @@ export function useAuthentication() {
     })
   }
 
-  function signMessage(message?: string) {
+  async function signMessage(message?: string) {
     if (!state?.currentUser?.walletAddress ||
         !state?.connectedChain?.id ||
         state.Service?.starting ||
