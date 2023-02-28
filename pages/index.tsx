@@ -22,6 +22,8 @@ export default function Index() {
 
     if (isAdmin && !hasSupportedChains)
       replace("/setup");
+    else
+      replace("/networks");
 
   }, [state?.supportedChains, state.currentUser?.walletAddress]);
 
