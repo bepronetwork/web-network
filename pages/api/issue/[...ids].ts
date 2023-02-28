@@ -1,4 +1,3 @@
-import { IssueRoute } from "middleware/issue-route";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
@@ -8,7 +7,10 @@ import models from "db/models";
 
 import * as IssueQueries from "graphql/issue";
 
+import { chainFromHeader } from "helpers/chain-from-header";
 import { getPropertyRecursively } from "helpers/object";
+
+import { IssueRoute } from "middleware/issue-route";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
