@@ -88,7 +88,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     include,
     attributes,
     group,
-    order: [[String(req.query.sortBy) ||["createdAt"], String(req.query.order) || "DESC"]],
+    order: [[req.query.sortBy || "createdAt", req.query.order || "DESC"]],
     where: whereCondition,
     nest: true,
   })
