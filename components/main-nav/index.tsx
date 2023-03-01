@@ -144,11 +144,14 @@ export default function MainNav() {
 
   async function handleNetworkSelected(chain: SupportedChainData) {
     if (noNeedNetworkInstance) {
-      const connected = state.currentUser?.walletAddress ? true : await connect();
-        
-      if (connected)
-        handleAddNetwork(chain).catch(() => null);
-        
+      handleAddNetwork(chain)
+        .then(() => {
+          if (state.currentUser?.walletAddress) return;
+
+          connect();
+        })
+        .catch(() => null);
+
       return;
     }
 
