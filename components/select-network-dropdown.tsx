@@ -20,6 +20,7 @@ interface SelectNetworkDropdownProps {
   isOnNetwork?: boolean;
   className?: string;
   isDisabled?: boolean;
+  placeHolder?: string;
 }
 
 interface ChainOption {
@@ -35,14 +36,14 @@ export default function SelectNetworkDropdown({
   isOnNetwork,
   className = "text-uppercase",
   onSelect,
-  isDisabled
+  isDisabled,
+  placeHolder
 }: SelectNetworkDropdownProps) {
   const { t } = useTranslation("common");
 
   const [options, setOptions] = useState<ChainOption[]>([]);
   const [selected, setSelectedChain] = useState<ChainOption>(null);
   const [chainsWithSameNetwork, setChainsWithSameNetwork] = useState<SupportedChainData[]>();
-  const [placeHolderText, setPlaceHolderText] = useState<string>(t("forms.select-placeholder"))
   
   const { searchNetworks } = useApi();
   const { networkName } = useNetwork();
@@ -82,7 +83,6 @@ export default function SelectNetworkDropdown({
         options?.find(({ value: { chainId } }) => chainId === +(defaultChain?.chainId || connectedChain.id))?.value;
 
     if (!chain) {
-      setPlaceHolderText(t("forms.select-placeholder-chain"))
       return;
     }
 
@@ -135,7 +135,7 @@ export default function SelectNetworkDropdown({
         options={options}
         value={selected}
         onChange={selectSupportedChain}
-        placeholder={placeHolderText}
+        placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
         isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
         readOnly={true}
         components={{
