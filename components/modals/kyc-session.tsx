@@ -92,9 +92,7 @@ export function KycSessionModal() {
                   ? <ContextualSpan className="mt-3 mbn-3" context={"success"}>
                       <Translation ns="bounty"
                                    label="kyc.identified"/></ContextualSpan>
-                  : <ContextualSpan className="mt-3 mbn-3" context={"info"}>
-                      <Translation ns="bounty"
-                                   label="kyc.identifying"/></ContextualSpan>
+                  : null
               }
             </div>
           </Modal>
