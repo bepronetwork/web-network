@@ -29,6 +29,7 @@ import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-s
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import { useDao } from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 
@@ -51,6 +52,7 @@ export default function MainNav() {
   const [showHelp, setShowHelp] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>(newNetworkObj);
   
+  const { connect } = useDao();
   const { state } = useAppState();
   const { dispatch } = useAppState();
   const { searchNetworks } = useApi();
@@ -140,9 +142,13 @@ export default function MainNav() {
 
   }
 
-  function handleNetworkSelected(chain: SupportedChainData) {
+  async function handleNetworkSelected(chain: SupportedChainData) {
     if (noNeedNetworkInstance) {
-      handleAddNetwork(chain).catch(() => null);
+      const connected = state.currentUser?.walletAddress ? true : await connect();
+        
+      if (connected)
+        handleAddNetwork(chain).catch(() => null);
+        
       return;
     }
 
