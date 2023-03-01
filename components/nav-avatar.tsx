@@ -9,6 +9,7 @@ import ExternalLinkIcon from "assets/icons/external-link-icon";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
+import If from "components/If";
 
 import {useAppState} from "contexts/app-state";
 
@@ -16,8 +17,6 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
-
-import If from "./If";
 
 interface NavAvatarProps {
   onNetwork?: boolean;
@@ -181,11 +180,11 @@ export default function NavAvatar({
             size="md"
           />
 
-          <If condition={!!state.currentUser?.walletAddress}>
+          {/* <If condition={!!state.currentUser?.walletAddress}>
             <span className="caption-small text-white">
               {truncateAddress(state.currentUser?.walletAddress, 6, 3)}
             </span>
-          </If>
+          </If> */}
         </div>
       </OverlayTrigger>
     </div>
