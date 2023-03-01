@@ -7,6 +7,7 @@ import models from "db/models";
 import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
+
 import {LogAccess} from "../../../../middleware/log-access";
 import WithCors from "../../../../middleware/withCors";
 
@@ -157,15 +158,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           } : {})
         }
       },
+      { association: "network", attributes: ["colors", "name"] }
     ];
 
     if (state === "closed")
       include.push({
         association: "payments"
       });
-
-    if (networks.length > 1)
-      include.push({ association: "network", attributes: ["colors", "name"] });
 
     const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
                                     .replaceAll(',',`,+,`)
