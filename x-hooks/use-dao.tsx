@@ -129,7 +129,7 @@ export function useDao() {
     if (!isConfigured) {
       console.debug("Chain not configured", chainToConnect);
 
-      if (state.currentUser?.isAdmin && !asPath.includes("setup")) {
+      if (state.currentUser?.isAdmin && !asPath.includes("setup") && !asPath.includes("connect-account")) {
         replace("/setup");
 
         return;
