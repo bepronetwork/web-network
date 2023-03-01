@@ -9,7 +9,6 @@ import ExternalLinkIcon from "assets/icons/external-link-icon";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
-import If from "components/If";
 
 import {useAppState} from "contexts/app-state";
 

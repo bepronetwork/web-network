@@ -8,7 +8,6 @@ import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
 import IssueBody from "components/bounty/issue-body";
 import TabSections from "components/bounty/tabs-sections";
-import CustomContainer from "components/custom-container";
 import If from "components/If";
 import IssueComments from "components/issue-comments";
 import PageActions from "components/page-actions";
