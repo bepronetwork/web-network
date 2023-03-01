@@ -15,6 +15,8 @@ import PageActions from "components/page-actions";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
+import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
+
 import { useAuthentication } from "x-hooks/use-authentication";
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
@@ -29,16 +31,16 @@ export default function PageIssue() {
 
   const {state} = useAppState();
   const { getUserRepository } = useOctokit();
-  const { signMessageIfCreatorIssue } = useAuthentication();
+  const { signMessage } = useAuthentication();
 
   const { id } = router.query;
 
   async function handleEditIssue() {
-    const isCreator = await signMessageIfCreatorIssue()
-
-    if(isCreator){
-      setIsEditIssue(true)
-    }
+    signMessage(IM_AM_CREATOR_ISSUE)
+      .then(() => {
+        setIsEditIssue(true);
+      })
+      .catch(error => console.debug(error));
   }
 
   function handleCancelEditIssue() {

@@ -23,7 +23,6 @@ import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "context
 import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
 import {IM_AN_ADMIN, NOT_AN_ADMIN} from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
@@ -274,99 +273,68 @@ export function useAuthentication() {
     dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
-  async function signMessageIfCreatorIssue() {
-    return new Promise(async (resolve, reject) => { 
-      console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
+  function signMessage(message?: string) {
+    return new Promise<string>(async (resolve, reject) => { 
+      if (!state?.currentUser?.walletAddress ||
+          !state?.connectedChain?.id ||
+          state.Service?.starting ||
+          state.spinners?.signingMessage) {
+        reject("Wallet not connected, service not started or already signing a message");
+        return;
+      }
 
-      if (
-        !state?.currentUser?.walletAddress ||
-        !state?.connectedChain?.id ||
-        !state?.currentBounty?.data?.creatorAddress
-      )
-        return reject("error to get data");
+      const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
+      const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+
+      if (!isAdminUser && state.connectedChain?.name === "unknown") {
+        dispatch(addToast({
+          type: "warning",
+          title: "Unsupported chain",
+          content: "To sign a message, connect to a supported chain",
+        }));
+
+        reject("Unsupported chain");
+        return;
+      }
+
+      const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
+
+      const storedSignature = sessionStorage.getItem("currentSignature");
 
       if (decodeMessage(state?.connectedChain?.id,
-                        IM_AM_CREATOR_ISSUE,
-                        state?.currentUser?.signature,
-                        state?.currentBounty?.data?.creatorAddress))
-        return resolve(true)
+                        messageToSign,
+                        storedSignature || state?.currentUser?.signature,
+                        currentWallet)) {
+        if (storedSignature)
+          dispatch(changeCurrentUserSignature(storedSignature));
+        else
+          sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
 
-      if (
-          state?.currentUser?.walletAddress?.toLowerCase() ===
-          state?.currentBounty?.data?.creatorAddress?.toLowerCase()
-        )
-        _signMessage(IM_AM_CREATOR_ISSUE)
-        .then((r) => {
-          dispatch(changeCurrentUserSignature(r));
-          sessionStorage.setItem(`currentSignature`, r || '');
-          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id || '0');
-          resolve(true)
-        })
-        .catch(e => {
-          console.error(`ERROR`, e);
-          reject(e)
-        })
-      else {
-        sessionStorage.setItem(`currentSignature`, '');
-        sessionStorage.setItem(`currentChainId`, '');
-        return reject('error not owner of this bounty')
+        resolve(storedSignature || state?.currentUser?.signature);
+        return;
       }
-    })
-  }
 
-  async function signMessage(message?: string) {
-    if (!state?.currentUser?.walletAddress ||
-        !state?.connectedChain?.id ||
-        state.Service?.starting ||
-        state.spinners?.signingMessage)
-      return undefined;
+      dispatch(changeSpinners.update({ signingMessage: true }));
 
-    const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
-    const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+      await _signMessage(messageToSign)
+        .then(signature => {
+          dispatch(changeSpinners.update({ signingMessage: false }));
 
-    if (!isAdminUser && state.connectedChain?.name === "unknown") {
-      dispatch(addToast({
-        type: "warning",
-        title: "Unsupported chain",
-        content: "To sign a message, connect to a supported chain",
-      }));
+          if (signature) {
+            dispatch(changeCurrentUserSignature(signature));
+            sessionStorage.setItem("currentSignature", signature);
+            
+            resolve(signature);
+            return;
+          }
 
-      return undefined;
-    }
+          dispatch(changeCurrentUserSignature(undefined));
+          sessionStorage.removeItem("currentSignature");
 
-    const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
-
-    const storedSignature = sessionStorage.getItem("currentSignature");
-
-    if (decodeMessage(state?.connectedChain?.id,
-                      messageToSign,
-                      storedSignature || state?.currentUser?.signature,
-                      currentWallet)) {
-      if (storedSignature)
-        dispatch(changeCurrentUserSignature(storedSignature));
-      else
-        sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
-
-      return storedSignature || state?.currentUser?.signature;
-    }
-
-    dispatch(changeSpinners.update({ signingMessage: true }));
-
-    return _signMessage(messageToSign)
-      .then(signature => {
-        dispatch(changeSpinners.update({ signingMessage: false }));
-
-        if (signature) {
-          dispatch(changeCurrentUserSignature(signature));
-          sessionStorage.setItem("currentSignature", signature);
-          
-          return signature;
-        }
-
-        dispatch(changeCurrentUserSignature(undefined));
-        sessionStorage.removeItem("currentSignature");
-        throw new Error("Message not signed");
-      });
+          reject("Message not signed");
+          return;
+        });
+    });
   }
 
   return {
@@ -380,7 +348,6 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    signMessageIfCreatorIssue,
     signMessage
   }
 }
