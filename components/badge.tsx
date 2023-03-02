@@ -6,18 +6,21 @@ interface BadgeProps {
   color?: string;
   className?: string;
   children?: ReactElement
+  style?: object;
 }
 
 export default function Badge({
   label,
   color = "primary",
   className,
-  children
+  children,
+  style
 }: BadgeProps) {
   return(
     <ReactBadge 
       className={className || "p-small family-Regular text-uppercase"}
-      bg={color} 
+      bg={style ? '' : color}
+      style={style}
     >
       {label ? label : children}
     </ReactBadge>
