@@ -12,10 +12,10 @@
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "clean": "npm cache clean --force && rm -rf .next",
-    "dev": "cross-env NODE_OPTIONS=\"--inspect --require=elastic-apm-node/start-next.js\" next dev",
+    "dev": "npm run auto-mining | cross-env NODE_OPTIONS=\"--inspect --require=elastic-apm-node/start-next.js\" next dev",
     "prebuild": "next telemetry disable",
     "build": "next build",
-    "start": "next start",
+    "start": "npm run auto-mining | next start",
     "lint": "npx eslint . --fix --ext .ts,.tsx",
     "generate-settings-types": "node ./scripts/settings/generate-types.js",
     "deploy:local": "node ./scripts/deploy-v2 -n development",
@@ -33,7 +33,8 @@
     "deploy:bitgert": "node ./scripts/deploy-v2 -n bitgert",
     "deploy:bsc": "node ./scripts/deploy-v2 -n bsc",
     "deploy:apollodorus": "node ./scripts/deploy-v2 -n apollodorus",
-    "ganache:dev": "ganache -h 0.0.0.0 -p 8545 -a 50  -s 0x6d2119524d65ea0b15b214ef260d3acdf8ca0ec6ec68045b5785d970f5ad97bd3d0025d212e625a8a21920852cc165c10faa6d8387a0c2530d1ffc0d265d92935749"
+    "ganache:dev": "ganache -h 0.0.0.0 -p 8545 -a 50  -s 0x6d2119524d65ea0b15b214ef260d3acdf8ca0ec6ec68045b5785d970f5ad97bd3d0025d212e625a8a21920852cc165c10faa6d8387a0c2530d1ffc0d265d92935749",
+    "auto-mining": "node scripts/auto-mining"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
