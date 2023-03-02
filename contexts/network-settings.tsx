@@ -356,7 +356,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           .filter(repo => {
             const isOwner = state.currentUser.login === repo?.nameWithOwner.split("/")[0];
 
-            if((!repo?.isFork && isOwner || repo?.isInOrganization) && !repo?.isArchived)
+            if((isOwner || repo?.isInOrganization) && !repo?.isFork && !repo?.isArchived)
               return repo;
           })
           .map(repo => ({
