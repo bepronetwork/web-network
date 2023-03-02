@@ -1,7 +1,7 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
-import {Op} from "sequelize";
+import {Op, Sequelize} from "sequelize";
 
 import Database from "db/models";
 
@@ -60,7 +60,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         association: "chain",
         ... chainName ? {
           where: {
-            chainShortName: chainName
+            chainShortName: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("chain.chainShortName")), 
+                                            "=",
+                                            chainName.toString().toLowerCase())
           }
         } : {},
         required: !!chainName
