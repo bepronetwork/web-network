@@ -2,10 +2,12 @@ import Badge from "components/badge";
 
 interface BountyTagsProps {
   tags: string[];
+  color?: string;
 }
 
 export default function BountyTags({
-  tags
+  tags,
+  color,
 } : BountyTagsProps) {
   if (!tags) return <></>;
   
@@ -15,8 +17,9 @@ export default function BountyTags({
         <Badge
           key={tag}
           label={tag} 
-          className="caption-small border border-primary border-radius-8" 
-          color="primary-30"
+          className="caption-small border-radius-8" 
+          color="primary" 
+          style={color ? { backgroundColor: color }: null}
         /> )}
     </div>
   );
