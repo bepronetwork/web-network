@@ -51,7 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   };
 
   const network = await Database.network.findOne({
-    attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
+    attributes: { exclude: ["creatorAddress", "updatedAt"] },
     include: [
       { association: "tokens" },
       { association: "curators" },
