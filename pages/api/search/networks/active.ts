@@ -34,7 +34,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = await models.network.findAll({
         attributes: {
-          exclude: ["id", "creatorAddress"]
+          exclude: ["creatorAddress"]
         },
         where: whereCondition,
         include,
