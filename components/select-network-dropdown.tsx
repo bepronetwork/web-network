@@ -47,7 +47,7 @@ export default function SelectNetworkDropdown({
   
   const { searchNetworks } = useApi();
   const { networkName } = useNetwork();
-  const { state: { Service, supportedChains, connectedChain, currentUser } } = useAppState();
+  const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
 
   function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption { 
     return { 
@@ -66,7 +66,7 @@ export default function SelectNetworkDropdown({
   async function selectSupportedChain({value}) {
     const chain = supportedChains?.find(({ chainId }) => +chainId === +value.chainId);
 
-    if (!chain)
+    if (!chain || chain?.chainId === selected?.value?.chainId)
       return;
 
     onSelect(chain);
@@ -126,7 +126,8 @@ export default function SelectNetworkDropdown({
   useEffect(updateSelectedChainMatchConnected, [
     options,
     Service?.network?.active?.chain,
-    connectedChain?.id
+    connectedChain?.id,
+    spinners
   ]);
 
   return(

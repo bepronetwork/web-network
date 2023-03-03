@@ -36,17 +36,26 @@ export function useDao() {
   function connect() {
     dispatch(changeConnecting(true));
 
-    (state.Service?.active ? state.Service.active.connect() : window.ethereum.request({method: 'eth_requestAccounts'}))
+    return (state.Service?.active ? state.Service.active.connect() : 
+      window.ethereum.request({method: 'eth_requestAccounts'}))
       .then((connected) => {
         if (!connected) {
-          dispatch(toastError('Failed to connect'));
-          console.error(`Failed to connect`, state.Service);
-          return;
+          console.debug(`Failed to connect`, state.Service);
+
+          return false;
         }
 
         dispatch(changeCurrentUserConnected(true));
-        dispatch(changeConnecting(false))
         dispatch(changeCurrentUserWallet(connected[0] as string));
+
+        return true;
+      })
+      .catch(error => {
+        console.debug(`Failed to connect`, error);
+        return false;
+      })
+      .finally(() => {
+        dispatch(changeConnecting(false));
       });
   }
 
@@ -120,7 +129,7 @@ export function useDao() {
     if (!isConfigured) {
       console.debug("Chain not configured", chainToConnect);
 
-      if (state.currentUser?.isAdmin && !asPath.includes("setup")) {
+      if (state.currentUser?.isAdmin && !asPath.includes("setup") && !asPath.includes("connect-account")) {
         replace("/setup");
 
         return;

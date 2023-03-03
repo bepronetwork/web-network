@@ -104,8 +104,7 @@ export function useAuthentication() {
 
     dispatch(changeWalletSpinnerTo(true));
 
-    (state.Service?.active ? 
-      state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
+    window.ethereum.request({method: 'eth_requestAccounts'})
       .then(_address => {
         if (Array.isArray(_address)) console.debug("eth_requestAccounts", _address);
         
