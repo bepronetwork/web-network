@@ -14,7 +14,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, page, sortBy, time, search } = req.query || {};
+    const { address, page, time, search } = req.query || {};
 
     if (address) whereCondition.address = address;
 
