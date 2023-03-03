@@ -27,8 +27,8 @@ export default function ProposalProgressBar({
   const [_columns, setColumns] = useState<number[]>([]);
 
   function toPercent(value = 0, total = 0, decimals = 2) {
-    const percent = ((value / total) * 100).toFixed(decimals)
-    return isNaN(+percent) ? 0 : +percent;
+    const percent = +((value / total) * 100).toFixed(decimals)
+    return isNaN(percent) ? 0 : percent;
   }
 
   function toRepresentationPercent(value = 0) {
