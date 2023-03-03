@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { CSSProperties, ReactElement } from "react";
 import { Badge as ReactBadge } from "react-bootstrap";
 
 interface BadgeProps {
