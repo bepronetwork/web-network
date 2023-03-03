@@ -337,59 +337,44 @@ export function useAuthentication() {
     });
   }
 
-  async function signMessage(message?: string) {
-    if (!state?.currentUser?.walletAddress ||
-        !state?.connectedChain?.id ||
-        state.Service?.starting ||
-        state.spinners?.signingMessage)
-      return undefined;
+      const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
 
-    const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
-    const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+      const storedSignature = sessionStorage.getItem("currentSignature");
 
-    if (!isAdminUser && state.connectedChain?.name === "unknown") {
-      dispatch(addToast({
-        type: "warning",
-        title: "Unsupported chain",
-        content: "To sign a message, connect to a supported chain",
-      }));
+      if (decodeMessage(state?.connectedChain?.id,
+                        messageToSign,
+                        storedSignature || state?.currentUser?.signature,
+                        currentWallet)) {
+        if (storedSignature)
+          dispatch(changeCurrentUserSignature(storedSignature));
+        else
+          sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
 
-      return undefined;
-    }
+        resolve(storedSignature || state?.currentUser?.signature);
+        return;
+      }
 
-    const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
+      dispatch(changeSpinners.update({ signingMessage: true }));
 
-    const storedSignature = sessionStorage.getItem("currentSignature");
+      await _signMessage(messageToSign)
+        .then(signature => {
+          dispatch(changeSpinners.update({ signingMessage: false }));
 
-    if (decodeMessage(state?.connectedChain?.id,
-                      messageToSign,
-                      storedSignature || state?.currentUser?.signature,
-                      currentWallet)) {
-      if (storedSignature)
-        dispatch(changeCurrentUserSignature(storedSignature));
-      else
-        sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
+          if (signature) {
+            dispatch(changeCurrentUserSignature(signature));
+            sessionStorage.setItem("currentSignature", signature);
+            
+            resolve(signature);
+            return;
+          }
 
-      return storedSignature || state?.currentUser?.signature;
-    }
+          dispatch(changeCurrentUserSignature(undefined));
+          sessionStorage.removeItem("currentSignature");
 
-    dispatch(changeSpinners.update({ signingMessage: true }));
-
-    return _signMessage(messageToSign)
-      .then(signature => {
-        dispatch(changeSpinners.update({ signingMessage: false }));
-
-        if (signature) {
-          dispatch(changeCurrentUserSignature(signature));
-          sessionStorage.setItem("currentSignature", signature);
-          
-          return signature;
-        }
-
-        dispatch(changeCurrentUserSignature(undefined));
-        sessionStorage.removeItem("currentSignature");
-        throw new Error("Message not signed");
-      });
+          reject("Message not signed");
+          return;
+        });
+    });
   }
 
   function updateKycSession(){
