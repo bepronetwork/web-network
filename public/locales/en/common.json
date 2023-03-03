@@ -309,6 +309,7 @@
       "required": "Field is required"
     },
     "select-placeholder": "Select...",
+    "select-placeholder-chain": "Select a supported chain",
     "create-pull-request": {
       "title": {
         "label": "Title",
