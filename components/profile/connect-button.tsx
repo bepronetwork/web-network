@@ -69,7 +69,15 @@ function ConnectionButton({
     ...(isDisabled || isLoading)?  ["pe-none", "trans"] : [],
   ];
 
-  const handleConnect = () => credential ? undefined : connect();
+  const handleConnect = () => {
+    if (credential) return undefined;
+    else
+      try {
+        return connect();
+      } catch (err) {
+        console.debug("handleConnect error:", err);
+      }
+  };
 
   return(
     <div className="d-flex flex-column">
