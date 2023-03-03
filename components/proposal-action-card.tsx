@@ -224,7 +224,7 @@ export default function ProposalActionCard({
 
           { prsNeedsApproval &&
             <div className="row mt-2">
-              <ContextualSpan context="warning">
+              <ContextualSpan context="warning" classNameIcon="mb-4">
                 {t("pull-request:errors.approval")}
               </ContextualSpan>
             </div>
