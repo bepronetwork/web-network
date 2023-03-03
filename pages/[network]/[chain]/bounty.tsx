@@ -8,13 +8,14 @@ import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
 import IssueBody from "components/bounty/issue-body";
 import TabSections from "components/bounty/tabs-sections";
-import CustomContainer from "components/custom-container";
 import If from "components/If";
 import IssueComments from "components/issue-comments";
 import PageActions from "components/page-actions";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
+
+import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 import {useBounty} from "x-hooks/use-bounty";
@@ -27,20 +28,19 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState<boolean>();
   const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
-  const { signMessageIfCreatorIssue } = useAuthentication();
 
   const {state} = useAppState();
-
   const { getUserRepository } = useOctokit();
+  const { signMessage } = useAuthentication();
 
   const { id } = router.query;
 
   async function handleEditIssue() {
-    const isCreator = await signMessageIfCreatorIssue()
-
-    if(isCreator){
-      setIsEditIssue(true)
-    }
+    signMessage(IM_AM_CREATOR_ISSUE)
+      .then(() => {
+        setIsEditIssue(true);
+      })
+      .catch(error => console.debug(error));
   }
 
   function handleCancelEditIssue() {
