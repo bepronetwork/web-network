@@ -27,7 +27,8 @@ export default function ProposalProgressBar({
   const [_columns, setColumns] = useState<number[]>([]);
 
   function toPercent(value = 0, total = 0, decimals = 2) {
-    return ((value / total) * 100).toFixed(decimals);
+    const percent = ((value / total) * 100).toFixed(decimals)
+    return isNaN(+percent) ? 0 : percent;
   }
 
   function toRepresentationPercent(value = 0) {
@@ -62,6 +63,7 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
+    console.log('issueDisputeAmount',  state.currentUser?.balance?.staked?.toNumber(), issueDisputeAmount)
     setPercentage(+toPercent(issueDisputeAmount, state.currentUser?.balance?.staked?.toNumber()));
   }
 
@@ -129,7 +131,7 @@ export default function ProposalProgressBar({
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
             /{formatNumberToNScale(state.currentUser?.balance?.staked?.toNumber() || 0)}{" "}
-            
+            {console.log('values->', state.currentUser?.balance?.staked?.toNumber())}
             <Translation 
               label="$oracles" 
               params={{ token: state.Service?.network?.active?.networkToken?.symbol }}
