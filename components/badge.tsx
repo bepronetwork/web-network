@@ -6,7 +6,7 @@ interface BadgeProps {
   color?: string;
   className?: string;
   children?: ReactElement
-  style?: object;
+  style?: CSSProperties;
 }
 
 export default function Badge({
@@ -19,7 +19,7 @@ export default function Badge({
   return(
     <ReactBadge 
       className={className || "p-small family-Regular text-uppercase"}
-      bg={style ? '' : color}
+      bg={style ? null : color} 
       style={style}
     >
       {label ? label : children}
