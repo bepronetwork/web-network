@@ -14,14 +14,14 @@
       "title": "Lock {{currency}}",
       "description": "Lock {{currency}} to receive bv{{token}}",
       "get-amount-oracles": "Get {{amount}} bv{{token}}",
-      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get {{amount}} bv{{token}}"
+      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get /oracles{{oracleAmount}} bv{{token}}"
     },
     "unlock": {
       "label": "Unlock",
       "title": "Unlock {{currency}}",
       "description": "Get {{currency}} from bv{{token}}",
       "get-amount-bepro": "Get {{amount}} {{currency}}",
-      "body": "Give away {{amount}} bv{{token}}/ /br/ to get back /bepro{{amount}} {{currency}}"
+      "body": "Give away /oracles{{amount}} bv{{token}}/ /br/ to get back /bepro{{oracleAmount}} {{currency}}"
     },
     "delegate": {
       "label": "Delegate",
