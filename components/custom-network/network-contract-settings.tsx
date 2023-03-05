@@ -78,7 +78,7 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:oracle-exchange-rate.label"), 
       description: t("custom-network:oracle-exchange-rate.description"),
-      symbol: "%", 
+      symbol: "", 
       value: settings?.parameters?.oracleExchangeRate?.value,
       error: settings?.parameters?.oracleExchangeRate?.validated === false,
       decimals: 4,
