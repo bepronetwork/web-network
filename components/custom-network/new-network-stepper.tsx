@@ -20,10 +20,14 @@ import {changeLoadState} from "contexts/reducers/change-load";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {
+  DEFAULT_CANCELABLE_TIME,
   DEFAULT_COUNCIL_AMOUNT,
   DEFAULT_DISPUTE_TIME,
   DEFAULT_DRAFT_TIME,
-  DEFAULT_PERCENTAGE_FOR_DISPUTE
+  DEFAULT_MERGER_FEE,
+  DEFAULT_ORACLE_EXCHANGE_RATE,
+  DEFAULT_PERCENTAGE_FOR_DISPUTE,
+  DEFAULT_PROPOSER_FEE
 } from "helpers/contants";
 import {psReadAsText} from "helpers/file-reader";
 
@@ -56,6 +60,10 @@ function NewNetwork() {
     { id: 1, name: t("custom-network:modals.loader.steps.changing-disputable-time") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-dispute-percentage") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-council-amount") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-cancelable-time") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-oracle-exchange-rate") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-merger-fee") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-proposer-fee") },
     { id: 2, name: t("custom-network:modals.loader.steps.add-to-registry") },
     { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") }
   ];
@@ -110,6 +118,10 @@ function NewNetwork() {
     const disputableTime = settings.parameters.disputableTime.value;
     const councilAmount = settings.parameters.councilAmount.value;
     const percentageForDispute = settings.parameters.percentageNeededForDispute.value;
+    const cancelableTime = settings.parameters.cancelableTime.value;
+    const oracleExchangeRate = settings.parameters.oracleExchangeRate.value;
+    const mergerFee = settings.parameters.mergeCreatorFeeShare.value;
+    const proposerFee = settings.parameters.proposerFeeShare.value;
 
     if (draftTime !== DEFAULT_DRAFT_TIME) {
       setCreatingNetwork(1);
@@ -131,7 +143,27 @@ function NewNetwork() {
       await handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, deployedNetworkAddress);
     }
 
-    setCreatingNetwork(5);
+    if (cancelableTime !== DEFAULT_CANCELABLE_TIME) {
+      setCreatingNetwork(5);
+      await handleChangeNetworkParameter("cancelableTime", cancelableTime, deployedNetworkAddress);
+    }
+
+    if (oracleExchangeRate !== DEFAULT_ORACLE_EXCHANGE_RATE) {
+      setCreatingNetwork(6);
+      await handleChangeNetworkParameter("oracleExchangeRate", oracleExchangeRate, deployedNetworkAddress);
+    }
+
+    if (mergerFee !== DEFAULT_MERGER_FEE) {
+      setCreatingNetwork(7);
+      await handleChangeNetworkParameter("mergeCreatorFeeShare", mergerFee, deployedNetworkAddress);
+    }
+
+    if (proposerFee !== DEFAULT_PROPOSER_FEE) {
+      setCreatingNetwork(8);
+      await handleChangeNetworkParameter("proposerFeeShare", proposerFee, deployedNetworkAddress);
+    }
+
+    setCreatingNetwork(9);
 
     const registrationTx = await handleAddNetworkToRegistry(deployedNetworkAddress)
       .catch(error => {
@@ -140,7 +172,7 @@ function NewNetwork() {
         return error;
       });
 
-    setCreatingNetwork(6);
+    setCreatingNetwork(10);
     cleanStorage?.();
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
       .then(() => router.push(getURLWithNetwork("/", { network: payload.name.toLowerCase().replaceAll(" ", "-") })))

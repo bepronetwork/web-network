@@ -234,6 +234,10 @@
         "changing-disputable-time": "Deploying Network_v2 (Changing disputable time)",
         "changing-dispute-percentage": "Deploying Network_v2 (Changing dispute percentage)",
         "changing-council-amount": "Deploying Network_v2 (Changing curator amount)",
+        "changing-cancelable-time": "Deploying Network_v2 (Changing cancelable time)",
+        "changing-oracle-exchange-rate": "Deploying Network_v2 (Changing oracle exchange rate)",
+        "changing-merger-fee": "Deploying Network_v2 (Changing merger fee)",
+        "changing-proposer-fee": "Deploying Network_v2 (Changing proposer fee)",
         "set-dispatcher": "Setting Bounty Token Dispatcher",
         "add-to-registry": "Registering Network_v2",
         "sync-web-network": "Synchronizing Web-network"
