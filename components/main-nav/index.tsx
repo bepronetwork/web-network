@@ -20,7 +20,6 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import SelectNetworkDropdown from "components/select-network-dropdown";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
-import WrongNetworkModal from "components/wrong-network-modal";
 
 import {useAppState} from "contexts/app-state";
 import { changeCurrentUserHasRegisteredNetwork } from "contexts/reducers/change-current-user";
@@ -54,12 +53,12 @@ export default function MainNav() {
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>(newNetworkObj);
   
   const { connect } = useDao();
+  const { chain } = useChain();
   const { state } = useAppState();
   const { dispatch } = useAppState();
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
   const { handleAddNetwork } = useNetworkChange();
-  const { chain, findSupportedChain } = useChain();
 
   const noNeedNetworkInstance = [
     "/",
@@ -249,8 +248,6 @@ export default function MainNav() {
             >
               <HelpIcon />
             </Button>
-
-            <WrongNetworkModal />
 
             <ConnectWalletButton>
               <TransactionsStateIndicator />

@@ -18,12 +18,12 @@ import Seo from "components/seo";
 import StatusBar from "components/status-bar";
 import Toaster from "components/toaster";
 import WebThreeDialog from "components/web3-dialog";
+import WrongNetworkModal from "components/wrong-network-modal";
 
 import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
-
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
@@ -48,6 +48,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
               <Component {...pageProps} />
             </div>
             <CreateBountyModal/>
+            <WrongNetworkModal />
             <StatusBar />
             <Toaster />
             <Loading />
