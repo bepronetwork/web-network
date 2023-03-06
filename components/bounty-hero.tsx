@@ -125,7 +125,7 @@ export default function BountyHero() {
                   <div className="mt-3">
                     <BountyTags
                       tags={state.currentBounty?.data?.tags}
-                      color={state?.Service?.network?.active.colors.primary}
+                      color={state?.Service?.network?.active?.colors?.primary}
                     />
                   </div>
                 }
