@@ -174,7 +174,7 @@ export default function ProposalActionCard({
                 className="flex-grow-1"
                 textClass="text-uppercase text-white"
                 color="purple"
-                disabled={!proposalCanBeDisputed() || isDisputing}
+                disabled={isRefusing || isMerging ||  isDisputing || !proposalCanBeDisputed()}
                 onClick={handleDispute}
                 isLoading={isDisputing}
                 withLockIcon={!proposalCanBeDisputed() || isMerging || isRefusing}
