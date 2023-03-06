@@ -11,15 +11,15 @@ import WithCors from "middleware/withCors";
 
 import { Logger } from "services/logging";
 
+type StrOrNmb = string | string[] | number;
+
 interface includeProps {
   association: string;
   required?: boolean;
   attributes?: string[];
   where?: {
-    state?: {
-      [Op.ne]?: string;
-    } | string;
-  }
+    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb }
+  };
 }
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -34,7 +34,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     isDefault, 
     page, 
     chainId,
-    isNeedCountsAndTokensLocked
+    isNeedCountsAndTokensLocked,
+    chainShortName
   } = req.query || {};
 
   if (name) 
@@ -63,7 +64,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const include: includeProps[] = [
     { association: "tokens" },
-    { association: "chain" },
+    { 
+      association: "chain",
+      where: {
+        ... chainShortName ? { chainShortName: chainShortName } : {}
+      }
+    },
     { association: "networkToken"}
   ];
 
