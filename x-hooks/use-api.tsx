@@ -394,7 +394,9 @@ export default function useApi() {
     if (!state.connectedChain?.events)
       return;
 
-    return axios.get(`${state.connectedChain?.events}/past-events/${entity}/${event}`, {
+    const eventsURL = new URL(`/past-events/${entity}/${event}`, state.connectedChain?.events);
+
+    return axios.get(eventsURL.href, {
       params: { ...params, networkName }
     }).then(({ data }) => data?.[networkName]);
   }
