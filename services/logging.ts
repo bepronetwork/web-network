@@ -1,63 +1,12 @@
-import {format} from "date-fns";
-import getConfig from "next/config";
+import Scribal from "./scribal";
 
-const { serverRuntimeConfig } = getConfig();
-
-enum LogLevel {
-  none, error, warn, info, trace, log, debug
-}
-
-const consoleMethods = {
-  none: '',
-  log: 'log',
-  info: 'info',
-  error: 'error',
-  DEBUG: 'debug',
-  warn: 'warn',
-  debug: 'debug',
-  trace: 'info'
-};
-
-const LOG_LEVEL = serverRuntimeConfig.logLevel ? parseInt(serverRuntimeConfig.logLevel, 10) : LogLevel.debug;
-// const INDEX_STACK_TRACE = serverRuntimeConfig.logStackTrace;
-
-// const {url: node, username, password} = serverRuntimeConfig.elasticSearch;
-
-export const output = (_level: LogLevel, message, ...rest) => { // eslint-disable-line
-  const level = LogLevel[_level];
-  const method = consoleMethods[level];
-
-  if (!(LOG_LEVEL && LOG_LEVEL >= _level))
-    return;
-
-  const string = `(${level.toUpperCase()}) (${format(new Date(), `dd/MM HH:mm:ss`)}) ${message}`;
-
-  console[method](string, ...rest); // eslint-disable-line
-
-  // if (node && username && password) {
-  //   if (!INDEX_STACK_TRACE && _level === LogLevel.trace)
-  //     return; // optionally disable indexing stack traces
-  //
-  //   const client = new Client({node, auth: {username, password} })
-  //
-  //   const info = {restArray: [], restObject: {}, restSimple: ''};
-  //   if (Array.isArray(rest))
-  //     info.restArray = rest;
-  //   else if (rest !== null && typeof rest === "object")
-  //     info.restObject = rest;
-  //   else info.restSimple = rest;
-  //
-  //   client?.index({ index: "web-network-ui", document: {level, timestamp: new Date(), message, info}})
-  //     .catch(e => console.log(e))
-  // }
-}
 /* eslint-disable */
-export const info = (message, ...rest) => output(LogLevel.info, message, ...rest);
-export const error = (message, ...rest) => output(LogLevel.error, message, ...rest);
-export const log = (message, ...rest) => output(LogLevel.log, message, ...rest);
-export const warn = (message, ...rest) => output(LogLevel.warn, message, ...rest);
-export const debug = (message, ...rest) => output(LogLevel.debug, message, ...rest);
-export const trace = (message, ...rest) => output(LogLevel.trace, message, ...rest);
+export const info = (message: string, ...rest) => Scribal.i(message, ...rest);
+export const error = (message: string, ...rest) => Scribal.e(message, ...rest);
+export const log = (message: string, ...rest) => Scribal.d(message, ...rest);
+export const warn = (message: string, ...rest) => Scribal.w(message, ...rest);
+export const debug = (message: string, ...rest) => Scribal.d(message, ...rest);
+export const trace = (message: string, ...rest) => Scribal.d(message, ...rest);
 
 
 export class Logger {

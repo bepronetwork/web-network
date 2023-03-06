@@ -11,7 +11,8 @@ export default function ImageUploader({
   onChange,
   lg = false,
   error = false,
-  className = ""
+  className = "",
+  isLoading = false,
 }) {
   const { t } = useTranslation("custom-network");
 
@@ -45,7 +46,9 @@ export default function ImageUploader({
         } ${className}`}
         htmlFor={name}
       >
-        {image.preview || typeof image === "string" ? (
+        {isLoading ? (
+          <span className="spinner-border spinner-border-xs ml-1" />
+        ) : image.preview || typeof image === "string" ? (
           <img
             src={image.preview || image}
             alt="dummy"

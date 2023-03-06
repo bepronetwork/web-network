@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import removeMarkdown from "markdown-to-text";
 import {DefaultSeo, NextSeo} from "next-seo";
 import getConfig from "next/config";
+import { useRouter } from "next/router";
 
 import {IssueBigNumberData, IssueData} from "interfaces/issue-data";
 
@@ -16,13 +17,13 @@ interface ISeoProps {
 }
 
 const Seo: React.FC<ISeoProps> = () => {
-
+  const {query} = useRouter();
   const {state} = useAppState();
   const [issueMeta, setIssueMeta] = useState<IssueBigNumberData>(null);
 
   useEffect(() => { setIssueMeta(state.currentBounty?.data)}, [state.currentBounty?.data]);
 
-  if (issueMeta) {
+  if (issueMeta && query?.id && query?.repoId) {
     // eslint-disable-next-line no-unsafe-optional-chaining
     const homeUrl = publicRuntimeConfig?.urls?.home;
     // eslint-disable-next-line no-unsafe-optional-chaining

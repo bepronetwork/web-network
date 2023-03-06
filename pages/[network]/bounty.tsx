@@ -6,16 +6,15 @@ import {GetServerSideProps} from "next/types";
 
 import BountyHero from "components/bounty-hero";
 import FundingSection from "components/bounty/funding-section";
+import IssueBody from "components/bounty/issue-body";
 import TabSections from "components/bounty/tabs-sections";
-import CustomContainer from "components/custom-container";
 import IssueComments from "components/issue-comments";
-import IssueDescription from "components/issue-description";
-import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
 import PageActions from "components/page-actions";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
+import { useAuthentication } from "x-hooks/use-authentication";
 import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
 
@@ -25,12 +24,26 @@ export default function PageIssue() {
 
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState<boolean>();
+  const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
+  const { signMessageIfCreatorIssue } = useAuthentication();
 
   const {state} = useAppState();
 
   const { getUserRepository } = useOctokit();
 
   const { id } = router.query;
+
+  async function handleEditIssue() {
+    const isCreator = await signMessageIfCreatorIssue()
+
+    if(isCreator){
+      setIsEditIssue(true)
+    }
+  }
+
+  function handleCancelEditIssue() {
+    setIsEditIssue(false)
+  }
 
   function checkForks(){
     if (!state.Service?.network?.repos?.active?.githubPath || isRepoForked !== undefined) return;
@@ -79,11 +92,14 @@ export default function PageIssue() {
     <BountyEffectsProvider>
       <BountyHero />
 
-      { state.currentBounty?.chainData?.isFundingRequest ? <FundingSection /> : null}
+      { state.currentBounty?.chainData?.isFundingRequest && state.currentBounty?.data?.fundingAmount ? 
+      <FundingSection /> : null}
 
       <PageActions
         isRepoForked={!!isRepoForked}
         addNewComment={addNewComment}
+        handleEditIssue={handleEditIssue}
+        isEditIssue={isEditIssue}
       />
 
       {(state.currentUser?.walletAddress)
@@ -91,26 +107,10 @@ export default function PageIssue() {
         : null
       }
 
-      { state.currentUser?.walletAddress ? (
-        <div className="container mb-1">
-          <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
-            <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
-              <div className="container">
-                <IssueDescription description={state.currentBounty?.data?.body || ""} />
-              </div>
-            </div>
-            <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
-              <div className="sticky-bounty">
-                <IssueProposalProgressBar />
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <CustomContainer>
-          <IssueDescription description={state.currentBounty?.data?.body || ""} />
-        </CustomContainer>
-      )}
+      <IssueBody 
+        isEditIssue={isEditIssue} 
+        cancelEditIssue={handleCancelEditIssue}
+        />
 
       <IssueComments
         comments={commentsIssue}

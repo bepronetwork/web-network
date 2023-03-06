@@ -12,11 +12,15 @@ import {
   changeCurrentUserHandle,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
+  changeCurrentUserSignature,
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
+
+import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
+import decodeMessage from "helpers/decode-message";
 
 import {CustomSession} from "interfaces/custom-session";
 
@@ -29,6 +33,7 @@ import {useTransactions} from "x-hooks/use-transactions";
 
 import {EventName} from "../interfaces/analytics";
 import useAnalyticEvents from "./use-analytic-events";
+import useSignature from "./use-signature";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
@@ -43,6 +48,7 @@ export function useAuthentication() {
 
   const {asPath, push} = useRouter();
   const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {signMessage} = useSignature()
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -241,6 +247,46 @@ export function useAuthentication() {
     dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
+  async function signMessageIfCreatorIssue() {
+    return new Promise(async (resolve, reject) => { 
+      console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
+
+      if (
+        !state?.currentUser?.walletAddress ||
+        !state?.connectedChain?.id ||
+        !state?.currentBounty?.data?.creatorAddress
+      )
+        return reject("error to get data");
+
+      if (decodeMessage(state?.connectedChain?.id,
+                        IM_AM_CREATOR_ISSUE,
+                        state?.currentUser?.signature,
+                        state?.currentBounty?.data?.creatorAddress))
+        return resolve(true)
+
+      if (
+          state?.currentUser?.walletAddress?.toLowerCase() ===
+          state?.currentBounty?.data?.creatorAddress?.toLowerCase()
+        )
+        signMessage(IM_AM_CREATOR_ISSUE)
+        .then((r) => {
+          dispatch(changeCurrentUserSignature(r));
+          sessionStorage.setItem(`currentSignature`, r || '');
+          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id || '0');
+          resolve(true)
+        })
+        .catch(e => {
+          console.error(`ERROR`, e);
+          reject(e)
+        })
+      else {
+        sessionStorage.setItem(`currentSignature`, '');
+        sessionStorage.setItem(`currentChainId`, '');
+        return reject('error not owner of this bounty')
+      }
+    })
+  }
+
   return {
     connectWallet,
     disconnectWallet,
@@ -251,6 +297,7 @@ export function useAuthentication() {
     validateGhAndWallet,
     listenToAccountsChanged,
     updateCurrentUserLogin,
-    verifyReAuthorizationNeed
+    verifyReAuthorizationNeed,
+    signMessageIfCreatorIssue
   }
 }
