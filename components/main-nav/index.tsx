@@ -29,6 +29,7 @@ import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-s
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import { useDao } from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
@@ -58,6 +59,7 @@ export default function MainNav() {
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
   const { handleAddNetwork } = useNetworkChange();
+  const { chain, findSupportedChain } = useChain();
 
   const noNeedNetworkInstance = [
     "/",
@@ -73,10 +75,28 @@ export default function MainNav() {
   const brandHref = noNeedNetworkInstance ? "/" : getURLWithNetwork("/", {
     network: state.Service?.network?.active?.name,
   });
+  
+
+  function getChainShortName() {
+    const availableChains = state.Service?.network?.availableChains;
+    const isOnAvailableChain = availableChains?.find(({ chainId }) => +chainId === +state.connectedChain?.id);
+
+    if (chain) return chain.chainShortName;
+
+    if (isOnAvailableChain) {
+      return isOnAvailableChain.chainShortName;
+    }
+
+    if (availableChains) return availableChains[0].chainShortName;
+
+    return null;
+  }
 
   const links = [
     {
-      href: getURLWithNetwork("/"),
+      href: getURLWithNetwork("/", {
+        chain: getChainShortName()
+      }),
       label: t("main-nav.nav-avatar.bounties"),
       isVisible: !noNeedNetworkInstance
     },
