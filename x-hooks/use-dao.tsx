@@ -6,7 +6,6 @@ import {useAppState} from "contexts/app-state";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
-import {toastError,} from "contexts/reducers/change-toaster";
 
 import { UNSUPPORTED_CHAIN } from "helpers/contants";
 
