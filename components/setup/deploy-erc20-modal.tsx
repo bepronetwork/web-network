@@ -3,11 +3,17 @@ import { useTranslation } from "next-i18next";
 import { ERC20Details } from "components/custom-network/erc20-details";
 import Modal from "components/modal";
 
+interface DeployERC20ModalProps {
+  show?: boolean;
+  handleHide: () => void;
+  onChange: (value: string, validated?: boolean) =>  void;
+}
+
 export function DeployERC20Modal({
   show = false,
   handleHide,
   onChange
-}) {
+}: DeployERC20ModalProps) {
   const { t } = useTranslation("setup");
 
   function handleChange(value: string) {

@@ -4,7 +4,6 @@ import removeMarkdown from "markdown-to-text";
 import {DefaultSeo, NextSeo} from "next-seo";
 import SEO_CONFIG from "next-seo-config";
 import getConfig from "next/config";
-import { useRouter } from "next/router";
 
 import {useAppState} from "contexts/app-state";
 
@@ -17,7 +16,6 @@ interface ISeoProps {
 }
 
 const Seo: React.FC<ISeoProps> = () => {
-  const {query} = useRouter();
   const {state} = useAppState();
   const [issueMeta, setIssueMeta] = useState<IssueBigNumberData>(null);
 

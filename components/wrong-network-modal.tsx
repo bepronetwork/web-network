@@ -119,6 +119,7 @@ export default function WrongNetworkModal() {
           defaultChain={networkChain}
           onSelect={selectSupportedChain}
           isDisabled={isAddingNetwork}
+          placeHolder={t("forms.select-placeholder-chain")}
         />
 
         <Button 

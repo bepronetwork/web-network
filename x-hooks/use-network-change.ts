@@ -39,7 +39,7 @@ export default function useNetworkChange() {
               },
             ],
           }).catch(e => {
-            throw new Error(e)
+            throw new Error(e);
           })
         }
 
@@ -50,5 +50,5 @@ export default function useNetworkChange() {
 
   return {
     handleAddNetwork
-  }
+  };
 }
