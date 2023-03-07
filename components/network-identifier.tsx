@@ -1,5 +1,7 @@
 import {useEffect} from "react";
 
+import { useTranslation } from "next-i18next";
+
 import Indicator from "components/indicator";
 
 import {useAppState} from "contexts/app-state";
@@ -10,6 +12,8 @@ import { UNSUPPORTED_CHAIN } from "helpers/contants";
 import {NetworkColors} from "interfaces/enums/network-colors";
 
 export default function NetworkIdentifier() {
+  const { t } = useTranslation("common");
+
   const {state, dispatch} = useAppState();
 
   function findChain(windowChainId: number) {
@@ -55,7 +59,7 @@ export default function NetworkIdentifier() {
       <div className="ml-2 bg-transparent p-0 d-flex flex-row align-items-center justify-content-center">
         <Indicator bg={findChain(+state.connectedChain?.id)?.color || NetworkColors[state.connectedChain?.name]} />
         <span className="caption-small text-white-50 ">
-          {state.connectedChain?.name}
+          {state.connectedChain?.name === UNSUPPORTED_CHAIN ? t("misc.unsupported") : state.connectedChain?.name}
         </span>
       </div>
     )) || <></>
