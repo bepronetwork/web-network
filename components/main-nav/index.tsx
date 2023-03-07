@@ -12,7 +12,6 @@ import Button from "components/button";
 import ClosedNetworkAlert from "components/closed-network-alert";
 import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
-import InternalLink from "components/internal-link";
 import BrandLogo from "components/main-nav/brand-logo";
 import NavLinks from "components/main-nav/nav-links";
 import NavAvatar from "components/nav-avatar";
@@ -23,6 +22,7 @@ import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
 import { changeCurrentUserHasRegisteredNetwork } from "contexts/reducers/change-current-user";
+import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
 import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
@@ -51,7 +51,7 @@ export default function MainNav() {
 
   const [showHelp, setShowHelp] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>(newNetworkObj);
-  
+
   const { connect } = useDao();
   const { chain } = useChain();
   const { state } = useAppState();
@@ -123,6 +123,16 @@ export default function MainNav() {
     }
   ];
 
+  const actionProps = noNeedNetworkInstance ? {
+    label: myNetwork.label,
+    icon: myNetwork.icon,
+    onClick: handleNewNetwork
+  } : {
+    label: t("main-nav.new-bounty"),
+    icon: <PlusIcon />,
+    onClick: handleNewBounty
+  };
+
   useEffect(() => {
     if (!state.currentUser?.walletAddress || !state.connectedChain?.id)
       return;
@@ -154,11 +164,23 @@ export default function MainNav() {
       .catch(error => console.debug("Failed to get network address by wallet", error));
   }, [state.currentUser?.walletAddress, state.connectedChain]);
 
-  function handleNewBounty () {
+  function networkMatchHandler(fn) {
     if(!window.ethereum) return dispatch(changeShowWeb3(true));
 
-    return dispatch(changeShowCreateBounty(true));
+    if (state.connectedChain?.matchWithNetworkChain)
+      fn();
+    else
+      dispatch(changeNeedsToChangeChain(true));
+  }
 
+  function handleNewBounty () {
+    networkMatchHandler( () => dispatch(changeShowCreateBounty(true)));
+  }
+
+  function handleNewNetwork () {
+    networkMatchHandler(() => {
+      push(myNetwork.href);
+    });
   }
 
   async function handleNetworkSelected(chain: SupportedChainData) {
@@ -188,7 +210,7 @@ export default function MainNav() {
   return (
     <div className="nav-container">
       <ClosedNetworkAlert
-        isVisible={state.Service?.network?.active?.isClosed}
+        isVisible={!noNeedNetworkInstance && state.Service?.network?.active?.isClosed}
       />
 
       <div className="main-nav d-flex flex-column justify-content-center">
@@ -217,28 +239,17 @@ export default function MainNav() {
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">
-            {(!noNeedNetworkInstance && (
-              <ReadOnlyButtonWrapper>
-                <Button
-                  outline
-                  onClick={handleNewBounty}
-                  textClass="text-white"
-                  className="read-only-button"
-                >
-                  <PlusIcon />
-                  <span><Translation label={"main-nav.new-bounty"} /></span>
-                </Button>
-              </ReadOnlyButtonWrapper>
-            )) || (
-              <InternalLink
-                href={myNetwork.href}
-                icon={myNetwork.icon}
-                label={myNetwork.label}
-                iconBefore
-                uppercase
+            <ReadOnlyButtonWrapper>
+              <Button
                 outline
-              />
-            )}
+                onClick={actionProps.onClick}
+                textClass="text-white"
+                className="read-only-button"
+              >
+                {actionProps.icon}
+                <span>{actionProps.label}</span>
+              </Button>
+            </ReadOnlyButtonWrapper>
 
             <Button
               onClick={() => setShowHelp(true)}

@@ -18,6 +18,7 @@ interface Spinners {
   changingChain: boolean;
   signingMessage: boolean;
   switchingChain: boolean;
+  needsToChangeChain: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {
@@ -57,3 +58,6 @@ export const changeConnectingGH = (connectingGH: boolean) =>
 
 export const changeChangingChain = (changingChain: boolean) =>
   changeSpinners.update({changingChain});
+
+export const changeNeedsToChangeChain = (needsToChangeChain: boolean) =>
+  changeSpinners.update({needsToChangeChain});
