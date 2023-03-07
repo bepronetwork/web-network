@@ -8,6 +8,8 @@ import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service"
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 import {toastError,} from "contexts/reducers/change-toaster";
 
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
+
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import DAO from "services/dao-service";
@@ -115,7 +117,7 @@ export function useDao() {
 
     const chainIdToConnect =
       state.Service?.network?.active?.chain_id || 
-      (connectedChain?.name === "unsupported" ? undefined : connectedChain?.id);
+      (connectedChain?.name === UNSUPPORTED_CHAIN ? undefined : connectedChain?.id);
 
     const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
       chainIdToConnect ? +chainIdToConnect === +chainId : isDefault);

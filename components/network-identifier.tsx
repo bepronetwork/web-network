@@ -5,6 +5,8 @@ import Indicator from "components/indicator";
 import {useAppState} from "contexts/app-state";
 import {changeChain} from "contexts/reducers/change-chain";
 
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
+
 import {NetworkColors} from "interfaces/enums/network-colors";
 
 export default function NetworkIdentifier() {
@@ -21,8 +23,8 @@ export default function NetworkIdentifier() {
     
     return dispatch(changeChain.update({
       id: (chain?.chainId || chainId)?.toString(),
-      name: chain?.chainName || "unsupported",
-      shortName: chain?.chainShortName?.toLowerCase() || "unsupported",
+      name: chain?.chainName || UNSUPPORTED_CHAIN,
+      shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
       explorer: chain?.blockScanner,
       events: chain?.eventsApi,
       registry: chain?.registryAddress

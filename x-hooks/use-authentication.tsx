@@ -23,7 +23,7 @@ import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "context
 import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import {IM_AN_ADMIN, NOT_AN_ADMIN} from "helpers/contants";
+import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/contants";
 import decodeMessage from "helpers/decode-message";
 
 import {EventName} from "interfaces/analytics";
@@ -118,8 +118,8 @@ export function useAuthentication() {
 
         dispatch(changeChain.update({
           id: (chain?.chainId || windowChainId)?.toString(),
-          name: chain?.chainName || "unsupported",
-          shortName: chain?.chainShortName?.toLowerCase() || "unsupported",
+          name: chain?.chainName || UNSUPPORTED_CHAIN,
+          shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
           explorer: chain?.blockScanner,
           events: chain?.eventsApi,
           registry: chain?.registryAddress
@@ -283,7 +283,7 @@ export function useAuthentication() {
       const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
       const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
 
-      if (!isAdminUser && state.connectedChain?.name === "unsupported") {
+      if (!isAdminUser && state.connectedChain?.name === UNSUPPORTED_CHAIN) {
         dispatch(addToast({
           type: "warning",
           title: "Unsupported chain",
