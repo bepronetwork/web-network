@@ -5,11 +5,14 @@ import {useTranslation} from "next-i18next";
 import { useRouter } from "next/router";
 
 import Button from "components/button";
+import ConnectWalletButton from "components/connect-wallet-button";
 import Modal from "components/modal";
 import SelectNetworkDropdown from "components/select-network-dropdown";
 
 import {useAppState} from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
+
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
@@ -21,7 +24,7 @@ type typeError = { code?: number; message?: string }
 
 export default function WrongNetworkModal() {
   const { t } = useTranslation("common");
-  const { query } = useRouter();
+  const { query, pathname } = useRouter();
 
   const [error, setError] = useState<string>("");
   const [_showModal, setShowModal] = useState(false);
@@ -37,6 +40,8 @@ export default function WrongNetworkModal() {
     state: { connectedChain, currentUser, Service, supportedChains, loading, spinners }
   } = useAppState();
 
+  const canBeHided = !["/new-network"].includes(pathname);
+
   function changeShowModal() {
     if (!supportedChains?.length ||
         loading?.isLoading ||
@@ -45,10 +50,8 @@ export default function WrongNetworkModal() {
       return;
     }
 
-    if (connectedChain?.name === "unsupported")
-      setShowModal(true);
-    else if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
-      setShowModal(!supportedChains?.find(({ chainId }) => +chainId === +connectedChain.id));
+    if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
+      setShowModal(connectedChain?.name === UNSUPPORTED_CHAIN);
     else
       setShowModal(!connectedChain?.matchWithNetworkChain && !!currentUser?.walletAddress);
   }
@@ -110,13 +113,16 @@ export default function WrongNetworkModal() {
     spinners
   ]);
 
+  if (spinners?.needsToChangeChain && !currentUser?.walletAddress)
+    return <ConnectWalletButton asModal={true} />;
+
   return (
     <Modal
       title={t("modals.wrong-network.change-network")}
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
       show={_showModal}
-      onCloseClick={handleHideModal}
+      onCloseClick={canBeHided ? handleHideModal : undefined}
     >
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
