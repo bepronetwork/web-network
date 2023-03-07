@@ -21,8 +21,8 @@ export default function NetworkIdentifier() {
     
     return dispatch(changeChain.update({
       id: (chain?.chainId || chainId)?.toString(),
-      name: chain?.chainName || 'unknown',
-      shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
+      name: chain?.chainName || "unsupported",
+      shortName: chain?.chainShortName?.toLowerCase() || "unsupported",
       explorer: chain?.blockScanner,
       events: chain?.eventsApi,
       registry: chain?.registryAddress

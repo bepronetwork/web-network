@@ -118,8 +118,8 @@ export function useAuthentication() {
 
         dispatch(changeChain.update({
           id: (chain?.chainId || windowChainId)?.toString(),
-          name: chain?.chainName || "unknown",
-          shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
+          name: chain?.chainName || "unsupported",
+          shortName: chain?.chainShortName?.toLowerCase() || "unsupported",
           explorer: chain?.blockScanner,
           events: chain?.eventsApi,
           registry: chain?.registryAddress
@@ -283,7 +283,7 @@ export function useAuthentication() {
       const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
       const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
 
-      if (!isAdminUser && state.connectedChain?.name === "unknown") {
+      if (!isAdminUser && state.connectedChain?.name === "unsupported") {
         dispatch(addToast({
           type: "warning",
           title: "Unsupported chain",
