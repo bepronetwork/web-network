@@ -41,8 +41,14 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
 
     if (min !== undefined && max !== undefined)
       return t("setup:registry.errors.exceeds-limit", { min, max });
-    else
+
+    if (min)
       return t("setup:registry.errors.greater-than", { min });
+
+    if (max)
+      return t("setup:registry.errors.less-than", { max });
+
+    return t("setup:registry.errors.missing-limits");
   }
 
   const params = {
