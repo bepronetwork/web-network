@@ -63,7 +63,7 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
-    setPercentage(+toPercent(issueDisputeAmount, +(state.Service?.network?.amounts?.totalNetworkToken || 0)));
+    setPercentage(toPercent(issueDisputeAmount, +(state.Service?.network?.amounts?.totalNetworkToken || 0)));
   }
 
   function renderColumn(dotLabel, index) {
