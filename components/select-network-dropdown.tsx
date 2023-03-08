@@ -20,6 +20,7 @@ interface SelectNetworkDropdownProps {
   isOnNetwork?: boolean;
   className?: string;
   isDisabled?: boolean;
+  placeHolder?: string;
 }
 
 interface ChainOption {
@@ -35,7 +36,8 @@ export default function SelectNetworkDropdown({
   isOnNetwork,
   className = "text-uppercase",
   onSelect,
-  isDisabled
+  isDisabled,
+  placeHolder
 }: SelectNetworkDropdownProps) {
   const { t } = useTranslation("common");
 
@@ -45,7 +47,7 @@ export default function SelectNetworkDropdown({
   
   const { searchNetworks } = useApi();
   const { networkName } = useNetwork();
-  const { state: { Service, supportedChains, connectedChain, currentUser } } = useAppState();
+  const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
 
   function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption { 
     return { 
@@ -64,7 +66,7 @@ export default function SelectNetworkDropdown({
   async function selectSupportedChain({value}) {
     const chain = supportedChains?.find(({ chainId }) => +chainId === +value.chainId);
 
-    if (!chain)
+    if (!chain || chain?.chainId === selected?.value?.chainId)
       return;
 
     onSelect(chain);
@@ -81,7 +83,6 @@ export default function SelectNetworkDropdown({
         options?.find(({ value: { chainId } }) => chainId === +(defaultChain?.chainId || connectedChain.id))?.value;
 
     if (!chain) {
-      setSelectedChain(chainToOption({ chainShortName: "Unknown" }));  
       return;
     }
 
@@ -125,7 +126,8 @@ export default function SelectNetworkDropdown({
   useEffect(updateSelectedChainMatchConnected, [
     options,
     Service?.network?.active?.chain,
-    connectedChain?.id
+    connectedChain?.id,
+    spinners
   ]);
 
   return(
@@ -134,7 +136,7 @@ export default function SelectNetworkDropdown({
         options={options}
         value={selected}
         onChange={selectSupportedChain}
-        placeholder={t("forms.select-placeholder")}
+        placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
         isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
         readOnly={true}
         components={{
