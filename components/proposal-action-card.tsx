@@ -205,10 +205,9 @@ export default function ProposalActionCard({
             )}
           </div>
 
-          {
-            chainDisputable &&
+          { chainDisputable &&
             <div className="row mt-2">
-              <ContextualSpan context="warning">
+              <ContextualSpan context="warning" classNameIcon="mr-3">
                 {t('proposal:messages.in-disputable-time', {time: missingDisputableTime})}
               </ContextualSpan>
             </div> || ""
@@ -216,7 +215,7 @@ export default function ProposalActionCard({
 
           { allowMergeCommit === false &&
             <div className="row mt-2">
-              <ContextualSpan context="warning">
+              <ContextualSpan context="warning" classNameIcon="mb-4">
                 {t("pull-request:errors.merge-commit")}
               </ContextualSpan>
             </div>
