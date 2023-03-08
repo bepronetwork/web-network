@@ -17,7 +17,7 @@ import useChain from "x-hooks/use-chain";
 import useNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
-  const { replace, asPath } = useRouter();
+  const { replace, asPath, pathname } = useRouter();
 
   const { chain } = useChain();
   const {state, dispatch} = useAppState();
@@ -109,6 +109,14 @@ export function useDao() {
 
     if (!supportedChains?.length) {
       console.debug("No supported chains found");
+      return;
+    }
+
+    const networkChainId = state.Service?.network?.active?.chain_id;
+    const isOnNetwork = pathname?.includes("[network]");
+
+    if (isOnNetwork && !networkChainId) {
+      console.debug("Is on network, but network data was not loaded yet");
       return;
     }
 
