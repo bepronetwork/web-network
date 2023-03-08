@@ -123,7 +123,10 @@ export default function BountyHero() {
 
                 { !!state.currentBounty?.data?.tags?.length &&
                   <div className="mt-3">
-                    <BountyTags tags={state.currentBounty.data.tags} />
+                    <BountyTags
+                      tags={state.currentBounty?.data?.tags}
+                      color={state?.Service?.network?.active?.colors?.primary}
+                    />
                   </div>
                 }
               </>
