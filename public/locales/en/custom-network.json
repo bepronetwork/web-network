@@ -17,19 +17,19 @@
   "council-amount": "Curator Amount",
   "cancelable-time": {
     "label": "Cancelable Time",
-    "description": "After this time the network governor can cancel a stuck bounty"
+    "description": "After this time the network governor can cancel a stuck bounty. Min. {{min}}."
   },
   "oracle-exchange-rate": {
     "label": "Oracle Exchange Rate",
-    "description": "Exchange rate applied when locking or unlocking tokens into the network"
+    "description": "Exchange rate applied when locking or unlocking tokens into the network. Must be greater than {{min}}."
   },
   "merger-fee": {
     "label": "Merger Fee",
-    "description": "Percentage of the bounty amount distributed to the wallet that closed the bounty"
+    "description": "Percentage of the bounty amount distributed to the wallet that closed the bounty. Max. {{max}}."
   },
   "proposer-fee": {
     "label": "Proposal Creator Fee",
-    "description": "Percentage of the bounty amount distributed to the wallet that created the accepted proposal"
+    "description": "Percentage of the bounty amount distributed to the wallet that created the accepted proposal. Max. {{max}}."
   },
   "save-settings": "Save settings",
   "config-tokens-registry": "Config Allowed Tokens",
