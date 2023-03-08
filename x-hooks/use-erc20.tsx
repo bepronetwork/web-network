@@ -94,7 +94,7 @@ export default function useERC20() {
 
   useEffect(() => {
     updateAllowanceAndBalance();
-  }, [state.currentUser?.walletAddress, isServiceReady, state.connectedChain]);
+  }, [state.currentUser?.walletAddress, isServiceReady, state.connectedChain, name]);
 
   async function deploy(name: string,
                         symbol: string,
