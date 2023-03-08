@@ -18,6 +18,7 @@ interface InternalLinkProps {
   brand?: boolean;
   style?: CSSProperties;
   outline?: boolean;
+  title?: string;
 }
 
 export default function InternalLink({
@@ -65,6 +66,7 @@ export default function InternalLink({
         className={getClasses()}
         target={`${blank ? "_blank" : ""}`}
         style={{ ...style }}
+        title={props?.title}
       >
         {(iconBefore && props.icon) || ""}
         {(props.label && <span>{props.label}</span>) || ""}

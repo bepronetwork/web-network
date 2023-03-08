@@ -1,18 +1,17 @@
 import { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import ReactSelect from "react-select";
 
 import { useTranslation } from "next-i18next";
 
 import { PROGRAMMING_LANGUAGES } from "assets/bounty-labels";
 
+import BountyTags from "components/bounty/bounty-tags";
 import { ContextualSpan } from "components/contextual-span";
+import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
 import { MAX_TAGS } from "helpers/contants";
-
-import BountyTags from "./bounty-tags";
 
 interface IssueEditTagProps {
   isEdit: boolean;
