@@ -59,14 +59,15 @@ export default function WalletBalance() {
 
     if (!state.currentUser?.walletAddress || 
         !registryTokenAddress || 
-        !networkToken?.address)
+        !networkToken?.address ||
+        !state.connectedChain?.matchWithNetworkChain)
       return;
 
     const isSameToken = registryTokenAddress === networkToken.address;
 
     Promise.all([
-      processToken(registryTokenAddress),
-      isSameToken ? Promise.resolve(null) : processToken(networkToken.address)
+      isSameToken ? Promise.resolve(null) : processToken(registryTokenAddress),
+      processToken(networkToken.address)
     ]).then(tokens => {
       setOracleToken({
         symbol: t("$oracles",  { token: networkToken?.symbol }),
@@ -81,7 +82,8 @@ export default function WalletBalance() {
   useEffect(loadBalances, [
     state.currentUser?.walletAddress, 
     state.Service?.active?.registry?.token?.contractAddress,
-    state.Service?.active?.network?.contractAddress
+    state.Service?.active?.network?.contractAddress,
+    state.connectedChain?.matchWithNetworkChain
   ]);
 
   useEffect(() => {

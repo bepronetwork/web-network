@@ -40,7 +40,10 @@ export default function WrongNetworkModal() {
     state: { connectedChain, currentUser, Service, supportedChains, loading, spinners }
   } = useAppState();
 
-  const canBeHided = !["/new-network"].includes(pathname);
+  const canBeHided = ![
+    pathname?.includes("new-network"),
+    pathname?.includes("profile") && !(pathname === "/profile")
+  ].some(c => c);
 
   function changeShowModal() {
     if (!supportedChains?.length ||
