@@ -20,7 +20,7 @@ import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
+import { IM_AM_CREATOR_ISSUE } from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 import {CustomSession} from "interfaces/custom-session";

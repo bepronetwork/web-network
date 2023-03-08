@@ -19,3 +19,5 @@ export const MISSING_CHAIN_ID = `Missing chain id`;
 export const IM_AM_CREATOR_ISSUE = `I am the owner of this bounty`;
 export const NOT_AN_CREATOR_ISSUE = `Not an creator issue`;
 export const MISSING_CREATOR_ISSUE_SIGNATURE = `Missing creator issue signature`;
+export const MAX_INTEGER_SOLIDITY = 2**256 - 1;
+export const NETWORK_DIVISOR = 1000000;

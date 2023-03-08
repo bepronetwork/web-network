@@ -28,7 +28,7 @@ import {
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
   DEFAULT_PROPOSER_FEE
-} from "helpers/contants";
+} from "helpers/constants";
 import {psReadAsText} from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";

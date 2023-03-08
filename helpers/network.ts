@@ -1,5 +1,7 @@
 import BigNumber from "bignumber.js";
 
+import { MAX_INTEGER_SOLIDITY, NETWORK_DIVISOR } from "helpers/constants";
+
 import { NetworkParameters } from "types/dappkit";
 
 type StrOrNmb = string | number;
@@ -18,7 +20,7 @@ const betweenIn =
 const limits = (min?: StrOrNmb, max?: StrOrNmb) => ({ min, max });
 
 export const NETWORK_LIMITS: NetworkLimits = {
-  councilAmount: limits(101000, 100000000000),
+  councilAmount: limits(1, 100000000000),
   disputableTime: limits(60, 1728000),
   draftTime: limits(60, 1728000),
   oracleExchangeRate: limits(0),
@@ -35,11 +37,11 @@ export const ParameterValidator = (param: NetworkParameters, value: StrOrNmb): b
     councilAmount: betweenIn(value, min, max),
     disputableTime: betweenIn(value, min, max),
     draftTime: betweenIn(value, min, max),
-    oracleExchangeRate: BigNumber(value).gt(min),
+    oracleExchangeRate: BigNumber(value).gt(min) && BigNumber(value).lte(MAX_INTEGER_SOLIDITY / NETWORK_DIVISOR),
     mergeCreatorFeeShare: betweenIn(value, min, max),
     proposerFeeShare: betweenIn(value, min, max),
     percentageNeededForDispute: betweenIn(value, min, max),
-    cancelableTime: BigNumber(value).gte(min)
+    cancelableTime: BigNumber(value).gte(min) && BigNumber(value).lte(MAX_INTEGER_SOLIDITY / NETWORK_DIVISOR)
   };
 
   return validators[param];
