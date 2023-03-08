@@ -181,8 +181,8 @@ export default function IssueListItem({
             <RenderIssueData state={issueState} />
             
             <DateLabel date={issue?.createdAt} className="text-white-40" />
-
-            <BountyTags tags={issue?.tags} />
+            
+            <BountyTags tags={issue?.tags} color={issue?.network?.colors?.primary}/>
           </div>
         </div>
 
