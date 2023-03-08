@@ -42,7 +42,7 @@ export const NetworkSettingsProvider = ({ children }) => {
             referred to user nework when he access `/my-network` page from/in another network.
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
-  const [networkSettings, setNetworkSettings] = useState(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
+  const [networkSettings, setNetworkSettings] = useState<NetworkSettings>(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [registryToken, setRegistryToken] = useState<Token>();
   const [forcedService, setForcedService] = useState<DAO>();
@@ -543,7 +543,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if ([
       !state.currentUser?.walletAddress,
-      !isCreating && (!network?.name || !forcedService),
+      !isCreating && (!network?.name || !forcedService || !!networkSettings?.settings?.parameters?.councilAmount?.value),
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad,
       !state.Settings
