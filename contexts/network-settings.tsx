@@ -1,6 +1,5 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
-import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
@@ -21,8 +20,8 @@ import {
   DEFAULT_PROPOSER_FEE
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
-import { ParameterValidator } from "helpers/registry";
-import { ParameterValidator } from "helpers/network";
+import { NetworkValidator } from "helpers/network";
+import { RegistryValidator } from "helpers/registry";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 import { Token } from "interfaces/token";
@@ -77,9 +76,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
     const validations = [
-      ifEmptyThenUndefined(ParameterValidator("treasury", settings?.treasury?.address?.value)),
-      ifEmptyThenUndefined(ParameterValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
-      ifEmptyThenUndefined(ParameterValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
+      ifEmptyThenUndefined(RegistryValidator("treasury", settings?.treasury?.address?.value)),
+      ifEmptyThenUndefined(RegistryValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
+      ifEmptyThenUndefined(RegistryValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
     ];
 
     settings.treasury.address.validated = validations[0];
@@ -89,14 +88,14 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     //Parameters
     const parametersValidations = [
-      ParameterValidator("draftTime", settings?.parameters?.draftTime?.value),
-      ParameterValidator("councilAmount", settings?.parameters?.councilAmount?.value),
-      ParameterValidator("disputableTime", settings?.parameters?.disputableTime?.value),
-      ParameterValidator("percentageNeededForDispute", settings?.parameters?.percentageNeededForDispute?.value),
-      ParameterValidator("oracleExchangeRate", settings?.parameters?.oracleExchangeRate?.value),
-      ParameterValidator("mergeCreatorFeeShare", settings?.parameters?.mergeCreatorFeeShare?.value),
-      ParameterValidator("proposerFeeShare", settings?.parameters?.proposerFeeShare?.value),
-      ParameterValidator("cancelableTime", settings?.parameters?.cancelableTime?.value)
+      NetworkValidator("draftTime", settings?.parameters?.draftTime?.value),
+      NetworkValidator("councilAmount", settings?.parameters?.councilAmount?.value),
+      NetworkValidator("disputableTime", settings?.parameters?.disputableTime?.value),
+      NetworkValidator("percentageNeededForDispute", settings?.parameters?.percentageNeededForDispute?.value),
+      NetworkValidator("oracleExchangeRate", settings?.parameters?.oracleExchangeRate?.value),
+      NetworkValidator("mergeCreatorFeeShare", settings?.parameters?.mergeCreatorFeeShare?.value),
+      NetworkValidator("proposerFeeShare", settings?.parameters?.proposerFeeShare?.value),
+      NetworkValidator("cancelableTime", settings?.parameters?.cancelableTime?.value)
     ];
 
     settings.parameters.draftTime.validated = parametersValidations[0];

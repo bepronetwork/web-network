@@ -30,7 +30,7 @@ export const NETWORK_LIMITS: NetworkLimits = {
   cancelableTime: limits(15552000)
 };
 
-export const ParameterValidator = (param: NetworkParameters, value: StrOrNmb): boolean => {
+export const NetworkValidator = (param: NetworkParameters, value: StrOrNmb): boolean => {
   const { min, max } = NETWORK_LIMITS[param] || {};
 
   const validators = {
