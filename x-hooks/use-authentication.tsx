@@ -2,6 +2,7 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
 
@@ -20,7 +21,7 @@ import {
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
-import { addToast } from "contexts/reducers/change-toaster";
+import { addToast, toastError } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
 import {IM_AN_ADMIN, NOT_AN_ADMIN} from "helpers/contants";
@@ -44,6 +45,7 @@ export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 const { publicRuntimeConfig } = getConfig();
 
 export function useAuthentication() {
+  const {t} = useTranslation(["common"]);
   const session = useSession();
   const {asPath, push} = useRouter();
   
@@ -151,6 +153,10 @@ export function useAuthentication() {
           disconnectGithub()
           push(`/connect-account`);
           return false;
+        }
+        if(user?.githubLogin){
+          dispatch(toastError(t("errors.failed-connect-account")));
+          return false
         }
         return true;
       })
