@@ -72,10 +72,7 @@ export default function PageProposal() {
         .then(async txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
           
-          return Promise.all([
-            processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } ),
-            processEvent("bountyToken", "transfer", state.Service?.network?.lastVisited, { fromBlock } )
-          ]);
+          return Promise.all([processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } )]);
         })
         .then(() => {
           getDatabaseBounty(true);
