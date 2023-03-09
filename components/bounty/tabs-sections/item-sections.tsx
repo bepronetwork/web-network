@@ -122,7 +122,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                   <div className="row align-items-center">
                     <div className="col">
                       <Button
-                        className="read-only-button"
+                        className="read-only-button text-truncate"
                         onClick={(ev) => {
                           ev.preventDefault();
                           router.push?.(getURLWithNetwork(pathRedirect, {
