@@ -6,7 +6,6 @@ import {useRouter} from "next/router";
 
 import EditIcon from "assets/icons/transactions/edit";
 
-import Button from "components/button";
 import ConnectGithub from "components/connect-github";
 import { ContextualSpan } from "components/contextual-span";
 import ContractButton from "components/contract-button";
