@@ -20,7 +20,7 @@ import ReposDropdown from "components/repos-dropdown";
 
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
+import {BODY_CHARACTERES_LIMIT} from "helpers/contants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
