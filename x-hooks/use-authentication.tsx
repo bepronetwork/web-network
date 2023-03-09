@@ -85,7 +85,7 @@ export function useAuthentication() {
 
     expirationStorage.removeItem();
 
-    signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})
+    signOut({callbackUrl: `${URL_BASE}/${lastNetwork}/${chain.chainShortName}`})
       .then(() => {
         dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
       });
