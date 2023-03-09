@@ -18,7 +18,7 @@ export const REGISTRY_LIMITS = {
   lockAmountForNetworkCreation: limits(0)
 }
 
-export const RegistryValidator = (param: RegistryParameters, value: StrOrNmb) => {
+export const ParameterValidator = (param: RegistryParameters, value: StrOrNmb) => {
   const { min, max } = REGISTRY_LIMITS[param] || {};
 
   const validators = {
