@@ -5,9 +5,9 @@ import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {useRouter} from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import Button from "components/button";
 import Comment from "components/comment";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import CreateReviewModal from "components/create-review-modal";
 import CustomContainer from "components/custom-container";
 import GithubLink from "components/github-link";
@@ -208,8 +208,9 @@ export default function PullRequestPage() {
   }, [state.currentBounty?.data, prId]);
 
   useEffect(() => {
-    if (review && pullRequest && state.currentUser?.login) setShowModal(true);
-  }, [review, pullRequest, state.currentUser]);
+    if (review && pullRequest && state.currentUser?.login && state.connectedChain?.matchWithNetworkChain)
+      setShowModal(true);
+  }, [review, pullRequest, state.currentUser, state.connectedChain?.matchWithNetworkChain]);
 
   return (
     <BountyEffectsProvider>
@@ -231,14 +232,14 @@ export default function PullRequestPage() {
                 {/* Make Review Button */}
                 {(isWalletConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
                   <ReadOnlyButtonWrapper>
-                    <Button
+                    <ContractButton
                       className="read-only-button text-nowrap"
                       onClick={handleShowModal}
                       disabled={isCreatingReview || isCancelling || isMakingReady || !isGithubConnected}
                       isLoading={isCreatingReview}
                       withLockIcon={isCancelling || isMakingReady || !isGithubConnected}>
                       {t("actions.make-a-review")}
-                    </Button>
+                    </ContractButton>
                   </ReadOnlyButtonWrapper>
                 }
 
@@ -249,14 +250,14 @@ export default function PullRequestPage() {
                   !isPullRequestCanceled &&
                   isPullRequestCreator) && (
                   <ReadOnlyButtonWrapper>
-                    <Button
+                    <ContractButton
                       className="read-only-button text-nowrap"
                       onClick={handleMakeReady}
                       disabled={isCreatingReview || isCancelling || isMakingReady}
                       isLoading={isMakingReady}
                       withLockIcon={isCreatingReview || isCancelling}>
                       {t("pull-request:actions.make-ready.title")}
-                    </Button>
+                    </ContractButton>
                   </ReadOnlyButtonWrapper>
                 )
                 }
@@ -267,7 +268,7 @@ export default function PullRequestPage() {
                   isPullRequestCancelable &&
                   isPullRequestCreator) && (
                   <ReadOnlyButtonWrapper>
-                    <Button
+                    <ContractButton
                       className="read-only-button text-nowrap"
                       onClick={handleCancel}
                       disabled={isCreatingReview || isCancelling || isMakingReady}
@@ -275,7 +276,7 @@ export default function PullRequestPage() {
                       withLockIcon={isCreatingReview || isMakingReady}
                     >
                       {t("actions.cancel")}
-                    </Button>
+                    </ContractButton>
                   </ReadOnlyButtonWrapper>
                 )
                 }

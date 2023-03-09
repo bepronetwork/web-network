@@ -9,6 +9,7 @@ import LockedIcon from "assets/icons/locked-icon";
 
 import Avatar from "components/avatar";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import CreateProposalDistributionItem from "components/create-proposal-distribution-item";
 import Modal from "components/modal";
 import PullRequestLabels from "components/pull-request-labels";
@@ -406,9 +407,12 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   return (
     <div className="d-flex">
       <ReadOnlyButtonWrapper >
-        <Button className="read-only-button" onClick={() => setShow(true)}>
+        <ContractButton 
+          className="read-only-button" 
+          onClick={() => setShow(true)}
+        >
           {t("proposal:actions.create")}
-        </Button>
+        </ContractButton>
       </ReadOnlyButtonWrapper>
 
       <Modal
