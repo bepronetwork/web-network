@@ -21,7 +21,8 @@
   },
   "oracle-exchange-rate": {
     "label": "Oracle Exchange Rate",
-    "description": "Exchange rate applied when locking or unlocking tokens into the network. Min. {{min}}."
+    "description": "Exchange rate applied when locking or unlocking tokens into the network. Min. {{min}}.",
+    "unable-to-change": "Unable to change because there are {{amount}} {{symbol}} locked."
   },
   "merger-fee": {
     "label": "Merger Fee",

@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
@@ -5,7 +6,7 @@ import NetworkParameterInput from "components/custom-network/network-parameter-i
 import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 
-import {formatNumberToCurrency} from "helpers/formatNumber";
+import {formatNumberToCurrency, formatStringToCurrency} from "helpers/formatNumber";
 import { NETWORK_LIMITS } from "helpers/network";
 
 export default function NetworkContractSettings() {
@@ -19,6 +20,7 @@ export default function NetworkContractSettings() {
   }
 
   const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
+  const totalNetworkToken = BigNumber(state.Service?.network?.amounts?.totalNetworkToken);
 
   const parameterInputs = [
     { 
@@ -83,7 +85,12 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.oracleExchangeRate?.value,
       error: settings?.parameters?.oracleExchangeRate?.validated === false,
       decimals: 0,
-      onChange: value => onChange("oracleExchangeRate", value)
+      onChange: value => onChange("oracleExchangeRate", value),
+      disabled: totalNetworkToken.gt(0),
+      helperText: totalNetworkToken.gt(0) ? t("custom-network:oracle-exchange-rate.unable-to-change", {
+        amount: formatStringToCurrency(totalNetworkToken.toFixed()),
+        symbol: networkTokenSymbol
+      }) : ""
     },
     { 
       label: t("custom-network:merger-fee.label"), 

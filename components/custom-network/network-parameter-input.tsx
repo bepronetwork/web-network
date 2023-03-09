@@ -15,6 +15,7 @@ interface NetworkParameterInputProps {
   decimals?: number;
   className?: string;
   disabled?: boolean;
+  helperText?: string;
 }
 
 export default function NetworkParameterInput({
