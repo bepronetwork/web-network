@@ -80,13 +80,13 @@ export default function MainNav() {
   function LinkExplore() {
     return (
       <InternalLink
-        className="mt-1"
+        className="mgt-3"
         href={"/explore"}
         blank={!noNeedNetworkInstance}
         label={<Translation label={"main-nav.explorer"} />}
         nav
         uppercase
-        icon={!noNeedNetworkInstance ? <ExternalLinkIcon className="mb-1" width={12} height={12} />:null}
+        icon={!noNeedNetworkInstance ? <ExternalLinkIcon className="ms-1 mb-1 pt-1" width='12' height='12' />:null}
       />
     );
   }
