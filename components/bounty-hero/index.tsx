@@ -14,10 +14,11 @@ import If from "components/If";
 import PriceConversor from "components/price-conversor";
 import Translation from "components/translation";
 
-import {useAppState} from "contexts/app-state";
-
 import {getIssueState} from "helpers/handleTypeIssue";
 import {truncateAddress} from "helpers/truncate-address";
+
+import {useAppState} from "../contexts/app-state";
+import Badge from "./badge";
 
 export default function BountyHero() {
   const {t} = useTranslation(["bounty", "common"]);
