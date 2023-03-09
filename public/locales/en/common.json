@@ -333,7 +333,8 @@
     "creating-issue": "Failed to create github issue!",
     "failed-update-bounty": "Failed to update bounty!",
     "read-only-network": "This network is closed. It is set to read-only mode.",
-    "results-truncated": "Results Truncated"
+    "results-truncated": "Results Truncated",
+    "failed-connect-account": "This address is linked to another github account"
   },
   "404": {
     "the-page": "The page you looking for was",
