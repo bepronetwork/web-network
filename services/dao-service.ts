@@ -478,7 +478,7 @@ export default class DAO {
 
     const governor = await this.registry.governed._governor();
 
-    return governor === address;
+    return governor.toLowerCase() === address?.toLowerCase();
   }
 
   async isNetworkGovernor(address: string): Promise<boolean> {

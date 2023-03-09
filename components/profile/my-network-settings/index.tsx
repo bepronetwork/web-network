@@ -226,7 +226,7 @@ export default function MyNetworkSettings({
     state.Service?.active
       .isRegistryGovernor(state.currentUser?.walletAddress)
       .then(setIsGovernorRegistry);
-  }, [state.currentUser?.walletAddress]);
+  }, [state.Service?.active, state.currentUser?.walletAddress]);
 
   useEffect(() => {
     if(!network) return;
