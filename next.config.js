@@ -9,7 +9,8 @@ const publicRuntimeConfig = {
     api: process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3000",
     home: process.env.NEXT_PUBLIC_HOME_URL || "http://localhost:3000",
     events: process.env.NEXT_PUBLIC_EVENTS_API || "http://localhost:3334",
-    ipfs: process.env.NEXT_PUBLIC_IPFS_BASE
+    ipfs: process.env.NEXT_PUBLIC_IPFS_BASE,
+    kyc: process.env.NEXT_PUBLIC_KYC_API || 'https://individual-api.synaps.io/v3',
   },
   enableCoinGecko: process.env.NEXT_ENABLE_COINGECKO,
   adminWallet: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS,
@@ -22,7 +23,10 @@ const publicRuntimeConfig = {
     proposalAccepted: process.env.NEXT_PUBLIC_PROPOSAL_ACCEPTED || 0.3,
     proposalRejected: process.env.NEXT_PUBLIC_PROPOSAL_REJECTED || -0.5
   },
-  gaMeasureID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  gaMeasureID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+  kyc:{
+    isEnabled: process.env.NEXT_PUBLIC_ENABLE_KYC || false
+  },
 }
 
 // Will only be available on the server-side
@@ -38,6 +42,11 @@ const serverRuntimeConfig = {
     mainBranch: process.env.NEXT_GH_MAINBRANCH,
     owner: process.env.NEXT_GH_OWNER,
     repository: process.env.NEXT_GH_REPO,
+  },
+  kyc:{
+    clientId: process.env.NEXT_SYNAPS_CLIENT_ID,
+    key: process.env.NEXT_SYNAPS_KEY,
+    defaultTier: process.env.NEXT_SYNAPS_TIER_ID
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
   elasticSearch: {

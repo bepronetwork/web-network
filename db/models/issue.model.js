@@ -38,6 +38,25 @@ class Issue extends Model {
         tags: {
           type: DataTypes.ARRAY(DataTypes.STRING)
         },
+        isKyc:{
+          type: DataTypes.BOOLEAN,
+          default: false
+        },
+        kycTierList:{
+          type: DataTypes.ARRAY(DataTypes.INTEGER),
+          default: []
+        },
+        tags: {
+          type: DataTypes.ARRAY(DataTypes.STRING)
+        },
+        isKyc:{
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        },
+        kycTierList:{
+          type: DataTypes.ARRAY(DataTypes.INTEGER),
+          default: []
+        }
     },
                {
         sequelize,

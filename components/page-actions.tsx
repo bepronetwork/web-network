@@ -27,8 +27,10 @@ import useBepro from "x-hooks/use-bepro";
 import {BountyEffectsProvider} from "../contexts/bounty-effects";
 import {useBounty} from "../x-hooks/use-bounty";
 import ConnectGithub from "./connect-github";
-import { ContextualSpan } from "./contextual-span";
+import {ContextualSpan} from "./contextual-span";
 import Modal from "./modal";
+import Link from "next/link";
+import useNetworkTheme from "../x-hooks/use-network-theme";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -66,6 +68,7 @@ export default function PageActions({
   const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
   const isBountyFinished = !!state.currentBounty?.chainData?.isFinished;
   const isWalletConnected = !!state.currentUser?.walletAddress;
+  const isKycVerified = state?.currentUser?.kycSession?.status === 'VERIFIED';
   const isGithubConnected = !!state.currentUser?.login;
   const isFundingRequest = 
     state.currentBounty?.chainData?.fundingAmount?.gt(0) || state.currentBounty?.data?.fundingAmount?.gt(0);
@@ -237,8 +240,7 @@ export default function PageActions({
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
           hrefPath="fork"
-          color="primary"
-        >
+          color="primary">
           <Translation label="actions.fork-repository"/>
         </GithubLink>);
   }
@@ -250,22 +252,35 @@ export default function PageActions({
         isBountyOpen &&
         !isWorkingOnBounty &&
         isRepoForked &&
-        isStateToWorking)
-      return (
-        <ReadOnlyButtonWrapper>
-          <Button
-            color="primary"
-            onClick={handleStartWorking}
-            className="read-only-button"
-            disabled={isExecuting}
-            isLoading={isExecuting}
-          >
-            <span>
-              <Translation ns="bounty" label="actions.start-working.title"/>
-            </span>
+        isStateToWorking &&
+        state?.currentUser?.accessToken
+        ){
+
+      if (state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
+        return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
+          <Button>
+            <Translation ns="bounty" label="kyc.identify-to-start" />
           </Button>
-        </ReadOnlyButtonWrapper>
-      );
+        </Link>
+      }
+      else{
+        return (
+            <ReadOnlyButtonWrapper>
+              <Button
+                color="primary"
+                onClick={handleStartWorking}
+                className="read-only-button"
+                disabled={isExecuting}
+                isLoading={isExecuting}
+              >
+                <span>
+                  <Translation ns="bounty" label="actions.start-working.title"/>
+                </span>
+              </Button>
+            </ReadOnlyButtonWrapper>
+        );
+      }
+    }
   }
 
   function renderCreatePullRequestButton() {
