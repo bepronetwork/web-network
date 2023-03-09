@@ -3,8 +3,6 @@ import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import ContractButton from "components/contract-button";
 import NetworkContractSettings from "components/custom-network/network-contract-settings";
 import TokensSettings from "components/profile/my-network-settings/tokens-settings";
