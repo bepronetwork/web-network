@@ -17,6 +17,7 @@ import {
   DEFAULT_PERCENTAGE_FOR_DISPUTE
 } from "helpers/contants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
+import { ParameterValidator } from "helpers/registry";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 import { Token } from "interfaces/token";
@@ -65,26 +66,21 @@ export const NetworkSettingsProvider = ({ children }) => {
     useMemo(() =>
       forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
 
-  async function handlerValidateSettings(settings) {
+  function handlerValidateSettings(settings) {
     //Treasury
-    if (state.Service?.active) {
-      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" ||
-        settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
+    const isTreasuryEmpty = settings?.treasury?.address?.value?.trim() === "";
+    const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
-      const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
+    const validations = [
+      ifEmptyThenUndefined(ParameterValidator("treasury", settings?.treasury?.address?.value)),
+      ifEmptyThenUndefined(ParameterValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
+      ifEmptyThenUndefined(ParameterValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
+    ];
 
-      await Promise.all([
-        conditionOrUndefined(state.Service?.active.isAddress(settings?.treasury?.address?.value)),
-        conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
-        conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
-      ]).then((treasuryValidator)=>{
-        settings.treasury.address.validated = treasuryValidator[0];
-        settings.treasury.cancelFee.validated = treasuryValidator[1]
-        settings.treasury.closeFee.validated = treasuryValidator[2]
-        settings.treasury.validated = treasuryValidator.every(condition => condition !== false);
-      })
-      
-    }
+    settings.treasury.address.validated = validations[0];
+    settings.treasury.cancelFee.validated = validations[1];
+    settings.treasury.closeFee.validated = validations[2];
+    settings.treasury.validated = validations.every(condition => condition !== false);
 
     //Parameters
     const parametersValidations = [
