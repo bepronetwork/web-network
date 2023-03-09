@@ -23,7 +23,7 @@ export const NETWORK_LIMITS: NetworkLimits = {
   councilAmount: limits(1, 100000000000),
   disputableTime: limits(60, 1728000),
   draftTime: limits(60, 1728000),
-  oracleExchangeRate: limits(0),
+  oracleExchangeRate: limits(1),
   mergeCreatorFeeShare: limits(0, 10),
   proposerFeeShare: limits(0, 10),
   percentageNeededForDispute: limits(0, 51),
