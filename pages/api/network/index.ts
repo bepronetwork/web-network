@@ -421,8 +421,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           IpfsStorage.add(logoIcon, true, undefined, "svg")
         ])
 
-        if (full?.hash) network.logoIcon = logo?.hash;
-        if (logo?.hash) network.fullLogo = full?.hash;
+        if (logo?.hash) network.logoIcon = logo?.hash;
+        if (full?.hash) network.fullLogo = full?.hash;
 
       } catch (error) {
         Logger.error(error, 'Failed to store ipfs');
