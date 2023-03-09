@@ -3,7 +3,7 @@ import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import { ContainerTab } from "components/profile/my-network-settings/container-tab";
 import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
 import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
@@ -28,7 +28,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
-
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -322,14 +321,13 @@ export default function MyNetworkSettings({
         !networkNeedRegistration && (
           <Row className="mt-3 mb-4">
             <Col>
-              <Button onClick={handleSubmit} disabled={isUpdating}>
+              <ContractButton 
+                onClick={handleSubmit} 
+                disabled={isUpdating}
+                isLoading={isUpdating}
+              >
                 <span>{t("custom-network:save-settings")}</span>
-                {isUpdating ? (
-                  <span className="spinner-border spinner-border-xs ml-1" />
-                ) : (
-                  ""
-                )}
-              </Button>
+              </ContractButton>
             </Col>
           </Row>
         )}
