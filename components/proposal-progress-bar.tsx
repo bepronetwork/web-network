@@ -29,7 +29,8 @@ export default function ProposalProgressBar({
   const totalNetworkToken = state.Service?.network?.amounts?.totalNetworkToken;
 
   function toPercent(value = 0, total = 0, decimals = 2) {
-    return ((value / total) * 100).toFixed(decimals);
+    const percent = +((value / total) * 100).toFixed(decimals)
+    return isNaN(percent) ? 0 : percent;
   }
 
   function toRepresentationPercent(value = 0) {
