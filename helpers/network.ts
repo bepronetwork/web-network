@@ -37,7 +37,7 @@ export const ParameterValidator = (param: NetworkParameters, value: StrOrNmb): b
     councilAmount: betweenIn(value, min, max),
     disputableTime: betweenIn(value, min, max),
     draftTime: betweenIn(value, min, max),
-    oracleExchangeRate: BigNumber(value).gt(min) && BigNumber(value).lte(MAX_INTEGER_SOLIDITY / NETWORK_DIVISOR),
+    oracleExchangeRate: BigNumber(value).gte(min) && BigNumber(value).lte(MAX_INTEGER_SOLIDITY / NETWORK_DIVISOR),
     mergeCreatorFeeShare: betweenIn(value, min, max),
     proposerFeeShare: betweenIn(value, min, max),
     percentageNeededForDispute: betweenIn(value, min, max),
