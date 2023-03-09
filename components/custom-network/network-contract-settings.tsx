@@ -82,7 +82,7 @@ export default function NetworkContractSettings() {
       symbol: "", 
       value: settings?.parameters?.oracleExchangeRate?.value,
       error: settings?.parameters?.oracleExchangeRate?.validated === false,
-      decimals: 4,
+      decimals: 0,
       onChange: value => onChange("oracleExchangeRate", value)
     },
     { 
