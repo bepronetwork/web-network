@@ -6,7 +6,7 @@ import NetworkParameterInput from "components/custom-network/network-parameter-i
 import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 
-import {formatNumberToCurrency, formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
+import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import { NETWORK_LIMITS } from "helpers/network";
 
 export default function NetworkContractSettings() {
@@ -15,9 +15,7 @@ export default function NetworkContractSettings() {
   const { state } = useAppState();
   const { fields, settings } = useNetworkSettings();
 
-  function onChange(label, value) {
-    fields.parameter.setter({ label, value })
-  }
+  const onChange = (label) => (value) => fields.parameter.setter({label, value});
 
   const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
   const totalNetworkToken = BigNumber(state.Service?.network?.amounts?.totalNetworkToken);
@@ -33,7 +31,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.disputableTime?.value,
       error: settings?.parameters?.disputableTime?.validated === false,
       decimals: 0,
-      onChange: value => onChange("disputableTime", value)
+      onChange: onChange("disputableTime")
     },
     { 
       label: t("custom-network:percentage-for-dispute"), 
@@ -41,7 +39,7 @@ export default function NetworkContractSettings() {
       symbol: "%", 
       value: settings?.parameters?.percentageNeededForDispute?.value,
       error: settings?.parameters?.percentageNeededForDispute?.validated === false,
-      onChange: value => onChange("percentageNeededForDispute", value)
+      onChange: onChange("percentageNeededForDispute")
     },
     { 
       label: t("custom-network:redeem-time"), 
@@ -53,7 +51,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.draftTime?.value,
       error: settings?.parameters?.draftTime?.validated === false,
       decimals: 0,
-      onChange: value => onChange("draftTime", value)
+      onChange: onChange("draftTime")
     },
     { 
       label: t("custom-network:council-amount"), 
@@ -65,7 +63,7 @@ export default function NetworkContractSettings() {
       symbol: networkTokenSymbol || "Token", 
       value: settings?.parameters?.councilAmount?.value,
       error: settings?.parameters?.councilAmount?.validated === false,
-      onChange: value => onChange("councilAmount", value)
+      onChange: onChange("councilAmount")
     },
     { 
       label: t("custom-network:cancelable-time.label"), 
@@ -76,7 +74,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.cancelableTime?.value,
       error: settings?.parameters?.cancelableTime?.validated === false,
       decimals: 0,
-      onChange: value => onChange("cancelableTime", value)
+      onChange: onChange("cancelableTime")
     },
     { 
       label: t("custom-network:oracle-exchange-rate.label"), 
@@ -85,7 +83,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.oracleExchangeRate?.value,
       error: settings?.parameters?.oracleExchangeRate?.validated === false,
       decimals: 0,
-      onChange: value => onChange("oracleExchangeRate", value),
+      onChange: onChange("oracleExchangeRate"),
       disabled: totalNetworkToken.gt(0),
       helperText: totalNetworkToken.gt(0) ? t("custom-network:oracle-exchange-rate.unable-to-change", {
         amount: formatNumberToNScale(totalNetworkToken.toFixed()),
@@ -99,7 +97,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.mergeCreatorFeeShare?.value,
       error: settings?.parameters?.mergeCreatorFeeShare?.validated === false,
       decimals: 4,
-      onChange: value => onChange("mergeCreatorFeeShare", value)
+      onChange: onChange("mergeCreatorFeeShare")
     },
     { 
       label: t("custom-network:proposer-fee.label"), 
@@ -108,7 +106,7 @@ export default function NetworkContractSettings() {
       value: settings?.parameters?.proposerFeeShare?.value,
       error: settings?.parameters?.proposerFeeShare?.validated === false,
       decimals: 4,
-      onChange: value => onChange("proposerFeeShare", value)
+      onChange: onChange("proposerFeeShare")
     }
   ];
   
