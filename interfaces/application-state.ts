@@ -91,11 +91,14 @@ export interface CurrentUserState {
   signature?: string;
   isAdmin?: boolean;
   hasRegisteredNetwork?: boolean;
+  kyc?: kycSession;
+  kycSession?: kycSession;
 }
 
 export interface CurrentBounty {
   comments: IssueDataComment[];
   lastUpdated: number;
+  kycSteps?: Tier[];
   data: IssueBigNumberData;
 }
 

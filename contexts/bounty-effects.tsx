@@ -19,6 +19,12 @@ export const BountyEffectsProvider = ({children}) => {
     query?.id,
     query?.repoId,
   ]);
+  
+  useEffect(bounty.validateKycSteps, [
+      state?.currentBounty?.data?.isKyc,
+      state?.currentBounty?.data?.kycTierList,
+      state?.currentUser?.kycSession,
+  ]);
 
   return <BountyEffectsContext.Provider value={_context} children={children} />
 }

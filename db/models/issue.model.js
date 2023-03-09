@@ -83,7 +83,15 @@ class Issue extends Model {
         get() {
           return BigNumber(this.fundedAmount).dividedBy(this.fundingAmount).multipliedBy(100).toNumber();
         }
-      }
+      },
+        isKyc:{
+          type: DataTypes.BOOLEAN,
+          default: false
+        },
+        kycTierList:{
+          type: DataTypes.ARRAY(DataTypes.INTEGER),
+          default: []
+        },
     },
     {
       sequelize,

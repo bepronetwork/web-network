@@ -13,6 +13,7 @@ import {
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserHandle,
+  changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
@@ -29,6 +30,7 @@ import decodeMessage from "helpers/decode-message";
 
 import {EventName} from "interfaces/analytics";
 import {CustomSession} from "interfaces/custom-session";
+import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -56,7 +58,7 @@ export function useAuthentication() {
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
 
-  const {getUserOf, getUserAll, searchCurators} = useApi();
+  const {getUserOf, getUserWith, searchCurators, getKycSession, validateKycSession} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -335,6 +337,19 @@ export function useAuthentication() {
     });
   }
 
+  function updateKycSession(){
+    if(!state?.currentUser?.login
+        || !state?.currentUser?.match
+        || !state?.currentUser?.accessToken
+        || !state?.currentUser?.walletAddress
+        || !state?.Settings?.kyc?.isKycEnabled)
+      return
+
+    getKycSession()
+      .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
+      .then((session)=> dispatch(changeCurrentUserKycSession(session)))
+  }
+
   return {
     connectWallet,
     disconnectWallet,
@@ -346,6 +361,7 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    signMessage
+    signMessage,
+    updateKycSession,
   }
 }

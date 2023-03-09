@@ -61,6 +61,11 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(auth.updateWalletAddress, [currentUser]);
   useEffect(auth.listenToAccountsChanged, [Service]);
   useEffect(auth.updateWalletBalance, [currentUser?.walletAddress, Service?.active?.network]);
+  useEffect(auth.updateKycSession, [state?.currentUser?.login,
+                                    state?.currentUser?.accessToken,
+                                    state?.currentUser?.match,
+                                    state?.currentUser?.walletAddress,
+                                    state?.Settings?.kyc?.tierList]);
   useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [currentUser?.walletAddress]);
   
