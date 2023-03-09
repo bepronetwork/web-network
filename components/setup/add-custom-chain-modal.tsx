@@ -23,7 +23,7 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
   const [currencyName, setCurrencyName] = useState('');
   const [currencyDecimals, setCurrencyDecimals] = useState('');
   const [eventsApi, setEventsApi] = useState('');
-  const [color, setColor] = useState('');
+  const [color, setColor] = useState('#4250e4');
 
   function getChainModel(): MiniChainInfo {
     return {
