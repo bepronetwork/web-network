@@ -24,7 +24,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     body,
     repositoryId,
     networkName,
-    tags
+    tags,
+    tierList,
+    isKyc,
   } = req.body;
 
   const chain = await chainFromHeader(req);
@@ -115,7 +117,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     body: body,
     network_id: network.id,
     tags,
-    chain_id: +chain.chainId
+    chain_id: +chain.chainId,
+    isKyc: !!isKyc,
+    kycTierList: tierList?.map(Number).filter(id=> !Number.isNaN(id)) || [],
   });
 
   return res.status(200).json(`${repository.id}/${githubId}`);

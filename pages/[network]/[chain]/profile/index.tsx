@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
 import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
@@ -16,6 +16,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
+import KycSessionModal from "../../../components/modals/kyc-session";
 export default function Profile() {
   const { t } = useTranslation("profile");
 
@@ -62,6 +63,9 @@ export default function Profile() {
 
       <GithubConnectionState handleClickDisconnect={handleClickDisconnect} />
 
+      <div className="mt-4">
+        <KycSessionModal/>
+      </div>
       <RemoveGithubAccount
         show={showRemoveModal}
         githubLogin={state.currentUser?.login}

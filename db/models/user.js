@@ -30,7 +30,10 @@ class User extends Model {
                });
   }
   static associate(models) {
-    // define association here
+    this.belongsTo(models.kycSession, {
+      foreignKey: "id",
+      sourceKey: "id"
+    });
   }
 }
 

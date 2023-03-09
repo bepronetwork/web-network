@@ -3,6 +3,7 @@ import {Dispatch} from "react";
 import {TreasuryInfo} from "@taikai/dappkit";
 
 import {XReducerAction} from "contexts/reducers/reducer";
+import { kycSession } from "./kyc-session";
 
 import {Balance} from "interfaces/balance-state";
 import {BountyExtended} from "interfaces/bounty";
@@ -91,11 +92,14 @@ export interface CurrentUserState {
   signature?: string;
   isAdmin?: boolean;
   hasRegisteredNetwork?: boolean;
+  kyc?: kycSession;
+  kycSession?: kycSession;
 }
 
 export interface CurrentBounty {
   comments: IssueDataComment[];
   lastUpdated: number;
+  kycSteps?: Tier[];
   data: IssueBigNumberData;
 }
 

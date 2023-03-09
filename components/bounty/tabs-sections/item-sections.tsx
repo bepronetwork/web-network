@@ -33,8 +33,8 @@ function ItemSections({ data, isProposal }: ItemProps) {
   const { getURLWithNetwork } = useNetwork();
 
   const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
-  const approvalsRequired = 
-    branchProtectionRules ? 
+  const approvalsRequired =
+    branchProtectionRules ?
       branchProtectionRules[state.currentBounty?.data?.branch]?.requiredApprovingReviewCount || 0 : 0;
   const canUserApprove = state.Service?.network?.repos?.active?.viewerPermission !== "READ";
 
@@ -52,7 +52,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
             };
             const status = []
 
-            const proposal = 
+            const proposal =
               state.currentBounty?.data?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
             const isDisputed = !!proposal?.isDisputed
             const isMerged = item?.isMerged;
@@ -87,7 +87,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
             return (
               <ItemRow 
                 key={`${uuidv4()} ${item?.id}`}
-                id={itemId} 
+                id={itemId}
                 href={getURLWithNetwork(pathRedirect, valueRedirect)} 
                 githubLogin={item?.githubLogin}
                 creator={item?.creator} 
@@ -137,7 +137,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                       </Button>
                     </div>
 
-                    { shouldRenderApproveButton && 
+                    { shouldRenderApproveButton &&
                       <div className="col">
                         <GithubLink
                           forcePath={state.Service?.network?.repos?.active?.githubPath}

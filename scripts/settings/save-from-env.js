@@ -50,6 +50,8 @@ const publicSettings = [
   PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS || 0, "boolean", "defaultNetworkConfig"),
   PublicSettingItem("minBountyValue", process.env.NEXT_MIN_BOUNTY_VALUE_WEI || "0.000000000000000100", "string"),
   PublicSettingItem("adminWallet", process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS, "string", "defaultNetworkConfig"),
+  PublicSettingItem("tierList", process.env.NEXT_SYNAPS_TIER_LIST || '[]', "json", "kyc"),
+  PublicSettingItem("isKycEnabled", process.env.NEXT_PUBLIC_ENABLE_KYC || false, "boolean", "kyc"),
 ];
 
 const saveSettingsFromEnv = async () => {
