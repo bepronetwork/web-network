@@ -27,7 +27,11 @@ export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
   
   const [totalAmount, setTotalAmount] = useState("0");
-  const [oracleToken, setOracleToken] = useState(null);
+  const [oracleToken, setOracleToken] = useState({
+    symbol: "",
+    name: "",
+    icon: <OracleIcon />
+  });
   const [tokens, setTokens] = useState<TokenBalanceType[]>([]);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
