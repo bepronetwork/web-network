@@ -42,7 +42,7 @@ export default function WrongNetworkModal() {
 
   const canBeHided = ![
     pathname?.includes("new-network"),
-    pathname?.includes("profile") && !(pathname === "/profile")
+    pathname?.includes("profile")
   ].some(c => c);
 
   function changeShowModal() {
