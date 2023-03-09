@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import NetworkContractSettings from "components/custom-network/network-contract-settings";
 import TokensSettings from "components/profile/my-network-settings/tokens-settings";
 
@@ -116,22 +116,16 @@ export default function GovernanceSettings({
           />
         </Col>
         <Col className="d-flex align-items-center justify-content-end">
-          <Button
+          <ContractButton
             color="dark-gray"
             disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
             className="ml-2"
             onClick={handleCloseMyNetwork}
+            isLoading={isClosing}
+            withLockIcon={!isAbleToClosed || !state.currentUser?.login}
           >
-            {(!isAbleToClosed || !state.currentUser?.login) && (
-              <LockedIcon className="me-2" />
-            )}
             <span>{t("custom-network:close-network")}</span>
-            {isClosing ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
-          </Button>
+          </ContractButton>
         </Col>
       </Row>
       <Row className="mt-4">

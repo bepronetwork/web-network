@@ -6,7 +6,7 @@ import getConfig from "next/config";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import AmountCard from "components/custom-network/amount-card";
 import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
@@ -140,7 +140,7 @@ export default function LogoAndColoursSettings({
             </span>
           </Col>
           <Col xs="auto">
-            <Button
+            <ContractButton
               color="warning"
               onClick={handleRegisterNetwork}
               disabled={
@@ -155,7 +155,7 @@ export default function LogoAndColoursSettings({
               isLoading={isRegistering}
             >
               {t("actions.register")}
-            </Button>
+            </ContractButton>
           </Col>
         </Row>
       )}

@@ -15,6 +15,8 @@ import { formatDate } from "helpers/formatDate";
 
 import { pullRequest } from "interfaces/issue-data";
 
+import ContractButton from "./contract-button";
+
 interface CreateReviewModalModalProps {
   show: boolean,
   isExecuting: boolean,
@@ -116,20 +118,15 @@ export default function CreateReviewModal({
           >
             {t("actions.cancel")}
           </Button>
-          <Button
+
+          <ContractButton
             disabled={isButtonDisabled()}
             onClick={handleConfirm}
+            isLoading={isExecuting}
+            withLockIcon={isButtonDisabled() && !isExecuting}
           >
-            {isButtonDisabled() && !isExecuting && (
-              <LockedIcon className="me-2" />
-            )}
             <span>{t("modals.create-review.create-review")}</span>
-            {isExecuting ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
-          </Button>
+          </ContractButton>
         </div>
       </div>
     </Modal>
