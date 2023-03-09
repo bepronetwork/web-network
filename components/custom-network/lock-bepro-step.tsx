@@ -17,6 +17,7 @@ import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 import {addTx, TxList, updateTx} from "contexts/reducers/change-tx-list";
 
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import {parseTransaction} from "helpers/transactions";
 
@@ -182,14 +183,18 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     const tokenAddress = state.Service?.active?.registry?.token?.contractAddress;
     const registryAddress = state.Service?.active?.registry?.contractAddress;
 
-    if (tokenAddress && registryAddress) {
+    if (tokenAddress && registryAddress && state.connectedChain?.name !== UNSUPPORTED_CHAIN) {
       registryToken.setAddress(tokenAddress);
       registryToken.setSpender(registryAddress);
     } else {
       registryToken.setAddress(undefined);
       registryToken.setSpender(undefined);
     }
-  }, [state.Service?.active?.registry?.token?.contractAddress, state.Service?.active?.registry?.contractAddress]);
+  }, [
+    state.Service?.active?.registry?.token?.contractAddress,
+    state.Service?.active?.registry?.contractAddress,
+    state.connectedChain?.name
+  ]);
 
   return (
     <Step
