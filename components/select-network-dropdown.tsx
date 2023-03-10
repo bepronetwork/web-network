@@ -55,7 +55,11 @@ export default function SelectNetworkDropdown({
       label: chain.chainShortName,
       preIcon: (<Indicator bg={isDisabled ? "gray" : chain.color} />),
       isDisabled,
-      tooltip: isDisabled ? "Not available on this chain" : undefined
+      tooltip: isDisabled
+      ? "Not available on this chain"
+      : chain?.chainShortName?.length > 12
+      ? chain.chainShortName
+      : undefined,
     };
   }
 
