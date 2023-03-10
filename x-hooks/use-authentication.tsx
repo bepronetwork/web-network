@@ -57,7 +57,7 @@ export function useAuthentication() {
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
 
-  const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {getUserOf, getUserAll, searchCurators} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -154,10 +154,6 @@ export function useAuthentication() {
           push(`/connect-account`);
           return false;
         }
-        if(user?.githubLogin){
-          dispatch(toastError(t("errors.failed-connect-account")));
-          return false
-        }
         return true;
       })
       .then(signedIn => {
@@ -184,7 +180,7 @@ export function useAuthentication() {
     const userLogin = sessionUser.login;
     const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
-    getUserWith(userLogin)
+    getUserAll(walletAddress,userLogin)
       .then(async(user) => {
         if (!user.githubLogin){
           dispatch(changeCurrentUserMatch(undefined));
