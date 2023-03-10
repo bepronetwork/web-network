@@ -4,7 +4,6 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import useChain from "x-hooks/use-chain";
@@ -19,7 +18,7 @@ const _context = {};
 export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
-  const {state, dispatch} = useAppState();
+  const {state} = useAppState();
   const {query} = useRouter();
   const session = useSession();
 

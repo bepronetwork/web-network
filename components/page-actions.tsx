@@ -253,7 +253,7 @@ export default function PageActions({
       else{
         return (
             <ReadOnlyButtonWrapper>
-              <Button
+              <ContractButton
                 color="primary"
                 onClick={handleStartWorking}
                 className="read-only-button"
@@ -263,7 +263,7 @@ export default function PageActions({
                 <span>
                   <Translation ns="bounty" label="actions.start-working.title"/>
                 </span>
-              </Button>
+              </ContractButton>
             </ReadOnlyButtonWrapper>
         );
       }
