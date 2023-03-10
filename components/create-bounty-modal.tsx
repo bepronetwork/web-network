@@ -9,6 +9,7 @@ import router from "next/router";
 import BranchsDropdown from "components/branchs-dropdown";
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import CreateBountyDetails from "components/create-bounty-details";
 import CreateBountyProgress from "components/create-bounty-progress";
 import CreateBountyTokenAmount from "components/create-bounty-token-amount";
@@ -664,19 +665,19 @@ export default function CreateBountyModal() {
 
               {!isTokenApproved && currentSection === 3 ? (
                 <ReadOnlyButtonWrapper>
-                  <Button
+                  <ContractButton
                     className="read-only-button"
                     disabled={isApproveButtonDisabled()}
                     onClick={allowCreateIssue}
                     isLoading={isLoadingApprove}
                   >
                     {t("actions.approve")}
-                  </Button>
+                  </ContractButton>
                 </ReadOnlyButtonWrapper>
               ) : null}
 
               { (isTokenApproved && currentSection === 3 || currentSection !== 3) &&
-                <Button
+                <ContractButton
                   className="d-flex flex-shrink-0 w-40 btn-block"
                   onClick={handleNextStepAndCreate}
                   disabled={verifyNextStepAndCreate()}
@@ -687,7 +688,7 @@ export default function CreateBountyModal() {
                       ? t("bounty:next-step")
                       : t("bounty:create-bounty")}
                   </span>
-                </Button>
+                </ContractButton>
               }
             </div>
           </>

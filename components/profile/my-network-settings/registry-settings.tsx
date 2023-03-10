@@ -3,7 +3,7 @@ import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import { FormGroup } from "components/form-group";
@@ -104,9 +104,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
         {isGovernorRegistry && (
           <Col xs={4}>
-            <Button onClick={saveFeeSettings} className="mt-4">
+            <ContractButton onClick={saveFeeSettings} className="mt-4">
               <span>{t("custom-network:registry.save-fees-config")}</span>
-            </Button>
+            </ContractButton>
           </Col>
         )}
       </Row>
@@ -126,13 +126,13 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
         {isGovernorRegistry && (
           <Col xs={5}>
-            <Button 
+            <ContractButton 
             className="mt-4" 
             onClick={saveCreateNetworkFee} 
             disabled={exceedsFeesLimitsError(networkCreationFeePercentage) ? true : false}
             >
               <span>{t("custom-network:registry.save-create-network-fee")}</span>
-            </Button>
+            </ContractButton>
           </Col>
         )}
       </Row>
@@ -148,9 +148,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         />
         {isGovernorRegistry && (
           <Col xs={5}>
-            <Button onClick={saveCreateNetworkAmount} className="mt-4">
+            <ContractButton onClick={saveCreateNetworkAmount} className="mt-4">
             <span>{t("custom-network:registry.save-create-network-amount")}</span>
-            </Button>
+            </ContractButton>
           </Col>
         )}
       </Row>

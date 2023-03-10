@@ -4,8 +4,8 @@ import BigNumber from "bignumber.js";
 import {addSeconds, formatDistance} from "date-fns";
 import {useTranslation} from "next-i18next";
 
-import Button from "components/button";
 import {ContextualSpan} from "components/contextual-span";
+import ContractButton from "components/contract-button";
 import ProposalMerge from "components/proposal-merge";
 import ProposalProgressBar from "components/proposal-progress-bar";
 
@@ -84,7 +84,8 @@ export default function ProposalActionCard({
     !proposal?.isDisputed,
     !proposal?.refusedByBountyOwner,
     !isProposalDisputable(proposal?.contractCreationDate,
-                          BigNumber(state.Service?.network?.times?.disputableTime).toNumber()),
+                          BigNumber(state.Service?.network?.times?.disputableTime).toNumber(),
+                          chaintime),
     !isMerging,
     !isRefusing,
     !isDisputing,
@@ -177,7 +178,7 @@ export default function ProposalActionCard({
             />
 
             {proposalCanBeDisputed() && (
-              <Button
+              <ContractButton
                 className="flex-grow-1"
                 textClass="text-uppercase text-white"
                 color="purple"
@@ -187,11 +188,11 @@ export default function ProposalActionCard({
                 withLockIcon={!proposalCanBeDisputed() || isMerging || isRefusing}
               >
                 {t("actions.dispute")}
-              </Button>
+              </ContractButton>
             )}
 
             {isRefusable() && (
-              <Button
+              <ContractButton
                 className="flex-grow-1"
                 textClass="text-uppercase text-white"
                 color="danger"
@@ -201,7 +202,7 @@ export default function ProposalActionCard({
                 withLockIcon={isDisputing || isMerging}
               >
                 {t("actions.refuse")}
-              </Button>
+              </ContractButton>
             )}
           </div>
 

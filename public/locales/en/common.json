@@ -189,7 +189,8 @@
     "clear": "Clear",
     "wallet": "Wallet",
     "unkown": "Unknown",
-    "latest": "Latest"
+    "latest": "Latest",
+    "unsupported": "Unsupported"
   },
   "modals": {
     "help-modal": {
@@ -261,7 +262,8 @@
       "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
     },
     "wrong-network": {
-      "please-connect": "please, connect to a supported network",
+      "please-connect": "Please, connect to a supported network",
+      "connect-to-network-chain": "To interact with this network, please connect to the chain below",
       "network": "network",
       "on-your-wallet": "on your metamask wallet",
       "change-network": "Change Network",

@@ -4,6 +4,7 @@ import {useTranslation} from "next-i18next";
 
 import Badge from "components/badge";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import Modal from "components/modal";
@@ -148,14 +149,14 @@ export default function CreatePullRequestModal({
               {t("actions.cancel")}
             </Button>
   
-            <Button
+            <ContractButton
               disabled={isButtonDisabled() || isCreating}
               onClick={handleConfirm}
               withLockIcon={isButtonDisabled()}
               isLoading={isCreating}
             >
               <span>{t("pull-request:actions.create.title")}</span>
-            </Button>
+            </ContractButton>
           </div>
         )
       }

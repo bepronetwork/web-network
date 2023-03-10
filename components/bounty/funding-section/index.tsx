@@ -10,9 +10,9 @@ import FundModal from "components/bounty/funding-section/fund-modal";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import {Amount, CaptionLarge, CaptionMedium, RowWithTwoColumns} from "components/bounty/funding-section/minimals";
 import RetractOrWithdrawModal from "components/bounty/funding-section/retract-or-withdraw-modal";
-import Button from "components/button";
 import Collapsable from "components/collapsable";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
 
 import {useAppState} from "contexts/app-state";
@@ -84,9 +84,9 @@ export default function FundingSection() {
       <RowWithTwoColumns
         col1={<h4 className="family-Regular">{t("funding:title")}</h4>}
         col2={isBountyFunded || isCanceled ? <></> : 
-          <Button onClick={handleShowFundModal}>
+          <ContractButton onClick={handleShowFundModal}>
             {t("funding:actions.fund-bounty")}
-          </Button>}
+          </ContractButton>}
       />
       
       <Row className="border-radius-8 bg-shadow mt-3 mx-0 p-2 border border-disabled">
@@ -199,7 +199,7 @@ export default function FundingSection() {
                       }
                       col2={
                           (isBountyInDraft || isBountyClosed && hasReward && !fund.withdrawn) && (
-                            <Button
+                            <ContractButton
                             textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
                             transparent
                             onClick={() => setFundingToRetractOrWithdraw(fund)}
@@ -207,7 +207,7 @@ export default function FundingSection() {
                             {isBountyClosed
                               ? t("funding:actions.withdraw-funding")
                               : t("funding:actions.retract-funding")}
-                          </Button>
+                          </ContractButton>
                           )
                       }
                     />

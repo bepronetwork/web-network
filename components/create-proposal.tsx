@@ -9,6 +9,7 @@ import LockedIcon from "assets/icons/locked-icon";
 
 import Avatar from "components/avatar";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import CreateProposalDistributionItem from "components/create-proposal-distribution-item";
 import Modal from "components/modal";
 import PullRequestLabels from "components/pull-request-labels";
@@ -406,9 +407,12 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   return (
     <div className="d-flex">
       <ReadOnlyButtonWrapper >
-        <Button className="read-only-button" onClick={() => setShow(true)}>
+        <ContractButton 
+          className="read-only-button" 
+          onClick={() => setShow(true)}
+        >
           {t("proposal:actions.create")}
-        </Button>
+        </ContractButton>
       </ReadOnlyButtonWrapper>
 
       <Modal
@@ -421,13 +425,14 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             <Button color="dark-gray" onClick={handleClose}>
               {t("actions.cancel")}
             </Button>
-            <Button
+            <ContractButton
               onClick={handleClickCreate}
               disabled={!state.currentUser?.walletAddress ||
                 participants.length === 0 ||
                 !success ||
                 executing ||
                 cantBeMergeable()}
+              isLoading={executing}
             >
               {!state.currentUser?.walletAddress ||
                 participants.length === 0 ||
@@ -436,12 +441,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
                   <LockedIcon width={12} height={12} className="mr-1" />
                 ))}
               <span>{t("proposal:actions.create")}</span>
-              {executing ? (
-                <span className="spinner-border spinner-border-xs ml-1" />
-              ) : (
-                ""
-              )}
-            </Button>
+            </ContractButton>
           </div>
         }>
         <p className="caption-small text-white-50 mb-2 mt-2">

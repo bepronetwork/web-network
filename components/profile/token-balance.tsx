@@ -1,14 +1,13 @@
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
+import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { DelegationExtended } from "interfaces/oracles-state";
 import { TokenInfo } from "interfaces/token";
-
-import { FlexColumn, FlexRow } from "./wallet-balance";
 
 export type TokenBalanceType = Partial<TokenInfo>;
 
@@ -60,9 +59,9 @@ export default function TokenBalance({
 
       <FlexRow>
         {type === "delegation" && 
-          <Button onClick={onTakeBackClick} color="purple" outline  textClass="text-white">
+          <ContractButton onClick={onTakeBackClick} color="purple" outline  textClass="text-white">
             {t("actions.take-back")}
-          </Button> ||
+          </ContractButton> ||
           <>
             <span className="caption text-white mr-1">{formatStringToCurrency(BigNumber(balance).toFixed())}</span>
             <span className={`caption text-${symbolColor[type]}`}>{symbol}</span>

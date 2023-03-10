@@ -6,8 +6,8 @@ import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
-import Button from "components/button";
 import ConnectGithub from "components/connect-github";
+import ContractButton from "components/contract-button";
 import AmountWithPreview from "components/custom-network/amount-with-preview";
 import InputNumber from "components/input-number";
 import Step from "components/step";
@@ -17,6 +17,7 @@ import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 import {addTx, TxList, updateTx} from "contexts/reducers/change-tx-list";
 
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import {parseTransaction} from "helpers/transactions";
 
@@ -182,14 +183,18 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     const tokenAddress = state.Service?.active?.registry?.token?.contractAddress;
     const registryAddress = state.Service?.active?.registry?.contractAddress;
 
-    if (tokenAddress && registryAddress) {
+    if (tokenAddress && registryAddress && state.connectedChain?.name !== UNSUPPORTED_CHAIN) {
       registryToken.setAddress(tokenAddress);
       registryToken.setSpender(registryAddress);
     } else {
       registryToken.setAddress(undefined);
       registryToken.setSpender(undefined);
     }
-  }, [state.Service?.active?.registry?.token?.contractAddress, state.Service?.active?.registry?.contractAddress]);
+  }, [
+    state.Service?.active?.registry?.token?.contractAddress,
+    state.Service?.active?.registry?.contractAddress,
+    state.connectedChain?.name
+  ]);
 
   return (
     <Step
@@ -367,12 +372,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 <div className="d-flex justify-content-center mt-4 pt-3">
                   {
                     needsAllowance &&
-                    <Button disabled={isApproving || !!lockingPercent?.gt(100)} onClick={handleApproval}>
+                    <ContractButton disabled={isApproving || !!lockingPercent?.gt(100)} onClick={handleApproval}>
                       {t('actions.approve')}
                       {isApproving && <span className="spinner-border spinner-border-xs ml-1" />}
-                    </Button>
+                    </ContractButton>
                     ||
-                    <Button
+                    <ContractButton
                       disabled={isLockBtnDisabled || isLocking}
                       onClick={() => handleLock()}
                       isLoading={isLocking}
@@ -381,10 +386,10 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       <span>
                         {t("transactions.types.lock")} {registryTokenSymbol}
                       </span>
-                    </Button>
+                    </ContractButton>
                   }
 
-                  <Button
+                  <ContractButton
                     disabled={isUnlockBtnDisabled || isUnlocking || isApproving || isLocking }
                     color="light-gray"
                     onClick={handleUnLock}
@@ -392,7 +397,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                     withLockIcon={!isUnlocking && isUnlockBtnDisabled}
                   >
                     <span>{t('transactions.types.unlock')}</span>
-                  </Button>
+                  </ContractButton>
                 </div>
               </div>
             </div>

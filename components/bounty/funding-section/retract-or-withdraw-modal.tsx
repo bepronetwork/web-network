@@ -5,6 +5,7 @@ import {useTranslation} from "next-i18next";
 
 import {Amount, RowWithTwoColumns} from "components/bounty/funding-section/minimals";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import Modal from "components/modal";
 
 import {useAppState} from "contexts/app-state";
@@ -139,7 +140,7 @@ export default function RetractOrWithdrawModal({
             </Button>
           }
           col2={
-            <Button
+            <ContractButton
               disabled={isExecuting}
               color={isBountyClosed ?  "primary" : "danger"}
               onClick={handleRetractOrWithdraw}
@@ -150,7 +151,7 @@ export default function RetractOrWithdrawModal({
                 : t("funding:actions.retract-funding")}
             </span>
               { isExecuting && <span className="spinner-border spinner-border-xs ml-1" /> }
-            </Button>
+            </ContractButton>
           }
         />
     </Modal>

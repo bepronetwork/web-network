@@ -6,9 +6,9 @@ import { changeSpinners } from "contexts/reducers/change-spinners";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 export default function useNetworkChange() {
-  const { dispatch } = useAppState();
+  const { state, dispatch } = useAppState();
   
-  async function handleAddNetwork(chosenSupportedChain: SupportedChainData) {
+  async function handleAddNetwork(chosenSupportedChain: SupportedChainData = state.Service?.network?.active?.chain) {
     const chainId = toHex(chosenSupportedChain.chainId);
 
     dispatch(changeSpinners.update({ switchingChain: true }));

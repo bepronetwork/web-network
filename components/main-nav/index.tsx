@@ -11,6 +11,7 @@ import PlusIcon from "assets/icons/plus-icon";
 import Button from "components/button";
 import ClosedNetworkAlert from "components/closed-network-alert";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
 import BrandLogo from "components/main-nav/brand-logo";
@@ -20,15 +21,15 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import SelectNetworkDropdown from "components/select-network-dropdown";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
-import WrongNetworkModal from "components/wrong-network-modal";
 
 import {useAppState} from "contexts/app-state";
 import { changeCurrentUserHasRegisteredNetwork } from "contexts/reducers/change-current-user";
-import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
+import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import { useDao } from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
@@ -51,8 +52,9 @@ export default function MainNav() {
 
   const [showHelp, setShowHelp] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>(newNetworkObj);
-  
+
   const { connect } = useDao();
+  const { chain } = useChain();
   const { state } = useAppState();
   const { dispatch } = useAppState();
   const { searchNetworks } = useApi();
@@ -73,10 +75,28 @@ export default function MainNav() {
   const brandHref = noNeedNetworkInstance ? "/" : getURLWithNetwork("/", {
     network: state.Service?.network?.active?.name,
   });
+  
+
+  function getChainShortName() {
+    const availableChains = state.Service?.network?.availableChains;
+    const isOnAvailableChain = availableChains?.find(({ chainId }) => +chainId === +state.connectedChain?.id);
+
+    if (chain) return chain.chainShortName;
+
+    if (isOnAvailableChain) {
+      return isOnAvailableChain.chainShortName;
+    }
+
+    if (availableChains) return availableChains[0].chainShortName;
+
+    return null;
+  }
 
   const links = [
     {
-      href: getURLWithNetwork("/"),
+      href: getURLWithNetwork("/", {
+        chain: getChainShortName()
+      }),
       label: t("main-nav.nav-avatar.bounties"),
       isVisible: !noNeedNetworkInstance
     },
@@ -136,10 +156,7 @@ export default function MainNav() {
   }, [state.currentUser?.walletAddress, state.connectedChain]);
 
   function handleNewBounty () {
-    if(!window.ethereum) return dispatch(changeShowWeb3(true));
-
-    return dispatch(changeShowCreateBounty(true));
-
+    dispatch(changeShowCreateBounty(true));
   }
 
   async function handleNetworkSelected(chain: SupportedChainData) {
@@ -169,7 +186,7 @@ export default function MainNav() {
   return (
     <div className="nav-container">
       <ClosedNetworkAlert
-        isVisible={state.Service?.network?.active?.isClosed}
+        isVisible={!noNeedNetworkInstance && state.Service?.network?.active?.isClosed}
       />
 
       <div className="main-nav d-flex flex-column justify-content-center">
@@ -198,19 +215,7 @@ export default function MainNav() {
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">
-            {(!noNeedNetworkInstance && (
-              <ReadOnlyButtonWrapper>
-                <Button
-                  outline
-                  onClick={handleNewBounty}
-                  textClass="text-white"
-                  className="read-only-button"
-                >
-                  <PlusIcon />
-                  <span><Translation label={"main-nav.new-bounty"} /></span>
-                </Button>
-              </ReadOnlyButtonWrapper>
-            )) || (
+            { noNeedNetworkInstance ?
               <InternalLink
                 href={myNetwork.href}
                 icon={myNetwork.icon}
@@ -218,8 +223,19 @@ export default function MainNav() {
                 iconBefore
                 uppercase
                 outline
-              />
-            )}
+              /> : 
+              <ReadOnlyButtonWrapper>
+                <ContractButton
+                  outline
+                  onClick={handleNewBounty}
+                  textClass="text-white"
+                  className="read-only-button"
+                >
+                  <PlusIcon />
+                  <span>{t("main-nav.new-bounty")}</span>
+                </ContractButton>
+              </ReadOnlyButtonWrapper>
+            }
 
             <Button
               onClick={() => setShowHelp(true)}
@@ -229,8 +245,6 @@ export default function MainNav() {
             >
               <HelpIcon />
             </Button>
-
-            <WrongNetworkModal />
 
             <ConnectWalletButton>
               <TransactionsStateIndicator />
