@@ -214,7 +214,7 @@
     },
     "invalid-account-wallet": {
       "title": "Github Account and Wallet don't match",
-      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection"
+      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection or connect with github already registered and disconnect from this wallet"
     },
     "not-mergeable": {
       "title": "Merging bounty",
