@@ -15,7 +15,6 @@ import {TransactionTypes} from "interfaces/enums/transaction-types";
 import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
-import { useDao } from "x-hooks/use-dao";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
@@ -28,7 +27,6 @@ export default function useERC20() {
   const [allowance, setAllowance] = useState(BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
-  const { isServiceReady } = useDao();
   const { state, dispatch } = useAppState();
   const { handleApproveToken } = useBepro();
 
