@@ -15,6 +15,7 @@ import PullRequestLabels from "components/pull-request-labels";
 import ReactSelect from "components/react-select";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
+import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import sumObj from "helpers/sumObj";
 
 import {pullRequest} from "interfaces/issue-data";
@@ -114,6 +115,10 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const { getUserWith, processEvent } = useApi();
 
   const currentBounty = useBounty();
+  const bountyAmount = BigNumber(amountTotal);
+  const proposerFeeShare = state.Service?.network?.amounts?.proposerFeeShare || 0;
+  const mergeCreator = state.Service?.network?.amounts?.mergeCreatorFeeShare || 0;
+  const treasury = state.Service.network.amounts?.treasury;
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => {
@@ -179,40 +184,26 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       } else {
         handleInputColor("success");
       }
+
+      const proposalDetails = 
+        currentDistrbuition.prAddressAmount.map(({ amount, address }) => ({ percentage: amount, recipient: address }));
+
+      const distributedAmounts = 
+        calculateDistributedAmounts(treasury, mergeCreator, proposerFeeShare, bountyAmount, proposalDetails);
+
+      console.log("distributedAmounts", distributedAmounts.proposals);
+
+      if (distributedAmounts.proposals.some(({ value }) => BigNumber(value).lt(1e-15))) {
+        handleInputColor("error");
+        setShowExceptionalMessage(true);
+      }
     }
+
     if ((currentAmount > 0 && currentAmount < 100) || currentAmount > 100) {
       handleInputColor("error");
     }
     if (currentAmount === 0) {
       handleInputColor("normal");
-    }
-
-    if (currentAmount === 100) {
-      const bountyAmount = BigNumber(amountTotal);
-      const proposerFeeShare = BigNumber(state.Service?.network?.amounts?.proposerFeeShare || 0);
-      const mergeCreator = BigNumber(state.Service?.network?.amounts?.mergeCreatorFeeShare || 0);
-      const closeFee = BigNumber(state.Service.network.amounts?.treasury?.closeFee || 0);
-      const subtract =
-        [proposerFeeShare, mergeCreator, closeFee]
-          .reduce((p, c) => p.plus(c.multipliedBy(bountyAmount).dividedBy(100)), BigNumber(0));
-
-      const availableAmount = bountyAmount.minus(subtract);
-
-      for (let i = 0; i < participants.length; i++) {
-        const githubHandle = participants[i].githubHandle;
-        const proposalValue = BigNumber(obj[githubHandle]);
-
-        if (!obj[githubHandle])
-          continue;
-
-        const value = proposalValue.multipliedBy(availableAmount).dividedBy(100);
-
-        if (value.lt(1e-15)) {
-          handleInputColor("error");
-          setShowExceptionalMessage(true);
-          i = participants.length;
-        }
-      }
     }
   }
 
