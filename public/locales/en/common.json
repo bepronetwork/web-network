@@ -213,7 +213,7 @@
     },
     "invalid-account-wallet": {
       "title": "Github Account and Wallet don't match",
-      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection"
+      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection or connect with github already registered and disconnect from this wallet"
     },
     "not-mergeable": {
       "title": "Merging bounty",
@@ -333,8 +333,7 @@
     "creating-issue": "Failed to create github issue!",
     "failed-update-bounty": "Failed to update bounty!",
     "read-only-network": "This network is closed. It is set to read-only mode.",
-    "results-truncated": "Results Truncated",
-    "failed-connect-account": "This address is linked to another github account"
+    "results-truncated": "Results Truncated"
   },
   "404": {
     "the-page": "The page you looking for was",
