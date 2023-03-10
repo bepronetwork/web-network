@@ -191,9 +191,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       const distributedAmounts = 
         calculateDistributedAmounts(treasury, mergeCreator, proposerFeeShare, bountyAmount, proposalDetails);
 
-      console.log("distributedAmounts", distributedAmounts.proposals);
-
-      if (distributedAmounts.proposals.some(({ value }) => BigNumber(value).lt(1e-15))) {
+      if (distributedAmounts.proposals.some(({ value, percentage }) => 
+        BigNumber(value).lt(1e-15) && BigNumber(percentage).gt(0))) {
         handleInputColor("error");
         setShowExceptionalMessage(true);
       }
