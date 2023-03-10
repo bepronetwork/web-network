@@ -16,7 +16,7 @@ export default function IconOption(props) {
       ${props.data.isDisabled ? 'bg-transparent-hover text-light-gray' : ''}
     `}>
       <OverlayTrigger key={`overlay-${props.label}`} placement="right" overlay={popover}>
-        <div>
+        <div className="text-truncate">
           <span>
             {
               props.data.preIcon &&
