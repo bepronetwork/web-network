@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import Modal from "components/modal";
 import ProposalListDistribution from "components/proposal-list-distribution";
 
@@ -71,7 +72,7 @@ export default function ProposalMerge({
 
   return (
     <>
-      <Button
+      <ContractButton
         className="flex-grow-1"
         textClass="text-uppercase text-white"
         onClick={() => setShow(true)}
@@ -80,7 +81,7 @@ export default function ProposalMerge({
         withLockIcon={!canMerge || isMerging}
       >
         <span>{t("actions.merge")}</span>
-      </Button>
+      </ContractButton>
 
       <Modal
         show={show}

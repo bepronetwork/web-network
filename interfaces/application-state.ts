@@ -60,6 +60,7 @@ export interface ServiceNetwork {
   times: NetworkTimes;
   amounts: NetworkAmounts;
   noDefaultNetwork?: boolean;
+  availableChains?: SupportedChainData[];
   tokens: {transactional: Token[]; reward: Token[];} | null;
 }
 

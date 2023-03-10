@@ -6,7 +6,8 @@ import {useAppState} from "contexts/app-state";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
-import {toastError,} from "contexts/reducers/change-toaster";
+
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
@@ -16,7 +17,7 @@ import useChain from "x-hooks/use-chain";
 import useNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
-  const { replace, asPath } = useRouter();
+  const { replace, asPath, pathname } = useRouter();
 
   const { chain } = useChain();
   const {state, dispatch} = useAppState();
@@ -111,10 +112,19 @@ export function useDao() {
       return;
     }
 
+    const networkChainId = state.Service?.network?.active?.chain_id;
+    const isOnNetwork = pathname?.includes("[network]");
+
+    if (isOnNetwork && !networkChainId) {
+      console.debug("Is on network, but network data was not loaded yet");
+      return;
+    }
+
     const { connectedChain } = state;
 
     const chainIdToConnect =
-      state.Service?.network?.active?.chain_id || (connectedChain?.name === "unknown" ? undefined : connectedChain?.id);
+      state.Service?.network?.active?.chain_id || 
+      (connectedChain?.name === UNSUPPORTED_CHAIN ? undefined : connectedChain?.id);
 
     const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
       chainIdToConnect ? +chainIdToConnect === +chainId : isDefault);

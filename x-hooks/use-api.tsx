@@ -602,9 +602,10 @@ export default function useApi() {
     isRegistered = undefined,
     isDefault = undefined,
     isNeedCountsAndTokensLocked = undefined,
-    chainId = ""
+    chainId = "",
+    chainShortName = ""
   }: SearchNetworkParams) {
-    const params = new URLSearchParams({
+    const params = {
       page,
       name,
       creatorAddress,
@@ -613,14 +614,14 @@ export default function useApi() {
       order,
       search,
       chainId,
+      chainShortName,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
       ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {}),
       ...((isNeedCountsAndTokensLocked !== undefined && {
         isNeedCountsAndTokensLocked: isNeedCountsAndTokensLocked.toString(),
-      }) ||
-        {})
-    }).toString();
+      }) || {})
+    };
 
     return api
       .get<{
@@ -628,7 +629,7 @@ export default function useApi() {
         count: number;
         pages: number;
         currentPage: number;
-      }>(`/search/networks/?${params}`)
+      }>(`/search/networks`, { params })
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }

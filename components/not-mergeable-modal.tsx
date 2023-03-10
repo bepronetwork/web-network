@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
@@ -127,7 +128,7 @@ export default function NotMergeableModal({
         </div>
         <div className="d-flex justify-content-center">
           {state.Service?.network?.active?.isCouncil && state.currentBounty?.data?.isClosed && (
-            <Button
+            <ContractButton
               color={`${
                 (mergeState === "error" && "transparent") || "primary"
               }`}
@@ -145,7 +146,7 @@ export default function NotMergeableModal({
               {mergeState === "loading" && (
                 <span className="spinner-border spinner-border-xs ml-1" />
               )}
-            </Button>
+            </ContractButton>
           )}
           {isPullRequestOwner && (
             <GithubLink

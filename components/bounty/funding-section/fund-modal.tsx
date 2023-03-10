@@ -6,6 +6,7 @@ import {useTranslation} from "next-i18next";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import {Amount, CaptionMedium, RowWithTwoColumns} from "components/bounty/funding-section/minimals";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputWithBalance from "components/input-with-balance";
 import Modal from "components/modal";
 
@@ -196,14 +197,14 @@ export default function FundModal({
             </Button>
           }
           col2={
-            <Button
+            <ContractButton
               disabled={fundBtnDisabled}
               onClick={ConfirmBtn.action}
               withLockIcon={fundBtnDisabled && !isExecuting}
               isLoading={isExecuting}
             >
               <span>{ConfirmBtn.label}</span>
-            </Button>
+            </ContractButton>
           }
         />
       </div>

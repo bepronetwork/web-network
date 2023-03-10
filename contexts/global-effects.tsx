@@ -4,7 +4,6 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
-import { changeLoadState } from "contexts/reducers/change-load";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import useChain from "x-hooks/use-chain";
@@ -19,7 +18,7 @@ const _context = {};
 export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
-  const {state, dispatch} = useAppState();
+  const {state} = useAppState();
   const {query} = useRouter();
   const session = useSession();
 
@@ -33,9 +32,9 @@ export const GlobalEffectsProvider = ({children}) => {
 
   const { supportedChains, connectedChain, currentUser, Service } = state;
 
-  function updateLoadingState() {
-    dispatch(changeLoadState(Object.values(state.spinners).some(v => v)));
-  }
+  // function updateLoadingState() {
+  //   dispatch(changeLoadState(Object.values(state.spinners).some(v => v)));
+  // }
 
   useEffect(dao.start, [
     supportedChains,
@@ -51,7 +50,7 @@ export const GlobalEffectsProvider = ({children}) => {
 
   useEffect(repos.loadRepos, [
     query?.network,
-    query?.chain,
+    chain,
     state.Service?.network?.active
   ]);
   useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);

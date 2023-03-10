@@ -8,6 +8,7 @@ import {useTranslation} from "next-i18next";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
@@ -296,7 +297,7 @@ function OraclesActions({
           <ReadOnlyButtonWrapper>
             <div className="mt-5 d-grid gap-3">
               {action === t("my-oracles:actions.lock.label") && (
-                <Button
+                <ContractButton
                   disabled={!needsApproval() || isApproving}
                   className="ms-0 read-only-button"
                   onClick={approveSettlerToken}
@@ -317,10 +318,10 @@ function OraclesActions({
                       ""
                     )}
                   </span>
-                </Button>
+                </ContractButton>
               )}
 
-              <Button
+              <ContractButton
                 color={
                   action === t("my-oracles:actions.lock.label")
                     ? "purple"
@@ -334,7 +335,7 @@ function OraclesActions({
                   <LockedIcon width={12} height={12} className="mr-1" />
                 )}
                 <span>{renderInfo?.label}</span>
-              </Button>
+              </ContractButton>
             </div>
           </ReadOnlyButtonWrapper>
 

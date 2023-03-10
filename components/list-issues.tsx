@@ -10,6 +10,7 @@ import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
 import InfiniteScroll from "components/infinite-scroll";
 import IssueFilters from "components/issue-filters";
@@ -379,9 +380,9 @@ export default function ListIssues({
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {(appState.currentUser?.walletAddress && !allNetworks) && (
               <ReadOnlyButtonWrapper>
-                <Button onClick={handleNotFoundClick}>
+                <ContractButton onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
-                </Button>
+                </ContractButton>
                 </ReadOnlyButtonWrapper>
               )}
           </NothingFound>

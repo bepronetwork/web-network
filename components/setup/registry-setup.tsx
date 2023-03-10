@@ -6,8 +6,8 @@ import {isZeroAddress} from "ethereumjs-util";
 import {useTranslation} from "next-i18next";
 import {isAddress} from "web3-utils";
 
-import Button from "components/button";
 import {ContextualSpan} from "components/contextual-span";
+import ContractButton from "components/contract-button";
 import {FormGroup} from "components/form-group";
 import {CallToAction} from "components/setup/call-to-action";
 import {ContractField, ContractInput} from "components/setup/contract-input";
@@ -334,6 +334,7 @@ export function RegistrySetup({
           color="warning"
           disabled={!needToSetDispatcher}
           executing={isSettingDispatcher}
+          isContractAction
         />
       }
 
@@ -345,6 +346,7 @@ export function RegistrySetup({
           color="info"
           disabled={!!isErc20Allowed?.transactional || !!isAllowingToken}
           executing={isAllowingToken === "transactional"}
+          isContractAction
         />
       }
 
@@ -356,6 +358,7 @@ export function RegistrySetup({
           color="info"
           disabled={!!isErc20Allowed?.reward || !!isAllowingToken}
           executing={isAllowingToken === "reward"}
+          isContractAction
         />
       }
 
@@ -479,14 +482,14 @@ export function RegistrySetup({
 
       <Row className="mb-2">
         <Col xs="auto">
-          <Button
+          <ContractButton
             disabled={isDeployRegistryBtnDisabled || isDeployingRegistry}
             withLockIcon={isDeployRegistryBtnDisabled}
             isLoading={isDeployingRegistry}
             onClick={deployRegistryContract}
           >
             <span>{t("setup:registry.actions.deploy-registry")}</span>
-          </Button>
+          </ContractButton>
         </Col>
       </Row>
 

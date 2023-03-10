@@ -11,9 +11,6 @@ import {useAppState} from "contexts/app-state";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
-import useApi from "x-hooks/use-api";
-import { useNetwork } from "x-hooks/use-network";
-
 interface SelectNetworkDropdownProps {
   onSelect: (chain: SupportedChainData) => void;
   defaultChain?: SupportedChainData;
@@ -43,10 +40,7 @@ export default function SelectNetworkDropdown({
 
   const [options, setOptions] = useState<ChainOption[]>([]);
   const [selected, setSelectedChain] = useState<ChainOption>(null);
-  const [chainsWithSameNetwork, setChainsWithSameNetwork] = useState<SupportedChainData[]>();
-  
-  const { searchNetworks } = useApi();
-  const { networkName } = useNetwork();
+
   const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
 
   function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption { 
@@ -95,38 +89,25 @@ export default function SelectNetworkDropdown({
     setSelectedChain(chainToOption(chain));
   }
 
-  function updateChainsWithSameNetwork() {
-    if (isOnNetwork !== true || !networkName) {
-      setChainsWithSameNetwork(undefined);
-      return;
-    }
-
-    searchNetworks({
-      name: networkName
-    })
-      .then(({ count, rows }) => {
-        if (count === 0)
-          setChainsWithSameNetwork(undefined);
-        else
-          setChainsWithSameNetwork(rows.map(row => row.chain));
-      })
-      .catch(console.debug);
-  }
-
   function updateOptions() {
-    if (!supportedChains || (isOnNetwork && !chainsWithSameNetwork)) return;
+    if (!supportedChains || (isOnNetwork && !Service?.network?.availableChains)) return;
 
     const configuredChains = supportedChains.filter(isChainConfigured);
 
     if (isOnNetwork)
       setOptions(configuredChains.map(chain => 
-        chainToOption(chain, !chainsWithSameNetwork?.find(({ chainId }) => chainId === chain.chainId))));
+        chainToOption(chain, !Service?.network?.availableChains?.find(({ chainId }) => chainId === chain.chainId))));
     else
       setOptions(configuredChains.map(chain => chainToOption(chain)));
   }
 
-  useEffect(updateOptions, [isOnNetwork, chainsWithSameNetwork, supportedChains, currentUser?.isAdmin]);
-  useEffect(updateChainsWithSameNetwork, [isOnNetwork, networkName]);
+  useEffect(updateOptions, [
+    isOnNetwork,
+    Service?.network?.availableChains,
+    supportedChains,
+    currentUser?.isAdmin
+  ]);
+
   useEffect(updateSelectedChainMatchConnected, [
     options,
     Service?.network?.active?.chain,

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import Avatar from "components/avatar";
 import Button from "components/button";
 import GithubInfo from "components/github-info";
@@ -14,6 +12,8 @@ import { useAppState } from "contexts/app-state";
 import { formatDate } from "helpers/formatDate";
 
 import { pullRequest } from "interfaces/issue-data";
+
+import ContractButton from "./contract-button";
 
 interface CreateReviewModalModalProps {
   show: boolean,
@@ -116,20 +116,15 @@ export default function CreateReviewModal({
           >
             {t("actions.cancel")}
           </Button>
-          <Button
+
+          <ContractButton
             disabled={isButtonDisabled()}
             onClick={handleConfirm}
+            isLoading={isExecuting}
+            withLockIcon={isButtonDisabled() && !isExecuting}
           >
-            {isButtonDisabled() && !isExecuting && (
-              <LockedIcon className="me-2" />
-            )}
             <span>{t("modals.create-review.create-review")}</span>
-            {isExecuting ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
-          </Button>
+          </ContractButton>
         </div>
       </div>
     </Modal>

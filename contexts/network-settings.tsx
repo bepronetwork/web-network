@@ -18,7 +18,8 @@ import {
   DEFAULT_MERGER_FEE,
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
-  DEFAULT_PROPOSER_FEE
+  DEFAULT_PROPOSER_FEE,
+  UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
 import { NetworkValidator } from "helpers/network";
@@ -48,7 +49,8 @@ export const NetworkSettingsProvider = ({ children }) => {
             referred to user nework when he access `/my-network` page from/in another network.
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
-  const [networkSettings, setNetworkSettings] = useState(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
+  const [networkSettings, setNetworkSettings] = 
+    useState<NetworkSettings>(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [registryToken, setRegistryToken] = useState<Token>();
   const [forcedService, setForcedService] = useState<DAO>();
@@ -547,7 +549,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if (!network || !state.Service?.active || state.Service?.starting)
       setForcedService(undefined);
-    else if (network.chain.chainRpc === state.Service?.active?.web3Connection?.options?.web3Host)
+    else if (network?.chain?.chainRpc === state.Service?.active?.web3Connection?.options?.web3Host)
       loadForcedService()
         .then(setForcedService);
   }, [network, state.Service?.active, state.Service?.starting]);
@@ -555,7 +557,8 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if ([
       !state.currentUser?.walletAddress,
-      !isCreating && (!network?.name || !forcedService),
+      !isCreating && 
+        (!network?.name || !forcedService || !!networkSettings?.settings?.parameters?.councilAmount?.value),
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad,
       !state.Settings
@@ -581,11 +584,11 @@ export const NetworkSettingsProvider = ({ children }) => {
   ]);
 
   useEffect(() => {
-    if (state.Service?.active?.registry?.contractAddress)
+    if (state.Service?.active?.registry?.contractAddress && state.connectedChain?.name !== UNSUPPORTED_CHAIN)
       state.Service.active.getERC20TokenData(state.Service.active.registry.token.contractAddress)
         .then(setRegistryToken)
         .catch(error => console.debug("Failed to load registry token", error));
-  }, [state.Service?.active?.registry?.contractAddress]);
+  }, [state.Service?.active?.registry?.contractAddress, state.connectedChain?.name]);
 
   // Pre Select same network on other chain repositories
   useEffect(() => {

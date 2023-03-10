@@ -26,12 +26,14 @@ interface OraclesDelegateProps {
 }
 
 function OraclesDelegate({
-                           wallet,
-                           updateWalletBalance,
-                           defaultAddress
-                         }: OraclesDelegateProps) {
+  wallet,
+  updateWalletBalance,
+  defaultAddress
+}: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
-  const debounce = useRef(null)
+  
+  const debounce = useRef(null);
+
   const [error, setError] = useState<string>("");
   const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();

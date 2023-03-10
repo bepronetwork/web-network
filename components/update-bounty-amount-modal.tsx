@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
@@ -108,14 +109,14 @@ export default function UpdateBountyAmountModal({
             >
               <span>{t("actions.approve")}</span>
             </Button> :
-            <Button
+            <ContractButton
                 disabled={isExecuting || exceedsBalance || !newAmount}
                 withLockIcon={exceedsBalance || !newAmount}
                 onClick={handleSubmit}
                 isLoading={isExecuting}
             >
               <span>{t("actions.confirm")}</span>
-            </Button>
+            </ContractButton>
           }
         </div>
       )}

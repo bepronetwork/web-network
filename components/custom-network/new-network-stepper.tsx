@@ -18,6 +18,7 @@ import Stepper from "components/stepper";
 import {useAppState} from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import {changeLoadState} from "contexts/reducers/change-load";
+import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {
@@ -28,7 +29,8 @@ import {
   DEFAULT_MERGER_FEE,
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
-  DEFAULT_PROPOSER_FEE
+  DEFAULT_PROPOSER_FEE,
+  UNSUPPORTED_CHAIN,
   WANT_TO_CREATE_NETWORK
 } from "helpers/constants";
 import {psReadAsText} from "helpers/file-reader";
@@ -224,15 +226,23 @@ function NewNetwork() {
     
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(networkAddress => setHasNetwork(!isZeroAddress(networkAddress)))
-      .catch(console.log)
+      .catch(console.debug)
       .finally(() => dispatch(changeLoadState(false)));
   }
 
   useEffect(() => {
-    if (!state.Service?.active || !state.currentUser?.walletAddress) return;
+    const walletAddress = state.currentUser?.walletAddress;
+    const connectedChain = state.connectedChain;
+
+    if (!state.Service?.active || !walletAddress || !connectedChain) return;
+
+    if (walletAddress && connectedChain.name === UNSUPPORTED_CHAIN) {
+      dispatch(changeNeedsToChangeChain(true));
+      return;
+    }
 
     checkHasNetwork();
-  }, [state.Service?.active, state.currentUser]);
+  }, [state.Service?.active, state.currentUser, state.connectedChain]);
 
   return (
     <div>

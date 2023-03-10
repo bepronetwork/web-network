@@ -34,6 +34,7 @@ export interface SearchNetworkParams {
   isDefault?: boolean;
   isNeedCountsAndTokensLocked?: boolean;
   chainId?: string;
+  chainShortName?: string;
 }
 
 export interface SearchActiveNetworkParams {

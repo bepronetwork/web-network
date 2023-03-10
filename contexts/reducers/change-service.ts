@@ -1,3 +1,5 @@
+import { SupportedChainData } from "interfaces/supported-chain-data";
+
 import { RepositoryPermissions } from "types/octokit";
 
 import {
@@ -90,6 +92,8 @@ export const changeNoDefaultNetwork = (noDefaultNetwork: boolean) => changeNetwo
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
 export const changeActiveNetworkTimes = (times: NetworkTimes) => changeNetwork.update({times});
 export const changeActiveNetworkAmounts = (amounts: NetworkAmounts) => changeNetwork.update({amounts});
+export const changeActiveAvailableChains = 
+  (availableChains: SupportedChainData[]) => changeNetwork.update({availableChains});
 
 export const changeAllowedTokens = (transactional: Token[], reward: Token[]) =>
   changeNetwork.update({tokens: {transactional, reward}})

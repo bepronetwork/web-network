@@ -84,10 +84,11 @@ export default function PageIssue() {
         isRepoForked !== undefined) 
       return;
     checkForks();
-  },[state.currentUser?.login, 
-     state.currentBounty?.data?.working, 
-     state.Service?.network?.repos?.active,
-     !state.currentUser?.walletAddress
+  },[
+    state.currentUser?.login, 
+    state.currentBounty?.data?.working, 
+    state.Service?.network?.repos?.active,
+    !state.currentUser?.walletAddress
   ]);
 
   return (

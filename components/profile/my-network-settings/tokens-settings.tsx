@@ -3,7 +3,7 @@ import {Col, Row} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import {WarningSpan} from "components/warning-span";
 
@@ -173,13 +173,13 @@ export default function TokensSettings({
   function renderButtons(tokenType: TokenType) {
     return (
       <div className="d-flex" key={`col-${tokenType}`}>
-        <Button className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
+        <ContractButton className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
           <span>
           {tokenType === 'transactional'
               ? t("custom-network:save-transactional-config")
               : t("custom-network:save-reward-config")}
           </span>
-        </Button>
+        </ContractButton>
       </div>
     );
   }

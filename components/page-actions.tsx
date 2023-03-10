@@ -7,9 +7,9 @@ import {useRouter} from "next/router";
 
 import EditIcon from "assets/icons/transactions/edit";
 
-import Button from "components/button";
 import ConnectGithub from "components/connect-github";
 import { ContextualSpan } from "components/contextual-span";
+import ContractButton from "components/contract-button";
 import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import ForksAvatars from "components/forks-avatars";
@@ -245,15 +245,15 @@ export default function PageActions({
 
       if (state.Settings?.kyc?.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
         return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
-          <Button>
+          <ContractButton>
             <Translation ns="bounty" label="kyc.identify-to-start" />
-          </Button>
+          </ContractButton>
         </Link>
       }
       else{
         return (
             <ReadOnlyButtonWrapper>
-              <Button
+              <ContractButton
                 color="primary"
                 onClick={handleStartWorking}
                 className="read-only-button"
@@ -263,7 +263,7 @@ export default function PageActions({
                 <span>
                   <Translation ns="bounty" label="actions.start-working.title"/>
                 </span>
-              </Button>
+              </ContractButton>
             </ReadOnlyButtonWrapper>
         );
       }
@@ -279,13 +279,13 @@ export default function PageActions({
         isRepoForked)
       return (
         <ReadOnlyButtonWrapper>
-          <Button
+          <ContractButton
             className="read-only-button"
             onClick={() => setShowPRModal(true)}
             disabled={!state.currentUser?.login || !isWalletConnected}
           >
             <Translation ns="pull-request" label="actions.create.title"/>
-          </Button>
+          </ContractButton>
         </ReadOnlyButtonWrapper>
       );
   }
@@ -294,13 +294,13 @@ export default function PageActions({
     if (state.Service?.network?.active?.isGovernor && isCancelable)
       return (
         <ReadOnlyButtonWrapper>
-          <Button
+          <ContractButton
             color="danger"
             className="read-only-button me-1"
             onClick={() => setShowHardCancelModal(true)}
           >
             <Translation ns="common" label="actions.cancel"/>
-          </Button>
+          </ContractButton>
         </ReadOnlyButtonWrapper>
       );
   }
@@ -311,12 +311,12 @@ export default function PageActions({
     if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded && !isEditIssue)
       return (
         <ReadOnlyButtonWrapper>
-          <Button
+          <ContractButton
             className="read-only-button me-1"
             onClick={handleRedeem}
           > 
             <Translation ns="common" label="actions.cancel"/>
-          </Button>
+          </ContractButton>
         </ReadOnlyButtonWrapper>
       );
   }
@@ -325,12 +325,12 @@ export default function PageActions({
     if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest && !isEditIssue)
       return (
         <ReadOnlyButtonWrapper>
-          <Button
+          <ContractButton
             className="read-only-button me-1"
             onClick={() => setShowUpdateAmount(true)}
           >
             <Translation ns="bounty" label="actions.update-amount"/>
-          </Button>
+          </ContractButton>
         </ReadOnlyButtonWrapper>
       );
   }
@@ -365,13 +365,13 @@ export default function PageActions({
     if (isWalletConnected && isBountyInDraft && isBountyOwner)
       return (
         <ReadOnlyButtonWrapper>
-          <Button
+          <ContractButton
             className="read-only-button me-1"
             onClick={handleEditIssue}
           >
             <EditIcon className="me-1"/>
             <Translation ns="bounty" label="actions.edit-bounty" />
-          </Button>
+          </ContractButton>
         </ReadOnlyButtonWrapper>
       );
   }

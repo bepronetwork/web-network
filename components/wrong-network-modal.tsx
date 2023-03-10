@@ -5,21 +5,26 @@ import {useTranslation} from "next-i18next";
 import { useRouter } from "next/router";
 
 import Button from "components/button";
+import ConnectWalletButton from "components/connect-wallet-button";
 import Modal from "components/modal";
 import SelectNetworkDropdown from "components/select-network-dropdown";
 
 import {useAppState} from "contexts/app-state";
+import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
+
+import { UNSUPPORTED_CHAIN } from "helpers/contants";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import { useDao } from "x-hooks/use-dao";
 import useNetworkChange from "x-hooks/use-network-change";
 
 type typeError = { code?: number; message?: string }
 
 export default function WrongNetworkModal() {
   const { t } = useTranslation("common");
-  const { query } = useRouter();
+  const { query, pathname } = useRouter();
 
   const [error, setError] = useState<string>("");
   const [_showModal, setShowModal] = useState(false);
@@ -28,23 +33,30 @@ export default function WrongNetworkModal() {
   const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
   
   const api = useApi();
+  const { connect } = useDao();
   const { handleAddNetwork } = useNetworkChange();
-  const { state: { connectedChain, currentUser, Service, supportedChains, loading, spinners } } = useAppState();
+  const { 
+    dispatch, 
+    state: { connectedChain, currentUser, Service, supportedChains, loading, spinners }
+  } = useAppState();
+
+  const canBeHided = ![
+    pathname?.includes("new-network"),
+    pathname?.includes("profile")
+  ].some(c => c);
 
   function changeShowModal() {
-    if (!connectedChain?.id || 
-        !supportedChains?.length ||
+    if (!supportedChains?.length ||
         loading?.isLoading ||
-        spinners?.changingChain) {
+        !spinners?.needsToChangeChain) {
       setShowModal(false);
       return;
     }
 
     if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
-      setShowModal(!supportedChains?.find(({ chainId }) => +chainId === +connectedChain.id));
+      setShowModal(connectedChain?.name === UNSUPPORTED_CHAIN);
     else
       setShowModal(!connectedChain?.matchWithNetworkChain && !!currentUser?.walletAddress);
-
   }
 
   async function selectSupportedChain(chain: SupportedChainData) {
@@ -58,6 +70,10 @@ export default function WrongNetworkModal() {
     setIsAddingNetwork(true);
     setError("");
     handleAddNetwork(chosenSupportedChain)
+      .then(() => {
+        if (!currentUser?.walletAddress)
+          return connect();
+      })
       .catch(error => {
         if ((error as typeError).code === -32602) {
           setError(t("modals.wrong-network.error-invalid-rpcUrl"));
@@ -68,6 +84,7 @@ export default function WrongNetworkModal() {
       })
       .finally(() => {
         setIsAddingNetwork(false);
+        dispatch(changeNeedsToChangeChain(false));
       });
   }
 
@@ -82,8 +99,11 @@ export default function WrongNetworkModal() {
       setNetworkChain(null);
   }
 
-  const isButtonDisabled = (): boolean =>
-    [isAddingNetwork].some((values) => values);
+  function handleHideModal() {
+    dispatch(changeNeedsToChangeChain(false));
+  }
+
+  const isButtonDisabled = () => [isAddingNetwork].some((values) => values);
 
   useEffect(() => { api.getSupportedChains() }, []);
   useEffect(updateNetworkChain, [Service?.network?.active?.chain_id, supportedChains, query?.network]);
@@ -96,15 +116,20 @@ export default function WrongNetworkModal() {
     spinners
   ]);
 
+  if (spinners?.needsToChangeChain && !currentUser?.walletAddress)
+    return <ConnectWalletButton asModal={true} />;
+
   return (
     <Modal
       title={t("modals.wrong-network.change-network")}
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
-      show={_showModal}>
+      show={_showModal}
+      onCloseClick={canBeHided ? handleHideModal : undefined}
+    >
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-          {t("modals.wrong-network.please-connect")}
+          {networkChain ? t("modals.wrong-network.connect-to-network-chain") : t("modals.wrong-network.please-connect")}
         </strong>
 
         {!isAddingNetwork ? '' :

@@ -24,7 +24,7 @@ import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "context
 import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import {IM_AN_ADMIN, NOT_AN_ADMIN} from "helpers/constants";
+import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 import {EventName} from "interfaces/analytics";
@@ -92,9 +92,6 @@ export function useAuthentication() {
   }
 
   function connectWallet() {
-    // if (!state.Service?.active)
-    //   return;
-
     connect();
   }
 
@@ -104,7 +101,8 @@ export function useAuthentication() {
 
     dispatch(changeWalletSpinnerTo(true));
 
-    window.ethereum.request({method: 'eth_requestAccounts'})
+    (state.Service?.active ?
+      state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
       .then(_address => {
         if (Array.isArray(_address)) console.debug("eth_requestAccounts", _address);
         
@@ -122,8 +120,8 @@ export function useAuthentication() {
 
         dispatch(changeChain.update({
           id: (chain?.chainId || windowChainId)?.toString(),
-          name: chain?.chainName || "unknown",
-          shortName: chain?.chainShortName?.toLowerCase() || 'unknown',
+          name: chain?.chainName || UNSUPPORTED_CHAIN,
+          shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
           explorer: chain?.blockScanner,
           events: chain?.eventsApi,
           registry: chain?.registryAddress
@@ -287,7 +285,7 @@ export function useAuthentication() {
       const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
       const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
 
-      if (!isAdminUser && state.connectedChain?.name === "unknown") {
+      if (!isAdminUser && state.connectedChain?.name === UNSUPPORTED_CHAIN) {
         dispatch(addToast({
           type: "warning",
           title: "Unsupported chain",

@@ -5,7 +5,7 @@ import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
@@ -178,7 +178,7 @@ export default function UnlockBeproModal({
         </div>
 
         <div className="d-flex pt-2 justify-content-center">
-          <Button
+          <ContractButton
             className="mr-2"
             disabled={isButtonDisabled}
             onClick={handleUnlock}
@@ -192,7 +192,7 @@ export default function UnlockBeproModal({
                 formatStringToCurrency(amountToUnlock?.toFixed())}{" "}
               {t("$bepro")}
             </span>
-          </Button>
+          </ContractButton>
         </div>
       </div>
 

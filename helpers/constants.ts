@@ -26,5 +26,6 @@ export const SEVEN_DAYS_IN_MS = 60 * 60 * 24 * 7 * 1000;
 export const IM_AM_CREATOR_ISSUE = `I am the owner of this bounty`;
 export const NOT_AN_CREATOR_ISSUE = `Not an creator issue`;
 export const MISSING_CREATOR_ISSUE_SIGNATURE = `Missing creator issue signature`;
+export const UNSUPPORTED_CHAIN = "unsupported";
 export const MAX_INTEGER_SOLIDITY = 2**256 - 1;
 export const NETWORK_DIVISOR = 1000000;

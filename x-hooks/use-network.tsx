@@ -6,6 +6,7 @@ import {UrlObject} from "url";
 import {useAppState} from "contexts/app-state";
 import { changeMatchWithNetworkChain } from "contexts/reducers/change-chain";
 import {
+  changeActiveAvailableChains,
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
@@ -26,9 +27,13 @@ export function useNetwork() {
   const [networkName, setNetworkName] = useState<string>();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   
-  const { chain, findSupportedChain } = useChain();
   const {state, dispatch} = useAppState();
-  const {getNetwork, getNetworkTokens} = useApi();
+  const { chain, findSupportedChain } = useChain();
+  const {searchNetworks, getNetworkTokens} = useApi();
+
+  function getStorageKey(networkName: string, chainId: string | number) {
+    return `bepro.network:${networkName}:${chainId}`;
+  }
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -37,28 +42,41 @@ export function useNetwork() {
     const chainId = state.connectedChain?.id;
 
     if (networkName)
-      new WinStorage(`bepro.network:${networkName}:${chainId}`, 0, `sessionStorage`).delete();
+      new WinStorage(getStorageKey(networkName, chainId), 0, `sessionStorage`).delete();
   }
 
   function updateActiveNetwork(forceUpdate = false) {
     const queryNetworkName = query?.network?.toString();
     const queryChainName = query?.chain?.toString();
 
-    if (queryNetworkName && queryChainName) {
-      const chainId = findSupportedChain({ chainShortName: queryChainName })?.chainId;
-      const storageKey = `bepro.network:${queryNetworkName}:${chainId}`;
+    if (!queryNetworkName) return;
 
-      if (storage.value && storage.value !== queryNetworkName)
-        storage.value = queryNetworkName;
+    if (queryChainName) {
+      const chain = findSupportedChain({ chainShortName: queryChainName });
+      
+      if (chain) {
+        const storageKey = getStorageKey(queryNetworkName, chain.chainId);
 
-      const cachedNetworkData = new WinStorage(storageKey, 3000, `sessionStorage`);
-      if (forceUpdate === false && cachedNetworkData.value) {
-        dispatch(changeActiveNetwork(cachedNetworkData.value));
-        return;
+        if (storage.value && storage.value !== queryNetworkName)
+          storage.value = queryNetworkName;
+
+        const cachedNetworkData = new WinStorage(storageKey, 3000, `sessionStorage`);
+        if (forceUpdate === false && cachedNetworkData.value) {
+          dispatch(changeActiveNetwork(cachedNetworkData.value));
+          return;
+        }
       }
+    }
 
-      getNetwork({name: queryNetworkName, chainName: queryChainName })
-        .then(async ({data}) => {
+    searchNetworks({ name: queryNetworkName, chainShortName: queryChainName })
+      .then(({count, rows}) => {
+        if (count === 0) {
+          throw new Error("No networks found");
+        }
+
+        if (queryChainName) {
+          const data = rows[0];
+
           if (!data.isRegistered) {
             if (state.currentUser?.walletAddress === data.creatorAddress)
               return replace(getURLWithNetwork("/profile/my-network", {
@@ -66,20 +84,26 @@ export function useNetwork() {
                 chain: data.chain.chainShortName
               }));
             else
-              return replace(`/networks`);
+              throw new Error("Network not registered");
           }
-
-          const newCachedData = new WinStorage(storageKey, 3600, `sessionStorage`);
+  
+          const newCachedData = new WinStorage(getStorageKey(data.name, data.chain.chainId), 3600, `sessionStorage`);
           newCachedData.value = data;
-
+  
           dispatch(changeNetworkLastVisited(queryNetworkName));
           dispatch(changeActiveNetwork(newCachedData.value));
-        })
-        .catch(e => {
-          console.log(`Failed to get network ${queryNetworkName}`, e);
-          return replace(`/networks`);
-        })
-    }
+        } else {
+          const available = rows
+                            .filter(({ isRegistered, isClosed }) => isRegistered && !isClosed)
+                            .map(network => network.chain);
+
+          dispatch(changeActiveAvailableChains(available));
+        }
+      })
+      .catch(e => {
+        console.log(`Failed to get network ${queryNetworkName}`, e);
+        return replace(`/networks`);
+      });
   }
 
   function getURLWithNetwork(href: string, _query = undefined): UrlObject {
