@@ -15,11 +15,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const {
       action: [action]
     } = req.query;
-  
+
     const whereCondition = {
-      all: {},
+      all: {
+        [Op.or]: [
+          { address: (req?.body[0]?.toLowerCase()) },
+          { githubLogin: req?.body[1] }
+        ]
+      },
       login: { githubLogin: { [Op.in]: req.body || [] } },
-      address: { address: { [Op.in]: (req.body || []).map((s) => s.toLowerCase()) } }
+      address: { address: { [Op.in]: (req.body || []).map((s) => s?.toLowerCase()) } }
     };
   
     const queryOptions = {
@@ -29,9 +34,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       },
       where: whereCondition[action]
     };
-  
+
     const users = await models.user.findAll(paginate(queryOptions, req.body));
-  
+
     return res.status(200).json(users);
   } catch (error) {
     LogError("Failed to search users", { req, error });
