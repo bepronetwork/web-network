@@ -65,7 +65,7 @@ export default function NetworkListItem({
         </span>
       </div>
 
-      <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
+      <div className="col-2 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white ml-3">
         {isNotUndefined(network?.tokensLocked) ? (
             formatNumberToNScale(BigNumber(network?.tokensLocked || 0).toFixed())
@@ -73,10 +73,10 @@ export default function NetworkListItem({
             <Spinner />
           )}
         </span>
+      </div>
 
-        <span
-          className="caption-medium mr-2 text-blue"
-        >
+      <div className="col-1 d-flex flex-row align-items-center justify-content-start">
+        <span className="caption-medium mr-2 text-blue">
           {network?.networkToken?.symbol || tokenSymbolDefault}
         </span>
       </div>
