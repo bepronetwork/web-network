@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import Avatar from "components/avatar";
 import Button from "components/button";
 import GithubInfo from "components/github-info";
