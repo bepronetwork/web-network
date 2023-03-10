@@ -494,6 +494,13 @@ export default function useApi() {
       .catch(() => ({} as User));
   }
 
+  async function getUserAll(address: string, login: string): Promise<User> {
+    return api
+      .post<User[]>("/search/users/all/", [address,login])
+      .then(({ data }) => data[0])
+      .catch(() => ({} as User));
+  }
+
   async function isNetworkOwner(creatorAddress, networkAddress) {
     const params = new URLSearchParams({
       creatorAddress,
@@ -859,6 +866,7 @@ export default function useApi() {
     getTotalUsers,
     getTotalBounties,
     getTotalNetworks,
+    getUserAll,
     getUserOf,
     getUserPullRequests,
     getUserWith,

@@ -2,6 +2,7 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
 
@@ -55,7 +56,7 @@ export function useAuthentication() {
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
 
-  const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {getUserOf, getUserAll, searchCurators} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -176,9 +177,9 @@ export function useAuthentication() {
     const userLogin = sessionUser.login;
     const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
-    getUserWith(userLogin)
+    getUserAll(walletAddress,userLogin)
       .then(async(user) => {
-        if (!user.githubLogin){
+        if (!user?.githubLogin){
           dispatch(changeCurrentUserMatch(undefined));
 
           if(session.status === 'authenticated' && state.currentUser.login && !asPath.includes(`connect-account`)){
