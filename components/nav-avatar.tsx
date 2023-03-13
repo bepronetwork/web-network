@@ -122,7 +122,9 @@ export default function NavAvatar({
 
           <div className="col-9 p-0">
               <div className="d-flex flex-row justify-content-left mb-1">
-                <span className="caption-large text-white mb-1 text-capitalize font-weight-normal">{username}</span>
+              <span className="caption-large text-white mb-1 text-capitalize font-weight-normal text-truncate">
+                {username}
+              </span>
               </div>
 
               { onNetwork && 
