@@ -4,7 +4,8 @@ import {CurrentBounty, State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 import {IssueBigNumberData, IssueDataComment} from "interfaces/issue-data";
 
-import {Tier} from 'types/settings'
+import { Tier } from "types/settings";
+
 export class ChangeCurrentBounty<T = CurrentBounty|Partial<CurrentBounty>, A = keyof CurrentBounty & 'clear'>
   extends SimpleAction<T, A> {
 
@@ -42,5 +43,6 @@ export const changeCurrentBountyData = (data: IssueBigNumberData) =>
 
 export const clearCurrentBountyData = () =>
   changeCurrentBounty.update(null, 'clear');
+
 export const changeCurrentKycSteps = (kycSteps: Tier[]) =>
   changeCurrentBounty.update({kycSteps}, 'kycSteps');

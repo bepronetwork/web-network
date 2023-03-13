@@ -4,6 +4,7 @@ import { kycSession } from "interfaces/kyc-session";
 import {CurrentUserState, State} from "interfaces/application-state";
 import {Balance} from "interfaces/balance-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
+import { kycSession } from "interfaces/kyc-session";
 
 export class ChangeCurrentUser<T = CurrentUserState|Partial<CurrentUserState>> extends SimpleAction<T> {
   constructor(id = AppStateReduceId.CurrentUser) {

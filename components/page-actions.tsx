@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
+import Link from "next/link";
 import {useRouter} from "next/router";
 
 import EditIcon from "assets/icons/transactions/edit";
@@ -28,6 +29,7 @@ import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
+import { useNetwork } from "x-hooks/use-network";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -37,11 +39,11 @@ interface PageActionsProps {
 }
 
 export default function PageActions({
-                                      isRepoForked = false,
-                                      addNewComment,
-                                      handleEditIssue,
-                                      isEditIssue
-                                    }: PageActionsProps) {
+  isRepoForked = false,
+  addNewComment,
+  handleEditIssue,
+  isEditIssue
+}: PageActionsProps) {
   const {t} = useTranslation(["common", "pull-request", "bounty"]);
 
   const { query: { repoId } } = useRouter();
@@ -243,7 +245,7 @@ export default function PageActions({
         ){
 
       if (state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
-        return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
+        return <Link href={useNetwork().getURLWithNetwork("/profile")}>
           <Button>
             <Translation ns="bounty" label="kyc.identify-to-start" />
           </Button>

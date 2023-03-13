@@ -5,9 +5,9 @@ import {TreasuryInfo} from "@taikai/dappkit";
 import {XReducerAction} from "contexts/reducers/reducer";
 
 import {Balance} from "interfaces/balance-state";
-import {BountyExtended} from "interfaces/bounty";
 import {BranchesList} from "interfaces/branches-list";
 import {IssueBigNumberData, IssueDataComment} from "interfaces/issue-data";
+import { kycSession } from "interfaces/kyc-session";
 import {LoadingState} from "interfaces/loading-state";
 import {Network} from "interfaces/network";
 import {ForkInfo, ForksList, RepoInfo, ReposList} from "interfaces/repos-list";
@@ -18,7 +18,7 @@ import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction}
 
 import DAO from "services/dao-service";
 
-import {SettingsType} from "types/settings";
+import {SettingsType, Tier} from "types/settings";
 
 export interface ServiceNetworkReposActive extends RepoInfo {
   forks?: ForkInfo[];

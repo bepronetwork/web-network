@@ -1,11 +1,9 @@
-import Database from "db/models";
-import {Op, Sequelize} from "sequelize";
 import {NextApiRequest, NextApiResponse} from "next";
+import {Op, Sequelize} from "sequelize";
+
+import Database from "db/models";
 
 export default async function Count(req: NextApiRequest, res: NextApiResponse) {
-
-  // add this to associations (allIssues, openIssues)
-  const issues_exclude = ['id', 'githubId', 'title', 'branch', 'network_id', 'contractId', 'creatorAddress', 'state', 'creatorGithub', 'amount', 'fundingAmount', 'fundedAmount', 'repository_id', 'body', 'working', 'merged', 'seoImage', 'tokenId', 'fundedAt', 'tags', 'isKyc', 'kycTierList', 'createdAt', 'updatedAt']
 
   const result = await Database.network.findAll({
     include: [

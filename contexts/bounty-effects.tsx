@@ -2,6 +2,8 @@ import {createContext, useEffect} from "react";
 
 import {useRouter} from "next/router";
 
+import { useAppState } from "contexts/app-state";
+
 import {useBounty} from "x-hooks/use-bounty";
 import useChain from "x-hooks/use-chain";
 
@@ -13,6 +15,7 @@ export const BountyEffectsProvider = ({children}) => {
   const bounty = useBounty();
   const { chain } = useChain();
   const { query } = useRouter();
+  const { state } = useAppState();
 
   useEffect(bounty.getDatabaseBounty, [
     chain,
