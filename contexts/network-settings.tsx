@@ -18,7 +18,6 @@ import {
   UNSUPPORTED_CHAIN
 } from "helpers/contants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
-import { toLower } from "helpers/string";
 import { ParameterValidator } from "helpers/registry";
 import { toLower } from "helpers/string";
 
