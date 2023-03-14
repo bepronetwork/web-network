@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, Sequelize, WhereOptions} from "sequelize";
-import {Fn, Literal} from "sequelize/types/utils";
+import {Fn, Literal, Where} from "sequelize/types/utils";
 
 import models from "db/models";
 
@@ -18,7 +18,7 @@ interface includeProps {
   required?: boolean;
   attributes?: string[];
   where?: {
-    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb }
+    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb | Where } | Where
   };
 }
 
@@ -67,7 +67,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { 
       association: "chain",
       where: {
-        ... chainShortName ? { chainShortName: chainShortName } : {}
+        ... chainShortName ? { 
+          chainShortName: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("chain.chainShortName")), 
+                                          "=",
+                                          chainShortName.toString().toLowerCase())
+        } : {}
       }
     },
     { association: "networkToken"}
