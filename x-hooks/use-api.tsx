@@ -21,6 +21,7 @@ import {
   updateIssueParams
 } from "interfaces/api";
 import {Curator, SearchCuratorParams} from "interfaces/curators";
+import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
 import {HeaderNetworksProps} from "interfaces/header-information";
 import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
 import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
@@ -31,8 +32,6 @@ import {ReposList} from "interfaces/repos-list";
 import {Token} from "interfaces/token";
 
 import {api} from "services/api";
-
-import {Entities, Events} from "types/dappkit";
 
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
@@ -363,19 +362,23 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function processEvent(entity: Entities, 
-                              event: Events, 
-                              networkName: string = DEFAULT_NETWORK_NAME,
-                              params: PastEventsParams = {}) {
+  async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents, params: PastEventsParams = {}) {
+    const chainId = state.connectedChain?.id;
+    const events = state.connectedChain?.events;
+    const networkAddress = state.Service?.network?.active?.networkAddress;
+    const registryAddress = state.connectedChain?.registry;
 
-    if (!state.connectedChain?.events)
-      return;
+    if (!events || (!networkAddress && !registryAddress) || !chainId)
+      throw new Error("Missing events url, chain id, network or registry addresses");
 
-    const eventsURL = new URL(`/past-events/${entity}/${event}`, state.connectedChain?.events);
+    const address = event in RegistryEvents ? registryAddress : networkAddress;
+
+    const eventsURL = new URL(`/read/${chainId}/${address}/${event}`, state.connectedChain?.events);
 
     return axios.get(eventsURL.href, {
-      params: { ...params, networkName }
-    }).then(({ data }) => data?.[networkName]);
+      params
+    })
+      .then(({ data }) => data);
   }
 
   async function getHealth() {

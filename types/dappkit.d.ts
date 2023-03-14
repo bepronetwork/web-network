@@ -9,7 +9,7 @@ export type NetworkParameters = "councilAmount" |
   "closeFee" |
   "cancelableTime" |
   "treasury" |
-  "transfer"
+  "transfer";
 
 export type RegistryParameters = "networkCreationFeePercentage" | 
   "lockAmountForNetworkCreation" | 
@@ -19,7 +19,7 @@ export type RegistryParameters = "networkCreationFeePercentage" |
   "treasury" |
   "erc20" |
   "MAX_LOCK_PERCENTAGE_FEE" |
-  "DIVISOR" 
+  "DIVISOR";
 
 export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles" | "network";
 
