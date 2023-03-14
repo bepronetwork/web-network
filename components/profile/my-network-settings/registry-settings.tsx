@@ -13,7 +13,7 @@ import { WarningSpan } from "components/warning-span";
 import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 
-import { ParameterValidator, REGISTRY_LIMITS } from "helpers/registry";
+import { RegistryValidator, REGISTRY_LIMITS } from "helpers/registry";
 
 import { RegistryParameters } from "types/dappkit";
 
@@ -35,7 +35,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
   const { handleFeeSettings, handleAmountNetworkCreation, handleFeeNetworkCreation } = useBepro();
 
   function validateLimits(param: RegistryParameters, value: string | number) {
-    if (ParameterValidator(param, value)) return undefined;
+    if (RegistryValidator(param, value)) return undefined;
 
     const { min, max } = REGISTRY_LIMITS[param] || {};
 

@@ -31,7 +31,7 @@ export default function SetupPage(){
   const { state: { currentUser, Settings } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
-  const isAdmin = adminWallet === currentUser?.walletAddress;
+  const isAdmin = adminWallet?.toLowerCase() === currentUser?.walletAddress?.toLowerCase();
 
   const networkRegistryAddress = Settings?.contracts?.networkRegistry;
 
