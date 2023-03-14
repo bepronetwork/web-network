@@ -214,7 +214,9 @@ export function RegistrySetup({
     handleChangeAllowedTokens([erc20.value], isTransactional)
       .then(txInfo => Promise.all([
         updateData(),
-        processEvent(RegistryEvents.ChangeAllowedTokens, { fromBlock: (txInfo as { blockNumber: number }).blockNumber })
+        processEvent(RegistryEvents.ChangeAllowedTokens, connectedChain?.registry, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        })
       ]))
       .then(() => dispatch(toastSuccess(t("registry.success.allow"))))
       .catch(error => {

@@ -362,16 +362,14 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents, params: PastEventsParams = {}) {
+  async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents, 
+                              address: string,
+                              params: PastEventsParams = {}) {
     const chainId = state.connectedChain?.id;
     const events = state.connectedChain?.events;
-    const networkAddress = state.Service?.network?.active?.networkAddress;
-    const registryAddress = state.connectedChain?.registry;
 
-    if (!events || (!networkAddress && !registryAddress) || !chainId)
-      throw new Error("Missing events url, chain id, network or registry addresses");
-
-    const address = event in RegistryEvents ? registryAddress : networkAddress;
+    if (!events || !address || !chainId)
+      throw new Error("Missing events url, chain id or address");
 
     const eventsURL = new URL(`/read/${chainId}/${address}/${event}`, state.connectedChain?.events);
 
