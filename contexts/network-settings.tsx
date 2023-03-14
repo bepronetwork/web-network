@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
-import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
+import { isZeroAddress } from "ethereumjs-util";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -73,7 +73,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   function handlerValidateSettings(settings) {
     //Treasury
-    const isTreasuryEmpty = settings?.treasury?.address?.value?.trim() === "";
+    const isTreasuryEmpty = settings?.treasury?.address?.value?.trim() === "" || 
+      isZeroAddress(settings?.treasury?.address?.value);
     const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
     const validations = [
@@ -401,25 +402,26 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.settings.parameters = {
         draftTime: {
           value: DEFAULT_DRAFT_TIME,
-          validated: undefined
+          validated: true
         },
         disputableTime: {
           value: DEFAULT_DISPUTE_TIME,
-          validated: undefined
+          validated: true
         },
         percentageNeededForDispute: {
           value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
-          validated: undefined
+          validated: true
         },
         councilAmount: {
           value: DEFAULT_COUNCIL_AMOUNT,
-          validated: undefined
+          validated: true
         },
-        validated: undefined
+        validated: true
     }
 
-    defaultState.settings.treasury.cancelFee = { value:DEFAULT_CANCEL_FEE, validated: true };
+    defaultState.settings.treasury.cancelFee = { value: DEFAULT_CANCEL_FEE, validated: true };
     defaultState.settings.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+    defaultState.settings.treasury.validated = true;
 
     defaultState.github.repositories = await loadGHRepos();
 
