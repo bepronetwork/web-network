@@ -83,9 +83,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
     const validations = [
-      ifEmptyThenUndefined(ParameterValidator("treasury", settings?.treasury?.address?.value)),
-      ifEmptyThenUndefined(ParameterValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
-      ifEmptyThenUndefined(ParameterValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
+      ifEmptyThenUndefined(RegistryValidator("treasury", settings?.treasury?.address?.value)),
+      ifEmptyThenUndefined(RegistryValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
+      ifEmptyThenUndefined(RegistryValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
     ];
 
     settings.treasury.address.validated = validations[0];
