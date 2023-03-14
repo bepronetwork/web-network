@@ -12,7 +12,7 @@ import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
 import { useAppState } from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 
 import useApi from "x-hooks/use-api";
 import { useBounty } from "x-hooks/use-bounty";

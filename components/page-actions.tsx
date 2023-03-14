@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
+import Link from "next/link";
 import {useRouter} from "next/router";
 
 import EditIcon from "assets/icons/transactions/edit";
@@ -242,7 +243,7 @@ export default function PageActions({
         state?.currentUser?.accessToken
         ){
 
-      if (state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
+      if (state.Settings?.kyc?.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
         return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
           <ContractButton>
             <Translation ns="bounty" label="kyc.identify-to-start" />

@@ -259,8 +259,6 @@ export default class DAO {
   }
 
   async setNetworkParameter(parameter: NetworkParameters, value: number | string): Promise<TransactionReceipt> {    
-    if (parameter === "treasury") return this.network.updateTresuryAddress(value);
-
     return this.network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
 
@@ -480,7 +478,7 @@ export default class DAO {
 
     const governor = await this.registry.governed._governor();
 
-    return governor.toLowerCase() === address.toLowerCase();
+    return governor.toLowerCase() === address?.toLowerCase();
   }
 
   async isNetworkGovernor(address: string): Promise<boolean> {

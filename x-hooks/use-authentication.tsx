@@ -25,7 +25,7 @@ import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "context
 import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/contants";
+import { IM_AM_CREATOR_ISSUE, IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN } from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 import {EventName} from "interfaces/analytics";

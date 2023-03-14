@@ -14,7 +14,8 @@ interface NetworkParameterInputProps {
   onBlur?: () => void;
   decimals?: number;
   className?: string;
-  disabled?: boolean
+  disabled?: boolean;
+  helperText?: string;
 }
 
 export default function NetworkParameterInput({
@@ -25,26 +26,28 @@ export default function NetworkParameterInput({
   value,
   ...props
 } : NetworkParameterInputProps) {
+  const [inputValue, setInputValue] = useState<number | null>(null);
 
-  const [inputValue, setInputValue] = useState<number | null>(null)
+  const debounce = useRef(null);
 
-  const debounce = useRef(null)
-  
   const handleChange = (values: NumberFormatValues) => {
     if(values.floatValue === inputValue) return;
-    setInputValue(values.floatValue)
+
+    setInputValue(values.floatValue);
     
-    clearTimeout(debounce.current)
+    clearTimeout(debounce.current);
     
     debounce.current = setTimeout(() => {
-      onChange(values.floatValue)
-    }, 500)
+      onChange(values.floatValue);
+    }, 500);
   };
 
-  useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
+  useEffect(() => {
+    if(value !== inputValue) setInputValue(value);
+  },[value]);
   
   return(
-    <div className={`form-group col mb-0 ${className}`}>
+    <div className={`form-group col-3 mb-0 ${className}`}>
       <InputNumber
         classSymbol={"text-primary"}
         min={0}

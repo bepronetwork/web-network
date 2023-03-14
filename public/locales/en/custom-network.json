@@ -15,6 +15,23 @@
   "percentage-for-dispute": "Percentage for dispute",
   "redeem-time": "Draft time",
   "council-amount": "Curator Amount",
+  "cancelable-time": {
+    "label": "Cancelable Time",
+    "description": "After this time the network governor can cancel a stuck bounty. Min. {{min}}."
+  },
+  "oracle-exchange-rate": {
+    "label": "Oracle Exchange Rate",
+    "description": "Exchange rate applied when locking or unlocking tokens into the network. Min. {{min}}.",
+    "unable-to-change": "Unable to change because there are {{amount}} {{symbol}} locked."
+  },
+  "merger-fee": {
+    "label": "Merger Fee",
+    "description": "Percentage of the bounty amount distributed to the wallet that closed the bounty. Max. {{max}}."
+  },
+  "proposer-fee": {
+    "label": "Proposal Creator Fee",
+    "description": "Percentage of the bounty amount distributed to the wallet that created the accepted proposal. Max. {{max}}."
+  },
   "save-settings": "Save settings",
   "config-tokens-registry": "Config Allowed Tokens",
   "config-tokens": "Config Tokens",
@@ -218,6 +235,10 @@
         "changing-disputable-time": "Deploying Network_v2 (Changing disputable time)",
         "changing-dispute-percentage": "Deploying Network_v2 (Changing dispute percentage)",
         "changing-council-amount": "Deploying Network_v2 (Changing curator amount)",
+        "changing-cancelable-time": "Deploying Network_v2 (Changing cancelable time)",
+        "changing-oracle-exchange-rate": "Deploying Network_v2 (Changing oracle exchange rate)",
+        "changing-merger-fee": "Deploying Network_v2 (Changing merger fee)",
+        "changing-proposer-fee": "Deploying Network_v2 (Changing proposer fee)",
         "set-dispatcher": "Setting Bounty Token Dispatcher",
         "add-to-registry": "Registering Network_v2",
         "sync-web-network": "Synchronizing Web-network"

@@ -24,7 +24,7 @@ import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
-import {BODY_CHARACTERES_LIMIT} from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
