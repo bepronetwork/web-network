@@ -31,8 +31,6 @@ import useNetworkTheme from "../x-hooks/use-network-theme";
 import ConnectGithub from "./connect-github";
 import {ContextualSpan} from "./contextual-span";
 import Modal from "./modal";
-import Link from "next/link";
-import useNetworkTheme from "../x-hooks/use-network-theme";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -258,7 +256,7 @@ export default function PageActions({
         state?.currentUser?.accessToken
         ){
 
-      if (state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
+      if (state.Settings?.kyc?.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
         return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
           <Button>
             <Translation ns="bounty" label="kyc.identify-to-start" />

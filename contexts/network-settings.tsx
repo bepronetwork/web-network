@@ -20,7 +20,8 @@ import {
   DEFAULT_PROPOSER_FEE
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
-import { ParameterValidator } from "helpers/registry";
+import { NetworkValidator } from "helpers/network";
+import { RegistryValidator } from "helpers/registry";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 import { Token } from "interfaces/token";
@@ -75,9 +76,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
     const validations = [
-      ifEmptyThenUndefined(ParameterValidator("treasury", settings?.treasury?.address?.value)),
-      ifEmptyThenUndefined(ParameterValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
-      ifEmptyThenUndefined(ParameterValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
+      ifEmptyThenUndefined(RegistryValidator("treasury", settings?.treasury?.address?.value)),
+      ifEmptyThenUndefined(RegistryValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
+      ifEmptyThenUndefined(RegistryValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
     ];
 
     settings.treasury.address.validated = validations[0];
