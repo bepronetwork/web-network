@@ -546,12 +546,12 @@ label {
   color: var(--bs-gray);
 }
 .form-control {
-  background-color: $black;
-  border: 1px solid $black;
+  background-color: $gray-800;
+  border: 1px solid $gray-700;
   color: var(--bs-gray);
   &:disabled,
   &[readonly] {
-    background-color: $black;
+    background-color: $gray-800;
     opacity: 0.4;
   }
 }
@@ -803,6 +803,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         background-color: #4c8473 !important;
       }
     }
+  }
+
+  .border-top {
+    border-top: 1px solid;
   }
 
   .progress-bar {
