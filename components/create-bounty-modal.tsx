@@ -30,6 +30,7 @@ import {BODY_CHARACTERES_LIMIT} from "helpers/contants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Token} from "interfaces/token";
@@ -588,15 +589,14 @@ export default function CreateBountyModal() {
         dispatch(updateTx([
           parseTransaction(networkBounty, transactionToast.payload[0] as SimpleBlockTransactionPayload)]));
 
-        const createdBounty = await processEvent("bounty",
-                                                 "created",
-                                                 Service?.network?.active?.name,
-      { fromBlock: networkBounty?.blockNumber})
+        const createdBounty = await processEvent(NetworkEvents.BountyCreated, undefined, {
+          fromBlock: networkBounty?.blockNumber
+        });
 
         if (!createdBounty){
           dispatch(toastWarning(t("bounty:errors.sync")));
         }
-    
+
         if (createdBounty?.[cid]) {
           const [repoId, githubId] = String(cid).split("/");
 

@@ -20,6 +20,7 @@ import {useAppState} from "contexts/app-state";
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 
 import {Wallet} from "interfaces/authentication";
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
@@ -162,10 +163,8 @@ function OraclesActions({
   }
 
   function handleProcessEvent(blockNumber) {
-    processEvent("oracles",
-                 "changed",
-                 Service?.network?.lastVisited,
-      { fromBlock: blockNumber }).catch(console.debug);
+    processEvent(NetworkEvents.OraclesChanged, undefined, { fromBlock: blockNumber })
+      .catch(console.debug);
   }
 
   function handleChangeToken(params: NumberFormatValues) {

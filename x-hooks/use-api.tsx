@@ -363,20 +363,40 @@ export default function useApi() {
   }
 
   async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents, 
-                              address: string,
+                              address?: string,
                               params: PastEventsParams = {}) {
     const chainId = state.connectedChain?.id;
     const events = state.connectedChain?.events;
+    const registryAddress = state.connectedChain?.registry;
+    const networkAddress = state.Service?.network?.active?.networkAddress;
 
-    if (!events || !address || !chainId)
+    const isRegistryEvent = event in RegistryEvents;
+    const addressToSend = address || (isRegistryEvent ? registryAddress : networkAddress);
+
+    if (!events || !addressToSend || !chainId)
       throw new Error("Missing events url, chain id or address");
 
-    const eventsURL = new URL(`/read/${chainId}/${address}/${event}`, state.connectedChain?.events);
+    const eventsURL = new URL(`/read/${chainId}/${addressToSend}/${event}`, state.connectedChain?.events);
+    const networkName = state.Service?.network?.active?.name;
 
     return axios.get(eventsURL.href, {
       params
     })
-      .then(({ data }) => data);
+      .then(({ data }) => {
+        if (isRegistryEvent) return data;
+
+        const entries = data.flatMap(i => {
+          if (!Object.keys(i).length) return [];
+
+          const keys = Object.keys(i[networkName]);
+
+          if (!Object.keys(i).length) return [];
+        
+          return keys.map(key => [key, i[networkName][key]])
+        });
+        
+        return Object.fromEntries(entries);
+      });
   }
 
   async function getHealth() {
