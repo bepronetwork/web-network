@@ -112,10 +112,17 @@ export default function CreateBountyDetails({
 
   return (
     <>
+      <div className="mt-2 mb-4">
+        <h5>Bounty Details</h5>
+        <p className="text-gray">
+          Est quis sit irure exercitation id consequat cupidatat elit nulla
+          velit amet ex.
+        </p>
+      </div>
       <div className="row justify-content-center">
         <div className="col-md-12 m-0">
           <div className="form-group">
-            <label className="caption-small mb-2">
+            <label className="mb-2">
               {t("fields.title.label")}
             </label>
             <input
