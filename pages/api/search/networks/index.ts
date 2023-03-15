@@ -79,9 +79,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   let group: string[] = []
 
-  const attributes: { include?: (string | [Fn,string] | [Literal,string])[]; exclude: string[] } = {
-    exclude: ["creatorAddress"]
-  }
+  const attributes: { include?: (string | [Fn,string] | [Literal,string])[]; } = {
+    
+  };
 
   if (isNeedCountsAndTokensLocked) {
     const caseZeroThen1 = (clause: string) => `case when ${clause} = 0 then 1 else ${clause} end`;
