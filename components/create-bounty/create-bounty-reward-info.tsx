@@ -1,14 +1,19 @@
-import { useState } from "react";
-import { FormCheck } from "react-bootstrap";
+import { ReactNode } from "react";
 
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
-import ReactSelect from "components/react-select";
 
-export default function CreateBountyRewardInfo() {
+export default function CreateBountyRewardInfo({
+  isFunding = false,
+  updateIsFunding,
+  children,
+}: {
+  isFunding?: boolean;
+  updateIsFunding?: (e: boolean) => void;
+  children: ReactNode;
+}) {
   const { t } = useTranslation(["common", "bounty"]);
-  const [isFunding, setIsFunding] = useState<boolean>(false);
 
   return (
     <div className="mt-2">
@@ -33,51 +38,21 @@ export default function CreateBountyRewardInfo() {
           <div className="mx-1 text-danger">*</div>
         </div>
         <div className="d-flex mt-1">
-          <Button outline onClick={() => setIsFunding(false)}>
+          <Button
+            className={!isFunding ? "bounty-button" : "bounty-outline-button"}
+            onClick={() => updateIsFunding(false)}
+          >
             Self-fund
           </Button>
-          <Button onClick={() => setIsFunding(true)}>Seek Funding</Button>
+          <Button
+            className={isFunding ? "bounty-button" : "bounty-outline-button"}
+            onClick={() => updateIsFunding(true)}
+          >
+            Seek Funding
+          </Button>
         </div>
       </>
-      <>
-        <div className="d-flex mt-4">
-          <label>{isFunding ? "Set Funded Reward" : "Set Reward"}</label>
-        </div>
-        {isFunding ? (
-          <>
-            <div className="col-6 p-4 border-radius-8 border border-gray-700">
-              21,303
-            </div>
-
-            <div className="col-12 mt-4">
-              <FormCheck
-                className="form-control-md pb-0"
-                type="checkbox"
-                label={t("bounty:reward-funders")}
-                onChange={() => {
-                  null;
-                }}
-                checked={false}
-              />
-              <p className="text-gray ms-4">
-                Reward anyone who funds this bounty.
-              </p>
-            </div>
-          </>
-        ) : (
-          <div className="p-2 border-radius-8 border border-gray-700">
-            <div className="col-6 d-flex">
-              <ReactSelect />
-              <div className="col-4 ms-2">
-                <Button outline>Use Max</Button>
-              </div>
-            </div>
-            <div className="mt-1 col-12 border-radius-8 border border-gray-700 bg-gray-850">
-              aaa
-            </div>
-          </div>
-        )}
-      </>
+      <>{children}</>
     </div>
   );
 }
