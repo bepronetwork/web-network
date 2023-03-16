@@ -7,10 +7,7 @@ import { useTranslation } from "next-i18next";
 import { PROGRAMMING_LANGUAGES } from "assets/bounty-labels";
 
 import BranchsDropdown from "components/branchs-dropdown";
-import Button from "components/button";
 import { ContextualSpan } from "components/contextual-span";
-import DescriptionPreviewModal from "components/description-preview-modal";
-import DragAndDrop from "components/drag-and-drop";
 import DropDown from "components/dropdown";
 import InfoTooltip from "components/info-tooltip";
 import ReactSelect from "components/react-select";
@@ -19,7 +16,6 @@ import ReposDropdown from "components/repos-dropdown";
 import { useAppState } from "contexts/app-state";
 
 import {
-  BODY_CHARACTERES_LIMIT,
   BOUNTY_TITLE_LIMIT,
   MAX_TAGS,
 } from "helpers/contants";
@@ -27,6 +23,9 @@ import {
 import { DetailsProps } from "interfaces/create-bounty";
 
 import { useRepos } from "x-hooks/use-repos";
+
+import CreateBountyDescription from "./create-bounty-description";
+import BountyLabel from "./create-bounty-label";
 
 export default function CreateBountyDetails({
   title,
@@ -51,7 +50,6 @@ export default function CreateBountyDetails({
 
   const [strFiles, setStrFiles] = useState<string[]>([]);
   const [bodyLength, setBodyLength] = useState<number>(0);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const {updateActiveRepo} = useRepos();
   
   const {
@@ -62,14 +60,6 @@ export default function CreateBountyDetails({
     label: tag,
     value: tag,
   }));
-
-  function handleShowModal() {
-    setShowPreviewModal(true);
-  }
-
-  function handleCloseModal() {
-    setShowPreviewModal(false);
-  }
 
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement>) {
     updateTitle(e.target.value);
@@ -122,9 +112,9 @@ export default function CreateBountyDetails({
       <div className="row justify-content-center">
         <div className="col-md-12 m-0">
           <div className="form-group">
-            <label className="mb-2">
+            <BountyLabel className="mb-2" required>
               {t("fields.title.label")}
-            </label>
+            </BountyLabel>
             <input
               type="text"
               className={clsx("form-control rounded-lg", {
@@ -151,39 +141,21 @@ export default function CreateBountyDetails({
       </div>
 
       <div className="form-group">
-        <label className="caption-small mb-2">
-          {t("fields.description.label")}
-        </label>
-        <textarea
-          className={clsx("form-control", {
-            "border border-1 border-danger border-radius-8":
-              bodyLength > BODY_CHARACTERES_LIMIT,
-          })}
-          rows={3}
-          placeholder={t("fields.description.placeholder")}
-          value={description}
-          onChange={handleChangeDescription}
-          disabled={review}
+        <CreateBountyDescription 
+          description={description}
+          handleChangeDescription={handleChangeDescription}
+          bodyLength={bodyLength}
+          files={files}
+          updateFiles={updateFiles}
+          updateUploading={updateUploading}
         />
-        {bodyLength > BODY_CHARACTERES_LIMIT && (
-          <span className="caption-small text-danger bg-opacity-100">
-            {t("errors.description-limit", { value: bodyLength })}
-          </span>
-        )}
-
-        {review && (
-          <Button
-            onClick={handleShowModal}
-            outline
-            className="mt-2 text-primary"
-          >
-            {t("fields.preview-descripion")}
-          </Button>
-        )}
       </div>
+      <span className="text-gray">
+        Finding yourself lost?<a href="/" className="ms-1">See bounty examples</a>
+      </span>
 
-      <div className="form-group">
-        <label htmlFor="" className="caption-small mb-2">
+      <div className="form-group mt-4">
+        <label htmlFor="" className="mb-2">
           {t("fields.tags")}
         </label>
         <ReactSelect
@@ -200,15 +172,6 @@ export default function CreateBountyDetails({
             {t("fields.tags-info")}
           </ContextualSpan>
         )}
-      </div>
-
-      <div>
-        <DragAndDrop
-          externalFiles={files}
-          onUpdateFiles={updateFiles}
-          onUploading={updateUploading}
-          review={review}
-        />
       </div>
       {!Settings?.kyc?.isKycEnabled ? (
         <>
@@ -241,7 +204,7 @@ export default function CreateBountyDetails({
           ) : null}
         </>
       ) : null}
-
+      <div className="border-top border-gray-700 my-4"/>
       <div className="mt-4">
         <h5>Github Information</h5>
         <p className="text-gray">
@@ -271,12 +234,6 @@ export default function CreateBountyDetails({
               </div>
         </div>
       </div>
-
-      <DescriptionPreviewModal
-        description={description}
-        show={showPreviewModal && review}
-        onClose={handleCloseModal}
-      />
     </>
   );
 }
