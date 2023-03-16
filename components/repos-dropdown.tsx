@@ -6,6 +6,8 @@ import ReactSelect from "components/react-select";
 
 import {useAppState} from "contexts/app-state";
 
+import BountyLabel from "./create-bounty/create-bounty-label";
+
 export default function ReposDropdown({ onSelected, value, disabled }: {
   onSelected: (e: { value: { id: string; path: string; } }) => void,
   value?: { label: string, value: { id: string, path: string } }
@@ -42,9 +44,9 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
 
   return (
     <div>
-      <label className="caption-small mb-2 text-uppercase">
+      <BountyLabel className="mb-2" required>
         {t("select-a-repository")}
-      </label>
+      </BountyLabel>
       <ReactSelect
         options={options}
         value={option}

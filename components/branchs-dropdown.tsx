@@ -5,6 +5,7 @@ import {useTranslation} from "next-i18next";
 import ReactSelect from "components/react-select";
 
 import {useAppState} from "../contexts/app-state";
+import BountyLabel from "./create-bounty/create-bounty-label";
 
 
 export default function BranchsDropdown({
@@ -46,9 +47,9 @@ export default function BranchsDropdown({
 
   return (
     <div>
-      <label className="caption-small mb-2 text-uppercase">
+      <BountyLabel className="mb-2" required>
         {t("select-a-branch")}
-      </label>
+      </BountyLabel>
       <ReactSelect
         key={`select_repo-${repoId}`}
         isDisabled={disabled || !repoId || !options?.length}
