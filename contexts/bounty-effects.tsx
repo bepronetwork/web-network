@@ -17,7 +17,9 @@ export const BountyEffectsProvider = ({children}) => {
   const { query } = useRouter();
   const { state } = useAppState();
 
-  useEffect(bounty.getDatabaseBounty, [
+  useEffect(() => {
+    bounty.getDatabaseBounty();
+  }, [
     chain,
     query?.id,
     query?.repoId,

@@ -1,5 +1,4 @@
 import {SimpleAction} from "contexts/reducers/reducer";
-import { kycSession } from "interfaces/kyc-session";
 
 import {CurrentUserState, State} from "interfaces/application-state";
 import {Balance} from "interfaces/balance-state";
