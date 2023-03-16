@@ -1,17 +1,17 @@
-import {useEffect, useState} from "react";
-import {NumberFormatValues} from "react-number-format";
+import { useEffect, useState } from "react";
+import { NumberFormatValues } from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import {useTranslation} from "next-i18next";
+import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
-import ArrowRight from "assets/icons/arrow-right";
+import DoubleArrowRight from "assets/icons/double-arrow-right";
 
-import {useAppState} from "../contexts/app-state";
-import {getCoinPrice} from "../services/coingecko";
+import { useAppState } from "../contexts/app-state";
+import { getCoinPrice } from "../services/coingecko";
+import Button from "./button";
 import InputNumber from "./input-number";
 import TokensDropdown from "./tokens-dropdown";
-
 
 export default function CreateBountyTokenAmount({
   currentToken,
@@ -27,25 +27,31 @@ export default function CreateBountyTokenAmount({
   setIssueAmount,
   review = false,
   needValueValidation,
-  decimals = 18
+  decimals = 18,
+  isFunding = false,
 }) {
   const { t } = useTranslation("bounty");
-  const {state} = useAppState();
-  const {publicRuntimeConfig} = getConfig();
+  const { state } = useAppState();
+  const { publicRuntimeConfig } = getConfig();
   const [inputError, setInputError] = useState("");
   const [convertedAmount, setConvertedAmount] = useState(0);
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
-    if(needValueValidation && (+values.floatValue > +currentToken?.currentValue)){
+    if (
+      needValueValidation &&
+      +values.floatValue > +currentToken?.currentValue
+    ) {
       setIssueAmount({ formattedValue: "" });
-      setInputError(t("bounty:errors.exceeds-allowance"))
+      setInputError(t("bounty:errors.exceeds-allowance"));
     } else if (values.floatValue < 0) {
       setIssueAmount({ formattedValue: "" });
-    } else if(values.floatValue !== 0 && 
-              BigNumber(values.floatValue).isLessThan(BigNumber(state.Settings?.minBountyValue))){
-      setInputError(t("bounty:errors.exceeds-minimum-amount",{
-        amount: state.Settings?.minBountyValue
-      }))
+    } else if (
+      values.floatValue !== 0 &&
+      BigNumber(values.floatValue).isLessThan(BigNumber(state.Settings?.minBountyValue))
+    ) {
+      setInputError(t("bounty:errors.exceeds-minimum-amount", {
+          amount: state.Settings?.minBountyValue,
+      }));
     } else {
       setIssueAmount(values);
       if (inputError) setInputError("");
@@ -58,108 +64,120 @@ export default function CreateBountyTokenAmount({
     }
   }
 
-  function handleMaxValue() {
-    if (review) return;
-    if (!needValueValidation) return;
+  function updateConversion() {
+    if (!currentToken?.symbol || !publicRuntimeConfig?.enableCoinGecko) return;
+
+    getCoinPrice(currentToken?.symbol,
+                 state?.Settings?.currency?.defaultFiat).then((price) => {
+                   setConvertedAmount(issueAmount.value * price);
+                 });
+  }
+
+  function selectTokens() {
     return (
-      <div className="text-gray text-uppercase caption-small">
-        {t("fields.set")}
-        <span
-          className="text-primary ms-2 cursor-pointer text-uppercase"
-          onClick={() =>
-            setIssueAmount({
-              formattedValue: tokenBalance.toFixed(),
-              floatValue: tokenBalance.toNumber(),
-              value: tokenBalance.toFixed()
-            })
-          }
-        >
-          {t("fields.amount.max")}
-        </span>
-      </div>
+      <TokensDropdown
+        token={currentToken}
+        label={labelSelect}
+        tokens={customTokens}
+        userAddress={userAddress}
+        canAddToken={canAddCustomToken}
+        addToken={addToken}
+        setToken={setCurrentToken}
+        disabled={review}
+        defaultToken={defaultToken}
+        showCurrencyValue={needValueValidation}
+        needsBalance
+        noLabel
+      />
     );
   }
 
-  function updateConversion() {
-    if (!currentToken?.symbol || !publicRuntimeConfig?.enableCoinGecko)
-      return;
-
-    getCoinPrice(currentToken?.symbol, state?.Settings?.currency?.defaultFiat)
-      .then(price => {
-        setConvertedAmount(issueAmount.value * price);
-      });
-  }
-
-  useEffect(updateConversion, [issueAmount.value])
+  useEffect(updateConversion, [issueAmount.value]);
 
   return (
-    <div className="container">
-      <div className="col-md-12 mt-4">
-        <TokensDropdown
-          token={currentToken}
-          label={labelSelect}
-          tokens={customTokens}
-          userAddress={userAddress}
-          canAddToken={canAddCustomToken}
-          addToken={addToken}
-          setToken={setCurrentToken}
-          disabled={review}
-          defaultToken={defaultToken}
-          showCurrencyValue={needValueValidation}
-          needsBalance
-        />
-      </div>
-      <div className="col-md-12">
-        <div className="d-flex">
-          <InputNumber
-            fullWidth={!publicRuntimeConfig?.enableCoinGecko}
-            thousandSeparator
-            disabled={review || !currentToken?.currentValue}
-            max={tokenBalance.toFixed()}
-            label={
-              <div className="d-flex mb-2">
-                <label className="flex-grow-1 caption-small text-gray align-items-center">
-                  <span className="mr-1">
-                    {t("fields.amount.label")}
-                  </span>{" "}
-                </label>
-                {handleMaxValue()}
-              </div>
-            }
-            symbol={currentToken?.symbol || t("common:misc.token")}
-            value={issueAmount.value}
-            placeholder="0"
-            allowNegative={false}
-            decimalScale={decimals}
-            onValueChange={handleIssueAmountOnValueChange}
-            onBlur={handleIssueAmountBlurChange}
-            error={!!inputError}
-            helperText={
-              <>
-              {inputError && <p className="p-small my-2">{inputError}</p>}
-              </>
-            }
-          />
-          {
-            publicRuntimeConfig?.enableCoinGecko &&
-              <>
-                <div className="mt-4 pt-1 mx-2">
-                  <ArrowRight className="text-gray" width={9} height={9} />
-                </div>
-                <InputNumber
-                  thousandSeparator
-                  label={" "}
-                  className="mt-3"
-                  symbol={state.Settings?.currency.defaultFiat}
-                  classSymbol="text-white-30 mt-3"
-                  allowNegative={false}
-                  disabled
-                  value={convertedAmount}
-                  placeholder="-"/>
-              </>
-          }
+    <div className="mt-4">
+      <label className="mb-1 text-gray">
+        {isFunding ? "Set Funded Reward" : "Set Reward"}
+      </label>
+      {isFunding ? (
+        <div className="d-flex justify-content-between col-md-6 p-2 border-radius-8 border border-gray-700">
+          <div className="d-flex flex-column col-7">
+            <InputNumber 
+              className="input-funded" 
+              thousandSeparator
+            />
+            <div className="text-white-30 ms-2 mt-1">
+              {convertedAmount} {state.Settings?.currency.defaultFiat}
+            </div>
+          </div>
+          <div className="col-4 me-2 mt-3">
+          {selectTokens()}
+          </div>
+
         </div>
-      </div>
+      ) : (
+        <div className="p-2 border-radius-8 border border-gray-700">
+          <div className="row d-flex justify-content-between">
+            <div className="d-flex col-8">
+              <div className="col-md-6">{selectTokens()}</div>
+              <div className="col-md-4 ms-2">
+                <Button
+                  className="bounty-outline-button"
+                  onClick={() => {
+                    setIssueAmount({
+                      formattedValue: tokenBalance.toFixed(),
+                      floatValue: tokenBalance.toNumber(),
+                      value: tokenBalance.toFixed(),
+                    });
+                  }}
+                >
+                  Use Max
+                </Button>
+              </div>
+            </div>
+            <div className="col-md-4 ">
+              <div className="p-1 ps-3 border-radius-4 border border-gray-700 text-gray">
+                Balance: {tokenBalance.toFixed()}{" "}
+                {currentToken?.symbol || t("common:misc.token")}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-12 bg-gray-850 border border-radius-4 border-gray-700">
+            <div className="d-flex mt-4 ms-3">
+              <InputNumber
+                fullWidth={!publicRuntimeConfig?.enableCoinGecko}
+                thousandSeparator
+                disabled={review || !currentToken?.currentValue}
+                max={tokenBalance.toFixed()}
+                symbol={currentToken?.symbol || t("common:misc.token")}
+                value={issueAmount.value}
+                placeholder="0"
+                allowNegative={false}
+                decimalScale={decimals}
+                onValueChange={handleIssueAmountOnValueChange}
+                onBlur={handleIssueAmountBlurChange}
+                error={!!inputError}
+                helperText={
+                  <>
+                    {inputError && <p className="p-small my-2">{inputError}</p>}
+                  </>
+                }
+              />
+              {publicRuntimeConfig?.enableCoinGecko && (
+                <div className="d-flex mt-0">
+                  <div className="pt-1 mx-2">
+                    <DoubleArrowRight className="text-gray" />
+                  </div>
+                  <div className="mt-1 ms-2">
+                    {convertedAmount} {state.Settings?.currency.defaultFiat}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
