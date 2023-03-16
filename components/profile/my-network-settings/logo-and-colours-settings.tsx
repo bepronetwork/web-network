@@ -19,6 +19,7 @@ import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
+import { RegistryEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
@@ -103,7 +104,7 @@ export default function LogoAndColoursSettings({
 
     handleAddNetworkToRegistry(network.networkAddress)
       .then((txInfo) => {
-        return processEvent("registry", "registered", network.name, {
+        return processEvent(RegistryEvents.NetworkRegistered, undefined, {
           fromBlock: txInfo.blockNumber,
         });
       })
