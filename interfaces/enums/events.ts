@@ -27,5 +27,5 @@ export enum StandAloneEvents {
   UpdateBountiesToDraft = "UpdateBountiesToDraft",
   UpdateNetworkParams = "UpdateNetworkParams",
   BountyMovedToOpen = "BountyMovedToOpen",
-  WithdrawReward = "WithdrawReward"
+  BountyWithdrawReward = "BountyWithdrawReward"
 }

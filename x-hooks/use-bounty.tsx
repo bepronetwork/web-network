@@ -45,7 +45,7 @@ export function useBounty() {
     return false;
   }
 
-  function getDatabaseBounty(force = false) {
+  async function getDatabaseBounty(force = false) {
     if (!query?.id || !query.repoId || !chain)
       return;
 
@@ -54,7 +54,7 @@ export function useBounty() {
 
     dispatch(changeSpinners.update({bountyDatabase: true}))
 
-    getIssue(+query.repoId, +query.id, query.network.toString(), chain.chainId)
+    await getIssue(+query.repoId, +query.id, query.network.toString(), chain.chainId)
       .then((bounty: IssueData) => {
         const parsedBounty = issueParser(bounty);
 

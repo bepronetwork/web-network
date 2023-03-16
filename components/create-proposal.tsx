@@ -20,6 +20,7 @@ import {useAppState} from "contexts/app-state";
 
 import sumObj from "helpers/sumObj";
 
+import { NetworkEvents } from "interfaces/enums/events";
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -105,7 +106,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
-  const [showDecimalsError, setShowDecimalsError] = useState(false)
+  const [showDecimalsError, setShowDecimalsError] = useState(false);
 
   const {state} = useAppState();
 
@@ -288,7 +289,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "created", state.Service?.network?.lastVisited, { fromBlock });
+      return processEvent(NetworkEvents.ProposalCreated, undefined, { fromBlock });
     })
     .then(() => {
       handleClose();

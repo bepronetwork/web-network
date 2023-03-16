@@ -25,6 +25,8 @@ import {addToast} from "contexts/reducers/change-toaster";
 
 import {getIssueState} from "helpers/handleTypeIssue";
 
+import { NetworkEvents } from "interfaces/enums/events";
+
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
@@ -155,7 +157,7 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
       .then(txInfo => {
-        return processEvent("pull-request", "created", state.Service?.network?.lastVisited, {
+        return processEvent(NetworkEvents.PullRequestCreated, undefined, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber
         });
       })
@@ -246,9 +248,9 @@ export default function PageActions({
 
       if (state.Settings.kyc.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
         return <Link href={useNetwork().getURLWithNetwork("/profile")}>
-          <Button>
+          <ContractButton>
             <Translation ns="bounty" label="kyc.identify-to-start" />
-          </Button>
+          </ContractButton>
         </Link>
       }
       else{
