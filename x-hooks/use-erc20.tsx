@@ -53,7 +53,7 @@ export default function useERC20() {
   function approve(amount: string) {
     if (!state.currentUser?.walletAddress || !state.Service?.active || !address || !amount) return;
 
-    return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
+    return handleApproveToken(address, amount, undefined, symbol).then(updateAllowanceAndBalance);
   }
 
   function setDefaults() {
