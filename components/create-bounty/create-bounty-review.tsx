@@ -1,6 +1,16 @@
+import { isArray } from "lodash";
 
+interface ReviewProps {
+  [name: string]: string | string[];
+}
 
-export default function CreateBountyReview() {
+type Value = string | string[];
+
+export default function CreateBountyReview({
+  payload,
+}: {
+  payload: ReviewProps;
+}) {
   return (
     <div className="mt-2">
       <h5>Review Bounty</h5>
@@ -8,20 +18,27 @@ export default function CreateBountyReview() {
         Est quis sit irure exercitation id consequat cupidatat elit nulla velit
         amet ex.
       </p>
-      <div className="d-flex border-top border-gray-700 py-3 px-2">
-        <div className="col-3 text-gray">Title</div>
-        <div className="col-9">Create a NFT Marketplace</div>
-      </div>
-      <div className="d-flex border-top border-gray-700 py-3 px-2">
-        <div className="col-3 text-gray">Description</div>
-        <div className="col-9">
-          Est culpa ex qui sunt incididunt. Est proident in ex aliqua dolore.
-          Irure adipisicing sint ullamco ipsum irure esse non deserunt. Sint
-          exercitation et sit qui excepteur amet aute amet amet velit. Velit
-          quis id excepteur labore. Voluptate nisi voluptate laboris eu
-          incididunt culpa velit do laboris quis laborum sit consectetur.
+      {Object.entries(payload).map(([name, value]: [string, Value], key) => (
+        <div className="d-flex border-top border-gray-700 py-3 px-2" key={key}>
+          <div className="col-3 text-gray">
+            {name.charAt(0).toUpperCase() + name.slice(1).replace("_", " ")}
+          </div>
+          <div className="col-9">
+            {isArray(value) ? (
+              <div className="d-flex">
+                {value.map((item, key) => (
+                  <div className="d-flex" key={key}>
+                    <div className="tag-ball mt-2 mx-2" key={key}/>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              value
+            )}
+          </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 }
