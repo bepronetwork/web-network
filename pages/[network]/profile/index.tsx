@@ -7,17 +7,17 @@ import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
 import Button from "components/button";
+import KycSessionModal from "components/modals/kyc-session";
 import {ConnectionButton} from "components/profile/connect-button";
 import ProfileLayout from "components/profile/profile-layout";
 import {RemoveGithubAccount} from "components/profile/remove-github-modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
+import {useAppState} from "contexts/app-state";
+
 import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
-
-import {useAppState} from "../../../contexts/app-state";
-import KycSessionModal from "../../../components/modals/kyc-session";
 
 export default function Profile() {
   const { t } = useTranslation("profile");
@@ -43,7 +43,6 @@ export default function Profile() {
             user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
             size="lg"
-            withBorder
           />
           
           <div className="d-flex flex-row mt-3 align-items-center">

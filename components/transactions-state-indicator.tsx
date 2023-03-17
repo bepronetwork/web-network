@@ -90,7 +90,7 @@ export default function TransactionsStateIndicator() {
         overlay={overlay}>
         <div>
           <Button
-            className="opacity-75 opacity-100-hover"
+            className="bg-gray-850 border-gray-850 rounded p-2"
             transparent
             rounded
             onClick={() => setShowOverlay(!showOverlay)}
