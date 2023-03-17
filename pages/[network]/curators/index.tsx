@@ -39,7 +39,7 @@ export default function PageCouncil() {
         key={"ready-to-propose"}
         filterState="ready"
         emptyMessage={t("council:empty")}
-        inView={type === 'ready-to-propose'}
+        inView={!type || type === 'ready-to-propose'}
       />
     ),
   };
