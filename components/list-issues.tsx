@@ -282,7 +282,7 @@ export default function ListIssues({
 
   return (
     <CustomContainer 
-      className={isProfilePage && "px-0 mx-0" || ""}
+      className={`pb-3 ${isProfilePage && "px-0 mx-0" || ""}`}
       childWrapperClassName={isProfilePage && "justify-content-left" || ""}
     >
       {allNetworks && (
@@ -295,7 +295,7 @@ export default function ListIssues({
       )}
       {isRenderFilter() ? (
         <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-dark"}
+          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-gray-950"}
         >
           <div className="w-100">
             <InputGroup className="border-radius-8">
