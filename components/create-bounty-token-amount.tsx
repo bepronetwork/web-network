@@ -145,7 +145,10 @@ export default function CreateBountyTokenAmount({
 
           <div className="col-md-12 bg-gray-850 border border-radius-4 border-gray-700">
             <div className="d-flex mt-4 ms-3">
+              <div className="col-5">
               <InputNumber
+                className="input-fund"
+                classSymbol="symbol-fund"
                 fullWidth={!publicRuntimeConfig?.enableCoinGecko}
                 thousandSeparator
                 disabled={review || !currentToken?.currentValue}
@@ -164,12 +167,13 @@ export default function CreateBountyTokenAmount({
                   </>
                 }
               />
+              </div>
               {publicRuntimeConfig?.enableCoinGecko && (
                 <div className="d-flex mt-0">
-                  <div className="pt-1 mx-2">
+                  <div className="pt-2 mx-4">
                     <DoubleArrowRight className="text-gray" />
                   </div>
-                  <div className="mt-1 ms-2">
+                  <div className="mt-2 ms-2 convert-value">
                     {convertedAmount} {state.Settings?.currency.defaultFiat}
                   </div>
                 </div>
