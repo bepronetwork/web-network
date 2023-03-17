@@ -1,4 +1,6 @@
-export default function SelectNetwork() {
+import { ReactNode } from "react";
+
+export default function SelectNetwork({children}: { children?: ReactNode}) {
   return (
     <div className="mt-2">
       <h5>Select Network</h5>
@@ -6,6 +8,9 @@ export default function SelectNetwork() {
         Est quis sit irure exercitation id consequat cupidatat elit nulla velit
         amet ex.
       </p>
+      <div className="col-md-6">
+        {children}
+      </div>  
     </div>
   );
 }
