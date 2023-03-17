@@ -13,26 +13,26 @@ export default function DoubleArrowRight(props: SVGProps<SVGSVGElement>) {
       <path
         d="M16.5 13.5L19.5 16.5L16.5 19.5"
         stroke="#C7C8D1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M4.5 16.5L19.5 16.5"
         stroke="#C7C8D1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M7.5 10.5L4.5 7.5L7.5 4.5"
         stroke="#C7C8D1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M19.5 7.5L4.5 7.5"
         stroke="#C7C8D1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
