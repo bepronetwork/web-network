@@ -11,6 +11,7 @@ import { useAppState } from "contexts/app-state";
 import { Network } from "interfaces/network";
 
 interface SelectNetworkDropdownProps {
+  value?: Network;
   onSelect: (network: Network) => void;
   networks: Network[];
   className?: string;
@@ -32,16 +33,17 @@ export default function SelectNetworkDropdown({
   onSelect,
   isDisabled,
   placeHolder,
+  value
 }: SelectNetworkDropdownProps) {
   const { t } = useTranslation("common");
 
   const [options, setOptions] = useState<NetworkOption[]>([]);
-  const [selected, setSelectedChain] = useState<NetworkOption>(null);
+  const [selected, setSelected] = useState<NetworkOption>(null);
   const {
     state: { Settings: settings },
   } = useAppState();
 
-  function chainToOption(network: Network | Partial<Network>,
+  function networkOption(network: Network | Partial<Network>,
                          isDisabled?: boolean): NetworkOption {
     return {
       value: network.name,
@@ -60,11 +62,10 @@ export default function SelectNetworkDropdown({
   }
 
   async function selectSupportedNetwork({ value }) {
-    console.log("select - value", value);
     const network = networks.find((network) => network.name === value);
 
     onSelect(network);
-    setSelectedChain(chainToOption(network));
+    setSelected(networkOption(network));
   }
 
   function updateOptions() {
@@ -87,6 +88,11 @@ export default function SelectNetworkDropdown({
   }
 
   useEffect(updateOptions, [networks]);
+  useEffect(() => {
+    if(!value) return;
+    
+    setSelected(networkOption(value))
+  }, [value])
 
   return (
     <div className={className}>
