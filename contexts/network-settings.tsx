@@ -90,7 +90,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     settings.treasury.address.validated = validations[0];
     settings.treasury.cancelFee.validated = validations[1];
     settings.treasury.closeFee.validated = validations[2];
-    settings.treasury.validated = isTreasuryZero ||validations.every(condition => condition !== false);
+    settings.treasury.validated = isTreasuryZero || validations.every(condition => condition !== false);
 
     //Parameters
     const parametersValidations = [
