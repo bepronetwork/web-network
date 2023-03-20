@@ -85,12 +85,37 @@ export default function CreateBountyTokenAmount({
         setToken={setCurrentToken}
         disabled={review}
         defaultToken={defaultToken}
-        showCurrencyValue={needValueValidation}
-        needsBalance
+        showCurrencyValue={false}
+        needsBalance={isFunding}
         noLabel
       />
     );
   }
+
+  function inputNumber() {
+    return(
+      <InputNumber
+      className={isFunding ? `input-funded`: 'input-fund'}
+      classSymbol={isFunding ? "" : 'symbol-fund'}
+      thousandSeparator
+      fullWidth={!publicRuntimeConfig?.enableCoinGecko}
+      max={tokenBalance.toFixed()}
+      value={issueAmount.value}
+      placeholder="0"
+      allowNegative={false}
+      decimalScale={decimals}
+      onValueChange={handleIssueAmountOnValueChange}
+      onBlur={handleIssueAmountBlurChange}
+      error={!!inputError}
+      helperText={
+        <>
+          {inputError && <p className="p-small my-2">{inputError}</p>}
+        </>
+      }
+    />
+    )
+  } 
+
 
   useEffect(updateConversion, [issueAmount.value]);
 
@@ -102,18 +127,12 @@ export default function CreateBountyTokenAmount({
       {isFunding ? (
         <div className="d-flex justify-content-between col-md-6 p-2 border-radius-8 border border-gray-700">
           <div className="d-flex flex-column col-7">
-            <InputNumber 
-              className="input-funded" 
-              thousandSeparator
-            />
+            {inputNumber()}
             <div className="text-white-30 ms-2 mt-1">
               {convertedAmount} {state.Settings?.currency.defaultFiat}
             </div>
           </div>
-          <div className="col-4 me-2 mt-3">
-          {selectTokens()}
-          </div>
-
+          <div className="col-4 me-2 mt-3">{selectTokens()}</div>
         </div>
       ) : (
         <div className="p-2 border-radius-8 border border-gray-700">
@@ -146,27 +165,7 @@ export default function CreateBountyTokenAmount({
           <div className="col-md-12 bg-gray-850 border border-radius-4 border-gray-700">
             <div className="d-flex mt-4 ms-3">
               <div className="col-5">
-              <InputNumber
-                className="input-fund"
-                classSymbol="symbol-fund"
-                fullWidth={!publicRuntimeConfig?.enableCoinGecko}
-                thousandSeparator
-                disabled={review || !currentToken?.currentValue}
-                max={tokenBalance.toFixed()}
-                symbol={currentToken?.symbol || t("common:misc.token")}
-                value={issueAmount.value}
-                placeholder="0"
-                allowNegative={false}
-                decimalScale={decimals}
-                onValueChange={handleIssueAmountOnValueChange}
-                onBlur={handleIssueAmountBlurChange}
-                error={!!inputError}
-                helperText={
-                  <>
-                    {inputError && <p className="p-small my-2">{inputError}</p>}
-                  </>
-                }
-              />
+              {inputNumber()}
               </div>
               {publicRuntimeConfig?.enableCoinGecko && (
                 <div className="d-flex mt-0">
