@@ -1,5 +1,7 @@
 import { IFilesProps } from "components/drag-and-drop";
 
+import { ReposList } from "./repos-list";
+
 export interface Repository {
     id: string; 
     path: string
@@ -26,6 +28,7 @@ export interface DetailsProps {
   updateRepository: (e: Repository) => void;
   branch?: Branch;
   updateBranch?: (e: Branch) => void;
-  review?: boolean;
   updateUploading: (e: boolean) => void;
+  repositories?: ReposList;
+  branches?: string[];
 }
