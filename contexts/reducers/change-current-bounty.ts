@@ -4,6 +4,8 @@ import {CurrentBounty, State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 import { Token } from "interfaces/token";
 
+import {Tier} from 'types/settings'
+
 import {BenefactorExtended, BountyExtended, ProposalExtended} from "../../interfaces/bounty";
 import {IssueBigNumberData, IssueDataComment} from "../../interfaces/issue-data";
 import {SimpleAction} from "./reducer";
@@ -21,6 +23,7 @@ export class ChangeCurrentBounty<T = CurrentBounty|Partial<CurrentBounty>, A = k
     switch (subAction) {
     case 'comments':
     case 'data':
+    case 'kycSteps':
     case 'lastUpdated':
     case 'chainData':
       transformed = {...state.currentBounty, lastUpdated: +new Date(), ...payload}
@@ -92,3 +95,6 @@ export const changeCurrentBountyDataTransactional = (transactionalTokenData: Tok
 
 export const changeCurrentBountyDataReward = (rewardTokenData: Token) =>
   changeCurrentBountyDataChain.update({rewardTokenData}); 
+
+export const changeCurrentKycSteps = (kycSteps: Tier[]) =>
+  changeCurrentBounty.update({kycSteps}, 'kycSteps');

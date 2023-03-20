@@ -3,13 +3,12 @@ import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 
+import DragAndDrop, { IFilesProps } from "components/drag-and-drop";
 import MarkedRender from "components/MarkedRender";
 
 import { useAppState } from "contexts/app-state";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
-
-import DragAndDrop, { IFilesProps } from "./drag-and-drop";
+import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 
 interface DescriptionProps { 
   body: string; 

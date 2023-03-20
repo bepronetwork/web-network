@@ -58,8 +58,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       if (!network) return res.status(404).json("Invalid network");
       networks = [network]
       whereCondition.network_id = network?.id;
-    } 
-    
+    }
+
     if(allNetworks) {
       networks = await models.network.findAll({
         where: {
@@ -164,7 +164,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         association: "payments"
       });
 
-    if (networks.length > 1)
+    if (networks.length > 0)
       include.push({ association: "network", attributes: ["colors", "name"] });
 
     const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
@@ -175,12 +175,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (search) {
       const issues = await models.issue.findAll({
-      where: whereCondition,
-      include,
-      nest: true,
-      order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
+        where: whereCondition,
+        include,
+        nest: true,
+        order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
       }).then(data => handleNetworkValues(data))
-
 
       const result = [];
 
@@ -197,8 +196,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         currentPage: +paginatedData.page
       });
     } else {
-      
-      const issues = await models.issue.findAndCountAll(paginate({ 
+
+      const issues = await models.issue.findAndCountAll(paginate({
       where: whereCondition, 
       include, nest: true }, req.query, [
         [...sortBy|| ["createdAt"], req.query.order || "DESC"]

@@ -13,12 +13,13 @@ import { IssueBigNumberData } from "interfaces/issue-data";
 
 export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBigNumberData, size: "sm" | "lg"}) {
   const { t } = useTranslation(["bounty", "common"]);
+  const fundedAmount = issue?.fundedAmount.isNaN() ? BigNumber(0) : issue?.fundedAmount
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
   const bountyAmount = (isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0");
   const isActive = ["closed", "canceled"].includes(issue?.state);
 
   const percentage =
-    BigNumber(issue?.fundedAmount?.multipliedBy(100).toFixed(2, 1))
+    BigNumber(fundedAmount.multipliedBy(100).toFixed(2, 1))
       .dividedBy(issue?.fundingAmount)
       .toFixed(1, 1) || 0;
 
@@ -64,7 +65,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
           </div>
         )}
         {isFundingRequest &&
-          issue?.fundedAmount?.isLessThan(issue?.fundingAmount) && (
+          fundedAmount.isLessThan(issue?.fundingAmount) && (
             <>
               <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "pt-1"}`}>
                 <div className="bg-dark-gray w-100 issue-funding-progress">

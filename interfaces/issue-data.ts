@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
 
-import { Proposal, INetworkProposal } from "interfaces/proposal";
-import { Token } from "interfaces/token";
+import {INetworkProposal, Proposal} from "interfaces/proposal";
+import {Token} from "interfaces/token";
 
-import { Payment } from "./payments";
+import {Payment} from "./payments";
 
 export type IssueState =
   | "pending"
@@ -63,6 +63,8 @@ export interface IssueData {
     logoIcon: string;
   }
   tags: string[];
+  isKyc: boolean;
+  kycTierList: number[];
 }
 
 export interface Disputes {
@@ -80,8 +82,8 @@ export interface IssueBigNumberData extends Omit<IssueData , "amount" | "funding
 }
 
 export interface IssueNetwork extends IssueBigNumberData {
-  networkName?: string; 
-  totalValueLock?: BigNumber; 
+  networkName?: string;
+  totalValueLock?: BigNumber;
   issues?: IssueBigNumberData[]
 }
 export interface IssueSearch {

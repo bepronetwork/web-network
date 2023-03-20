@@ -91,13 +91,12 @@ export default function GovernanceSettings({
   }
 
   useEffect(() => {
-    console.log('tokens', tokens)
     if(tokens.length > 0) setNetworkToken(tokens.map((token) => ({
       ...token,
       isReward: !!token.network_tokens.isReward,
       isTransactional: !!token.network_tokens.isTransactional
     })))
-  }, [tokens])
+  }, [tokens]);
 
   return (
     <>
@@ -122,16 +121,10 @@ export default function GovernanceSettings({
             disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
             className="ml-2"
             onClick={handleCloseMyNetwork}
+            isLoading={isClosing}
+            withLockIcon={!isAbleToClosed || !state.currentUser?.login}
           >
-            {(!isAbleToClosed || !state.currentUser?.login) && (
-              <LockedIcon className="me-2" />
-            )}
             <span>{t("custom-network:close-network")}</span>
-            {isClosing ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
           </Button>
         </Col>
       </Row>

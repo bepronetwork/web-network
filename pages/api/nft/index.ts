@@ -161,7 +161,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json({url});
   }
   catch(error){
-    LogError(error)
+    LogError(`Failed to POST nft`, {error: error?.toString()})
     return res.status(500).send(error);
   }
 }

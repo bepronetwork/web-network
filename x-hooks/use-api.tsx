@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
-import { head } from "lodash";
+import {head} from "lodash";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
 import { 
   PastEventsParams, 
@@ -16,19 +16,19 @@ import {
   SearchActiveNetworkParams,
   updateIssueParams
 } from "interfaces/api";
-import { Curator, SearchCuratorParams } from "interfaces/curators";
-import { HeaderNetworksProps } from "interfaces/header-information";
-import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
-import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
-import { Network } from "interfaces/network";
-import { PaginatedData } from "interfaces/paginated-data";
-import { Proposal } from "interfaces/proposal";
-import { ReposList } from "interfaces/repos-list";
-import { Token } from "interfaces/token";
+import {Curator, SearchCuratorParams} from "interfaces/curators";
+import {HeaderNetworksProps} from "interfaces/header-information";
+import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
+import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
+import {Network} from "interfaces/network";
+import {PaginatedData} from "interfaces/paginated-data";
+import {Proposal} from "interfaces/proposal";
+import {ReposList} from "interfaces/repos-list";
+import {Token} from "interfaces/token";
 
-import { api, eventsApi } from "services/api";
+import {api, eventsApi} from "services/api";
 
-import { Entities, Events } from "types/dappkit";
+import {Entities, Events} from "types/dappkit";
 
 interface NewIssueParams {
   title: string;
@@ -45,6 +45,8 @@ interface CreateBounty {
   creator: string;
   repositoryId: string;
   tags: string[];
+  isKyc?: boolean;
+  tierList?: number[];
 }
 
 interface GetNetworkProps {
@@ -157,7 +159,7 @@ export default function useApi() {
     }).toString();
     return api
       .get<IssueBigNumberData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => 
+      .then(({ data }): IssueBigNumberData[] =>
         (data.map(bounty => ({
           ...bounty,
           amount: BigNumber(bounty.amount),
@@ -166,7 +168,7 @@ export default function useApi() {
         }))))
       .catch((): IssueBigNumberData[] => ([]));
   }
-  
+
 
   async function searchRepositories({
     page = "1",
@@ -302,7 +304,7 @@ export default function useApi() {
   async function getTotalNetworks(creatorAddress = "",
                                   isClosed = undefined,
                                   isRegistered = undefined): Promise<number> {
-    const search = new URLSearchParams({ 
+    const search = new URLSearchParams({
       creatorAddress,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
@@ -521,7 +523,7 @@ export default function useApi() {
         throw error;
       });
   }
-  
+
   async function getTokens() {
     return api
       .get<Token[]>(`/tokens`)
@@ -713,6 +715,30 @@ export default function useApi() {
       });
   }
 
+  async function getKycSession(asNewSession = false){
+    const params = asNewSession ? {asNewSession}: {};
+
+    return api.get("/kyc/init",{
+      params
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
+  async function validateKycSession(session_id: string){
+    return api.get("/kyc/validate", {
+      headers:{
+        session_id
+      }
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
   return {
     createIssue,
     updateIssue,
@@ -761,6 +787,8 @@ export default function useApi() {
     getTokens,
     getNetworkTokens,
     createNFT,
-    saveNetworkRegistry
+    saveNetworkRegistry,
+    getKycSession,
+    validateKycSession
   };
 }

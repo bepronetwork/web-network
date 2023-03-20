@@ -91,7 +91,10 @@
     },
     "errors": {
       "invalid-contract-address": "Please provide a valid {{contract}} address",
-      "exceeds-limit": "Value must be between 0 and 100",
+      "exceeds-limit": "Value must be between {{min}} and {{max}}",
+      "greater-than": "Value must be greater than {{min}}",
+      "less-than": "Value must be less than {{max}}",
+      "missing-limits": "Missing limits values",
       "deploy": "Failed to deploy Network Registry",
       "dispatcher": "Failed to set dispatcher",
       "allow": "Failed to allow token",

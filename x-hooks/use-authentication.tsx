@@ -10,6 +10,7 @@ import {
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserHandle,
+  changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
@@ -19,10 +20,11 @@ import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import { IM_AM_CREATOR_ISSUE } from "helpers/contants";
+import { IM_AM_CREATOR_ISSUE } from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 import {CustomSession} from "interfaces/custom-session";
+import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
@@ -30,7 +32,6 @@ import useApi from "x-hooks/use-api";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
 import {useTransactions} from "x-hooks/use-transactions";
-
 import {EventName} from "../interfaces/analytics";
 import useAnalyticEvents from "./use-analytic-events";
 import useSignature from "./use-signature";
@@ -47,7 +48,7 @@ export function useAuthentication() {
   const { pushAnalytic } = useAnalyticEvents();
 
   const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith, searchCurators} = useApi();
+  const {getUserOf, getUserWith, searchCurators, getKycSession, validateKycSession} = useApi();
   const {signMessage} = useSignature()
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
@@ -248,7 +249,7 @@ export function useAuthentication() {
   }
 
   async function signMessageIfCreatorIssue() {
-    return new Promise(async (resolve, reject) => { 
+    return new Promise(async (resolve, reject) => {
       console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
 
       if (
@@ -287,6 +288,19 @@ export function useAuthentication() {
     })
   }
 
+  function updateKycSession(){
+    if(!state?.currentUser?.login
+        || !state?.currentUser?.match
+        || !state?.currentUser?.accessToken
+        || !state?.currentUser?.walletAddress
+        || !state?.Settings?.kyc?.isKycEnabled)
+      return
+
+    getKycSession()
+      .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
+      .then((session)=> dispatch(changeCurrentUserKycSession(session)))
+  }
+
   return {
     connectWallet,
     disconnectWallet,
@@ -298,6 +312,7 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    signMessageIfCreatorIssue
+    signMessageIfCreatorIssue,
+    updateKycSession,
   }
 }

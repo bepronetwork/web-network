@@ -38,7 +38,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(tokens);
   } catch (error) {
-    logError(error);
+    logError(`Failed to get tokens`, {error: error?.toString()});
     return res.status(500);
   }
 }

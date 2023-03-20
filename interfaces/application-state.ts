@@ -4,11 +4,12 @@ import { TreasuryInfo } from "@taikai/dappkit";
 
 import {XReducerAction} from "../contexts/reducers/reducer";
 import DAO from "../services/dao-service";
-import {SettingsType} from "../types/settings";
+import {SettingsType, Tier} from "../types/settings";
 import {Balance} from "./balance-state";
 import {BountyExtended} from "./bounty";
 import {BranchesList} from "./branches-list";
 import {IssueBigNumberData, IssueDataComment} from "./issue-data";
+import { kycSession } from "./kyc-session";
 import {LoadingState} from "./loading-state";
 import {Network} from "./network";
 import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
@@ -80,11 +81,14 @@ export interface CurrentUserState {
   accessToken?: string;
   connected?: boolean;
   signature?: string;
+  kyc?: kycSession;
+  kycSession?: kycSession;
 }
 
 export interface CurrentBounty {
   comments: IssueDataComment[];
   lastUpdated: number;
+  kycSteps?: Tier[];
   data: IssueBigNumberData;
   chainData: BountyExtended;
 }

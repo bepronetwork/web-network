@@ -3,6 +3,11 @@ import { Defaults } from "@taikai/dappkit";
 import { Repository, ThemeColors } from "interfaces/network";
 import { Token } from "interfaces/token";
 
+const ZeroField = () => ({
+  value: 0,
+  validated: undefined
+});
+
 export const DefaultNetworkSettings = {
   isSettingsValidated: false,
   isAbleToClosed: false,
@@ -45,33 +50,19 @@ export const DefaultNetworkSettings = {
         value: Defaults.nativeZeroAddress,
         validated: undefined
       },
-      cancelFee: {
-        value: 0,
-        validated: undefined
-      },
-      closeFee: {
-        value: 0,
-        validated: undefined
-      },
+      cancelFee: ZeroField(),
+      closeFee: ZeroField(),
       validated: false
     },
     parameters: {
-      draftTime: {
-        value: 0,
-        validated: undefined
-      },
-      disputableTime: {
-        value: 0,
-        validated: undefined
-      },
-      percentageNeededForDispute: {
-        value: 0,
-        validated: undefined
-      },
-      councilAmount: {
-        value: 0,
-        validated: undefined
-      },
+      draftTime: ZeroField(),
+      disputableTime: ZeroField(),
+      percentageNeededForDispute: ZeroField(),
+      councilAmount: ZeroField(),
+      cancelableTime: ZeroField(),
+      oracleExchangeRate: ZeroField(),
+      proposerFeeShare: ZeroField(),
+      mergeCreatorFeeShare: ZeroField(),
       validated: undefined
     },
     validated: undefined

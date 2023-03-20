@@ -11,14 +11,15 @@ import GithubInfo from "components/github-info";
 import PriceConversor from "components/price-conversor";
 import Translation from "components/translation";
 
-import {useAppState} from "contexts/app-state";
-
 import {getIssueState} from "helpers/handleTypeIssue";
 import {truncateAddress} from "helpers/truncate-address";
 
+import {useAppState} from "../contexts/app-state";
+import Badge from "./badge";
+
 export default function BountyHero() {
   const {t} = useTranslation(["bounty", "common"]);
-  
+
   const {state} = useAppState();
 
   function renderPriceConversor() {
@@ -52,6 +53,11 @@ export default function BountyHero() {
                     })}
                   />
 
+                  {state.currentBounty?.data?.isKyc
+                  ? <Badge
+                    className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                    label={t("bounty:kyc.label")}
+                  /> : null}
                   <div className="d-flex align-items-center">
                     <Avatar
                       className="me-2"
@@ -123,7 +129,10 @@ export default function BountyHero() {
 
                 { !!state.currentBounty?.data?.tags?.length &&
                   <div className="mt-3">
-                    <BountyTags tags={state.currentBounty.data.tags} />
+                    <BountyTags
+                      tags={state.currentBounty?.data?.tags}
+                      color={state?.Service?.network?.active?.colors?.primary}
+                    />
                   </div>
                 }
               </>
