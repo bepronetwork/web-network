@@ -14,6 +14,8 @@ import {
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
+import { ProfilePages } from "interfaces/utils";
+
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
@@ -122,6 +124,34 @@ export function useNetwork() {
     };
   }
 
+  function goToProfilePage(profilePage: ProfilePages) {
+    const queryNetwork = query?.network;
+
+    const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
+
+    if (queryNetwork)
+      push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${path}`);
+    else
+      push("/profile/[[...profilePage]]", `/${queryNetwork}/${path}`);
+  }
+
+  function loadNetworkToken() {
+    if (!state.Service?.active?.network || state.Service?.network?.networkToken)
+      return;
+
+    const activeNetworkToken: any = state.Service?.active?.network?.networkToken;
+
+    Promise.all([activeNetworkToken.name(), activeNetworkToken.symbol(),])
+      .then(([name, symbol]) => {
+        dispatch(changeActiveNetworkToken({
+          name,
+          symbol,
+          decimals: activeNetworkToken.decimals,
+          address: activeNetworkToken.contractAddress
+        }))
+      });
+  }
+
   function loadNetworkAllowedTokens() {
     if (!state?.Service?.network?.active || !chain)
       return;
@@ -212,6 +242,7 @@ export function useNetwork() {
     loadNetworkTimes,
     loadNetworkAmounts,
     loadNetworkAllowedTokens,
+    goToProfilePage,
     updateNetworkAndChainMatch
   }
 
