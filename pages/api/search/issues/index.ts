@@ -1,4 +1,6 @@
 import {subHours, subMonths, subWeeks, subYears} from "date-fns";
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, Sequelize, WhereOptions} from "sequelize";
 

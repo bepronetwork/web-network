@@ -43,6 +43,7 @@ type FiltersByIssueState = Filter[];
 
 interface ListIssuesProps {
   creator?: string;
+  creatorAddress?: string,
   redirect?: string | UrlObject;
   filterState?: IssueState;
   emptyMessage?: string;
@@ -53,6 +54,7 @@ interface ListIssuesProps {
   disputableFilter?: "dispute" | "merge";
   allNetworks?: boolean;
   inView?: boolean;
+  variant?: "bounty-hall" | "profile" | "network"
 }
 
 interface IssuesPage {
@@ -71,7 +73,9 @@ export default function ListIssues({
   redirect,
   disputableFilter,
   allNetworks = false,
-  inView
+  inView,
+  creatorAddress,
+  variant = "network"
 }: ListIssuesProps) {
   const {dispatch, state: appState} = useAppState();
 
@@ -191,8 +195,9 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
+      address: creatorAddress,
+      networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
       chainId: chain?.chainId?.toString(),
-      networkName: networkName?.toString(),
       allNetworks: allNetworks ? allNetworks : ""
     })
       .then(async ({ rows, pages, currentPage }) => {
