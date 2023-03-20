@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { FormCheck } from "react-bootstrap";
 import { NumberFormatValues } from "react-number-format";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
 
+import CheckCircle from "assets/icons/check-circle";
+
 import Button from "components/button";
+import ConnectWalletButton from "components/connect-wallet-button";
 import CreateBountyTokenAmount from "components/create-bounty-token-amount";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
@@ -17,16 +21,19 @@ import SelectNetwork from "components/create-bounty/select-network";
 import SelectNetworkDropdown from "components/create-bounty/select-network-dropdown";
 import CustomContainer from "components/custom-container";
 import { IFilesProps } from "components/drag-and-drop";
+import Modal from "components/modal";
 
 import { useAppState } from "contexts/app-state";
 
 import { Network } from "interfaces/network";
+import { ReposList } from "interfaces/repos-list";
 import { Token } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useERC20 from "x-hooks/use-erc20";
+import useOctokit from "x-hooks/use-octokit";
 
 
 const ZeroNumberFormatValues = {
@@ -55,6 +62,8 @@ export default function CreateBountyPage() {
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
   const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
   const [repository, setRepository] = useState<{ id: string; path: string }>();
+  const [repositories, setRepositories] = useState<ReposList>();
+  const [branches, setBranches] = useState<string[]>();
   const [isLoadingCreateBounty, setIsLoadingCreateBounty] =
     useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -63,12 +72,15 @@ export default function CreateBountyPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [currentNetwork, setCurrentNetwork] = useState<Network>();
   const [networks, setNetworks] = useState<Network[]>([]);
+  const [showModalSuccess, setShowModalSuccess] = useState<boolean>(false);
 
   const rewardERC20 = useERC20();
 
   const transactionalERC20 = useERC20();
 
-  const { searchNetworks } = useApi();
+  const { searchNetworks, getReposList } = useApi();
+
+  const { getRepositoryBranches } = useOctokit();
 
   const {
     dispatch,
@@ -76,8 +88,7 @@ export default function CreateBountyPage() {
       transactions,
       Settings,
       Service,
-      currentUser,
-      show: { createBounty: showCreateBounty },
+      currentUser
     },
   } = useAppState();
 
@@ -87,6 +98,8 @@ export default function CreateBountyPage() {
     "Reward Information",
     "Review",
   ];
+
+  const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
   async function addToken(newToken: Token) {
     await getCoinInfoByContract(newToken?.symbol)
@@ -111,6 +124,20 @@ export default function CreateBountyPage() {
     }
   }
 
+  function cleanFields() {
+    setFiles([]);
+    setSelectedTags([]);
+    setBountyTitle("");
+    setBountyDescription("");
+    setIssueAmount(ZeroNumberFormatValues);
+    setRewardAmount(ZeroNumberFormatValues);
+    setRepository(undefined);
+    setBranch(null);
+    setIsKyc(false);
+    setTierList([]);
+    setCurrentSection(0);
+  }
+
   useEffect(() => {
     searchNetworks({
       isRegistered: true,
@@ -128,9 +155,65 @@ export default function CreateBountyPage() {
       })
   },[])
 
+
+
+  useEffect(() => {
+    if (transactionalToken?.address) transactionalERC20.setAddress(transactionalToken.address);
+  }, [transactionalToken?.address, currentUser, Service?.active]);
+
+  useEffect(() => {
+    if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
+  }, [rewardToken?.address, currentUser, Service?.active]);
+
+  useEffect(() => {
+    if(customTokens?.length === 1) {
+      setTransactionalToken(customTokens[0])
+      setRewardToken(customTokens[0])
+    }
+  }, [customTokens]);
+
+  useEffect(() => {
+    let approved = true
+
+    if (!isFundingType)
+      approved = isAmountApproved(transactionalERC20.allowance, BigNumber(issueAmount.value));
+    else if (rewardChecked)
+      approved = isAmountApproved(rewardERC20.allowance, BigNumber(rewardAmount.value));
+
+    setIsTokenApproved(approved);
+  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
+
+  useEffect(() => {
+    if(currentNetwork && currentSection === 1){
+      getReposList(true, currentNetwork.name).then(setRepositories)
+    }
+  }, [currentNetwork, currentSection])
+
+  useEffect(() => {
+    if(repository){
+      getRepositoryBranches(repository.path, true).then(b => setBranches(b.branches))
+    }
+  }, [repository])
+
+
+  useEffect(() => {
+    if (!currentNetwork?.tokens)
+      return;
+
+    setCustomTokens(currentNetwork?.tokens);
+
+  }, [currentNetwork]);
+
+  useEffect(()=>{
+    //cleanFields();
+    transactionalERC20.updateAllowanceAndBalance();
+    rewardERC20.updateAllowanceAndBalance();
+  },[])
+
   function section() {
     if (currentSection === 0) return <SelectNetwork >
       <SelectNetworkDropdown 
+        value={currentNetwork}
         networks={networks}
         onSelect={setCurrentNetwork}
       />
@@ -154,8 +237,9 @@ export default function CreateBountyPage() {
           updateRepository={setRepository}
           branch={branch}
           updateBranch={setBranch}
+          repositories={repositories}
+          branches={branches}
           updateUploading={setIsUploading}
-          review={false}
         />
       );
 
@@ -164,9 +248,18 @@ export default function CreateBountyPage() {
         <>
           <CreateBountyRewardInfo
             isFunding={isFundingType}
-            updateIsFunding={setIsFundingType}
+            updateIsFunding={(e: boolean) => {
+              if(e === true) 
+                setIssueAmount(ZeroNumberFormatValues)
+              else {
+                setIssueAmount(ZeroNumberFormatValues)
+                setRewardAmount(ZeroNumberFormatValues)
+              }
+
+              setIsFundingType(e)
+            }}
           >
-            {renderBountyToken(false, "bounty")}
+            {renderBountyToken("bounty")}
             {isFundingType && (
               <div className="col-md-12 my-4">
                 <FormCheck
@@ -183,20 +276,21 @@ export default function CreateBountyPage() {
             )}
             {rewardChecked &&
               isFundingType &&
-              renderBountyToken(false, "reward")}
+              renderBountyToken("reward")}
           </CreateBountyRewardInfo>
         </>
       );
 
     if (currentSection === 3) return (
         <CreateBountyReview 
-          payload={{          title: 'title',
-                              description: 'desc',
-                              tags: ['js','ts'],
-                              repository:'dappkit',
-                              branch: 'main',
-                              reward: 'string',
-                              funders_reward: 'string'
+          payload={{          
+            title: bountyTitle,
+            description: bountyDescription,
+            tags: selectedTags,
+            repository: repository?.path?.split('/')[1],
+            branch: branch.label,
+            reward: `${issueAmount.value} ${transactionalToken?.symbol}`,
+            funders_reward: rewardAmount.value && `${rewardAmount.value} ${rewardToken?.symbol}`
           }}
         />
     )
@@ -204,7 +298,7 @@ export default function CreateBountyPage() {
 
   }
 
-  function renderBountyToken(review = false, type: "bounty" | "reward") {
+  function renderBountyToken(type: "bounty" | "reward") {
     const fieldParams = {
       bounty: {
         token: transactionalToken,
@@ -215,9 +309,9 @@ export default function CreateBountyPage() {
         setAmount: setIssueAmount,
         tokens: customTokens.filter((token) => !!token?.network_tokens?.isTransactional),
         balance: transactionalERC20.balance,
-        isFunding: false,
+        isFunding: isFundingType,
         label: t("bounty:fields.select-token.bounty", {
-          set: review ? "" : t("bounty:fields.set"),
+          set: t("bounty:fields.set"),
         }),
       },
       reward: {
@@ -229,9 +323,9 @@ export default function CreateBountyPage() {
         setAmount: setRewardAmount,
         tokens: customTokens.filter((token) => !!token?.network_tokens?.isReward),
         balance: rewardERC20.balance,
-        isFunding: true,
+        isFunding: isFundingType,
         label: t("bounty:fields.select-token.reward", {
-          set: review ? "" : t("bounty:fields.set"),
+          set: t("bounty:fields.set"),
         }),
       },
     };
@@ -243,7 +337,7 @@ export default function CreateBountyPage() {
           setCurrentToken={fieldParams[type].setToken}
           customTokens={fieldParams[type].tokens}
           userAddress={currentUser?.walletAddress}
-          defaultToken={review && fieldParams[type].default}
+          defaultToken={fieldParams[type].default}
           canAddCustomToken={Service?.network?.active?.allowCustomTokens}
           addToken={addToken}
           decimals={fieldParams[type].decimals}
@@ -253,11 +347,13 @@ export default function CreateBountyPage() {
           needValueValidation={!isFundingType || type === "reward"}
           isFunding={isFundingType}
           labelSelect={fieldParams[type].label}
-          review={review}
         />
       </>
     );
   }
+
+  if (!currentUser?.walletAddress)
+    return <ConnectWalletButton asModal={true} />;
 
   return (
     <>
@@ -265,10 +361,18 @@ export default function CreateBountyPage() {
         <CreateBountySteps steps={steps} currentSection={currentSection} />
       </CustomContainer>
       <CustomContainer>
-        <CreateBountyCard maxSteps={steps?.length} currentStep={currentSection}>
+        <CreateBountyCard maxSteps={steps?.length} currentStep={currentSection+1}>
           {section()}
         </CreateBountyCard>
       </CustomContainer>
+      {currentSection === 3 && (
+        <div className="d-flex justify-content-center col-12 mt-4">
+          <p>
+            By creating this bounty you agree to our{" "}
+            <a href="/">terms and conditions.</a>
+          </p>
+        </div>
+      )}
       <CustomContainer>
         <div className="d-flex justify-content-between mt-4 me-4">
           <Button
@@ -291,8 +395,23 @@ export default function CreateBountyPage() {
             {currentSection === 3 ? "Create Bounty" : "Next Step"}
           </Button>
         </div>
-        {console.log('current network', currentNetwork)}
+        {console.log({value: issueAmount.value, valueReward: rewardAmount.value})}
       </CustomContainer>
+      <Modal
+        show={showModalSuccess}
+        footer={
+            <div className="d-flex justify-content-center mb-2">
+              <Button>
+                <span>See Bounty</span>
+              </Button>
+            </div>
+        }
+      >
+        <div className="d-flex flex-column text-center align-items-center">
+          <CheckCircle />
+          <span className="mt-1">Bounty created successfully!</span>
+        </div>
+      </Modal>
     </>
   );
 }
