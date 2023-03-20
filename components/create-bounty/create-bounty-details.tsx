@@ -22,8 +22,6 @@ import {
 
 import { DetailsProps } from "interfaces/create-bounty";
 
-import { useRepos } from "x-hooks/use-repos";
-
 import CreateBountyDescription from "./create-bounty-description";
 import BountyLabel from "./create-bounty-label";
 
@@ -43,14 +41,14 @@ export default function CreateBountyDetails({
   updateRepository,
   branch,
   updateBranch,
+  repositories,
+  branches,
   updateUploading,
-  review = false,
 }: DetailsProps) {
   const { t } = useTranslation("bounty");
 
   const [strFiles, setStrFiles] = useState<string[]>([]);
   const [bodyLength, setBodyLength] = useState<number>(0);
-  const {updateActiveRepo} = useRepos();
   
   const {
     state: { Settings },
@@ -124,18 +122,15 @@ export default function CreateBountyDetails({
               placeholder={t("fields.title.placeholder")}
               value={title}
               onChange={handleChangeTitle}
-              disabled={review}
             />
             {title.length >= BOUNTY_TITLE_LIMIT && (
               <span className="caption-small mt-3 text-danger bg-opacity-100">
                 {t("errors.title-character-limit", { value: title?.length })}
               </span>
-            )}
-            {!review && (
+            )}   
               <p className="p-small text-gray trans mt-2">
                 {t("fields.title.tip")}
               </p>
-            )}
           </div>
         </div>
       </div>
@@ -163,15 +158,12 @@ export default function CreateBountyDetails({
           options={TAGS_OPTIONS}
           onChange={handleChangeTags}
           isOptionDisabled={() => selectedTags.length >= MAX_TAGS}
-          isDisabled={review}
           isMulti
         />
 
-        {!review && (
           <ContextualSpan context="info" className="mt-1">
             {t("fields.tags-info")}
           </ContextualSpan>
-        )}
       </div>
       {!Settings?.kyc?.isKycEnabled ? (
         <>
@@ -212,10 +204,10 @@ export default function CreateBountyDetails({
           velit amet ex.
         </p>
         <div className="row mt-2">
-              <div className="col-6">
+              <div className="col-6">   
               <ReposDropdown
+                repositories={repositories}
                 onSelected={(opt) => {
-                  updateActiveRepo(opt.value.id);
                   updateRepository(opt.value)
                   updateBranch(null)
                 }}
@@ -227,7 +219,7 @@ export default function CreateBountyDetails({
               </div>
               <div className="col-6">
               <BranchsDropdown
-                repoId={repository?.id}
+                branches={branches}
                 onSelected={(opt) => updateBranch(opt)}
                 value={branch}
               />
