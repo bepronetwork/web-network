@@ -484,7 +484,7 @@ export default function CreateBountyModal() {
       tokenERC20 = rewardERC20;
     }
 
-    handleApproveToken(tokenAddress, bountyValue)
+    handleApproveToken(tokenAddress, bountyValue, undefined, transactionalToken?.symbol)
       .then(() => {
         return tokenERC20.updateAllowanceAndBalance();
       })
@@ -536,7 +536,8 @@ export default function CreateBountyModal() {
       const transactionToast =  addTx([{
         type: TransactionTypes.openIssue, 
         amount: payload.amount,
-        network: Service?.network?.active
+        network: Service?.network?.active,
+        currency: transactionalToken?.symbol
       }]);
 
       dispatch(transactionToast);
