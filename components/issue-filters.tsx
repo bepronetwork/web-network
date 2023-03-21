@@ -103,7 +103,7 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
         ) : (
           <>
             {!["/bounty-hall"].includes(pathname) && (
-              <div>
+              <div className="bg-shadow">
                 <IssueFilterBox
                   className="h-100 border border-right border-dark-gray"
                   title={t("filters.repository")}
@@ -115,7 +115,7 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
                 />
               </div>
             )}
-            <div>
+            <div className="bg-shadow">
               <IssueFilterBox
                 title={t("filters.bounties.title")}
                 options={stateOptions}

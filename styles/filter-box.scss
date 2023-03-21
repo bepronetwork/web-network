@@ -12,6 +12,8 @@
 
     .filter-content {
       height: calc(100% - 30px);
+      max-height: 300px;
+      overflow-y: auto;
       &.filter-search {
         height: calc(100% - 76px);
       }
