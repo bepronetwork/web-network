@@ -138,11 +138,15 @@ export default function useBepro() {
     });
   }
 
-  async function handleUpdateBountyAmount(bountyId: number, amount: string): Promise<TransactionReceipt | Error> {
+  async function handleUpdateBountyAmount(bountyId: number, 
+                                          amount: string, 
+                                          currency: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
         type: TransactionTypes.updateBountyAmount,
-        network: state.Service?.network?.active
+        network: state.Service?.network?.active,
+        amount: amount,
+        currency: currency
       } as any]);
 
       dispatch(transaction);
@@ -247,14 +251,15 @@ export default function useBepro() {
 
   async function handleApproveToken(tokenAddress: string, 
                                     amount: string, 
-                                    tokenType: "transactional" | "network" = "transactional"):
+                                    tokenType: "transactional" | "network" = "transactional",
+                                    currency: string):
     Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
       const type = tokenType === "transactional" ? 
         TransactionTypes.approveTransactionalERC20Token : TransactionTypes.approveSettlerToken ;
       
-      const tx = addTx([{ type, network: state.Service?.network?.active } as any]);
+      const tx = addTx([{ type, network: state.Service?.network?.active, amount, currency } as any]);
       dispatch(tx);
 
       await state.Service?.active.approveToken(tokenAddress, amount)
