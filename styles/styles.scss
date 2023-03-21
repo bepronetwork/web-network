@@ -22,6 +22,7 @@
 @import "components/identicon";
 @import "components/profile-menu";
 @import "components/mini-tabs";
+@import "components/nav-avatar";
 
 @import "components/swagger-ui";
 
@@ -53,8 +54,8 @@
   --bs-secondary-rgb:#{toRGB($secondary)};
   --bs-body-bg:#{$bg};
   --bs-body-bg-rgb:#{toRGB($bg)};
-  --bs-dark:#{$bg};
-  --bs-dark-rgb:#{toRGB($bg)};
+  --bs-dark:#{$gray-950};
+  --bs-dark-rgb:#{toRGB($gray-950)};
 }
 
 //bootstrap-overrides
@@ -416,7 +417,7 @@ li {
     list-style: none;
     margin-left: $m * 2;
     li {
-      margin-left: $m;
+      margin-left: $m * 2;
     }
     a:not(.brand) {
       color: rgba($white, 0.7);
@@ -710,18 +711,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .font-weight-medium {
   font-weight: 600 !important;
-}
-
-.border-avatar {
-  border: solid;
-  border-width: 2px;
-  border-color: $white;
-
-  &.border-primary {
-    border: solid;
-    border-width: 2px;
-    border-color: var(--bs-primary);
-  }
 }
 
 .min-w-fit{
@@ -1120,8 +1109,8 @@ $c_props: (
   border-bottom: 1px solid $dark-gray;
 
   .btn:not(.brand) svg:only-child {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -1688,20 +1677,6 @@ input[type="color"] {
   0%{background-position:right}
   50%{background-position:left}
   100%{background-position:right}
-}
-
-.nav-avatar {
-  .text-primary {
-    svg {
-      color: var(--bs-primary);
-    }
-  }
-
-  .text-danger {
-    svg {
-      color: var(--bs-danger) !important;
-    }
-  }
 }
 
 .profile {
