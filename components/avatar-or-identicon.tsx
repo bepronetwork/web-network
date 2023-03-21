@@ -8,20 +8,25 @@ interface AvatarOrIdenticonProps {
   address?: string;
   size?: SizeOptions;
   withBorder?: boolean;
+  active?: boolean;
 }
 
 export default function AvatarOrIdenticon({
   user,
   address,
   size = "md",
-  withBorder
+  withBorder,
+  active = false
 } : AvatarOrIdenticonProps ) {
 
-  if (user) 
-    return <Avatar userLogin={user} className="border-primary" size={size} border={withBorder} />;
-  
-  if (address)
-    return <Identicon address={address} size={size} withBorder={withBorder} />;
+  if (!user && !address) return <></>;
 
-  return <></>;
+  return(
+    <div className={`${withBorder ? "border-avatar p-1" : ""} ${withBorder && active ? "active" : ""}`}>
+      { user ? 
+        <Avatar userLogin={user} className="border-primary" size={size} /> : 
+        <Identicon address={address} size={size} /> 
+      }
+    </div>
+  );
 }

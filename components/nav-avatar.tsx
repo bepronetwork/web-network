@@ -8,6 +8,7 @@ import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
 import Avatar from "components/avatar";
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
 import Identicon from "components/identicon";
 
@@ -17,7 +18,6 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
-
 
 export default function NavAvatar() {
   const { t } = useTranslation("common");
@@ -174,7 +174,13 @@ export default function NavAvatar() {
         overlay={overlay}
       >
         <div>
-          {avatar()} 
+          <AvatarOrIdenticon
+            user={state.currentUser.login}
+            address={state.currentUser?.walletAddress}
+            size="sm"
+            withBorder
+            active={visible}
+          />
         </div>
       </OverlayTrigger>
     </div>

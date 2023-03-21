@@ -1,0 +1,35 @@
+.nav-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 3px solid var(--bs-primary);
+  border-radius: 50%;
+
+  .text-primary {
+    svg {
+      color: var(--bs-primary);
+    }
+  }
+
+  .text-danger {
+    svg {
+      color: var(--bs-danger) !important;
+    }
+  }
+}
+
+.border-avatar {
+  border: 2px solid $gray-850;
+  border-radius: 50%;
+
+  &.active {
+    border: 2px solid var(--bs-primary);
+  }
+
+  &.border-primary {
+    border: solid;
+    border-width: 2px;
+    border-color: var(--bs-primary);
+  }
+}
