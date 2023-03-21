@@ -6,7 +6,8 @@ import {useAppState} from "contexts/app-state";
 import {BountyEffectsContext} from "contexts/bounty-effects";
 import {
   changeCurrentBountyComments,
-  changeCurrentBountyData
+  changeCurrentBountyData,
+  changeCurrentKycSteps
 } from "contexts/reducers/change-current-bounty";
 import {changeSpinners} from "contexts/reducers/change-spinners";
 

@@ -1,7 +1,7 @@
 import {NextApiRequest} from "next";
 import getConfig from "next/config";
 
-import {IM_AN_ADMIN} from "helpers/contants";
+import {IM_AN_ADMIN} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 export function isAdmin(req: NextApiRequest) {

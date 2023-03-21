@@ -94,11 +94,6 @@ function NewNetwork() {
 
     const deployedNetworkAddress = deployNetworkTX.contractAddress;
 
-    const draftTime = settings.parameters.draftTime.value;
-    const disputableTime = settings.parameters.disputableTime.value;
-    const councilAmount = settings.parameters.councilAmount.value;
-    const percentageForDispute = settings.parameters.percentageNeededForDispute.value;
-
     const payload = {
       name: details.name.value,
       description: details.description,

@@ -3,7 +3,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import Database from "db/models";
 
 import {chainFromHeader} from "helpers/chain-from-header";
-import {CHAIN_NOT_CONFIGURED, NOT_AN_ADMIN} from "helpers/contants";
+import {CHAIN_NOT_CONFIGURED, NOT_AN_ADMIN} from "helpers/constants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 

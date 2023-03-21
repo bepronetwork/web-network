@@ -29,6 +29,7 @@ import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
+import { useNetwork } from "x-hooks/use-network";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -244,7 +245,7 @@ export default function PageActions({
         ){
 
       if (state.Settings?.kyc?.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
-        return <Link href={useNetworkTheme().getURLWithNetwork("/profile")}>
+        return <Link href={useNetwork().getURLWithNetwork("/profile")}>
           <ContractButton>
             <Translation ns="bounty" label="kyc.identify-to-start" />
           </ContractButton>

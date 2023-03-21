@@ -21,7 +21,6 @@ import {
   UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
-import { toLower } from "helpers/string";
 import { NetworkValidator } from "helpers/network";
 import { RegistryValidator } from "helpers/registry";
 import { toLower } from "helpers/string";
@@ -528,12 +527,17 @@ export const NetworkSettingsProvider = ({ children }) => {
     setForcedNetwork((prev)=>({
       ...prev,
       tokensLocked: tokensLocked.toFixed(),
-      tokensStaked: "0",
       councilAmount: councilAmount.toString(),
       disputableTime: +disputableTime / 1000,
       draftTime: +draftTime / 1000,
       percentageNeededForDispute: +percentageNeededForDispute,
+      cancelableTime: +cancelableTime / 1000,
+      oracleExchangeRate: oracleExchangeRate,
+      proposerFeeShare: proposerFeeShare,
+      mergeCreatorFeeShare: mergeCreatorFeeShare
     }));
+
+    setNetworkSettings(defaultState);
 
     setNetworkSettings(defaultState);
     

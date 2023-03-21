@@ -6,7 +6,7 @@ import {Op, Sequelize} from "sequelize";
 import Database from "db/models";
 
 import {chainFromHeader} from "helpers/chain-from-header";
-import { WANT_TO_CREATE_NETWORK } from "helpers/contants";
+import { WANT_TO_CREATE_NETWORK } from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
 import {isAdmin} from "helpers/is-admin";

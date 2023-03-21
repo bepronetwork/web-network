@@ -3,6 +3,7 @@ import {Button, Col, Row} from 'react-bootstrap';
 
 import Synaps from '@synaps-io/react-verify'
 
+import {ContextualSpan} from "components/contextual-span";
 import Modal from 'components/modal';
 import ReadOnlyButtonWrapper from 'components/read-only-button-wrapper';
 import Translation from "components/translation";
@@ -11,7 +12,6 @@ import {useAppState} from 'contexts/app-state';
 import {changeCurrentUserKycSession} from 'contexts/reducers/change-current-user';
 
 import useApi from 'x-hooks/use-api';
-import {ContextualSpan} from "../contextual-span";
 
 export function KycSessionModal() {
   const [show, setShow] = useState<boolean>(false);
@@ -21,8 +21,8 @@ export function KycSessionModal() {
   const {validateKycSession} = useApi()
   const {state, dispatch} = useAppState()
 
-  const session = state?.currentUser?.kycSession
-  const bountyMissSteps = state?.currentBounty?.kycSteps
+  const session = state?.currentUser?.kycSession;
+  const isVerified = session?.status === "VERIFIED";
 
   function handlerValidateSession() {
     if (session?.session_id)
@@ -31,7 +31,6 @@ export function KycSessionModal() {
           dispatch(changeCurrentUserKycSession(data))
         })
   }
-
 
   function updateSessionStateTimer() {
     let _timer;
@@ -52,8 +51,9 @@ export function KycSessionModal() {
   return <>
     <Row className="mb-3">
       <h6><Translation ns="bounty" label="kyc.label"/></h6>
-      <span
-        className={`p-small rans ${state?.currentUser?.kycSession?.status === "VERIFIED" ? 'text-success' : 'text-gray'}`}>{state?.currentUser?.kycSession?.status}</span>
+      <span className={`p-small rans ${isVerified ? 'text-success' : 'text-gray'}`}>
+          {state?.currentUser?.kycSession?.status}
+      </span>
     </Row>
     <Row>
       <Col>

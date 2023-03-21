@@ -4,7 +4,7 @@ import { useAppState } from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
 import { changeShowWeb3 } from "contexts/reducers/update-show-prop";
 
-import { UNSUPPORTED_CHAIN } from "helpers/contants";
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 
 export default function ContractButton({ onClick, children, ...rest }: ButtonProps) {
   const { state, dispatch } = useAppState();
