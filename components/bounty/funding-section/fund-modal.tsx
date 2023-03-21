@@ -16,6 +16,7 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import {formatNumberToCurrency} from "helpers/formatNumber";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
+import { NetworkEvents } from "interfaces/enums/events";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -84,7 +85,7 @@ export default function FundModal({
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         
-        return processEvent("bounty", "funded", state.Service?.network?.lastVisited, {fromBlock});
+        return processEvent(NetworkEvents.BountyFunded, undefined, {fromBlock});
       })
       .then(async () => {
         const amountFormatted = formatNumberToCurrency(amountToFund.toFixed());

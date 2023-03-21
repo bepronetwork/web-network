@@ -11,14 +11,15 @@ import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
 
+import {useAppState} from "contexts/app-state";
+
 import {formatStringToCurrency} from "helpers/formatNumber";
 
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
-
-import {useAppState} from "../contexts/app-state";
 
 export default function UnlockBeproModal({
   show = false,
@@ -71,10 +72,8 @@ export default function UnlockBeproModal({
   }
 
   function handleProcessEvent(blockNumber) {
-    processEvent("oracles",
-                 "changed",
-                 state.Service?.network?.lastVisited,
-      { fromBlock: blockNumber }).catch(console.debug);
+    processEvent(NetworkEvents.OraclesChanged, undefined, { fromBlock: blockNumber })
+      .catch(console.debug);
   }
 
   function handleUnlock() {

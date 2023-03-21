@@ -14,6 +14,7 @@ import {useAppState} from "contexts/app-state";
 import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Wallet} from "interfaces/authentication";
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
@@ -92,10 +93,8 @@ function OraclesDelegate({
   }
 
   function handleProcessEvent(blockNumber) {
-    processEvent("oracles",
-                 "transfer",
-                 Service?.network?.lastVisited,
-      { fromBlock: blockNumber }).catch(console.debug);
+    processEvent(NetworkEvents.OraclesTransfer, undefined, { fromBlock: blockNumber })
+      .catch(console.debug);
   }
   
   const isButtonDisabled = (): boolean =>

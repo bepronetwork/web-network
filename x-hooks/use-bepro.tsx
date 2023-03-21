@@ -7,6 +7,7 @@ import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
 import {parseTransaction} from "helpers/transactions";
 
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {SimpleBlockTransactionPayload, TransactionCurrency} from "interfaces/transaction";
@@ -174,10 +175,9 @@ export default function useBepro() {
       await state.Service?.active.cancelBounty(state.currentBounty?.data?.contractId, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
-          return processEvent("bounty",
-                              "canceled",
-                              state.Service?.network?.lastVisited,
-            {fromBlock: txInfo.blockNumber, id: state.currentBounty?.data?.contractId});
+          return processEvent(NetworkEvents.BountyCanceled, undefined, {
+            fromBlock: txInfo.blockNumber, id: state.currentBounty?.data?.contractId
+          });
         })
         .then((canceledBounties) => {
           if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
@@ -206,7 +206,7 @@ export default function useBepro() {
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           
-          return processEvent("bounty", "canceled", state.Service?.network?.lastVisited, {
+          return processEvent(NetworkEvents.BountyCanceled, undefined, {
             fromBlock: txInfo.blockNumber, 
             id: state.currentBounty?.data?.contractId
           });
@@ -295,10 +295,10 @@ export default function useBepro() {
             throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
 
-          processEvent("oracles",
-                       "transfer",
-                       state.Service?.network?.lastVisited,
-                      { fromBlock: txInfo.blockNumber }).catch(console.debug);
+          processEvent(NetworkEvents.OraclesTransfer, undefined, { 
+            fromBlock: txInfo.blockNumber 
+          })
+            .catch(console.debug);
 
           resolve(txInfo);
         })
