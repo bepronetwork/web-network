@@ -22,6 +22,7 @@ import {
 
 import { psReadAsText } from "helpers/file-reader";
 
+import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
