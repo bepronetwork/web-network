@@ -31,9 +31,9 @@ export interface Network {
   councilAmount?: string;
   disputableTime?: number;
   draftTime?: number;
-  oracleExchangeRate?: number;
-  mergeCreatorFeeShare?: number;
-  proposerFeeShare?: number;
+  oracleExchangeRate?: string | number;
+  mergeCreatorFeeShare?: string | number;
+  proposerFeeShare?: string | number;
   cancelableTime?: number;
   percentageNeededForDispute?: number;
   treasury?: TreasuryInfo;
