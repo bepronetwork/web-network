@@ -27,6 +27,7 @@ import {ReposList} from "interfaces/repos-list";
 import {Token} from "interfaces/token";
 
 import {api, eventsApi} from "services/api";
+import { WinStorage } from "services/win-storage";
 
 import {Entities, Events} from "types/dappkit";
 
@@ -329,6 +330,28 @@ export default function useApi() {
         console.error("Failed to create repo", e);
         return false;
       });
+  }
+
+  async function getReposWithBounties() {
+    const cache = new WinStorage("getReposWithBounties", 10000, "sessionStorage");
+
+    if (cache.value)
+      return cache.value;
+    
+    return api
+      .get<ReposList>("/repos", {
+        params: {
+          withBounties: "true"
+        }
+      })
+      .then(({ data }) => {
+        cache.value = data;
+
+        console.log("getReposWithBounties not cached")
+
+        return data;
+      })
+      .catch(() => []);
   }
 
   async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME) {
@@ -789,6 +812,7 @@ export default function useApi() {
     createNFT,
     saveNetworkRegistry,
     getKycSession,
-    validateKycSession
+    validateKycSession,
+    getReposWithBounties
   };
 }

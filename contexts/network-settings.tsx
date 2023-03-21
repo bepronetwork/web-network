@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
 import BigNumber from "bignumber.js";
+import { isZeroAddress } from "ethereumjs-util";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -73,6 +74,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   function handlerValidateSettings(settings) {
     //Treasury
     const isTreasuryEmpty = settings?.treasury?.address?.value?.trim() === "";
+    const isTreasuryZero = isZeroAddress(settings?.treasury?.address?.value);
     const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
     const validations = [
@@ -84,7 +86,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     settings.treasury.address.validated = validations[0];
     settings.treasury.cancelFee.validated = validations[1];
     settings.treasury.closeFee.validated = validations[2];
-    settings.treasury.validated = validations.every(condition => condition !== false);
+    settings.treasury.validated = isTreasuryZero ||validations.every(condition => condition !== false);
 
     //Parameters
     const parametersValidations = [
@@ -394,6 +396,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     defaultState.settings.treasury.cancelFee = validatedParameter(DEFAULT_CANCEL_FEE);
     defaultState.settings.treasury.closeFee = validatedParameter(DEFAULT_CLOSE_FEE);
+    defaultState.settings.treasury.validated = true;
 
     defaultState.github.repositories = await loadGHRepos();
 
