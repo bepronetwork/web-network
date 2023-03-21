@@ -44,8 +44,6 @@ import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 import {useRepos} from "x-hooks/use-repos";
 
-import DropDown from "./dropdown";
-import InfoTooltip from "./info-tooltip";
 interface BountyPayload {
   title: string;
   cid: string | boolean;

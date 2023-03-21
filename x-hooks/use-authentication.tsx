@@ -337,46 +337,6 @@ export function useAuthentication() {
     });
   }
 
-      const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
-
-      const storedSignature = sessionStorage.getItem("currentSignature");
-
-      if (decodeMessage(state?.connectedChain?.id,
-                        messageToSign,
-                        storedSignature || state?.currentUser?.signature,
-                        currentWallet)) {
-        if (storedSignature)
-          dispatch(changeCurrentUserSignature(storedSignature));
-        else
-          sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
-
-        resolve(storedSignature || state?.currentUser?.signature);
-        return;
-      }
-
-      dispatch(changeSpinners.update({ signingMessage: true }));
-
-      await _signMessage(messageToSign)
-        .then(signature => {
-          dispatch(changeSpinners.update({ signingMessage: false }));
-
-          if (signature) {
-            dispatch(changeCurrentUserSignature(signature));
-            sessionStorage.setItem("currentSignature", signature);
-            
-            resolve(signature);
-            return;
-          }
-
-          dispatch(changeCurrentUserSignature(undefined));
-          sessionStorage.removeItem("currentSignature");
-
-          reject("Message not signed");
-          return;
-        });
-    });
-  }
-
   function updateKycSession(){
     if(!state?.currentUser?.login
         || !state?.currentUser?.match
