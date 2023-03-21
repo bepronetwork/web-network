@@ -3,7 +3,7 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "helpers/contants";
+import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "helpers/constants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 

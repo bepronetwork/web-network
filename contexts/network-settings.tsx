@@ -1,6 +1,5 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
-import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import {useRouter} from "next/router";
 
@@ -9,15 +8,21 @@ import {useAppState} from "contexts/app-state";
 import {isSameSet} from "helpers/array";
 import {isColorsSimilar} from "helpers/colors";
 import {
+  DEFAULT_CANCELABLE_TIME,
   DEFAULT_CANCEL_FEE,
   DEFAULT_CLOSE_FEE,
   DEFAULT_COUNCIL_AMOUNT,
   DEFAULT_DISPUTE_TIME,
   DEFAULT_DRAFT_TIME,
+  DEFAULT_MERGER_FEE,
+  DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
+  DEFAULT_PROPOSER_FEE,
   UNSUPPORTED_CHAIN
-} from "helpers/contants";
+} from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
+import { NetworkValidator } from "helpers/network";
+import { RegistryValidator } from "helpers/registry";
 import { toLower } from "helpers/string";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
@@ -69,44 +74,47 @@ export const NetworkSettingsProvider = ({ children }) => {
     useMemo(() =>
       forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
 
-  async function handlerValidateSettings(settings) {
+  function handlerValidateSettings(settings) {
     //Treasury
-    if (state.Service?.active) {
-      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" ||
-        settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
+    const isTreasuryEmpty = settings?.treasury?.address?.value?.trim() === "";
+    const ifEmptyThenUndefined = (condition: boolean) => isTreasuryEmpty ? undefined : condition;
 
-      const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
+    const validations = [
+      ifEmptyThenUndefined(RegistryValidator("treasury", settings?.treasury?.address?.value)),
+      ifEmptyThenUndefined(RegistryValidator("cancelFeePercentage", settings?.treasury?.cancelFee?.value)),
+      ifEmptyThenUndefined(RegistryValidator("closeFeePercentage", settings?.treasury?.closeFee?.value))
+    ];
 
-      await Promise.all([
-        conditionOrUndefined(state.Service?.active.isAddress(settings?.treasury?.address?.value)),
-        conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
-        conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
-      ]).then((treasuryValidator)=>{
-        settings.treasury.address.validated = treasuryValidator[0];
-        settings.treasury.cancelFee.validated = treasuryValidator[1]
-        settings.treasury.closeFee.validated = treasuryValidator[2]
-        settings.treasury.validated = treasuryValidator.every(condition => condition !== false);
-      })
-      
-    }
+    settings.treasury.address.validated = validations[0];
+    settings.treasury.cancelFee.validated = validations[1];
+    settings.treasury.closeFee.validated = validations[2];
+    settings.treasury.validated = validations.every(condition => condition !== false);
 
     //Parameters
     const parametersValidations = [
-      Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),
-      Fields.parameter.validator("councilAmount", settings?.parameters?.councilAmount?.value),
-      Fields.parameter.validator("disputableTime", settings?.parameters?.disputableTime?.value),
-      Fields.parameter.validator("percentageNeededForDispute", 
-                                 settings?.parameters?.percentageNeededForDispute?.value)
+      NetworkValidator("draftTime", settings?.parameters?.draftTime?.value),
+      NetworkValidator("councilAmount", settings?.parameters?.councilAmount?.value),
+      NetworkValidator("disputableTime", settings?.parameters?.disputableTime?.value),
+      NetworkValidator("percentageNeededForDispute", settings?.parameters?.percentageNeededForDispute?.value),
+      NetworkValidator("oracleExchangeRate", settings?.parameters?.oracleExchangeRate?.value),
+      NetworkValidator("mergeCreatorFeeShare", settings?.parameters?.mergeCreatorFeeShare?.value),
+      NetworkValidator("proposerFeeShare", settings?.parameters?.proposerFeeShare?.value),
+      NetworkValidator("cancelableTime", settings?.parameters?.cancelableTime?.value)
     ];
 
     settings.parameters.draftTime.validated = parametersValidations[0];
     settings.parameters.councilAmount.validated = parametersValidations[1];
     settings.parameters.disputableTime.validated = parametersValidations[2];
     settings.parameters.percentageNeededForDispute.validated = parametersValidations[3];
+    settings.parameters.oracleExchangeRate.validated = parametersValidations[4];
+    settings.parameters.mergeCreatorFeeShare.validated = parametersValidations[5];
+    settings.parameters.proposerFeeShare.validated = parametersValidations[6];
+    settings.parameters.cancelableTime.validated = parametersValidations[7];
     settings.parameters.validated = parametersValidations.every(condition => condition);
+
     //Theme
     const colors = settings.theme?.colors;
-    
+
     if (colors?.primary){
       const similar = [];
 
@@ -145,7 +153,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         Fields.repository.validator(newState.github?.repositories),
         isCreating ? newState.github?.botPermission : true,
     ].every(condition => condition);
-    
+
     newState.settings = await handlerValidateSettings(newState.settings);
 
     const settingsValidated = [
@@ -155,23 +163,28 @@ export const NetworkSettingsProvider = ({ children }) => {
     newState.settings?.parameters?.disputableTime?.validated,
     newState.settings?.parameters?.percentageNeededForDispute?.validated,
     newState.settings?.parameters?.councilAmount?.validated,
+    newState.settings?.parameters?.oracleExchangeRate?.validated,
+    newState.settings?.parameters?.mergeCreatorFeeShare?.validated,
+    newState.settings?.parameters?.proposerFeeShare?.validated,
+    newState.settings?.parameters?.cancelableTime?.validated,
     ].every(condition => condition);
-    
+
     const tokensValidated = [
       isCreating && newState.tokens?.settler?.trim() !== "" || true,
     ].every(condition => condition);
-    
+
     newState.tokensLocked.validated = tokensLockedValidate;
     newState.details.validated = detailsValidate;
     newState.github.validated = githubValidate;
     newState.settings.validated = !!settingsValidated;
     newState.tokens.validated = tokensValidated;
-    newState.isSettingsValidated = [tokensLockedValidate,
-                                    detailsValidate,
-                                    githubValidate,
-                                    settingsValidated,
-                                    tokensValidated,
-    ].every(condtion=> condtion)
+    newState.isSettingsValidated = [
+      tokensLockedValidate,
+      detailsValidate,
+      githubValidate,
+      settingsValidated,
+      tokensValidated
+    ].every(condtion=> condtion);
 
     if(detailsValidate && isCreating){
       const data = Object.keys(newState)
@@ -189,7 +202,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const setFields = async (field: string, value: unknown) => {
     const method = field.split('.')
-    
+
     if(!method) return;
 
     const newState = { ...networkSettings };
@@ -245,9 +258,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     logo: {
       setter: (value, type: "full" | "icon") => {
         setFields(`details.${type}Logo`, {
-                    value,
-                    validated: value?.preview !== "" && value?.raw?.type?.includes("image/svg")
-        })
+          value,
+          validated: value?.preview !== "" && value?.raw?.type?.includes("image/svg")
+        });
       }
     },
     colors: {
@@ -285,9 +298,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: value => setFields(`settings.treasury.closeFee.value`, value)
     },
     parameter: {
-      setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value),
-      validator: 
-        (parameter, value) => value >= (LIMITS[parameter]?.min || value) && value <= (LIMITS[parameter]?.max || value)
+      setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value)
     }
   };
 
@@ -401,28 +412,22 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     defaultState.settings.theme.colors = DefaultTheme();
 
-    defaultState.settings.parameters = {
-        draftTime: {
-          value: DEFAULT_DRAFT_TIME,
-          validated: undefined
-        },
-        disputableTime: {
-          value: DEFAULT_DISPUTE_TIME,
-          validated: undefined
-        },
-        percentageNeededForDispute: {
-          value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
-          validated: undefined
-        },
-        councilAmount: {
-          value: DEFAULT_COUNCIL_AMOUNT,
-          validated: undefined
-        },
-        validated: undefined
-    }
+    const validatedParameter = value => ({ value, validated: true });
 
-    defaultState.settings.treasury.cancelFee = { value:DEFAULT_CANCEL_FEE, validated: true };
-    defaultState.settings.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+    defaultState.settings.parameters = {
+        draftTime: validatedParameter(DEFAULT_DRAFT_TIME),
+        disputableTime: validatedParameter(DEFAULT_DISPUTE_TIME),
+        percentageNeededForDispute: validatedParameter(DEFAULT_PERCENTAGE_FOR_DISPUTE),
+        councilAmount: validatedParameter(DEFAULT_COUNCIL_AMOUNT),
+        cancelableTime: validatedParameter(DEFAULT_CANCELABLE_TIME),
+        oracleExchangeRate: validatedParameter(DEFAULT_ORACLE_EXCHANGE_RATE),
+        proposerFeeShare: validatedParameter(DEFAULT_PROPOSER_FEE),
+        mergeCreatorFeeShare: validatedParameter(DEFAULT_MERGER_FEE),
+        validated: true
+    };
+
+    defaultState.settings.treasury.cancelFee = validatedParameter(DEFAULT_CANCEL_FEE);
+    defaultState.settings.treasury.closeFee = validatedParameter(DEFAULT_CLOSE_FEE);
 
     defaultState.github.repositories = await loadGHRepos();
 
@@ -446,6 +451,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
 
     setNetworkSettings(defaultState);
+
     return defaultState;
   }
 
@@ -460,6 +466,10 @@ export const NetworkSettingsProvider = ({ children }) => {
         disputableTime,
         draftTime,
         percentageNeededForDispute,
+        mergeCreatorFeeShare,
+        proposerFeeShare,
+        oracleExchangeRate,
+        cancelableTime,
         isNetworkAbleToBeClosed,
         tokensLocked
       ] = await Promise.all([
@@ -468,53 +478,48 @@ export const NetworkSettingsProvider = ({ children }) => {
         forcedService.getNetworkParameter("disputableTime"),
         forcedService.getNetworkParameter("draftTime"),
         forcedService.getNetworkParameter("percentageNeededForDispute"),
+        forcedService.getNetworkParameter("mergeCreatorFeeShare"),
+        forcedService.getNetworkParameter("proposerFeeShare"),
+        forcedService.getNetworkParameter("oracleExchangeRate"),
+        forcedService.getNetworkParameter("cancelableTime"),
         forcedService.isNetworkAbleToBeClosed(),
         forcedService.getTotalNetworkToken()
-      ])
+      ]);
+
+    const validatedParameter = value => ({ value, validated: true });
 
     defaultState.settings.parameters = {
-        draftTime: {
-          value: +draftTime / 1000,
-          validated: true
-        },
-        disputableTime: {
-          value: +disputableTime / 1000,
-          validated: true
-        },
-        percentageNeededForDispute: {
-          value: +percentageNeededForDispute,
-          validated: true
-        },
-        councilAmount: {
-          value: +councilAmount,
-          validated: true
-        },
-        validated: true
-    }
+      draftTime: validatedParameter(+draftTime / 1000),
+      disputableTime: validatedParameter(+disputableTime / 1000),
+      percentageNeededForDispute: validatedParameter(percentageNeededForDispute),
+      councilAmount: validatedParameter(+councilAmount),
+      mergeCreatorFeeShare: validatedParameter(mergeCreatorFeeShare),
+      proposerFeeShare: validatedParameter(proposerFeeShare),
+      oracleExchangeRate: validatedParameter(oracleExchangeRate),
+      cancelableTime: validatedParameter(+cancelableTime / 1000),
+      validated: true
+    };
 
-    defaultState.settings.treasury.address = {value: treasury.treasury, validated: true}
-    defaultState.settings.treasury.cancelFee = { value: treasury.cancelFee, validated: true };
-    defaultState.settings.treasury.closeFee = { value: treasury.closeFee, validated: true };
+    defaultState.settings.treasury.address = validatedParameter(treasury.treasury);
+    defaultState.settings.treasury.cancelFee = validatedParameter(treasury.cancelFee);
+    defaultState.settings.treasury.closeFee = validatedParameter(treasury.closeFee);
+
     defaultState.tokens.allowedTransactions = network?.tokens?.filter(token => token.isTransactional);
     defaultState.tokens.allowedRewards = network?.tokens?.filter(token => token.isReward);
 
-    defaultState.details.name = {value: network?.name, validated: true}
+    defaultState.details.name = validatedParameter(network?.name);
     defaultState.details.description = network?.description
 
-    defaultState.details.fullLogo = {
-      value: {
+    defaultState.details.fullLogo = validatedParameter({
         preview:`${IPFS_URL}/${network?.fullLogo}`,
         raw: undefined
-      },
-      validated: true
-    }
-    defaultState.details.iconLogo = {
-      value: {
+    });
+
+    defaultState.details.iconLogo = validatedParameter({
         preview:`${IPFS_URL}/${network?.logoIcon}`,
         raw: undefined
-      },
-      validated: true
-    }
+    });
+
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
     defaultState.github.repositories = await loadGHRepos();
@@ -522,12 +527,17 @@ export const NetworkSettingsProvider = ({ children }) => {
     setForcedNetwork((prev)=>({
       ...prev,
       tokensLocked: tokensLocked.toFixed(),
-      tokensStaked: "0",
       councilAmount: councilAmount.toString(),
       disputableTime: +disputableTime / 1000,
       draftTime: +draftTime / 1000,
       percentageNeededForDispute: +percentageNeededForDispute,
+      cancelableTime: +cancelableTime / 1000,
+      oracleExchangeRate: oracleExchangeRate,
+      proposerFeeShare: proposerFeeShare,
+      mergeCreatorFeeShare: mergeCreatorFeeShare
     }));
+
+    setNetworkSettings(defaultState);
 
     setNetworkSettings(defaultState);
     

@@ -22,7 +22,7 @@ export default function PullRequests() {
       <ListIssues
         redirect={getURLWithNetwork("/bounties")}
         buttonMessage={t('bounty:label_other')}
-        pullRequesterAddress={state.currentUser.walletAddress || null}
+        pullRequesterAddress={state.currentUser?.walletAddress || null}
         pullRequesterLogin={state.currentUser?.login || null}
         emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
       />

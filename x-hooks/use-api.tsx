@@ -20,15 +20,15 @@ import {
   SearchNetworkParams,
   updateIssueParams
 } from "interfaces/api";
-import { Curator, SearchCuratorParams } from "interfaces/curators";
-import { HeaderNetworksProps } from "interfaces/header-information";
-import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
-import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
-import { Network } from "interfaces/network";
-import { PaginatedData } from "interfaces/paginated-data";
-import { Proposal } from "interfaces/proposal";
-import { ReposList } from "interfaces/repos-list";
-import { Token } from "interfaces/token";
+import {Curator, SearchCuratorParams} from "interfaces/curators";
+import {HeaderNetworksProps} from "interfaces/header-information";
+import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
+import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
+import {Network} from "interfaces/network";
+import {PaginatedData} from "interfaces/paginated-data";
+import {Proposal} from "interfaces/proposal";
+import {ReposList} from "interfaces/repos-list";
+import {Token} from "interfaces/token";
 
 import {api} from "services/api";
 
@@ -53,6 +53,8 @@ interface CreateBounty {
   creator: string;
   repositoryId: string;
   tags: string[];
+  isKyc?: boolean;
+  tierList?: number[];
 }
 
 interface GetNetworkProps {
@@ -169,7 +171,7 @@ export default function useApi() {
       .then(({ data }): IssueBigNumberData[] => (data.map(issueParser)))
       .catch((): IssueBigNumberData[] => ([]));
   }
-  
+
 
   async function searchRepositories({
     page = "1",
@@ -845,6 +847,30 @@ export default function useApi() {
       })
   }
 
+  async function getKycSession(asNewSession = false){
+    const params = asNewSession ? {asNewSession}: {};
+
+    return api.get("/kyc/init",{
+      params
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
+  async function validateKycSession(session_id: string){
+    return api.get("/kyc/validate", {
+      headers:{
+        session_id
+      }
+    })
+    .then(({ data }) => data)
+    .catch((error) => {
+      throw error;
+    });
+  }
+
   return {
     getSupportedChains,
     createIssue,
@@ -899,6 +925,8 @@ export default function useApi() {
     addSupportedChain,
     deleteSupportedChain,
     updateChainRegistry,
-    patchSupportedChain
+    patchSupportedChain,
+    getKycSession,
+    validateKycSession
   };
 }

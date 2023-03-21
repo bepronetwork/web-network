@@ -8,7 +8,7 @@ import {
   NOT_AN_CREATOR_ISSUE,
   MISSING_CREATOR_ISSUE_SIGNATURE,
   MISSING_CHAIN_ID
-} from "helpers/contants";
+} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 export const IssueRoute = (handler: NextApiHandler, methods: string[] = [ `PUT` ]) => {

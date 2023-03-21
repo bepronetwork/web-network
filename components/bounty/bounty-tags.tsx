@@ -2,10 +2,14 @@ import Badge from "components/badge";
 
 interface BountyTagsProps {
   tags: string[];
+  color?: string;
+  opacity?: boolean;
 }
 
 export default function BountyTags({
-  tags
+  tags,
+  color,
+  opacity = true
 } : BountyTagsProps) {
   if (!tags) return <></>;
   
@@ -15,8 +19,9 @@ export default function BountyTags({
         <Badge
           key={tag}
           label={tag} 
-          className="caption-small border border-primary border-radius-8" 
-          color="primary-30"
+          className={`caption-small ${!color && "border border-primary"} border-radius-8`}
+          color={opacity ? 'primary-30' : 'primary'}
+          style={color ? { backgroundColor: `${color}90`, border: `1px solid ${color}` }: null}
         /> )}
     </div>
   );

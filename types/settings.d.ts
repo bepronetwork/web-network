@@ -14,6 +14,12 @@ export type ChainId = {
   [key: string]: string;
 }
 
+export type Tier = {
+  id: string;
+  name: string;
+  steps_id: string[];
+}
+
 // This type must be kept in sync with the settings in the database
 export type SettingsType = {
   chainIds: ChainId;
@@ -59,4 +65,8 @@ export type SettingsType = {
   };
   beproToken?: Token
   minBountyValue?: string | number;
+  kyc: {
+    isKycEnabled: boolean;
+    tierList: Tier[];
+  }
 }

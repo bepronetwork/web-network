@@ -67,6 +67,8 @@ export interface IssueData {
   isReady?: boolean;
   hasReward?: boolean;
   fundedPercent: number;
+  isKyc: boolean;
+  kycTierList: number[];
 }
 
 export interface Disputes {
@@ -85,8 +87,8 @@ export interface IssueBigNumberData
 }
 
 export interface IssueNetwork extends IssueBigNumberData {
-  networkName?: string; 
-  totalValueLock?: BigNumber; 
+  networkName?: string;
+  totalValueLock?: BigNumber;
   issues?: IssueBigNumberData[]
 }
 export interface IssueSearch {

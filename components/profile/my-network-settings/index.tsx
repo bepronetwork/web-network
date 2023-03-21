@@ -52,12 +52,10 @@ export default function MyNetworkSettings({
   const [tabs, setTabs] = useState<TabsProps[]>([])
 
   const { state, dispatch } = useAppState();
-
   const { colorsToCSS } = useNetworkTheme();
+  const { updateActiveNetwork } = useNetwork();
   const { updateNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
-
-  const { updateActiveNetwork } = useNetwork();
   const {
     details,
     github,
@@ -299,7 +297,7 @@ export default function MyNetworkSettings({
     isGovernorRegistry,
     networkNeedRegistration,
     errorBigImages
-  ])
+  ]);
 
   return (
     <>

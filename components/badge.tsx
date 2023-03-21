@@ -5,7 +5,7 @@ interface BadgeProps {
   label?: string;
   color?: string;
   className?: string;
-  children?: ReactElement;
+  children?: ReactElement
   style?: CSSProperties;
 }
 

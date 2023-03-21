@@ -13,7 +13,7 @@ import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
-import { BODY_CHARACTERES_LIMIT, BOUNTY_TITLE_LIMIT, MAX_TAGS } from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT, BOUNTY_TITLE_LIMIT, MAX_TAGS } from "helpers/constants";
 
 export default function CreateBountyDetails({
   bountyTitle,

@@ -6,7 +6,7 @@ import {Op, Sequelize} from "sequelize";
 import Database from "db/models";
 
 import {chainFromHeader} from "helpers/chain-from-header";
-import { WANT_TO_CREATE_NETWORK } from "helpers/contants";
+import { WANT_TO_CREATE_NETWORK } from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
 import {isAdmin} from "helpers/is-admin";
@@ -51,7 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   };
 
   const network = await Database.network.findOne({
-    attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
+    attributes: { exclude: ["creatorAddress", "updatedAt"] },
     include: [
       { association: "tokens" },
       { association: "curators" },
@@ -421,8 +421,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           IpfsStorage.add(logoIcon, true, undefined, "svg")
         ])
 
-        if (full?.hash) network.logoIcon = logo?.hash;
-        if (logo?.hash) network.fullLogo = full?.hash;
+        if (logo?.hash) network.logoIcon = logo?.hash;
+        if (full?.hash) network.fullLogo = full?.hash;
 
       } catch (error) {
         Logger.error(error, 'Failed to store ipfs');

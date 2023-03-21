@@ -6,7 +6,7 @@ import {isAddress} from "web3-utils";
 
 import models from "db/models";
 
-import {WRONG_PARAM_ADDRESS, WRONG_PARAM_URL} from "helpers/contants";
+import {WRONG_PARAM_ADDRESS, WRONG_PARAM_URL} from "helpers/constants";
 import {resJsonMessage} from "helpers/res-json-message";
 
 import {MiniChainInfo} from "interfaces/mini-chain";

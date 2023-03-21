@@ -3,6 +3,7 @@ import {isMobile} from "react-device-detect";
 import {useTranslation} from "next-i18next";
 
 import Avatar from "components/avatar";
+import Badge from "components/badge";
 import CountInfo from "components/bounty-hero/count-info";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
@@ -20,7 +21,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 export default function BountyHero() {
   const {t} = useTranslation(["bounty", "common"]);
-  
+
   const {state} = useAppState();
 
   function renderPriceConversor() {
@@ -54,6 +55,12 @@ export default function BountyHero() {
                     })}
                   />
 
+                  {state.currentBounty?.data?.isKyc
+                  ? <Badge
+                    className={
+                      `d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                    label={t("bounty:kyc.label")}
+                  /> : null}
                   <div className="d-flex align-items-center">
                     <Avatar
                       className="me-2"
@@ -112,7 +119,10 @@ export default function BountyHero() {
 
                 <If condition={!!state.currentBounty?.data?.tags?.length}>
                   <div className="mt-3">
-                    <BountyTags tags={state.currentBounty?.data?.tags} />
+                    <BountyTags
+                      tags={state.currentBounty?.data?.tags}
+                      color={state?.Service?.network?.active?.colors?.primary}
+                    />
                   </div>
                 </If>
               </>

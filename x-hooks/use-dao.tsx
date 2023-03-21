@@ -7,7 +7,7 @@ import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/redu
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 
-import { UNSUPPORTED_CHAIN } from "helpers/contants";
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
 

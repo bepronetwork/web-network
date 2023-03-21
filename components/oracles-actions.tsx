@@ -58,6 +58,10 @@ function OraclesActions({
 
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
+  const oracleExchangeRate = Service?.network?.amounts?.oracleExchangeRate || 1;
+  const oracleAmount = action === t("my-oracles:actions.lock.label") ? 
+    BigNumber(tokenAmount || 0).multipliedBy(oracleExchangeRate).toFixed() :
+    BigNumber(tokenAmount || 0).dividedBy(oracleExchangeRate).toFixed();
 
   const exceedsAvailable = value => BigNumber(value).gt(getMaxAmount());
 
@@ -75,7 +79,7 @@ function OraclesActions({
                token: Service?.network?.active?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(oracleAmount),
         token: Service?.network?.active?.networkToken?.symbol
       }),
       caption: (
@@ -90,7 +94,8 @@ function OraclesActions({
       ),
       body: 
         t("my-oracles:actions.lock.body", { 
-          amount: formatNumberToNScale(tokenAmount), 
+          amount: formatNumberToNScale(tokenAmount),
+          oracleAmount: formatNumberToNScale(oracleAmount),
           currency: networkTokenSymbol,
           token: Service?.network?.active?.networkToken?.symbol
         }),
@@ -107,7 +112,7 @@ function OraclesActions({
           token: Service?.network?.active?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: formatNumberToNScale(tokenAmount),
+        amount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
         token: Service?.network?.active?.networkToken?.symbol
       }),
@@ -122,6 +127,7 @@ function OraclesActions({
       ),
       body: t("my-oracles:actions.unlock.body", { 
         amount: formatNumberToNScale(tokenAmount),
+        oracleAmount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
         token: Service?.network?.active?.networkToken?.symbol
       }),

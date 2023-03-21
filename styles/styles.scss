@@ -86,6 +86,10 @@ li {
   margin-top: 20px !important;
 }
 
+.mgt-3 {
+  margin-top: 3px !important;
+}
+
 .mgb-20 {
   margin-bottom: 50px !important;
 }
@@ -1779,4 +1783,8 @@ input[type="color"] {
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 500px;
+}
+
+.kyc-modal-body{
+  min-height: 630px !important;
 }

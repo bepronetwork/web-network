@@ -1,4 +1,5 @@
 import {SimpleAction} from "contexts/reducers/reducer";
+import { kycSession } from "interfaces/kyc-session";
 
 import {CurrentUserState, State} from "interfaces/application-state";
 import {Balance} from "interfaces/balance-state";
@@ -50,3 +51,6 @@ export const changeCurrentUserisAdmin = (isAdmin: boolean) =>
 
 export const changeCurrentUserHasRegisteredNetwork = (hasRegisteredNetwork: boolean) =>
   changeCurrentUser.update({hasRegisteredNetwork});
+
+export const changeCurrentUserKycSession = (kycSession: kycSession) =>
+  changeCurrentUser.update({kycSession})

@@ -12,7 +12,7 @@ import SelectNetworkDropdown from "components/select-network-dropdown";
 import {useAppState} from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
 
-import { UNSUPPORTED_CHAIN } from "helpers/contants";
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 

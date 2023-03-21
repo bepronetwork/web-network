@@ -17,7 +17,7 @@ import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 import {addTx, TxList, updateTx} from "contexts/reducers/change-tx-list";
 
-import { UNSUPPORTED_CHAIN } from "helpers/contants";
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import {parseTransaction} from "helpers/transactions";
 

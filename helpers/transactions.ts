@@ -1,4 +1,4 @@
-import { SEVEN_DAYS_IN_MS } from "helpers/contants";
+import { SEVEN_DAYS_IN_MS } from "helpers/constants";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { BlockTransaction, SimpleBlockTransactionPayload } from "interfaces/transaction";

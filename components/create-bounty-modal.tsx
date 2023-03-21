@@ -14,7 +14,9 @@ import CreateBountyDetails from "components/create-bounty-details";
 import CreateBountyProgress from "components/create-bounty-progress";
 import CreateBountyTokenAmount from "components/create-bounty-token-amount";
 import {IFilesProps} from "components/drag-and-drop";
+import DropDown from "components/dropdown";
 import GithubInfo from "components/github-info";
+import InfoTooltip from "components/info-tooltip";
 import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
@@ -24,14 +26,14 @@ import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Token} from "interfaces/token";
-import { SimpleBlockTransactionPayload } from "interfaces/transaction";
+import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
@@ -73,6 +75,8 @@ export default function CreateBountyModal() {
   const [currentSection, setCurrentSection] = useState<number>(0);
   const [isBountyType, setisBountyType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
+  const [isKyc, setIsKyc] = useState<boolean>(false);
+  const [tierList, setTierList] = useState<number[]>([]);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
@@ -133,6 +137,10 @@ export default function CreateBountyModal() {
       setRewardAmount(ZeroNumberFormatValues)
       setRewardToken(undefined);
     }
+  }
+
+  function handleIsKYCChecked(e) {
+    setIsKyc(e.target.checked);
   }
 
   function renderDetails(review = false) {
@@ -234,6 +242,8 @@ export default function CreateBountyModal() {
                 onClick={() => {
                   setisBountyType(false);
                   setRewardChecked(true);
+                  setIsKyc(false);
+                  setTierList([]);
                   setIssueAmount(ZeroNumberFormatValues);
                 }}
               >
@@ -255,6 +265,38 @@ export default function CreateBountyModal() {
                 {rewardChecked && renderBountyToken(false, "reward")}
               </>
             )}
+            {isBountyType && Settings?.kyc?.isKycEnabled ? (
+              <>
+                <div className="col-md-12 d-flex flex-row gap-2">
+                  <FormCheck
+                    className="form-control-md pb-0"
+                    type="checkbox"
+                    label={t("bounty:kyc.is-required")}
+                    onChange={handleIsKYCChecked}
+                    checked={isKyc}
+                  />
+                  <span>
+                    <InfoTooltip
+                      description={t("bounty:kyc.tool-tip")}
+                      secondaryIcon
+                    />
+                  </span>
+                </div>
+                {isKyc && Settings?.kyc?.tierList?.length ? (
+                  <DropDown
+                    className="mt-2"
+                    onSelected={(opt) =>{
+                      setTierList(Array.isArray(opt) ? opt.map((i) => +i.value) : [+opt.value])
+                    }
+                    }
+                    options={Settings?.kyc?.tierList.map((i) => ({
+                      value: i.id,
+                      label: i.name,
+                    }))}
+                  />
+                ) : null}
+              </>
+            ) : null}
           </div>
         </div>
       );
@@ -383,6 +425,13 @@ export default function CreateBountyModal() {
       isRewardAmount
     )
       return true;
+
+    if (
+      currentSection === 1 &&
+      isKyc && Settings?.kyc?.tierList?.length && !tierList.length
+    )
+      return true;
+
     if (currentSection === 2 && (!repository || !branch)) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
     return currentSection === 3 && isLoadingCreateBounty;
@@ -476,7 +525,9 @@ export default function CreateBountyModal() {
         body: payload.body,
         creator: payload.githubUser,
         repositoryId: payload.repositoryId,
-        tags: selectedTags
+        tags: selectedTags,
+        isKyc: isBountyType ? isKyc : false,
+        tierList: isBountyType ? tierList : null,
       }, Service?.network?.active?.name)
       .then((cid) => cid)
 

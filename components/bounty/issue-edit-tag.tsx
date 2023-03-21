@@ -11,7 +11,7 @@ import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
-import { MAX_TAGS } from "helpers/contants";
+import { MAX_TAGS } from "helpers/constants";
 
 interface IssueEditTagProps {
   isEdit: boolean;
