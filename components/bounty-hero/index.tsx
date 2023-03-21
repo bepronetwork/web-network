@@ -3,6 +3,7 @@ import {isMobile} from "react-device-detect";
 import {useTranslation} from "next-i18next";
 
 import Avatar from "components/avatar";
+import Badge from "components/badge";
 import CountInfo from "components/bounty-hero/count-info";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
@@ -13,11 +14,10 @@ import If from "components/If";
 import PriceConversor from "components/price-conversor";
 import Translation from "components/translation";
 
+import {useAppState} from "contexts/app-state";
+
 import {getIssueState} from "helpers/handleTypeIssue";
 import {truncateAddress} from "helpers/truncate-address";
-
-import {useAppState} from "../contexts/app-state";
-import Badge from "./badge";
 
 export default function BountyHero() {
   const {t} = useTranslation(["bounty", "common"]);
@@ -57,7 +57,8 @@ export default function BountyHero() {
 
                   {state.currentBounty?.data?.isKyc
                   ? <Badge
-                    className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                    className={
+                      `d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
                     label={t("bounty:kyc.label")}
                   /> : null}
                   <div className="d-flex align-items-center">

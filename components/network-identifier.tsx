@@ -7,7 +7,7 @@ import Indicator from "components/indicator";
 import {useAppState} from "contexts/app-state";
 import {changeChain} from "contexts/reducers/change-chain";
 
-import { UNSUPPORTED_CHAIN } from "helpers/contants";
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 
 import {NetworkColors} from "interfaces/enums/network-colors";
 

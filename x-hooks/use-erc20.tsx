@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import {useAppState} from "contexts/app-state";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
-import { UNSUPPORTED_CHAIN } from "helpers/contants";
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";

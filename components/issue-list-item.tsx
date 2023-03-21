@@ -6,6 +6,7 @@ import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
+import Badge from "components/badge";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
 import CardItem from "components/card-item";
@@ -151,7 +152,8 @@ export default function IssueListItem({
               <>
                 <BountyStatusInfo issueState={issueState} />
                 {issue?.isKyc ? <Badge
-                  className={`d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
+                  className={
+                    `d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
                   label={t("bounty:kyc.label")}
                 /> : null}
                 <div className="d-flex align-items-center">

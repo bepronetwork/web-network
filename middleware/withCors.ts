@@ -2,7 +2,7 @@ import {recoverTypedSignature} from "@metamask/eth-sig-util";
 import Cors from 'cors'
 import getConfig from "next/config";
 
-import {IM_AN_ADMIN, MISSING_ADMIN_SIGNATURE, NOT_AN_ADMIN} from "helpers/contants";
+import {IM_AN_ADMIN, MISSING_ADMIN_SIGNATURE, NOT_AN_ADMIN} from "helpers/constants";
 import {messageFor} from "helpers/message-for";
 
 const { publicRuntimeConfig } = getConfig();

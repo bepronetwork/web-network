@@ -5,7 +5,7 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import {NOT_AN_ADMIN} from "helpers/contants";
+import {NOT_AN_ADMIN} from "helpers/constants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 
