@@ -52,7 +52,6 @@ interface ListIssuesProps {
   pullRequesterAddress?: string;
   proposer?: string;
   disputableFilter?: "dispute" | "merge";
-  allNetworks?: boolean;
   inView?: boolean;
   variant?: "bounty-hall" | "profile" | "network"
 }
@@ -72,7 +71,6 @@ export default function ListIssues({
   proposer,
   redirect,
   disputableFilter,
-  allNetworks = false,
   inView,
   creatorAddress,
   variant = "network"
@@ -93,10 +91,11 @@ export default function ListIssues({
   const searchTimeout = useRef(null);
 
   const { chain } = useChain();
-  const { searchIssues, getTotalBounties } = useApi();
+  const { searchIssues } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
 
-  const isProfilePage = router?.asPath?.includes("profile");
+  const isProfile = variant === "profile";
+  const isBountyHall = variant === "bounty-hall";
 
   const { network: networkName, repoId, time, state, sortBy, order } = router.query as {
     network: string;
@@ -178,11 +177,6 @@ export default function ListIssues({
 
     dispatch(changeLoadState(true));
 
-    if(allNetworks) 
-      getTotalBounties()
-        .then(setTotalBounties)
-        .catch(error => console.debug("Failed to getTotalBounties", error));
-
     searchIssues({
       page,
       repoId,
@@ -196,11 +190,12 @@ export default function ListIssues({
       pullRequesterAddress,
       proposer,
       address: creatorAddress,
-      networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
+      networkName: (isProfile || isBountyHall) ? "" : appState.Service?.network?.active?.name,
+      allNetworks: (isProfile || isBountyHall) || "",
       chainId: chain?.chainId?.toString(),
-      allNetworks: allNetworks ? allNetworks : ""
     })
-      .then(async ({ rows, pages, currentPage }) => {
+      .then(async ({ count, rows, pages, currentPage }) => {
+        setTotalBounties(count);
         const issues = disputableFilter ? await disputableFilterFn(rows) : rows;
 
         if (currentPage > 1) {
@@ -287,14 +282,14 @@ export default function ListIssues({
 
   return (
     <CustomContainer 
-      className={`pb-3 ${isProfilePage && "px-0 mx-0" || ""}`}
-      childWrapperClassName={isProfilePage && "justify-content-left" || ""}
+      className={isProfile && "px-0 mx-0" || ""}
+      childWrapperClassName={isProfile && "justify-content-left" || ""}
     >
-      {allNetworks && (
-        <div className="d-flex mt-2 p-1">
-          <h4 className="mt-1">{t("bounty:all-bounties")}</h4>
-          <div className="bg-shadow border-radius-8 p-1 ms-3 px-2">
-            <span className="p text-white-40">{totalBounties}</span>
+      {(isBountyHall || isProfile) && (
+        <div className="d-flex flex-row align-items-center">
+          <h3 className="text-capitalize font-weight-medium">{t("bounty:label_other")}</h3>
+          <div className="ms-2">
+            <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">{totalBounties}</span>
           </div>
         </div>
       )}
@@ -383,7 +378,7 @@ export default function ListIssues({
       !appState.loading?.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            {(appState.currentUser?.walletAddress && !allNetworks) && (
+            {(appState.currentUser?.walletAddress && !isBountyHall) && (
               <ReadOnlyButtonWrapper>
                 <ContractButton onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
