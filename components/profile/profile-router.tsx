@@ -17,14 +17,14 @@ export default function ProfileRouter() {
   const Route = (path, page) => ({ path, page });
   
   const routes = [
-    Route("/profile", <ProfilePage />),
-    Route("/profile/wallet", <WalletPage />),
-    Route("/profile/voting-power", <VotingPowerPage />),
-    Route("/profile/payments", <PaymentsPage />),
-    Route("/profile/bounties", <BountiesPage />),
-    Route("/profile/pull-requests", <PullRequestsPage />),
-    Route("/profile/proposals", <ProposalsPage />),
-    Route("/profile/my-network", <MyNetworkPage />),
+    Route("/profile", ProfilePage),
+    Route("/profile/wallet", WalletPage),
+    Route("/profile/voting-power", VotingPowerPage),
+    Route("/profile/payments", PaymentsPage),
+    Route("/profile/bounties", BountiesPage),
+    Route("/profile/pull-requests", PullRequestsPage),
+    Route("/profile/proposals", ProposalsPage),
+    Route("/profile/my-network", MyNetworkPage),
   ];
 
   const currentRoute = routes.find(({ path }) => asPath.endsWith(path));
@@ -35,7 +35,7 @@ export default function ProfileRouter() {
   }, [currentRoute]);
 
   if (currentRoute)
-    return currentRoute.page;
+    return <currentRoute.page />;
 
   return <></>;
 }
