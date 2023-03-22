@@ -165,6 +165,7 @@ li {
 
 .react-select {
   &-container {
+    min-width: fit-content;
     width: 100%;
   }
   &-container & {
@@ -176,6 +177,7 @@ li {
       border-radius: 4px;
       &:hover {
         border-color: $gray-700;
+        background-color: $gray-850;
       }
       &--is-focused {
         border-color: var(--bs-primary);
@@ -211,10 +213,15 @@ li {
       border: 1px solid $gray-800;
       background-color: $gray-900;
       z-index: 4;
+      padding: 6px;
 
       &-list {
         padding-top: 0;
         padding-bottom: 0;
+
+        .react-select__option + .react-select__option {
+          margin-top: 6px;
+        }
       }
     }
     &__value {
@@ -232,19 +239,7 @@ li {
       background-color: transparent;
       color: $gray-500;
 
-      &:only-child {
-        border-radius: 4px;
-      }
-
-      &:first-child {
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-      }
-
-      &:last-child {
-        border-bottom-left-radius: 4px;
-        border-bottom-right-radius: 4px;
-      }
+      border-radius: 4px;
 
       &--is-selected {
         color: $white;
@@ -574,7 +569,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #fff;
   }
 
-  > input:not(:only-child) {
+  .form-control:not(:only-child), > input:not(:only-child) {
     border-right: none !important;
   }
 
