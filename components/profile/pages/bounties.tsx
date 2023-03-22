@@ -9,7 +9,7 @@ export default function BountiesPage() {
   return(
     <ProfileLayout>
       <ListIssues 
-        creatorAddress={state.currentUser?.walletAddress || "not-connected"}
+        creator={state.currentUser?.walletAddress || "not-connected"}
         variant="profile"
       />
     </ProfileLayout>

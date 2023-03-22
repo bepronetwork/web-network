@@ -28,7 +28,7 @@ export default function VotingPowerPage() {
   const { state } = useAppState();
   const { updateWalletBalance } = useAuthentication();
 
-  const { curatorAddress } = useRouter().query
+  const { curatorAddress } = useRouter().query;
 
   const oracleToken = {
     symbol: t("$oracles", { token: state.Service?.network?.active?.networkToken?.symbol }),

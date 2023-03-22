@@ -15,12 +15,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-<<<<<<<< HEAD:pages/[network]/[chain]/profile/index.tsx
-
-export default function Profile() {
-========
 export default function ProfilePage() {
->>>>>>>> 3a5664b7 (introducing new profile structure and profile router):components/profile/pages/profile.tsx
   const { t } = useTranslation("profile");
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);

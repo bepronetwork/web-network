@@ -15,16 +15,10 @@ import {changeLoadState} from "contexts/reducers/change-load";
 import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
-<<<<<<<< HEAD:pages/[network]/[chain]/profile/my-network.tsx
 import useChain from "x-hooks/use-chain";
-
-export function MyNetwork() {
-  const { t } = useTranslation(["common", "custom-network"]);
-========
 
 function MyNetwork() {
   const {t} = useTranslation(["common", "custom-network"]);
->>>>>>>> 3a5664b7 (introducing new profile structure and profile router):components/profile/pages/my-network.tsx
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 

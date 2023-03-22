@@ -45,7 +45,6 @@ type FiltersByIssueState = Filter[];
 
 interface ListIssuesProps {
   creator?: string;
-  creatorAddress?: string,
   redirect?: string | UrlObject;
   filterState?: IssueState;
   emptyMessage?: string;
@@ -74,7 +73,6 @@ export default function ListIssues({
   redirect,
   disputableFilter,
   inView,
-  creatorAddress,
   variant = "network"
 }: ListIssuesProps) {
   const {dispatch, state: appState} = useAppState();
@@ -191,7 +189,6 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      address: creatorAddress,
       networkName: (isProfile || isBountyHall) ? "" : appState.Service?.network?.active?.name,
       allNetworks: (isProfile || isBountyHall) || "",
       chainId: chain?.chainId?.toString(),
@@ -260,7 +257,6 @@ export default function ListIssues({
     proposer,
     appState.Service?.network?.active?.name,
     inView,
-    creatorAddress,
     appState.supportedChains
   ]);
 
