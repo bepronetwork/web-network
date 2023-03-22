@@ -37,8 +37,8 @@ export function useDao() {
    * Change network to a known address if not the same
    * @param networkAddress
    */
-  function changeNetwork() {
-    const networkAddress = state.Service?.network?.active?.networkAddress;
+  function changeNetwork(address = '') {
+    const networkAddress = address || state.Service?.network?.active?.networkAddress;
     
     if (!state.Service?.active || !networkAddress)
       return;
@@ -57,6 +57,8 @@ export function useDao() {
             console.error(`Failed to load network`, networkAddress);
             return;
           }
+          console.log('started', started)
+          console.log('started service->', service)
           dispatch(changeActiveDAO(service));
         })
         .catch(error => {
