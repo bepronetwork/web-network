@@ -1,5 +1,7 @@
-import MarkedRender from "components/MarkedRender";
 import { isArray } from "lodash";
+import { useTranslation } from "next-i18next";
+
+import MarkedRender from "components/MarkedRender";
 
 interface ReviewProps {
   [name: string]: string | string[];
@@ -12,12 +14,12 @@ export default function CreateBountyReview({
 }: {
   payload: ReviewProps;
 }) {
+  const { t } = useTranslation(["bounty"]);
   return (
     <div className="mt-2">
-      <h5>Review Bounty</h5>
+      <h5>{t("bounty:steps.review")}</h5>
       <p className="text-gray mb-4">
-        Est quis sit irure exercitation id consequat cupidatat elit nulla velit
-        amet ex.
+        {t("bounty:descriptions.review")}
       </p>
       {Object.entries(payload).map(([name, value]: [string, Value], key) => {
         if(!value || value?.length === 0) return null;
