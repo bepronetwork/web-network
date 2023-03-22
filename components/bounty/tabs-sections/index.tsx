@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import ItemSections from "components/bounty/tabs-sections/item-sections";
 import CustomContainer from "components/custom-container";
 import TabbedNavigation from "components/tabbed-navigation";
 
@@ -9,11 +10,11 @@ import { useAppState } from "contexts/app-state";
 
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
-import ItemSections from "./item-sections";
-
 function TabSections(){
   const { t } = useTranslation("bounty");
+
   const {state} = useAppState();
+  
   const [pullRequests, setPullRequests] = useState(state.currentBounty?.data?.pullRequests)
   const [proposals, setProposals] = useState(state.currentBounty?.data?.mergeProposals)
 

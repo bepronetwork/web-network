@@ -2,7 +2,7 @@ import { ProposalDetail } from "@taikai/dappkit";
 import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 
-import { DistributedAmounts } from "interfaces/proposal";
+import { DistributedAmounts, ProposalDistribution } from "interfaces/proposal";
 
 const bigNumberPercentage = 
   (value1: BigNumber, value2: BigNumber) => value1.dividedBy(value2).multipliedBy(100).toFixed(2);
@@ -12,7 +12,8 @@ export default function calculateDistributedAmounts(treasury,
                                                     mergerFee: string | number,
                                                     proposerFee: string | number,
                                                     bountyAmount: BigNumber,
-                                                    proposalPercents: ProposalDetail[]): DistributedAmounts {
+                                                    proposalPercents: ProposalDetail[] | ProposalDistribution[]): 
+                                                    DistributedAmounts {
   let treasuryAmount = BigNumber(0);
   
   if (treasury.treasury && treasury.treasury !== Defaults.nativeZeroAddress)

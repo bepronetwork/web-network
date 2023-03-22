@@ -2,12 +2,12 @@ import { useTranslation } from "next-i18next";
 
 import InternalLink from "components/internal-link";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function ProfileSide() {
   const { t } = useTranslation("common");
 
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
 
   const Link = (label, href) => ({ label, href });
   const ProfileLink = ({ label, href }) => (

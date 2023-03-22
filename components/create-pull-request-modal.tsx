@@ -4,14 +4,15 @@ import {useTranslation} from "next-i18next";
 
 import Badge from "components/badge";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
-import useOctokit from "x-hooks/use-octokit";
+import {useAppState} from "contexts/app-state";
 
-import {useAppState} from "../contexts/app-state";
+import useOctokit from "x-hooks/use-octokit";
 
 interface props {
   show: boolean,
@@ -148,14 +149,14 @@ export default function CreatePullRequestModal({
               {t("actions.cancel")}
             </Button>
   
-            <Button
+            <ContractButton
               disabled={isButtonDisabled() || isCreating}
               onClick={handleConfirm}
               withLockIcon={isButtonDisabled()}
               isLoading={isCreating}
             >
               <span>{t("pull-request:actions.create.title")}</span>
-            </Button>
+            </ContractButton>
           </div>
         )
       }

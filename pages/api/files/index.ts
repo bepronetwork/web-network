@@ -1,12 +1,12 @@
 import formidable from "formidable";
 import fs from "fs";
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
 
-import IpfsStorage from "services/ipfs-service";
+import { LogAccess } from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
-import {Logger} from "../../../services/logging";
+import IpfsStorage from "services/ipfs-service";
+import {Logger} from "services/logging";
 
 export const config = {
   api: {

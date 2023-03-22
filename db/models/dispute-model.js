@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 
 class Disputes extends Model {
@@ -20,7 +21,10 @@ class Disputes extends Model {
         },
         address: {
           type: DataTypes.STRING,
-          allowNull: false
+          allowNull: false,
+          get() {
+            return getValueToLowerCase(this, "address");
+          }
         },
         proposalId: {
           type: DataTypes.INTEGER,

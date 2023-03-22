@@ -4,16 +4,16 @@ import {useRouter} from "next/router";
 import ArrowLeft from "assets/icons/arrow-left";
 
 import Avatar from "components/avatar";
+import CustomContainer from "components/custom-container";
+import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
+import PriceConversor from "components/price-conversor";
+
+import {useAppState} from "contexts/app-state";
 
 import {pullRequest} from "interfaces/issue-data";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
-
-import {useAppState} from "../contexts/app-state";
-import CustomContainer from "./custom-container";
-import DateLabel from "./date-label";
-import PriceConversor from "./price-conversor";
+import { useNetwork } from "x-hooks/use-network";
 
 interface IPullRequestHeroProps {
   currentPullRequest: pullRequest;
@@ -24,8 +24,8 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
   
   const router = useRouter();
   
-  const { getURLWithNetwork } = useNetworkTheme()
   const { state } = useAppState();
+  const { getURLWithNetwork } = useNetwork();
 
   return (
     <div className="banner-shadow">
@@ -86,7 +86,7 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
               currentValue={state.currentBounty?.data?.amount?.toFixed() || "0"}
-              currency={state.currentBounty?.chainData?.transactionalTokenData?.symbol || t("misc.token")}
+              currency={state.currentBounty?.data?.transactionalToken?.symbol || t("misc.token")}
             />
           </div>
         </div>

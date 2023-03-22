@@ -28,16 +28,16 @@ export default function BountyDistributionItem({
         key={name}
       >
         <div className="d-flex flex-grow-1 flex-column">
-          <span className="text-gray label-m">
+          <div className="text-gray label-m d-flex align-items-center gap-2 mb-1">
             {githubLogin ? <Avatar key={githubLogin}  size="xsm"  userLogin={githubLogin} tooltip /> : null}
-            <label className="mx-2 text-truncate text-uppercase">
+            <label className="text-truncate text-uppercase">
               {name}
             </label>
             {description && (
               <InfoTooltip description={description} secondaryIcon={true} />
             )}
 
-          </span>
+          </div>
           {verifyAmount() && (
             <span className="caption-small text-light-gray">{name}</span>
           )}

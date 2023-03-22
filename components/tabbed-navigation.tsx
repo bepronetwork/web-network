@@ -1,12 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  Accordion,
-  Nav,
-  Tab,
-  OverlayTrigger,
-  Popover,
-  useAccordionButton
-} from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Accordion, Nav, OverlayTrigger, Popover, Tab, useAccordionButton} from "react-bootstrap";
 
 import ArrowDown from "assets/icons/arrow-down";
 import ArrowUp from "assets/icons/arrow-up";
@@ -14,7 +7,7 @@ import InfoIconEmpty from "assets/icons/info-icon-empty";
 
 import Button from "components/button";
 
-import { TabbedNavigationProps } from "interfaces/tabbed-navigation";
+import {TabbedNavigationProps} from "interfaces/tabbed-navigation";
 
 function renderDescription(description: string) {
   if (!description) return <></>;
@@ -46,6 +39,7 @@ export default function TabbedNavigation({
   tabs,
   defaultActiveKey,
   onTransition,
+  forceActiveKey,
   ...props
 }: TabbedNavigationProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -65,7 +59,11 @@ export default function TabbedNavigation({
 
   useEffect(() => {
     if (!defaultActiveKey) setActiveKey(getDefaultActiveTab());
-  }, []);
+  }, [tabs]);
+
+  useEffect(() => {
+    setActiveKey(forceActiveKey);
+  }, [forceActiveKey])
 
   return (
     <Tab.Container defaultActiveKey={defaultActiveKey} activeKey={activeKey} onSelect={handleTransition}>

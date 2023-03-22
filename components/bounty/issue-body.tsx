@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import IssueEditTag from "components/bounty/issue-edit-tag";
 import Button from "components/button";
 import CustomContainer from "components/custom-container";
 import { IFilesProps } from "components/drag-and-drop";
@@ -15,8 +16,6 @@ import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 
 import useApi from "x-hooks/use-api";
 import { useBounty } from "x-hooks/use-bounty";
-
-import IssueEditTag from "./issue-edit-tag";
 
 interface issueBodyProps {
   isEditIssue: boolean;

@@ -18,14 +18,16 @@ import {
   DEFAULT_MERGER_FEE,
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
-  DEFAULT_PROPOSER_FEE
+  DEFAULT_PROPOSER_FEE,
+  UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
 import { NetworkValidator } from "helpers/network";
 import { RegistryValidator } from "helpers/registry";
+import { toLower } from "helpers/string";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
-import { Token } from "interfaces/token";
+import {Token} from "interfaces/token";
 
 import DAO from "services/dao-service";
 import {WinStorage} from "services/win-storage";
@@ -36,7 +38,7 @@ import useOctokit from "x-hooks/use-octokit";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration", "/setup"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/[chain]/profile/my-network", "/administration", "/setup"];
 const TTL = 48 * 60 * 60 // 2 day
 const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
@@ -47,14 +49,16 @@ export const NetworkSettingsProvider = ({ children }) => {
             referred to user nework when he access `/my-network` page from/in another network.
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
-  const [networkSettings, setNetworkSettings] = useState(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
+  const [networkSettings, setNetworkSettings] = 
+    useState<NetworkSettings>(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [registryToken, setRegistryToken] = useState<Token>();
+  const [forcedService, setForcedService] = useState<DAO>();
 
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
   const { getUserRepositories } = useOctokit();
-  const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
+  const { searchNetworks, searchRepositories } = useApi();
 
   const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
@@ -221,13 +225,33 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: async (value: string) => {
         setFields('details.name', {value, validated: await Fields.name.validator(value)})
       },
-      validator: async (value: string) => {
-        let validated = undefined;
-  
-        if (value.trim() !== "" && !isSetup)
-          validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
+      validator: async (value: string) => {  
+        if (value.trim() === "") 
+          return undefined;
 
-        return !!validated;
+        // Reserved names
+        if (/bepro|taikai/gi.test(value)) 
+          return false;
+
+        const networksWithSameName = await searchNetworks({ name: value });
+
+        // No networks with this name
+        if (networksWithSameName.count === 0) 
+          return true;
+        
+        const currentChain = +state.connectedChain?.id;
+        
+        // Network with same name on this chain
+        if (networksWithSameName.rows.some(({ chain_id }) => +chain_id === currentChain))
+          return false;
+
+        const currentWallet = state.currentUser?.walletAddress?.toLowerCase();
+
+        // Network with same name on other chain and connected with the same creator wallet
+        if (networksWithSameName.rows.find(({ creatorAddress }) => creatorAddress.toLowerCase() === currentWallet))
+          return true;
+
+        return false;
       }
     },
     description: {
@@ -280,16 +304,22 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
   };
 
-  async function loadDaoService(): Promise<DAO> {
-    if (!forcedNetwork) return state.Service?.active;
+  async function loadForcedService(): Promise<DAO> {
+    if (!network ||
+        toLower(state.Service?.active?.network?.contractAddress) === toLower(network?.networkAddress)) 
+      return state.Service?.active;
+    
+    if (toLower(forcedService?.network?.contractAddress) === toLower(network?.networkAddress))
+      return forcedService;
 
-    const networkAddress = network?.networkAddress;
     const dao = new DAO({
-      web3Connection: state.Service?.active.web3Connection,
+      web3Connection: state.Service?.active?.web3Connection,
       skipWindowAssignment: true
     });
 
-    await dao.loadNetwork(networkAddress);
+    await dao.start();
+
+    await dao.loadNetwork(network?.networkAddress);
 
     return dao;
   }
@@ -320,7 +350,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadGHRepos(){
     const repositories = [];
 
-    if(state.currentUser?.login){
+    if(state.currentUser?.login) {
       const botUser = !isCreating ? state.Settings?.github?.botUser : undefined
       const githubRepositories = await getUserRepositories(state.currentUser?.login, botUser);
 
@@ -328,8 +358,8 @@ export const NetworkSettingsProvider = ({ children }) => {
           .filter(repo => {
             const isOwner = state.currentUser.login === repo?.nameWithOwner.split("/")[0];
 
-            if((!repo?.isFork && isOwner || repo?.isInOrganization) && !repo?.isArchived)
-              return repo
+            if((isOwner || repo?.isInOrganization) && !repo?.isFork && !repo?.isArchived)
+              return repo;
           })
           .map(repo => ({
             checked: false,
@@ -342,24 +372,28 @@ export const NetworkSettingsProvider = ({ children }) => {
             collaborators: repo.collaborators
           }));
 
+      if (!isCreating) {
+        const repositoryAlreadyExists =  await searchRepositories({ 
+          networkName: network?.name,
+          chainId: state.connectedChain?.id,
+          includeIssues: "true"
+        })
+          .then(({ rows }) =>
+          Promise.all(rows.map( async repo => {
+            const repoOnGh = filtered.find(({ fullName }) => fullName === repo.githubPath);
 
-      if (!isCreating){
-        const repositoryAlreadyExists =  await searchRepositories({ networkName: network?.name })
-            .then(({ rows }) =>
-            Promise.all(rows.map( async repo => {
-              const repoOnGh = filtered.find(({ fullName }) => fullName === repo.githubPath);
+            return {
+              checked: true,
+              isSaved: true,
+              name: repo.githubPath.split("/")[1],
+              fullName: repo.githubPath,
+              hasIssues: !!repo.issues.length,
+              mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
+              collaborators: repoOnGh?.collaborators || [],
+            };
+          })));
 
-              return {
-                checked: true,
-                isSaved: true,
-                name: repo.githubPath.split("/")[1],
-                fullName: repo.githubPath,
-                hasIssues: await repositoryHasIssues(repo.githubPath),
-                mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
-                collaborators: repoOnGh?.collaborators || [],
-              };
-            })))
-        repositories.push(...repositoryAlreadyExists)
+        repositories.push(...repositoryAlreadyExists);
       }
 
       repositories.push(...filtered.filter(repo => !repositories.find((repoB) => repoB.fullName === repo.fullName)));
@@ -427,9 +461,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
 
-    const service = await loadDaoService();
-
-    if (!service.network) return;
+    if (!forcedService?.network) return;
 
     const [
         treasury,
@@ -442,17 +474,19 @@ export const NetworkSettingsProvider = ({ children }) => {
         oracleExchangeRate,
         cancelableTime,
         isNetworkAbleToBeClosed,
+        tokensLocked
       ] = await Promise.all([
-        service.network.treasuryInfo(),
-        service.getNetworkParameter("councilAmount"),
-        service.getNetworkParameter("disputableTime"),
-        service.getNetworkParameter("draftTime"),
-        service.getNetworkParameter("percentageNeededForDispute"),
-        service.getNetworkParameter("mergeCreatorFeeShare"),
-        service.getNetworkParameter("proposerFeeShare"),
-        service.getNetworkParameter("oracleExchangeRate"),
-        service.getNetworkParameter("cancelableTime"),
-        service.isNetworkAbleToBeClosed(),
+        forcedService.network.treasuryInfo(),
+        forcedService.getNetworkParameter("councilAmount"),
+        forcedService.getNetworkParameter("disputableTime"),
+        forcedService.getNetworkParameter("draftTime"),
+        forcedService.getNetworkParameter("percentageNeededForDispute"),
+        forcedService.getNetworkParameter("mergeCreatorFeeShare"),
+        forcedService.getNetworkParameter("proposerFeeShare"),
+        forcedService.getNetworkParameter("oracleExchangeRate"),
+        forcedService.getNetworkParameter("cancelableTime"),
+        forcedService.isNetworkAbleToBeClosed(),
+        forcedService.getTotalNetworkToken()
       ]);
 
     const validatedParameter = value => ({ value, validated: true });
@@ -493,16 +527,37 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
     defaultState.github.repositories = await loadGHRepos();
 
-    setNetworkSettings(defaultState);
+    setForcedNetwork((prev)=>({
+      ...prev,
+      tokensLocked: tokensLocked.toFixed(),
+      councilAmount: councilAmount.toString(),
+      disputableTime: +disputableTime / 1000,
+      draftTime: +draftTime / 1000,
+      percentageNeededForDispute: +percentageNeededForDispute,
+      cancelableTime: +cancelableTime / 1000,
+      oracleExchangeRate: oracleExchangeRate,
+      proposerFeeShare: proposerFeeShare,
+      mergeCreatorFeeShare: mergeCreatorFeeShare
+    }));
 
+    setNetworkSettings(defaultState);
+    
     return defaultState;
   }
 
   useEffect(() => {
+    if (!network || !state.Service?.active || state.Service?.starting)
+      setForcedService(undefined);
+    else if (network?.chain?.chainRpc === state.Service?.active?.web3Connection?.options?.web3Host)
+      loadForcedService()
+        .then(setForcedService);
+  }, [network, state.Service?.active, state.Service?.starting]);
+
+  useEffect(() => {
     if ([
-      !state.Service?.active,
       !state.currentUser?.walletAddress,
-      !isCreating && !network?.name && !network?.councilAmount,
+      !isCreating && 
+        (!network?.name || !forcedService || !!networkSettings?.settings?.parameters?.councilAmount?.value),
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad,
       !state.Settings
@@ -518,66 +573,45 @@ export const NetworkSettingsProvider = ({ children }) => {
   }, [
     state.currentUser?.login,
     state.currentUser?.walletAddress,
-    state.Service?.active,
+    forcedService,
     network,
     isCreating,
-    forcedNetwork,
     needsToLoad,
     router.pathname,
     state.Service?.active?.registry?.token?.contractAddress,
     state.Settings
   ]);
 
-  // NOTE -  Load Forced/User Network
-  useEffect(()=>{
-    if(state.Service?.active && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
-      loadDaoService()
-      .then((service)=>
-       Promise.all([
-                service.getTotalNetworkToken(),
-                0,
-                service.getNetworkParameter("councilAmount"),
-                service.getNetworkParameter("disputableTime"),
-                service.getNetworkParameter("draftTime"),
-                service.getNetworkParameter("percentageNeededForDispute"),
-                service.getNetworkParameter("cancelableTime"),
-                service.getNetworkParameter("oracleExchangeRate"),
-                service.getNetworkParameter("proposerFeeShare"),
-                service.getNetworkParameter("mergeCreatorFeeShare")
-       ]))
-       .then(([
-        tokensLocked,
-        tokensStaked,
-        councilAmount,
-        disputableTime,
-        draftTime,
-        percentageNeededForDispute,
-        cancelableTime,
-        oracleExchangeRate,
-        proposerFeeShare,
-        mergeCreatorFeeShare
-      ])=>
-         setForcedNetwork((prev)=>({
-          ...prev,
-          tokensLocked: tokensLocked.toFixed(),
-          tokensStaked: tokensStaked.toFixed(),
-          councilAmount: councilAmount.toString(),
-          disputableTime: +disputableTime / 1000,
-          draftTime: +draftTime / 1000,
-          percentageNeededForDispute: +percentageNeededForDispute,
-          cancelableTime: +cancelableTime / 1000,
-          oracleExchangeRate: oracleExchangeRate,
-          proposerFeeShare: proposerFeeShare,
-          mergeCreatorFeeShare: mergeCreatorFeeShare
-         })));
-  },[forcedNetwork, state.Service?.active]);
-
   useEffect(() => {
-    if (state.Service?.active?.registry?.contractAddress)
+    if (state.Service?.active?.registry?.contractAddress && state.connectedChain?.name !== UNSUPPORTED_CHAIN)
       state.Service.active.getERC20TokenData(state.Service.active.registry.token.contractAddress)
         .then(setRegistryToken)
         .catch(error => console.debug("Failed to load registry token", error));
-  }, [state.Service?.active?.registry?.contractAddress]);
+  }, [state.Service?.active?.registry?.contractAddress, state.connectedChain?.name]);
+
+  // Pre Select same network on other chain repositories
+  useEffect(() => {
+    const creatingName = networkSettings?.details?.name?.value;
+    const currentAddress = state.currentUser?.walletAddress;
+    const connectedChainId = state.connectedChain?.id;
+
+    if (!creatingName || !currentAddress || !connectedChainId || !isCreating) return;
+
+    searchRepositories({
+      networkName: creatingName
+    })
+      .then(({ count, rows }) => {
+        if (count === 0) return;
+
+        const reposToSelect = rows.filter(({ network: { name, creatorAddress, chain_id } }) => 
+          toLower(name) === toLower(creatingName) &&
+          creatorAddress === currentAddress &&
+          chain_id !== connectedChainId);
+
+        reposToSelect.forEach(({ githubPath }) => Fields.repository.setter(githubPath));
+      });
+  }, [networkSettings?.details?.name?.value, state.currentUser?.walletAddress, state.connectedChain?.id, isCreating]);
+
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,

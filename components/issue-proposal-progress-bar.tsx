@@ -3,10 +3,9 @@ import {Fragment, useEffect, useState} from "react";
 import {add, addSeconds, compareAsc, intervalToDuration} from "date-fns";
 import {useTranslation} from "next-i18next";
 
+import {useAppState} from "contexts/app-state";
+
 import {formatDate, getTimeDifferenceInWords} from "helpers/formatDate";
-
-import {useAppState} from "../contexts/app-state";
-
 
 export default function IssueProposalProgressBar() {
   const {t} = useTranslation(["common", "bounty"]);
@@ -23,21 +22,20 @@ export default function IssueProposalProgressBar() {
   ]);
 
   const {state} = useAppState();
-  const getChainTime = () => state.Service.active.getTimeChain().then(setChainTime).catch(console.log)
-  const isFinalized = !!(state.currentBounty?.data?.state === "closed")
-  const isInValidation = !!(state.currentBounty?.data?.state === "proposal")
-  const isIssueinDraft = !!(state.currentBounty?.data?.state === "draft")
-  const isFundingRequest = state.currentBounty?.data?.fundingAmount?.gt(0);
-  const isBountyFunded = state.currentBounty?.data?.fundedAmount?.isEqualTo(state.currentBounty?.data?.fundingAmount);
-  const creationDate = state.currentBounty?.chainData?.creationDate;
+
+  const getChainTime = () => state.Service.active.getTimeChain().then(setChainTime).catch(console.log);
+
+  const { isClosed, isCanceled, isDraft, isFundingRequest, isFunded } = state.currentBounty?.data || {};
+
+  const isInValidation = !!(state.currentBounty?.data?.state === "proposal");
+  const creationDate = state.currentBounty?.data?.createdAt;
   const fundedDate = state.currentBounty?.data?.fundedAt;
-  const closedDate = state.currentBounty?.chainData?.closedDate;
-  const isCanceled = !!(state.currentBounty?.data?.state === "canceled")
-  const lastProposalCreationDate = state.currentBounty?.data?.mergeProposals?.
+  const closedDate = isClosed ? state.currentBounty?.data?.updatedAt : undefined;
+  const lastProposalCreationDate = 
+    state.currentBounty?.data?.mergeProposals?.
       filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
-      .reduce((proposalAnt, proposalCur) => 
-        proposalAnt.creationDate > proposalCur.creationDate && 
-        proposalAnt || proposalCur, { creationDate })?.creationDate;
+      .reduce((acc, curr) => +curr.contractCreationDate > +acc ? new Date(curr.contractCreationDate) : acc,
+              creationDate);
 
   function toRepresentationHeight() {
     return currentStep === 0 ? "1px" : `${currentStep * 66.7}px`;
@@ -80,14 +78,14 @@ export default function IssueProposalProgressBar() {
     if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest) 
       currentValue = item(addSeconds(creationDate, +state.Service?.network?.times?.draftTime)).Started;
 
-    if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
+    if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isClosed) 
       currentValue = item(creationDate, +state.Service?.network?.times?.draftTime).Warning;
     
     if (
         index === currentStep &&
         currentStep === 2 &&
         !isCanceled &&
-        !isFinalized
+        !isClosed
       ) {
       if (isFundingRequest && creationDate && fundedDate) {
         const intervalFunded = intervalToDuration({
@@ -194,16 +192,16 @@ export default function IssueProposalProgressBar() {
     let step = 0 + addIsFunding;
     let stepColor = "primary"
 
-    if (isFinalized) step = 3 + addIsFunding;
+    if (isClosed) step = 3 + addIsFunding;
     else if (isInValidation) step = 2 + addIsFunding;
-    else if (!isIssueinDraft && (!isFundingRequest || isBountyFunded)) step = 1 + addIsFunding;
+    else if (!isDraft && (!isFundingRequest || isFunded)) step = 1 + addIsFunding;
 
     if (isCanceled) stepColor = "danger";
-    if (isFinalized) stepColor = "success";
+    if (isClosed) stepColor = "success";
 
     setStepColor(stepColor);
     setCurrentStep(step);
-  }, [isFinalized, isIssueinDraft, isCanceled, isInValidation, isFundingRequest, isBountyFunded]);
+  }, [isClosed, isDraft, isCanceled, isInValidation, isFundingRequest, isFunded]);
 
   return (
     <div className="container">

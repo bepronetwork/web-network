@@ -5,7 +5,7 @@ export default function IconSingleValue(props) {
 
   return(
     <SingleValue {...props} className="d-flex flex-row justify-content-between align-items-center">
-      <span>
+      <span className="text-truncate">
         {
           props.data.preIcon && 
           <span className="mr-1">

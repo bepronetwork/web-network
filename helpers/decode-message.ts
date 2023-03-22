@@ -1,6 +1,6 @@
 import {recoverTypedSignature,} from "@metamask/eth-sig-util";
 
-import {messageFor} from "./message-for";
+import {messageFor} from "helpers/message-for";
 
 export default function decodeMessage(chainId, message = "", signature: string, assumedOwner: string): boolean {
   if (!signature)
@@ -11,8 +11,6 @@ export default function decodeMessage(chainId, message = "", signature: string, 
     data: JSON.parse(messageFor(chainId, message)),
     version: 'V4'
   }
-
-  console.log(recoverTypedSignature<any, any>(params))
 
   return recoverTypedSignature<any, any>(params)?.toLowerCase() === assumedOwner.toLowerCase();
 }

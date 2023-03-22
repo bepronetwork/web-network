@@ -2,8 +2,13 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import { resJsonMessage } from "helpers/res-json-message";
+
+import { WithJwt } from "middleware";
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
@@ -26,30 +31,19 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
 
   if (address) whereCondition.creatorAddress = address;
 
-  if (networkName) {
-    const network = await models.network.findOne({
-      where: {
-        name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
-      }
-    });
+  const networks = await models.network.findAll({
+    where: {
+      isRegistered: true,
+      isClosed: false,
+      ... networkName ? {
+        name: { [Op.iLike]: String(networkName) }
+      } : {}
+    }
+  })
 
-    if (!network) return res.status(404).json("Invalid network");
+  if (networks.length === 0) return resJsonMessage("Networks not found", res, 404);
 
-    whereCondition.network_id = network?.id;
-  } else {
-    const networks = await models.network.findAll({
-      where: {
-        isRegistered: true,
-        isClosed: false
-      }
-    })
-
-    if (networks.length === 0) return res.status(404).json("Networks not found");
-
-    whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
-  }
+  whereCondition.network_id = { [Op.in]: networks.map(network => network.id) };
 
   const issueCount = await models.issue.count({
     where: whereCondition
@@ -58,8 +52,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issueCount);
 }
 
-async function getAll(req: NextApiRequest,
-                      res: NextApiResponse) {
+async function getAll(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getTotal(req, res);
@@ -72,4 +65,4 @@ async function getAll(req: NextApiRequest,
   res.end();
 }
 
-export default LogAccess(WithCors(getAll));
+export default LogAccess(WithCors(WithJwt(WithValidChainId(getAll))));

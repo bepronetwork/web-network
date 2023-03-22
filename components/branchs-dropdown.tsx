@@ -4,8 +4,7 @@ import {useTranslation} from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
-import {useAppState} from "../contexts/app-state";
-
+import {useAppState} from "contexts/app-state";
 
 export default function BranchsDropdown({
   repoId,
@@ -24,7 +23,6 @@ export default function BranchsDropdown({
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
-
 
   function mapOptions() {
     if (!state.Service?.network?.repos?.active?.branches?.length || !repoId)

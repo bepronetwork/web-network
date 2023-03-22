@@ -7,11 +7,12 @@ import getConfig from "next/config";
 
 import ArrowRight from "assets/icons/arrow-right";
 
-import {useAppState} from "../contexts/app-state";
-import {getCoinPrice} from "../services/coingecko";
-import InputNumber from "./input-number";
-import TokensDropdown from "./tokens-dropdown";
+import InputNumber from "components/input-number";
+import TokensDropdown from "components/tokens-dropdown";
 
+import {useAppState} from "contexts/app-state";
+
+import {getCoinPrice} from "services/coingecko";
 
 export default function CreateBountyTokenAmount({
   currentToken,

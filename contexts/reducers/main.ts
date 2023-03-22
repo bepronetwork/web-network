@@ -21,7 +21,7 @@ export const mainReducer = (state: State, actor: { id, payload, subAction }) => 
 
   const action = Actions.find(({id: id}) => id === actor.id);
   if (!action)
-    throw new Error(`No action found for ${actor.id}`);
+    throw new Error(`No action found for ${AppStateReduceId[actor.id]}`);
 
   return action.reducer(state, actor.payload, actor.subAction);
 }

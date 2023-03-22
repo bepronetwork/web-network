@@ -1,6 +1,6 @@
 import {NextApiHandler, NextApiRequest, NextApiResponse} from "next";
 
-import {debug, log, Logger} from "../services/logging";
+import {debug, log, Logger} from "services/logging";
 
 export const LogAccess = (handler: NextApiHandler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {

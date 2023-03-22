@@ -64,6 +64,7 @@
           ["/^graphql/"],
           ["/^helpers/"],
           ["/^interfaces/"],
+          ["/^middleware/"],
           ["/^pages/"],
           ["/^services/"],
           ["/^styles/"],
