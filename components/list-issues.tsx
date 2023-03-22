@@ -256,8 +256,9 @@ export default function ListIssues({
     chain,
     creator,
     proposer,
-    networkName,
+    appState.Service?.network?.active?.name,
     inView,
+    creatorAddress,
     appState.supportedChains
   ]);
 
@@ -313,7 +314,7 @@ export default function ListIssues({
 
               {showClearButton() && (
                 <button
-                  className="btn bg-black border-0 py-0 px-3"
+                  className="btn bg-gray-900 border-0 py-0 px-3"
                   onClick={handleClearSearch}
                 >
                   <CloseIcon width={10} height={10} />

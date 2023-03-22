@@ -538,7 +538,7 @@ label {
 
   background-color: $gray-900;
   border: 1px solid $gray-800;
-  color: $gray-700;
+  color: #fff;
 
   &:disabled,
   &[readonly] {
@@ -574,6 +574,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   &,
   > input {
     border-radius: math.div($m, 4);
+    color: #fff;
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+      color: $gray-700;
+      opacity: 1; /* Firefox */
+    }
+    
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+      color: $gray-700;
+    }
+    
+    ::-ms-input-placeholder { /* Microsoft Edge */
+      color: $gray-700;
+    }
   }
 
   > input:not(:only-child) {
@@ -583,7 +597,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   &:focus-within {
     .input-group-text {
       border-left: none !important;
-      background-color: $bg;
 
       &:not(.border) {
         border: 1px solid var(--bs-primary);
@@ -594,8 +607,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
   .input-group-text {
     background-color: $gray-900;
-    border: 1px solid $gray-800;
-    color: $gray-700;
+    border: none;
+    color: #fff;
 
     &.group-disabled {
       opacity: 0.4;
