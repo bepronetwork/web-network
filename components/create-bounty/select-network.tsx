@@ -1,12 +1,14 @@
 import { ReactNode } from "react";
 
+import { useTranslation } from "next-i18next";
+
 export default function SelectNetwork({children}: { children?: ReactNode}) {
+  const { t } = useTranslation(["bounty"]);
   return (
     <div className="mt-2">
-      <h5>Select Network</h5>
+      <h5>{t("steps.select-network")}</h5>
       <p className="text-gray">
-        Est quis sit irure exercitation id consequat cupidatat elit nulla velit
-        amet ex.
+      {t("descriptions.select-network")}
       </p>
       <div className="col-md-6">
         {children}
