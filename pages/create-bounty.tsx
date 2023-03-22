@@ -109,10 +109,10 @@ export default function CreateBountyPage() {
   } = useAppState();
 
   const steps = [
-    "Select network",
-    "Bounty details",
-    "Reward Information",
-    "Review",
+    t("bounty:steps.select-network"),
+    t("bounty:steps.details"),
+    t("bounty:steps.reward"),
+    t("bounty:steps.review"),
   ];
 
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) =>
@@ -519,7 +519,7 @@ export default function CreateBountyPage() {
                   checked={rewardChecked}
                 />
                 <p className="ms-4 text-gray">
-                  Reward anyone who funds this bounty.
+                {t("bounty:reward-funders-description")}
                 </p>
               </div>
             )}
@@ -622,9 +622,9 @@ export default function CreateBountyPage() {
           {currentSection === 3 && (
             <div className="d-flex justify-content-center col-12 mt-4">
               <p>
-                By creating this bounty you agree to our{" "}
+                {t("bounty:creating-this-bounty")}{" "}
                 <a href="https://www.bepro.network/terms" target="_blank">
-                  terms and conditions.
+                  {t("bounty:terms-and-conditions")}
                 </a>
               </p>
             </div>
@@ -639,7 +639,7 @@ export default function CreateBountyPage() {
                     setCurrentSection((prevState) => prevState - 1);
                 }}
               >
-                Back
+                {t("actions.back")}
               </Button>
 
               {!isTokenApproved && currentSection === 3 ? (
@@ -664,7 +664,7 @@ export default function CreateBountyPage() {
                     }
                   }}
                 >
-                  {currentSection === 3 ? "Create Bounty" : "Next Step"}
+                  {currentSection === 3 ? t("bounty:create-bounty") : t("bounty:next-step")}
                 </Button>
               )}
             </div>
@@ -686,14 +686,14 @@ export default function CreateBountyPage() {
                 }));
               }}
             >
-              <span>See Bounty</span>
+              <span>{t("bounty:see-bounty")}</span>
             </Button>
           </div>
         }
       >
         <div className="d-flex flex-column text-center align-items-center">
           <CheckCircle />
-          <span className="mt-1">Bounty created successfully!</span>
+          <span className="mt-1">{t("bounty:created-success")}</span>
         </div>
       </Modal>
     </>
