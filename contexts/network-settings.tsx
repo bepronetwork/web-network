@@ -541,7 +541,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     }));
 
     setNetworkSettings(defaultState);
-
+    
     return defaultState;
   }
 
