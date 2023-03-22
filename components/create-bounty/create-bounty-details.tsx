@@ -101,14 +101,13 @@ export default function CreateBountyDetails({
   return (
     <>
       <div className="mt-2 mb-4">
-        <h5>Bounty Details</h5>
+        <h5>{t("steps.details")}</h5>
         <p className="text-gray">
-          Est quis sit irure exercitation id consequat cupidatat elit nulla
-          velit amet ex.
+          {t("descriptions.details")}
         </p>
       </div>
       <div className="row justify-content-center">
-        <div className="col-md-12 m-0">
+        <div className="col-md-12 m-0 mb-2">
           <div className="form-group">
             <BountyLabel className="mb-2" required>
               {t("fields.title.label")}
@@ -128,9 +127,6 @@ export default function CreateBountyDetails({
                 {t("errors.title-character-limit", { value: title?.length })}
               </span>
             )}   
-              <p className="p-small text-gray trans mt-2">
-                {t("fields.title.tip")}
-              </p>
           </div>
         </div>
       </div>
@@ -146,7 +142,7 @@ export default function CreateBountyDetails({
         />
       </div>
       <span className="text-gray">
-        Finding yourself lost?<a href="/explore" target='_blank' className="ms-1">See bounty examples</a>
+        {t("finding-yourself-lost")}<a href="/explore" target='_blank' className="ms-1">{t("bounty-examples")}</a>
       </span>
 
       <div className="form-group mt-4">
@@ -198,11 +194,8 @@ export default function CreateBountyDetails({
       ) : null}
       <div className="border-top border-gray-700 my-4"/>
       <div className="mt-4">
-        <h5>Github Information</h5>
-        <p className="text-gray">
-          Est quis sit irure exercitation id consequat cupidatat elit nulla
-          velit amet ex.
-        </p>
+        <h5>{t("steps.github")}</h5>
+        <p className="text-gray">{t("descriptions.github")}</p>
         <div className="row mt-2">
               <div className="col-6">   
               <ReposDropdown
