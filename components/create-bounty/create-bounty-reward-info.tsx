@@ -13,28 +13,20 @@ export default function CreateBountyRewardInfo({
   updateIsFunding?: (e: boolean) => void;
   children: ReactNode;
 }) {
-  const { t } = useTranslation(["common", "bounty"]);
+  const { t } = useTranslation(["bounty"]);
 
   return (
     <div className="mt-2">
-      <h5>Reward information</h5>
+      <h5>{t("steps.reward")}</h5>
       <div className="text-gray">
-        When creating a new bounty, you have two options regarding the reward:
-        <p className="mt-2 ms-1">
-          1. Self-fund: You use your own money to create the bounty. This means
-          you will be responsible for providing the reward money that will be
-          given to the person who successfully completes the task.
-        </p>
-        <p className="ms-1">
-          2. Seekfunding: You can seek funding for the bounty. This means you
-          can look for other individuals who are willing to contribute to the
-          reward money.
-        </p>
+        {t("descriptions.reward")}
+        <p className="mt-2 ms-1">{t("descriptions.reward-1")}</p>
+        <p className="ms-1">{t("descriptions.reward-2")}</p>
       </div>
 
       <>
         <div className="d-flex">
-          <label>Reward Type</label>
+          <label>{t("fields.reward-type")}</label>
           <div className="mx-1 text-danger">*</div>
         </div>
         <div className="d-flex mt-1">
@@ -42,13 +34,13 @@ export default function CreateBountyRewardInfo({
             className={!isFunding ? "bounty-button" : "bounty-outline-button"}
             onClick={() => updateIsFunding(false)}
           >
-            Self-fund
+            {t("self-fund")}
           </Button>
           <Button
             className={isFunding ? "bounty-button" : "bounty-outline-button"}
             onClick={() => updateIsFunding(true)}
           >
-            Seek Funding
+            {t("seek-funding")}
           </Button>
         </div>
       </>
