@@ -57,8 +57,6 @@ export function useDao() {
             console.error(`Failed to load network`, networkAddress);
             return;
           }
-          console.log('started', started)
-          console.log('started service->', service)
           dispatch(changeActiveDAO(service));
         })
         .catch(error => {
