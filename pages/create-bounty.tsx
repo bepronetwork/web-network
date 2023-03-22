@@ -5,18 +5,19 @@ import { NumberFormatValues } from "react-number-format";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import router, { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
 
 import CheckCircle from "assets/icons/check-circle";
 
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
-import CreateBountyTokenAmount from "components/create-bounty-token-amount";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
 import CreateBountyReview from "components/create-bounty/create-bounty-review";
 import CreateBountyRewardInfo from "components/create-bounty/create-bounty-reward-info";
 import CreateBountySteps from "components/create-bounty/create-bounty-steps";
+import CreateBountyTokenAmount from "components/create-bounty/create-bounty-token-amount";
 import SelectNetwork from "components/create-bounty/select-network";
 import SelectNetworkDropdown from "components/create-bounty/select-network-dropdown";
 import CustomContainer from "components/custom-container";
@@ -24,17 +25,29 @@ import { IFilesProps } from "components/drag-and-drop";
 import Modal from "components/modal";
 
 import { useAppState } from "contexts/app-state";
+import { toastError, toastWarning } from "contexts/reducers/change-toaster";
+import { addTx, updateTx } from "contexts/reducers/change-tx-list";
 
+import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import { parseTransaction } from "helpers/transactions";
+
+import { BountyPayload } from "interfaces/create-bounty";
+import { MetamaskErrors } from "interfaces/enums/Errors";
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Network } from "interfaces/network";
 import { ReposList } from "interfaces/repos-list";
 import { Token } from "interfaces/token";
+import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
+import useBepro from "x-hooks/use-bepro";
+import { useDao } from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
+import { useNetwork } from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
-
 
 const ZeroNumberFormatValues = {
   value: "",
@@ -59,7 +72,6 @@ export default function CreateBountyPage() {
   const [tierList, setTierList] = useState<number[]>([]);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
-  const [progressPercentage, setProgressPercentage] = useState<number>(0);
   const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
   const [repository, setRepository] = useState<{ id: string; path: string }>();
   const [repositories, setRepositories] = useState<ReposList>();
@@ -73,23 +85,27 @@ export default function CreateBountyPage() {
   const [currentNetwork, setCurrentNetwork] = useState<Network>();
   const [networks, setNetworks] = useState<Network[]>([]);
   const [showModalSuccess, setShowModalSuccess] = useState<boolean>(false);
+  const [currentCid, setCurrentCid] = useState<string>("");
+
+  const { query } = useRouter();
 
   const rewardERC20 = useERC20();
 
   const transactionalERC20 = useERC20();
 
-  const { searchNetworks, getReposList } = useApi();
+  const { searchNetworks, getReposList, createPreBounty, processEvent } =
+    useApi();
+
+  const { getURLWithNetwork } = useNetwork();
+
+  const { handleApproveToken } = useBepro();
+  const { changeNetwork } = useDao();
 
   const { getRepositoryBranches } = useOctokit();
 
   const {
     dispatch,
-    state: {
-      transactions,
-      Settings,
-      Service,
-      currentUser
-    },
+    state: { transactions, Settings, Service, currentUser },
   } = useAppState();
 
   const steps = [
@@ -99,7 +115,8 @@ export default function CreateBountyPage() {
     "Review",
   ];
 
-  const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
+  const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) =>
+    !tokenAllowance.lt(amount);
 
   async function addToken(newToken: Token) {
     await getCoinInfoByContract(newToken?.symbol)
@@ -124,6 +141,228 @@ export default function CreateBountyPage() {
     }
   }
 
+  function verifyNextStepAndCreate() {
+    if (isLoadingCreateBounty) return true;
+
+    const isIssueAmount =
+      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
+    const isRewardAmount =
+      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
+
+    if (currentSection === 0 && !currentNetwork) return true;
+
+    if (
+      currentSection === 1 &&
+      (!bountyTitle ||
+        !bountyDescription ||
+        isUploading ||
+        addFilesInDescription(bountyDescription).length >
+          BODY_CHARACTERES_LIMIT ||
+        bountyTitle.length >= 131)
+    )
+      return true;
+
+    if (currentSection === 1 && (!repository || !branch)) return true;
+
+    if (currentSection === 2 && !isFundingType && isIssueAmount) return true;
+    if (
+      currentSection === 2 &&
+      isFundingType &&
+      !rewardChecked &&
+      isIssueAmount
+    )
+      return true;
+    if (currentSection === 2 && isFundingType && rewardChecked && isIssueAmount)
+      return true;
+    if (
+      currentSection === 2 &&
+      isFundingType &&
+      rewardChecked &&
+      isRewardAmount
+    )
+      return true;
+
+    if (
+      currentSection === 2 &&
+      isKyc &&
+      Settings?.kyc?.tierList?.length &&
+      !tierList.length
+    )
+      return true;
+
+    if (currentSection === 3 && !isTokenApproved) return true;
+
+    return currentSection === 3 && isLoadingCreateBounty;
+  }
+
+  function addFilesInDescription(str) {
+    const strFiles = files?.map((file) =>
+        file.uploaded &&
+        `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
+          Settings?.urls?.ipfs
+        }/${file.hash}) \n\n`);
+    return `${str}\n\n${strFiles
+      .toString()
+      .replace(",![", "![")
+      .replace(",[", "[")}`;
+  }
+
+  async function allowCreateIssue() {
+    if (!Service?.active || !transactionalToken || issueAmount.floatValue <= 0)
+      return;
+
+    setIsLoadingApprove(true);
+
+    let tokenAddress = transactionalToken.address;
+    let bountyValue = issueAmount.value;
+    let tokenERC20 = transactionalERC20;
+
+    if (rewardChecked && rewardToken?.address && rewardAmount.floatValue > 0) {
+      tokenAddress = rewardToken.address;
+      bountyValue = rewardAmount.value;
+      tokenERC20 = rewardERC20;
+    }
+
+    handleApproveToken(tokenAddress, bountyValue)
+      .then(() => {
+        return tokenERC20.updateAllowanceAndBalance();
+      })
+      .finally(() => setIsLoadingApprove(false));
+  }
+
+  const verifyTransactionState = (type: TransactionTypes): boolean =>
+    !!transactions.find((transactions) =>
+        transactions.type === type &&
+        transactions.status === TransactionStatus.pending);
+
+  const isApproveButtonDisabled = (): boolean =>
+    [
+      !isTokenApproved,
+      !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token),
+    ].some((value) => value === false);
+
+  async function createBounty() {
+    if (!repository || !transactionalToken || !Service?.active || !currentUser)
+      return;
+
+    setIsLoadingCreateBounty(true);
+
+    try {
+      const payload = {
+        title: bountyTitle,
+        body: addFilesInDescription(bountyDescription),
+        amount: issueAmount.value,
+        creatorAddress: currentUser.walletAddress,
+        githubUser: currentUser?.login,
+        repositoryId: repository?.id,
+        branch,
+      };
+
+      const cid = await createPreBounty({
+          title: payload.title,
+          body: payload.body,
+          creator: payload.githubUser,
+          repositoryId: payload.repositoryId,
+          tags: selectedTags,
+          isKyc: !isFundingType ? isKyc : false,
+          tierList: !isFundingType ? tierList : null,
+      },
+                                        currentNetwork?.name).then((cid) => cid);
+
+      if (!cid) {
+        return dispatch(toastError(t("bounty:errors.creating-bounty")));
+      }
+
+      const transactionToast = addTx([
+        {
+          type: TransactionTypes.openIssue,
+          amount: payload.amount,
+          network: currentNetwork,
+        },
+      ]);
+
+      dispatch(transactionToast);
+
+      const bountyPayload: BountyPayload = {
+        cid,
+        branch: branch.value,
+        repoPath: repository.path,
+        transactional: transactionalToken.address,
+        title: payload.title,
+        tokenAmount: payload.amount,
+        githubUser: payload.githubUser,
+      };
+
+      if (isFundingType && !rewardChecked) {
+        bountyPayload.tokenAmount = "0";
+        bountyPayload.fundingAmount = issueAmount.value;
+      }
+
+      if (rewardChecked) {
+        bountyPayload.tokenAmount = "0";
+        bountyPayload.rewardAmount = rewardAmount.value;
+        bountyPayload.rewardToken = rewardToken.address;
+        bountyPayload.fundingAmount = issueAmount.value;
+      }
+
+      const networkBounty = await Service?.active
+        .openBounty(bountyPayload)
+        .catch((e) => {
+          dispatch(updateTx([
+              {
+                ...transactionToast.payload[0],
+                status:
+                  e?.code === MetamaskErrors.UserRejected
+                    ? TransactionStatus.failed
+                    : TransactionStatus.failed,
+              },
+          ]));
+
+          if (e?.code === MetamaskErrors.ExceedAllowance)
+            dispatch(toastError(t("bounty:errors.exceeds-allowance")));
+          else if (e?.code === MetamaskErrors.UserRejected)
+            dispatch(toastError(t("bounty:errors.bounty-canceled")));
+          else
+            dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
+
+          console.debug(e);
+
+          return { ...e, error: true };
+        });
+
+      if (networkBounty?.error !== true) {
+        dispatch(updateTx([
+            parseTransaction(networkBounty,
+                             transactionToast.payload[0] as SimpleBlockTransactionPayload),
+        ]));
+
+        const createdBounty = await processEvent("bounty",
+                                                 "created",
+                                                 currentNetwork?.name,
+          { fromBlock: networkBounty?.blockNumber });
+
+        if (!createdBounty) {
+          dispatch(toastWarning(t("bounty:errors.sync")));
+        }
+
+        if (createdBounty?.[cid]) {
+          setCurrentCid(cid);
+          setShowModalSuccess(true);
+          router.push({
+            pathname: "/create-bounty",
+            query: {
+              created: true,
+            },
+          });
+        }
+
+        cleanFields();
+      }
+    } finally {
+      setIsLoadingCreateBounty(false);
+    }
+  }
+
   function cleanFields() {
     setFiles([]);
     setSelectedTags([]);
@@ -143,7 +382,7 @@ export default function CreateBountyPage() {
       isRegistered: true,
       sortBy: "name",
       order: "asc",
-      isNeedCountsAndTokensLocked: true
+      isNeedCountsAndTokensLocked: true,
     })
       .then(async ({ count, rows }) => {
         if (count > 0) {
@@ -152,13 +391,12 @@ export default function CreateBountyPage() {
       })
       .catch((error) => {
         console.log("Failed to retrieve networks list", error);
-      })
-  },[])
-
-
+      });
+  }, []);
 
   useEffect(() => {
-    if (transactionalToken?.address) transactionalERC20.setAddress(transactionalToken.address);
+    if (transactionalToken?.address)
+      transactionalERC20.setAddress(transactionalToken.address);
   }, [transactionalToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
@@ -166,58 +404,69 @@ export default function CreateBountyPage() {
   }, [rewardToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
-    if(customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0])
-      setRewardToken(customTokens[0])
+    if (customTokens?.length === 1) {
+      setTransactionalToken(customTokens[0]);
+      setRewardToken(customTokens[0]);
     }
   }, [customTokens]);
 
   useEffect(() => {
-    let approved = true
+    let approved = true;
 
     if (!isFundingType)
-      approved = isAmountApproved(transactionalERC20.allowance, BigNumber(issueAmount.value));
+      approved = isAmountApproved(transactionalERC20.allowance,
+                                  BigNumber(issueAmount.value));
     else if (rewardChecked)
-      approved = isAmountApproved(rewardERC20.allowance, BigNumber(rewardAmount.value));
+      approved = isAmountApproved(rewardERC20.allowance,
+                                  BigNumber(rewardAmount.value));
 
     setIsTokenApproved(approved);
-  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
+  }, [
+    transactionalERC20.allowance,
+    rewardERC20.allowance,
+    issueAmount,
+    rewardAmount,
+    rewardChecked,
+  ]);
 
   useEffect(() => {
-    if(currentNetwork && currentSection === 1){
-      getReposList(true, currentNetwork.name).then(setRepositories)
+    if (currentNetwork && currentSection === 1) {
+      getReposList(true, currentNetwork.name).then(setRepositories);
     }
-  }, [currentNetwork, currentSection])
+  }, [currentNetwork, currentSection]);
 
   useEffect(() => {
-    if(repository){
-      getRepositoryBranches(repository.path, true).then(b => setBranches(b.branches))
+    if (repository) {
+      getRepositoryBranches(repository.path, true).then((b) =>
+        setBranches(b.branches));
     }
-  }, [repository])
-
+  }, [repository]);
 
   useEffect(() => {
-    if (!currentNetwork?.tokens)
-      return;
+    if (!currentNetwork) return;
+    changeNetwork(currentNetwork?.networkAddress);
 
+    if (!currentNetwork?.tokens) return;
     setCustomTokens(currentNetwork?.tokens);
-
   }, [currentNetwork]);
 
-  useEffect(()=>{
+  useEffect(() => {
     //cleanFields();
     transactionalERC20.updateAllowanceAndBalance();
     rewardERC20.updateAllowanceAndBalance();
-  },[])
+  }, []);
 
   function section() {
-    if (currentSection === 0) return <SelectNetwork >
-      <SelectNetworkDropdown 
-        value={currentNetwork}
-        networks={networks}
-        onSelect={setCurrentNetwork}
-      />
-    </SelectNetwork>;
+    if (currentSection === 0)
+      return (
+        <SelectNetwork>
+          <SelectNetworkDropdown
+            value={currentNetwork}
+            networks={networks}
+            onSelect={setCurrentNetwork}
+          />
+        </SelectNetwork>
+      );
 
     if (currentSection === 1)
       return (
@@ -249,14 +498,13 @@ export default function CreateBountyPage() {
           <CreateBountyRewardInfo
             isFunding={isFundingType}
             updateIsFunding={(e: boolean) => {
-              if(e === true) 
-                setIssueAmount(ZeroNumberFormatValues)
+              if (e === true) setIssueAmount(ZeroNumberFormatValues);
               else {
-                setIssueAmount(ZeroNumberFormatValues)
-                setRewardAmount(ZeroNumberFormatValues)
+                setIssueAmount(ZeroNumberFormatValues);
+                setRewardAmount(ZeroNumberFormatValues);
               }
 
-              setIsFundingType(e)
+              setIsFundingType(e);
             }}
           >
             {renderBountyToken("bounty")}
@@ -274,28 +522,28 @@ export default function CreateBountyPage() {
                 </p>
               </div>
             )}
-            {rewardChecked &&
-              isFundingType &&
-              renderBountyToken("reward")}
+            {rewardChecked && isFundingType && renderBountyToken("reward")}
           </CreateBountyRewardInfo>
         </>
       );
 
-    if (currentSection === 3) return (
-        <CreateBountyReview 
-          payload={{          
+    if (currentSection === 3)
+      return (
+        <CreateBountyReview
+          payload={{
+            network: currentNetwork?.name,
             title: bountyTitle,
-            description: bountyDescription,
-            tags: selectedTags,
-            repository: repository?.path?.split('/')[1],
-            branch: branch.label,
+            description: addFilesInDescription(bountyDescription),
+            tags: selectedTags && selectedTags,
+            repository: repository?.path?.split("/")[1],
+            branch: branch?.label,
             reward: `${issueAmount.value} ${transactionalToken?.symbol}`,
-            funders_reward: rewardAmount.value && `${rewardAmount.value} ${rewardToken?.symbol}`
+            funders_reward:
+              rewardAmount.value &&
+              `${rewardAmount.value} ${rewardToken?.symbol}`,
           }}
         />
-    )
-              
-
+      );
   }
 
   function renderBountyToken(type: "bounty" | "reward") {
@@ -338,7 +586,7 @@ export default function CreateBountyPage() {
           customTokens={fieldParams[type].tokens}
           userAddress={currentUser?.walletAddress}
           defaultToken={fieldParams[type].default}
-          canAddCustomToken={Service?.network?.active?.allowCustomTokens}
+          canAddCustomToken={false}
           addToken={addToken}
           decimals={fieldParams[type].decimals}
           issueAmount={fieldParams[type].amount}
@@ -357,54 +605,89 @@ export default function CreateBountyPage() {
 
   return (
     <>
-      <CustomContainer>
-        <CreateBountySteps steps={steps} currentSection={currentSection} />
-      </CustomContainer>
-      <CustomContainer>
-        <CreateBountyCard maxSteps={steps?.length} currentStep={currentSection+1}>
-          {section()}
-        </CreateBountyCard>
-      </CustomContainer>
-      {currentSection === 3 && (
-        <div className="d-flex justify-content-center col-12 mt-4">
-          <p>
-            By creating this bounty you agree to our{" "}
-            <a href="/">terms and conditions.</a>
-          </p>
-        </div>
+      {!(query?.created?.toString() === "true") && (
+        <>
+          <CustomContainer>
+            <CreateBountySteps steps={steps} currentSection={currentSection} />
+          </CustomContainer>
+          <CustomContainer>
+            <CreateBountyCard
+              maxSteps={steps?.length}
+              currentStep={currentSection + 1}
+            >
+              {section()}
+            </CreateBountyCard>
+          </CustomContainer>
+          {currentSection === 3 && (
+            <div className="d-flex justify-content-center col-12 mt-4">
+              <p>
+                By creating this bounty you agree to our{" "}
+                <a href="https://www.bepro.network/terms" target="_blank">
+                  terms and conditions.
+                </a>
+              </p>
+            </div>
+          )}
+          <CustomContainer>
+            <div className="d-flex justify-content-between mt-4 me-4">
+              <Button
+                className="col-6 bounty-outline-button me-3"
+                upperCase={false}
+                onClick={() => {
+                  currentSection !== 0 &&
+                    setCurrentSection((prevState) => prevState - 1);
+                }}
+              >
+                Back
+              </Button>
+
+              {!isTokenApproved && currentSection === 3 ? (
+                <Button
+                  className="col-6 bounty-button"
+                  disabled={isApproveButtonDisabled()}
+                  onClick={allowCreateIssue}
+                  isLoading={isLoadingApprove}
+                >
+                  {t("actions.approve")}
+                </Button>
+              ) : (
+                <Button
+                  className="col-6 bounty-button"
+                  disabled={verifyNextStepAndCreate()}
+                  isLoading={isLoadingCreateBounty}
+                  onClick={() => {
+                    if (currentSection + 1 < steps.length)
+                      setCurrentSection((prevState) => prevState + 1);
+                    if (currentSection === 3) {
+                      createBounty();
+                    }
+                  }}
+                >
+                  {currentSection === 3 ? "Create Bounty" : "Next Step"}
+                </Button>
+              )}
+            </div>
+          </CustomContainer>
+        </>
       )}
-      <CustomContainer>
-        <div className="d-flex justify-content-between mt-4 me-4">
-          <Button
-            className="col-6 bounty-outline-button me-3"
-            upperCase={false}
-            onClick={() => {
-              currentSection !== 0 &&
-                setCurrentSection((prevState) => prevState - 1);
-            }}
-          >
-            Back
-          </Button>
-          <Button
-            className="col-6 bounty-button"
-            onClick={() => {
-              currentSection + 1 < steps.length &&
-                setCurrentSection((prevState) => prevState + 1);
-            }}
-          >
-            {currentSection === 3 ? "Create Bounty" : "Next Step"}
-          </Button>
-        </div>
-        {console.log({value: issueAmount.value, valueReward: rewardAmount.value})}
-      </CustomContainer>
       <Modal
         show={showModalSuccess}
         footer={
-            <div className="d-flex justify-content-center mb-2">
-              <Button>
-                <span>See Bounty</span>
-              </Button>
-            </div>
+          <div className="d-flex justify-content-center mb-2">
+            <Button
+              onClick={() => {
+                const [repoId, githubId] = String(currentCid).split("/");
+
+                router.push(getURLWithNetwork("/bounty", {
+                    network: currentNetwork?.name,
+                    id: githubId,
+                    repoId,
+                }));
+              }}
+            >
+              <span>See Bounty</span>
+            </Button>
+          </div>
         }
       >
         <div className="d-flex flex-column text-center align-items-center">
