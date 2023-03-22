@@ -8,6 +8,7 @@ import DragAndDrop, { IFilesProps } from "components/drag-and-drop";
 import MarkedRender from "components/MarkedRender";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+
 import BountyLabel from "./create-bounty-label";
 
 interface DescriptionProps {
@@ -59,7 +60,7 @@ export default function CreateBountyDescription({
         {!isPreview ? (
           <>
             <textarea
-              className={clsx("form-control", {
+              className={clsx("form-control form-bounty", {
                 "border border-1 border-danger border-radius-8":
                   bodyLength > BODY_CHARACTERES_LIMIT,
               })}

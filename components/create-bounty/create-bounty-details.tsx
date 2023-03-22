@@ -115,7 +115,7 @@ export default function CreateBountyDetails({
             </BountyLabel>
             <input
               type="text"
-              className={clsx("form-control rounded-lg", {
+              className={clsx("form-control form-bounty rounded-lg", {
                 "border border-1 border-danger border-radius-8":
                   title.length >= BOUNTY_TITLE_LIMIT,
               })}
@@ -165,7 +165,7 @@ export default function CreateBountyDetails({
             {t("fields.tags-info")}
           </ContextualSpan>
       </div>
-      {!Settings?.kyc?.isKycEnabled ? (
+      {Settings?.kyc?.isKycEnabled ? (
         <>
           <div className="col-md-12 d-flex flex-row gap-2">
             <FormCheck
