@@ -122,7 +122,7 @@ export default function CreateBountyTokenAmount({
   return (
     <div className="mt-4">
       <label className="mb-1 text-gray">
-        {isFunding ? "Set Funded Reward" : "Set Reward"}
+        {isFunding ? t("fields.select-token.reward") : t("fields.select-token.bounty")}
       </label>
       {isFunding ? (
         <div className="d-flex justify-content-between col-md-6 p-2 border-radius-8 border border-gray-700">
@@ -150,13 +150,13 @@ export default function CreateBountyTokenAmount({
                     });
                   }}
                 >
-                  Use Max
+                  {t("fields.amount.max")}
                 </Button>
               </div>
             </div>
             <div className="col-md-4 ">
               <div className="p-1 ps-3 border-radius-4 border border-gray-700 text-gray">
-                Balance: {tokenBalance.toFixed()}{" "}
+              {t("balance")}: {tokenBalance.toFixed()}{" "}
                 {currentToken?.symbol || t("common:misc.token")}
               </div>
             </div>
