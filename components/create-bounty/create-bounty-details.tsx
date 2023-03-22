@@ -18,7 +18,7 @@ import { useAppState } from "contexts/app-state";
 import {
   BOUNTY_TITLE_LIMIT,
   MAX_TAGS,
-} from "helpers/contants";
+} from "helpers/constants";
 
 import { DetailsProps } from "interfaces/create-bounty";
 

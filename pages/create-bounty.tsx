@@ -28,7 +28,7 @@ import { useAppState } from "contexts/app-state";
 import { toastError, toastWarning } from "contexts/reducers/change-toaster";
 import { addTx, updateTx } from "contexts/reducers/change-tx-list";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 import { parseTransaction } from "helpers/transactions";
 
 import { BountyPayload } from "interfaces/create-bounty";
@@ -223,7 +223,7 @@ export default function CreateBountyPage() {
       tokenERC20 = rewardERC20;
     }
 
-    handleApproveToken(tokenAddress, bountyValue)
+    handleApproveToken(tokenAddress, bountyValue, undefined, transactionalToken?.symbol)
       .then(() => {
         return tokenERC20.updateAllowanceAndBalance();
       })
@@ -278,6 +278,7 @@ export default function CreateBountyPage() {
           type: TransactionTypes.openIssue,
           amount: payload.amount,
           network: currentNetwork,
+          currency: transactionalToken?.symbol
         },
       ]);
 

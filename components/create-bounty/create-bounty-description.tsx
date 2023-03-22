@@ -7,7 +7,7 @@ import Button from "components/button";
 import DragAndDrop, { IFilesProps } from "components/drag-and-drop";
 import MarkedRender from "components/MarkedRender";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/contants";
+import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 
 import BountyLabel from "./create-bounty-label";
 
