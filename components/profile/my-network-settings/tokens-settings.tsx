@@ -10,6 +10,7 @@ import {WarningSpan} from "components/warning-span";
 import {useAppState} from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 
+import { RegistryEvents } from "interfaces/enums/events";
 import {Token, TokenType} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
@@ -143,7 +144,7 @@ export default function TokensSettings({
     Promise.all(transactions).then(async (txs : { blockNumber: number }[]) => {
       const fromBlock = txs.reduce((acc, tx) => Math.min(acc, tx.blockNumber), Number.MAX_SAFE_INTEGER)
 
-      await processEvent("registry", "changed", state.Service?.network?.active.name, { fromBlock });
+      await processEvent(RegistryEvents.ChangeAllowedTokens, undefined, { fromBlock });
 
       await getAllowedTokensContract();
     })

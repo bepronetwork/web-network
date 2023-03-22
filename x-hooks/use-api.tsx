@@ -20,15 +20,16 @@ import {
   SearchNetworkParams,
   updateIssueParams
 } from "interfaces/api";
-import {Curator, SearchCuratorParams} from "interfaces/curators";
-import {HeaderNetworksProps} from "interfaces/header-information";
-import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
-import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
-import {Network} from "interfaces/network";
-import {PaginatedData} from "interfaces/paginated-data";
-import {Proposal} from "interfaces/proposal";
-import {ReposList} from "interfaces/repos-list";
-import {Token} from "interfaces/token";
+import { Curator, SearchCuratorParams } from "interfaces/curators";
+import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
+import { HeaderNetworksProps } from "interfaces/header-information";
+import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
+import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
+import { Network } from "interfaces/network";
+import { PaginatedData } from "interfaces/paginated-data";
+import { Proposal } from "interfaces/proposal";
+import { ReposList } from "interfaces/repos-list";
+import { Token } from "interfaces/token";
 
 import {api} from "services/api";
 import { WinStorage } from "services/win-storage";
@@ -386,19 +387,41 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function processEvent(entity: Entities, 
-                              event: Events, 
-                              networkName: string = DEFAULT_NETWORK_NAME,
+  async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
+                              address?: string,
                               params: PastEventsParams = {}) {
+    const chainId = state.connectedChain?.id;
+    const events = state.connectedChain?.events;
+    const registryAddress = state.connectedChain?.registry;
+    const networkAddress = state.Service?.network?.active?.networkAddress;
 
-    if (!state.connectedChain?.events)
-      return;
+    const isRegistryEvent = event in RegistryEvents;
+    const addressToSend = address || (isRegistryEvent ? registryAddress : networkAddress);
 
-    const eventsURL = new URL(`/past-events/${entity}/${event}`, state.connectedChain?.events);
+    if (!events || !addressToSend || !chainId)
+      throw new Error("Missing events url, chain id or address");
+
+    const eventsURL = new URL(`/read/${chainId}/${addressToSend}/${event}`, state.connectedChain?.events);
+    const networkName = state.Service?.network?.active?.name;
 
     return axios.get(eventsURL.href, {
-      params: { ...params, networkName }
-    }).then(({ data }) => data?.[networkName]);
+    params
+    })
+      .then(({ data }) => {
+        if (isRegistryEvent) return data;
+
+        const entries = data.flatMap(i => {
+          if (!Object.keys(i).length) return [];
+
+          const keys = Object.keys(i[networkName]);
+
+          if (!Object.keys(i).length) return [];
+
+          return keys.map(key => [key, i[networkName][key]]);
+        });
+
+        return Object.fromEntries(entries);
+      });
   }
 
   async function getHealth() {

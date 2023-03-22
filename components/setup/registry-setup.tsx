@@ -17,6 +17,7 @@ import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
+import { RegistryEvents } from "interfaces/enums/events";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
@@ -213,7 +214,9 @@ export function RegistrySetup({
     handleChangeAllowedTokens([erc20.value], isTransactional)
       .then(txInfo => Promise.all([
         updateData(),
-        processEvent("registry", "changed", "", { fromBlock: (txInfo as { blockNumber: number }).blockNumber })
+        processEvent(RegistryEvents.ChangeAllowedTokens, connectedChain?.registry, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        })
       ]))
       .then(() => dispatch(toastSuccess(t("registry.success.allow"))))
       .catch(error => {

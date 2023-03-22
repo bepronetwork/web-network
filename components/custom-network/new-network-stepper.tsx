@@ -35,6 +35,8 @@ import {
 } from "helpers/constants";
 import {psReadAsText} from "helpers/file-reader";
 
+import { RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
@@ -180,7 +182,7 @@ function NewNetwork() {
       await handleChangeNetworkParameter("proposerFeeShare", proposerFee, deployedNetworkAddress);
     }
 
-    await processEvent("network", "parameters", payload.name.toLowerCase(), {
+    await processEvent(StandAloneEvents.UpdateNetworkParams, deployedNetworkAddress, {
       chainId: state.connectedChain?.id
     })
       .catch(error => console.debug("Failed to update network parameters", error));
@@ -196,7 +198,9 @@ function NewNetwork() {
 
     setCreatingNetwork(10);
     cleanStorage?.();
-    await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
+    await processEvent(RegistryEvents.NetworkRegistered, state.connectedChain?.registry, { 
+      fromBlock: registrationTx.blockNumber 
+    })
       .then(() => router.push(getURLWithNetwork("/", { 
         network: payload.name,
         chain: state.connectedChain?.shortName
