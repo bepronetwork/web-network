@@ -9,16 +9,22 @@ import router from "next/router";
 import BranchsDropdown from "components/branchs-dropdown";
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import CreateBountyDetails from "components/create-bounty-details";
 import CreateBountyProgress from "components/create-bounty-progress";
 import CreateBountyTokenAmount from "components/create-bounty-token-amount";
 import {IFilesProps} from "components/drag-and-drop";
+import DropDown from "components/dropdown";
 import GithubInfo from "components/github-info";
+import InfoTooltip from "components/info-tooltip";
 import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
+import {useAppState} from "contexts/app-state";
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
+import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
@@ -33,15 +39,10 @@ import {getCoinInfoByContract} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useChain from "x-hooks/use-chain";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
-
-import {useAppState} from "../contexts/app-state";
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
-import {useRepos} from "../x-hooks/use-repos";
-import DropDown from "./dropdown";
-import InfoTooltip from "./info-tooltip";
+import {useRepos} from "x-hooks/use-repos";
 
 interface BountyPayload {
   title: string;
@@ -88,13 +89,13 @@ export default function CreateBountyModal() {
   const [selectedTags, setSelectedTags]= useState<string[]>([]);
 
   const rewardERC20 = useERC20();
-
   const transactionalERC20 = useERC20();
 
+  const { chain } = useChain();
+  const {updateActiveRepo} = useRepos();
   const { handleApproveToken } = useBepro();
   const { getURLWithNetwork } = useNetwork();
   const { createPreBounty, processEvent } = useApi();
-  const {updateActiveRepo} = useRepos();
 
   const {
     dispatch,
@@ -438,6 +439,20 @@ export default function CreateBountyModal() {
 
   }
 
+  function cleanFields() {
+    setFiles([]);
+    setSelectedTags([]);
+    setBountyTitle("");
+    setBountyDescription("");
+    setIssueAmount(ZeroNumberFormatValues);
+    setRewardAmount(ZeroNumberFormatValues);
+    setRepository(undefined);
+    setBranch(null);
+    setCurrentSection(0);
+    rewardERC20.setAddress(undefined);
+    transactionalERC20.setAddress(undefined);
+  }
+
   function handleCancelAndBack() {
     if (currentSection === 0) {
       cleanFields();
@@ -452,19 +467,6 @@ export default function CreateBountyModal() {
     setProgressPercentage(progress[steps.findIndex((value) => value === steps[currentSection])]);
   }
 
-  function cleanFields() {
-    setFiles([]);
-    setSelectedTags([]);
-    setBountyTitle("");
-    setBountyDescription("");
-    setIssueAmount(ZeroNumberFormatValues);
-    setRewardAmount(ZeroNumberFormatValues);
-    setRepository(undefined);
-    setBranch(null);
-    setIsKyc(false);
-    setTierList([]);
-    setCurrentSection(0);
-  }
 
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
@@ -640,14 +642,6 @@ export default function CreateBountyModal() {
 
   useEffect(() => {
     if(!showCreateBounty) return;
-    if(customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0])
-      setRewardToken(customTokens[0])
-    }
-  }, [customTokens, showCreateBounty]);
-
-  useEffect(() => {
-    if(!showCreateBounty) return;
     let approved = true
 
     if (isBountyType)
@@ -659,17 +653,27 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!Service?.network?.active?.tokens || !showCreateBounty)
+    if (!Service?.network?.active?.tokens || !showCreateBounty || !chain) {
+      setTransactionalToken(undefined);
+      setRewardToken(undefined);
+      setCustomTokens([]);
+      transactionalERC20.setAddress(undefined);
+      rewardERC20.setAddress(undefined);
       return;
+    }
 
     const tokens = Service?.network.active.tokens || [];
 
     if (tokens.length === customTokens.length)
       return;
 
-    setCustomTokens(tokens);
+    if (tokens.length === 1) {
+      setTransactionalToken(tokens[0]);
+      setRewardToken(tokens[0]);
+    }
 
-  }, [Service?.network?.active?.tokens, showCreateBounty]);
+    setCustomTokens(tokens);
+  }, [Service?.network?.active?.tokens, showCreateBounty, chain]);
 
   useEffect(()=>{
     cleanFields();
@@ -679,7 +683,7 @@ export default function CreateBountyModal() {
   },[showCreateBounty])
 
   if(!showCreateBounty)
-    return <></>
+    return <></>;
 
   if (showCreateBounty && !currentUser?.walletAddress)
     return <ConnectWalletButton asModal={true} />;
@@ -713,19 +717,19 @@ export default function CreateBountyModal() {
 
               {!isTokenApproved && currentSection === 3 ? (
                 <ReadOnlyButtonWrapper>
-                  <Button
+                  <ContractButton
                     className="read-only-button"
                     disabled={isApproveButtonDisabled()}
                     onClick={allowCreateIssue}
                     isLoading={isLoadingApprove}
                   >
                     {t("actions.approve")}
-                  </Button>
+                  </ContractButton>
                 </ReadOnlyButtonWrapper>
               ) : null}
 
               { (isTokenApproved && currentSection === 3 || currentSection !== 3) &&
-                <Button
+                <ContractButton
                   className="d-flex flex-shrink-0 w-40 btn-block"
                   onClick={handleNextStepAndCreate}
                   disabled={verifyNextStepAndCreate()}
@@ -736,7 +740,7 @@ export default function CreateBountyModal() {
                       ? t("bounty:next-step")
                       : t("bounty:create-bounty")}
                   </span>
-                </Button>
+                </ContractButton>
               }
             </div>
           </>

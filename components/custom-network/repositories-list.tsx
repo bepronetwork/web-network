@@ -5,6 +5,10 @@ import {useTranslation} from "next-i18next";
 import {ContextualSpan} from "components/contextual-span";
 import RepositoryCheck from "components/custom-network/repository-check";
 
+import { useAppState } from "contexts/app-state";
+
+import { Repository } from "interfaces/issue-data";
+
 import useApi from "x-hooks/use-api";
 
 interface infoType {
@@ -13,15 +17,24 @@ interface infoType {
   text: string
 }
 
-export default function RepositoriesList({ withLabel = true, repositories, botUser = undefined, onClick }) {
+export default function RepositoriesList({ 
+  withLabel = true,
+  repositories,
+  botUser = undefined,
+  onClick,
+  networkName = undefined,
+  networkCreator = undefined
+}) {
   const { t } = useTranslation("custom-network");
 
   const [existingRepos, setExistingRepos] = useState([]);
   const [reposWithIssues, setReposWithIssues] = useState([]);
+  const [reposWithNetwork, setReposWithNetwork] = useState<Repository[]>();
   const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
   const [withoutMergeCommitPerm, setWithoutMergeCommitPerm] = useState([]);
   const [withoutBotCollaborator, setWithoutBotCollaborator] = useState([]);
 
+  const { state } = useAppState();
   const { searchRepositories } = useApi();
 
   const renderInfos: infoType[] = [
@@ -62,8 +75,13 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
       text: t("steps.repositories.no-repositories-selected"),
       type: "danger"
     },
-  ]
+  ];
 
+  const toLower = (str: string) => str?.toLowerCase();
+
+  const activeNetworkName = toLower(networkName || state.Service?.network?.active?.name);
+  const activeNetworCreator = toLower(networkCreator || state.Service?.network?.active?.creatorAddress);
+  const currentWallet = toLower(state.currentUser?.walletAddress);
 
   function updateReposWithoutMergeCommitPerm() {
     setWithoutMergeCommitPerm(repositories.filter(repository => repository.checked && !repository.mergeCommitAllowed)
@@ -102,9 +120,7 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
         path: paths,
         networkName: ""
       })
-        .then(({ rows }) => {
-          setExistingRepos(rows.map((repo) => repo.githubPath));
-        })
+        .then(({ rows }) => setReposWithNetwork(rows))
         .catch(console.log);
 
     setReposWithIssues(repositories.filter(repository => repository.hasIssues)
@@ -120,6 +136,17 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
   }, [repositories]);
 
   useEffect(updateReposWithoutBotCollaborator, [botUser]);
+  useEffect(() => {
+    if (!reposWithNetwork) return;
+    
+    const isUsedByOtherNetwork = ({ network: { name, creatorAddress }} : Repository) => 
+            (toLower(name) !== activeNetworkName) ||
+            (toLower(name) === activeNetworkName && 
+            creatorAddress !== activeNetworCreator && 
+            creatorAddress !== currentWallet);
+
+    setExistingRepos(reposWithNetwork.filter(isUsedByOtherNetwork).map((repo) => repo.githubPath));
+  }, [reposWithNetwork, activeNetworkName, activeNetworCreator]);
 
   function renderInfo({
     text,
@@ -141,21 +168,19 @@ export default function RepositoriesList({ withLabel = true, repositories, botUs
       }
 
       {repositories.map((repository, index) => (
-        <>
-          <RepositoryCheck
-            key={`${index}-${repository.fullName}`}
-            label={repositories.filter(r => 
-              r.name === repository.name).length > 1 
-              ? repository.fullName 
-              : repository.name}
-            active={repository.checked}
-            userPermission={repository.userPermission}
-            hasIssues={reposWithIssues.includes(repository.fullName)}
-            mergeCommitAllowed={repository.mergeCommitAllowed}
-            onClick={() => handleClick(repository)}
-            usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
-          />
-        </>
+        <RepositoryCheck
+          key={`${index}-${repository.fullName}`}
+          label={repositories.filter(r => 
+            r.name === repository.name).length > 1 
+            ? repository.fullName 
+            : repository.name}
+          active={repository.checked}
+          userPermission={repository.userPermission}
+          hasIssues={reposWithIssues.includes(repository.fullName)}
+          mergeCommitAllowed={repository.mergeCommitAllowed}
+          onClick={() => handleClick(repository)}
+          usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
+        />
       ))}
 
       {renderInfos.filter(({ visible }) => visible).map(renderInfo)}

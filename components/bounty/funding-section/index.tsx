@@ -9,17 +9,17 @@ import ArrowRight from "assets/icons/arrow-right";
 import FundModal from "components/bounty/funding-section/fund-modal";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import {Amount, CaptionLarge, CaptionMedium, RowWithTwoColumns} from "components/bounty/funding-section/minimals";
-import Button from "components/button";
+import RetractOrWithdrawModal from "components/bounty/funding-section/retract-or-withdraw-modal";
 import Collapsable from "components/collapsable";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
+
+import {useAppState} from "contexts/app-state";
 
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {fundingBenefactor} from "interfaces/issue-data";
-
-import {useAppState} from "../../../contexts/app-state";
-import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
 export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);
@@ -31,17 +31,19 @@ export default function FundingSection() {
   const {state} = useAppState();
 
   const isConnected = !!state.currentUser?.walletAddress;
-  const hasReward = state.currentBounty?.chainData?.rewardAmount?.gt(0);
-  const isBountyClosed = !!state.currentBounty?.chainData?.closed;
-  const isBountyFunded = !!state.currentBounty?.chainData?.funded;
-  const isBountyInDraft = !!state.currentBounty?.chainData?.isDraft;
-  const transactionalSymbol = state.currentBounty?.data?.token?.symbol;
-  const rewardTokenSymbol = state.currentBounty?.chainData?.rewardTokenData?.symbol;
+  const hasReward = state.currentBounty?.data?.hasReward;
+  const isBountyClosed = !!state.currentBounty?.data?.isClosed;
+  const isBountyFunded = !!state.currentBounty?.data?.isFunded;
+  const isBountyInDraft = !!state.currentBounty?.data?.isDraft;
+  const transactionalSymbol = state.currentBounty?.data?.transactionalToken?.symbol;
+  const rewardTokenSymbol = state.currentBounty?.data?.rewardToken?.symbol;
 
   const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
   
-  const futureRewards = fundsGiven.multipliedBy(state.currentBounty?.chainData?.rewardAmount)
+  const futureRewards = fundsGiven.multipliedBy(state.currentBounty?.data?.rewardAmount)
     .dividedBy(state.currentBounty?.data?.fundingAmount).toFixed();
+
+  const collapseAction = isBountyClosed ? t("funding:rewards") :  t("funding:actions.manage-funding");
   
   const isCanceled = getIssueState({
     state: state.currentBounty?.data?.state,
@@ -57,16 +59,10 @@ export default function FundingSection() {
     if (!state.currentUser?.walletAddress || !state.currentBounty?.data) return;
   
     const funds = state.currentBounty?.data?.benefactors
-        .filter(fund => fund.address.toLowerCase() === state.currentUser.walletAddress.toLowerCase())
-        .map((fund) => ({
-          ...fund,
-          isWithdrawn: !!state.currentBounty?.chainData?.funding?.find((networkFund, key) =>
-              key === fund.contractId &&
-              networkFund.amount.isEqualTo(0))
-        }));
+        .filter(fund => fund.address === state.currentUser.walletAddress);
 
     setWalletFunds(funds);
-  }, [state.currentUser, state.currentBounty?.data, state.currentBounty?.chainData]);
+  }, [state.currentUser, state.currentBounty?.data, state.currentBounty?.data]);
 
   if (isBountyFunded && !walletFunds?.length) return <></>;
 
@@ -88,9 +84,9 @@ export default function FundingSection() {
       <RowWithTwoColumns
         col1={<h4 className="family-Regular">{t("funding:title")}</h4>}
         col2={isBountyFunded || isCanceled ? <></> : 
-          <Button onClick={handleShowFundModal}>
+          <ContractButton onClick={handleShowFundModal}>
             {t("funding:actions.fund-bounty")}
-          </Button>}
+          </ContractButton>}
       />
       
       <Row className="border-radius-8 bg-shadow mt-3 mx-0 p-2 border border-disabled">
@@ -104,7 +100,7 @@ export default function FundingSection() {
             fundedAmount={state.currentBounty?.data?.fundedAmount?.toFixed()}
             fundingAmount={state.currentBounty?.data?.fundingAmount?.toFixed()}
             fundingTokenSymbol={transactionalSymbol}
-            fundedPercent={state.currentBounty?.data?.fundedPercent?.toFixed(2, 1)}
+            fundedPercent={state.currentBounty?.data?.fundedPercent?.toString()}
           />
 
           { hasReward &&
@@ -117,8 +113,8 @@ export default function FundingSection() {
               }
               col2={
                 <Amount 
-                  amount={state.currentBounty?.chainData?.rewardAmount?.toFixed()}
-                  symbol={state.currentBounty?.chainData?.rewardTokenData?.symbol}
+                  amount={state.currentBounty?.data?.rewardAmount?.toFixed()}
+                  symbol={state.currentBounty?.data?.rewardToken?.symbol}
                   symbolColor="warning"
                   className="caption-large text-white font-weight-normal"
                 />
@@ -149,7 +145,7 @@ export default function FundingSection() {
                       col2={
                         <Amount 
                           amount={futureRewards}
-                          symbol={state.currentBounty?.chainData?.rewardTokenData?.symbol}
+                          symbol={state.currentBounty?.data?.rewardToken?.symbol}
                           className="caption-large text-white font-weight-normal"
                           symbolColor="warning"
                         />
@@ -162,8 +158,8 @@ export default function FundingSection() {
 
               <Row className="mx-0">
                 <Collapsable
-                  labelShow={t("funding:actions.manage-funding")}
-                  labelHide={t("funding:actions.manage-funding")}
+                  labelShow={collapseAction}
+                  labelHide={collapseAction}
                   labelColor="gray"
                   activeColor="white"
                   className="gap-2"
@@ -189,8 +185,8 @@ export default function FundingSection() {
                                 <Amount
                                   amount={
                                     fund.amount
-                                      .dividedBy(state.currentBounty?.data.fundingAmount)
-                                      .multipliedBy(state.currentBounty?.chainData.rewardAmount)
+                                      .dividedBy(state.currentBounty?.data?.fundingAmount)
+                                      .multipliedBy(state.currentBounty?.data?.rewardAmount)
                                       .toFixed()
                                   }
                                   symbol={rewardTokenSymbol}
@@ -202,8 +198,8 @@ export default function FundingSection() {
                       </>
                       }
                       col2={
-                          (isBountyInDraft || isBountyClosed && hasReward && !fund.isWithdrawn) && (
-                            <Button
+                          (isBountyInDraft || isBountyClosed && hasReward && !fund.withdrawn) && (
+                            <ContractButton
                             textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
                             transparent
                             onClick={() => setFundingToRetractOrWithdraw(fund)}
@@ -211,7 +207,7 @@ export default function FundingSection() {
                             {isBountyClosed
                               ? t("funding:actions.withdraw-funding")
                               : t("funding:actions.retract-funding")}
-                          </Button>
+                          </ContractButton>
                           )
                       }
                     />

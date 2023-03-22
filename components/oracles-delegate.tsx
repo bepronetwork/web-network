@@ -26,12 +26,14 @@ interface OraclesDelegateProps {
 }
 
 function OraclesDelegate({
-                           wallet,
-                           updateWalletBalance,
-                           defaultAddress
-                         }: OraclesDelegateProps) {
+  wallet,
+  updateWalletBalance,
+  defaultAddress
+}: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
-  const debounce = useRef(null)
+  
+  const debounce = useRef(null);
+
   const [error, setError] = useState<string>("");
   const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
@@ -44,8 +46,8 @@ function OraclesDelegate({
 
   const { processEvent } = useApi();
 
-  const networkTokenDecimals = Service?.network?.networkToken?.decimals || 18;
-  const networkTokenSymbol = Service?.network?.networkToken?.symbol;
+  const networkTokenDecimals = Service?.network?.active?.networkToken?.decimals || 18;
+  const networkTokenSymbol = Service?.network?.active?.networkToken?.symbol;
 
   function handleChangeOracles(params: NumberFormatValues) {
     if (params.value === "") return setTokenAmount("");

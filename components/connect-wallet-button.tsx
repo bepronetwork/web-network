@@ -8,45 +8,32 @@ import metamaskLogo from "assets/metamask.png";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import {NetworkColors} from "interfaces/enums/network-colors";
+import {useAppState} from "contexts/app-state";
+import {changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import {useAuthentication} from "x-hooks/use-authentication";
-
-import {useAppState} from "../contexts/app-state";
-import {changeChain} from "../contexts/reducers/change-chain";
-import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
-  const {dispatch, state} = useAppState();
   const [showModal, setShowModal] = useState(false);
+
+  const {dispatch, state} = useAppState();
 
   const { connectWallet } = useAuthentication();
 
   async function handleLogin()  {
+
     if(!window?.ethereum) {
       dispatch(changeShowWeb3(true))
       return;
     }
 
-    if (!state.Service?.active)
-      return;
-
-    if (
-      (+state.connectedChain?.id || +window?.ethereum?.chainId) ===
-      +state.Settings?.requiredChain?.id
-      ) {
-      connectWallet();
-    } else {
-      dispatch(changeChain.update({...state.connectedChain, id: state.Settings?.requiredChain?.id}));
-      setShowModal(false);
-    }
+    connectWallet();
   }
 
-  function handleShowModal() {
-    if (!state.currentUser?.walletAddress) setShowModal(true);
-    else setShowModal(false);
+  function onWalletChange() {
+    setShowModal(!state.currentUser?.walletAddress);
   }
 
   useEffect(() => {
@@ -57,10 +44,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
 
   }, [state.Service?.active, forceLogin]);
 
-  useEffect(() => {
-    handleShowModal();
-  }, [state.currentUser?.walletAddress]);
-
+  useEffect(onWalletChange, [state.currentUser?.walletAddress]);
 
   if (asModal) {
     if (state?.loading?.isLoading) return <></>;
@@ -71,19 +55,10 @@ export default function ConnectWalletButton({children = null, asModal = false, f
         titlePosition="center"
         centerTitle
         titleClass="h3 text-white bg-opacity-100"
-        show={showModal}
-      >
+        show={showModal}>
         <div className="d-flex flex-column text-center align-items-center">
           <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-            {t("connect-wallet-button:to-access-this-page")}
-            <br />
-            <span
-              style={{ color: NetworkColors[state.Settings?.requiredChain?.name?.toLowerCase()] }}
-            >
-              <span>{state.Settings?.requiredChain?.name}</span>{" "}
-              {t("connect-wallet-button:network")}
-            </span>{" "}
-            {t("connect-wallet-button:on-your-wallet")}
+            {t("connect-wallet-button:this-page-needs-access-to-your-wallet-address")}
           </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
             <div
@@ -129,11 +104,10 @@ export default function ConnectWalletButton({children = null, asModal = false, f
       <Button
         color="white"
         className="text-dark bg-opacity-100"
-        onClick={handleLogin}
-      >
+        onClick={handleLogin}>
         <span>{t("main-nav.connect")}</span>
       </Button>
     );
 
-  return children;
+  return <>{children}</>;
 }

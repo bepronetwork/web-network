@@ -62,7 +62,7 @@
     "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
     "new-bounty": "New bounty",
-    "explorer": "Explore", 
+    "explore": "Explore", 
     "get-started": "Get Started",
     "connect": "Connect Wallet",
     "new-network": "New Network",
@@ -127,6 +127,7 @@
     "reply-on-github": "Reply on Github",
     "review": "Review",
     "view-proposal": "View Proposal",
+    "view-pull-request": "View Pull Request",
     "make-a-review": "Make a Review",
     "success": "Success",
     "view-on-github": "View on Github",
@@ -188,7 +189,8 @@
     "clear": "Clear",
     "wallet": "Wallet",
     "unkown": "Unknown",
-    "latest": "Latest"
+    "latest": "Latest",
+    "unsupported": "Unsupported"
   },
   "modals": {
     "help-modal": {
@@ -212,7 +214,7 @@
     },
     "invalid-account-wallet": {
       "title": "Github Account and Wallet don't match",
-      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection"
+      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection or connect with github already registered and disconnect from this wallet"
     },
     "not-mergeable": {
       "title": "Merging bounty",
@@ -260,7 +262,8 @@
       "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
     },
     "wrong-network": {
-      "please-connect": "please, connect to the",
+      "please-connect": "Please, connect to a supported network",
+      "connect-to-network-chain": "To interact with this network, please connect to the chain below",
       "network": "network",
       "on-your-wallet": "on your metamask wallet",
       "change-network": "Change Network",
@@ -291,7 +294,7 @@
     "already-has-network": {
       "title": "Network already exists",
       "button-label": "My network",
-      "content": "Connected wallet already has a network."
+      "content": "Connected wallet already has a network on this chain."
     },
     "settings-not-loaded": {
       "title": "Failed to load settings",
@@ -308,6 +311,7 @@
       "required": "Field is required"
     },
     "select-placeholder": "Select...",
+    "select-placeholder-chain": "Select a supported chain",
     "create-pull-request": {
       "title": {
         "label": "Title",

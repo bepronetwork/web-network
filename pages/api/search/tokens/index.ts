@@ -1,28 +1,59 @@
-import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize, WhereOptions } from "sequelize";
 
 import Database from "db/models";
 
+import {withCors} from "middleware";
+
+import { error as logError } from 'services/logging';
+
+const colToLower = (colName: string) => Sequelize.fn("LOWER", Sequelize.col(colName));
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {networkName} = req.query
+  const { networkName, chainId } = req.query;
   
   try {
-    const network = await Database.network.findOne({
-      where:{
-        name: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("name")), "=", (networkName as string).toLowerCase()) 
-      },
-      include:[{ association: "tokens" }]
-    });  
+    const whereCondition: WhereOptions = {};
 
-    return res.status(200).json(network.tokens);
+    let queryParams = {};
+
+    if (chainId)
+      whereCondition.chain_id = +chainId;
+
+    if (networkName) {
+      whereCondition.isAllowed = true;
+
+      queryParams = {
+        where: {
+          [Op.or]: [{ isTransactional: true }, { isReward: true }]
+        },
+        include: [
+          {
+            association: "networks",
+            attributes: [],
+            required: true,
+            where: {
+              name: Sequelize.where(colToLower("networks.name"), "=", (networkName as string).toLowerCase())
+            }
+          }
+        ]
+      };
+    }
+      
+
+    const tokens = await Database.tokens.findAll({
+      where: whereCondition,
+      ...queryParams
+    });
+
+    return res.status(200).json(tokens);
   } catch (error) {
-    console.log(error)
-    return res.status(500)
+    logError(`Failed to get tokens`, {error: error?.toString()});
+    return res.status(500);
   }
 }
 
-async function tokensEndPoint(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -35,4 +66,4 @@ async function tokensEndPoint(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(tokensEndPoint);
+export default withCors(handler);

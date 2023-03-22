@@ -6,14 +6,15 @@ import models from "db/models";
 
 import paginate, {calculateTotalPages, paginateArray} from "helpers/paginate";
 import {searchPatternInText} from "helpers/string";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, page, sortBy, time, search } = req.query || {};
+    const { address, page, time, search } = req.query || {};
 
     if (address) whereCondition.address = address;
 

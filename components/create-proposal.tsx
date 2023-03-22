@@ -9,11 +9,14 @@ import LockedIcon from "assets/icons/locked-icon";
 
 import Avatar from "components/avatar";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import CreateProposalDistributionItem from "components/create-proposal-distribution-item";
 import Modal from "components/modal";
 import PullRequestLabels from "components/pull-request-labels";
 import ReactSelect from "components/react-select";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+
+import {useAppState} from "contexts/app-state";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import sumObj from "helpers/sumObj";
@@ -22,11 +25,8 @@ import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import {useBounty} from "x-hooks/use-bounty";
 import useOctokit from "x-hooks/use-octokit";
-
-import {useAppState} from "../contexts/app-state";
-import {useBounty} from "../x-hooks/use-bounty";
-
 
 interface participants {
   githubHandle: string;
@@ -133,8 +133,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     });
   }
 
-  function isSameProposal(currentDistrbuition: SameProposal,
-                          currentProposals: SameProposal[]) {
+  function isSameProposal(currentDistrbuition: SameProposal, currentProposals: SameProposal[]) {
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
@@ -145,7 +144,6 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       }
     });
   }
-
 
   function handleCheckDistrib(obj: object) {
     const currentAmount = sumObj(obj);
@@ -168,13 +166,12 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         }))
       };
 
-      const currentProposals = state.currentBounty?.chainData?.proposals?.map((item) => {
+      const currentProposals = state.currentBounty?.data?.mergeProposals?.map((item) => {
         return {
-          currentPrId: 
-            Number(state.currentBounty?.data?.mergeProposals.find(mp=> +mp?.contractId === item.id)?.pullRequestId),
-          prAddressAmount: item.details.map(detail => ({
-            amount: Number(detail.percentage),
-            address: detail.recipient
+          currentPrId: item.pullRequestId,
+          prAddressAmount: item.distributions.map(distribution => ({
+            amount: distribution.percentage,
+            address: distribution.recipient
           }))
         };
       });
@@ -277,7 +274,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
     setExecuting(true);
 
-    handleProposeMerge(+state.currentBounty?.chainData.id, +currentPullRequest.contractId, prAddresses, prAmounts)
+    handleProposeMerge(+state.currentBounty?.data.contractId, +currentPullRequest.contractId, prAddresses, prAmounts)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -287,7 +284,6 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       handleClose();
       setExecuting(false);
       currentBounty.getDatabaseBounty(true);
-      currentBounty.getChainBounty(true);
     })
   }
 
@@ -401,9 +397,12 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   return (
     <div className="d-flex">
       <ReadOnlyButtonWrapper >
-        <Button className="read-only-button" onClick={() => setShow(true)}>
+        <ContractButton 
+          className="read-only-button" 
+          onClick={() => setShow(true)}
+        >
           {t("proposal:actions.create")}
-        </Button>
+        </ContractButton>
       </ReadOnlyButtonWrapper>
 
       <Modal
@@ -416,13 +415,14 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             <Button color="dark-gray" onClick={handleClose}>
               {t("actions.cancel")}
             </Button>
-            <Button
+            <ContractButton
               onClick={handleClickCreate}
               disabled={!state.currentUser?.walletAddress ||
                 participants.length === 0 ||
                 !success ||
                 executing ||
                 cantBeMergeable()}
+              isLoading={executing}
             >
               {!state.currentUser?.walletAddress ||
                 participants.length === 0 ||
@@ -431,12 +431,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
                   <LockedIcon width={12} height={12} className="mr-1" />
                 ))}
               <span>{t("proposal:actions.create")}</span>
-              {executing ? (
-                <span className="spinner-border spinner-border-xs ml-1" />
-              ) : (
-                ""
-              )}
-            </Button>
+            </ContractButton>
           </div>
         }>
         <p className="caption-small text-white-50 mb-2 mt-2">

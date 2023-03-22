@@ -3,7 +3,7 @@ import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import { FormGroup } from "components/form-group";
@@ -168,7 +168,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
         {isGovernorRegistry && (
           <Col xs={4}>
-            <Button 
+            <ContractButton 
               onClick={saveFeeSettings} 
               className="mt-4"
               disabled={isSaveBountyFeesBtnDisabled}
@@ -176,7 +176,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
               isLoading={params.cancelFee.isExecuting}
             >
               <span>{t("custom-network:registry.save-fees-config")}</span>
-            </Button>
+            </ContractButton>
           </Col>
         )}
       </Row>
@@ -196,7 +196,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
         {isGovernorRegistry && (
           <Col xs={5}>
-            <Button 
+            <ContractButton 
             className="mt-4" 
             onClick={saveCreateNetworkFee} 
             disabled={isSaveCreationFeeBtnDisabled}
@@ -204,7 +204,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             isLoading={params.creationFee.isExecuting}
             >
               <span>{t("custom-network:registry.save-create-network-fee")}</span>
-            </Button>
+            </ContractButton>
           </Col>
         )}
       </Row>
@@ -221,7 +221,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         />
         {isGovernorRegistry && (
           <Col xs={5}>
-            <Button 
+            <ContractButton 
               onClick={saveCreateNetworkAmount} 
               className="mt-4"
               disabled={isSaveCreationAmountBtnDisabled}
@@ -229,7 +229,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
               isLoading={params.creationAmount.isExecuting}
             >
               <span>{t("custom-network:registry.save-create-network-amount")}</span>
-            </Button>
+            </ContractButton>
           </Col>
         )}
       </Row>

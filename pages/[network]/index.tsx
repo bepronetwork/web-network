@@ -1,28 +1,24 @@
-import { useEffect } from "react";
+import React from "react";
 
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
+import ExplorePage from "pages/explore";
 
-export default function Home() {
-  const { getURLWithNetwork } = useNetworkTheme();
-  const { replace, query } = useRouter();
-
-  useEffect(() => {
-    replace(getURLWithNetwork(`/bounties`, {
-      network: query?.network
-    }));
-  }, []);
-
-  return null;
+export default function NetworkBountyHall() {
+  return <ExplorePage/>;
 }
 
-export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button"]))
-    }
+      ...(await serverSideTranslations(locale, [
+        "common",
+        "bounty",
+        "connect-wallet-button",
+        "custom-network",
+        "leaderboard",
+      ])),
+    },
   };
 };

@@ -4,6 +4,8 @@ import {GetServerSideProps} from "next";
 import {SessionProvider} from "next-auth/react";
 import {appWithTranslation} from "next-i18next";
 import {AppProps} from "next/app";
+import getConfig from "next/config";
+import {useRouter} from "next/router";
 import {GoogleAnalytics} from "nextjs-google-analytics";
 
 import CreateBountyModal from "components/create-bounty-modal";
@@ -16,13 +18,12 @@ import Seo from "components/seo";
 import StatusBar from "components/status-bar";
 import Toaster from "components/toaster";
 import WebThreeDialog from "components/web3-dialog";
+import WrongNetworkModal from "components/wrong-network-modal";
 
 import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
-import {useRouter} from "next/router";
-import getConfig from "next/config";
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
@@ -47,6 +48,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
               <Component {...pageProps} />
             </div>
             <CreateBountyModal/>
+            <WrongNetworkModal />
             <StatusBar />
             <Toaster />
             <Loading />

@@ -8,25 +8,31 @@ import models from "db/models";
 import * as CommentsQueries from "graphql/comments";
 import * as IssueQueries from "graphql/issue";
 
+import {chainFromHeader} from "helpers/chain-from-header";
 import {getPropertyRecursively} from "helpers/object";
 
-import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
-import {Logger} from "../../../../services/logging";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+import {Logger} from "services/logging";
+
+import {GraphQlQueryResponseData, GraphQlResponse} from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin, networkName } = req.body;
 
+  const chain = await chainFromHeader(req);
+
   try {
     const network = await models.network.findOne({
       where: {
         name: {
           [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
+        },
+        chain_id: { [Op.eq]: +chain?.chainId }
       }
     });
 
@@ -82,8 +88,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function Working(req: NextApiRequest,
-                       res: NextApiResponse) {
+async function Working(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
     await put(req, res);
@@ -97,4 +102,4 @@ async function Working(req: NextApiRequest,
 }
 
 Logger.changeActionName(`Issue/Working`);
-export default LogAccess(WithCors(Working))
+export default LogAccess(WithCors(WithValidChainId(Working)));

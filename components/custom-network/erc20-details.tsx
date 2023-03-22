@@ -4,16 +4,15 @@ import {Col, Row} from "react-bootstrap";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import {FormGroup} from "components/form-group";
 
+import {useAppState} from "contexts/app-state";
 import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
 import useERC20 from "x-hooks/use-erc20";
-
-import {useAppState} from "../../contexts/app-state";
 
 interface ERC20DetailsProps {
   address?: string;
@@ -170,14 +169,14 @@ export function ERC20Details({
       { isDeployer &&
         <Row className="mt-2">
           <Col>
-            <Button
+            <ContractButton
               disabled={isDeployBtnDisabled || isDeploying}
               withLockIcon={isDeployBtnDisabled}
               isLoading={isDeploying}
               onClick={handleDeploy}
             >
               {t("custom-network:steps.token-configuration.actions.deploy")}
-            </Button>
+            </ContractButton>
           </Col>
         </Row>
       }

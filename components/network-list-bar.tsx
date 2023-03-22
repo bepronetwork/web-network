@@ -40,6 +40,7 @@ export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
       />
 
       <NetworkListBarColumn
+        col={2}
         hideOrder={hideOrder}
         label={t("network-list-bar.token-locked")}
         columnOrder={order[1]}

@@ -105,9 +105,9 @@ export default function TokensDropdown({
 
   useEffect(() => {
     if (!tokens?.length) return;
-    if (needsBalance) getBalanceTokens();
+    if (needsBalance && state.connectedChain?.matchWithNetworkChain) getBalanceTokens();
     else setOptions(tokens.map(tokenToOption));
-  }, [tokens]);
+  }, [tokens, state.connectedChain?.matchWithNetworkChain]);
 
   useEffect(() => {
     if(!!option || !options?.length) return;

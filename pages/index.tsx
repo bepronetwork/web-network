@@ -1,11 +1,32 @@
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSideProps } from "next/types";
+import {useEffect} from "react";
 
-import ExplorePage from "./explore";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
+import {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
+
+import {useAppState} from "contexts/app-state";
+
+import ExplorePage from "pages/explore";
+
+const { publicRuntimeConfig } = getConfig();
 
 export default function Index() {
+  const { replace } = useRouter();
+
+  const { state } = useAppState();
+
+  useEffect(() => {
+    const isAdmin = state.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase();
+    const hasSupportedChains = !!state?.supportedChains?.length;
+
+    if (isAdmin && !hasSupportedChains)
+      replace("/setup");
+
+  }, [state?.supportedChains, state.currentUser?.walletAddress]);
+
   return(
-   <ExplorePage />
+    <ExplorePage />
   );
 }
 

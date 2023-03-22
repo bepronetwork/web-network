@@ -63,7 +63,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                 isMergeable: item?.isMergeable,
                 isDraft: item?.status === "draft"
               })
-              valueRedirect.prId = (item as pullRequest)?.githubId
+              valueRedirect.prId = (item as pullRequest)?.githubId;
             } else if(proposal){
               if(isDisputed || isMerged){
                 status.push({
@@ -75,9 +75,14 @@ function ItemSections({ data, isProposal }: ItemProps) {
               valueRedirect.proposalId = item?.id
             }
 
+            const btnLabel = isProposal ? "actions.view-proposal" : 
+              item.status === "draft" ? "actions.view-pull-request" : "actions.review";
             const approvalsCurrentPr = item?.approvals?.total || 0;
             const shouldRenderApproveButton = approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
-            const itemId = isProposal ? item?.id : item?.githubId;
+            const itemId = isProposal ? item?.contractId + 1 : item?.githubId;
+            const totalToBeDisputed = BigNumber(state.Service?.network?.amounts?.percentageNeededForDispute)
+              .multipliedBy(state.Service?.network?.amounts?.totalNetworkToken)
+              .dividedBy(100);
 
             return (
               <ItemRow 
@@ -93,7 +98,7 @@ function ItemSections({ data, isProposal }: ItemProps) {
                       <ProposalProgressSmall
                         color={isDisputed ? 'danger' : isMerged ? 'success' : 'purple'}
                         value={proposal?.disputeWeight}
-                        total={BigNumber(state.Service?.network?.amounts?.totalNetworkToken)}
+                        total={totalToBeDisputed}
                       />
                     </div>
                   </>
@@ -117,18 +122,17 @@ function ItemSections({ data, isProposal }: ItemProps) {
                   <div className="row align-items-center">
                     <div className="col">
                       <Button
-                        className="read-only-button"
+                        className="read-only-button text-truncate"
                         onClick={(ev) => {
                           ev.preventDefault();
                           router.push?.(getURLWithNetwork(pathRedirect, {
                             ...valueRedirect,
-                            review: true
+                            review: item?.status === "ready"
                           }))
                         }}
-                        disabled={item?.status === "draft" ? true : false}
                       >
                         <span className="label-m text-white">
-                          <Translation label={isProposal ? "actions.view-proposal" : "actions.review"} />
+                          <Translation label={btnLabel} />
                         </span>
                       </Button>
                     </div>

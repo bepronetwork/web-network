@@ -17,7 +17,7 @@ export default function NetworkContractSettings() {
 
   const onChange = (label) => (value) => fields.parameter.setter({label, value});
 
-  const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
   const totalNetworkToken = BigNumber(state.Service?.network?.amounts?.totalNetworkToken);
 
   const parameterInputs = [

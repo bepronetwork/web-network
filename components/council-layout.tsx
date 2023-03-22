@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -10,15 +11,18 @@ import PageHero, {InfosHero} from "components/page-hero";
 import {useAppState} from "contexts/app-state";
 import { changeActiveNetwork } from "contexts/reducers/change-service";
 
+import { Curator } from "interfaces/curators";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import {useNetwork} from "x-hooks/use-network";
 
 export default function CouncilLayout({ children }) {
-  const { asPath, push } = useRouter();
+  const { asPath, query, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
+  const { chain } = useChain();
   const { state, dispatch} = useAppState();
   const { getURLWithNetwork } = useNetwork();
   const { getTotalBounties, searchCurators, searchIssues } = useApi();
@@ -39,7 +43,7 @@ export default function CouncilLayout({ children }) {
     },
     {
       value: 0,
-      label: t("heroes.bounties-in-network"),
+      label: t("heroes.in-network"),
       currency: t("misc.token"),
     },
   ]);
@@ -47,52 +51,58 @@ export default function CouncilLayout({ children }) {
   function handleUrlCurators (type: string) {
     return push(getURLWithNetwork("/curators", {
       type
-    }), undefined, { shallow: true  })
+    }), asPath, { shallow: true  });
   }
 
   const internalLinks = [
     {
       onClick: () => handleUrlCurators("ready-to-propose"),
       label: t("council:ready-to-propose"),
-      active: asPath.endsWith("/curators") || asPath.endsWith("ready-to-propose")
+      active: query?.type === "ready-to-propose" || !query?.type
     },
     {
       onClick: () => handleUrlCurators("ready-to-dispute"),
       label: t("council:ready-to-dispute"),
-      active: asPath.endsWith("ready-to-dispute")
+      active: query?.type === "ready-to-dispute"
     },
     {
       onClick: () => handleUrlCurators("ready-to-close"),
       label: t("council:ready-to-close"),
-      active: asPath.endsWith("ready-to-close")
+      active: query?.type === "ready-to-close"
     },
     {
       onClick: () => handleUrlCurators("curators-list"),
       label: t("council:council-list"),
-      active: asPath.endsWith("curators-list")
+      active: query?.type === "curators-list"
     }
   ]
 
   async function loadTotals() {
-    if (!state.Service?.active?.network ||
-        !state.Service?.network?.active?.name ||
-        !state.Service?.network?.networkToken?.address) return;
+    if (!state.Service?.network?.active?.name || !chain) return;
     
     const [totalBounties, onNetwork, curators, distributed] = await Promise.all([
-      getTotalBounties("ready", state.Service?.network?.active?.name),
-      state.Service?.active.getTotalNetworkToken(),
+      getTotalBounties(state.Service?.network?.active?.name, "ready"),
       searchCurators({
-        isCurrentlyCurator: true,
         networkName: state.Service?.network?.active?.name,
+        chainShortName: chain.chainShortName
       }).then(({ rows }) => rows),
       searchIssues({
         state: "closed",
         networkName: state.Service.network.active.name,
-        tokenAddress: state.Service.network.networkToken.address
+        tokenAddress: state.Service?.network?.active?.networkToken?.address,
+        chainId: chain.chainId.toString()
       })
         .then(({ rows } : { rows: IssueBigNumberData[] }) => 
           rows.reduce((acc, { payments }) => acc + payments.reduce((acc, { ammount }) => acc + ammount, 0), 0))
-    ]);
+    ])
+      .then(([totalBounties, curators, distributed]) => {
+        const { onNetwork, totalCurators } = (curators as Curator[]).reduce((acc, curator) => ({
+          onNetwork: new BigNumber(acc.onNetwork).plus(curator.tokensLocked).toFixed(),
+          totalCurators: acc.totalCurators + (curator.isCurrentlyCurator ? 1 : 0 )
+        }), { onNetwork: "0", totalCurators: 0 });
+
+        return [totalBounties, onNetwork, totalCurators, distributed];
+      });
 
     dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, { curators })));
 
@@ -102,34 +112,32 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: curators.length || 0,
+        value: curators,
         label: t("council:council-members"),
       },
       {
         value: distributed,
         label: t("council:distributed-developers"),
-        currency: state.Service?.network?.networkToken?.symbol,
+        currency: state.Service?.network?.active?.networkToken?.symbol,
       },
       {
-        value: onNetwork.toFixed(),
+        value: onNetwork,
         label: t("heroes.in-network"),
-        currency: state.Service?.network?.networkToken?.symbol,
+        currency: state.Service?.network?.active?.networkToken?.symbol,
       },
     ]);
   }
 
   useEffect(() => {
     loadTotals();
-  }, [state.Service?.active?.network?.contractAddress,
-      state.Service?.network?.active?.name,
-      state.Service?.network?.networkToken?.address]);
+  }, [state.Service?.network?.active?.name, chain]);
 
   return (
     <div>
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: state.Service?.network?.networkToken?.symbol,
+          token: state.Service?.network?.active?.networkToken?.symbol,
         })}
         infos={infos}
       />

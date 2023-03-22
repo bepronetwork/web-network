@@ -141,8 +141,8 @@
       "user-permission-not-admin_other": "Your permission level on these repositories does not allow giving access.",
       "no-merge-commit-permission_one": "Repository {{repos}} don't support \"merge commits\" merge type. Please, allow that in the repository settings.", 
       "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings.",
-      "without-bot-collab_one": "Repository {{repos}} don't have {{bot}} bot as collaborator. Please, remove the repository from the network and re-add it.", 
-      "without-bot-collab_other": "Repositories {{repos}} doesn't have {{bot}} bot as collaborator. Please, remove the repositories from the network and re-add them." 
+      "without-bot-collab_one": "Repository {{repos}} don't have {{bot}} bot as collaborator. Please, remove the repository from the network and re-add it.",
+      "without-bot-collab_other": "Repositories {{repos}} doesn't have {{bot}} bot as collaborator. Please, remove the repositories from the network and re-add them."
     },
     "token-configuration": {
       "title": "Governance Token",
@@ -275,7 +275,8 @@
     "council-amount": "The amount of {{token}} locked needed to be a curator. Min. {{min}} and Max. {{max}}.",
     "updating-values": "Error updating network values",
     "updated-parameters": "Failed to update {{failed}} params",
-    "network-not-registered": "This network has yet to be registered to be usable, please do so."
+    "network-not-registered": "This network has yet to be registered to be usable, please do so.",
+    "failed-to-update-network-id": "Failed to update network chain id"
   },
   "tabs": {
     "logo-and-colours": "Logo & Colours",

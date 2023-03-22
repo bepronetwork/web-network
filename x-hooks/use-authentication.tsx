@@ -2,9 +2,12 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
+import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
+import {changeChain} from "contexts/reducers/change-chain";
 import {
   changeCurrentUser,
   changeCurrentUserAccessToken,
@@ -14,42 +17,48 @@ import {
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
-  changeCurrentUserWallet
+  changeCurrentUserWallet,
+  changeCurrentUserisAdmin
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
+import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import { IM_AM_CREATOR_ISSUE } from "helpers/constants";
+import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
+import {EventName} from "interfaces/analytics";
 import {CustomSession} from "interfaces/custom-session";
 import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
+import useAnalyticEvents from "x-hooks/use-analytic-events";
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
+import useSignature from "x-hooks/use-signature";
 import {useTransactions} from "x-hooks/use-transactions";
-import {EventName} from "../interfaces/analytics";
-import useAnalyticEvents from "./use-analytic-events";
-import useSignature from "./use-signature";
 
 export const SESSION_EXPIRATION_KEY =  "next-auth.expiration";
 
-export function useAuthentication() {
+const { publicRuntimeConfig } = getConfig();
 
+export function useAuthentication() {
   const session = useSession();
-  const {state, dispatch} = useAppState();
+  const {asPath, push} = useRouter();
+  
   const {connect} = useDao();
+  const { chain } = useChain();
   const transactions = useTransactions();
+  const { signMessage: _signMessage } = useSignature();
+  const {state, dispatch} = useAppState();
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
 
-  const {asPath, push} = useRouter();
-  const {getUserOf, getUserWith, searchCurators, getKycSession, validateKycSession} = useApi();
-  const {signMessage} = useSignature()
+  const {getUserOf, getUserAll, searchCurators, getKycSession, validateKycSession} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
   const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
@@ -70,46 +79,60 @@ export function useAuthentication() {
       return;
 
     transactions.deleteFromStorage();
-    
+
     const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
-    
+
     const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
-    
+
     expirationStorage.removeItem();
 
-    signOut({callbackUrl: `${URL_BASE}/${lastNetwork}`})
+    signOut({callbackUrl: `${URL_BASE}/${lastNetwork}/${chain.chainShortName}`})
       .then(() => {
         dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
       });
   }
 
   function connectWallet() {
-    if (!state.Service?.active)
-      return;
-
     connect();
   }
 
   function updateWalletAddress() {
-    if (state.spinners?.wallet)
-      return;
-
-    if (!state.currentUser?.connected)
+    if (state.spinners?.wallet || !state.currentUser?.connected)
       return;
 
     dispatch(changeWalletSpinnerTo(true));
 
-    state.Service.active.getAddress()
-      .then(address => {
+    (state.Service?.active ?
+      state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
+      .then(_address => {
+        if (Array.isArray(_address)) console.debug("eth_requestAccounts", _address);
+        
+        const address = Array.isArray(_address) ? _address[0] : _address;
+        
         if (address !== state.currentUser?.walletAddress) {
-          dispatch(changeCurrentUserWallet(address))
-          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address.toString()})
+          dispatch(changeCurrentUserWallet(address?.toLowerCase()));
+          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()});
         }
 
-        sessionStorage.setItem(`currentWallet`, address);
+        dispatch(changeCurrentUserisAdmin(publicRuntimeConfig.adminWallet.toLowerCase() === address?.toLowerCase()));
+
+        const windowChainId = +window.ethereum.chainId;
+        const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
+
+        dispatch(changeChain.update({
+          id: (chain?.chainId || windowChainId)?.toString(),
+          name: chain?.chainName || UNSUPPORTED_CHAIN,
+          shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
+          explorer: chain?.blockScanner,
+          events: chain?.eventsApi,
+          registry: chain?.registryAddress
+        }));
+
+        sessionStorage.setItem("currentChainId", chain ? chain?.chainId?.toString() : (+windowChainId)?.toString());
+        sessionStorage.setItem("currentWallet", address || '');
       })
       .catch(e => {
-        console.error(`Error getting address`, e);
+        console.error("Error getting address", e);
       })
       .finally(() => {
         dispatch(changeWalletSpinnerTo(false));
@@ -118,8 +141,6 @@ export function useAuthentication() {
   }
 
   function connectGithub() {
-    console.debug(`connectGithub`, state.currentUser)
-
     if (!state.currentUser?.walletAddress)
       return;
 
@@ -139,7 +160,7 @@ export function useAuthentication() {
           return dispatch(changeConnectingGH(false))
 
         lastUrl.value = asPath;
-        
+
         if(signedIn)
           signIn('github', {callbackUrl: `${URL_BASE}${asPath}`})
 
@@ -158,9 +179,9 @@ export function useAuthentication() {
     const userLogin = sessionUser.login;
     const walletAddress = state.currentUser.walletAddress.toLowerCase();
 
-    getUserWith(userLogin)
+    getUserAll(walletAddress,userLogin)
       .then(async(user) => {
-        if (!user.githubLogin){
+        if (!user?.githubLogin){
           dispatch(changeCurrentUserMatch(undefined));
 
           if(session.status === 'authenticated' && state.currentUser.login && !asPath.includes(`connect-account`)){
@@ -187,7 +208,7 @@ export function useAuthentication() {
   }
 
   function updateWalletBalance(force = false) {
-    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service?.active?.network)
+    if ((!force && (balance.value || !state.currentUser?.walletAddress)) || !state.Service?.active?.network || !chain)
       return;
 
     const update = newBalance => {
@@ -205,7 +226,11 @@ export function useAuthentication() {
       state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
       state.Service.active.getBalance('settler', state.currentUser.walletAddress),
-      searchCurators({ address: state.currentUser.walletAddress, networkName: state.Service?.network?.active?.name })
+      searchCurators({ 
+        address: state.currentUser.walletAddress, 
+        networkName: state.Service?.network?.active?.name,
+        chainShortName: chain.chainShortName
+      })
       .then(v => v?.rows[0]?.tokensLocked || 0).then(value => new BigNumber(value)),
       // not balance, but related to address, no need for a second useEffect()
       state.Service.active.isCouncil(state.currentUser.walletAddress),
@@ -248,44 +273,68 @@ export function useAuthentication() {
     dispatch(changeReAuthorizeGithub(!!expirationStorage.value && new Date(expirationStorage.value) < new Date()));
   }
 
-  async function signMessageIfCreatorIssue() {
-    return new Promise(async (resolve, reject) => {
-      console.log(`signMessageIfCreatorIssue()`, state.connectedChain, state.currentUser?.walletAddress)
+  function signMessage(message?: string) {
+    return new Promise<string>(async (resolve, reject) => { 
+      if (!state?.currentUser?.walletAddress ||
+          !state?.connectedChain?.id ||
+          state.Service?.starting ||
+          state.spinners?.signingMessage) {
+        reject("Wallet not connected, service not started or already signing a message");
+        return;
+      }
 
-      if (
-        !state?.currentUser?.walletAddress ||
-        !state?.connectedChain?.id ||
-        !state?.currentBounty?.data?.creatorAddress
-      )
-        return reject("error to get data");
+      const currentWallet = state?.currentUser?.walletAddress?.toLowerCase();
+      const isAdminUser = currentWallet === publicRuntimeConfig?.adminWallet?.toLowerCase();
+
+      if (!isAdminUser && state.connectedChain?.name === UNSUPPORTED_CHAIN) {
+        dispatch(addToast({
+          type: "warning",
+          title: "Unsupported chain",
+          content: "To sign a message, connect to a supported chain",
+        }));
+
+        reject("Unsupported chain");
+        return;
+      }
+
+      const messageToSign = message || (isAdminUser ? IM_AN_ADMIN : NOT_AN_ADMIN);
+
+      const storedSignature = sessionStorage.getItem("currentSignature");
 
       if (decodeMessage(state?.connectedChain?.id,
-                        IM_AM_CREATOR_ISSUE,
-                        state?.currentUser?.signature,
-                        state?.currentBounty?.data?.creatorAddress))
-        return resolve(true)
+                        messageToSign,
+                        storedSignature || state?.currentUser?.signature,
+                        currentWallet)) {
+        if (storedSignature)
+          dispatch(changeCurrentUserSignature(storedSignature));
+        else
+          sessionStorage.setItem("currentSignature", state?.currentUser?.signature);
 
-      if (
-          state?.currentUser?.walletAddress?.toLowerCase() ===
-          state?.currentBounty?.data?.creatorAddress?.toLowerCase()
-        )
-        signMessage(IM_AM_CREATOR_ISSUE)
-        .then((r) => {
-          dispatch(changeCurrentUserSignature(r));
-          sessionStorage.setItem(`currentSignature`, r || '');
-          sessionStorage.setItem(`currentChainId`, state?.connectedChain?.id || '0');
-          resolve(true)
-        })
-        .catch(e => {
-          console.error(`ERROR`, e);
-          reject(e)
-        })
-      else {
-        sessionStorage.setItem(`currentSignature`, '');
-        sessionStorage.setItem(`currentChainId`, '');
-        return reject('error not owner of this bounty')
+        resolve(storedSignature || state?.currentUser?.signature);
+        return;
       }
-    })
+
+      dispatch(changeSpinners.update({ signingMessage: true }));
+
+      await _signMessage(messageToSign)
+        .then(signature => {
+          dispatch(changeSpinners.update({ signingMessage: false }));
+
+          if (signature) {
+            dispatch(changeCurrentUserSignature(signature));
+            sessionStorage.setItem("currentSignature", signature);
+            
+            resolve(signature);
+            return;
+          }
+
+          dispatch(changeCurrentUserSignature(undefined));
+          sessionStorage.removeItem("currentSignature");
+
+          reject("Message not signed");
+          return;
+        });
+    });
   }
 
   function updateKycSession(){
@@ -312,7 +361,7 @@ export function useAuthentication() {
     listenToAccountsChanged,
     updateCurrentUserLogin,
     verifyReAuthorizationNeed,
-    signMessageIfCreatorIssue,
+    signMessage,
     updateKycSession,
   }
 }

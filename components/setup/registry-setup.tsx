@@ -2,10 +2,12 @@ import {useEffect, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {isZeroAddress} from "ethereumjs-util";
 import {useTranslation} from "next-i18next";
+import {isAddress} from "web3-utils";
 
-import Button from "components/button";
 import {ContextualSpan} from "components/contextual-span";
+import ContractButton from "components/contract-button";
 import {FormGroup} from "components/form-group";
 import {CallToAction} from "components/setup/call-to-action";
 import {ContractField, ContractInput} from "components/setup/contract-input";
@@ -13,9 +15,12 @@ import {DeployBountyTokenModal} from "components/setup/deploy-bounty-token-modal
 import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 
 import {useAppState} from "contexts/app-state";
-import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
+import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
+
+import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
 
@@ -36,7 +41,7 @@ enum ModalKeys {
 
 const defaultContractField: ContractField = {
   value: "",
-  validated: undefined
+  validated: null
 };
 
 export function RegistrySetup({
@@ -59,17 +64,19 @@ export function RegistrySetup({
   const [bountyTokenDispatcher, setBountyTokenDispatcher] = useState<string>();
   const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState("");
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState("");
+  const [registrySaveCTA, setRegistrySaveCTA] = useState(false);
 
   const { loadSettings } = useSettings();
-  const { saveNetworkRegistry, processEvent } = useApi();
-  const { dispatch, state: { currentUser, Service } } = useAppState();
+  const { signMessage } = useAuthentication();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
+  const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains } = useApi();
+  const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
 
   function isEmpty(value: string) {
     return value.trim() === "";
   }
   
-  const hasRegistryAddress = !!registryAddress;
+  const hasRegistryAddress = !!registryAddress && isAddress(registryAddress) && !isZeroAddress(registryAddress);
   const needToSetDispatcher = hasRegistryAddress && bountyTokenDispatcher && registryAddress !== bountyTokenDispatcher;
 
   const isDeployRegistryBtnDisabled = [
@@ -126,13 +133,15 @@ export function RegistrySetup({
                           closeFeePercentage,
                           cancelFeePercentage,
                           bountyToken.value )
-      .then(tx => {
+      .then(async tx => {
         const { contractAddress } = tx as TransactionReceipt;
         setRegistry(previous => ({ ...previous, value: contractAddress}));
 
         Service?.active?.loadRegistry(false, contractAddress);
 
-        return saveNetworkRegistry(currentUser?.walletAddress, contractAddress);
+        await signMessage();
+
+        return setChainRegistry(contractAddress);
       })
       .then(() => {
         loadSettings(true);
@@ -145,46 +154,46 @@ export function RegistrySetup({
       .finally(() => setisDeployingRegistry(false));
   }
 
-  function updateData() {
+  function updateData(forcedValue?: string) {
     const updatedValue = value => ({ ...defaultContractField, value });
 
-    setRegistry(updatedValue(registryAddress));
+    if (!isAddress(forcedValue || registryAddress) || isZeroAddress(forcedValue || registryAddress))
+      return;
 
-    Service.active.loadRegistry(true, registryAddress)
-      .then(loaded => {
-        if (!loaded) throw new Error("Not Loaded");
+    setRegistry(updatedValue(forcedValue || registryAddress));
 
-        setErc20(updatedValue(loaded.token.contractAddress));
-        setBountyToken(updatedValue(loaded.bountyToken.contractAddress));
+    const registryObj = Service?.active?.registry;
 
-        const getParameterWithoutProxy = param => loaded.callTx(loaded.contract.methods[param]());
+    setErc20(updatedValue(registryObj.token.contractAddress));
+    setBountyToken(updatedValue(registryObj.bountyToken.contractAddress));
 
-        return Promise.all([
-          loaded.treasury(),
-          loaded.lockAmountForNetworkCreation(),
-          loaded.networkCreationFeePercentage(),
-          getParameterWithoutProxy("closeFeePercentage"),
-          getParameterWithoutProxy("cancelFeePercentage"),
-          loaded.bountyToken.dispatcher(),
-          loaded.divisor,
-          loaded.token.contractAddress,
-          loaded.getAllowedTokens()
-        ])
-      })
+    const getParameterWithoutProxy = param => registryObj.callTx(registryObj.contract.methods[param]());
+    
+    Promise.all([
+      registryObj.treasury(),
+      registryObj.lockAmountForNetworkCreation(),
+      registryObj.networkCreationFeePercentage(),
+      getParameterWithoutProxy("closeFeePercentage"),
+      getParameterWithoutProxy("cancelFeePercentage"),
+      registryObj.bountyToken.dispatcher(),
+      registryObj.divisor,
+      registryObj.token.contractAddress,
+      registryObj.getAllowedTokens()
+    ])
       .then(parameters => {
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
         setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
         setCloseFeePercentage((+parameters[3]/+parameters[6]).toString());
         setCancelFeePercentage((+parameters[4]/+parameters[6]).toString());
-        setBountyTokenDispatcher(parameters[5].toString());
+        setBountyTokenDispatcher(parameters[5].toString().toLowerCase());
 
         const transactional = !!parameters[8].transactional.find(address => parameters[7] = address);
         const reward = !!parameters[8].reward.find(address => parameters[7] = address);
 
         setIsErc20Allowed({ transactional, reward });
       })
-      .catch(console.debug);
+      .catch(console.debug);      
   }
 
   function setDispatcher() {
@@ -224,15 +233,86 @@ export function RegistrySetup({
     allowToken(false);
   }
 
+  function setChainRegistry(address = registryAddress) {
+    const chain = supportedChains?.find(({chainId}) => chainId === +connectedChain?.id);
+    if (!chain || !address)
+      return;
+
+    if (!isAddress(address)) {
+      dispatch(toastInfo('Registry address value must be an address; Can be 0x0'));
+      return;
+    }
+
+    return updateChainRegistry({...chain, registryAddress: address})
+      .then(result => {
+        if (!result) {
+          dispatch(toastError(`Failed to update chain ${chain.chainId} with ${address}`));
+          return;
+        }
+        dispatch(toastSuccess(`Updated chain ${chain.chainId} with ${address} `))
+        return getSupportedChains(true);
+      })
+  }
+
+  function _setRegistry(val) {
+    const value = val(registry);
+    setRegistry(value);
+
+    if (!hasRegistryAddress && value.validated)
+      updateData(value.value);
+  }
+
+  function _patchSupportedChain(data: Partial<SupportedChainData>) {
+    const chain = supportedChains?.find(c => +connectedChain.id === c.chainId);
+    if (!chain)
+      return;
+
+    return patchSupportedChain(chain, data)
+      .then(result => {
+        if (result)
+          dispatch(toastSuccess('updated chain registry'));
+        else dispatch(toastError('failed to update chain registry'));
+      })
+  }
+
+  function setDefaults() {
+    setErc20(defaultContractField);
+    setRegistry(defaultContractField);
+    setCloseFeePercentage("");
+    setCancelFeePercentage("");
+    setIsErc20Allowed(undefined);
+    setBountyToken(defaultContractField);
+    setBountyTokenDispatcher("");
+    setLockAmountForNetworkCreation("");
+    setNetworkCreationFeePercentage("");
+  }
+
   useEffect(() => {
-    if (!registryAddress || !Service?.active || !isVisible) return;
+    if (!registryAddress || !Service?.active?.registry?.contractAddress || !isVisible) return;
 
     updateData();
-  }, [registryAddress, Service?.active]);
+  }, [registryAddress, Service?.active?.registry?.contractAddress, isVisible]);
 
   useEffect(() => {
     if (currentUser?.walletAddress) setTreasury(currentUser?.walletAddress);
   }, [currentUser?.walletAddress]);
+
+  useEffect(() => {
+    if (!supportedChains?.length || !connectedChain?.id)
+      return;
+
+    const chain = supportedChains.find(({chainId}) => chainId === +connectedChain?.id);
+
+    if (!chain)
+      return;
+
+    setRegistrySaveCTA(chain?.registryAddress ? false : !!registryAddress);
+  }, [connectedChain, supportedChains, registryAddress]);
+
+  useEffect(() => {
+    if (connectedChain?.id && !registryAddress)
+      setDefaults();
+  }, [connectedChain?.id, registryAddress]);
 
   return(
     <div className="content-wrapper border-top-0 px-3 py-3">
@@ -254,6 +334,7 @@ export function RegistrySetup({
           color="warning"
           disabled={!needToSetDispatcher}
           executing={isSettingDispatcher}
+          isContractAction
         />
       }
 
@@ -265,6 +346,7 @@ export function RegistrySetup({
           color="info"
           disabled={!!isErc20Allowed?.transactional || !!isAllowingToken}
           executing={isAllowingToken === "transactional"}
+          isContractAction
         />
       }
 
@@ -276,15 +358,29 @@ export function RegistrySetup({
           color="info"
           disabled={!!isErc20Allowed?.reward || !!isAllowingToken}
           executing={isAllowingToken === "reward"}
+          isContractAction
         />
+      }
+
+      {
+        registrySaveCTA
+          ? <CallToAction call="Please save your registry onto the connected chain"
+                          action="Save" onClick={setChainRegistry} color="warning" disabled={false} executing={false}/>
+          : ''
       }
 
       <Row className="align-items-center mb-3">
         <ContractInput
           field={registry}
           contractName="Network Registry"
+          onChange={_setRegistry}
+          mustBeAddress
           docsLink="https://sdk.dappkit.dev/classes/Network_Registry.html"
-          readOnly
+          action={registry?.value && isAddress(registry?.value) && !isZeroAddress(registry?.value) ? {
+              label: t("registry.actions.save-registry"),
+              executing: false, disabled: false,
+              onClick: () => _patchSupportedChain({registryAddress: registry.value}) } : null 
+          }
         />
       </Row>
 
@@ -351,6 +447,7 @@ export function RegistrySetup({
           value={networkCreationFeePercentage}
           onChange={setNetworkCreationFeePercentage}
           variant="numberFormat"
+          decimalScale={7}
           description={t("registry.fields.network-creation-fee.description")}
           error={exceedsFeesLimitsError(networkCreationFeePercentage)}
           readOnly={hasRegistryAddress}
@@ -363,6 +460,7 @@ export function RegistrySetup({
           value={closeFeePercentage}
           onChange={setCloseFeePercentage}
           variant="numberFormat"
+          decimalScale={7}
           description={t("registry.fields.close-bounty-fee.description")}
           error={exceedsFeesLimitsError(closeFeePercentage)}
           readOnly={hasRegistryAddress}
@@ -375,6 +473,7 @@ export function RegistrySetup({
           value={cancelFeePercentage}
           onChange={setCancelFeePercentage}
           variant="numberFormat"
+          decimalScale={7}
           description={t("registry.fields.cancel-bounty-fee.description")}
           error={exceedsFeesLimitsError(cancelFeePercentage)}
           readOnly={hasRegistryAddress}
@@ -383,14 +482,14 @@ export function RegistrySetup({
 
       <Row className="mb-2">
         <Col xs="auto">
-          <Button
+          <ContractButton
             disabled={isDeployRegistryBtnDisabled || isDeployingRegistry}
             withLockIcon={isDeployRegistryBtnDisabled}
             isLoading={isDeployingRegistry}
             onClick={deployRegistryContract}
           >
             <span>{t("setup:registry.actions.deploy-registry")}</span>
-          </Button>
+          </ContractButton>
         </Col>
       </Row>
 
