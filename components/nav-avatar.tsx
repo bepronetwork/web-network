@@ -132,9 +132,11 @@ export default function NavAvatar() {
           </div>
         </div>
 
-        <LinksSession>
-          {internalLinks.map(ProfileInternalLink)}
-        </LinksSession>
+        { onNetwork &&
+          <LinksSession>
+            {internalLinks.map(ProfileInternalLink)}
+          </LinksSession>
+        }
 
         <LinksSession>
           {externalLinks.map(ProfileExternalLink)}
