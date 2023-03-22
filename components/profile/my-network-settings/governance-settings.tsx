@@ -121,16 +121,10 @@ export default function GovernanceSettings({
             disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
             className="ml-2"
             onClick={handleCloseMyNetwork}
+            isLoading={isClosing}
+            withLockIcon={!isAbleToClosed || !state.currentUser?.login}
           >
-            {(!isAbleToClosed || !state.currentUser?.login) && (
-              <LockedIcon className="me-2" />
-            )}
             <span>{t("custom-network:close-network")}</span>
-            {isClosing ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
           </Button>
         </Col>
       </Row>

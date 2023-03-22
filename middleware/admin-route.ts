@@ -7,7 +7,7 @@ import {
   MISSING_CHAIN_ID,
   NOT_ADMIN_WALLET,
   NOT_AN_ADMIN
-} from "helpers/contants";
+} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`, `PATCH`, `PUT`, `DELETE`]) => {

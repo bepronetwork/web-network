@@ -2,10 +2,12 @@ import {useEffect, useState} from "react";
 
 import {useRouter} from "next/router";
 
+import {useAppState} from "contexts/app-state";
+
 import {IssueFilterBoxOption} from "interfaces/filters";
 import {RepoInfo} from "interfaces/repos-list";
 
-import {useAppState} from "../contexts/app-state";
+import useApi from "x-hooks/use-api";
 
 type FilterStateUpdater = (
   opts: IssueFilterBoxOption[],
@@ -20,14 +22,16 @@ export default function useFilters(): [
   FilterStateUpdater,
   () => void
 ] {
-  const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
+  const router = useRouter();
+
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
-
+  const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
 
   const {state} = useAppState();
+  const { getReposWithBounties } = useApi();
 
-  const router = useRouter();
+  const isOnNetwork = router?.pathname?.includes("[network]");
 
   function getActiveFiltersOf(opts: IssueFilterBoxOption[]) {
     return opts
@@ -63,9 +67,17 @@ export default function useFilters(): [
                               (router.query?.repoId as string) === value.toString());
     }
 
-    setRepoFilters([
-      makeFilterOption("All", "allrepos", !router.query?.repoId)]
-      .concat(state.Service?.network?.repos?.list?.map(mapRepo)));
+    if (isOnNetwork)
+      setRepoFilters([
+        makeFilterOption("All", "allrepos", !router.query?.repoId)]
+        .concat(state.Service?.network?.repos?.list?.map(mapRepo)));
+    else
+        getReposWithBounties()
+          .then(data => {
+            setRepoFilters([
+              makeFilterOption("All", "allrepos", !router.query?.repoId)]
+              .concat(data.map(mapRepo)));
+          });
   }
 
   function loadFilters() {

@@ -7,20 +7,18 @@ import { SizeOptions } from "interfaces/utils";
 interface IdenticonProps {
   address: string;
   size?: SizeOptions;
-  withBorder?: boolean;
   className?: string;
 }
 
 export default function Identicon({
   address,
-  withBorder,
   size = "md",
   className
 } : IdenticonProps) {
   const ref = useRef<HTMLDivElement>();
 
   const SIZES = {
-    sm: 24,
+    sm: 32,
     md: 40,
     lg: 108
   };
@@ -38,7 +36,7 @@ export default function Identicon({
   }, [address]);
 
   return(
-    <div ref={ref} className={`d-flex identicon identicon${withBorder && "-border"} ${size} ${className}`}>
+    <div ref={ref} className={`d-flex identicon ${size} ${className}`}>
 
     </div>
   );

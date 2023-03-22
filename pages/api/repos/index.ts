@@ -1,29 +1,43 @@
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op} from "sequelize";
+import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
-import {LogAccess} from "../../../middleware/log-access";
-import WithCors from "../../../middleware/withCors";
 
 async function getAllRepos(req, res) {
-  const {networkName} = req.query;
+  const { networkName, withBounties } = req.query;
 
-  const network = await models.network.findOne({
-    where: {
-      name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+  const include = withBounties ? [
+    { 
+      association: "issues",
+      attributes: [],
+      required: true
     }
+  ] : [];
+
+  const where: WhereOptions = {};
+
+  if (networkName) {
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        }
+      }
+    });
+  
+    if (!network) return res.status(404).json("Invalid network");
+
+    where.network_id = network.id;
+  }
+
+  const repositories = await models.repositories.findAll({
+    where,
+    include
   });
 
-  if (!network) return res.status(404).json("Invalid network");
-
-  return res.status(200).json(await models.repositories.findAll({
-        where: {
-          network_id: network.id
-        }
-  },
-      { raw: true }));
+  return res.status(200).json(repositories);
 }
 
 async function addNewRepo(req, res) {
@@ -83,8 +97,7 @@ async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
     .json(!deleted ? `Couldn't delete entry ${id}` : "ok");
 }
 
-async function RepoRoute(req: NextApiRequest,
-                         res: NextApiResponse) {
+async function RepoRoute(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getAllRepos(req, res);
@@ -104,4 +117,4 @@ async function RepoRoute(req: NextApiRequest,
 
   res.end();
 }
-export default LogAccess(WithCors(RepoRoute))
+export default LogAccess(WithCors(RepoRoute));

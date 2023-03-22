@@ -50,7 +50,7 @@ export default function UpdateBountyAmountModal({
   const handleApprove = async () => {
     setIsExecuting(true);
 
-    handleApproveToken(transactionalAddress, newAmount.toFixed())
+    handleApproveToken(transactionalAddress, newAmount.toFixed(), undefined, transactionalERC20?.symbol)
       .then(() => {
         return transactionalERC20.updateAllowanceAndBalance();
       })
@@ -65,7 +65,7 @@ export default function UpdateBountyAmountModal({
   const handleSubmit = async () => {
     setIsExecuting(true);
 
-    handleUpdateBountyAmount(bountyId, newAmount.toFixed())
+    handleUpdateBountyAmount(bountyId, newAmount.toFixed(), transactionalERC20?.symbol)
       .then(txInfo => {
         return processEvent("bounty", "updated", state.Service?.network?.lastVisited, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 

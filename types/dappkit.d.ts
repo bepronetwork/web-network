@@ -5,11 +5,7 @@ export type NetworkParameters = "councilAmount" |
   "mergeCreatorFeeShare" | 
   "proposerFeeShare" |
   "percentageNeededForDispute" |
-  "cancelFee" |
-  "closeFee" |
-  "cancelableTime" |
-  "treasury" |
-  "transfer"
+  "cancelableTime";
 
 export type RegistryParameters = "networkCreationFeePercentage" | 
   "lockAmountForNetworkCreation" | 
@@ -19,7 +15,7 @@ export type RegistryParameters = "networkCreationFeePercentage" |
   "treasury" |
   "erc20" |
   "MAX_LOCK_PERCENTAGE_FEE" |
-  "DIVISOR" 
+  "DIVISOR" ;
 
 export type Entities = "bounty" | "proposal" | "pull-request" | "registry" | "oracles" | "bountyToken";
 

@@ -8,14 +8,12 @@ export default function Avatar({
   className,
   src,
   tooltip = false,
-  border = false,
   size = "sm"
 }: {
   userLogin: string;
   className?: string;
   src?: string;
   tooltip?: boolean;
-  border?: boolean;
   size?: SizeOptions;
 }) {
   const SIZES = {
@@ -36,7 +34,7 @@ export default function Avatar({
         }
       >
         <img
-          className={`avatar circle-${SIZES[size]} ${border && "border-avatar" || ""} ${className}`}
+          className={`avatar circle-${SIZES[size]} ${className}`}
           src={src || `https://github.com/${userLogin}.png`}
         />
       </OverlayTrigger>

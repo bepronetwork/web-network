@@ -141,7 +141,7 @@ export default function MainNav() {
 
   return (
     <div className="nav-container">
-      {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
+      {(state.Service?.network?.active?.isClosed && !noNeedNetworkInstance) && <ClosedNetworkAlert />}
       <div className="main-nav d-flex flex-column justify-content-center">
         <div
           className={`d-flex flex-row align-items-center justify-content-between px-3 ${
@@ -217,9 +217,7 @@ export default function MainNav() {
 
             <Button
               onClick={() => setShowHelp(true)}
-              className="opacity-75 opacity-100-hover"
-              transparent
-              rounded
+              className="bg-gray-850 border-gray-850 rounded p-2"
             >
               <HelpIcon />
             </Button>

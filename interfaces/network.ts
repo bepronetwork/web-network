@@ -30,9 +30,10 @@ export interface Network {
   councilAmount?: string;
   disputableTime?: number;
   draftTime?: number;
-  oracleExchangeRate?: number;
-  mergeCreatorFeeShare?: number;
-  proposerFeeShare?: number;
+  cancelableTime?: number;
+  oracleExchangeRate?: string | number;
+  mergeCreatorFeeShare?: string | number;
+  proposerFeeShare?: string | number;
   percentageNeededForDispute?: number;
   treasury?: TreasuryInfo;
   isRegistered?: boolean;
@@ -128,6 +129,10 @@ export interface NetworkSettings {
       disputableTime?: Field<number>;
       percentageNeededForDispute?: Field<number>;
       councilAmount?: Field<number>;
+      cancelableTime?: Field<number>;
+      oracleExchangeRate?: Field<number>;
+      proposerFeeShare?: Field<number>;
+      mergeCreatorFeeShare?: Field<number>;
       validated?: boolean;
     };
     validated: boolean;

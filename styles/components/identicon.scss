@@ -5,6 +5,12 @@
     justify-content: center;
 
     border: 3px solid var(--bs-primary);
+
+    &.sm {
+      border-radius: 50%;
+      width: 32;
+      height: 32;
+    }
     
     &.md {
       border-radius: 50%;
