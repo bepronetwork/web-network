@@ -17,17 +17,17 @@ import {Network} from "interfaces/network";
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 
-function MyNetwork() {
-  const {t} = useTranslation(["common", "custom-network"]);
+export function MyNetwork() {
+  const { t } = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 
   const { state, dispatch } = useAppState();
-  
+
   const { chain } = useChain();
   const { searchNetworks } = useApi();
   const { setForcedNetwork } = useNetworkSettings();
-  
+
   const defaultNetworkName = state?.Service?.network?.active?.name?.toLowerCase();
 
   async function updateEditingNetwork() {
@@ -44,7 +44,7 @@ function MyNetwork() {
         const savedNetwork = count > 0 ? rows[0] : undefined;
 
         if (savedNetwork)
-          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}:${chainId}`, 
+          sessionStorage.setItem(`bepro.network:${savedNetwork.name.toLowerCase()}:${chainId}`,
                                  JSON.stringify(savedNetwork));
 
         setMyNetwork(savedNetwork);
@@ -59,10 +59,10 @@ function MyNetwork() {
 
     updateEditingNetwork();
   }, [state.currentUser?.walletAddress, chain]);
-  
+
   return(
     <ProfileLayout>
-      { !myNetwork && 
+      { !myNetwork &&
         <Col className="pt-5">
           <NothingFound description={t("custom-network:errors.not-found")}>
             <InternalLink
