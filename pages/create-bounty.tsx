@@ -451,7 +451,7 @@ export default function CreateBountyPage() {
   }, [currentNetwork]);
 
   useEffect(() => {
-    //cleanFields();
+    cleanFields();
     transactionalERC20.updateAllowanceAndBalance();
     rewardERC20.updateAllowanceAndBalance();
   }, []);
