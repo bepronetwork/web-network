@@ -68,7 +68,7 @@ export default function VotingPowerPage() {
         </FlexRow>
 
         <TokenBalance
-          icon={oracleToken.icon} 
+          icon={oracleToken.icon}
           symbol={oracleToken.symbol}
           name={`${t("misc.locked")} ${state.Service?.network?.active?.networkToken?.name || oracleToken.name}`}
           overSymbol={t("bepro-votes")}
@@ -77,7 +77,7 @@ export default function VotingPowerPage() {
         />
 
         <Row className="mt-4 mb-4">
-          <OraclesActions 
+          <OraclesActions
             wallet={{
               address: state.currentUser?.walletAddress,
               balance: state.currentUser?.balance,
@@ -87,7 +87,7 @@ export default function VotingPowerPage() {
             updateWalletBalance={() => updateWalletBalance(true) }
           />
 
-          <OraclesDelegate 
+          <OraclesDelegate
             wallet={{
               address: state.currentUser?.walletAddress,
               balance: state.currentUser?.balance,
