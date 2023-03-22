@@ -6,7 +6,6 @@ import {appWithTranslation} from "next-i18next";
 import {AppProps} from "next/app";
 import {GoogleAnalytics} from "nextjs-google-analytics";
 
-import CreateBountyModal from "components/create-bounty-modal";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 import Loading from "components/loading";
 import MainNav from "components/main-nav";
@@ -46,7 +45,6 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             <div id="root-container">
               <Component {...pageProps} />
             </div>
-            <CreateBountyModal/>
             <StatusBar />
             <Toaster />
             <Loading />
