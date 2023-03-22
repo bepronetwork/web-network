@@ -20,7 +20,7 @@ import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import {useAppState} from "contexts/app-state";
-import {changeShowCreateBounty, changeShowWeb3} from "contexts/reducers/update-show-prop";
+import {changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network-theme";
@@ -32,7 +32,7 @@ interface MyNetworkLink {
 }
 
 export default function MainNav() {
-  const { pathname } = useRouter();
+  const { pathname, push } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
   const {dispatch} = useAppState();
@@ -73,8 +73,7 @@ export default function MainNav() {
 
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true))
-    return dispatch(changeShowCreateBounty(true))
-    
+    push('/create-bounty')
   }
   
   function LinkExplore() {
@@ -192,19 +191,20 @@ export default function MainNav() {
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">
-            {(!noNeedNetworkInstance && (
-              <ReadOnlyButtonWrapper>
-                <Button
-                  outline
-                  onClick={handleNewBounty}
-                  textClass="text-white"
-                  className="read-only-button"
-                >
-                  <PlusIcon />
-                  <span><Translation label={"main-nav.new-bounty"} /></span>
-                </Button>
-              </ReadOnlyButtonWrapper>
-            )) || (
+          <ReadOnlyButtonWrapper>
+              <Button
+                outline
+                onClick={handleNewBounty}
+                textClass="text-white"
+                className="read-only-button"
+              >
+                <PlusIcon />
+                <span>
+                  <Translation label={"main-nav.new-bounty"} />
+                </span>
+              </Button>
+            </ReadOnlyButtonWrapper>
+            {noNeedNetworkInstance && (
               <InternalLink
                 href={myNetwork.href}
                 icon={myNetwork.icon}
