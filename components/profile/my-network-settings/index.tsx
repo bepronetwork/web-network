@@ -304,15 +304,15 @@ export default function MyNetworkSettings({
       {isCurrentNetwork && (
         <style>{colorsToCSS(settings?.theme?.colors)}</style>
       )}
-
+      
       {!state.currentUser?.login && <WarningGithub />}
-
+      
       <TabbedNavigation
         className="my-network-tabs border border-dark-gray"
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
-
+      
       {settings?.validated &&
         github?.validated &&
         !network?.isClosed &&
