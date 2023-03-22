@@ -6,7 +6,7 @@ import getConfig from "next/config";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import AmountCard from "components/custom-network/amount-card";
 import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
@@ -19,6 +19,7 @@ import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
+import { RegistryEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
@@ -103,7 +104,7 @@ export default function LogoAndColoursSettings({
 
     handleAddNetworkToRegistry(network.networkAddress)
       .then((txInfo) => {
-        return processEvent("registry", "registered", network.name, {
+        return processEvent(RegistryEvents.NetworkRegistered, undefined, {
           fromBlock: txInfo.blockNumber,
         });
       })
@@ -140,7 +141,7 @@ export default function LogoAndColoursSettings({
             </span>
           </Col>
           <Col xs="auto">
-            <Button
+            <ContractButton
               color="warning"
               onClick={handleRegisterNetwork}
               disabled={
@@ -155,7 +156,7 @@ export default function LogoAndColoursSettings({
               isLoading={isRegistering}
             >
               {t("actions.register")}
-            </Button>
+            </ContractButton>
           </Col>
         </Row>
       )}

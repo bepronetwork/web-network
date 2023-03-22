@@ -1,22 +1,24 @@
 import {useEffect, useState} from "react";
 
-import {Defaults} from "@taikai/dappkit";
+import {isZeroAddress} from "ethereumjs-util";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
-import AlreadyHasNetworkModal from "components/already-has-network-modal";
 import ConnectWalletButton from "components/connect-wallet-button";
+import {ContextualSpan} from "components/contextual-span";
 import CreatingNetworkLoader from "components/creating-network-loader";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
+import If from "components/If";
 import Stepper from "components/stepper";
 
 import {useAppState} from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import {changeLoadState} from "contexts/reducers/change-load";
+import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {
@@ -27,31 +29,37 @@ import {
   DEFAULT_MERGER_FEE,
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
-  DEFAULT_PROPOSER_FEE
+  DEFAULT_PROPOSER_FEE,
+  UNSUPPORTED_CHAIN,
+  WANT_TO_CREATE_NETWORK
 } from "helpers/constants";
 import {psReadAsText} from "helpers/file-reader";
 
+import { RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
+import useSignature from "x-hooks/use-signature";
 
 function NewNetwork() {
   const router = useRouter();
 
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
+  const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
 
   const { state, dispatch } = useAppState();
 
+  const { signMessage } = useSignature();
+  const { colorsToCSS } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
   const { createNetwork, processEvent } = useApi();
-  const { handleChangeNetworkParameter } = useBepro();
-  const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
+  const { handleDeployNetworkV2, handleAddNetworkToRegistry, handleChangeNetworkParameter } = useBepro();
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
-  const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
-  const defaultNetworkName = state?.Service?.network?.active?.name.toLowerCase();
   const isSetupPage = router?.pathname?.toString()?.includes("setup");
     
   const creationSteps = [
@@ -65,14 +73,24 @@ function NewNetwork() {
     { id: 1, name: t("custom-network:modals.loader.steps.changing-merger-fee") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-proposer-fee") },
     { id: 2, name: t("custom-network:modals.loader.steps.add-to-registry") },
-    { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") }
+    { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") },
+    { id: 3, name: t("custom-network:modals.loader.steps.sync-chain-id") }
   ];
 
   async function handleCreateNetwork() {
     if (!state.currentUser?.login || !state.currentUser?.walletAddress || !state.Service?.active) return;
+
+    const signedMessage = await signMessage(WANT_TO_CREATE_NETWORK);
+
+    if (!signedMessage)
+      return;
+
     setCreatingNetwork(0);
 
-    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => {
+      console.debug("Failed to deploy network", error);
+      return error;
+    });
 
     if (!deployNetworkTX?.contractAddress) return setCreatingNetwork(-1);
 
@@ -95,7 +113,8 @@ function NewNetwork() {
       githubLogin: state.currentUser.login,
       allowedTokens: tokens,
       networkAddress: deployedNetworkAddress,
-      isDefault: isSetupPage
+      isDefault: isSetupPage,
+      signedMessage
     };
 
     const networkCreated = await createNetwork(payload)
@@ -163,6 +182,11 @@ function NewNetwork() {
       await handleChangeNetworkParameter("proposerFeeShare", proposerFee, deployedNetworkAddress);
     }
 
+    await processEvent(StandAloneEvents.UpdateNetworkParams, deployedNetworkAddress, {
+      chainId: state.connectedChain?.id
+    })
+      .catch(error => console.debug("Failed to update network parameters", error));
+
     setCreatingNetwork(9);
 
     const registrationTx = await handleAddNetworkToRegistry(deployedNetworkAddress)
@@ -174,8 +198,13 @@ function NewNetwork() {
 
     setCreatingNetwork(10);
     cleanStorage?.();
-    await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
-      .then(() => router.push(getURLWithNetwork("/", { network: payload.name.toLowerCase().replaceAll(" ", "-") })))
+    await processEvent(RegistryEvents.NetworkRegistered, state.connectedChain?.registry, { 
+      fromBlock: registrationTx.blockNumber 
+    })
+      .then(() => router.push(getURLWithNetwork("/", { 
+        network: payload.name,
+        chain: state.connectedChain?.shortName
+      })))
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({
@@ -191,26 +220,28 @@ function NewNetwork() {
       });
   }
 
-  function goToMyNetworkPage() {
-    router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
-  }
-
   function checkHasNetwork() {
     dispatch(changeLoadState(true));
     
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
-      .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
-      .catch(console.log)
+      .then(networkAddress => setHasNetwork(!isZeroAddress(networkAddress)))
+      .catch(console.debug)
       .finally(() => dispatch(changeLoadState(false)));
   }
 
-  
-
   useEffect(() => {
-    if (!state.Service?.active || !state.currentUser?.walletAddress) return;
+    const walletAddress = state.currentUser?.walletAddress;
+    const connectedChain = state.connectedChain;
+
+    if (!state.Service?.active || !walletAddress || !connectedChain) return;
+
+    if (walletAddress && connectedChain.name === UNSUPPORTED_CHAIN) {
+      dispatch(changeNeedsToChangeChain(true));
+      return;
+    }
 
     checkHasNetwork();
-  }, [state.Service?.active, state.currentUser]);
+  }, [state.Service?.active, state.currentUser, state.connectedChain]);
 
   return (
     <div>
@@ -220,9 +251,14 @@ function NewNetwork() {
       {
         (creatingNetwork > -1 && <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />)
       }
-      
-      <div>
-        <Stepper dark={isSetupPage}>
+
+      <If condition={hasNetwork}>
+        <div className="d-flex flex-col align-items-center justify-content-center mb-3">
+          <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
+        </div>
+      </If>
+
+      <Stepper dark={isSetupPage}>
           <LockBeproStep validated={tokensLocked?.validated} />
 
           <NetworkInformationStep validated={details?.validated} />
@@ -231,15 +267,14 @@ function NewNetwork() {
 
           <SelectRepositoriesStep validated={github?.validated} />
 
-          <TokenConfiguration 
-            validated={isSettingsValidated} 
-            handleFinish={handleCreateNetwork} 
-            finishLabel={t("custom-network:steps.repositories.submit-label")} 
+          <TokenConfiguration
+            validated={isSettingsValidated}
+            handleFinish={handleCreateNetwork}
+            finishLabel={t("custom-network:steps.repositories.submit-label")}
           />
         </Stepper>
-      </div>
 
-      <AlreadyHasNetworkModal show={hasNetwork} onOkClick={goToMyNetworkPage} />
+      {/*<AlreadyHasNetworkModal show={hasNetwork} onOkClick={goToMyNetworkPage} />*/}
     </div>
   );
 }

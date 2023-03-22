@@ -52,7 +52,7 @@
   --bs-warning-rgb:#{toRGB($warning)};
   --bs-secondary:#{$secondary};
   --bs-secondary-rgb:#{toRGB($secondary)};
-  --bs-body-bg:#{$bg};
+  --bs-body-bg:#{$gray-950};
   --bs-body-bg-rgb:#{toRGB($bg)};
   --bs-dark:#{$gray-950};
   --bs-dark-rgb:#{toRGB($gray-950)};
@@ -423,7 +423,6 @@ li {
     margin: 0px;
     padding: 0px;
     list-style: none;
-    margin-left: $m * 2;
     li {
       margin-left: $m * 2;
     }
@@ -1241,8 +1240,10 @@ a.row-button svg {
   height: 24px;
 }
 
-.text-white:hover svg path {
-  fill: white;
+.text-white:hover, .text-gray-150:hover {
+  svg path {
+    fill: white;
+  }
 }
 
 .spinner-border-xs {
@@ -1812,6 +1813,16 @@ input[type="color"] {
     border-right: 1px solid $disabled;
   }
 }
+
+.border-gray-850 {
+  &-left {
+    border-left: 1px solid $gray-850;
+  }
+
+  &-right {
+    border-right: 1px solid $gray-850;
+  }
+}
 .svg {
   &-gray {
     svg {
@@ -1872,4 +1883,25 @@ input[type="color"] {
 
 .kyc-modal-body{
   min-height: 630px !important;
+}
+
+.select-network-dropdown {
+  max-width: 168px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500px;
+}
+
+.kyc-modal-body{
+  min-height: 630px !important;
+}
+
+.profile-side-link-active {
+  color: #fff;
+  background-color: $gray-850;
+  border-radius: 4px;
+
+  svg path {
+    fill: white;
+  }
 }

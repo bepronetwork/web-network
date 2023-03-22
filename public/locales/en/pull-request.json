@@ -38,7 +38,8 @@
       "title": "Cancel Pull Request",
       "success": "Pull Request cancelled",
       "error": "Failed to cancel pull request"
-    }
+    },
+    "go-to-pull-request": "Go to Pull Request"
   },
   "status": {
     "ready-to-merge": "Ready to merge",

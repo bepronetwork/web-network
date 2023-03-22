@@ -7,10 +7,8 @@ import {useRouter} from "next/router";
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
-import Avatar from "components/avatar";
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
-import Identicon from "components/identicon";
 
 import {useAppState} from "contexts/app-state";
 
@@ -19,7 +17,13 @@ import {truncateAddress} from "helpers/truncate-address";
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
-export default function NavAvatar() {
+interface NavAvatarProps {
+  onNetwork?: boolean;
+}
+
+export default function NavAvatar({
+  onNetwork
+} : NavAvatarProps) {
   const { t } = useTranslation("common");
   const router = useRouter();
 
@@ -29,10 +33,6 @@ export default function NavAvatar() {
 
   const { getURLWithNetwork } = useNetwork();
   const { disconnectWallet } = useAuthentication();
-
-  const avatar = () => state.currentUser?.login &&
-    <Avatar userLogin={state.currentUser.login} className="border-primary" size="md" /> ||
-    <Identicon address={state.currentUser?.walletAddress} />;
   
   const username = 
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
@@ -93,7 +93,7 @@ export default function NavAvatar() {
 
   const internalLinks = [
     Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.oracles"),
+    Link(t("main-nav.nav-avatar.voting-power"),
          getURLWithNetwork("/profile/bepro-votes")),
     Link(t("main-nav.nav-avatar.payments"),
          getURLWithNetwork("/profile/payments")),
@@ -107,7 +107,6 @@ export default function NavAvatar() {
          getURLWithNetwork("/profile/my-network")),
   ];
 
-
   const externalLinks = [
     Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
     Link(t("main-nav.nav-avatar.guides"), "https://docs.bepro.network/"),
@@ -120,7 +119,11 @@ export default function NavAvatar() {
       <Popover.Body className="bg-shadow pt-3 px-4">
         <div className="row align-items-center border-bottom border-light-gray pb-2">
           <div className="col-3 px-0">
-            {avatar()}
+            <AvatarOrIdenticon
+              user={state.currentUser?.login}
+              address={state.currentUser?.walletAddress}
+              size="md"
+            />
           </div>
 
           <div className="col-9 p-0">
@@ -130,19 +133,23 @@ export default function NavAvatar() {
               </span>
               </div>
 
-              <div className="d-flex flex-row justify-content-left">
-                <ProfileInternalLink 
-                  href={getURLWithNetwork("/profile")} 
-                  label={t("main-nav.nav-avatar.view-profile")} 
-                  className="text-gray p family-Regular"
-                />
-              </div>
+              { onNetwork && 
+                <div className="d-flex flex-row justify-content-left">
+                  <ProfileInternalLink 
+                    href={getURLWithNetwork("/profile")} 
+                    label={t("main-nav.nav-avatar.view-profile")} 
+                    className="text-gray p family-Regular"
+                  />
+                </div>
+              }
           </div>
         </div>
 
-        <LinksSession>
-          {internalLinks.map(ProfileInternalLink)}
-        </LinksSession>
+        { onNetwork &&
+          <LinksSession>
+            {internalLinks.map(ProfileInternalLink)}
+          </LinksSession>
+        }
 
         <LinksSession>
           {externalLinks.map(ProfileExternalLink)}
@@ -173,14 +180,18 @@ export default function NavAvatar() {
         onToggle={(next) => setVisible(next)}
         overlay={overlay}
       >
-        <div>
+        <div className="d-flex flex-column align-items-center justify-content-center">
           <AvatarOrIdenticon
-            user={state.currentUser.login}
+            user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
-            size="sm"
-            withBorder
-            active={visible}
+            size="md"
           />
+
+          {/* <If condition={!!state.currentUser?.walletAddress}>
+            <span className="caption-small text-white">
+              {truncateAddress(state.currentUser?.walletAddress, 6, 3)}
+            </span>
+          </If> */}
         </div>
       </OverlayTrigger>
     </div>

@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import Button from "components/button";
+import CuratorListBar from "components/curator-list-bar";
+import CuratorListItem from "components/curator-list-item";
 import CustomContainer from "components/custom-container";
+import InfiniteScroll from "components/infinite-scroll";
 import NothingFound from "components/nothing-found";
+import ScrollTopButton from "components/scroll-top-button";
 
 import { useAppState } from "contexts/app-state";
 import { changeLoadState } from "contexts/reducers/change-load";
@@ -14,17 +19,13 @@ import { Curator } from "interfaces/curators";
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 
-import CuratorListBar from "./curator-list-bar";
-import CuratorListItem from "./curator-list-item";
-import InfiniteScroll from "./infinite-scroll";
-import ScrollTopButton from "./scroll-top-button";
-
 interface CuratorsPages {
   curators: Curator[];
   page: number;
 }
 
 export default function CuratorsList({ inView }: { inView?: boolean }) {
+  const { query } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
   const [hasMore, setHasMore] = useState(false);
@@ -32,23 +33,22 @@ export default function CuratorsList({ inView }: { inView?: boolean }) {
   const [isEmptyPage, setIsEmptyPage] = useState<boolean>();
   const [curatorsPage, setCuratorsPage] = useState<CuratorsPages[]>([]);
 
+  const { searchCurators } = useApi();
+  const { state, dispatch } = useAppState();
   const { page, nextPage, goToFirstPage } = usePage();
 
-  const { searchCurators } = useApi();
-
-  const { state, dispatch } = useAppState();
-
   function handlerSearch() {
-    if (!state.Service?.network?.active || inView === false) return;
+    if (!state.Service?.network?.active || inView === false || !query?.chain) return;
 
     dispatch(changeLoadState(true));
 
     searchCurators({
       isCurrentlyCurator: true,
-      networkName: state.Service?.network?.lastVisited,
+      networkName: state.Service?.network?.active?.name,
       sortBy: "acceptedProposals",
       order: "asc",
-      page
+      page,
+      chainShortName: query.chain.toString()
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -78,7 +78,7 @@ export default function CuratorsList({ inView }: { inView?: boolean }) {
       });
   }
 
-  useEffect(handlerSearch, [page, state.Service?.network?.lastVisited, inView]);
+  useEffect(handlerSearch, [page, state.Service?.network?.active, inView, query?.chain]);
 
   useEffect(() => {
     if (page) {
@@ -115,13 +115,14 @@ export default function CuratorsList({ inView }: { inView?: boolean }) {
           isLoading={state.loading?.isLoading}
           hasMore={hasMore}
         >
-          {curatorsPage.map(({ curators }) => {
-            return curators?.map((curator) => (
-              <CuratorListItem
-                curator={curator}
-              />
-            ));
-          })}
+          {
+            curatorsPage
+              .flatMap(({ curators }) => curators )
+              .map(curator => (<CuratorListItem
+                                key={`curator-${curator?.address}`}
+                                curator={curator}
+                              />))
+          }
         </InfiniteScroll>
       )) || <></>}
 

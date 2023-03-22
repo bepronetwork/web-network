@@ -3,9 +3,8 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import handleNetworkValues from 'helpers/handleNetworksValuesApi';
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 3) => (models.issue.findAll({
   where: {
@@ -14,9 +13,12 @@ const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit
   },
   order: [[ String(sortBy), String(order) ]],
   include: [ 
-    { association: "network", attributes: ['colors', 'name', 'logoIcon'] },
+    { 
+      association: "network",
+      include: [ { association: "chain" }]
+    },
     { association: "repository" },
-    { association: "token" }
+    { association: "transactionalToken" }
   ],
   limit
 }))
@@ -42,7 +44,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const network = await models.network.findOne({
       where: {
         name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-")
+          [Op.iLike]: networkName.toString()
         }
       }
     });
@@ -66,13 +68,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const issuesOpen = await getLastIssuesByStatus("open",
                                                  whereCondition,
                                                  sortBy,
-                                                 order).then((data) => handleNetworkValues(data));
+                                                 order);
   
   return res.status(200).json(issuesOpen);
 }
 
-async function getAll(req: NextApiRequest,
-                      res: NextApiResponse) {
+async function getAll(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

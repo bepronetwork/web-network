@@ -4,7 +4,11 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import Modal from "components/modal";
+import ProposalListDistribution from "components/proposal-list-distribution";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
@@ -12,11 +16,6 @@ import { DistributedAmounts, Proposal } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
-
-import {useAppState} from "../contexts/app-state";
-import ProposalListDistribution from "./proposal-list-distribution";
-
-
 
 interface props {
   amountTotal: BigNumber;
@@ -54,7 +53,7 @@ export default function ProposalMerge({
   }
 
   async function  getCoinInfo() { 
-    await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol).then((tokenInfo) => {
+    await getCoinInfoByContract(state.Service?.network?.active?.networkToken?.symbol).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
     }).catch(error => console.debug("getCoinInfo", error));
   }
@@ -73,7 +72,7 @@ export default function ProposalMerge({
 
   return (
     <>
-      <Button
+      <ContractButton
         className="flex-grow-1"
         textClass="text-uppercase text-white"
         onClick={() => setShow(true)}
@@ -82,7 +81,7 @@ export default function ProposalMerge({
         withLockIcon={!canMerge || isMerging}
       >
         <span>{t("actions.merge")}</span>
-      </Button>
+      </ContractButton>
 
       <Modal
         show={show}

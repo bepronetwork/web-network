@@ -10,6 +10,7 @@ import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
 import InfiniteScroll from "components/infinite-scroll";
 import IssueFilters from "components/issue-filters";
@@ -28,6 +29,7 @@ import {isProposalDisputable} from "helpers/proposal";
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
@@ -86,12 +88,14 @@ export default function ListIssues({
 
   const searchTimeout = useRef(null);
 
+  const { chain } = useChain();
   const { searchIssues, getTotalBounties } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
 
   const isProfilePage = router?.asPath?.includes("profile");
 
-  const { repoId, time, state, sortBy, order } = router.query as {
+  const { network: networkName, repoId, time, state, sortBy, order } = router.query as {
+    network: string;
     repoId: string;
     time: string;
     state: string;
@@ -165,11 +169,15 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name || inView === false) return;
+    if (router.pathname === "/[network]" && !networkName ||
+        router.pathname.includes("/[network]/[chain]") && (!networkName || !chain || inView === false)) return;
 
     dispatch(changeLoadState(true));
 
-    if(allNetworks) getTotalBounties().then(setTotalBounties)
+    if(allNetworks) 
+      getTotalBounties()
+        .then(setTotalBounties)
+        .catch(error => console.debug("Failed to getTotalBounties", error));
 
     searchIssues({
       page,
@@ -179,11 +187,12 @@ export default function ListIssues({
       search,
       sortBy: sortBy || 'createdAt',
       order,
-      creator,
+      address: creator,
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
+      chainId: chain?.chainId?.toString(),
+      networkName: networkName?.toString(),
       allNetworks: allNetworks ? allNetworks : ""
     })
       .then(async ({ rows, pages, currentPage }) => {
@@ -208,7 +217,7 @@ export default function ListIssues({
         setHasMore(currentPage < pages);
       })
       .catch((error) => {
-        console.error("Error fetching issues", error);
+        console.debug("Error fetching issues", error);
       })
       .finally(() => {
         dispatch(changeLoadState(false));
@@ -228,7 +237,7 @@ export default function ListIssues({
   }
 
   useEffect(() => {
-    if (page) {
+    if (page && !!issuesPages.length) {
       const pagesToValidate = [...Array(+page).keys()].map((i) => i + 1);
 
       setTruncatedData(!pagesToValidate.every((pageV) =>
@@ -244,10 +253,12 @@ export default function ListIssues({
     state,
     sortBy,
     order,
+    chain,
     creator,
     proposer,
-    appState.Service?.network?.active?.name,
-    inView
+    networkName,
+    inView,
+    appState.supportedChains
   ]);
 
   useEffect(() => {
@@ -271,7 +282,7 @@ export default function ListIssues({
 
   return (
     <CustomContainer 
-      className={isProfilePage && "px-0 mx-0" || ""}
+      className={`pb-3 ${isProfilePage && "px-0 mx-0" || ""}`}
       childWrapperClassName={isProfilePage && "justify-content-left" || ""}
     >
       {allNetworks && (
@@ -284,7 +295,7 @@ export default function ListIssues({
       )}
       {isRenderFilter() ? (
         <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-dark"}
+          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-gray-950"}
         >
           <div className="w-100">
             <InputGroup className="border-radius-8">
@@ -369,9 +380,9 @@ export default function ListIssues({
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {(appState.currentUser?.walletAddress && !allNetworks) && (
               <ReadOnlyButtonWrapper>
-                <Button onClick={handleNotFoundClick}>
+                <ContractButton onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
-                </Button>
+                </ContractButton>
                 </ReadOnlyButtonWrapper>
               )}
           </NothingFound>

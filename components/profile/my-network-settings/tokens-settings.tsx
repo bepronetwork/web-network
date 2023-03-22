@@ -3,20 +3,21 @@ import {Col, Row} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import {useNetworkSettings} from "contexts/network-settings";
+import ContractButton from "components/contract-button";
+import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
+import {WarningSpan} from "components/warning-span";
 
+import {useAppState} from "contexts/app-state";
+import { useNetworkSettings } from "contexts/network-settings";
+
+import { RegistryEvents } from "interfaces/enums/events";
 import {Token, TokenType} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
-
-import {useAppState} from "../../../contexts/app-state";
-import useBepro from "../../../x-hooks/use-bepro";
-import Button from "../../button";
-import MultipleTokensDropdown from "../../multiple-tokens-dropdown";
-import {WarningSpan} from "../../warning-span";
+import useBepro from "x-hooks/use-bepro";
 
 interface SelectedTokens {
-   [tokenType: TokenType | string]: string[]
+  [tokenType: TokenType | string]: string[];
 }
 
 export default function TokensSettings({
@@ -58,7 +59,7 @@ export default function TokensSettings({
     setIsLoadingTokens(true);
 
     try {
-      const dbTokens = await getTokens();
+      const dbTokens = await getTokens(state.connectedChain?.id);
 
       const { 
         dbRewardAllowed,
@@ -143,7 +144,7 @@ export default function TokensSettings({
     Promise.all(transactions).then(async (txs : { blockNumber: number }[]) => {
       const fromBlock = txs.reduce((acc, tx) => Math.min(acc, tx.blockNumber), Number.MAX_SAFE_INTEGER)
 
-      await processEvent("registry", "changed", state.Service?.network?.active.name, { fromBlock });
+      await processEvent(RegistryEvents.ChangeAllowedTokens, undefined, { fromBlock });
 
       await getAllowedTokensContract();
     })
@@ -151,11 +152,11 @@ export default function TokensSettings({
 
 
   useEffect(() => {
-    if (!state.Service?.active) return;
+    if (!state.Service?.active || !state.connectedChain?.id) return;
 
     getAllowedTokensContract();
       
-  }, [state.Service?.active, isGovernorRegistry]);
+  }, [state.Service?.active, state.connectedChain?.id, isGovernorRegistry]);
 
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {
@@ -173,13 +174,13 @@ export default function TokensSettings({
   function renderButtons(tokenType: TokenType) {
     return (
       <div className="d-flex" key={`col-${tokenType}`}>
-        <Button className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
+        <ContractButton className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
           <span>
           {tokenType === 'transactional'
               ? t("custom-network:save-transactional-config")
               : t("custom-network:save-reward-config")}
           </span>
-        </Button>
+        </ContractButton>
       </div>
     );
   }

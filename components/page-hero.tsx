@@ -2,13 +2,13 @@ import React from "react";
 
 import InfoIcon from "assets/icons/info-icon";
 
+import Button from "components/button";
+import CustomContainer from "components/custom-container";
+
 import {formatNumberToNScale} from "helpers/formatNumber";
 import {highlightText} from "helpers/string";
 
 import {Currency} from "interfaces/currency";
-
-import Button from "./button";
-import CustomContainer from "./custom-container";
 
 export interface InfosHero {
   value: number | string;

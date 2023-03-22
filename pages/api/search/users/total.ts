@@ -1,8 +1,9 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+
+import {LogAccess} from "middleware/log-access";
+import WithCors from "middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const userCount = await models.user.count();
@@ -10,8 +11,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(userCount);
 }
 
-async function getAll(req: NextApiRequest,
-                      res: NextApiResponse) {
+async function getAll(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getTotal(req, res);

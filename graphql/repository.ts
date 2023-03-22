@@ -56,7 +56,7 @@ export const Details =
   `query Details($repo: String!, $owner: String!) {
     repository(name: $repo, owner: $owner) {
         id
-        labels(first: 1, query: "draft") {
+        labels(first: 100) {
           nodes {
             id
             name

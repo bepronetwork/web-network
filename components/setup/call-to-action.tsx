@@ -1,5 +1,6 @@
 import Button from "components/button";
-import { ContextualSpan } from "components/contextual-span";
+import {ContextualSpan} from "components/contextual-span";
+import ContractButton from "components/contract-button";
 
 export function CallToAction({
   call,
@@ -7,8 +8,11 @@ export function CallToAction({
   onClick,
   color,
   disabled,
-  executing
+  executing,
+  isContractAction = false
 }) {
+  const BtnComponent = isContractAction ? ContractButton : Button;
+
   return(
     <ContextualSpan
       context={color}
@@ -16,15 +20,14 @@ export function CallToAction({
       isAlert
     >
       <span className="col">{call}</span>
-      <Button
+      <BtnComponent
         color={color}
         disabled={executing || disabled}
         withLockIcon={disabled && !executing}
         isLoading={executing}
-        onClick={onClick}
-      >
+        onClick={onClick}>
         <span>{action}</span>
-      </Button>
+      </BtnComponent>
     </ContextualSpan>
   );
 }

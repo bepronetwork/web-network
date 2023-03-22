@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
@@ -12,16 +13,18 @@ import {toastError} from "contexts/reducers/change-toaster";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
+import { NetworkEvents } from "interfaces/enums/events";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import { useBounty } from "x-hooks/use-bounty";
 import useERC20 from "x-hooks/use-erc20";
 
 export default function UpdateBountyAmountModal({
-                                                  show,
-                                                  transactionalAddress,
+  show,
+  transactionalAddress,
   handleClose = undefined,
-  bountyId,
+  bountyId
 }) {
   const { t } = useTranslation("common");
 
@@ -34,8 +37,8 @@ export default function UpdateBountyAmountModal({
   const { processEvent } = useApi();
   const transactionalERC20 = useERC20();
 
+  const { getDatabaseBounty } = useBounty();
   const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
-  const {getDatabaseBounty, getChainBounty} = useBounty();
   
   const handleChange = params => setNewAmount(BigNumber(params.value));
 
@@ -67,13 +70,12 @@ export default function UpdateBountyAmountModal({
 
     handleUpdateBountyAmount(bountyId, newAmount.toFixed(), transactionalERC20?.symbol)
       .then(txInfo => {
-        return processEvent("bounty", "updated", state.Service?.network?.lastVisited, {
+        return processEvent(NetworkEvents.BountyUpdated, undefined, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         });
       })
       .then(() => {
-        getDatabaseBounty(true) 
-        getChainBounty(true)
+        getDatabaseBounty(true);
         resetValues();
         handleClose();
       })
@@ -109,14 +111,14 @@ export default function UpdateBountyAmountModal({
             >
               <span>{t("actions.approve")}</span>
             </Button> :
-            <Button
+            <ContractButton
                 disabled={isExecuting || exceedsBalance || !newAmount}
                 withLockIcon={exceedsBalance || !newAmount}
                 onClick={handleSubmit}
                 isLoading={isExecuting}
             >
               <span>{t("actions.confirm")}</span>
-            </Button>
+            </ContractButton>
           }
         </div>
       )}

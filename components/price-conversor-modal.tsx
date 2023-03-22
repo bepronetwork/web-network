@@ -9,11 +9,11 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
+import {useAppState} from "contexts/app-state";
+
 import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {getCoinInfoByContract} from "services/coingecko";
-
-import {useAppState} from "../contexts/app-state";
 
 interface IPriceConversiorModalProps{
   show: boolean;
@@ -37,10 +37,10 @@ export default function PriceConversorModal({
   const {state} = useAppState();
 
   async function handlerChange({value, label}){
-    if (!state.Service?.network?.networkToken?.address) return;
+    if (!state.Service?.network?.active?.networkToken?.address) return;
 
     const data = 
-      await getCoinInfoByContract(state.Service?.network?.networkToken.symbol)
+      await getCoinInfoByContract(state.Service?.network?.active?.networkToken.symbol)
         .catch((err) => {
           if(err) setErrorCoinInfo(true)
           return ({ prices: { [value]: 0 } })
@@ -101,7 +101,7 @@ export default function PriceConversorModal({
         <div className="col">
           <InputNumber
             className="caption-large"
-            symbol={state.Service?.network?.networkToken?.symbol || t("common:misc.$token")}
+            symbol={state.Service?.network?.active?.networkToken?.symbol || t("common:misc.$token")}
             value={currentValue}
             onValueChange={(e) => setValue(e.floatValue)}
           />
@@ -132,7 +132,7 @@ export default function PriceConversorModal({
         </div>
       </div>
       <div className="d-flex flex-row justify-content-center mt-4">
-        {formatNumberToNScale(currentPrice * currentValue)} {state.Service?.network?.networkToken?.symbol}
+        {formatNumberToNScale(currentPrice * currentValue)} {state.Service?.network?.active?.networkToken?.symbol}
       </div>
     </Modal>
   );

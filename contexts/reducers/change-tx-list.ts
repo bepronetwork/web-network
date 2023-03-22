@@ -1,11 +1,14 @@
 import {v4 as uuidv4} from "uuid";
 
-import {State} from "../../interfaces/application-state";
-import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
-import {TransactionStatus} from "../../interfaces/enums/transaction-status";
-import {TransactionTypes} from "../../interfaces/enums/transaction-types";
-import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "../../interfaces/transaction";
-import {SimpleAction} from "./reducer";
+import {SimpleAction} from "contexts/reducers/reducer";
+
+import { saveTransactionsToStorage } from "helpers/transactions";
+
+import {State} from "interfaces/application-state";
+import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
+import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "interfaces/transaction";
 
 type Tx = Partial<(SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)>;
 export type TxList = Tx[];
@@ -17,7 +20,7 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
     super(AppStateReduceId.AddTransaction, 'transactions');
   }
 
-  reducer(state: State, payload: TxList, subAction): State {
+  reducer(state: State, payload: TxList, subAction): State {   
     let transformed;
 
     const addMapper = (_tx) => ({
@@ -57,6 +60,8 @@ class ChangeTxList extends SimpleAction<TxList, SubActions> {
       console.debug(`Unknown subAction ${subAction}`);
       break;
     }
+
+    saveTransactionsToStorage(transformed);
 
     return super.reducer(state, transformed);
   }

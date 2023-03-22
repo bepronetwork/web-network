@@ -1,46 +1,61 @@
+import clsx from "clsx";
 import { useTranslation } from "next-i18next";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-import InternalLink from "components/internal-link";
+import BountiesIcon from "assets/icons/bounties-icon";
+import CustomNetworkIcon from "assets/icons/custom-network-icon";
+import PaymentsIcon from "assets/icons/payments-icon";
+import ProfileIcon from "assets/icons/profile-icon";
+import ProposalsIcon from "assets/icons/proposals-icon";
+import PullRequestsIcon from "assets/icons/pull-requests-icon";
+import VotingPowerIcon from "assets/icons/voting-power-icon";
+import WalletIcon from "assets/icons/wallet-icon";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function ProfileSide() {
+  const { asPath } = useRouter();
   const { t } = useTranslation("common");
 
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
 
-  const Link = (label, href) => ({ label, href });
-  const ProfileLink = ({ label, href }) => (
-    <li className="mb-4" key={label}>
-      <InternalLink
-      href={href}
-      label={label}
-      className="p-0 caption-large"
-      activeClass="account-link-active"
-      nav
-    />
+  const getHref = (href = "") => getURLWithNetwork(`/profile${href}`);
+  const getTranslation = page => t(`main-nav.nav-avatar.${page}`);
+  const isActive = href => href !== "" ? asPath.endsWith(href) : asPath.endsWith("/profile")
+
+  const ProfileLink = ({ label, href, icon }) => (
+    <li className="mb-2" key={label}>
+      <Link href={getHref(href)} passHref>
+        <a 
+          className={clsx([
+            "d-flex flex-row align-items-center gap-2 text-decoration-none",
+            "text-gray-150 border-radius-1 p-2 text-white-hover",
+            isActive(href) ? "profile-side-link-active" : ""
+          ])}
+        >
+          {icon}
+          <span>{getTranslation(label)}</span>
+        </a>
+      </Link>
     </li>
-  );
+    );
+    
+  const getLink = (label, href, icon) => ({ label, href, icon });
 
   const links = [
-    Link(t("main-nav.nav-avatar.profile"), getURLWithNetwork("/profile")),
-    Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.oracles"),
-         getURLWithNetwork("/profile/bepro-votes")),
-    Link(t("main-nav.nav-avatar.payments"),
-         getURLWithNetwork("/profile/payments")),
-    Link(t("main-nav.nav-avatar.bounties"),
-         getURLWithNetwork("/profile/bounties")),
-    Link(t("main-nav.nav-avatar.pull-requests"),
-         getURLWithNetwork("/profile/pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"),
-         getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.my-network"),
-         getURLWithNetwork("/profile/my-network")),
+    getLink("profile", "", <ProfileIcon />),
+    getLink("wallet", "/wallet", <WalletIcon />),
+    getLink("voting-power", "/bepro-votes", <VotingPowerIcon />),
+    getLink("payments", "/payments", <PaymentsIcon />),
+    getLink("bounties", "/bounties", <BountiesIcon />),
+    getLink("pull-requests", "/pull-requests", <PullRequestsIcon />),
+    getLink("proposals", "/proposals", <ProposalsIcon />),
+    getLink("my-network", "/my-network", <CustomNetworkIcon />),
   ];
 
   return(
-    <aside className="col-2">
+    <aside className="col-2 bg-gray-950">
       <ul className="ml-2 pt-4">
         {links.map(ProfileLink)}  
       </ul>

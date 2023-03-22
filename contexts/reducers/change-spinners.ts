@@ -1,6 +1,7 @@
-import {State} from "../../interfaces/application-state";
-import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
-import {SimpleAction} from "./reducer";
+import {SimpleAction} from "contexts/reducers/reducer";
+
+import {State} from "interfaces/application-state";
+import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 
 interface Spinners {
   proposals: boolean;
@@ -14,6 +15,10 @@ interface Spinners {
   connecting: boolean;
   connectingGH: boolean;
   repos: boolean;
+  changingChain: boolean;
+  signingMessage: boolean;
+  switchingChain: boolean;
+  needsToChangeChain: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {
@@ -50,3 +55,9 @@ export const changeConnecting = (connecting: boolean) =>
 
 export const changeConnectingGH = (connectingGH: boolean) =>
   changeSpinners.update({connectingGH});
+
+export const changeChangingChain = (changingChain: boolean) =>
+  changeSpinners.update({changingChain});
+
+export const changeNeedsToChangeChain = (needsToChangeChain: boolean) =>
+  changeSpinners.update({needsToChangeChain});

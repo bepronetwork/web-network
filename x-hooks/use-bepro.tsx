@@ -2,8 +2,12 @@ import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core"
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
+import {useAppState} from "contexts/app-state";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
+
 import {parseTransaction} from "helpers/transactions";
 
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {SimpleBlockTransactionPayload, TransactionCurrency} from "interfaces/transaction";
@@ -14,19 +18,15 @@ import {NetworkParameters} from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
 
-import {useAppState} from "../contexts/app-state";
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-
 const DIVISOR = 1000000;
 
 export default function useBepro() {
-  const { dispatch, state } = useAppState();
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
-  // const {getDatabaseBounty, getChainBounty} = useBounty();
+  const { dispatch, state } = useAppState();
 
-  const networkTokenSymbol = state.Service?.network?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
 
   const failTx = (err, tx, reject?) => {
 
@@ -46,7 +46,7 @@ export default function useBepro() {
         network: state.Service?.network?.active,
       }] as any);
       dispatch(disputeTxAction);
-      await state.Service?.active.disputeProposal(+state.currentBounty?.chainData?.id, +proposalContractId)
+      await state.Service?.active.disputeProposal(+state.currentBounty?.data?.contractId, +proposalContractId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, disputeTxAction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve?.(txInfo);
@@ -172,16 +172,15 @@ export default function useBepro() {
 
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.cancelBounty(state.currentBounty?.chainData?.id, funding)
+      await state.Service?.active.cancelBounty(state.currentBounty?.data?.contractId, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
-          return processEvent("bounty",
-                              "canceled",
-                              state.Service?.network?.lastVisited,
-            {fromBlock: txInfo.blockNumber, id: state.currentBounty?.chainData?.id});
+          return processEvent(NetworkEvents.BountyCanceled, undefined, {
+            fromBlock: txInfo.blockNumber, id: state.currentBounty?.data?.contractId
+          });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
+          if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(tx)
           // todo should force these two after action, but we can't have it here or it will fall outside of context
@@ -203,17 +202,17 @@ export default function useBepro() {
       dispatch(transaction);
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.hardCancel(state.currentBounty?.chainData?.id)
+      await state.Service?.active.hardCancel(state.currentBounty?.data?.contractId)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           
-          return processEvent("bounty", "canceled", state.Service?.network?.lastVisited, {
+          return processEvent(NetworkEvents.BountyCanceled, undefined, {
             fromBlock: txInfo.blockNumber, 
-            id: state.currentBounty?.chainData?.id
+            id: state.currentBounty?.data?.contractId
           });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[state.currentBounty?.chainData?.cid]) throw new Error('Failed');
+          if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
           // getChainBounty(true);
           // getDatabaseBounty(true);
@@ -296,10 +295,10 @@ export default function useBepro() {
             throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
 
-          processEvent("oracles",
-                       "transfer",
-                       state.Service?.network?.lastVisited,
-                      { fromBlock: txInfo.blockNumber }).catch(console.debug);
+          processEvent(NetworkEvents.OraclesTransfer, undefined, { 
+            fromBlock: txInfo.blockNumber 
+          })
+            .catch(console.debug);
 
           resolve(txInfo);
         })

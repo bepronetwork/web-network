@@ -14,6 +14,7 @@ import {useAppState} from "contexts/app-state";
 import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Wallet} from "interfaces/authentication";
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
@@ -26,12 +27,14 @@ interface OraclesDelegateProps {
 }
 
 function OraclesDelegate({
-                           wallet,
-                           updateWalletBalance,
-                           defaultAddress
-                         }: OraclesDelegateProps) {
+  wallet,
+  updateWalletBalance,
+  defaultAddress
+}: OraclesDelegateProps) {
   const {t} = useTranslation(["common", "my-oracles"]);
-  const debounce = useRef(null)
+  
+  const debounce = useRef(null);
+
   const [error, setError] = useState<string>("");
   const [addressError, setAddressError] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<string>();
@@ -44,8 +47,8 @@ function OraclesDelegate({
 
   const { processEvent } = useApi();
 
-  const networkTokenDecimals = Service?.network?.networkToken?.decimals || 18;
-  const networkTokenSymbol = Service?.network?.networkToken?.symbol;
+  const networkTokenDecimals = Service?.network?.active?.networkToken?.decimals || 18;
+  const networkTokenSymbol = Service?.network?.active?.networkToken?.symbol;
 
   function handleChangeOracles(params: NumberFormatValues) {
     if (params.value === "") return setTokenAmount("");
@@ -90,10 +93,8 @@ function OraclesDelegate({
   }
 
   function handleProcessEvent(blockNumber) {
-    processEvent("oracles",
-                 "transfer",
-                 Service?.network?.lastVisited,
-      { fromBlock: blockNumber }).catch(console.debug);
+    processEvent(NetworkEvents.OraclesTransfer, undefined, { fromBlock: blockNumber })
+      .catch(console.debug);
   }
   
   const isButtonDisabled = (): boolean =>

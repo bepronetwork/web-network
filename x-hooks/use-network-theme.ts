@@ -1,5 +1,4 @@
 import {useRouter} from "next/router";
-import {UrlObject} from "url";
 
 import {useAppState} from "contexts/app-state";
 
@@ -138,22 +137,9 @@ export default function useNetworkTheme() {
     });
   }
 
-  function getURLWithNetwork(href: string, query = undefined): UrlObject {
-    return {
-      pathname: `/[network]/${href}`.replace("//", "/"),
-      query: {
-        ...query,
-        network: query?.network || 
-                 router?.query?.network || 
-                 state?.Service?.network?.active?.name
-      }
-    };
-  }
-
   return {
     colorsToCSS,
     DefaultTheme,
-    getURLWithNetwork,
     setNetwork: changeNetwork
   };
 }

@@ -8,6 +8,7 @@ import {useTranslation} from "next-i18next";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
@@ -19,6 +20,7 @@ import {useAppState} from "contexts/app-state";
 import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
 
 import {Wallet} from "interfaces/authentication";
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
@@ -75,16 +77,16 @@ function OraclesActions({
       description: 
              t("my-oracles:actions.lock.description", { 
                currency: networkTokenSymbol, 
-               token: Service?.network?.networkToken?.symbol
+               token: Service?.network?.active?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
         amount: formatNumberToNScale(oracleAmount),
-        token: Service?.network?.networkToken?.symbol
+        token: Service?.network?.active?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-purple">
-                            {t("$oracles", { token: Service?.network?.networkToken?.symbol })}
+                            {t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })}
                           </span>{" "}
           {t("misc.from")} <span className="text-primary">
             {networkTokenSymbol}
@@ -96,7 +98,7 @@ function OraclesActions({
           amount: formatNumberToNScale(tokenAmount),
           oracleAmount: formatNumberToNScale(oracleAmount),
           currency: networkTokenSymbol,
-          token: Service?.network?.networkToken?.symbol
+          token: Service?.network?.active?.networkToken?.symbol
         }),
       params() {
         return { tokenAmount };
@@ -108,19 +110,19 @@ function OraclesActions({
       description: 
         t("my-oracles:actions.unlock.description", { 
           currency: networkTokenSymbol,
-          token: Service?.network?.networkToken?.symbol
+          token: Service?.network?.active?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
         amount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
-        token: Service?.network?.networkToken?.symbol
+        token: Service?.network?.active?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-primary">
             { networkTokenSymbol}</span>{" "}
           {t("misc.from")} <span className="text-purple">
-                            {t("$oracles", { token: Service?.network?.networkToken?.symbol })}
+                            {t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })}
                            </span>
         </>
       ),
@@ -128,7 +130,7 @@ function OraclesActions({
         amount: formatNumberToNScale(tokenAmount),
         oracleAmount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
-        token: Service?.network?.networkToken?.symbol
+        token: Service?.network?.active?.networkToken?.symbol
       }),
       params(from: string) {
         return { tokenAmount, from };
@@ -167,10 +169,8 @@ function OraclesActions({
   }
 
   function handleProcessEvent(blockNumber) {
-    processEvent("oracles",
-                 "changed",
-                 Service?.network?.lastVisited,
-      { fromBlock: blockNumber }).catch(console.debug);
+    processEvent(NetworkEvents.OraclesChanged, undefined, { fromBlock: blockNumber })
+      .catch(console.debug);
   }
 
   function handleChangeToken(params: NumberFormatValues) {
@@ -204,7 +204,7 @@ function OraclesActions({
   function getCurrentLabel() {
     return action === t("my-oracles:actions.lock.label")
       ? networkTokenSymbol
-      : t("$oracles", { token: Service?.network?.networkToken?.symbol });
+      : t("$oracles", { token: Service?.network?.active?.networkToken?.symbol });
   }
 
   function getMaxAmount(trueValue = false): string {
@@ -260,7 +260,7 @@ function OraclesActions({
             })}
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${
-              getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol })
+              getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })
                 ? "text-purple"
                 : "text-primary"
             }`}
@@ -282,7 +282,7 @@ function OraclesActions({
                 {getCurrentLabel()} {t("misc.available")}
                 <span onClick={setMaxAmount}
                       className={`caption-small ml-1 cursor-pointer text-uppercase ${(
-                        getCurrentLabel() === t("$oracles", { token: Service?.network?.networkToken?.symbol }) 
+                        getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol }) 
                           ? "text-purple" 
                           : "text-primary"
                       )}`}>
@@ -296,7 +296,7 @@ function OraclesActions({
           <ReadOnlyButtonWrapper>
             <div className="mt-5 d-grid gap-3">
               {action === t("my-oracles:actions.lock.label") && (
-                <Button
+                <ContractButton
                   disabled={!needsApproval() || isApproving}
                   className="ms-0 read-only-button"
                   onClick={approveSettlerToken}
@@ -317,10 +317,10 @@ function OraclesActions({
                       ""
                     )}
                   </span>
-                </Button>
+                </ContractButton>
               )}
 
-              <Button
+              <ContractButton
                 color={
                   action === t("my-oracles:actions.lock.label")
                     ? "purple"
@@ -334,7 +334,7 @@ function OraclesActions({
                   <LockedIcon width={12} height={12} className="mr-1" />
                 )}
                 <span>{renderInfo?.label}</span>
-              </Button>
+              </ContractButton>
             </div>
           </ReadOnlyButtonWrapper>
 

@@ -12,15 +12,16 @@ import PageHero, { InfosHero } from "components/page-hero";
 import { BountyEffectsProvider } from "contexts/bounty-effects";
 
 import useApi from "x-hooks/use-api";
-
+import { useNetwork } from "x-hooks/use-network";
 
 export default function ExplorePage() {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
+
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
 
+  const { networkName } = useNetwork();
   const { getTotalNetworks, getTotalBounties } = useApi();
-
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -33,10 +34,20 @@ export default function ExplorePage() {
     }
   ]);
 
+  const heroTitle = networkName ? 
+    `${networkName.replace(/^\w/, c => c.toUpperCase())} Bounty Hall` : t("bounty:title-bounties");
+  const heroSubTitle = networkName ? 
+    `A collection of the most recent bounties of ${networkName} networks` : t("bounty:sub-title-bounties");
+
   useEffect(() => {
-    getTotalNetworks().then(setNumberOfNetworks)
-    getTotalBounties().then(setNumberOfBounties)
-  },[])
+    getTotalNetworks(networkName)
+      .then(setNumberOfNetworks)
+      .catch(error => console.debug("Failed to getTotalNetworks", error));
+
+    getTotalBounties(networkName)
+      .then(setNumberOfBounties)
+      .catch(error => console.debug("Failed to getTotalBounties", error));
+  },[networkName])
 
   useEffect(() => {    
     setInfos([
@@ -54,8 +65,8 @@ export default function ExplorePage() {
   return (
     <BountyEffectsProvider>
       <PageHero
-        title={t("bounty:title-bounties")}
-        subtitle={t("bounty:sub-title-bounties")}
+        title={heroTitle}
+        subtitle={heroSubTitle}
         infos={infos}
       />
       <ListActiveNetworks />
@@ -70,10 +81,10 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       ...(await serverSideTranslations(locale, [
         "common",
+        "custom-network",
         "bounty",
         "connect-wallet-button",
-        "custom-network",
-        "leaderboard",
+        "leaderboard"
       ])),
     },
   };
