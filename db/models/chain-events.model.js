@@ -2,6 +2,13 @@
 const { Model, DataTypes } = require("sequelize");
 
 class ChainEvents extends Model {
+  id;
+  name;
+  lastBlock;
+  chain_id;
+  createdAt;
+  updatedAt;
+
   static init(sequelize) {
     super.init({
       id: {

@@ -59,7 +59,7 @@ export default function ProfilePage() {
       </div>
 
       <GithubConnectionState handleClickDisconnect={handleClickDisconnect} />
-       
+
        {state.Settings?.kyc?.isKycEnabled && (
         <div className="mt-4">
           <KycSessionModal/>
