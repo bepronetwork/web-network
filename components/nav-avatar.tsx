@@ -179,6 +179,12 @@ export default function NavAvatar({
             address={state.currentUser?.walletAddress}
             size="md"
           />
+
+          {/* <If condition={!!state.currentUser?.walletAddress}>
+            <span className="caption-small text-white">
+              {truncateAddress(state.currentUser?.walletAddress, 6, 3)}
+            </span>
+          </If> */}
         </div>
       </OverlayTrigger>
     </div>
