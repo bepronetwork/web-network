@@ -180,12 +180,18 @@ export default function NavAvatar({
         onToggle={(next) => setVisible(next)}
         overlay={overlay}
       >
-        <div>
+        <div className="d-flex flex-column align-items-center justify-content-center">
           <AvatarOrIdenticon
             user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
             size="md"
           />
+
+          {/* <If condition={!!state.currentUser?.walletAddress}>
+            <span className="caption-small text-white">
+              {truncateAddress(state.currentUser?.walletAddress, 6, 3)}
+            </span>
+          </If> */}
         </div>
       </OverlayTrigger>
     </div>

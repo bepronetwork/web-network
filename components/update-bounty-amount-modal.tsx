@@ -13,6 +13,8 @@ import {toastError} from "contexts/reducers/change-toaster";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
+import { NetworkEvents } from "interfaces/enums/events";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import { useBounty } from "x-hooks/use-bounty";
@@ -68,7 +70,7 @@ export default function UpdateBountyAmountModal({
 
     handleUpdateBountyAmount(bountyId, newAmount.toFixed(), transactionalERC20?.symbol)
       .then(txInfo => {
-        return processEvent("bounty", "updated", state.Service?.network?.lastVisited, {
+        return processEvent(NetworkEvents.BountyUpdated, undefined, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         });
       })

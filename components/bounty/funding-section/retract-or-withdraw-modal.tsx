@@ -11,6 +11,7 @@ import Modal from "components/modal";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
+import { NetworkEvents, StandAloneEvents } from "interfaces/enums/events";
 import {fundingBenefactor} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -56,7 +57,7 @@ export default function RetractOrWithdrawModal({
                                      retractOrWithdrawAmount,
                                      rewardTokenSymbol)
       .then(() => {
-        return processEvent("bounty", "withdraw", state.Service?.network?.lastVisited, {
+        return processEvent(StandAloneEvents.BountyWithdrawReward, undefined, {
           issueId: state.currentBounty?.data?.issueId
         });
       })
@@ -77,15 +78,15 @@ export default function RetractOrWithdrawModal({
       handleRetractFundBounty(state.currentBounty?.data?.contractId, funding.contractId)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-
-        getDatabaseBounty(true);
         
-        return processEvent("bounty", "funded", state.Service?.network?.lastVisited, {
+        return processEvent(NetworkEvents.BountyFunded, undefined, {
           fromBlock
         });
       })
-      .then(() => {
+      .then(async () => {
         onCloseClick();
+        await getDatabaseBounty(true);
+        
         dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
           amount: retractOrWithdrawAmount,
           symbol: tokenSymbol

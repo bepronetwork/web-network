@@ -23,6 +23,7 @@ import {addToast} from "contexts/reducers/change-toaster";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
+import { NetworkEvents } from "interfaces/enums/events";
 import {pullRequest} from "interfaces/issue-data";
 import {DistributedAmounts, Proposal} from "interfaces/proposal";
 
@@ -72,7 +73,7 @@ export default function PageProposal() {
         .then(async txInfo => {
           const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
           
-          return Promise.all([processEvent("bounty", "closed", state.Service?.network?.lastVisited, { fromBlock } )]);
+          return Promise.all([processEvent(NetworkEvents.BountyClosed, undefined, { fromBlock } )]);
         })
         .then(() => {
           getDatabaseBounty(true);
@@ -100,7 +101,7 @@ export default function PageProposal() {
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("proposal", "disputed", state.Service?.network?.lastVisited, { fromBlock } );
+        return processEvent(NetworkEvents.ProposalDisputed, undefined, { fromBlock } );
       })
       .then(() => getDatabaseBounty(true))
       .catch(error => {
@@ -121,7 +122,7 @@ export default function PageProposal() {
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("proposal", "refused", state.Service?.network?.lastVisited, { fromBlock } );
+        return processEvent(NetworkEvents.ProposalRefused, undefined, { fromBlock } );
       })
       .then(() => getDatabaseBounty(true))
       .then( () => {

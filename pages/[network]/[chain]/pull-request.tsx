@@ -23,6 +23,7 @@ import {changeSpinners} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {MetamaskErrors} from "interfaces/enums/Errors";
+import { NetworkEvents } from "interfaces/enums/events";
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -115,7 +116,7 @@ export default function PullRequestPage() {
     handleMakePullRequestReady(state.currentBounty?.data.contractId, pullRequest.contractId)
       .then(txInfo => {
         const {blockNumber: fromBlock} = txInfo as { blockNumber: number };
-        return processEvent("pull-request", "ready", state.Service?.network?.lastVisited, {fromBlock});
+        return processEvent(NetworkEvents.PullRequestReady, undefined, {fromBlock});
       })
       .then(() => {
         return getDatabaseBounty(true);
@@ -147,7 +148,7 @@ export default function PullRequestPage() {
     handleCancelPullRequest(state.currentBounty?.data?.contractId, pullRequest?.contractId)
       .then(txInfo => {
         const {blockNumber: fromBlock} = txInfo as { blockNumber: number };
-        return processEvent("pull-request", "canceled", state.Service?.network?.lastVisited, {fromBlock});
+        return processEvent(NetworkEvents.PullRequestCanceled, undefined, {fromBlock});
       })
       .then(() => {
         getDatabaseBounty(true);
