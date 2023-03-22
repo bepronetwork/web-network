@@ -21,7 +21,7 @@ export default function ProfileLayout({ children }) {
       <div className="row mx-0">
         <ProfileSide />
 
-        <div className="col-10 pt-4 px-4 profile-content">
+        <div className="col-10 pt-4 px-4 profile-content bg-gray-950">
           {children}
         </div>
       </div>
