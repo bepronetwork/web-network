@@ -33,6 +33,8 @@ import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
+import SelectNetwork from "./bounties/select-network";
+
 type Filter = {
   label: string;
   value: string;
@@ -274,9 +276,9 @@ export default function ListIssues({
 
   
   function isRenderFilter() {
-    if(isMobile) return false
+    if(isMobile) return false;
 
-    return (!isListEmpy() || (isListEmpy() && hasFilter()))
+    return (!isListEmpy() || (isListEmpy() && hasFilter()));
   }
   
   if(inView !== null && inView === false) return null;
@@ -298,7 +300,7 @@ export default function ListIssues({
         <div
           className={"d-flex align-items-center gap-20 list-actions sticky-top bg-gray-950"}
         >
-          <div className="w-100">
+          <div className="w-50">
             <InputGroup className="border-radius-8">
               <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
@@ -324,7 +326,7 @@ export default function ListIssues({
           </div>
 
           <div className="d-flex align-items-center">
-            <span className="caption-small text-white-50 text-nowrap mr-1">
+            <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
               {t("sort.label")}
             </span>
 
@@ -358,7 +360,9 @@ export default function ListIssues({
             />
           </div>
 
-          {!filterState && <IssueFilters />}
+          {(!filterState && !isProfile) && <IssueFilters />}
+          
+          {(!filterState && isProfile) && <SelectNetwork />}
         </div>
       ) : (
         ""

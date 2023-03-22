@@ -169,25 +169,22 @@ li {
   }
   &-container & {
     &__control {
-      border-color: transparent;
-      background-color: $black;
+      border: 1px solid $gray-800;
+      background-color: $gray-900;
       min-height: 38px;
       box-shadow: none;
-      border-radius: 8px;
-      border-width: 2px;
+      border-radius: 4px;
       &:hover {
-        border-color: $light-gray;
+        border-color: $gray-700;
       }
       &--is-focused {
         border-color: var(--bs-primary);
       }
       &--menu-is-open {
         border-color: var(--bs-primary) !important;
-        background: $black;
       }
       &--is-disabled {
         border-color: transparent;
-        background-color: $black;
         opacity: 0.4;
       }
     }
@@ -199,7 +196,7 @@ li {
     }
     &__indicator {
       font-size: 12px;
-      color: var(--bs-gray);
+      color: $gray-500;
     }
     &__single-value {
       @extend .p-small;
@@ -210,9 +207,9 @@ li {
     }
     &__menu {
       // min-width: 210px;
-      border-radius: 8px;
-      border: 1px solid $light-gray;
-      background-color: $bg-shadow;
+      border-radius: 4px;
+      border: 1px solid $gray-800;
+      background-color: $gray-900;
       z-index: 4;
 
       &-list {
@@ -233,29 +230,29 @@ li {
     &__option {
       @extend .p;
       background-color: transparent;
-      color: $gray;
+      color: $gray-500;
 
       &:only-child {
-        border-radius: 8px;
+        border-radius: 4px;
       }
 
       &:first-child {
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
       }
 
       &:last-child {
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
       }
 
       &--is-selected {
         color: $white;
-        background-color: $bg;
+        background-color: $gray-850;
       }
       &:hover {
         color: $white;
-        background-color: $dark-gray;
+        background-color: $gray-850;
       }
       &:active {
         background-color: transparent;
@@ -575,23 +572,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   > input {
     border-radius: math.div($m, 4);
     color: #fff;
-
-    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-      color: $gray-700;
-      opacity: 1; /* Firefox */
-    }
-    
-    :-ms-input-placeholder { /* Internet Explorer 10-11 */
-      color: $gray-700;
-    }
-    
-    ::-ms-input-placeholder { /* Microsoft Edge */
-      color: $gray-700;
-    }
   }
 
   > input:not(:only-child) {
     border-right: none !important;
+  }
+
+  &:hover {
+    border: 1px solid $gray-700;
   }
 
   &:focus-within {
@@ -608,7 +596,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .input-group-text {
     background-color: $gray-900;
     border: none;
-    color: #fff;
+    color: $gray-500;
 
     &.group-disabled {
       opacity: 0.4;
@@ -625,6 +613,19 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .button-max {
     cursor: pointer;
   }
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: $gray-700;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: $gray-700;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: $gray-700;
 }
 
 .issue-body {
@@ -1314,7 +1315,11 @@ textarea.form-control {
 
   .input-group {
     border: 1px solid $gray-800;
-    
+
+    &:hover {
+      border: 1px solid $gray-700;
+    }
+
     .input-group-text {
       border-top-left-radius: math.div($m, 4);
       border-bottom-left-radius: math.div($m, 4);
@@ -1360,7 +1365,7 @@ textarea.form-control {
   .react-select__control,
   .react-select__currency,
   .react-select__menu {
-    color: var(--bs-gray);
+    color: $gray-700;
     min-width: 170px !important;
     // min-width: max-content;
   }
