@@ -214,7 +214,7 @@ export default function MainNav() {
             />
           </div>
 
-          <div className="d-flex flex-row align-items-center gap-20">
+          <div className="d-flex flex-row align-items-center gap-3">
             { noNeedNetworkInstance ?
               <InternalLink
                 href={myNetwork.href}
@@ -239,7 +239,7 @@ export default function MainNav() {
 
             <Button
               onClick={() => setShowHelp(true)}
-              className="opacity-75 opacity-100-hover"
+              className="bg-gray-850 border-gray-850 rounded p-2"
               transparent
               rounded
             >

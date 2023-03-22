@@ -24,7 +24,7 @@ import useChain from "x-hooks/use-chain";
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
-  const {query, replace} = useRouter();
+  const {query, replace, push} = useRouter();
 
   const [networkName, setNetworkName] = useState<string>();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
@@ -94,13 +94,13 @@ export function useNetwork() {
   
           dispatch(changeNetworkLastVisited(queryNetworkName));
           dispatch(changeActiveNetwork(newCachedData.value));
-        } else {
-          const available = rows
-                            .filter(({ isRegistered, isClosed }) => isRegistered && !isClosed)
-                            .map(network => network.chain);
-
-          dispatch(changeActiveAvailableChains(available));
         }
+
+        const available = rows
+          .filter(({ isRegistered, isClosed }) => isRegistered && !isClosed)
+          .map(network => network.chain);
+
+        dispatch(changeActiveAvailableChains(available));
       })
       .catch(e => {
         console.log(`Failed to get network ${queryNetworkName}`, e);
@@ -126,30 +126,14 @@ export function useNetwork() {
 
   function goToProfilePage(profilePage: ProfilePages) {
     const queryNetwork = query?.network;
+    const queryChain = query?.chain;
 
     const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
 
     if (queryNetwork)
-      push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${path}`);
+      push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${queryChain}/${path}`);
     else
-      push("/profile/[[...profilePage]]", `/${queryNetwork}/${path}`);
-  }
-
-  function loadNetworkToken() {
-    if (!state.Service?.active?.network || state.Service?.network?.networkToken)
-      return;
-
-    const activeNetworkToken: any = state.Service?.active?.network?.networkToken;
-
-    Promise.all([activeNetworkToken.name(), activeNetworkToken.symbol(),])
-      .then(([name, symbol]) => {
-        dispatch(changeActiveNetworkToken({
-          name,
-          symbol,
-          decimals: activeNetworkToken.decimals,
-          address: activeNetworkToken.contractAddress
-        }))
-      });
+      push("/profile/[[...profilePage]]", `/${path}`);
   }
 
   function loadNetworkAllowedTokens() {

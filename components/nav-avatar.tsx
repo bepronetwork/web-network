@@ -94,7 +94,7 @@ export default function NavAvatar({
 
   const internalLinks = [
     Link(t("main-nav.nav-avatar.wallet"), "wallet"),
-    Link(t("main-nav.nav-avatar.oracles"), "voting-power"),
+    Link(t("main-nav.nav-avatar.voting-power"), "voting-power"),
     Link(t("main-nav.nav-avatar.payments"), "payments"),
     Link(t("main-nav.nav-avatar.bounties"), "bounties"),
     Link(t("main-nav.nav-avatar.pull-requests"), "pull-requests"),
@@ -138,11 +138,9 @@ export default function NavAvatar({
           </div>
         </div>
 
-        { onNetwork &&
-          <LinksSession>
-            {internalLinks.map(ProfileInternalLink)}
-          </LinksSession>
-        }
+        <LinksSession>
+          {internalLinks.map(ProfileInternalLink)}
+        </LinksSession>
 
         <LinksSession>
           {externalLinks.map(ProfileExternalLink)}
@@ -177,14 +175,10 @@ export default function NavAvatar({
           <AvatarOrIdenticon
             user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
-            size="md"
+            size="sm"
+            withBorder
+            active={visible}
           />
-
-          {/* <If condition={!!state.currentUser?.walletAddress}>
-            <span className="caption-small text-white">
-              {truncateAddress(state.currentUser?.walletAddress, 6, 3)}
-            </span>
-          </If> */}
         </div>
       </OverlayTrigger>
     </div>
