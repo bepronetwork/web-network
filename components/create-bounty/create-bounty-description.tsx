@@ -45,7 +45,7 @@ export default function CreateBountyDescription({
               isPreview ? "description-button text-gray" : "active-description-button"
             }
           >
-            Write
+            {t("write")}
           </Button>
           <Button
             outline
