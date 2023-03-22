@@ -32,3 +32,15 @@ export interface DetailsProps {
   repositories?: ReposList;
   branches?: string[];
 }
+export interface BountyPayload {
+  title: string;
+  cid: string | boolean;
+  repoPath: string;
+  transactional: string;
+  branch: string;
+  githubUser: string;
+  tokenAmount: string;
+  rewardToken?: string;
+  rewardAmount?: string;
+  fundingAmount?: string;
+}
