@@ -146,7 +146,7 @@ export default function CreateBountyDetails({
         />
       </div>
       <span className="text-gray">
-        Finding yourself lost?<a href="/" className="ms-1">See bounty examples</a>
+        Finding yourself lost?<a href="/explore" target='_blank' className="ms-1">See bounty examples</a>
       </span>
 
       <div className="form-group mt-4">
