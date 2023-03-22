@@ -12,6 +12,7 @@ import CheckCircle from "assets/icons/check-circle";
 
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
+import ContractButton from "components/contract-button";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
 import CreateBountyReview from "components/create-bounty/create-bounty-review";
@@ -33,6 +34,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { BountyPayload } from "interfaces/create-bounty";
 import { MetamaskErrors } from "interfaces/enums/Errors";
+import { NetworkEvents } from "interfaces/enums/events";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Network } from "interfaces/network";
@@ -44,6 +46,7 @@ import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useChain from "x-hooks/use-chain";
 import { useDao } from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
 import { useNetwork } from "x-hooks/use-network";
@@ -95,6 +98,7 @@ export default function CreateBountyPage() {
 
   const { searchNetworks, getReposList, createPreBounty, processEvent } =
     useApi();
+    
 
   const { getURLWithNetwork } = useNetwork();
 
@@ -107,6 +111,8 @@ export default function CreateBountyPage() {
     dispatch,
     state: { transactions, Settings, Service, currentUser },
   } = useAppState();
+
+  const { chain } = useChain();
 
   const steps = [
     t("bounty:steps.select-network"),
@@ -337,10 +343,9 @@ export default function CreateBountyPage() {
                              transactionToast.payload[0] as SimpleBlockTransactionPayload),
         ]));
 
-        const createdBounty = await processEvent("bounty",
-                                                 "created",
-                                                 currentNetwork?.name,
-          { fromBlock: networkBounty?.blockNumber });
+        const createdBounty = await processEvent(NetworkEvents.BountyCreated, undefined, {
+          fromBlock: networkBounty?.blockNumber
+        });
 
         if (!createdBounty) {
           dispatch(toastWarning(t("bounty:errors.sync")));
@@ -376,6 +381,8 @@ export default function CreateBountyPage() {
     setIsKyc(false);
     setTierList([]);
     setCurrentSection(0);
+    rewardERC20.setAddress(undefined);
+    transactionalERC20.setAddress(undefined);
   }
 
   useEffect(() => {
@@ -404,12 +411,6 @@ export default function CreateBountyPage() {
     if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
   }, [rewardToken?.address, currentUser, Service?.active]);
 
-  useEffect(() => {
-    if (customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0]);
-      setRewardToken(customTokens[0]);
-    }
-  }, [customTokens]);
 
   useEffect(() => {
     let approved = true;
@@ -444,12 +445,34 @@ export default function CreateBountyPage() {
   }, [repository]);
 
   useEffect(() => {
-    if (!currentNetwork) return;
+    if (!currentNetwork?.tokens || !chain) {
+      setTransactionalToken(undefined);
+      setRewardToken(undefined);
+      setCustomTokens([]);
+      transactionalERC20.setAddress(undefined);
+      rewardERC20.setAddress(undefined);
+      return;
+    }
+
+    if (!currentNetwork?.networkAddress) return;
+    
     changeNetwork(currentNetwork?.networkAddress);
 
-    if (!currentNetwork?.tokens) return;
+    const tokens = currentNetwork?.tokens
+
+    if (tokens.length === customTokens.length)
+      return;
+
+    if (tokens.length === 1) {
+      setTransactionalToken(tokens[0]);
+      setRewardToken(tokens[0]);
+    }
+
+    if (tokens.length === customTokens.length)
+      return;
+
     setCustomTokens(currentNetwork?.tokens);
-  }, [currentNetwork]);
+  }, [currentNetwork, chain]);
 
   useEffect(() => {
     cleanFields();
@@ -643,16 +666,16 @@ export default function CreateBountyPage() {
               </Button>
 
               {!isTokenApproved && currentSection === 3 ? (
-                <Button
+                <ContractButton
                   className="col-6 bounty-button"
                   disabled={isApproveButtonDisabled()}
                   onClick={allowCreateIssue}
                   isLoading={isLoadingApprove}
                 >
                   {t("actions.approve")}
-                </Button>
+                </ContractButton>
               ) : (
-                <Button
+                <ContractButton
                   className="col-6 bounty-button"
                   disabled={verifyNextStepAndCreate()}
                   isLoading={isLoadingCreateBounty}
@@ -665,7 +688,7 @@ export default function CreateBountyPage() {
                   }}
                 >
                   {currentSection === 3 ? t("bounty:create-bounty") : t("bounty:next-step")}
-                </Button>
+                </ContractButton>
               )}
             </div>
           </CustomContainer>

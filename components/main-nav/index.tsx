@@ -24,7 +24,6 @@ import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
 import { changeCurrentUserHasRegisteredNetwork } from "contexts/reducers/change-current-user";
-import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
@@ -156,7 +155,7 @@ export default function MainNav() {
   }, [state.currentUser?.walletAddress, state.connectedChain]);
 
   function handleNewBounty () {
-    dispatch(changeShowCreateBounty(true));
+    push('/create-bounty')
   }
 
   async function handleNetworkSelected(chain: SupportedChainData) {
@@ -215,15 +214,6 @@ export default function MainNav() {
           </div>
 
           <div className="d-flex flex-row align-items-center gap-20">
-            { noNeedNetworkInstance ?
-              <InternalLink
-                href={myNetwork.href}
-                icon={myNetwork.icon}
-                label={myNetwork.label}
-                iconBefore
-                uppercase
-                outline
-              /> : 
               <ReadOnlyButtonWrapper>
                 <ContractButton
                   outline
@@ -235,7 +225,16 @@ export default function MainNav() {
                   <span>{t("main-nav.new-bounty")}</span>
                 </ContractButton>
               </ReadOnlyButtonWrapper>
-            }
+              {noNeedNetworkInstance && (
+                <InternalLink
+                  href={myNetwork.href}
+                  icon={myNetwork.icon}
+                  label={myNetwork.label}
+                  iconBefore
+                  uppercase
+                  outline
+                />
+              )} 
 
             <Button
               onClick={() => setShowHelp(true)}
