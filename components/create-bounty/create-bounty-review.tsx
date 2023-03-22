@@ -1,3 +1,4 @@
+import MarkedRender from "components/MarkedRender";
 import { isArray } from "lodash";
 
 interface ReviewProps {
@@ -19,7 +20,7 @@ export default function CreateBountyReview({
         amet ex.
       </p>
       {Object.entries(payload).map(([name, value]: [string, Value], key) => {
-        if(!value) return null;
+        if(!value || value?.length === 0) return null;
         return (
           <div className="d-flex border-top border-gray-700 py-3 px-2" key={key}>
             <div className="col-3 text-gray">
@@ -35,9 +36,9 @@ export default function CreateBountyReview({
                     </div>
                   ))}
                 </div>
-              ) : (
-                value
-              )}
+              ) : 
+              name === 'description' ? <MarkedRender source={value}/> : value 
+              }
             </div>
           </div>
         )
