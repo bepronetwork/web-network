@@ -13,7 +13,7 @@ export default function CheckCircle(props: SVGProps<SVGSVGElement>) {
       <path
         d="M72.5625 43.875L47.7984 67.5L35.4375 55.6875"
         stroke="#4250E4"
-        stroke-width="3"
+        strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
