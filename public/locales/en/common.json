@@ -4,6 +4,7 @@
   "bepro-votes": "Bepro Votes",
   "$bepro": "BEPRO",
   "bepro": "BEPRO",
+  "token-votes": "{{token}} Votes",
   "please-wait": "Please wait",
   "close": "Close",
   "currencies": {
@@ -13,7 +14,7 @@
   "filters": {
     "filters": "Filter",
     "search-repositories": "Search repositories",
-    "repository": "repository", 
+    "repository": "repository",
     "all": "All",
     "no-records-found": "No records found",
     "clear-filter": "Clear filter",
@@ -62,7 +63,7 @@
     "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
     "new-bounty": "New bounty",
-    "explore": "Explore", 
+    "explore": "Explore",
     "get-started": "Get Started",
     "connect": "Connect Wallet",
     "new-network": "New Network",
@@ -191,7 +192,8 @@
     "unkown": "Unknown",
     "latest": "Latest",
     "network": "Network",
-    "unsupported": "Unsupported"
+    "unsupported": "Unsupported",
+    "votes": "Votes"
   },
   "modals": {
     "help-modal": {

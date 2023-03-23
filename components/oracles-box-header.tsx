@@ -38,7 +38,7 @@ function OraclesBoxHeader({
                 active: action === currentAction
               })}
             >
-              <h4 className="h4 mb-0 mr-2">{action}</h4>
+              <h4 className={`h4 mb-0 mr-2 ${action === currentAction ? "tex-white" : "text-gray-500"}`}>{action}</h4>
             </Button>
           ))
         )}
