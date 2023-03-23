@@ -283,5 +283,6 @@
     "repositories": "Repositories",
     "governance": "Governance",
     "registry": "Registry"
-  }
+  },
+  "allow-merge": "Allow automatic merge of pull-request when bounty is distributed (by ticking this off this merging and closing of pull-requests will have to be made manually)"
 }
