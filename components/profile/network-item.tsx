@@ -31,7 +31,7 @@ export default function NetworkItem({
   type?: "network" | "voting";
   networkName: string;
   subNetworkText?: string;
-  iconNetwork: string;
+  iconNetwork: string | ReactNode;
   amount: string | number;
   symbol: string;
   handleNetworkLink?: () => void;
@@ -68,17 +68,17 @@ export default function NetworkItem({
         <FlexRow className={`${!isNetwork && "justify-content-between"}`}>
           <FlexRow className={`${isNetwork && "col-3"}`}>
             <FlexColumn className="justify-content-center me-2">
-              <NetworkLogo
+              { typeof iconNetwork === "string" ? <NetworkLogo
                 src={`${settings?.urls?.ipfs}/${iconNetwork}`}
                 alt={`${networkName} logo`}
                 isBepro={networkName?.toLowerCase() === "bepro"}
                 size="md"
-              />
+              /> : iconNetwork }
             </FlexColumn>
             <FlexColumn className="justify-content-center">
               <FlexRow>{networkName}</FlexRow>
 
-              {!isNetwork && (
+              {subNetworkText && (
                 <FlexRow>
                   <span className="text-gray">{subNetworkText}</span>
                 </FlexRow>
@@ -130,7 +130,7 @@ export default function NetworkItem({
 
   return (
     <div
-      className="bg-gray-900 p-3 border border-gray-850 border-radius-4 my-2"
+      className="bg-gray-900 p-3 border border-gray-800 border-radius-4 my-2"
       key={key}
     >
       {renderType()}
