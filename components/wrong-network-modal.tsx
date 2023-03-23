@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
 import Modal from "components/modal";
-import SelectNetworkDropdown from "components/select-network-dropdown";
+import SelectChainDropdown from "components/select-chain-dropdown";
 
 import {useAppState} from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
@@ -31,12 +31,12 @@ export default function WrongNetworkModal() {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const [networkChain, setNetworkChain] = useState<SupportedChainData>(null);
   const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
-  
+
   const api = useApi();
   const { connect } = useDao();
   const { handleAddNetwork } = useNetworkChange();
-  const { 
-    dispatch, 
+  const {
+    dispatch,
     state: { connectedChain, currentUser, Service, supportedChains, loading, spinners }
   } = useAppState();
 
@@ -91,7 +91,7 @@ export default function WrongNetworkModal() {
   function updateNetworkChain() {
     if (supportedChains?.length && Service?.network?.active?.chain_id && query?.network) {
       const chain = supportedChains.find(({ chainId }) => +Service?.network?.active?.chain_id === +chainId );
-      
+
       setNetworkChain(chain);
       setChosenSupportedChain(chain);
     }
@@ -108,8 +108,8 @@ export default function WrongNetworkModal() {
   useEffect(() => { api.getSupportedChains() }, []);
   useEffect(updateNetworkChain, [Service?.network?.active?.chain_id, supportedChains, query?.network]);
   useEffect(changeShowModal, [
-    currentUser?.walletAddress, 
-    connectedChain?.matchWithNetworkChain, 
+    currentUser?.walletAddress,
+    connectedChain?.matchWithNetworkChain,
     connectedChain?.id,
     supportedChains,
     loading,
@@ -133,21 +133,21 @@ export default function WrongNetworkModal() {
         </strong>
 
         {!isAddingNetwork ? '' :
-          <Spinner 
+          <Spinner
             className="text-primary align-self-center p-2 mt-1 mb-2"
             style={{ width: "5rem", height: "5rem" }}
             animation="border"
           />
         }
 
-        <SelectNetworkDropdown
+        <SelectChainDropdown
           defaultChain={networkChain}
           onSelect={selectSupportedChain}
           isDisabled={isAddingNetwork}
           placeHolder={t("forms.select-placeholder-chain")}
         />
 
-        <Button 
+        <Button
           className="my-3"
           disabled={isButtonDisabled()}
           onClick={_handleAddNetwork}

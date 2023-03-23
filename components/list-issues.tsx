@@ -75,15 +75,10 @@ export default function ListIssues({
   inView,
   variant = "network"
 }: ListIssuesProps) {
-  const {dispatch, state: appState} = useAppState();
-
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);
 
-  const { search, setSearch, clearSearch } = useSearch();
-  
   const [hasMore, setHasMore] = useState(false);
-  const [searchState, setSearchState] = useState(search);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
   const [totalBounties, setTotalBounties] = useState<number>(0);
@@ -92,13 +87,19 @@ export default function ListIssues({
 
   const { chain } = useChain();
   const { searchIssues } = useApi();
+  const { dispatch, state: appState } = useAppState();
   const { page, nextPage, goToFirstPage } = usePage();
+  const { search, setSearch, clearSearch } = useSearch();
+
+  const [searchState, setSearchState] = useState(search);
 
   const isProfile = variant === "profile";
   const isBountyHall = variant === "bounty-hall";
+  const isOnNetwork = !!router?.query?.network;
 
-  const { network: networkName, repoId, time, state, sortBy, order } = router.query as {
+  const { network: queryNetwork, networkName, repoId, time, state, sortBy, order } = router.query as {
     network: string;
+    networkName: string;
     repoId: string;
     time: string;
     state: string;
@@ -149,16 +150,16 @@ export default function ListIssues({
   }
 
   async function disputableFilterFn(bounties: IssueBigNumberData[]): Promise<IssueBigNumberData[]> {
-    const bountiesIds = 
+    const bountiesIds =
       (await Promise.all(bounties.map(async ({ contractId, mergeProposals}) => {
         const proposals = [];
 
         for await (const proposal of mergeProposals) {
           const isDisputed = await appState.Service?.active?.isProposalDisputed(contractId, proposal.contractId);
-          const isDisputable = isProposalDisputable(proposal?.createdAt, 
-                                                    +appState.Service?.network?.times?.disputableTime, 
+          const isDisputable = isProposalDisputable(proposal?.createdAt,
+                                                    +appState.Service?.network?.times?.disputableTime,
                                                     await appState.Service?.active.getTimeChain());
-          
+
           if (disputableFilter === "merge" && !isDisputed && !isDisputable) proposals.push(proposal);
           else if (disputableFilter === "dispute" && !isDisputed && isDisputable) proposals.push(proposal);
         }
@@ -172,8 +173,8 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (router.pathname === "/[network]" && !networkName ||
-        router.pathname.includes("/[network]/[chain]") && (!networkName || !chain || inView === false)) return;
+    if (router.pathname === "/[network]" && !queryNetwork ||
+        router.pathname.includes("/[network]/[chain]") && (!queryNetwork || !chain || inView === false)) return;
 
     dispatch(changeLoadState(true));
 
@@ -189,8 +190,9 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: (isProfile || isBountyHall) ? "" : appState.Service?.network?.active?.name,
-      allNetworks: (isProfile || isBountyHall) || "",
+      networkName: isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
+        networkName || appState.Service?.network?.active?.name,
+      allNetworks: isBountyHall || "",
       chainId: chain?.chainId?.toString(),
     })
       .then(async ({ count, rows, pages, currentPage }) => {
@@ -257,7 +259,8 @@ export default function ListIssues({
     proposer,
     appState.Service?.network?.active?.name,
     inView,
-    appState.supportedChains
+    appState.supportedChains,
+    networkName
   ]);
 
   useEffect(() => {
@@ -270,19 +273,20 @@ export default function ListIssues({
     return () => clearTimeout(searchTimeout.current);
   }, [searchState]);
 
-  
+
   function isRenderFilter() {
     if(isMobile) return false;
 
     return (!isListEmpy() || (isListEmpy() && hasFilter()));
   }
-  
+
   if(inView !== null && inView === false) return null;
 
   return (
-    <CustomContainer 
+    <CustomContainer
       className={isProfile && "px-0 mx-0" || ""}
       childWrapperClassName={isProfile && "justify-content-left" || ""}
+      col={isProfile ? "col-12" : undefined}
     >
       {(isBountyHall || isProfile) && (
         <div className="d-flex flex-row align-items-center">
@@ -294,9 +298,9 @@ export default function ListIssues({
       )}
       {isRenderFilter() ? (
         <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-gray-950"}
+          className={"row align-items-center list-actions sticky-top bg-gray-950"}
         >
-          <div className="w-50">
+          <div className={`col-${isProfile ? "6" : "7"}`}>
             <InputGroup className="border-radius-8">
               <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
@@ -321,44 +325,48 @@ export default function ListIssues({
             </InputGroup>
           </div>
 
-          <div className="d-flex align-items-center">
-            <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
-              {t("sort.label")}
-            </span>
+          <div className="col">
+            <div className="d-flex align-items-center">
+              <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
+                {t("sort.label")}
+              </span>
 
-            <ListSort
-              options={[
-                {
-                  value: "newest",
-                  sortBy: "createdAt",
-                  order: "DESC",
-                  label: t("sort.types.newest")
-                },
-                {
-                  value: "oldest",
-                  sortBy: "createdAt",
-                  order: "ASC",
-                  label: t("sort.types.oldest")
-                },
-                {
-                  value: "highest-bounty",
-                  sortBy: "amount,fundingAmount",
-                  order: "DESC",
-                  label: t("sort.types.highest-bounty")
-                },
-                {
-                  value: "lowest-bounty",
-                  sortBy: "amount,fundingAmount",
-                  order: "ASC",
-                  label: t("sort.types.lowest-bounty")
-                }
-              ]}
-            />
+              <ListSort
+                options={[
+                  {
+                    value: "newest",
+                    sortBy: "createdAt",
+                    order: "DESC",
+                    label: t("sort.types.newest")
+                  },
+                  {
+                    value: "oldest",
+                    sortBy: "createdAt",
+                    order: "ASC",
+                    label: t("sort.types.oldest")
+                  },
+                  {
+                    value: "highest-bounty",
+                    sortBy: "amount,fundingAmount",
+                    order: "DESC",
+                    label: t("sort.types.highest-bounty")
+                  },
+                  {
+                    value: "lowest-bounty",
+                    sortBy: "amount,fundingAmount",
+                    order: "ASC",
+                    label: t("sort.types.lowest-bounty")
+                  }
+                ]}
+              />
+            </div>
           </div>
 
-          {(!filterState && !isProfile) && <IssueFilters />}
-          
-          {(!filterState && isProfile) && <SelectNetwork />}
+          <div className={`col${isProfile ? "" : "-auto"}`}>
+            {(!filterState && !isProfile) && <IssueFilters />}
+
+            {(!filterState && isProfile) && <SelectNetwork isCurrentDefault={isProfile && isOnNetwork} />}
+          </div>
         </div>
       ) : (
         ""

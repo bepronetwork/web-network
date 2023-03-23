@@ -15,18 +15,18 @@ import WalletIcon from "assets/icons/wallet-icon";
 import { useNetwork } from "x-hooks/use-network";
 
 export default function ProfileSide() {
-  const { asPath } = useRouter();
+  const { query, asPath } = useRouter();
   const { t } = useTranslation("common");
 
   const { getURLWithNetwork } = useNetwork();
 
-  const getHref = (href = "") => getURLWithNetwork(`/profile${href}`);
+  const getHref = (href = "") => `/${query?.network}/${query?.chain}/profile/${href}`;
   const getTranslation = page => t(`main-nav.nav-avatar.${page}`);
   const isActive = href => href !== "" ? asPath.endsWith(href) : asPath.endsWith("/profile")
 
   const ProfileLink = ({ label, href, icon }) => (
     <li className="mb-2" key={label}>
-      <Link href={getHref(href)} passHref>
+      <Link href={getURLWithNetwork("/profile/[[...profilePage]]")} as={getHref(href)} passHref>
         <a 
           className={clsx([
             "d-flex flex-row align-items-center gap-2 text-decoration-none",
@@ -45,13 +45,13 @@ export default function ProfileSide() {
 
   const links = [
     getLink("profile", "", <ProfileIcon />),
-    getLink("wallet", "/wallet", <WalletIcon />),
-    getLink("voting-power", "/bepro-votes", <VotingPowerIcon />),
-    getLink("payments", "/payments", <PaymentsIcon />),
-    getLink("bounties", "/bounties", <BountiesIcon />),
-    getLink("pull-requests", "/pull-requests", <PullRequestsIcon />),
-    getLink("proposals", "/proposals", <ProposalsIcon />),
-    getLink("my-network", "/my-network", <CustomNetworkIcon />),
+    getLink("wallet", "wallet", <WalletIcon />),
+    getLink("voting-power", "voting-power", <VotingPowerIcon />),
+    getLink("payments", "payments", <PaymentsIcon />),
+    getLink("bounties", "bounties", <BountiesIcon />),
+    getLink("pull-requests", "pull-requests", <PullRequestsIcon />),
+    getLink("proposals", "proposals", <ProposalsIcon />),
+    getLink("my-network", "my-network", <CustomNetworkIcon />),
   ];
 
   return(

@@ -83,8 +83,8 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
       )}
 
       <Button
-        color="black"
-        className={`${(show && "border-primary") || ""} rounded-8 m-0`}
+        color="gray-900"
+        className={`${(show && "border-primary") || ""} rounded-2 m-0`}
         onClick={() => setShow(!show)}
       >
         {countFiltersLabel()}{" "}
