@@ -15,15 +15,16 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import ContractButton from "components/contract-button";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
+import CreateBountyNetworkDropdown from "components/create-bounty/create-bounty-network-dropdown";
 import CreateBountyReview from "components/create-bounty/create-bounty-review";
 import CreateBountyRewardInfo from "components/create-bounty/create-bounty-reward-info";
 import CreateBountySteps from "components/create-bounty/create-bounty-steps";
 import CreateBountyTokenAmount from "components/create-bounty/create-bounty-token-amount";
 import SelectNetwork from "components/create-bounty/select-network";
-import SelectNetworkDropdown from "components/create-bounty/select-network-dropdown";
 import CustomContainer from "components/custom-container";
 import { IFilesProps } from "components/drag-and-drop";
 import Modal from "components/modal";
+import SelectNetworkDropdown from "components/select-network-dropdown";
 
 import { useAppState } from "contexts/app-state";
 import { toastError, toastWarning } from "contexts/reducers/change-toaster";
@@ -39,6 +40,7 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Network } from "interfaces/network";
 import { ReposList } from "interfaces/repos-list";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 import { Token } from "interfaces/token";
 import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
@@ -46,10 +48,10 @@ import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useChain from "x-hooks/use-chain";
 import { useDao } from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
 import { useNetwork } from "x-hooks/use-network";
+import useNetworkChange from "x-hooks/use-network-change";
 import useOctokit from "x-hooks/use-octokit";
 
 const ZeroNumberFormatValues = {
@@ -103,16 +105,16 @@ export default function CreateBountyPage() {
   const { getURLWithNetwork } = useNetwork();
 
   const { handleApproveToken } = useBepro();
-  const { changeNetwork } = useDao();
+  const { changeNetwork, connect } = useDao();
 
   const { getRepositoryBranches } = useOctokit();
 
   const {
     dispatch,
-    state: { transactions, Settings, Service, currentUser },
+    state: { transactions, Settings, Service, currentUser, connectedChain, },
   } = useAppState();
 
-  const { chain } = useChain();
+  const { handleAddNetwork } = useNetworkChange();
 
   const steps = [
     t("bounty:steps.select-network"),
@@ -343,9 +345,9 @@ export default function CreateBountyPage() {
                              transactionToast.payload[0] as SimpleBlockTransactionPayload),
         ]));
 
-        const createdBounty = await processEvent(NetworkEvents.BountyCreated, undefined, {
+        const createdBounty = await processEvent(NetworkEvents.BountyCreated, currentNetwork?.networkAddress, {
           fromBlock: networkBounty?.blockNumber
-        });
+        }, currentNetwork?.name);
 
         if (!createdBounty) {
           dispatch(toastWarning(t("bounty:errors.sync")));
@@ -386,8 +388,11 @@ export default function CreateBountyPage() {
   }
 
   useEffect(() => {
+    if(!connectedChain) return;
+
     searchNetworks({
       isRegistered: true,
+      chainId: connectedChain?.id,
       sortBy: "name",
       order: "asc",
       isNeedCountsAndTokensLocked: true,
@@ -400,7 +405,7 @@ export default function CreateBountyPage() {
       .catch((error) => {
         console.log("Failed to retrieve networks list", error);
       });
-  }, []);
+  }, [connectedChain]);
 
   useEffect(() => {
     if (transactionalToken?.address)
@@ -432,10 +437,10 @@ export default function CreateBountyPage() {
   ]);
 
   useEffect(() => {
-    if (currentNetwork && currentSection === 1) {
-      getReposList(true, currentNetwork.name).then(setRepositories);
+    if (currentNetwork && currentSection === 1 && connectedChain?.id) {
+      getReposList(true, currentNetwork.name, connectedChain?.id).then(setRepositories)
     }
-  }, [currentNetwork, currentSection]);
+  }, [currentNetwork, currentSection, connectedChain]);
 
   useEffect(() => {
     if (repository) {
@@ -445,7 +450,7 @@ export default function CreateBountyPage() {
   }, [repository]);
 
   useEffect(() => {
-    if (!currentNetwork?.tokens || !chain) {
+    if (!currentNetwork?.tokens) {
       setTransactionalToken(undefined);
       setRewardToken(undefined);
       setCustomTokens([]);
@@ -454,9 +459,9 @@ export default function CreateBountyPage() {
       return;
     }
 
-    if (!currentNetwork?.networkAddress) return;
-    
-    changeNetwork(currentNetwork?.networkAddress);
+    if (!currentNetwork?.networkAddress || !connectedChain) return;
+    console.log('currentNetwork?.networkAddress || !connectedChain', currentNetwork?.networkAddress , connectedChain)
+    changeNetwork(connectedChain?.id, currentNetwork?.networkAddress);
 
     const tokens = currentNetwork?.tokens
 
@@ -472,7 +477,7 @@ export default function CreateBountyPage() {
       return;
 
     setCustomTokens(currentNetwork?.tokens);
-  }, [currentNetwork, chain]);
+  }, [currentNetwork, connectedChain]);
 
   useEffect(() => {
     cleanFields();
@@ -480,11 +485,27 @@ export default function CreateBountyPage() {
     rewardERC20.updateAllowanceAndBalance();
   }, []);
 
+  async function handleNetworkSelected(chain: SupportedChainData) {
+    setCurrentNetwork(undefined)
+    handleAddNetwork(chain)
+        .then(() => {
+          if (currentUser?.walletAddress) return;
+
+          connect();
+        })
+        .catch(() => null);
+  }
+
   function section() {
     if (currentSection === 0)
       return (
         <SelectNetwork>
-          <SelectNetworkDropdown
+          <SelectNetworkDropdown 
+              onSelect={(chain) => handleNetworkSelected(chain)}
+              isOnNetwork={false}
+              className="select-network-dropdown w-max-none mb-4"
+            />
+          <CreateBountyNetworkDropdown
             value={currentNetwork}
             networks={networks}
             onSelect={setCurrentNetwork}
@@ -703,6 +724,7 @@ export default function CreateBountyPage() {
                 const [repoId, githubId] = String(currentCid).split("/");
 
                 router.push(getURLWithNetwork("/bounty", {
+                    chain: connectedChain?.name,
                     network: currentNetwork?.name,
                     id: githubId,
                     repoId,
