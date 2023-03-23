@@ -20,14 +20,17 @@ export default function ProfileSide() {
 
   const { getURLWithNetwork } = useNetwork();
 
-  const getHref = (href = "") => `/${query?.network}/${query?.chain}/profile/${href}`;
+  const getHref = (href = "") =>
+    query?.network ? `/${query?.network}/${query?.chain}/profile/${href}` : `/profile/${href}`;
+  const getUrl = () =>
+    query?.network ? getURLWithNetwork("/profile/[[...profilePage]]") : "/profile/[[...profilePage]]";
   const getTranslation = page => t(`main-nav.nav-avatar.${page}`);
-  const isActive = href => href !== "" ? asPath.endsWith(href) : asPath.endsWith("/profile")
+  const isActive = href => href !== "" ? asPath.endsWith(href) : asPath.endsWith("/profile");
 
   const ProfileLink = ({ label, href, icon }) => (
     <li className="mb-2" key={label}>
-      <Link href={getURLWithNetwork("/profile/[[...profilePage]]")} as={getHref(href)} passHref>
-        <a 
+      <Link href={getUrl()} as={getHref(href)} passHref>
+        <a
           className={clsx([
             "d-flex flex-row align-items-center gap-2 text-decoration-none",
             "text-gray-150 border-radius-1 p-2 text-white-hover",
@@ -40,7 +43,7 @@ export default function ProfileSide() {
       </Link>
     </li>
     );
-    
+
   const getLink = (label, href, icon) => ({ label, href, icon });
 
   const links = [
@@ -57,7 +60,7 @@ export default function ProfileSide() {
   return(
     <aside className="col-2 bg-gray-950">
       <ul className="ml-2 pt-4">
-        {links.map(ProfileLink)}  
+        {links.map(ProfileLink)}
       </ul>
     </aside>
   );

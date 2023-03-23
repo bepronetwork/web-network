@@ -93,7 +93,6 @@ export default function TransactionsStateIndicator() {
           <Button
             className="bg-gray-850 border-gray-850 rounded p-2"
             transparent
-            rounded
             onClick={() => setShowOverlay(!showOverlay)}
           >
             {(loading && (

@@ -707,24 +707,24 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .circle-1 {
   width: 16px;
   height: 16px;
-  border-radius: 8px;
+  border-radius: 50%;
 }
 .circle-2 {
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
 }
 
 .circle-3 {
-  width: 28px;
-  height: 28px;
-  border-radius: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 
 .circle-4 {
   width: 40px;
   height: 40px;
-  border-radius: 20px;
+  border-radius: 50%;
 }
 
 .become-council {
@@ -736,7 +736,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .circle-5 {
   width: 108px;
   height: 108px;
-  border-radius: 54px;
+  border-radius: 50%;
 }
 
 .font-weight-normal {
@@ -1249,7 +1249,7 @@ a.row-button svg {
       }
     }
   }
-  
+
   &.collapsed {
     border-radius: math.div($m, 2);
 
@@ -1628,42 +1628,42 @@ input[type="color"] {
 
 .svg {
   &-primary {
-    svg {  
+    svg {
       path {
         fill: var(--bs-primary);
       }
     }
   }
   &-success {
-    svg {  
+    svg {
       path {
         fill: var(--bs-success);
       }
     }
   }
   &-danger {
-    svg {  
+    svg {
       path {
         fill: var(--bs-danger);
       }
     }
   }
   &-warning {
-    svg {  
+    svg {
       path {
         fill: var(--bs-warning);
       }
     }
   }
   &-info {
-    svg {  
+    svg {
       path {
         fill: var(--bs-info);
       }
     }
   }
   &-purple {
-    svg {  
+    svg {
       path {
         fill: var(--bs-purple);
       }
@@ -1679,7 +1679,7 @@ input[type="color"] {
   width: fit-content;
   font-weight: bold;
   background-size: 200% 200%;
-  
+
   animation: grandient-loop 3s ease-in-out infinite;
 }
 

@@ -94,7 +94,7 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
       </Button>
 
       <div
-        className={`border border-dark-gray rounded rounded-3 filter-wrapper d-${
+        className={`border border-gray-800 rounded rounded-3 filter-wrapper d-${
           show ? "flex" : "none"
         } justify-content-start align-items-stretch position-absolute`}
       >
@@ -103,9 +103,9 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
         ) : (
           <>
             {!["/bounty-hall"].includes(pathname) && (
-              <div className="bg-shadow">
+              <div className="bg-gray-900">
                 <IssueFilterBox
-                  className="h-100 border border-right border-dark-gray"
+                  className="h-100 border border-right border-gray-800"
                   title={t("filters.repository")}
                   options={repoOptions}
                   filterPlaceholder={t("filters.search-repositories")}
@@ -115,7 +115,7 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
                 />
               </div>
             )}
-            <div className="bg-shadow">
+            <div className="bg-gray-900">
               <IssueFilterBox
                 title={t("filters.bounties.title")}
                 options={stateOptions}

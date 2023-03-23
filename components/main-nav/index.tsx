@@ -61,14 +61,7 @@ export default function MainNav() {
   const { getURLWithNetwork } = useNetwork();
   const { handleAddNetwork } = useNetworkChange();
 
-  const noNeedNetworkInstance = [
-    "/",
-    "/networks",
-    "/new-network",
-    "/explore",
-    "/leaderboard",
-    "/setup"
-  ].includes(pathname);
+  const noNeedNetworkInstance = !query?.network;
 
   const networkLogo = state.Service?.network?.active?.fullLogo;
   const fullLogoUrl = networkLogo && `${state.Settings?.urls?.ipfs}/${networkLogo}`;
@@ -241,7 +234,6 @@ export default function MainNav() {
               onClick={() => setShowHelp(true)}
               className="bg-gray-850 border-gray-850 rounded p-2"
               transparent
-              rounded
             >
               <HelpIcon />
             </Button>
