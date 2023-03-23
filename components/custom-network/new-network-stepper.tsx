@@ -18,7 +18,7 @@ import Stepper from "components/stepper";
 import {useAppState} from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import {changeLoadState} from "contexts/reducers/change-load";
-import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
+import {changeNeedsToChangeChain} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {
@@ -39,7 +39,7 @@ import { RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 import useSignature from "x-hooks/use-signature";
 
@@ -114,7 +114,8 @@ function NewNetwork() {
       allowedTokens: tokens,
       networkAddress: deployedNetworkAddress,
       isDefault: isSetupPage,
-      signedMessage
+      signedMessage,
+      allowMerge: details.allowMerge,
     };
 
     const networkCreated = await createNetwork(payload)
