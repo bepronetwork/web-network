@@ -1765,6 +1765,33 @@ input[type="color"] {
   border-color: var(--bs-purple);
 }
 
+.button-gray-850 {
+  text-transform: none !important;
+  border-radius: 4px;
+  background-color: $gray-850;
+  border: 1px solid $gray-700;
+  &:hover {
+    border-radius: 4px;
+    border-color: $gray-700;
+    background-color: $gray-850;
+    color: $gray-300;
+  }
+  &:focus {
+    border-radius: 4px;
+    border-color: $gray-700;
+    background-color: $gray-850;
+    color: $gray-300;
+  }
+}
+
+.w-9-p {
+  width: 9px !important;
+}
+
+.h-9-p {
+  height: 9px !important;
+}
+
 .kyc-modal-body{
   min-height: 630px !important;
 }
