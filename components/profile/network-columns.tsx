@@ -11,7 +11,7 @@ export default function NetworkColumns({ columns }: { columns: string[] }) {
           hideOrder={true}
           columnOrder={item}
           isColumnActive={false}
-          labelWhite={false}
+          labelWhite={true}
         />
       ))}
     </div>

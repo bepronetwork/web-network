@@ -62,83 +62,70 @@ export default function NetworkItem({
   }
 
   function renderType() {
-    if (type === "network")
-      return (
-        <>
-          <FlexRow>
-            <FlexRow className="col-3">
+    const isNetwork = type === "network";
+    return (
+      <>
+        <FlexRow className={`${!isNetwork && "justify-content-between"}`}>
+          <FlexRow className={`${isNetwork && "col-3"}`}>
+            <FlexColumn className="justify-content-center me-2">
               <NetworkLogo
                 src={`${settings?.urls?.ipfs}/${iconNetwork}`}
                 alt={`${networkName} logo`}
                 isBepro={networkName?.toLowerCase() === "bepro"}
                 size="md"
               />
+            </FlexColumn>
+            <FlexColumn className="justify-content-center">
+              <FlexRow>{networkName}</FlexRow>
 
-              <FlexColumn className="justify-content-center mx-2 text-white">
-                {networkName}
-              </FlexColumn>
-            </FlexRow>
-            <FlexRow className="col-3 justify-content-center">
-              {renderAmount()}
-            </FlexRow>
-            <FlexRow className="col-3 justify-content-center">
-              <FlexColumn className="justify-content-center">
-                <div
-                  className="px-1 py-0 mt-1 ms-4 cursor-pointer border border-gray-700 bg-gray-850 border-radius-4"
-                  onClick={handleNetworkLink}
-                >
-                  <ArrowUpRight />
-                </div>
-              </FlexColumn>
-            </FlexRow>
-            <div
-              className="col-3 d-flex justify-content-end"
-              onClick={() => setIsDropDown(!isDropdown)}
-            >
-              <FlexColumn className="justify-content-center mt-1">
-                <ArrowComponent />
-              </FlexColumn>
-            </div>
-          </FlexRow>
-          {isDropdown && <FlexRow className="mt-3">{children}</FlexRow>}
-        </>
-      );
-
-    if (type === "voting")
-      return (
-        <>
-          <FlexRow className="justify-content-between">
-            <FlexRow>
-              <FlexColumn className="justify-content-center me-2">
-                <NetworkLogo
-                  src={`${settings?.urls?.ipfs}/${iconNetwork}`}
-                  alt={`${networkName} logo`}
-                  isBepro={networkName?.toLowerCase() === "bepro"}
-                  size="md"
-                />
-              </FlexColumn>
-              <FlexColumn className="justify-content-center">
-                <FlexRow>{networkName}</FlexRow>
-
+              {!isNetwork && (
                 <FlexRow>
                   <span className="text-gray">{subNetworkText}</span>
                 </FlexRow>
-              </FlexColumn>
-            </FlexRow>
+              )}
+            </FlexColumn>
+          </FlexRow>
+          {isNetwork ? (
+            <>
+              <FlexRow className="col-3 justify-content-center">
+                {renderAmount()}
+              </FlexRow>
+              <FlexRow className="col-3 justify-content-center">
+                <FlexColumn className="justify-content-center">
+                  <div
+                    className="px-1 py-0 mt-1 ms-4 cursor-pointer border border-gray-700 bg-gray-850 border-radius-4"
+                    onClick={handleNetworkLink}
+                  >
+                    <ArrowUpRight />
+                  </div>
+                </FlexColumn>
+              </FlexRow>
+              <div
+                className="col-3 d-flex justify-content-end"
+                onClick={() => setIsDropDown(!isDropdown)}
+              >
+                <FlexColumn className="justify-content-center mt-1">
+                  <ArrowComponent />
+                </FlexColumn>
+              </div>
+            </>
+          ) : (
             <FlexColumn className="justify-content-center">
               <FlexRow>
                 {renderAmount()}
                 {handleNetworkLink && (
                   <Button className="button-gray-850 ms-3">
-                    <span>{t('go-to-network')}</span>{" "}
+                    <span>{t("go-to-network")}</span>{" "}
                     <ArrowUpRight className="w-9-p h-9-p" />
                   </Button>
                 )}
               </FlexRow>
             </FlexColumn>
-          </FlexRow>
-        </>
-      );
+          )}
+        </FlexRow>
+        {isDropdown && <FlexRow className="mt-3">{children}</FlexRow>}
+      </>
+    );
   }
 
   return (
