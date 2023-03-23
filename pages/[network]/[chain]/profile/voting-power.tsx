@@ -8,16 +8,14 @@ import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
-import OracleIcon from "assets/icons/oracle-icon";
-
 import Delegations from "components/delegations";
 import { Divider } from "components/divider";
 import Indicator from "components/indicator";
 import InfoTooltip from "components/info-tooltip";
 import OraclesActions from "components/oracles-actions";
 import OraclesDelegate from "components/oracles-delegate";
+import NetworkItem from "components/profile/network-item";
 import ProfileLayout from "components/profile/profile-layout";
-import TokenBalance from "components/profile/token-balance";
 import {FlexRow} from "components/profile/wallet-balance";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
@@ -87,24 +85,27 @@ export default function BeproVotes() {
               <span>Locked by me</span>
             </div>
 
-            <TokenBalance
-              icon={oracleToken.icon}
-              overSymbol={oracleToken.symbol}
-              name={votesSymbol}
+            <NetworkItem
+              type="voting"
+              iconNetwork={oracleToken.icon}
+              amount={oraclesLocked.toFixed()}
               symbol={votesSymbol}
-              balance={oraclesLocked}
+              networkName={oracleToken.symbol}
+              subNetworkText={votesSymbol}
             />
 
             <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3 mt-4">
               <span>Delegated to me</span>
             </div>
 
-            <TokenBalance
-              icon={oracleToken.icon}
-              overSymbol={oracleToken.symbol}
-              name={votesSymbol}
+
+            <NetworkItem
+              type="voting"
+              iconNetwork={oracleToken.icon}
+              amount={oraclesDelegatedToMe.toFixed()}
               symbol={votesSymbol}
-              balance={oraclesDelegatedToMe}
+              networkName={oracleToken.symbol}
+              subNetworkText={votesSymbol}
             />
           </div>
 
