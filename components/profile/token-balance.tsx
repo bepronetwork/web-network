@@ -12,27 +12,27 @@ import { TokenInfo } from "interfaces/token";
 export type TokenBalanceType = Partial<TokenInfo>;
 
 interface TokenBalanceProps {
-  type: "token" | "oracle" | "delegation";
+  type?: "token" | "oracle" | "delegation";
   delegation?: DelegationExtended;
   overSymbol?: string;
   onTakeBackClick?: () => void;
 }
 
-export default function TokenBalance({ 
-  icon, 
-  name, 
-  symbol, 
+export default function TokenBalance({
+  icon,
+  name,
+  symbol,
   balance,
-  type,
+  type = "token",
   delegation,
   overSymbol,
-  onTakeBackClick
+  onTakeBackClick,
 } : TokenBalanceType & TokenBalanceProps) {
   const { t } = useTranslation(["common"]);
 
   const CONTAINER_CLASSES = [
-    "justify-content-between align-items-center bg-transparent",
-    "border border-dark-gray border-radius-8 mb-2 py-3 px-4"
+    "justify-content-between align-items-center bg-transparent bg-gray-900",
+    "border border-gray-800 border-radius-4 mb-2 py-3 px-4"
   ];
 
   const symbolColor = {
@@ -41,7 +41,7 @@ export default function TokenBalance({
     delegation: "purple"
   };
 
-  const delegationSymbol =  delegation && 
+  const delegationSymbol =  delegation &&
     <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span className="ml-1 text-purple">{symbol}</span></>;
 
   return (
@@ -52,19 +52,28 @@ export default function TokenBalance({
         </FlexColumn>
 
         <FlexColumn>
-          <span className="caption text-white">{overSymbol ? overSymbol : (delegationSymbol || symbol)}</span>
-          <span className="caption text-gray text-capitalize font-weight-normal">{delegation?.to || name}</span>
+          <span className="caption text-white font-weight-500">
+            {overSymbol ? overSymbol : (delegationSymbol || symbol)}
+          </span>
+          <span className="caption text-gray-500 text-capitalize font-weight-500">{delegation?.to || name}</span>
         </FlexColumn>
       </FlexRow>
 
       <FlexRow>
-        {type === "delegation" && 
-          <ContractButton onClick={onTakeBackClick} color="purple" outline  textClass="text-white">
+        {type === "delegation" &&
+          <ContractButton
+            onClick={onTakeBackClick}
+            color="gray-850"
+            textClass="text-gray-200 font-weight-500 text-capitalize"
+            className="border-radius-4 border border-gray-800"
+          >
             {t("actions.take-back")}
           </ContractButton> ||
           <>
-            <span className="caption text-white mr-1">{formatStringToCurrency(BigNumber(balance).toFixed())}</span>
-            <span className={`caption text-${symbolColor[type]}`}>{symbol}</span>
+            <span className="caption text-white mr-1 font-weight-500">
+              {formatStringToCurrency(BigNumber(balance).toFixed())}
+            </span>
+            <span className={`caption text-${symbolColor[type]} font-weight-500`}>{symbol}</span>
           </>
         }
       </FlexRow>

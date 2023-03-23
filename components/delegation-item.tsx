@@ -2,8 +2,7 @@ import {useState} from "react";
 
 import {useTranslation} from "next-i18next";
 
-import OracleIcon from "assets/icons/oracle-icon";
-
+import Indicator from "components/indicator";
 import Modal from "components/modal";
 import TokenBalance from "components/profile/token-balance";
 
@@ -43,10 +42,12 @@ export default function DelegationItem({
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const oracleToken = {
-    symbol: t("$oracles", {token: state.Service?.network?.active?.networkToken?.symbol}),
-    name: t("profile:oracle-name-placeholder"),
-    icon: <OracleIcon />
+    symbol: state.Service?.network?.active?.networkToken?.symbol || t("misc.token"),
+    name: state.Service?.network?.active?.networkToken?.name || t("profile:oracle-name-placeholder"),
+    icon: <Indicator bg={state.Service?.network?.active?.colors?.primary} size="lg" />
   };
+
+  const votesSymbol = t("token-votes", { token: oracleToken?.symbol })
 
   function handleShow() {
     setShow(true);
@@ -67,10 +68,10 @@ export default function DelegationItem({
   }
 
   return (
-    <>      
+    <>
       <TokenBalance
-        icon={oracleToken.icon} 
-        symbol={oracleToken.symbol}
+        icon={oracleToken.icon}
+        symbol={votesSymbol}
         name={`${t("misc.locked")} ${tokenName || oracleToken.name}`}
         balance={delegationAmount}
         type={tokenBalanceType}
@@ -91,9 +92,7 @@ export default function DelegationItem({
         <p className="text-center h4">
           <span className="me-2">{t("actions.take-back")}</span>
           <span className="text-purple me-2">
-            {formatStringToCurrency(delegationAmount)} {t("$oracles", {
-              token: state.Service?.network?.active?.networkToken?.symbol
-            })}
+            {formatStringToCurrency(delegationAmount)} {t("misc.votes")}
           </span>
           <span>
             {t("misc.from")} {truncateAddress(delegation?.to || "", 12, 3)}

@@ -33,8 +33,8 @@ export default function NavAvatar({
 
   const { goToProfilePage } = useNetwork();
   const { disconnectWallet } = useAuthentication();
-  
-  const username = 
+
+  const username =
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
   function handleInternalLinkClick(profilePage: ProfilePages) {
@@ -61,9 +61,9 @@ export default function NavAvatar({
 
   const ProfileExternalLink = ({ label, href, className = "" }) => (
     <div className={`d-flex flex-row align-items-center justify-content-between ${className}`} key={label}>
-      <a 
-        href={href} 
-        className={`text-decoration-none p family-Regular ${ className || "text-gray"}`} 
+      <a
+        href={href}
+        className={`text-decoration-none p family-Regular ${ className || "text-gray"}`}
         target="_blank"
       >
           {label}
@@ -73,8 +73,8 @@ export default function NavAvatar({
   );
 
   const DisconnectWallet = ({ onClick }) => (
-    <div 
-      className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger" 
+    <div
+      className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger"
       onClick={onClick}
     >
       <span className="p family-Regular">{t("main-nav.nav-avatar.disconnect-wallet")}</span>
@@ -147,10 +147,10 @@ export default function NavAvatar({
         </LinksSession>
 
         <LinksSession>
-          <ProfileExternalLink 
+          <ProfileExternalLink
             label={t("main-nav.nav-avatar.web-network-1")}
-            href="https://v1.bepro.network/" 
-            className="text-primary" 
+            href="https://v1.bepro.network/"
+            className="text-primary"
           />
         </LinksSession>
 
