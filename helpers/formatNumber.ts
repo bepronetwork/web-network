@@ -12,7 +12,7 @@ export const formatNumberToNScale = (number: number | string, fixed = 2, spacer 
   const bigNumber = new BigNumber(number);
 
   if (bigNumber.lt(1e3))
-    return bigNumber.toFixed( number < 1 ? (+number.toString().split(`.`)?.[1]?.length || 2) : fixed)
+    return bigNumber.toFixed( bigNumber.lt(1) ? (+number.toString().split(`.`)?.[1]?.length || 2) : fixed);
 
   const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod', 'Vg', 'Uvg', 'Dvg']; // eslint-disable-line
   const zeroes = Math.floor(bigNumber.dividedBy(1.0e+1).toFixed(0).toString().length); // eslint-disable-line
@@ -34,6 +34,6 @@ export const formatStringToCurrency = (numStr: string) => {
   const [ rest, decimals ] = numStr.toString().split(".");
 
   const decimalsStr = decimals ? `.${decimals}` : "";
-  
+
   return `${rest.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}${decimalsStr}`;
 }
