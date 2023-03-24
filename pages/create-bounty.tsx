@@ -24,7 +24,6 @@ import SelectNetwork from "components/create-bounty/select-network";
 import CustomContainer from "components/custom-container";
 import { IFilesProps } from "components/drag-and-drop";
 import Modal from "components/modal";
-import SelectNetworkDropdown from "components/select-network-dropdown";
 
 import { useAppState } from "contexts/app-state";
 import { toastError, toastWarning } from "contexts/reducers/change-toaster";
@@ -53,6 +52,7 @@ import useERC20 from "x-hooks/use-erc20";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 import useOctokit from "x-hooks/use-octokit";
+import SelectChainDropdown from "components/select-chain-dropdown";
 
 const ZeroNumberFormatValues = {
   value: "",
@@ -272,8 +272,8 @@ export default function CreateBountyPage() {
           creator: payload.githubUser,
           repositoryId: payload.repositoryId,
           tags: selectedTags,
-          isKyc: !isFundingType ? isKyc : false,
-          tierList: !isFundingType ? tierList : null,
+          isKyc: isKyc,
+          tierList: tierList?.length ? tierList : null,
       },
                                         currentNetwork?.name).then((cid) => cid);
 
@@ -354,17 +354,18 @@ export default function CreateBountyPage() {
         }
 
         if (createdBounty?.[cid]) {
-          setCurrentCid(cid);
-          setShowModalSuccess(true);
-          router.push({
-            pathname: "/create-bounty",
-            query: {
-              created: true,
-            },
-          });
-        }
+          //setCurrentCid(cid);
+          //setShowModalSuccess(true);
+          const [repoId, githubId] = String(cid).split("/");
 
-        cleanFields();
+          router.push(getURLWithNetwork("/bounty", {
+              chain: connectedChain?.name,
+              network: currentNetwork?.name,
+              id: githubId,
+              repoId,
+          }));
+          cleanFields();
+        }
       }
     } finally {
       setIsLoadingCreateBounty(false);
@@ -460,7 +461,7 @@ export default function CreateBountyPage() {
     }
 
     if (!currentNetwork?.networkAddress || !connectedChain) return;
-    console.log('currentNetwork?.networkAddress || !connectedChain', currentNetwork?.networkAddress , connectedChain)
+
     changeNetwork(connectedChain?.id, currentNetwork?.networkAddress);
 
     const tokens = currentNetwork?.tokens
@@ -491,7 +492,7 @@ export default function CreateBountyPage() {
         .then(() => {
           if (currentUser?.walletAddress) return;
 
-          connect();
+          connect()
         })
         .catch(() => null);
   }
@@ -500,7 +501,7 @@ export default function CreateBountyPage() {
     if (currentSection === 0)
       return (
         <SelectNetwork>
-          <SelectNetworkDropdown 
+          <SelectChainDropdown 
               onSelect={(chain) => handleNetworkSelected(chain)}
               isOnNetwork={false}
               className="select-network-dropdown w-max-none mb-4"
@@ -653,7 +654,15 @@ export default function CreateBountyPage() {
       {!(query?.created?.toString() === "true") && (
         <>
           <CustomContainer>
-            <CreateBountySteps steps={steps} currentSection={currentSection} />
+          <CreateBountySteps
+              steps={steps}
+              currentSection={currentSection}
+              updateCurrentSection={(i: number) => {
+                if(!verifyNextStepAndCreate() || currentSection > i){
+                  setCurrentSection(i)
+                }
+              }}
+            />
           </CustomContainer>
           <CustomContainer>
             <CreateBountyCard
@@ -673,8 +682,8 @@ export default function CreateBountyPage() {
               </p>
             </div>
           )}
-          <CustomContainer>
-            <div className="d-flex justify-content-between mt-4 me-4">
+          <CustomContainer className='mb-5'>
+            <div className="d-flex justify-content-between my-4 me-4">
               <Button
                 className="col-6 bounty-outline-button me-3"
                 upperCase={false}
@@ -713,6 +722,7 @@ export default function CreateBountyPage() {
               )}
             </div>
           </CustomContainer>
+          {console.log('isKyc', isKyc, tierList?.length ? true : false)}
         </>
       )}
       <Modal
