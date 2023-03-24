@@ -46,8 +46,8 @@ export default function CreateBountyNetworkDropdown({
   function networkOption(network: Network | Partial<Network>,
                          isDisabled?: boolean): NetworkOption {
     return {
-      value: network.name,
-      label: network.name,
+      value: network?.name,
+      label: network?.name,
       preIcon: (
         <img
           src={`${settings?.urls?.ipfs}/${network?.logoIcon}`}
@@ -57,7 +57,7 @@ export default function CreateBountyNetworkDropdown({
         />
       ),
       isDisabled,
-      tooltip: network.name,
+      tooltip: network?.name,
     };
   }
 
@@ -85,7 +85,7 @@ export default function CreateBountyNetworkDropdown({
     <div className={className}>
       <ReactSelect
         options={options}
-        value={selected}
+        value={value ? selected : null}
         onChange={selectSupportedNetwork}
         placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
         isDisabled={isDisabled}
