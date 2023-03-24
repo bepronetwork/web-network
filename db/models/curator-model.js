@@ -30,6 +30,11 @@ class Curators extends Model {
           type: DataTypes.STRING,
           allowNull: true,
         },
+        delegatedToMe: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          defaultValue: "0"
+        },
         networkId: {
           type: DataTypes.INTEGER,
           allowNull: false,

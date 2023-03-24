@@ -3,6 +3,7 @@ export interface Curator {
     acceptedProposals?: number;
     disputedProposals?: number;
     tokensLocked?: string;
+    delegatedToMe?: string;
     networkId?: number;
     disputes?: number;
     isCurrentlyCurator?: boolean
