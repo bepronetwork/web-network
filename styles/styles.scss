@@ -78,12 +78,14 @@ li {
   border-color: var(--bs-purple);
 }
 
-.border-dotted {
-  border: 1px dashed;
-}
 
-.border-none {
-  border: none;
+.border {
+  &-dotter {
+    border: 1px dashed;
+  }
+  &-none {
+    border: none;
+  }
 }
 
 .account-link-active {

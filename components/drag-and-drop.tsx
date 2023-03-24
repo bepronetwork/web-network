@@ -156,7 +156,7 @@ export default function DragAndDrop({
     <>
       <div
         className={`d-flex ${
-          border && "border-dotted border-radius-4 border-gray-700"
+          border && "border-dotter border-radius-4 border-gray-700"
         } flex-wrap align-items-center text-center`}
       >
         {!review && (
