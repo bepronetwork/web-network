@@ -4,7 +4,6 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {chainFromHeader} from "helpers/chain-from-header";
 import {resJsonMessage} from "helpers/res-json-message";
 
 import {LogAccess} from "middleware/log-access";
@@ -12,20 +11,11 @@ import {WithValidChainId} from "middleware/with-valid-chain-id";
 import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {wallet, networkName, startDate, endDate} = req.query;
+  const {wallet, startDate, endDate} = req.query;
 
-  const chain = await chainFromHeader(req);
+  const networks = await models.network.findAll({});
 
-  const network = await models.network.findOne({
-    where: {
-      name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      },
-      chain_id: {[Op.eq]: +chain?.chainId}
-    }
-  });
-
-  if (!network) return resJsonMessage("Invalid network", res, 404);
+  if (!networks) return resJsonMessage("Network not found", res, 404);
 
   let filter: {
     createdAt?: {
@@ -55,11 +45,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const payments = await models.userPayments.findAll({
     include: [
-      { 
-        association: "issue", 
-        where: { network_id: network.id },
-        include:[{ association: "transactionalToken" }] 
-      }
+      {
+        association: "issue",
+        where: {
+          network_id: { [Op.in]: networks.map((network) => network.id) },
+        },
+        include: [
+          { association: "transactionalToken" },
+          {
+            association: "network",
+            include: [{ association: "chain", attributes: ["chainShortName"] }],
+          },
+        ],
+      },
     ],
     where: {
       address: {
