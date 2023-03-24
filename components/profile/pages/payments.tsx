@@ -189,7 +189,7 @@ export default function PaymentsPage() {
               <PaymentsList
                 payments={payments}
                 networks={networks}
-                totalConverted={formatNumberToCurrency(totalEuro)}
+                totalConverted={totalEuro}
                 symbol={state?.Settings?.currency?.defaultFiat?.toUpperCase()}
               />
             ) : (
