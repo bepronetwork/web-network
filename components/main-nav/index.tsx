@@ -18,7 +18,7 @@ import BrandLogo from "components/main-nav/brand-logo";
 import NavLinks from "components/main-nav/nav-links";
 import NavAvatar from "components/nav-avatar";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
-import SelectNetworkDropdown from "components/select-network-dropdown";
+import SelectChainDropdown from "components/select-chain-dropdown";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 
@@ -43,10 +43,10 @@ export default function MainNav() {
   const { t } = useTranslation("common");
   const { pathname, query, asPath, push } = useRouter();
 
-  const newNetworkObj = { 
-    label: <Translation label={"main-nav.new-network"} />, 
-    href: "/new-network", 
-    icon: <PlusIcon /> 
+  const newNetworkObj = {
+    label: <Translation label={"main-nav.new-network"} />,
+    href: "/new-network",
+    icon: <PlusIcon />
   };
 
   const [showHelp, setShowHelp] = useState(false);
@@ -60,21 +60,14 @@ export default function MainNav() {
   const { getURLWithNetwork } = useNetwork();
   const { handleAddNetwork } = useNetworkChange();
 
-  const noNeedNetworkInstance = [
-    "/",
-    "/networks", 
-    "/new-network", 
-    "/explore", 
-    "/leaderboard", 
-    "/setup"
-  ].includes(pathname);
+  const noNeedNetworkInstance = !query?.network;
 
   const networkLogo = state.Service?.network?.active?.fullLogo;
   const fullLogoUrl = networkLogo && `${state.Settings?.urls?.ipfs}/${networkLogo}`;
   const brandHref = noNeedNetworkInstance ? "/" : getURLWithNetwork("/", {
     network: state.Service?.network?.active?.name,
   });
-  
+
 
   function getChainShortName() {
     const availableChains = state.Service?.network?.availableChains;
@@ -133,7 +126,7 @@ export default function MainNav() {
       isClosed: false
     })
       .then(({ count, rows }) => {
-        const changeIfDifferent = (has: boolean) => state.currentUser?.hasRegisteredNetwork !== has && 
+        const changeIfDifferent = (has: boolean) => state.currentUser?.hasRegisteredNetwork !== has &&
           dispatch(changeCurrentUserHasRegisteredNetwork(has));
 
         if (count === 0) {
@@ -145,8 +138,8 @@ export default function MainNav() {
 
           changeIfDifferent(!!rows[0]?.isRegistered);
 
-          setMyNetwork({ 
-            label: <Translation label={"main-nav.my-network"} />, 
+          setMyNetwork({
+            label: <Translation label={"main-nav.my-network"} />,
             href: `/${networkName}/${chainShortName}${rows[0]?.isRegistered ? "" : "/profile/my-network"}`
           });
         }
@@ -173,7 +166,7 @@ export default function MainNav() {
 
     const needsRedirect = ["bounty", "pull-request", "proposal"].includes(pathname.replace("/[network]/[chain]/", ""));
     const newPath = needsRedirect ? "/" : pathname;
-    const newAsPath = needsRedirect ? `/${query.network}/${chain.chainShortName}` : 
+    const newAsPath = needsRedirect ? `/${query.network}/${chain.chainShortName}` :
       asPath.replace(query.chain.toString(), chain.chainShortName);
 
     push(getURLWithNetwork(newPath, {
@@ -202,7 +195,7 @@ export default function MainNav() {
               showDefaultBepro={noNeedNetworkInstance}
             />
 
-            <SelectNetworkDropdown 
+            <SelectChainDropdown
               onSelect={(chain) => handleNetworkSelected(chain)}
               isOnNetwork={!noNeedNetworkInstance}
               className="select-network-dropdown"
@@ -213,7 +206,7 @@ export default function MainNav() {
             />
           </div>
 
-          <div className="d-flex flex-row align-items-center gap-20">
+          <div className="d-flex flex-row align-items-center gap-3">
               <ReadOnlyButtonWrapper>
                 <ContractButton
                   outline
@@ -238,9 +231,8 @@ export default function MainNav() {
 
             <Button
               onClick={() => setShowHelp(true)}
-              className="opacity-75 opacity-100-hover"
+              className="bg-gray-850 border-gray-850 rounded p-2"
               transparent
-              rounded
             >
               <HelpIcon />
             </Button>

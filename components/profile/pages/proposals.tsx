@@ -1,6 +1,4 @@
-import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import ListIssues from "components/list-issues";
 import ProfileLayout from "components/profile/profile-layout";
@@ -9,7 +7,7 @@ import {useAppState} from"contexts/app-state";
 
 import {useNetwork} from "x-hooks/use-network";
 
-export default function Proposals() {
+export default function ProposalsPage() {
   const {t} = useTranslation(["proposal", "bounty"]);
 
   const {state} = useAppState();
@@ -28,18 +26,3 @@ export default function Proposals() {
     </ProfileLayout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "bounty",
-        "profile",
-        "proposal",
-        "connect-wallet-button"
-      ]))
-    }
-  };
-};

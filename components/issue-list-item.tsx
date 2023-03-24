@@ -11,7 +11,6 @@ import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
 import CardItem from "components/card-item";
 import ChainBadge from "components/chain-badge";
-import DateLabel from "components/date-label";
 import IssueAmountInfo from "components/issue-amount-info";
 import Translation from "components/translation";
 
@@ -25,17 +24,19 @@ import { useNetwork } from "x-hooks/use-network";
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
   xClick?: () => void;
-  size?: "sm" | "lg"
+  size?: "sm" | "lg";
+  variant?: "network" | "multi-network";
 }
 
 export default function IssueListItem({
   size = "lg",
   issue = null,
   xClick,
+  variant = "network"
 }: IssueListItemProps) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
-  
+
   const {state} = useAppState();
   const { getURLWithNetwork } = useNetwork();
 
@@ -44,6 +45,11 @@ export default function IssueListItem({
     amount: issue?.amount,
     fundingAmount: issue?.fundingAmount,
   })
+
+  const badgeStyle = {
+    backgroundColor: `${issue?.network?.colors?.primary}90`,
+    border: `1px solid ${issue?.network?.colors?.primary}`
+  };
 
   function handleClickCard() {
     if (xClick) return xClick();
@@ -156,13 +162,14 @@ export default function IssueListItem({
                     `d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
                   label={t("bounty:kyc.label")}
                 /> : null}
-                <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center gap-20">
                   <AvatarOrIdenticon
                     address={issue?.creatorAddress}
                     user={issue?.creatorGithub}
                     size="sm"
                   />
-                  {issue?.repository && (
+
+                  {(variant === "network" && issue?.repository) && (
                     <OverlayTrigger
                       key="bottom-githubPath"
                       placement="bottom"
@@ -172,22 +179,31 @@ export default function IssueListItem({
                         </Tooltip>
                       }
                     >
-                      <div className={`${!issue?.network?.colors?.primary && "bg-primary"} rounded-4 px-2 py-1 ml-2`}
-                        style={{backgroundColor: issue?.network?.colors?.primary}}>
+                      <div className={`${!issue?.network?.colors?.primary && "bg-primary"} rounded-4 px-2 py-1`}
+                        style={badgeStyle}>
                         <span className="caption-medium text-uppercase mw-github-info">
                           {issue?.repository?.githubPath.split("/")?.[1]}
                         </span>
                       </div>
                     </OverlayTrigger>
                   )}
+
+                  { variant === "multi-network" &&
+                    <Badge
+                      label={issue?.network?.name}
+                      style={badgeStyle}
+                    />
+                  }
                 </div>
               </>
             )}
 
             <RenderIssueData state={issueState} />
 
-            <DateLabel date={issue?.createdAt} className="text-white-40" />
-            
+            <span className="text-gray-500 font-weight-medium">
+              {issue?.createdAt?.toLocaleDateString("PT")}
+            </span>
+
             <BountyTags tags={issue?.tags} color={issue?.network?.colors?.primary}/>
           </div>
         </div>

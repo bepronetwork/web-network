@@ -53,7 +53,7 @@
   --bs-secondary:#{$secondary};
   --bs-secondary-rgb:#{toRGB($secondary)};
   --bs-body-bg:#{$gray-950};
-  --bs-body-bg-rgb:#{toRGB($bg)};
+  --bs-body-bg-rgb:#{toRGB($gray-950)};
   --bs-dark:#{$gray-950};
   --bs-dark-rgb:#{toRGB($gray-950)};
 }
@@ -175,25 +175,26 @@ li {
 
 .react-select {
   &-container {
+    min-width: fit-content;
     width: 100%;
   }
   &-container & {
     &__control {
-      border-color: transparent;
-      background-color: $gray-800;
+      border: 1px solid $gray-800;
+      background-color: $gray-900;
       min-height: 38px;
       box-shadow: none;
-      border-radius: 8px;
-      border-width: 2px;
+      border-radius: 4px;
       &:hover {
         border-color: $gray-700;
+        background-color: $gray-850;
       }
       &--is-focused {
         border-color: var(--bs-primary);
       }
       &--menu-is-open {
         border-color: var(--bs-primary) !important;
-        background: $gray-800;
+        background-color: $gray-800;
       }
       &--is-disabled {
         border-color: transparent;
@@ -209,7 +210,7 @@ li {
     }
     &__indicator {
       font-size: 12px;
-      color: var(--bs-gray);
+      color: $gray-500;
     }
     &__single-value {
       @extend .p-small;
@@ -220,14 +221,19 @@ li {
     }
     &__menu {
       // min-width: 210px;
-      border-radius: 8px;
-      border: 1px solid $gray-700;
-      background-color: $gray-800;
+      border-radius: 4px;
+      border: 1px solid $gray-800;
+      background-color: $gray-900;
       z-index: 4;
+      padding: 6px;
 
       &-list {
         padding-top: 0;
         padding-bottom: 0;
+
+        .react-select__option + .react-select__option {
+          margin-top: 6px;
+        }
       }
     }
     &__value {
@@ -243,29 +249,17 @@ li {
     &__option {
       @extend .p;
       background-color: transparent;
-      color: $gray;
+      color: $gray-500;
 
-      &:only-child {
-        border-radius: 8px;
-      }
-
-      &:first-child {
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-      }
-
-      &:last-child {
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-      }
+      border-radius: 4px;
 
       &--is-selected {
         color: $white;
-        background-color: $bg;
+        background-color: $gray-850;
       }
       &:hover {
         color: $white;
-        background-color: $dark-gray;
+        background-color: $gray-850;
       }
       &:active {
         background-color: transparent;
@@ -277,20 +271,7 @@ li {
   }
 }
 
-.form-control {
-  min-width: 100px;
-  border-color: transparent;
-  color: transparentize($white, 0.4);
-  &,
-  &:focus {
-    box-shadow: none;
-    background-color: $bg;
-  }
-  &:focus {
-    border-color: var(--bs-primary);
-    color: $white;
-  }
-}
+
 
 // familys
 .family-Regular {
@@ -557,13 +538,23 @@ label {
 }
 
 .form-control {
-  background-color: $black;
-  border: 1px solid $black;
-  color: var(--bs-gray);
+  min-width: 100px;
+
+  background-color: $gray-900;
+  border: 1px solid $gray-800;
+  color: #fff;
+
   &:disabled,
   &[readonly] {
-    background-color: $black;
+    background-color: $gray-900;
     opacity: 0.4;
+  }
+
+  &:focus {
+    box-shadow: none;
+    background-color: $gray-900;
+    border-color: var(--bs-primary);
+    color: $white;
   }
 }
 
@@ -594,24 +585,69 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .input-group {
+  padding-left: 0;
+  padding-right: 0;
+
+  border: 1px solid $gray-800;
+
+  &,
+  > input {
+    border-radius: math.div($m, 4);
+    color: #fff;
+  }
+
+  .form-control:not(:only-child), > input:not(:only-child) {
+    border-right: none !important;
+  }
+
+  &:hover {
+    border: 1px solid $gray-700;
+  }
+
+  &:focus-within {
+    .input-group-text {
+      border-left: none !important;
+
+      &:not(.border) {
+        border: 1px solid var(--bs-primary);
+        border-left: none;
+      }
+    }
+  }
+
   .input-group-text {
-    background-color: $black;
-    border: 1px solid $black;
-    color: var(--bs-gray);
+    background-color: $gray-900;
+    border: none;
+    color: $gray-500;
 
     &.group-disabled {
       opacity: 0.4;
       border: 1px solid rgba($black, 0.4);
     }
   }
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
+
   .button-max {
     cursor: pointer;
   }
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: $gray-700;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: $gray-700;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: $gray-700;
 }
 
 .issue-body {
@@ -785,24 +821,24 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .circle-1 {
   width: 16px;
   height: 16px;
-  border-radius: 8px;
+  border-radius: 50%;
 }
 .circle-2 {
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
 }
 
 .circle-3 {
-  width: 28px;
-  height: 28px;
-  border-radius: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 
 .circle-4 {
   width: 40px;
   height: 40px;
-  border-radius: 20px;
+  border-radius: 50%;
 }
 
 .become-council {
@@ -814,7 +850,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .circle-5 {
   width: 108px;
   height: 108px;
-  border-radius: 54px;
+  border-radius: 50%;
 }
 
 .font-weight-normal {
@@ -822,7 +858,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .font-weight-medium {
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 .min-w-fit{
@@ -1332,7 +1368,7 @@ a.row-button svg {
       }
     }
   }
-  
+
   &.collapsed {
     border-radius: math.div($m, 2);
 
@@ -1392,15 +1428,15 @@ textarea.form-control {
   }
 
   .input-group {
-    border: 2px solid transparent;
-    
-    .input-group-text {
-      border-top-left-radius: math.div($m, 2);
-      border-bottom-left-radius: math.div($m, 2);
-    }
+    border: 1px solid $gray-800;
 
     &:hover {
-      border: 2px solid $light-gray;
+      border: 1px solid $gray-700;
+    }
+
+    .input-group-text {
+      border-top-left-radius: math.div($m, 4);
+      border-bottom-left-radius: math.div($m, 4);
     }
 
     &:focus-within {
@@ -1408,7 +1444,6 @@ textarea.form-control {
 
       .input-group-text {
         border: 0 !important;
-        background-color: $black;
       }
     }
 
@@ -1417,13 +1452,12 @@ textarea.form-control {
 
       &:focus {
         border: 0;
-        background-color: $black;
       }
     }
 
     button {
-      background-color: $black;
-      border-top-right-radius: math.div($m, 2);
+      background-color: $gray-900;
+      border-top-right-radius: math.div($m, 4);
       border-bottom-right-radius: math.div($m, 2);
 
       svg {
@@ -1434,7 +1468,7 @@ textarea.form-control {
   }
 
   button {
-    border: 2px solid transparent;
+    border: 1px solid transparent;
 
     &:hover {
       border-color: $light-gray;
@@ -1445,7 +1479,7 @@ textarea.form-control {
   .react-select__control,
   .react-select__currency,
   .react-select__menu {
-    color: var(--bs-gray);
+    color: $gray-700;
     min-width: 170px !important;
     // min-width: max-content;
   }
@@ -1622,31 +1656,7 @@ input[type="color"] {
   }
 }
 
-.input-group {
-  padding-left: 0;
-  padding-right: 0;
 
-  &,
-  > input {
-    border-radius: math.div($m, 2);
-  }
-
-  > input:not(:only-child) {
-    border-right: none !important;
-  }
-
-  &:focus-within {
-    .input-group-text {
-      border-left: none !important;
-      background-color: $bg;
-
-      &:not(.border) {
-        border: 1px solid var(--bs-primary);
-        border-left: none;
-      }
-    }
-  }
-}
 
 .amount-input {
   .input-group {
@@ -1737,42 +1747,42 @@ input[type="color"] {
 
 .svg {
   &-primary {
-    svg {  
+    svg {
       path {
         fill: var(--bs-primary);
       }
     }
   }
   &-success {
-    svg {  
+    svg {
       path {
         fill: var(--bs-success);
       }
     }
   }
   &-danger {
-    svg {  
+    svg {
       path {
         fill: var(--bs-danger);
       }
     }
   }
   &-warning {
-    svg {  
+    svg {
       path {
         fill: var(--bs-warning);
       }
     }
   }
   &-info {
-    svg {  
+    svg {
       path {
         fill: var(--bs-info);
       }
     }
   }
   &-purple {
-    svg {  
+    svg {
       path {
         fill: var(--bs-purple);
       }
@@ -1788,7 +1798,7 @@ input[type="color"] {
   width: fit-content;
   font-weight: bold;
   background-size: 200% 200%;
-  
+
   animation: grandient-loop 3s ease-in-out infinite;
 }
 

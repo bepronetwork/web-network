@@ -52,7 +52,7 @@ export default function BountiesPage() {
 
   useEffect(() => {
     if (!state.Service?.network?.active || !chain || !query?.network) return;
-    
+
     setInfos(zeroInfo);
 
     Promise.all([
@@ -70,7 +70,7 @@ export default function BountiesPage() {
       .then(([bounties, curators, totalUsers, symbol]) => {
         const closedBounties = bounties.filter(({ state }) => state === "closed").length;
         const inProgress = bounties.filter(({ state }) => !["pending", "canceled", "closed"].includes(state)).length;
-        const onNetwork = (curators as Curator[]).reduce((acc, curator) => 
+        const onNetwork = (curators as Curator[]).reduce((acc, curator) =>
           new BigNumber(acc).plus(curator.tokensLocked).toFixed(), "0");
 
         return [closedBounties, inProgress, onNetwork, totalUsers, symbol];
@@ -106,7 +106,7 @@ export default function BountiesPage() {
         infos={infos}
       />
 
-      <ListIssues />
+      <ListIssues variant="network" />
     </BountyEffectsProvider>
   );
 }

@@ -1,25 +1,35 @@
 import BeProBlue from "assets/icons/bepro-blue";
 
+import { SizeOptions } from "interfaces/utils";
+
 interface NetworkLogoProps {
   src: string;
   alt?: string;
   isBepro?: boolean;
-  size?: 'lg' | 'md'
+  size?: SizeOptions;
+  noBg?: boolean;
 }
 
 export default function NetworkLogo({
   src,
   isBepro = false,
-  size = 'lg',
+  size = "md",
+  noBg,
   ...props
 }: NetworkLogoProps) {
-  const scale = size === 'lg' ? 24 : 20
+  const sizes = {
+    sm: 15,
+    md: 24
+  };
+
   return (
-    <div className={`network-logo-${size} bg-dark d-flex align-items-center justify-content-center rounded-circle`}>
+    <div className={
+      `${noBg ? "px-2 py-0" : "bg-dark p-2"} d-flex align-items-center justify-content-center rounded-circle`
+    }>
       {isBepro ? (
-        <BeProBlue width={scale} height={scale} />
+        <BeProBlue width={sizes[size]} height={sizes[size]} />
       ) : (
-        <img src={src} {...props} width={scale} height={scale} />
+        <img src={src} {...props} width={sizes[size]} height={sizes[size]} />
       )}
     </div>
   );

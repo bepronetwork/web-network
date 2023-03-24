@@ -2,7 +2,6 @@ import {useState} from "react";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
-import {useRouter} from "next/router";
 
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
@@ -13,6 +12,8 @@ import Button from "components/button";
 import {useAppState} from "contexts/app-state";
 
 import {truncateAddress} from "helpers/truncate-address";
+
+import { ProfilePages } from "interfaces/utils";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
@@ -25,29 +26,27 @@ export default function NavAvatar({
   onNetwork
 } : NavAvatarProps) {
   const { t } = useTranslation("common");
-  const router = useRouter();
 
   const [visible, setVisible] = useState(false);
 
   const {state} = useAppState();
 
-  const { getURLWithNetwork } = useNetwork();
+  const { goToProfilePage } = useNetwork();
   const { disconnectWallet } = useAuthentication();
   
   const username = 
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
-  function handleInternalLinkClick(href) {
+  function handleInternalLinkClick(profilePage: ProfilePages) {
     setVisible(false);
-    router.push(href);
+
+    goToProfilePage(profilePage);
   }
 
   function handleDisconnectWallet() {
     disconnectWallet();
     setVisible(false);
   }
-
-  const Link = (label, href) => ({ label, href });
 
   const ProfileInternalLink = ({ label, href, className = "" }) => 
     <Button
@@ -91,20 +90,16 @@ export default function NavAvatar({
     </div>
   );
 
+  const Link = (label, href) => ({ label, href });
+
   const internalLinks = [
-    Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.voting-power"),
-         getURLWithNetwork("/profile/bepro-votes")),
-    Link(t("main-nav.nav-avatar.payments"),
-         getURLWithNetwork("/profile/payments")),
-    Link(t("main-nav.nav-avatar.bounties"),
-         getURLWithNetwork("/profile/bounties")),
-    Link(t("main-nav.nav-avatar.pull-requests"),
-         getURLWithNetwork("/profile/pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"),
-         getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.my-network"),
-         getURLWithNetwork("/profile/my-network")),
+    Link(t("main-nav.nav-avatar.wallet"), "wallet"),
+    Link(t("main-nav.nav-avatar.voting-power"), "voting-power"),
+    Link(t("main-nav.nav-avatar.payments"), "payments"),
+    Link(t("main-nav.nav-avatar.bounties"), "bounties"),
+    Link(t("main-nav.nav-avatar.pull-requests"), "pull-requests"),
+    Link(t("main-nav.nav-avatar.proposals"), "proposals"),
+    Link(t("main-nav.nav-avatar.my-network"), "my-network"),
   ];
 
   const externalLinks = [
@@ -133,23 +128,19 @@ export default function NavAvatar({
               </span>
               </div>
 
-              { onNetwork && 
-                <div className="d-flex flex-row justify-content-left">
-                  <ProfileInternalLink 
-                    href={getURLWithNetwork("/profile")} 
-                    label={t("main-nav.nav-avatar.view-profile")} 
-                    className="text-gray p family-Regular"
-                  />
-                </div>
-              }
+              <div className="d-flex flex-row justify-content-left">
+                <ProfileInternalLink 
+                  href="profile"
+                  label={t("main-nav.nav-avatar.view-profile")} 
+                  className="text-gray p family-Regular"
+                />
+              </div>
           </div>
         </div>
 
-        { onNetwork &&
-          <LinksSession>
-            {internalLinks.map(ProfileInternalLink)}
-          </LinksSession>
-        }
+        <LinksSession>
+          {internalLinks.map(ProfileInternalLink)}
+        </LinksSession>
 
         <LinksSession>
           {externalLinks.map(ProfileExternalLink)}
@@ -184,14 +175,10 @@ export default function NavAvatar({
           <AvatarOrIdenticon
             user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
-            size="md"
+            size="sm"
+            withBorder
+            active={visible}
           />
-
-          {/* <If condition={!!state.currentUser?.walletAddress}>
-            <span className="caption-small text-white">
-              {truncateAddress(state.currentUser?.walletAddress, 6, 3)}
-            </span>
-          </If> */}
         </div>
       </OverlayTrigger>
     </div>

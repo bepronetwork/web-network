@@ -1,9 +1,7 @@
 import {useEffect, useState} from "react";
 import {Col} from "react-bootstrap";
 
-import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
@@ -19,8 +17,8 @@ import {Network} from "interfaces/network";
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 
-export function MyNetwork() {
-  const { t } = useTranslation(["common", "custom-network"]);
+function MyNetwork() {
+  const {t} = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 
@@ -87,23 +85,10 @@ export function MyNetwork() {
   );
 }
 
-export default () => <NetworkSettingsProvider><MyNetwork></MyNetwork></NetworkSettingsProvider>
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "connect-wallet-button",
-        "my-oracles",
-        "bounty",
-        "pull-request",
-        "custom-network",
-        "profile",
-        "setup",
-        "change-token-modal"
-      ]))
-    }
-  };
-};
+export default function MyNetworkPage() {
+  return(
+    <NetworkSettingsProvider>
+      <MyNetwork />
+    </NetworkSettingsProvider>
+  );
+}
