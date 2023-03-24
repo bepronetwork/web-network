@@ -178,7 +178,7 @@ export default function CreateBountyDetails({
               />
             </span>
           </div>
-          {isKyc && !Settings?.kyc?.tierList?.length ? (
+          {isKyc && Settings?.kyc?.tierList?.length ? (
             <DropDown
               className="mt-2"
               onSelected={(opt) => {
