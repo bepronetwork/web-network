@@ -1,9 +1,9 @@
 import React from "react";
 
-import { IssueState } from "interfaces/issue-data";
+import Badge from "components/badge";
+import Translation from "components/translation";
 
-import Badge from "./badge";
-import Translation from "./translation";
+import { IssueState } from "interfaces/issue-data";
 
 interface IBountyStatusInfo {
   issueState: IssueState;
@@ -13,13 +13,16 @@ interface IBountyStatusInfo {
 export default function BountyStatusInfo({ issueState, className }: IBountyStatusInfo) {
 
   const colors = {
-    draft: { ellipse: "bg-info", badge: "bg-info-30 text-info" },
-    open: { ellipse: "bg-success", badge: "bg-success-30 text-success"},
-    canceled: { ellipse: "", badge: "bg-danger-30 text-danger-70" },
-    closed: { ellipse: "", badge: "bg-dark-gray text-white-40" },
-    ready: { ellipse: "bg-success", badge: "bg-success-30 text-success" },
-    proposal: { ellipse: "bg-purple", badge: "bg-purple-30 text-purple" },
-    funding: { ellipse: "bg-light-warning", badge: "bg-light-warning-30 text-light-warning" },
+    draft: { ellipse: "bg-info", badge: "border border-info bg-info-30 text-info" },
+    open: { ellipse: "bg-success", badge: "border border-success bg-success-30 text-success"},
+    canceled: { ellipse: "", badge: "border border-danger bg-danger-30 text-danger-70" },
+    closed: { ellipse: "", badge: "border border-dark-gray bg-dark-gray text-white-40" },
+    ready: { ellipse: "bg-success", badge: "border border-success bg-success-30 text-success" },
+    proposal: { ellipse: "bg-purple", badge: "border border-purple bg-purple-30 text-purple" },
+    funding: {
+      ellipse: "bg-light-warning",
+      badge: "border border-light-warning bg-light-warning-30 text-light-warning"
+    },
   };
 
   return (

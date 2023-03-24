@@ -190,6 +190,7 @@
     "wallet": "Wallet",
     "unkown": "Unknown",
     "latest": "Latest",
+    "network": "Network",
     "unsupported": "Unsupported"
   },
   "modals": {

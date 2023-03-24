@@ -35,13 +35,13 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
       }
     >
       <div
-        className={`row justify-content-md-center m-0 px-1 pb-1 rounded-5 ${
+        className={`row justify-content-md-center m-0 px-1 py-1 rounded-5 ${
           !isActive ? "bg-black" : "bg-dark-gray"
         } `}
       >
         {isFundingRequest && isMobile ? null : (
           <div
-            className={`px-0 pt-1 col-md-12 ${size === "sm" && "text-center"}`}
+            className={`px-0 py-1 col-md-12 ${size === "sm" && "text-center"}`}
           >
             <span
               className={`caption-large text-opacity-1 text-white${
@@ -67,7 +67,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
         {isFundingRequest &&
           fundedAmount.isLessThan(issue?.fundingAmount) && (
             <>
-              <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "pt-1"}`}>
+              <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "py-1"}`}>
                 <div className="bg-dark-gray w-100 issue-funding-progress">
                   <div
                     className={`${
@@ -82,7 +82,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
               </div>
               <div
                 className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-2 col-md-2 text-white
-              ${isMobile && "pt-1"}`}
+              ${isMobile && "py-1"}`}
               >
                 {percentage}%
               </div>

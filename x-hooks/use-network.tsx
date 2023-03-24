@@ -14,6 +14,8 @@ import {
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
+import { ProfilePages } from "interfaces/utils";
+
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
@@ -22,7 +24,7 @@ import useChain from "x-hooks/use-chain";
 const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
 
 export function useNetwork() {
-  const {query, replace} = useRouter();
+  const {query, replace, push} = useRouter();
 
   const [networkName, setNetworkName] = useState<string>();
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
@@ -92,13 +94,13 @@ export function useNetwork() {
   
           dispatch(changeNetworkLastVisited(queryNetworkName));
           dispatch(changeActiveNetwork(newCachedData.value));
-        } else {
-          const available = rows
-                            .filter(({ isRegistered, isClosed }) => isRegistered && !isClosed)
-                            .map(network => network.chain);
-
-          dispatch(changeActiveAvailableChains(available));
         }
+
+        const available = rows
+          .filter(({ isRegistered, isClosed }) => isRegistered && !isClosed)
+          .map(network => network.chain);
+
+        dispatch(changeActiveAvailableChains(available));
       })
       .catch(e => {
         console.log(`Failed to get network ${queryNetworkName}`, e);
@@ -120,6 +122,18 @@ export function useNetwork() {
           state?.Service?.network?.active?.name
       }
     };
+  }
+
+  function goToProfilePage(profilePage: ProfilePages) {
+    const queryNetwork = query?.network;
+    const queryChain = query?.chain;
+
+    const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
+
+    if (queryNetwork)
+      push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${queryChain}/${path}`);
+    else
+      push("/profile/[[...profilePage]]", `/${path}`);
   }
 
   function loadNetworkAllowedTokens() {
@@ -212,6 +226,7 @@ export function useNetwork() {
     loadNetworkTimes,
     loadNetworkAmounts,
     loadNetworkAllowedTokens,
+    goToProfilePage,
     updateNetworkAndChainMatch
   }
 

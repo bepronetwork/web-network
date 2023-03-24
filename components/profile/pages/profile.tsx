@@ -1,8 +1,6 @@
 import React, {useState} from "react";
 
-import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
@@ -17,8 +15,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-
-export default function Profile() {
+export default function ProfilePage() {
   const { t } = useTranslation("profile");
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -76,17 +73,3 @@ export default function Profile() {
     </ProfileLayout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "connect-wallet-button",
-        "bounty",
-        "profile"
-      ]))
-    }
-  };
-};
