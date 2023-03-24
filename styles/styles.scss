@@ -268,17 +268,27 @@ li {
 }
 
 .form-control {
+  background-color: $gray-900;
+  border: 1px solid $gray-700;
   min-width: 100px;
   border-color: transparent;
-  color: transparentize($white, 0.4);
-  &,
-  &:focus {
-    box-shadow: none;
-    background-color: $bg;
+  color: var(--bs-gray);
+  ::after{
+   z-index: -1;
+   content: url("http://www.example.com/test.png") 
   }
+
+  &,
   &:focus {
     border-color: var(--bs-primary);
     color: $white;
+    box-shadow: none;
+    background-color: $gray-900;
+  }
+  &:disabled,
+  &[readonly] {
+    background-color: $gray-900;
+    opacity: 0.4;
   }
 }
 
@@ -545,26 +555,15 @@ li {
 label {
   color: var(--bs-gray);
 }
-.form-control {
-  background-color: $black;
-  border: 1px solid $black;
-  color: var(--bs-gray);
-  &:disabled,
-  &[readonly] {
-    background-color: $black;
-    opacity: 0.4;
-  }
-}
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  background-color: $white !important;
   border-radius: 5px;
+  content: url(../assets/CalendarBlank.svg);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   transform:scale(1.2);
   cursor:pointer;
-  background-color: rgba($white, 0.2);
 }
 
 .input-group {
