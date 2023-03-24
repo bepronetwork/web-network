@@ -15,7 +15,7 @@ export default function ProfileRouter() {
   const { asPath, push } = useRouter();
 
   const Route = (path, page) => ({ path, page });
-  
+
   const routes = [
     Route("/profile", ProfilePage),
     Route("/profile/wallet", WalletPage),
