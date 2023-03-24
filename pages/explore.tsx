@@ -71,7 +71,7 @@ export default function ExplorePage() {
       />
       <ListActiveNetworks />
       <ListRecentIssues />
-      <ListIssues allNetworks={true} />
+      <ListIssues variant="bounty-hall" />
     </BountyEffectsProvider>
   );
 }

@@ -6,7 +6,7 @@ export default function CardItem({ children, onClick }: {
 }) {
   return (
     <div
-      className="bg-shadow list-item p-3"
+      className="bg-gray-900 list-item p-3 border border-gray-800"
       onClick={onClick}
     >
       {children}

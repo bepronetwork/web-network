@@ -1,9 +1,7 @@
 import {ChangeEvent, SetStateAction, useEffect, useState} from "react";
 
 import {format, subDays} from "date-fns";
-import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import ArrowRight from "assets/icons/arrow-right";
 
@@ -23,7 +21,7 @@ import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
-export default function Payments() {
+export default function PaymentsPage() {
   const { t } = useTranslation(["common", "profile"]);
 
   const defaultOptions = [
@@ -182,16 +180,3 @@ export default function Payments() {
     </ProfileLayout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "profile",
-        "connect-wallet-button",
-        "bounty",
-      ])),
-    },
-  };
-};

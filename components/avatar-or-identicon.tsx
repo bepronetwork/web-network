@@ -23,9 +23,9 @@ export default function AvatarOrIdenticon({
 
   return(
     <div className={`${withBorder ? "border-avatar p-1" : ""} ${withBorder && active ? "active" : ""}`}>
-      { user ? 
-        <Avatar userLogin={user} className="border-primary" size={size} /> : 
-        <Identicon address={address} size={size} /> 
+      { user ?
+        <Avatar userLogin={user} className="border-primary" size={size} /> :
+        <Identicon address={address} size={size} />
       }
     </div>
   );

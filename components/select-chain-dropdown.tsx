@@ -11,7 +11,7 @@ import {useAppState} from "contexts/app-state";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
-interface SelectNetworkDropdownProps {
+interface SelectChainDropdownProps {
   onSelect: (chain: SupportedChainData) => void;
   defaultChain?: SupportedChainData;
   isOnNetwork?: boolean;
@@ -28,14 +28,14 @@ interface ChainOption {
   tooltip?: string;
 }
 
-export default function SelectNetworkDropdown({ 
+export default function SelectChainDropdown({
   defaultChain,
   isOnNetwork,
   className = "text-uppercase",
   onSelect,
   isDisabled,
   placeHolder
-}: SelectNetworkDropdownProps) {
+}: SelectChainDropdownProps) {
   const { t } = useTranslation("common");
 
   const [options, setOptions] = useState<ChainOption[]>([]);
@@ -43,9 +43,9 @@ export default function SelectNetworkDropdown({
 
   const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
 
-  function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption { 
-    return { 
-      value: chain, 
+  function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption {
+    return {
+      value: chain,
       label: chain.chainShortName,
       preIcon: (<Indicator bg={isDisabled ? "gray" : chain.color} />),
       isDisabled,
@@ -73,11 +73,11 @@ export default function SelectNetworkDropdown({
 
   function updateSelectedChainMatchConnected() {
     let chain = undefined;
-    
+
     if (isOnNetwork && Service?.network?.active?.chain)
       chain = Service?.network?.active?.chain;
     else
-      chain = 
+      chain =
         options?.find(({ value: { chainId } }) => chainId === +(defaultChain?.chainId || connectedChain.id))?.value;
 
     if (!chain) {
@@ -95,7 +95,7 @@ export default function SelectNetworkDropdown({
     const configuredChains = supportedChains.filter(isChainConfigured);
 
     if (isOnNetwork)
-      setOptions(configuredChains.map(chain => 
+      setOptions(configuredChains.map(chain =>
         chainToOption(chain, !Service?.network?.availableChains?.find(({ chainId }) => chainId === chain.chainId))));
     else
       setOptions(configuredChains.map(chain => chainToOption(chain)));
@@ -117,7 +117,7 @@ export default function SelectNetworkDropdown({
 
   return(
     <div className={className}>
-      <ReactSelect 
+      <ReactSelect
         options={options}
         value={selected}
         onChange={selectSupportedChain}

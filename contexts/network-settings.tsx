@@ -38,18 +38,18 @@ import useOctokit from "x-hooks/use-octokit";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/[chain]/profile/my-network", "/administration", "/setup"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/[chain]/profile/[[...profilePage]]", "/administration", "/setup"];
 const TTL = 48 * 60 * 60 // 2 day
 const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
-  
+
   /* NOTE - forced network might be renamed to `user network`,
             referred to user nework when he access `/my-network` page from/in another network.
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
-  const [networkSettings, setNetworkSettings] = 
+  const [networkSettings, setNetworkSettings] =
     useState<NetworkSettings>(JSON.parse(JSON.stringify(DefaultNetworkSettings)))
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [registryToken, setRegistryToken] = useState<Token>();
@@ -90,7 +90,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     settings.treasury.address.validated = validations[0];
     settings.treasury.cancelFee.validated = validations[1];
     settings.treasury.closeFee.validated = validations[2];
-    settings.treasury.validated = isTreasuryZero ||validations.every(condition => condition !== false);
+    settings.treasury.validated = isTreasuryZero || validations.every(condition => condition !== false);
 
     //Parameters
     const parametersValidations = [
@@ -144,7 +144,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     const tokensLockedValidate = [
       Fields.amount.validator(newState.tokensLocked?.locked, newState.tokensLocked?.needed)
     ].every(condition => condition);
-      
+
     const detailsValidate = [
       newState.details.name.validated,
       newState.details.fullLogo.validated,
@@ -215,7 +215,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     setNetworkSettings(valitedState);
   }
-  
+
   const Fields = {
     amount: {
       setter: (value: string) => setFields('tokensLocked.amount', value),
@@ -225,22 +225,22 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: async (value: string) => {
         setFields('details.name', {value, validated: await Fields.name.validator(value)})
       },
-      validator: async (value: string) => {  
-        if (value.trim() === "") 
+      validator: async (value: string) => {
+        if (value.trim() === "")
           return undefined;
 
         // Reserved names
-        if (/bepro|taikai/gi.test(value)) 
+        if (/bepro|taikai/gi.test(value))
           return false;
 
         const networksWithSameName = await searchNetworks({ name: value });
 
         // No networks with this name
-        if (networksWithSameName.count === 0) 
+        if (networksWithSameName.count === 0)
           return true;
-        
+
         const currentChain = +state.connectedChain?.id;
-        
+
         // Network with same name on this chain
         if (networksWithSameName.rows.some(({ chain_id }) => +chain_id === currentChain))
           return false;
@@ -306,9 +306,9 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   async function loadForcedService(): Promise<DAO> {
     if (!network ||
-        toLower(state.Service?.active?.network?.contractAddress) === toLower(network?.networkAddress)) 
+        toLower(state.Service?.active?.network?.contractAddress) === toLower(network?.networkAddress))
       return state.Service?.active;
-    
+
     if (toLower(forcedService?.network?.contractAddress) === toLower(network?.networkAddress))
       return forcedService;
 
@@ -373,7 +373,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           }));
 
       if (!isCreating) {
-        const repositoryAlreadyExists =  await searchRepositories({ 
+        const repositoryAlreadyExists =  await searchRepositories({
           networkName: network?.name,
           chainId: state.connectedChain?.id,
           includeIssues: "true"
@@ -541,7 +541,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     }));
 
     setNetworkSettings(defaultState);
-    
+
     return defaultState;
   }
 
@@ -556,7 +556,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if ([
       !state.currentUser?.walletAddress,
-      !isCreating && 
+      !isCreating &&
         (!network?.name || !forcedService || !!networkSettings?.settings?.parameters?.councilAmount?.value),
       isCreating && !state.Service?.active?.registry?.token?.contractAddress,
       !needsToLoad,
@@ -603,7 +603,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       .then(({ count, rows }) => {
         if (count === 0) return;
 
-        const reposToSelect = rows.filter(({ network: { name, creatorAddress, chain_id } }) => 
+        const reposToSelect = rows.filter(({ network: { name, creatorAddress, chain_id } }) =>
           toLower(name) === toLower(creatingName) &&
           creatorAddress === currentAddress &&
           chain_id !== connectedChainId);

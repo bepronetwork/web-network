@@ -17,7 +17,7 @@ export default function ProfileLayout({ children }) {
   return(
     <>
       <ConnectWalletButton asModal={true} />
-      
+
       <div className="row mx-0">
         <ProfileSide />
 
