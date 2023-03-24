@@ -1,9 +1,9 @@
-import {ReactElement, useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 
 interface IfProps {
   condition: boolean | (() => boolean);
-  otherwise?: ReactElement;
-  children: ReactElement;
+  otherwise?: ReactNode;
+  children: ReactNode;
 }
 
 export default function If({condition, children, otherwise}: IfProps) {
