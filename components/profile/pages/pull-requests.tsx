@@ -1,6 +1,4 @@
-import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 import ListIssues from "components/list-issues";
 import ProfileLayout from "components/profile/profile-layout";
@@ -9,7 +7,7 @@ import {useAppState} from "contexts/app-state";
 
 import {useNetwork} from "x-hooks/use-network";
 
-export default function PullRequests() {
+export default function PullRequestsPage() {
   const {t} = useTranslation(["pull-request", "bounty"]);
 
   const {state} = useAppState();
@@ -29,18 +27,3 @@ export default function PullRequests() {
     </ProfileLayout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "bounty",
-        "profile",
-        "pull-request",
-        "connect-wallet-button"
-      ]))
-    }
-  };
-};

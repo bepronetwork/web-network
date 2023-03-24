@@ -18,19 +18,20 @@ export default function Identicon({
   const ref = useRef<HTMLDivElement>();
 
   const SIZES = {
-    sm: 32,
-    md: 40,
+    xsm: 16,
+    sm: 24,
+    md: 32,
     lg: 108
   };
 
   useEffect(() => {
     if (address && ref.current) {
       ref.current.innerHTML = "";
-      
+
       const icon = jazzicon(SIZES[size], parseInt(address.slice(2, 10), 16));
-      
+
       if (size === "lg") icon.style.height = `${SIZES[size]-6}px`;
-      
+
       ref.current.appendChild(icon);
     }
   }, [address]);

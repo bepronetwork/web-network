@@ -2,9 +2,7 @@ import {useEffect} from "react";
 import {Col, Row} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
-import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
 import OracleIcon from "assets/icons/oracle-icon";
@@ -24,13 +22,13 @@ import {formatStringToCurrency} from "helpers/formatNumber";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-export default function BeproVotes() {
+export default function VotingPowerPage() {
   const { t } = useTranslation(["common", "profile"]);
 
   const { state } = useAppState();
   const { updateWalletBalance } = useAuthentication();
 
-  const { curatorAddress } = useRouter().query
+  const { curatorAddress } = useRouter().query;
 
   const oracleToken = {
     symbol: t("$oracles", { token: state.Service?.network?.active?.networkToken?.symbol }),
@@ -113,18 +111,3 @@ export default function BeproVotes() {
     </ProfileLayout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "bounty",
-        "my-oracles",
-        "connect-wallet-button",
-        "profile"
-      ]))
-    }
-  };
-};
