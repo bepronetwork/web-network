@@ -70,20 +70,7 @@ export default function CreateBountyNetworkDropdown({
 
   function updateOptions() {
     if (networks.length > 0) {
-      setOptions(networks.map((network) => ({
-          value: network?.name,
-          label: network?.name,
-          preIcon: (
-            <img
-              src={`${settings?.urls?.ipfs}/${network?.logoIcon}`}
-              alt={`${network?.name} logo`}
-              width={16}
-              height={16}
-            />
-          ),
-          isDisabled: false,
-          tooltip: network?.name,
-      })));
+      setOptions(networks.map(n => networkOption(n, false)));
     }
   }
 
