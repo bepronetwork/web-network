@@ -19,13 +19,15 @@ export function CallToAction({
       className="mb-3"
       isAlert
     >
-      <span className="col">{call}</span>
+      <span className="mr-3">{call}</span>
+
       <BtnComponent
         color={color}
         disabled={executing || disabled}
         withLockIcon={disabled && !executing}
         isLoading={executing}
-        onClick={onClick}>
+        onClick={onClick}
+      >
         <span>{action}</span>
       </BtnComponent>
     </ContextualSpan>
