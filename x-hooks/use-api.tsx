@@ -703,7 +703,7 @@ export default function useApi() {
     page = "1",
     address = "",
     isCurrentlyCurator = undefined,
-    networkName = DEFAULT_NETWORK_NAME,
+    networkName = "",
     sortBy = "updatedAt",
     order = "DESC",
     chainShortName
