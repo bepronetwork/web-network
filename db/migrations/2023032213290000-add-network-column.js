@@ -1,9 +1,9 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("network", "allowMerge", {type: Sequelize.BOOLEAN, defaultValue: true});
+    await queryInterface.addColumn("networks", "allowMerge", {type: Sequelize.BOOLEAN, defaultValue: true});
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn("network", "allowMerge");
+    await queryInterface.removeColumn("networks", "allowMerge");
   }
 };
