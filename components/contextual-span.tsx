@@ -18,6 +18,7 @@ interface ContextualSpanProps {
   className?: string;
   classNameIcon?: string;
   isAlert?: boolean;
+  isDismissable?: boolean;
 }
 
 export function ContextualSpan({
@@ -26,7 +27,8 @@ export function ContextualSpan({
   color,
   className = "",
   isAlert,
-  classNameIcon
+  classNameIcon,
+  isDismissable = false
 }: ContextualSpanProps) {
   const [visible, setVisible] = useState(true);
 
@@ -53,20 +55,22 @@ export function ContextualSpan({
     setVisible(false);
   }
 
-  if (isAlert && !visible)
+  if (isAlert && isDismissable && !visible)
     return <></>;
 
   return(
     <FlexRow className={CLASSES}>
-      <FlexRow className="align-items-center">
-        <span className={`mr-1 svg-${contextColor} ${classNameIcon}`}>
-          <Icon width={12} height={12} />
-        </span>
+      <FlexColumn>
+        <FlexRow className="align-items-center">
+          <span className={`mr-1 svg-${contextColor} ${classNameIcon}`}>
+            <Icon width={12} height={12} />
+          </span>
 
-        {children}
-      </FlexRow>
+          {children}
+        </FlexRow>
+      </FlexColumn>
 
-      <If condition={isAlert}>
+      <If condition={isAlert && isDismissable}>
         <FlexColumn>
           <Button
             transparent

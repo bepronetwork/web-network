@@ -17,6 +17,7 @@ interface TotalVotesProps {
   tokenName: string;
   tokenSymbol: string;
   votesSymbol: string;
+  variant?: "network" | "multi-network";
 }
 
 export default function TotalVotes({
@@ -25,12 +26,13 @@ export default function TotalVotes({
   icon,
   tokenName,
   tokenSymbol,
-  votesSymbol
+  votesSymbol,
+  variant = "network"
 } : TotalVotesProps) {
   const { t } = useTranslation(["common", "profile"]);
 
   return(
-    <div className="border border-gray-800 p-4 border-radius-4">
+    <div className="border border-gray-800 p-4 border-radius-4 col-12">
       <FlexRow className="mb-3 justify-content-between align-items-center">
         <span className="h4 family-Regular text-white font-weight-500">
           Total Votes
@@ -38,7 +40,8 @@ export default function TotalVotes({
 
         <FlexRow className={clsx([
           "d-flex justify-content-center align-items-center gap-2 caption-large",
-          "text-white bg-gray-900 py-2 px-3 border-radius-4 border border-gray-800 font-weight-medium"
+          "text-white py-2 px-3 border-radius-4 border border-gray-800 font-weight-medium",
+          variant === "network" ? "bg-gray-900" : "bg-gray-950"
         ])}>
           <span>
             {formatStringToCurrency(votesLocked.plus(votesDelegatedToMe).toFixed())}
@@ -68,6 +71,7 @@ export default function TotalVotes({
         symbol={votesSymbol}
         networkName={tokenSymbol}
         subNetworkText={votesSymbol}
+        variant={variant}
       />
 
       <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3 mt-4">
@@ -82,6 +86,7 @@ export default function TotalVotes({
         symbol={votesSymbol}
         networkName={tokenSymbol}
         subNetworkText={votesSymbol}
+        variant={variant}
       />
     </div>
   );

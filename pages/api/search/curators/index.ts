@@ -3,6 +3,7 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, {calculateTotalPages} from "helpers/paginate";
 import {resJsonMessage} from "helpers/res-json-message";
 
@@ -26,7 +27,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           }
         },
         include: [
-          { 
+          {
             association: "chain",
             where: {
               chainShortName: chainShortName
@@ -40,21 +41,30 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       whereCondition.networkId = network?.id;
     }
 
-    if (address) whereCondition.address = address;
+    if (address)
+      whereCondition.address = {
+        [Op.iLike]: address.toString()
+      };
 
     if (isCurrentlyCurator)
       whereCondition.isCurrentlyCurator = isCurrentlyCurator;
 
-    const curators = await models.curator
-      .findAndCountAll(paginate({
-            attributes: {
-              exclude: ["id"],
-            },
-            where: whereCondition,
-            nest: true,
+    const curators = await models.curator.findAndCountAll(paginate({
+      attributes: {
+        exclude: ["id"],
       },
-                                req.query,
-          [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
+      where: whereCondition,
+      nest: true,
+      include: [
+        {
+          association: "network",
+          include: [
+            { association: "networkToken" },
+            { association: "chain" },
+          ]
+        }
+      ]
+    }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
         return Promise.all(items.rows.map(async (item) => {
           item.dataValues.disputes =
@@ -63,7 +73,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             });
           return item;
         }))
-          .then((values) => ({ count: items.count, rows: values }))
+          .then((values) => ({ count: items.count, rows: handleNetworkValues(values) }))
           .catch(() => items);
       });
 

@@ -25,6 +25,7 @@ export default function NetworkItem({
   iconNetwork,
   networkName,
   subNetworkText,
+  variant = "network"
 }: {
   children?: ReactNode;
   key?: number | string;
@@ -35,19 +36,20 @@ export default function NetworkItem({
   amount: string | number;
   symbol: string;
   handleNetworkLink?: () => void;
+  variant?: "network" | "multi-network";
 }) {
   const { t } = useTranslation(["profile"]);
-  const [isDropdown, setIsDropDown] = useState<boolean>(false);
+
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+
   const {
-    state: { Settings: settings },
+    state: { Settings: settings }
   } = useAppState();
 
   function ArrowComponent() {
-    return !isDropdown ? (
-      <ArrowDown width={10} height={8} />
-    ) : (
-      <ArrowUp width={10} height={8} />
-    );
+    if (isCollapsed) return <ArrowDown width={10} height={8} />;
+
+    return <ArrowUp width={10} height={8} />;
   }
 
   function renderAmount() {
@@ -56,9 +58,13 @@ export default function NetworkItem({
         <span className="text-white mr-1">
           {formatNumberToCurrency(amount)}
         </span>
-        <span className="text-primary">{symbol}</span>
+        <span className="text-primary text-uppercase">{symbol}</span>
       </FlexRow>
     );
+  }
+
+  function toggleCollapse() {
+    setIsCollapsed(previous => !previous);
   }
 
   function renderType() {
@@ -102,7 +108,7 @@ export default function NetworkItem({
               </FlexRow>
               <div
                 className="col-3 d-flex justify-content-end"
-                onClick={() => setIsDropDown(!isDropdown)}
+                onClick={toggleCollapse}
               >
                 <FlexColumn className="justify-content-center mt-1">
                   <ArrowComponent />
@@ -123,14 +129,15 @@ export default function NetworkItem({
             </FlexColumn>
           )}
         </FlexRow>
-        {isDropdown && <FlexRow className="mt-3">{children}</FlexRow>}
+
+        {(children && !isCollapsed) && <FlexRow className="mt-3">{children}</FlexRow>}
       </>
     );
   }
 
   return (
     <div
-      className="bg-gray-900 p-3 border border-gray-800 border-radius-4 my-2"
+      className={`bg-gray-${ variant === "network" ? "900" : "950"} p-3 border border-gray-800 border-radius-4 my-2`}
       key={key}
     >
       {renderType()}
