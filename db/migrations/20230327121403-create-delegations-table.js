@@ -31,6 +31,10 @@ module.exports = {
         allowNull: false,
         defaultValue: "0"
       },
+      contractId: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       networkId: {
         type: Sequelize.INTEGER,
         references: {
@@ -82,10 +86,11 @@ module.exports = {
 
         if (!delegationOf.length) continue;
 
-        const delegations = delegationOf.map(({ from, to, amount }) => ({
+        const delegations = delegationOf.map(({ id, from, to, amount }) => ({
           from,
           to,
           amount,
+          contractId: id,
           networkId: curator.networkId,
           chainId: defaultChainId
         }));
