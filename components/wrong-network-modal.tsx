@@ -40,23 +40,23 @@ export default function WrongNetworkModal() {
     state: { connectedChain, currentUser, Service, supportedChains, loading, spinners }
   } = useAppState();
 
-  const canBeHided = ![
+  const isRequired = [
     pathname?.includes("new-network"),
-    pathname?.includes("profile")
+    pathname?.includes("/[network]/[chain]/profile")
   ].some(c => c);
 
+  const canBeHided = !isRequired;
+
   function changeShowModal() {
-    if (!supportedChains?.length ||
-        loading?.isLoading ||
-        !spinners?.needsToChangeChain) {
+    if (!supportedChains?.length || loading?.isLoading) {
       setShowModal(false);
       return;
     }
 
-    if (typeof connectedChain?.matchWithNetworkChain !== "boolean" && !!currentUser?.walletAddress)
-      setShowModal(connectedChain?.name === UNSUPPORTED_CHAIN);
-    else
-      setShowModal(!connectedChain?.matchWithNetworkChain && !!currentUser?.walletAddress);
+    setShowModal([
+      spinners?.needsToChangeChain,
+      !connectedChain?.matchWithNetworkChain && isRequired
+    ].some(c => c));
   }
 
   async function selectSupportedChain(chain: SupportedChainData) {
@@ -113,10 +113,11 @@ export default function WrongNetworkModal() {
     connectedChain?.id,
     supportedChains,
     loading,
-    spinners
+    spinners,
+    isRequired
   ]);
 
-  if (spinners?.needsToChangeChain && !currentUser?.walletAddress)
+  if ((spinners?.needsToChangeChain || _showModal) && !currentUser?.walletAddress)
     return <ConnectWalletButton asModal={true} />;
 
   return (
