@@ -63,7 +63,7 @@ export default function TotalVotes({
     <div className="border border-gray-800 p-4 border-radius-4 col-12">
       <FlexRow className="mb-3 justify-content-between align-items-center">
         <span className="h4 family-Regular text-white font-weight-500">
-          Total Votes
+          {t("profile:total-votes")}
         </span>
 
         <FlexRow className={clsx([
@@ -89,13 +89,13 @@ export default function TotalVotes({
       </FlexRow>
 
       <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3">
-        <span>Locked by me</span>
+        <span>{t("profile:locked-by-me")}</span>
       </div>
 
       {getAmountItem(votesLocked.toFixed())}
 
       <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3 mt-4">
-        <span>Delegated to me</span>
+        <span>{t("profile:deletaged-to-me")}</span>
       </div>
 
       {getAmountItem(votesDelegatedToMe.toFixed())}
