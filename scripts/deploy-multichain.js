@@ -1,22 +1,30 @@
+const {Sequelize} = require("sequelize");
 const yargs = require("yargs");
 const {hideBin} = require("yargs/helpers");
-const StagingAccounts = require('./staging-accounts');
 
 const {Network_v2, Web3Connection, NetworkRegistry, ERC20, BountyToken} = require("@taikai/dappkit");
 const {nativeZeroAddress} = require("@taikai/dappkit/dist/src/utils/constants");
-const {Sequelize} = require("sequelize");
-const SettingsModel = require("../db/models/settings.model");
+
+const DBConfig = require("../db/config");
+const ChainModel = require("../db/models/chain.model");
+const TokensModel = require("../db/models/tokens.model");
 const NetworkModel = require("../db/models/network.model");
 const NetworkTokensModel = require("../db/models/network-tokens.model");
 const RepositoryModel = require("../db/models/repositories.model");
 
-const xNetworks = {
-  seneca: 'https://eth-seneca.taikai.network:8080',
-  diogenes: 'https://eth-diogenes.taikai.network:8080',
-  aurelius: 'https://eth-aurelius.taikai.network:8080',
-  afrodite: 'https://eth-afrodite.taikai.network:8080',
-  irene: 'https://eth-irene.taikai.network:8080',
-  apollodorus: 'https://eth-apollodorus.taikai.network:8080',
+const StagingAccounts = require('./staging-accounts');
+
+const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl) =>
+  ({[name]: {rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl}})
+
+const _xNetworks = {
+  ... _xNetwork(`development`, [`http://localhost:8545`], `TETH`, 1338, `Local Test Chain`, `local`, `http://localhost:8545`, `http://localhost:3334`),
+  ... _xNetwork(`seneca`, [`https://eth-seneca.taikai.network:8080`], `TETH`, 1500, `Seneca Test Chain`, `seneca`, `https://eth-seneca.taikai.network:8080`, `https://seneca.taikai.network:2053`),
+  ... _xNetwork(`diogenes`, [`https://eth-diogenes.taikai.network:8080`], `TETH`, 1504, `Diogenes Test Chain`, `diogenes`, `https://eth-diogenes.taikai.network:8080`, `https://diogenes.taikai.network:2053`),
+  ... _xNetwork(`aurelius`, [`https://eth-aurelius.taikai.network:8080`], `TETH`, 1505, `Aurelius Test Chain`, `aurelius`, `https://eth-aurelius.taikai.network:8080`, `https://aurelius.taikai.network:2053`),
+  ... _xNetwork(`afrodite`, [`https://eth-afrodite.taikai.network:8080`], `TETH`, 1501, `Afrodite Test Chain`, `afrodite`, `https://eth-afrodite.taikai.network:8080`, `https://afrodite.taikai.network:2053`),
+  ... _xNetwork(`irene`, [`https://eth-irene.taikai.network:8080`], `TETH`, 1502, `Irene Test Chain`, `irene`, `https://eth-irene.taikai.network:8080`, `https://irene.taikai.network:2053`),
+  ... _xNetwork(`apollodorus`, [`https://eth-apollodorus.taikai.network:8080`], `TETH`, 1506, `Apollodorus Test Chain`, `apollodorus`, `https://eth-apollodorus.taikai.network:8080`, `https://apollodorus.taikai.network:2053`),
 }
 
 const options = yargs(hideBin(process.argv))
@@ -25,30 +33,52 @@ const options = yargs(hideBin(process.argv))
   .option(`paymentToken`, {alias: `p`, type: `array`, desc: `use these addresses as transactional token`})
   .option(`governanceToken`, {alias: `g`, type: `array`, desc: `use these addresses as governance token`})
   .option(`bountyNFT`, {alias: `b`, type: `array`, desc: `use these addresses as bounty token`})
-  .option(`privateKey`, {alias: `k`, type: `array`, desc: `Owner private key`})
+  .option(`privateKey`, {alias: `k`, type: `string`, desc: `Owner private key`})
   .option(`treasury`, {alias: `t`, type: `string`, desc: `custom treasury address (defaults to owner private key if not provided)`})
   .option(`envFile`, {alias: `e`, type: `array`, desc: `env-file names to load`})
   .demandOption([`n`, `k`])
   .parseSync();
 
 async function main(option = 0) {
-  const web3Host =
-    xNetworks[options.network[option]] ||
+  let chainData;
+
+  if (_xNetworks[options.network[option]])
+    chainData = _xNetworks[options.network[option]];
+  else chainData =
     await fetch(`https://chainid.network/chains_mini.json`)
       .then(d => d.json())
-      .then(data => data.find(d => d.networkId === +options.network[option]))
-      .then(chain => chain.rpc[0]);
+      .then(data => data.find(d => d.networkId === +options.network[option]));
 
-  const env = require('dotenv').config({path: options.envFile[option]});
-  const privateKey = options.privateKey[option] || options.privateKey[0];
+  if (!chainData) {
+    console.log(`Failed to find chainData for ${options.network[option]}; If it's a xNetwork, make sure it exists. If it's an Network ID, make sure if exists on https://chainid.network/chains_mini.json `);
+    return;
+  }
+
+  const web3Host = chainData.rpc[0];
+  const env = require('dotenv').config({path: options.envFile[option]}).parsed;
+  const privateKey = options.privateKey;
+
+  const {
+    DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION = 100,
+    DEPLOY_LOCK_FEE_PERCENTAGE = 10000,
+    DEPLOY_CLOSE_BOUNTY_FEE = 1000000,
+    DEPLOY_CANCEL_BOUNTY_FEE = 2000000,
+    DEPLOY_TOKENS_CAP_AMOUNT = "300000000000000000000000000",
+    DEPLOY_DRAFT_TIME = 60 * 5, // 5 minutes
+    DEPLOY_DISPUTABLE_TIME = 60 * 10, // 10 minutes
+    DEPLOY_COUNCIL_AMOUNT = 105000,
+  } = env;
 
   const connection = new Web3Connection({web3Host, privateKey});
   connection.start();
 
-  const treasury = options.treasury[option] || await connection.getAddress();
-  const hasPayment = !!options.paymentToken[option];
-  const hasGovernance = !!options.governanceToken[option];
-  const hasBountyNFT = !!options.bountyNFT[option];
+  const isDevelopment = options.network[option] === "development";
+  const accounts = isDevelopment ? await connection.Web3.eth.getAccounts() : StagingAccounts;
+
+  const treasury = options.treasury ? options.treasury[option] : await connection.getAddress();
+  const hasPayment = options.paymentToken ? !!options.paymentToken[option] : false;
+  const hasGovernance = options.governanceToken ? !!options.governanceToken[option] : false;
+  const hasBountyNFT = options.bountyNFT ? !!options.bountyNFT[option] : false;
 
   async function getContractAddress({contractAddress}) {
     return contractAddress;
@@ -58,7 +88,7 @@ async function main(option = 0) {
     const deployer = new _class(connection);
     deployer.loadAbi();
     console.debug(`Deploying ${deployer.constructor?.name} with args:`, ...(args || []));
-    return getContractAddress(await deployer.deployJsonAbi(...(args || [])))
+    return getContractAddress(await deployer.deployJsonAbi(...(args || [])));
   }
 
   async function deployNetwork(governanceToken, registryAddress) {
@@ -66,13 +96,18 @@ async function main(option = 0) {
   }
 
   async function deployRegistry(governanceToken, bountyToken) {
-    const {DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION, DEPLOY_LOCK_FEE_PERCENTAGE, DEPLOY_CLOSE_BOUNTY_FEE} = env;
-    return Deploy(NetworkRegistry, governanceToken, DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION, treasury, DEPLOY_LOCK_FEE_PERCENTAGE, DEPLOY_CLOSE_BOUNTY_FEE, bountyToken);
+    return Deploy(NetworkRegistry,
+                  governanceToken,
+                  DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION,
+                  treasury,
+                  DEPLOY_LOCK_FEE_PERCENTAGE,
+                  DEPLOY_CLOSE_BOUNTY_FEE,
+                  DEPLOY_CANCEL_BOUNTY_FEE,
+                  bountyToken);
   }
 
   async function deployERC20(name, symbol) {
-    const {DEPLOY_TOKENS_CAP_AMOUNT} = env;
-    return Deploy(ERC20, name, symbol, DEPLOY_TOKENS_CAP_AMOUNT)
+    return Deploy(ERC20, name, symbol, DEPLOY_TOKENS_CAP_AMOUNT, treasury)
   }
 
   async function deployBountyToken() {
@@ -80,45 +115,63 @@ async function main(option = 0) {
   }
 
   async function deployTokens() {
-    const mapper = ([name, symbol]) => deployERC20(name, symbol);
+    const tokens = [[`Test USDC`, `TUSD`], [`Test BEPRO`, `TBEPRO`], [`Test Reward BEPRO`, `TRBEPRO`]];
+    const addresses = [];
 
-    return Promise.all([[`Test USDC`, `TUSD`], [`Test BEPRO`, `TBEPRO`], [`Test Reward BEPRO`, `TRBEPRO`]].map(mapper));
+    for (const [name, symbol] of tokens) {
+      addresses.push(await deployERC20(name, symbol));
+    }
+
+    return addresses;
   }
 
   async function changeNetworkOptions(networkAddress, tokens) {
-    const {DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION, DEPLOY_DRAFT_TIME, DEPLOY_DISPUTABLE_TIME, DEPLOY_COUNCIL_AMOUNT} = env;
+    console.debug(`Changing network options`);
+
     const network = new Network_v2(connection, networkAddress);
     await network.loadContract();
-    await Promise.all([
+
+    const changeFunctions = [
       [`changeDraftTime`, DEPLOY_DRAFT_TIME],
       [`changeDisputableTime`, DEPLOY_DISPUTABLE_TIME],
       [`changeCouncilAmount`, DEPLOY_COUNCIL_AMOUNT]
-    ].map(([fn, value]) => network[fn](value)));
+    ];
 
-    [[tokens[0], true], ... tokens[1] !== nativeZeroAddress ? [tokens[1], false] : []]
-      .map(([address, transactional]) => network.registry.addAllowedTokens(address, transactional));
+    for (const [fn, value] of changeFunctions) {
+      await network[fn](value);
+    }
+
+    const transactionTokensAllowed = [tokens[1], tokens[0]];
+    const rewardTokensAllowed = [tokens[1]];
+
+    if (tokens[2] !== nativeZeroAddress)
+      rewardTokensAllowed.push(tokens[2]);
+
+    await network.registry.addAllowedTokens(transactionTokensAllowed, true);
+    await network.registry.addAllowedTokens(rewardTokensAllowed, false);
 
     await network.registry.token.approve(network.registry.contractAddress, DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION);
     await network.registry.lock(DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION);
     await network.registry.registerNetwork(networkAddress);
+    await network.registry.bountyToken.setDispatcher(network.registry.contractAddress);
 
-    const nameSymbol = async (address) => {
-      const token = new ERC20(connection, address);
+    const nameSymbol = async (_class, address) => {
+      const token = new _class(connection, address);
       await token.loadContract();
       return ({name: await token.name(), symbol: await token.symbol()});
     }
 
     const tokenInfo =
-      async (isTransactional, isReward, address) =>
-        ({...await nameSymbol(address), isTransactional, isReward, address})
+      async (_class, isTransactional, isReward, address) =>
+        ({...await nameSymbol(_class, address), isTransactional, isReward, address})
 
     const result = {
       network: networkAddress,
       registry: network.registry.contractAddress,
-      payment: await tokenInfo(true, false, tokens[0]),
-      governance: await tokenInfo(true, false, tokens[1]),
-      reward: tokens[2] !== nativeZeroAddress ? await tokenInfo(true, false, tokens[2]) : {},
-      bounty: {...await nameSymbol(tokens[3]), address: tokens[3]}
+      payment: await tokenInfo(ERC20, true, false, tokens[0]),
+      governance: await tokenInfo(ERC20, true, true, tokens[1]),
+      reward: tokens[2] !== nativeZeroAddress ? await tokenInfo(ERC20, false, true, tokens[2]) : {},
+      bounty: {...await nameSymbol(BountyToken, tokens[3]), address: tokens[3]}
     }
 
     console.debug(`Deploying and Configurations finished`);
@@ -127,16 +180,125 @@ async function main(option = 0) {
     return result;
   }
 
-  async function saveSettingsToDb({registry, payment, governance, reward, bounty},) {
-    const {NEXT_DB_USERNAME: username, NEXT_DB_PASSWORD: password, NEXT_DB_DATABASE: database, NEXT_DB_HOST, NEXT_DB_PORT} = env;
+  async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
+    console.debug("Saving settings to DB");
 
-    const dbConfig = {
-      dialect: 'postgres',
-      username, password, database, host: NEXT_DB_HOST || 'localhost', port: NEXT_DB_PORT || 54320,
-      ... NEXT_DB_HOST ? {dialectOptions: {ssl: {required: true, rejectUnauthorized: false}}} : {}
+    const {chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
+    const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
+
+    try {
+      const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
+
+      NetworkModel.init(sequelize);
+      RepositoryModel.init(sequelize);
+      ChainModel.init(sequelize);
+      TokensModel.init(sequelize);
+      NetworkTokensModel.init(sequelize);
+
+      await ChainModel.findOrCreate({
+        where: {
+          chainId: chainId
+        },
+        defaults: {
+          chainId: chainId,
+          chainRpc: web3Host,
+          chainName: chainData?.name || chainName,
+          chainShortName: chainData?.shortName || chainName,
+          chainCurrencyName: chainData?.nativeCurrency?.name || chainTokenName,
+          chainCurrencySymbol: chainData?.nativeCurrency?.symbol || chainTokenName,
+          chainCurrencyDecimals: chainData?.nativeCurrency?.decimals || 18,
+          registryAddress: registry,
+          eventsApi: eventsUrl,
+          blockScanner: chainScan,
+          isDefault: false,
+          color: "#29b6af"
+        }
+      });
+
+      const saveToken = async ({ address, name, symbol, isTransactional, isReward }) => {
+        const [token, created] = await TokensModel.findOrCreate({
+          where: {
+            name,
+            symbol,
+            isTransactional,
+            isReward,
+            chain_id: chainId
+          },
+          defaults: {
+            address,
+            isAllowed: true,
+            isTransactional,
+            isReward
+          }
+        });
+
+        return token;
+      };
+
+      const paymentToken = await saveToken(payment);
+      const governanceToken = await saveToken(governance);
+      const rewardToken = await saveToken(reward);
+
+      if(!NEXT_PUBLIC_DEFAULT_NETWORK_NAME) return;
+
+      const [networkDb] = await NetworkModel.findOrCreate({
+        where: {
+          name: NEXT_PUBLIC_DEFAULT_NETWORK_NAME
+        },
+        defaults: {
+          networkAddress: network,
+          creatorAddress: treasury,
+          isDefault: true,
+          isRegistered: true,
+          description: "Network",
+          network_token_id: governanceToken.id,
+          chain_id: chainId,
+          councilAmount: DEPLOY_COUNCIL_AMOUNT.toString(),
+          disputableTime: DEPLOY_DISPUTABLE_TIME,
+          draftTime: DEPLOY_DRAFT_TIME,
+          oracleExchangeRate: 1,
+          mergeCreatorFeeShare: 0.05,
+          percentageNeededForDispute: 3,
+          cancelableTime: 180 * 86400,
+          proposerFeeShare: 10
+        }
+      });
+
+      await RepositoryModel.findOrCreate({
+        where: {
+          githubPath: `${NEXT_GH_OWNER}/${NEXT_GH_REPO}`
+        },
+        defaults: {
+          network_id: networkDb.id
+        }
+      });
+
+
+      const saveNetworkTokensRelation = async (token, isTransactional, isReward) => {
+        await NetworkTokensModel.findOrCreate({
+          where: {
+            tokenId: token.id,
+            networkId: networkDb.id,
+          },
+          defaults: {
+            tokenId: token.id,
+            networkId: networkDb.id,
+            isTransactional: isTransactional,
+            isReward: isReward
+          }
+        });
+
+        await saveNetworkTokensRelation(paymentToken, payment.isTransactional, payment.isReward);
+        await saveNetworkTokensRelation(governanceToken, governance.isTransactional, governance.isReward);
+        await saveNetworkTokensRelation(rewardToken, reward.isTransactional, reward.isReward);
+      }
+    } catch (error) {
+      console.log("Failed to save default network", error);
     }
 
-    /* todo: use DB config to save needed information */
+    console.debug("Saving settings to finished");
+
+    return;
   }
 
   async function getTokens() {
@@ -156,16 +318,18 @@ async function main(option = 0) {
     }
 
     const transfers = async ([payment, governance, rwd]) => {
-      for (const address of StagingAccounts) {
+      for (const address of accounts) {
         console.debug(`Sending tokens to ${address}...`);
-        await Promise.all([payment, governance, rwd].map(t => t.transferTokenAmount(address, 10000000)));
+        await payment.transferTokenAmount(address, 10000000);
+        await governance.transferTokenAmount(address, 10000000);
+        await rwd.transferTokenAmount(address, 10000000);
       }
 
       console.debug(`All tokens sent!`);
     }
 
     /** Slice the BountyNFT from the saveTokens array and send transfers */
-    Promise.all(tokens.slice(0, 2).map(mapper)).then(transfers);
+    await Promise.all(tokens.slice(0, 3).map(mapper)).then(transfers);
 
     return tokens;
   }
@@ -175,12 +339,13 @@ async function main(option = 0) {
   await saveSettingsToDb( /** grab the result from having changed the network options and save it to db */
     await changeNetworkOptions( /** Load networkAddress and change settings on chain, return result */
       await deployNetwork(tokensToUse[0], /** deploy a network, return contractAddress */
-        await deployRegistry(tokensToUse[1], tokensToUse[3])))); /** Deploy Registry, return contractAddress */
-
+        await deployRegistry(tokensToUse[1], tokensToUse[3])), tokensToUse)); /** Deploy Registry, return contractAddress */
 }
 
 (async () => {
-  for (let index = 0; index <= options.network.length - 1; index--)
+  for (let index = 0; index < options.network.length; index++)
     await main(index);
-})()
+
+  process.exit(0);
+})();
 
