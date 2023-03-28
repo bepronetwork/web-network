@@ -24,7 +24,7 @@ const _xNetworks = {
   ... _xNetwork(`aurelius`, [`https://eth-aurelius.taikai.network:8080`], `TETH`, 1505, `Aurelius Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
   ... _xNetwork(`afrodite`, [`https://eth-afrodite.taikai.network:8080`], `TETH`, 1505, `Afrodite Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
   ... _xNetwork(`irene`, [`https://eth-irene.taikai.network:8080`], `TETH`, 1505, `Irene Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
-  ... _xNetwork(`apollodorus`, `https://eth-apollodorus.taikai.network:8080`, `TETH`, 1505, `Apollodorus Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`apollodorus`, [`https://eth-apollodorus.taikai.network:8080`], `TETH`, 1505, `Apollodorus Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
 }
 
 const options = yargs(hideBin(process.argv))
