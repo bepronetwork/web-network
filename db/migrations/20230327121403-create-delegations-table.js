@@ -61,6 +61,14 @@ module.exports = {
           key: "id"
         }
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: new Date()
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: new Date()
+      }
     });
 
     [
