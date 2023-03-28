@@ -1,3 +1,5 @@
+const { Network_v2, Web3Connection } = require("@taikai/dappkit");
+
 const ChainModel = require("../models/chain.model");
 const TokensModel = require("../models/tokens.model");
 const NetworkModel = require("../models/network.model");
@@ -25,6 +27,7 @@ async function up(queryInterface, Sequelize) {
   ChainEventsModel.init(queryInterface.sequelize);
   IssueModel.init(queryInterface.sequelize);
 
+  // Create default chain and update tables chain_id
   await ChainModel.findOrCreate({
     where: {
       chainId: defaultChainId
@@ -60,6 +63,41 @@ async function up(queryInterface, Sequelize) {
   await ChainEventsModel.update(...defaultChainIdWhereNull);
 
   await IssueModel.update(...defaultChainIdWhereNull);
+
+  // Other updates that came with multichain
+  const networks = await NetworkModel.findAll({
+    where: {
+      network_token_id: null
+    }
+  });
+
+  if (!networks.length) return;
+
+  const web3Connection = new Web3Connection({
+    skipWindowAssignment: true,
+    web3Host: web3Host,
+  });
+
+  await web3Connection.start();
+
+  for (const network of networks) {
+    const networkV2 = new Network_v2(web3Connection, network.networkAddress);
+
+    await networkV2.loadContract();
+
+    const token = await TokensModel.findOne({
+      where: {
+        address: networkV2.networkToken.contractAddress,
+        chain_id: network.chain_id
+      }
+    });
+
+    if (!token) continue;
+
+    network.network_token_id = token.id;
+
+    await network.save();
+  }
 }
 
 async function down(queryInterface, Sequelize) {
