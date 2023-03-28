@@ -11,17 +11,32 @@ import {useAppState} from "contexts/app-state";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
+import { Delegation } from "interfaces/curators";
+import { DelegationExtended } from "interfaces/oracles-state";
+
 interface DelegationsProps {
   type?: "toMe" | "toOthers";
+  delegations?: Delegation[];
+  variant?: "network" | "multi-network";
+  tokenColor?: string;
 }
 
+type JoinedDelegation = Delegation | DelegationExtended;
+
 export default function Delegations({
-  type = "toMe"
+  type = "toMe",
+  delegations,
+  variant = "network",
+  tokenColor
 } : DelegationsProps) {
   const { t } = useTranslation(["common", "profile", "my-oracles"]);
 
   const {state} = useAppState();
-  const walletDelegations = state.currentUser?.balance?.oracles?.delegations || [];
+
+  const walletDelegations =
+    (delegations || state.currentUser?.balance?.oracles?.delegations || []) as JoinedDelegation[];
+  const totalAmountDelegations =
+    walletDelegations.reduce((acc, delegation) => BigNumber(delegation.amount).plus(acc), BigNumber(0)).toFixed();
 
   const votesSymbol = t("token-votes", { token: state.Service?.network?.active?.networkToken.symbol })
 
@@ -33,27 +48,39 @@ export default function Delegations({
           token: state.Service?.network?.active?.networkToken?.symbol
         }),
       total: undefined,
-      delegations: [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
+      delegations: walletDelegations || [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) =>
-        delegation.amount.plus(acc), BigNumber(0)).toFixed()),
+      total: formatStringToCurrency(totalAmountDelegations),
       description:
              t("my-oracles:descriptions.oracles-delegated-to-others", {
               token: state.Service?.network?.active?.networkToken?.symbol
              }),
-      delegations: state.currentUser?.balance?.oracles?.delegations || []
+      delegations: walletDelegations || state.currentUser?.balance?.oracles?.delegations || []
     }
   };
 
   const oracleToken = {
     symbol: state.Service?.network?.active?.networkToken?.symbol || t("misc.token"),
     name: state.Service?.network?.active?.networkToken?.name || t("profile:oracle-name-placeholder"),
-    icon: <Indicator bg={state.Service?.network?.active?.colors?.primary} size="lg" />
+    icon: <Indicator bg={tokenColor || state.Service?.network?.active?.colors?.primary} size="lg" />
   };
 
   const networkTokenName = state.Service?.network?.active?.networkToken?.name || oracleToken.name;
+
+  function getTextColorProps() {
+    if (tokenColor)
+      return {
+        style: {
+          color: tokenColor
+        }
+      };
+
+    return {
+      className: "text-primary"
+    };
+  }
 
   return (
     <div className="mb-3">
@@ -70,7 +97,7 @@ export default function Delegations({
             {formatStringToCurrency(renderInfo[type].total)}
           </span>
 
-          <span className="text-primary">
+          <span {...getTextColorProps()}>
             {votesSymbol}
           </span>
 
@@ -92,6 +119,8 @@ export default function Delegations({
                 type={type}
                 delegation={type === "toMe" ? {amount: delegation} : delegation}
                 tokenName={networkTokenName}
+                variant={variant}
+                tokenColor={tokenColor}
               />)
           }
         </div>

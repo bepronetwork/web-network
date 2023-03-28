@@ -1,5 +1,6 @@
 import {useState} from "react";
 
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import Indicator from "components/indicator";
@@ -19,13 +20,17 @@ import useBepro from "x-hooks/use-bepro";
 interface DelegationProps {
   type: "toMe" | "toOthers";
   tokenName: string;
+  tokenColor?: string;
   delegation?: DelegationExtended;
+  variant?: "network" | "multi-network";
 }
 
 export default function DelegationItem({
   type,
   tokenName,
-  delegation
+  delegation,
+  variant = "network",
+  tokenColor
 }: DelegationProps) {
   const { t } = useTranslation(["common", "profile"]);
 
@@ -38,13 +43,14 @@ export default function DelegationItem({
 
   const { updateWalletBalance } = useAuthentication();
 
-  const delegationAmount = delegation?.amount?.toFixed() || "0";
+  const isNetworkVariant = variant === "network";
+  const delegationAmount = BigNumber(delegation?.amount)?.toFixed() || "0";
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const oracleToken = {
     symbol: state.Service?.network?.active?.networkToken?.symbol || t("misc.token"),
     name: state.Service?.network?.active?.networkToken?.name || t("profile:oracle-name-placeholder"),
-    icon: <Indicator bg={state.Service?.network?.active?.colors?.primary} size="lg" />
+    icon: <Indicator bg={tokenColor || state.Service?.network?.active?.colors?.primary} size="lg" />
   };
 
   const votesSymbol = t("token-votes", { token: oracleToken?.symbol })
@@ -76,7 +82,8 @@ export default function DelegationItem({
         balance={delegationAmount}
         type={tokenBalanceType}
         delegation={delegation}
-        onTakeBackClick={handleShow}
+        onTakeBackClick={isNetworkVariant && handleShow || null}
+        tokenColor={tokenColor}
       />
 
       <Modal

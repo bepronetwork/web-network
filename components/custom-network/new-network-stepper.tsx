@@ -61,7 +61,7 @@ function NewNetwork() {
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
 
   const isSetupPage = router?.pathname?.toString()?.includes("setup");
-    
+
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-draft-time") },
@@ -102,7 +102,7 @@ function NewNetwork() {
       colors: JSON.stringify(settings.theme.colors),
       logoIcon: await psReadAsText(details.iconLogo.value.raw),
       fullLogo: await psReadAsText(details.fullLogo.value.raw),
-      repositories: 
+      repositories:
         JSON.stringify(github.repositories
           .filter((repo) => repo.checked)
           .filter((repo) => repo?.userPermission === "ADMIN")
@@ -147,7 +147,7 @@ function NewNetwork() {
       setCreatingNetwork(1);
       await handleChangeNetworkParameter("draftTime", draftTime, deployedNetworkAddress);
     }
-    
+
     if (disputableTime !== DEFAULT_DISPUTE_TIME) {
       setCreatingNetwork(2);
       await handleChangeNetworkParameter("disputableTime", disputableTime, deployedNetworkAddress);
@@ -199,10 +199,10 @@ function NewNetwork() {
 
     setCreatingNetwork(10);
     cleanStorage?.();
-    await processEvent(RegistryEvents.NetworkRegistered, state.connectedChain?.registry, { 
-      fromBlock: registrationTx.blockNumber 
+    await processEvent(RegistryEvents.NetworkRegistered, state.connectedChain?.registry, {
+      fromBlock: registrationTx.blockNumber
     })
-      .then(() => router.push(getURLWithNetwork("/", { 
+      .then(() => router.push(getURLWithNetwork("/", {
         network: payload.name,
         chain: state.connectedChain?.shortName
       })))
@@ -223,7 +223,7 @@ function NewNetwork() {
 
   function checkHasNetwork() {
     dispatch(changeLoadState(true));
-    
+
     state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(networkAddress => setHasNetwork(!isZeroAddress(networkAddress)))
       .catch(console.debug)
@@ -234,12 +234,10 @@ function NewNetwork() {
     const walletAddress = state.currentUser?.walletAddress;
     const connectedChain = state.connectedChain;
 
-    if (!state.Service?.active || !walletAddress || !connectedChain) return;
-
-    if (walletAddress && connectedChain.name === UNSUPPORTED_CHAIN) {
-      dispatch(changeNeedsToChangeChain(true));
-      return;
-    }
+    if (!state.Service?.active ||
+        !walletAddress ||
+        !connectedChain ||
+        connectedChain?.name === UNSUPPORTED_CHAIN) return;
 
     checkHasNetwork();
   }, [state.Service?.active, state.currentUser, state.connectedChain]);
