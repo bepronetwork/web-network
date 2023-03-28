@@ -182,7 +182,7 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {chainRpc, chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
+    const {rpc: [chainRpc], chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
     const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
