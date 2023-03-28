@@ -29,6 +29,13 @@ class Delegation extends Model {
         type: DataTypes.INTEGER,
         allowNull: false
       },
+      chainId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "chain",
+          key: "chainId"
+        }
+      },
       networkId: {
         type: DataTypes.INTEGER,
         references: {
@@ -36,11 +43,11 @@ class Delegation extends Model {
           key: "id"
         }
       },
-      chainId: {
+      curatorId: {
         type: DataTypes.INTEGER,
         references: {
-          model: "chain",
-          key: "chainId"
+          model: "curator",
+          key: "id"
         }
       },
     }, {
@@ -51,6 +58,11 @@ class Delegation extends Model {
   }
 
   static associate(models) {
+    this.belongsTo(models.curator, {
+      foreignKey: "curatorId",
+      sourceKey: "id"
+    });
+
     this.belongsTo(models.network, {
       foreignKey: "networkId",
       sourceKey: "id"
