@@ -25,6 +25,7 @@ export default function NetworkItem({
   iconNetwork,
   networkName,
   subNetworkText,
+  primaryColor,
   variant = "network"
 }: {
   children?: ReactNode;
@@ -32,6 +33,7 @@ export default function NetworkItem({
   type?: "network" | "voting";
   networkName: string;
   subNetworkText?: string;
+  primaryColor?: string;
   iconNetwork: string | ReactNode;
   amount: string | number;
   symbol: string;
@@ -46,6 +48,9 @@ export default function NetworkItem({
     state: { Settings: settings }
   } = useAppState();
 
+  const isNetworkVariant = variant === "network";
+  const isNetworkType = type === "network";
+
   function ArrowComponent() {
     if (isCollapsed) return <ArrowDown width={10} height={8} />;
 
@@ -58,7 +63,12 @@ export default function NetworkItem({
         <span className="text-white mr-1">
           {formatNumberToCurrency(amount)}
         </span>
-        <span className="text-primary text-uppercase">{symbol}</span>
+        <span
+          className={`${isNetworkVariant ? "text-primary" : ""} text-uppercase`}
+          style={{ color: primaryColor }}
+        >
+            {symbol}
+        </span>
       </FlexRow>
     );
   }
@@ -68,11 +78,10 @@ export default function NetworkItem({
   }
 
   function renderType() {
-    const isNetwork = type === "network";
     return (
       <>
-        <FlexRow className={`${!isNetwork && "justify-content-between"}`}>
-          <FlexRow className={`${isNetwork && "col-3"}`}>
+        <FlexRow className={`${!isNetworkType && "justify-content-between"}`}>
+          <FlexRow className={`${isNetworkType && "col-3"}`}>
             <FlexColumn className="justify-content-center me-2">
               { typeof iconNetwork === "string" ? <NetworkLogo
                 src={`${settings?.urls?.ipfs}/${iconNetwork}`}
@@ -91,7 +100,7 @@ export default function NetworkItem({
               )}
             </FlexColumn>
           </FlexRow>
-          {isNetwork ? (
+          {isNetworkType ? (
             <>
               <FlexRow className="col-3 justify-content-center">
                 {renderAmount()}
@@ -107,7 +116,7 @@ export default function NetworkItem({
                 </FlexColumn>
               </FlexRow>
               <div
-                className="col-3 d-flex justify-content-end"
+                className="col-3 d-flex justify-content-end cursor-pointer"
                 onClick={toggleCollapse}
               >
                 <FlexColumn className="justify-content-center mt-1">
@@ -120,7 +129,7 @@ export default function NetworkItem({
               <FlexRow>
                 {renderAmount()}
                 {handleNetworkLink && (
-                  <Button className="button-gray-850 ms-3">
+                  <Button className="button-gray-850 ms-3 cursor-pointer">
                     <span>{t("go-to-network")}</span>{" "}
                     <ArrowUpRight className="w-9-p h-9-p" />
                   </Button>
@@ -137,7 +146,9 @@ export default function NetworkItem({
 
   return (
     <div
-      className={`bg-gray-${ variant === "network" ? "900" : "950"} p-3 border border-gray-800 border-radius-4 my-2`}
+      className={
+        `bg-gray-${ !isNetworkVariant && isNetworkType ? "900" : "950"} p-3 border border-gray-800 border-radius-4 my-2`
+      }
       key={key}
     >
       {renderType()}

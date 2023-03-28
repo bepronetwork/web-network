@@ -15,6 +15,7 @@ interface TotalVotesProps {
   votesDelegatedToMe: BigNumber;
   icon: string | ReactNode;
   tokenName: string;
+  tokenColor?: string;
   tokenSymbol: string;
   votesSymbol: string;
   variant?: "network" | "multi-network";
@@ -27,9 +28,36 @@ export default function TotalVotes({
   tokenName,
   tokenSymbol,
   votesSymbol,
-  variant = "network"
+  variant = "network",
+  tokenColor
 } : TotalVotesProps) {
   const { t } = useTranslation(["common", "profile"]);
+
+  function getTextColorProps() {
+    if (tokenColor)
+      return {
+        style: {
+          color: tokenColor
+        }
+      };
+
+    return {
+      className: "text-primary"
+    };
+  }
+
+  function getAmountItem(amount) {
+    return <NetworkItem
+      type="voting"
+      iconNetwork={icon}
+      amount={amount}
+      symbol={votesSymbol}
+      networkName={tokenSymbol}
+      primaryColor={tokenColor}
+      subNetworkText={votesSymbol}
+      variant={variant}
+    />;
+  }
 
   return(
     <div className="border border-gray-800 p-4 border-radius-4 col-12">
@@ -47,7 +75,7 @@ export default function TotalVotes({
             {formatStringToCurrency(votesLocked.plus(votesDelegatedToMe).toFixed())}
           </span>
 
-          <span className="text-primary">
+          <span {...getTextColorProps()}>
             {votesSymbol}
           </span>
 
@@ -64,30 +92,13 @@ export default function TotalVotes({
         <span>Locked by me</span>
       </div>
 
-      <NetworkItem
-        type="voting"
-        iconNetwork={icon}
-        amount={votesLocked.toFixed()}
-        symbol={votesSymbol}
-        networkName={tokenSymbol}
-        subNetworkText={votesSymbol}
-        variant={variant}
-      />
+      {getAmountItem(votesLocked.toFixed())}
 
       <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3 mt-4">
         <span>Delegated to me</span>
       </div>
 
-
-      <NetworkItem
-        type="voting"
-        iconNetwork={icon}
-        amount={votesDelegatedToMe.toFixed()}
-        symbol={votesSymbol}
-        networkName={tokenSymbol}
-        subNetworkText={votesSymbol}
-        variant={variant}
-      />
+      {getAmountItem(votesDelegatedToMe.toFixed())}
     </div>
   );
 }

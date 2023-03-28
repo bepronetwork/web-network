@@ -15,6 +15,7 @@ interface TokenBalanceProps {
   type?: "token" | "oracle" | "delegation";
   delegation?: DelegationExtended;
   overSymbol?: string;
+  tokenColor?: string;
   onTakeBackClick?: () => void;
 }
 
@@ -27,6 +28,7 @@ export default function TokenBalance({
   delegation,
   overSymbol,
   onTakeBackClick,
+  tokenColor
 } : TokenBalanceType & TokenBalanceProps) {
   const { t } = useTranslation(["common"]);
 
@@ -35,14 +37,22 @@ export default function TokenBalance({
     "border border-gray-800 border-radius-4 mb-2 py-3 px-4"
   ];
 
-  const symbolColor = {
-    token: "primary",
-    oracle: "primary",
-    delegation: "primary"
-  };
+  function getTextColorProps(classes) {
+    if (tokenColor)
+      return {
+        style: {
+          color: tokenColor
+        },
+        className: classes
+      };
+
+    return {
+      className: `${classes} text-primary`
+    };
+  }
 
   const delegationSymbol =  delegation &&
-    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span className="ml-1 text-primary">{symbol}</span></>;
+    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span {...getTextColorProps("ml-1")}>{symbol}</span></>;
 
   return (
     <FlexRow className={CONTAINER_CLASSES.join(" ")}>
@@ -60,7 +70,7 @@ export default function TokenBalance({
       </FlexRow>
 
       <FlexRow>
-        {type === "delegation" &&
+        {(type === "delegation" && onTakeBackClick) &&
           <ContractButton
             onClick={onTakeBackClick}
             color="gray-850"
@@ -68,12 +78,17 @@ export default function TokenBalance({
             className="border-radius-4 border border-gray-800"
           >
             {t("actions.take-back")}
-          </ContractButton> ||
+          </ContractButton>
+        }
+
+        { type !== "delegation" &&
           <>
             <span className="caption text-white mr-1 font-weight-500">
               {formatStringToCurrency(BigNumber(balance).toFixed())}
             </span>
-            <span className={`caption text-${symbolColor[type]} font-weight-500`}>{symbol}</span>
+            <span {...getTextColorProps("caption font-weight-500")}>
+              {symbol}
+            </span>
           </>
         }
       </FlexRow>
