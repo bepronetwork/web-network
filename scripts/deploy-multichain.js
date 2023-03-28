@@ -182,7 +182,7 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {rpc: [chainRpc], chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
+    const {chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
     const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
@@ -200,12 +200,12 @@ async function main(option = 0) {
         },
         defaults: {
           chainId: chainId,
-          chainRpc: chainRpc,
-          chainName: chainName,
-          chainShortName: chainName,
-          chainCurrencyName: chainTokenName,
-          chainCurrencySymbol: chainTokenName,
-          chainCurrencyDecimals: 18,
+          chainRpc: web3Host,
+          chainName: chainData?.name || chainName,
+          chainShortName: chainData?.shortName || chainName,
+          chainCurrencyName: chainData?.nativeCurrency?.name || chainTokenName,
+          chainCurrencySymbol: chainData?.nativeCurrency?.symbol || chainTokenName,
+          chainCurrencyDecimals: chainData?.nativeCurrency?.decimals || 18,
           registryAddress: registry,
           eventsApi: eventsUrl,
           blockScanner: chainScan,
