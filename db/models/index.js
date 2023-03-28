@@ -21,6 +21,7 @@ import Chain from "./chain.model";
 import ProposalDistributions from './proposal-distributions.model';
 import HeaderInformation from './header-information';
 import KycSession from './kyc-session.model'
+import Delegation from './delegation.model'
 
 const Database = { sequelize: null };
 
@@ -49,6 +50,7 @@ Database.proposalDistributions = ProposalDistributions;
 Database.chain = Chain;
 Database.headerInformation = HeaderInformation;
 Database.kycSession = KycSession;
+Database.delegation = Delegation;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {

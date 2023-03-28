@@ -61,6 +61,12 @@ class Curators extends Model {
       foreignKey: "networkId",
       sourceKey: "id"
     });
+
+    this.hasMany(models.delegation, {
+      foreignKey: "curatorId",
+      sourceKey: "id",
+      as: "delegations"
+    });
   }
 }
 
