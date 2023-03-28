@@ -216,7 +216,7 @@ async function main(option = 0) {
       });
 
       const saveToken = async ({ address, name, symbol, isTransactional, isReward }) => {
-        const [token, created] = await TokensModel.findOrCreate({
+        const [token, ] = await TokensModel.findOrCreate({
           where: {
             name,
             symbol,
@@ -287,13 +287,13 @@ async function main(option = 0) {
             isReward: isReward
           }
         });
+      };
 
-        await saveNetworkTokensRelation(paymentToken, payment.isTransactional, payment.isReward);
-        await saveNetworkTokensRelation(governanceToken, governance.isTransactional, governance.isReward);
-        await saveNetworkTokensRelation(rewardToken, reward.isTransactional, reward.isReward);
-      }
+      await saveNetworkTokensRelation(paymentToken, payment.isTransactional, payment.isReward);
+      await saveNetworkTokensRelation(governanceToken, governance.isTransactional, governance.isReward);
+      await saveNetworkTokensRelation(rewardToken, reward.isTransactional, reward.isReward);
     } catch (error) {
-      console.log("Failed to save default network", error);
+      console.debug("Failed to save default network", error);
     }
 
     console.debug("Saving settings to finished");
