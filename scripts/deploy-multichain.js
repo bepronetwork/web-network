@@ -14,14 +14,17 @@ const RepositoryModel = require("../db/models/repositories.model");
 
 const StagingAccounts = require('./staging-accounts');
 
-const xNetworks = {
-  development: 'http://localhost:8545',
-  seneca: 'https://eth-seneca.taikai.network:8080',
-  diogenes: 'https://eth-diogenes.taikai.network:8080',
-  aurelius: 'https://eth-aurelius.taikai.network:8080',
-  afrodite: 'https://eth-afrodite.taikai.network:8080',
-  irene: 'https://eth-irene.taikai.network:8080',
-  apollodorus: 'https://eth-apollodorus.taikai.network:8080',
+const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, chainScan, eventsUrl) =>
+  ({[name]: {rpc, chainTokenName, chainId, chainName, chainScan, eventsUrl}})
+
+const _xNetworks = {
+  ... _xNetwork(`development`, [`http://localhost:8545`], `TETH`, 1505, `Local Test Chain`, `http://`, `http://localhost:3001`),
+  ... _xNetwork(`seneca`, [`https://eth-seneca.taikai.network:8080`], `TETH`, 1505, `Seneca Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`diogenes`, [`https://eth-diogenes.taikai.network:8080`], `TETH`, 1505, `Diogenes Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`aurelius`, [`https://eth-aurelius.taikai.network:8080`], `TETH`, 1505, `Aurelius Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`afrodite`, [`https://eth-afrodite.taikai.network:8080`], `TETH`, 1505, `Afrodite Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`irene`, [`https://eth-irene.taikai.network:8080`], `TETH`, 1505, `Irene Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`apollodorus`, `https://eth-apollodorus.taikai.network:8080`, `TETH`, 1505, `Apollodorus Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
 }
 
 const options = yargs(hideBin(process.argv))
@@ -37,13 +40,21 @@ const options = yargs(hideBin(process.argv))
   .parseSync();
 
 async function main(option = 0) {
-  const web3Host =
-    xNetworks[options.network[option]] ||
+  let chainData;
+
+  if (_xNetworks[options.network[option]])
+    chainData = _xNetworks[options.network[option]];
+  else chainData =
     await fetch(`https://chainid.network/chains_mini.json`)
       .then(d => d.json())
-      .then(data => data.find(d => d.networkId === +options.network[option]))
-      .then(chain => chain.rpc[0]);
+      .then(data => data.find(d => d.networkId === +options.network[option]));
 
+  if (!chainData) {
+    console.log(`Failed to find chainData for ${options.network[option]}; If it's a xNetwork, make sure it exists. If it's an Network ID, make sure if exists on https://chainid.network/chains_mini.json `);
+    return;
+  }
+
+  const web3Host = chainData.rpc[0];
   const env = require('dotenv').config({path: options.envFile[option]}).parsed;
   const privateKey = options.privateKey;
 
@@ -171,17 +182,8 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {
-      NEXT_PUBLIC_WEB3_CONNECTION: chainRpc,
-      NEXT_PUBLIC_NATIVE_TOKEN_NAME: chainTokenName,
-      NEXT_PUBLIC_NEEDS_CHAIN_ID: chainId,
-      NEXT_PUBLIC_NEEDS_CHAIN_NAME: chainName,
-      NEXT_PUBLIC_BLOCKSCAN_LINK: chainScan,
-      NEXT_PUBLIC_EVENTS_API: eventsUrl,
-      NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-      NEXT_GH_OWNER,
-      NEXT_GH_REPO
-    } = env;
+    const {chainRpc, chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
+    const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
       const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
