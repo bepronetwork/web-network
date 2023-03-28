@@ -2,10 +2,14 @@
 
 const { Web3Connection, Network_v2 } = require("@taikai/dappkit");
 
-const CuratorsModel = require("../models/curator-model");
+const ChainModel = require("../models/chain.model");
 const NetworkModel = require("../models/network.model");
-
-const { NEXT_PUBLIC_WEB3_CONNECTION: web3Rpc, NEXT_PUBLIC_NEEDS_CHAIN_ID: defaultChainId } = process.env;
+const CuratorsModel = require("../models/curator-model");
+const IssueModel = require("../models/issue.model");
+const RepositoryModel = require("../models/repositories.model");
+const PullRequestModel = require("../models/pullRequest.model");
+const MergeProposalModel = require("../models/mergeProposal");
+const TokenModel = require("../models/tokens.model");
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -51,51 +55,69 @@ module.exports = {
       }
     });
 
-    CuratorsModel.init(queryInterface.sequelize);
-    NetworkModel.init(queryInterface.sequelize);
+    [
+      ChainModel,
+      NetworkModel,
+      CuratorsModel,
+      IssueModel,
+      RepositoryModel,
+      PullRequestModel,
+      MergeProposalModel,
+      TokenModel
+    ].forEach(model => model.init(queryInterface.sequelize));
 
-    CuratorsModel.associate(queryInterface.sequelize.models);
+    [
+      ChainModel,
+      NetworkModel,
+      CuratorsModel
+    ].forEach(model => model.associate(queryInterface.sequelize.models));
 
-    const curators = await CuratorsModel.findAll({
+    const chains = await ChainModel.findAll({
       include: [
-        { association: "network" }
-      ],
-      order: [["networkId", "ASC"]]
+        {
+          association: "networks",
+          include: [
+            { association: "curators" }
+          ]
+        }
+      ]
     });
 
-    if (!curators.length) return;
+    if (!chains.length) return;
 
     try {
-      const web3Connection = new Web3Connection({
-        skipWindowAssignment: true,
-        web3Host: web3Rpc,
-      });
+      for (const { chainId, chainRpc, networks } of chains) {
+        const web3Connection = new Web3Connection({
+          skipWindowAssignment: true,
+          web3Host: chainRpc,
+        });
 
-      await web3Connection.start();
+        await web3Connection.start();
 
-      let networkV2 = undefined;
+        for (const { networkAddress, curators } of networks) {
+          if (!curators.length) continue;
 
-      for (const curator of curators) {
-        if (networkV2?.contractAddress !== curator.network.networkAddress) {
-          networkV2 = new Network_v2(web3Connection, curator.network.networkAddress);
+          const networkV2 = new Network_v2(web3Connection, networkAddress);
 
           await networkV2.loadContract();
+
+          for (const curator of curators) {
+            const delegationOf = await networkV2.getDelegationsOf(curator.address);
+
+            if (!delegationOf.length) continue;
+
+            const delegations = delegationOf.map(({ id, from, to, amount }) => ({
+              from,
+              to,
+              amount,
+              contractId: id,
+              networkId: curator.networkId,
+              chainId: chainId
+            }));
+
+            await queryInterface.bulkInsert("delegations", delegations);
+          }
         }
-
-        const delegationOf = await networkV2.getDelegationsOf(curator.address);
-
-        if (!delegationOf.length) continue;
-
-        const delegations = delegationOf.map(({ id, from, to, amount }) => ({
-          from,
-          to,
-          amount,
-          contractId: id,
-          networkId: curator.networkId,
-          chainId: defaultChainId
-        }));
-
-        await queryInterface.bulkInsert("delegations", delegations);
       }
     } catch (error) {
       console.log("Failed to read previous delegations: ", error.toString());
