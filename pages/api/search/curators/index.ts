@@ -62,7 +62,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             { association: "networkToken" },
             { association: "chain" },
           ]
-        }
+        },
+        { association: "delegations" },
       ]
     }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {

@@ -50,6 +50,14 @@ class Delegation extends Model {
           key: "id"
         }
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: new Date()
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: new Date()
+      }
     }, {
       sequelize,
       modelName: "delegation",
