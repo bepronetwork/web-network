@@ -153,6 +153,7 @@ async function main(option = 0) {
     await network.registry.token.approve(network.registry.contractAddress, DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION);
     await network.registry.lock(DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION);
     await network.registry.registerNetwork(networkAddress);
+    await network.registry.bountyToken.setDispatcher(network.registry.contractAddress);
 
     const nameSymbol = async (_class, address) => {
       const token = new _class(connection, address);
