@@ -14,8 +14,8 @@ const RepositoryModel = require("../db/models/repositories.model");
 
 const StagingAccounts = require('./staging-accounts');
 
-const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, chainScan, eventsUrl) =>
-  ({[name]: {rpc, chainTokenName, chainId, chainName, chainScan, eventsUrl}})
+const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl) =>
+  ({[name]: {rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl}})
 
 const _xNetworks = {
   ... _xNetwork(`development`, [`http://localhost:8545`], `TETH`, 1505, `Local Test Chain`, `http://`, `http://localhost:3001`),
