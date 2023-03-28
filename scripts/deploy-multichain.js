@@ -14,14 +14,17 @@ const RepositoryModel = require("../db/models/repositories.model");
 
 const StagingAccounts = require('./staging-accounts');
 
-const xNetworks = {
-  development: 'http://localhost:8545',
-  seneca: 'https://eth-seneca.taikai.network:8080',
-  diogenes: 'https://eth-diogenes.taikai.network:8080',
-  aurelius: 'https://eth-aurelius.taikai.network:8080',
-  afrodite: 'https://eth-afrodite.taikai.network:8080',
-  irene: 'https://eth-irene.taikai.network:8080',
-  apollodorus: 'https://eth-apollodorus.taikai.network:8080',
+const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl) =>
+  ({[name]: {rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl}})
+
+const _xNetworks = {
+  ... _xNetwork(`development`, [`http://localhost:8545`], `TETH`, 1338, `Local Test Chain`, `local`, `http://localhost:8545`, `http://localhost:3334`),
+  ... _xNetwork(`seneca`, [`https://eth-seneca.taikai.network:8080`], `TETH`, 1500, `Seneca Test Chain`, `seneca`, `https://eth-seneca.taikai.network:8080`, `https://seneca.taikai.network:2053`),
+  ... _xNetwork(`diogenes`, [`https://eth-diogenes.taikai.network:8080`], `TETH`, 1504, `Diogenes Test Chain`, `diogenes`, `https://eth-diogenes.taikai.network:8080`, `https://diogenes.taikai.network:2053`),
+  ... _xNetwork(`aurelius`, [`https://eth-aurelius.taikai.network:8080`], `TETH`, 1505, `Aurelius Test Chain`, `aurelius`, `https://eth-aurelius.taikai.network:8080`, `https://aurelius.taikai.network:2053`),
+  ... _xNetwork(`afrodite`, [`https://eth-afrodite.taikai.network:8080`], `TETH`, 1501, `Afrodite Test Chain`, `afrodite`, `https://eth-afrodite.taikai.network:8080`, `https://afrodite.taikai.network:2053`),
+  ... _xNetwork(`irene`, [`https://eth-irene.taikai.network:8080`], `TETH`, 1502, `Irene Test Chain`, `irene`, `https://eth-irene.taikai.network:8080`, `https://irene.taikai.network:2053`),
+  ... _xNetwork(`apollodorus`, [`https://eth-apollodorus.taikai.network:8080`], `TETH`, 1506, `Apollodorus Test Chain`, `apollodorus`, `https://eth-apollodorus.taikai.network:8080`, `https://apollodorus.taikai.network:2053`),
 }
 
 const options = yargs(hideBin(process.argv))
@@ -37,13 +40,21 @@ const options = yargs(hideBin(process.argv))
   .parseSync();
 
 async function main(option = 0) {
-  const web3Host =
-    xNetworks[options.network[option]] ||
+  let chainData;
+
+  if (_xNetworks[options.network[option]])
+    chainData = _xNetworks[options.network[option]];
+  else chainData =
     await fetch(`https://chainid.network/chains_mini.json`)
       .then(d => d.json())
-      .then(data => data.find(d => d.networkId === +options.network[option]))
-      .then(chain => chain.rpc[0]);
+      .then(data => data.find(d => d.networkId === +options.network[option]));
 
+  if (!chainData) {
+    console.log(`Failed to find chainData for ${options.network[option]}; If it's a xNetwork, make sure it exists. If it's an Network ID, make sure if exists on https://chainid.network/chains_mini.json `);
+    return;
+  }
+
+  const web3Host = chainData.rpc[0];
   const env = require('dotenv').config({path: options.envFile[option]}).parsed;
   const privateKey = options.privateKey;
 
@@ -142,6 +153,7 @@ async function main(option = 0) {
     await network.registry.token.approve(network.registry.contractAddress, DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION);
     await network.registry.lock(DEPLOY_LOCK_AMOUNT_FOR_NETWORK_CREATION);
     await network.registry.registerNetwork(networkAddress);
+    await network.registry.bountyToken.setDispatcher(network.registry.contractAddress);
 
     const nameSymbol = async (_class, address) => {
       const token = new _class(connection, address);
@@ -171,17 +183,8 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {
-      NEXT_PUBLIC_WEB3_CONNECTION: chainRpc,
-      NEXT_PUBLIC_NATIVE_TOKEN_NAME: chainTokenName,
-      NEXT_PUBLIC_NEEDS_CHAIN_ID: chainId,
-      NEXT_PUBLIC_NEEDS_CHAIN_NAME: chainName,
-      NEXT_PUBLIC_BLOCKSCAN_LINK: chainScan,
-      NEXT_PUBLIC_EVENTS_API: eventsUrl,
-      NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-      NEXT_GH_OWNER,
-      NEXT_GH_REPO
-    } = env;
+    const {chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
+    const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
       const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
@@ -198,12 +201,12 @@ async function main(option = 0) {
         },
         defaults: {
           chainId: chainId,
-          chainRpc: chainRpc,
-          chainName: chainName,
-          chainShortName: chainName,
-          chainCurrencyName: chainTokenName,
-          chainCurrencySymbol: chainTokenName,
-          chainCurrencyDecimals: 18,
+          chainRpc: web3Host,
+          chainName: chainData?.name || chainName,
+          chainShortName: chainData?.shortName || chainName,
+          chainCurrencyName: chainData?.nativeCurrency?.name || chainTokenName,
+          chainCurrencySymbol: chainData?.nativeCurrency?.symbol || chainTokenName,
+          chainCurrencyDecimals: chainData?.nativeCurrency?.decimals || 18,
           registryAddress: registry,
           eventsApi: eventsUrl,
           blockScanner: chainScan,
@@ -249,7 +252,15 @@ async function main(option = 0) {
           isRegistered: true,
           description: "Network",
           network_token_id: governanceToken.id,
-          chain_id: chainId
+          chain_id: chainId,
+          councilAmount: DEPLOY_COUNCIL_AMOUNT.toString(),
+          disputableTime: DEPLOY_DISPUTABLE_TIME,
+          draftTime: DEPLOY_DRAFT_TIME,
+          oracleExchangeRate: 1,
+          mergeCreatorFeeShare: 0.05,
+          percentageNeededForDispute: 3,
+          cancelableTime: 180 * 86400,
+          proposerFeeShare: 10
         }
       });
 
