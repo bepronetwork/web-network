@@ -18,13 +18,7 @@ import { ProfilePages } from "interfaces/utils";
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
-interface NavAvatarProps {
-  onNetwork?: boolean;
-}
-
-export default function NavAvatar({
-  onNetwork
-} : NavAvatarProps) {
+export default function NavAvatar() {
   const { t } = useTranslation("common");
 
   const [visible, setVisible] = useState(false);
