@@ -23,7 +23,7 @@ export default function VotingPowerPage() {
       <ReadOnlyButtonWrapper>
         <Col xs={11}>
           <FlexRow className="mb-3">
-            <h3 className="text-white font-weight-500">Voting Power</h3>
+            <h3 className="text-white font-weight-500">{t("profile:voting-power")}</h3>
           </FlexRow>
 
           <If

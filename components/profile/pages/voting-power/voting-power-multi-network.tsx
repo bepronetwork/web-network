@@ -19,7 +19,7 @@ import { useNetwork } from "x-hooks/use-network";
 
 export default function VotingPowerMultiNetwork() {
   const { push } = useRouter();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common", "profile"]);
 
   const [networks, setNetworks] = useState([]);
 
@@ -53,14 +53,18 @@ export default function VotingPowerMultiNetwork() {
           isAlert
           isDismissable
         >
-          <span>To manage your voting power you need to be in a especific network</span>
+          <span>{t("profile:need-network-to-manage")}</span>
         </ContextualSpan>
       </div>
 
       <If condition={!!networks.length}>
         <div className="mt-5">
           <NetworkColumns
-            columns={["Network name", "Total votes", "Network link"]}
+            columns={[
+              t("profile:network-columns.network-name"),
+              t("profile:network-columns.total-votes"),
+              t("profile:network-columns.network-link")
+            ]}
           />
 
           { !!networks.length && networks.map(({ tokensLocked, delegatedToMe, delegations, network }) =>
