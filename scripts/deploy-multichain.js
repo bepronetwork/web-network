@@ -251,7 +251,15 @@ async function main(option = 0) {
           isRegistered: true,
           description: "Network",
           network_token_id: governanceToken.id,
-          chain_id: chainId
+          chain_id: chainId,
+          councilAmount: DEPLOY_COUNCIL_AMOUNT.toString(),
+          disputableTime: DEPLOY_DISPUTABLE_TIME,
+          draftTime: DEPLOY_DRAFT_TIME,
+          oracleExchangeRate: 1,
+          mergeCreatorFeeShare: 0.05,
+          percentageNeededForDispute: 3,
+          cancelableTime: 180 * 86400,
+          proposerFeeShare: 10
         }
       });
 
