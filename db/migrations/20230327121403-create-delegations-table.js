@@ -10,6 +10,7 @@ const RepositoryModel = require("../models/repositories.model");
 const PullRequestModel = require("../models/pullRequest.model");
 const MergeProposalModel = require("../models/mergeProposal");
 const TokenModel = require("../models/tokens.model");
+const DelegationModel = require("../models/delegation.model");
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -52,7 +53,14 @@ module.exports = {
           model: "chains",
           key: "chainId"
         }
-      }
+      },
+      curatorId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "curators",
+          key: "id"
+        }
+      },
     });
 
     [
@@ -63,7 +71,8 @@ module.exports = {
       RepositoryModel,
       PullRequestModel,
       MergeProposalModel,
-      TokenModel
+      TokenModel,
+      DelegationModel
     ].forEach(model => model.init(queryInterface.sequelize));
 
     [
@@ -112,7 +121,8 @@ module.exports = {
               amount,
               contractId: id,
               networkId: curator.networkId,
-              chainId: chainId
+              chainId: chainId,
+              curatorId: curator.id,
             }));
 
             await queryInterface.bulkInsert("delegations", delegations);
