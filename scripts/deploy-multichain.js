@@ -18,13 +18,13 @@ const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, shortName, cha
   ({[name]: {rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl}})
 
 const _xNetworks = {
-  ... _xNetwork(`development`, [`http://localhost:8545`], `TETH`, 1505, `Local Test Chain`, `http://`, `http://localhost:3001`),
-  ... _xNetwork(`seneca`, [`https://eth-seneca.taikai.network:8080`], `TETH`, 1505, `Seneca Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
-  ... _xNetwork(`diogenes`, [`https://eth-diogenes.taikai.network:8080`], `TETH`, 1505, `Diogenes Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
-  ... _xNetwork(`aurelius`, [`https://eth-aurelius.taikai.network:8080`], `TETH`, 1505, `Aurelius Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
-  ... _xNetwork(`afrodite`, [`https://eth-afrodite.taikai.network:8080`], `TETH`, 1505, `Afrodite Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
-  ... _xNetwork(`irene`, [`https://eth-irene.taikai.network:8080`], `TETH`, 1505, `Irene Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
-  ... _xNetwork(`apollodorus`, [`https://eth-apollodorus.taikai.network:8080`], `TETH`, 1505, `Apollodorus Test Chain`, `http://`, `https://eth-seneca.taikai.network:8080`),
+  ... _xNetwork(`development`, [`http://localhost:8545`], `TETH`, 1338, `Local Test Chain`, `local`, `http://`, `http://localhost:3334`),
+  ... _xNetwork(`seneca`, [`https://eth-seneca.taikai.network:8080`], `TETH`, 1500, `Seneca Test Chain`, `seneca`, `http://`, `https://seneca.taikai.network:2053`),
+  ... _xNetwork(`diogenes`, [`https://eth-diogenes.taikai.network:8080`], `TETH`, 1504, `Diogenes Test Chain`, `diogenes`, `http://`, `https://diogenes.taikai.network:2053`),
+  ... _xNetwork(`aurelius`, [`https://eth-aurelius.taikai.network:8080`], `TETH`, 1505, `Aurelius Test Chain`, `aurelius`, `http://`, `https://aurelius.taikai.network:2053`),
+  ... _xNetwork(`afrodite`, [`https://eth-afrodite.taikai.network:8080`], `TETH`, 1501, `Afrodite Test Chain`, `afrodite`, `http://`, `https://afrodite.taikai.network:2053`),
+  ... _xNetwork(`irene`, [`https://eth-irene.taikai.network:8080`], `TETH`, 1502, `Irene Test Chain`, `irene`, `http://`, `https://irene.taikai.network:2053`),
+  ... _xNetwork(`apollodorus`, [`https://eth-apollodorus.taikai.network:8080`], `TETH`, 1506, `Apollodorus Test Chain`, `apollodorus`, `http://`, `https://apollodorus.taikai.network:2053`),
 }
 
 const options = yargs(hideBin(process.argv))
