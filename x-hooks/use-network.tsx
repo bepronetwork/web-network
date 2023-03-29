@@ -4,7 +4,7 @@ import {useRouter} from "next/router";
 import {UrlObject} from "url";
 
 import {useAppState} from "contexts/app-state";
-import { changeMatchWithNetworkChain } from "contexts/reducers/change-chain";
+import {changeMatchWithNetworkChain} from "contexts/reducers/change-chain";
 import {
   changeActiveAvailableChains,
   changeActiveNetwork,
@@ -14,19 +14,17 @@ import {
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
-import { ProfilePages } from "interfaces/utils";
+import {ProfilePages} from "interfaces/utils";
 
 import {WinStorage} from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 
-const URLS_WITHOUT_NETWORK = ["/connect-account", "/networks", "/new-network", "/setup"];
-
 export function useNetwork() {
   const {query, replace, push} = useRouter();
 
-  const [networkName, setNetworkName] = useState<string>();
+  const [networkName, setNetworkName] = useState<string>('');
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   
   const {state, dispatch} = useAppState();
@@ -131,9 +129,9 @@ export function useNetwork() {
     const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
 
     if (queryNetwork)
-      push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${queryChain}/${path}`);
-    else
-      push("/profile/[[...profilePage]]", `/${path}`);
+      return push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${queryChain}/${path}`);
+
+    return push("/profile/[[...profilePage]]", `/${path}`);
   }
 
   function loadNetworkAllowedTokens() {
@@ -214,9 +212,7 @@ export function useNetwork() {
       dispatch(changeMatchWithNetworkChain(null));
   }
 
-  useEffect(() => {
-    setNetworkName(query?.network?.toString());
-  }, [query?.network]);
+  useEffect(() => { setNetworkName(query?.network?.toString() || ''); }, [query?.network]);
 
   return {
     networkName,
