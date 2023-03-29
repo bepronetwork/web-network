@@ -11,7 +11,7 @@ module.exports = {
     UsersPayments.init(queryInterface.sequelize);
 
     const Payments = await UsersPayments.findAll({})
-    
+
     const removedPayments = []
     for (const payment of Payments) {
         if(!removedPayments.includes(payment.id)){
@@ -23,11 +23,11 @@ module.exports = {
                     transactionHash: payment.transactionHash
                 }
             })
-            
+
             if(duplicatesPayments.length > 1){
                 const needRemove = duplicatesPayments.map(({id}) => id).slice(1, duplicatesPayments.length)
                 await UsersPayments.destroy({
-                    where: { 
+                    where: {
                         id: {
                           [Op.in]: needRemove
                         }
@@ -40,4 +40,8 @@ module.exports = {
 
     console.log(`${name} - Removed duplications users payments - number of removals:${removedPayments.length}`);
   },
+
+  async down(queryInterface, Sequelize) {
+
+  }
 };
