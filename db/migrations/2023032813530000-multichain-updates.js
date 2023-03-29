@@ -73,24 +73,13 @@ async function up(queryInterface, Sequelize) {
   await IssueModel.update(...defaultChainIdWhereNull);
 
   // Other updates that came with multichain
-  const networks = await NetworkModel.findAll({
-    include: [
-      {
-        association: "issues",
-        where: {
-          fundingAmount: {
-            [Op.notIn]: [null, "0"]
-          }
-        }
-      }
-    ]
-  });
+  const networks = await NetworkModel.findAll();
 
   if (!networks.length) return;
 
   const web3Connection = new Web3Connection({
     skipWindowAssignment: true,
-    web3Host: web3Host,
+    web3Host: defaultRpc,
   });
 
   await web3Connection.start();
@@ -106,6 +95,7 @@ async function up(queryInterface, Sequelize) {
       network.network_token_id = networkToken.id;
 
     const [
+      councilAmount,
       disputableTime,
       draftTime,
       oracleExchangeRate,
@@ -114,15 +104,17 @@ async function up(queryInterface, Sequelize) {
       cancelableTime,
       proposerFeeShare
     ] = await Promise.all([
+      networkV2.councilAmount(),
       networkV2.disputableTime(),
       networkV2.draftTime(),
       networkV2.oracleExchangeRate(),
       networkV2.mergeCreatorFeeShare(),
       networkV2.percentageNeededForDispute(),
       networkV2.cancelableTime(),
-      networkV2.proposerFeeShare()
+      networkV2.proposerFeeShare(),
     ]);
 
+    network.disputableTime = councilAmount;
     network.disputableTime = disputableTime;
     network.draftTime = draftTime;
     network.oracleExchangeRate = oracleExchangeRate;
@@ -133,7 +125,16 @@ async function up(queryInterface, Sequelize) {
 
     await network.save();
 
-    if (!network.issues.length) continue;
+    const issues = await IssueModel.findAll({
+      where: {
+        network_id: network.id,
+        fundingAmount: {
+          [Op.ne]: "0"
+        }
+      }
+    });
+
+    if (!issues.length) continue;
 
     for (const issue of issues) {
       const bounty = await networkV2.getBounty(issue.contractId);
