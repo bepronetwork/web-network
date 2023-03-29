@@ -690,6 +690,7 @@ export default function CreateBountyPage() {
                   currentSection !== 0 &&
                     setCurrentSection((prevState) => prevState - 1);
                 }}
+                disabled={!!(currentSection === 0)}
               >
                 {t("actions.back")}
               </Button>
