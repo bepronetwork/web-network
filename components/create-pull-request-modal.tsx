@@ -78,8 +78,8 @@ export default function CreatePullRequestModal({
     getRepositoryBranches(`${state.currentUser.login}/${activeName}`)
       .then(async branches => {
 
-        return { 
-          repository: { 
+        return {
+          repository: {
             nameWithOwner: branches.nameWithOwner,
             isFork: branches.isFork,
             isInOrganization: branches.isInOrganization,
@@ -90,7 +90,7 @@ export default function CreatePullRequestModal({
         }
       })
       .then(({ repository, branches, pullRequests }) => branches.map(branch => {
-        const prExistAtGh =  
+        const prExistAtGh =
           pullRequests.some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`);
 
         const prExistsInActiveIssue =
@@ -100,7 +100,7 @@ export default function CreatePullRequestModal({
         const isBaseBranch =
           (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
             state.currentBounty?.data.branch === branch);
-        
+
         let postIcon = <></>;
 
         if(repository.isFork)
@@ -111,7 +111,7 @@ export default function CreatePullRequestModal({
 
 
         if (repository.isInOrganization)
-          postIcon =  <Badge 
+          postIcon =  <Badge
             color={"white-10"}
             label={t("misc.organization")}
           />;
@@ -123,12 +123,13 @@ export default function CreatePullRequestModal({
           : <></>;
 
         return {
-          value: `${repository.owner}:${branch}`, 
+          value: `${repository.owner}:${branch}`,
           label: branch,
           isDisabled: prExistsInActiveIssue || prExistAtGh || isBaseBranch,
           disabledIcon,
           postIcon,
-          isSelected: !!selectedBranch && branch === selectedBranch
+          isSelected: !!selectedBranch && branch === selectedBranch,
+          spaceBetween: true
         };
       }))
       .then(setOptions)
@@ -148,7 +149,7 @@ export default function CreatePullRequestModal({
           <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
               {t("actions.cancel")}
             </Button>
-  
+
             <ContractButton
               disabled={isButtonDisabled() || isCreating}
               onClick={handleConfirm}
@@ -193,8 +194,8 @@ export default function CreatePullRequestModal({
             <label className="caption-small mb-2 text-gray">
               {t("forms.create-pull-request.branch.label")}
             </label>
-            <ReactSelect 
-              options={options} 
+            <ReactSelect
+              options={options}
               onChange={onSelectedBranch}
               isDisabled={!options.length}
               components={{
