@@ -1,4 +1,5 @@
 const { Network_v2, Web3Connection } = require("@taikai/dappkit");
+const { Op } = require("sequelize");
 
 const ChainModel = require("../models/chain.model");
 const TokensModel = require("../models/tokens.model");
@@ -26,6 +27,13 @@ async function up(queryInterface, Sequelize) {
   TokensModel.init(queryInterface.sequelize);
   ChainEventsModel.init(queryInterface.sequelize);
   IssueModel.init(queryInterface.sequelize);
+
+  const findToken = (address, chainId) => TokensModel.findOne({
+    where: {
+      address: address,
+      chain_id: chainId
+    }
+  });
 
   // Create default chain and update tables chain_id
   await ChainModel.findOrCreate({
@@ -66,9 +74,16 @@ async function up(queryInterface, Sequelize) {
 
   // Other updates that came with multichain
   const networks = await NetworkModel.findAll({
-    where: {
-      network_token_id: null
-    }
+    include: [
+      {
+        association: "issues",
+        where: {
+          fundingAmount: {
+            [Op.notIn]: [null, "0"]
+          }
+        }
+      }
+    ]
   });
 
   if (!networks.length) return;
@@ -85,18 +100,51 @@ async function up(queryInterface, Sequelize) {
 
     await networkV2.loadContract();
 
-    const token = await TokensModel.findOne({
-      where: {
-        address: networkV2.networkToken.contractAddress,
-        chain_id: network.chain_id
-      }
-    });
+    const networkToken = await findToken(networkV2.networkToken.contractAddress, network.chain_id);
 
-    if (!token) continue;
+    if (networkToken)
+      network.network_token_id = networkToken.id;
 
-    network.network_token_id = token.id;
+    const [
+      disputableTime,
+      draftTime,
+      oracleExchangeRate,
+      mergeCreatorFeeShare,
+      percentageNeededForDispute,
+      cancelableTime,
+      proposerFeeShare
+    ] = await Promise.all([
+      networkV2.disputableTime(),
+      networkV2.draftTime(),
+      networkV2.oracleExchangeRate(),
+      networkV2.mergeCreatorFeeShare(),
+      networkV2.percentageNeededForDispute(),
+      networkV2.cancelableTime(),
+      networkV2.proposerFeeShare()
+    ]);
+
+    network.disputableTime = disputableTime;
+    network.draftTime = draftTime;
+    network.oracleExchangeRate = oracleExchangeRate;
+    network.mergeCreatorFeeShare = mergeCreatorFeeShare;
+    network.percentageNeededForDispute = percentageNeededForDispute;
+    network.cancelableTime = cancelableTime;
+    network.proposerFeeShare = proposerFeeShare;
 
     await network.save();
+
+    if (!network.issues.length) continue;
+
+    for (const issue of issues) {
+      const bounty = await networkV2.getBounty(issue.contractId);
+
+      const rewardToken = await findToken(bounty.rewardToken, network.chain_id);
+
+      bounty.rewardTokenId = rewardToken.id;
+      bounty.rewardAmount = bounty.rewardAmount;
+
+      await bounty.save();
+    }
   }
 }
 
