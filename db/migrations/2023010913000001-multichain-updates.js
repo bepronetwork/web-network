@@ -43,7 +43,8 @@ async function up(queryInterface, Sequelize) {
       registryAddress: defaultRegisryAddress,
       eventsApi: defaultEventsUrl,
       blockScanner: defaultBlockScanLink,
-      isDefault: false
+      isDefault: false,
+      color: "#4250e4"
     }
   });
 

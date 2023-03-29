@@ -1,11 +1,7 @@
 'use strict';
-const { Network_v2, Web3Connection } = require("@taikai/dappkit");
-const { Op } = require("sequelize");
 
-const TokensModel = require("../models/tokens.model");
-const NetworkModel = require("../models/network.model");
-
-const { loadNetworkV2 } = require("../../helpers/db/dao");
+const { loadNetworkV2, getDAO } = require("../../helpers/db/dao");
+const { getTokenByAddressAndChainId, getAllNetworks } = require("../../helpers/db/rawQueries");
 
 const {
   NEXT_PUBLIC_WEB3_CONNECTION: defaultRpc
@@ -13,10 +9,7 @@ const {
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    NetworkModel.init(queryInterface.sequelize);
-    TokensModel.init(queryInterface.sequelize);
-
-    const networks = await NetworkModel.findAll();
+    const networks = await getAllNetworks(queryInterface);
 
     if (!networks.length) return;
 
@@ -25,34 +18,23 @@ module.exports = {
     });
 
     for (const network of networks) {
-
       const networkV2 = await loadNetworkV2(web3Connection, network.networkAddress);
 
-      const networkToken = await TokensModel.findOne({
-        where: {
-          address: networkV2.networkToken.contractAddress,
-          chain_id: network.chain_id
-        }
-      });
+      const [networkToken] = await getTokenByAddressAndChainId(queryInterface, networkV2.networkToken.contractAddress, network.chain_id);
 
       if (!networkToken) continue;
 
-      network.network_token_id = networkToken.id;
-      await network.save();
+      await queryInterface.bulkUpdate("networks", {
+        network_token_id: networkToken.id
+      }, {
+        id: network.id
+      });
     }
   },
 
   async down (queryInterface, Sequelize) {
-    NetworkModel.init(queryInterface.sequelize);
-
-    await NetworkModel.update({
+    await queryInterface.bulkUpdate("networks", {
       network_token_id: null
-    }, {
-      where: {
-        network_token_id: {
-          [Op.ne]: null
-        }
-      }
     });
   }
 };

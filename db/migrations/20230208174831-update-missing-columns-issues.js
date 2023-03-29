@@ -1,20 +1,17 @@
 'use strict';
 
-const { Op } = require("sequelize");
-
-const TokensModel = require("../models/tokens.model");
-const NetworkModel = require("../models/network.model");
-const IssueModel = require("../models/issue.model");
+const { QueryTypes } = require("sequelize");
 
 const { loadNetworkV2, getDAO } = require("../../helpers/db/dao");
+const { getAllNetworks, getTokenByAddressAndChainId } = require("../../helpers/db/rawQueries");
+
+const {
+  NEXT_PUBLIC_WEB3_CONNECTION: defaultRpc
+} = process.env;
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    NetworkModel.init(queryInterface.sequelize);
-    TokensModel.init(queryInterface.sequelize);
-    IssueModel.init(queryInterface.sequelize);
-
-    const networks = await NetworkModel.findAll();
+    const networks = await getAllNetworks(queryInterface);
 
     if (!networks.length) return;
 
@@ -23,13 +20,11 @@ module.exports = {
     });
 
     for (const network of networks) {
-      const issues = await IssueModel.findAll({
-        where: {
-          network_id: network.id,
-          fundingAmount: {
-            [Op.ne]: "0"
-          }
-        }
+      const issues = await queryInterface.sequelize.query(`SELECT * FROM issues WHERE "network_id" = $network_id AND "fundingAmount" IS NOT NULL AND "fundingAmount" <> '0'`, {
+        bind: {
+          network_id: network.id
+        },
+        type: QueryTypes.SELECT
       });
 
       if (!issues.length) continue;
@@ -39,33 +34,22 @@ module.exports = {
       for (const issue of issues) {
         const bounty = await networkV2.getBounty(issue.contractId);
 
-        const rewardToken = await TokensModel.findOne({
-          where: {
-            address: bounty.rewardToken,
-            chain_id: network.chain_id
-          }
+        const [rewardToken] = await getTokenByAddressAndChainId(queryInterface, bounty.rewardToken, network.chain_id);
+
+        await queryInterface.bulkUpdate("issues", {
+          rewardTokenId: rewardToken.id,
+          rewardAmount: bounty.rewardAmount
+        }, {
+          id: issue.id
         });
-
-        issue.rewardTokenId = rewardToken.id;
-        issue.rewardAmount = bounty.rewardAmount;
-
-        await issue.save();
       }
     }
   },
 
   async down (queryInterface, Sequelize) {
-    IssueModel.init(queryInterface.sequelize);
-
-    await IssueModel.update({
+    await queryInterface.bulkUpdate("issues", {
       rewardTokenId: null,
       rewardAmount: null
-    }, {
-      where: {
-        fundingAmount: {
-          [Op.ne]: "0"
-        }
-      }
     });
   }
 };

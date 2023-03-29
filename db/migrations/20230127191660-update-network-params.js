@@ -1,8 +1,7 @@
 'use strict';
 
-const { Op } = require("sequelize");
-
-const NetworkModel = require("../models/network.model");
+const { getDAO, loadNetworkV2 } = require("../../helpers/db/dao");
+const { getAllNetworks } = require("../../helpers/db/rawQueries");
 
 const {
   NEXT_PUBLIC_WEB3_CONNECTION: defaultRpc
@@ -10,9 +9,7 @@ const {
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    NetworkModel.init(queryInterface.sequelize);
-
-    const networks = await NetworkModel.findAll();
+    const networks = await getAllNetworks(queryInterface);
 
     if (!networks.length) return;
 
@@ -21,7 +18,6 @@ module.exports = {
     });
 
     for (const network of networks) {
-
       const networkV2 = await loadNetworkV2(web3Connection, network.networkAddress);
 
       const [
@@ -44,23 +40,23 @@ module.exports = {
         networkV2.proposerFeeShare(),
       ]);
 
-      network.councilAmount = councilAmount;
-      network.disputableTime = disputableTime;
-      network.draftTime = draftTime;
-      network.oracleExchangeRate = oracleExchangeRate;
-      network.mergeCreatorFeeShare = mergeCreatorFeeShare;
-      network.percentageNeededForDispute = percentageNeededForDispute;
-      network.cancelableTime = cancelableTime;
-      network.proposerFeeShare = proposerFeeShare;
-
-      await network.save();
+      await queryInterface.bulkUpdate("networks", {
+        councilAmount: councilAmount,
+        disputableTime: disputableTime,
+        draftTime: draftTime,
+        oracleExchangeRate: oracleExchangeRate,
+        mergeCreatorFeeShare: mergeCreatorFeeShare,
+        percentageNeededForDispute: percentageNeededForDispute,
+        cancelableTime: cancelableTime,
+        proposerFeeShare: proposerFeeShare,
+      }, {
+        id: network.id
+      });
     }
   },
 
   async down (queryInterface, Sequelize) {
-    NetworkModel.init(queryInterface.sequelize);
-
-    await NetworkModel.update({
+    await queryInterface.bulkUpdate("networks", {
       councilAmount: null,
       disputableTime: null,
       draftTime: null,
@@ -69,19 +65,6 @@ module.exports = {
       percentageNeededForDispute: null,
       cancelableTime: null,
       proposerFeeShare: null,
-    }, {
-      where: {
-        [Op.or]: [
-          { councilAmount: { [Op.not]: null } },
-          { disputableTime: { [Op.not]: null } },
-          { draftTime: { [Op.not]: null } },
-          { oracleExchangeRate: { [Op.not]: null } },
-          { mergeCreatorFeeShare: { [Op.not]: null } },
-          { percentageNeededForDispute: { [Op.not]: null } },
-          { cancelableTime: { [Op.not]: null } },
-          { proposerFeeShare: { [Op.not]: null } },
-        ]
-      }
     });
   }
 };
