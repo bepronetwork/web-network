@@ -51,7 +51,7 @@ export default function NotMergeableModal({
     (isIssueOwner || state.Service?.network?.active?.isCouncil || isProposer) &&
       !isPullRequestOwner &&
       !state.currentBounty?.data?.isClosed, // The bounty creator, proposal creator and council members can view only if the bounty was closed.
-    !state.Service.network.active.allowMerge
+    state.Service?.network?.active?.allowMerge === false
   ].some((values) => values);
 
   function handleRetryMerge() {
