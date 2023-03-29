@@ -91,7 +91,7 @@ export default function ProposalActionCard({
     !isDisputing,
     allowMergeCommit === true,
     !prsNeedsApproval,
-    state.Service?.network?.active?.allowMerge === true
+    // state.Service?.network?.active?.allowMerge === true
   ].every(v => v);
 
   function handleRefuse() {
