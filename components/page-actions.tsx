@@ -2,13 +2,12 @@ import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
-import Link from "next/link";
 import {useRouter} from "next/router";
 
 import EditIcon from "assets/icons/transactions/edit";
 
 import ConnectGithub from "components/connect-github";
-import { ContextualSpan } from "components/contextual-span";
+import {ContextualSpan} from "components/contextual-span";
 import ContractButton from "components/contract-button";
 import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
@@ -25,13 +24,14 @@ import {addToast} from "contexts/reducers/change-toaster";
 
 import {getIssueState} from "helpers/handleTypeIssue";
 
-import { NetworkEvents } from "interfaces/enums/events";
+import {NetworkEvents} from "interfaces/enums/events";
 
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
+import {Button} from "react-bootstrap";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -63,6 +63,7 @@ export default function PageActions({
   const { updateWalletBalance } = useAuthentication();
   const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
+  const { goToProfilePage } = useNetwork();
 
   const issueGithubID = state.currentBounty?.data?.githubId;
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
@@ -247,12 +248,13 @@ export default function PageActions({
         ){
 
       if (state.Settings?.kyc?.isKycEnabled && state.currentBounty?.data?.isKyc && !isKycVerified){
-        return <Link href={useNetwork().getURLWithNetwork("/profile")}>
-          <ContractButton>
+        return <>
+          <Button onClick={() => goToProfilePage("profile")}>
             <Translation ns="bounty" label="kyc.identify-to-start" />
-          </ContractButton>
-        </Link>
+          </Button>
+        </>
       }
+
       else{
         return (
             <ReadOnlyButtonWrapper>
