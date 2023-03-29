@@ -358,12 +358,11 @@ export default function CreateBountyPage() {
           const [repoId, githubId] = String(cid).split("/");
 
           router.push(getURLWithNetwork("/bounty", {
-              chain: connectedChain?.name,
+              chain: connectedChain?.shortName,
               network: currentNetwork?.name,
               id: githubId,
               repoId,
-          }));
-          cleanFields();
+          })).then(() => cleanFields())
         }
       }
     } finally {
