@@ -24,6 +24,7 @@ import SelectNetwork from "components/create-bounty/select-network";
 import CustomContainer from "components/custom-container";
 import { IFilesProps } from "components/drag-and-drop";
 import Modal from "components/modal";
+import SelectChainDropdown from "components/select-chain-dropdown";
 
 import { useAppState } from "contexts/app-state";
 import { toastError, toastWarning } from "contexts/reducers/change-toaster";
@@ -52,7 +53,6 @@ import useERC20 from "x-hooks/use-erc20";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 import useOctokit from "x-hooks/use-octokit";
-import SelectChainDropdown from "components/select-chain-dropdown";
 
 const ZeroNumberFormatValues = {
   value: "",
@@ -100,7 +100,6 @@ export default function CreateBountyPage() {
 
   const { searchNetworks, getReposList, createPreBounty, processEvent } =
     useApi();
-    
 
   const { getURLWithNetwork } = useNetwork();
 
