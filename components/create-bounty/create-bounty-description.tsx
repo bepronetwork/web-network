@@ -39,6 +39,7 @@ export default function CreateBountyDescription({
       <div className="p-1 border border-radius-4 border-gray-700">
         <div className="d-flex mt-1 mb-2">
           <Button
+            tabIndex={1}
             outline
             onClick={() => setIsPreview(false)}
             className={
@@ -48,6 +49,7 @@ export default function CreateBountyDescription({
             {t("write")}
           </Button>
           <Button
+            tabIndex={2}
             outline
             onClick={() => setIsPreview(true)}
             className={
@@ -60,6 +62,7 @@ export default function CreateBountyDescription({
         {!isPreview ? (
           <>
             <textarea
+              tabIndex={0}
               className={clsx("form-control form-bounty", {
                 "border border-1 border-danger border-radius-8":
                   bodyLength > BODY_CHARACTERES_LIMIT,

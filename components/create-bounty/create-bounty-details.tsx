@@ -142,7 +142,10 @@ export default function CreateBountyDetails({
         />
       </div>
       <span className="text-gray">
-        {t("finding-yourself-lost")}<a href="/explore" target='_blank' className="ms-1">{t("bounty-examples")}</a>
+      {t("finding-yourself-lost")}
+        <a tabIndex={3} href="/explore" target="_blank" className="ms-1">
+          {t("bounty-examples")}
+        </a>
       </span>
 
       <div className="form-group mt-4">
@@ -156,7 +159,6 @@ export default function CreateBountyDetails({
           isOptionDisabled={() => selectedTags.length >= MAX_TAGS}
           isMulti
         />
-
           <ContextualSpan context="info" className="mt-1">
             {t("fields.tags-info")}
           </ContextualSpan>
