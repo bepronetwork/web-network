@@ -77,7 +77,11 @@ async function down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('networks', 'chain_id');
   await queryInterface.removeColumn('issues', 'chain_id');
   await queryInterface.removeColumn('chain_events', 'chain_id');
-  await queryInterface.addConstraint('chain_events', {type: 'unique', fields: ['name']});
+  await queryInterface.addConstraint('chain_events', {
+    type: 'unique',
+    fields: ['name'],
+    name: "chain_events_name_key"
+  });
 }
 
 module.exports = {up, down}
