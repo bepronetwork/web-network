@@ -722,7 +722,6 @@ export default function CreateBountyPage() {
               )}
             </div>
           </CustomContainer>
-          {console.log('isKyc', isKyc, tierList?.length ? true : false)}
         </>
       )}
       <Modal
