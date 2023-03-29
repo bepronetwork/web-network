@@ -10,13 +10,13 @@ async function getTokenByAddressAndChainId(queryInterface, address, chain_id) {
   });
 }
 
-async function getAllNetworks(queryInterface) {
-  return queryInterface.sequelize.query("SELECT * FROM networks", {
+async function getAllFromTable(queryInterface, table) {
+  return queryInterface.sequelize.query(`SELECT * FROM ${table}`, {
     type: QueryTypes.SELECT
   });
 }
 
 module.exports = {
   getTokenByAddressAndChainId,
-  getAllNetworks
+  getAllFromTable
 }

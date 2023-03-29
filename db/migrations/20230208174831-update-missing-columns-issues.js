@@ -3,7 +3,7 @@
 const { QueryTypes } = require("sequelize");
 
 const { loadNetworkV2, getDAO } = require("../../helpers/db/dao");
-const { getAllNetworks, getTokenByAddressAndChainId } = require("../../helpers/db/rawQueries");
+const { getAllFromTable, getTokenByAddressAndChainId } = require("../../helpers/db/rawQueries");
 
 const {
   NEXT_PUBLIC_WEB3_CONNECTION: defaultRpc
@@ -11,7 +11,7 @@ const {
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const networks = await getAllNetworks(queryInterface);
+    const networks = await getAllFromTable(queryInterface, "networks");
 
     if (!networks.length) return;
 

@@ -1,7 +1,7 @@
 'use strict';
 
 const { getDAO, loadNetworkV2 } = require("../../helpers/db/dao");
-const { getAllNetworks } = require("../../helpers/db/rawQueries");
+const { getAllFromTable } = require("../../helpers/db/rawQueries");
 
 const {
   NEXT_PUBLIC_WEB3_CONNECTION: defaultRpc
@@ -9,7 +9,7 @@ const {
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const networks = await getAllNetworks(queryInterface);
+    const networks = await getAllFromTable(queryInterface, "networks");
 
     if (!networks.length) return;
 
