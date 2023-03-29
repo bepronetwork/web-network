@@ -1,5 +1,4 @@
 const ChainModel = require("../models/chain.model");
-const TokensModel = require("../models/tokens.model");
 const NetworkModel = require("../models/network.model");
 const ChainEventsModel = require("../models/chain-events.model");
 const IssueModel = require("../models/issue.model");
@@ -19,7 +18,6 @@ const {
 function initModels(sequelize) {
   NetworkModel.init(sequelize);
   ChainModel.init(sequelize);
-  TokensModel.init(sequelize);
   ChainEventsModel.init(sequelize);
   IssueModel.init(sequelize);
 }
@@ -45,8 +43,7 @@ async function up(queryInterface, Sequelize) {
       registryAddress: defaultRegisryAddress,
       eventsApi: defaultEventsUrl,
       blockScanner: defaultBlockScanLink,
-      isDefault: false,
-      color: "#4250e4"
+      isDefault: false
     }
   });
 
@@ -59,8 +56,6 @@ async function up(queryInterface, Sequelize) {
   }];
 
   await NetworkModel.update(...defaultChainIdWhereNull);
-
-  await TokensModel.update(...defaultChainIdWhereNull);
 
   await ChainEventsModel.update(...defaultChainIdWhereNull);
 
@@ -81,8 +76,6 @@ async function down(queryInterface, Sequelize) {
   }];
 
   await NetworkModel.update(...nullWhereDefaultChainId);
-
-  await TokensModel.update(...nullWhereDefaultChainId);
 
   await ChainEventsModel.update(...nullWhereDefaultChainId);
 

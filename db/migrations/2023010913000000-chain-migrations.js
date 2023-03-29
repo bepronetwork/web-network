@@ -52,6 +52,10 @@ async function up(queryInterface, Sequelize) {
     isDefault: {
       type: Sequelize.BOOLEAN
     },
+    color: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE
