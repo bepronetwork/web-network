@@ -141,10 +141,10 @@ async function up(queryInterface, Sequelize) {
 
       const rewardToken = await findToken(bounty.rewardToken, network.chain_id);
 
-      bounty.rewardTokenId = rewardToken.id;
-      bounty.rewardAmount = bounty.rewardAmount;
+      issue.rewardTokenId = rewardToken.id;
+      issue.rewardAmount = bounty.rewardAmount;
 
-      await bounty.save();
+      await issue.save();
     }
   }
 }
