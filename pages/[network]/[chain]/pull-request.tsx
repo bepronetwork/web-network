@@ -33,17 +33,17 @@ import {useNetwork} from "x-hooks/use-network";
 
 export default function PullRequestPage() {
   const router = useRouter();
-  
+
   const { t } = useTranslation(["common", "pull-request"]);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isMakingReady, setIsMakingReady] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [isCreatingReview, setIsCreatingReview] = useState(false);
-  
+
   const { state, dispatch } = useAppState();
-  
+
   const { getDatabaseBounty } = useBounty();
   const { getURLWithNetwork } = useNetwork();
   const { createReviewForPR, processEvent } = useApi();
@@ -60,8 +60,8 @@ export default function PullRequestPage() {
   const isPullRequestCancelable = !!pullRequest?.isCancelable;
   const isPullRequestCreator = pullRequest?.userAddress === state.currentUser?.walletAddress;
   const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
-  const approvalsRequired = 
-    branchProtectionRules ? 
+  const approvalsRequired =
+    branchProtectionRules ?
       branchProtectionRules[state.currentBounty?.data?.branch]?.requiredApprovingReviewCount || 0 : 0;
   const canUserApprove = state.Service?.network?.repos?.active?.viewerPermission !== "READ";
   const approvalsCurrentPr = pullRequest?.approvals?.total || 0;
@@ -187,9 +187,21 @@ export default function PullRequestPage() {
 
   useEffect(() => {
     if (!state.currentBounty?.data ||
-        !prId || 
-        state?.spinners?.pullRequests ||
-        !!pullRequest) return;
+        !prId ||
+        state?.spinners?.pullRequests) return;
+
+    if (pullRequest) {
+      const currentPr = state.currentBounty?.data?.pullRequests?.find((pr) => +pr.githubId === +prId);
+
+      if (pullRequest.isReady !== currentPr.isReady || pullRequest.status !== currentPr.status)
+        setPullRequest(previous => ({
+          ...previous,
+          isReady: currentPr.isReady,
+          status: currentPr.status
+        }));
+
+      return;
+    }
 
     dispatch(changeLoadState(true));
     dispatch(changeSpinners.update({pullRequests: true}));
@@ -283,12 +295,12 @@ export default function PullRequestPage() {
                 }
 
                 {/* Approve Link */}
-                { (isWalletConnected && 
-                   isGithubConnected && 
-                   prsNeedsApproval && 
+                { (isWalletConnected &&
+                   isGithubConnected &&
+                   prsNeedsApproval &&
                    canUserApprove &&
                    isPullRequestReady &&
-                   !isPullRequestCanceled) && 
+                   !isPullRequestCanceled) &&
                   <GithubLink
                     forcePath={state.Service?.network?.repos?.active?.githubPath}
                     hrefPath={`pull/${pullRequest?.githubId || ""}/files`}
