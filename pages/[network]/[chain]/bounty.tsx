@@ -15,14 +15,13 @@ import PageActions from "components/page-actions";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
-import { IM_AM_CREATOR_ISSUE } from "helpers/constants";
+import {IM_AM_CREATOR_ISSUE} from "helpers/constants";
 
-import { useAuthentication } from "x-hooks/use-authentication";
-import {useBounty} from "x-hooks/use-bounty";
+import {useAuthentication} from "x-hooks/use-authentication";
 import useOctokit from "x-hooks/use-octokit";
 
 export default function PageIssue() {
-  useBounty();
+  // useBounty();
   const router = useRouter();
 
   const [commentsIssue, setCommentsIssue] = useState([]);
