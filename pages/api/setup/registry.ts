@@ -28,7 +28,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const publicSettings = (new Settings(settings)).raw() as SettingsType;
 
-    if (publicSettings?.contracts?.networkRegistry) 
+    if (publicSettings?.contracts?.networkRegistry)
       return res.status(400).json("Environment already configured");
     if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
     if (!publicSettings?.defaultNetworkConfig?.adminWallet) return res.status(500).json("Missing admin wallet");
@@ -36,7 +36,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const { adminWallet } = publicSettings.defaultNetworkConfig;
     const { web3Provider: web3Host } = publicSettings.urls;
 
-    if (wallet !== adminWallet) {
+    if (wallet.toLowerCase() !== adminWallet?.toLowerCase()) {
       Log("Unauthorized request", { req });
       return res.status(401).json("User must be admin");
     }
