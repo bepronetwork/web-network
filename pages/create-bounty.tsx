@@ -307,7 +307,7 @@ export default function CreateBountyPage() {
         bountyPayload.fundingAmount = issueAmount.value;
       }
 
-      if (rewardChecked) {
+      if (isFundingType && rewardChecked) {
         bountyPayload.tokenAmount = "0";
         bountyPayload.rewardAmount = rewardAmount.value;
         bountyPayload.rewardToken = rewardToken.address;
@@ -584,7 +584,7 @@ export default function CreateBountyPage() {
             branch: branch?.label,
             reward: `${issueAmount.value} ${transactionalToken?.symbol}`,
             funders_reward:
-              rewardAmount.value &&
+              (rewardAmount.value && isFundingType) &&
               `${rewardAmount.value} ${rewardToken?.symbol}`,
           }}
         />
