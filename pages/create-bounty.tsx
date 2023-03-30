@@ -104,7 +104,7 @@ export default function CreateBountyPage() {
   const { getURLWithNetwork } = useNetwork();
 
   const { handleApproveToken } = useBepro();
-  const { changeNetwork, connect } = useDao();
+  const { changeNetwork } = useDao();
 
   const { getRepositoryBranches } = useOctokit();
 
@@ -487,13 +487,7 @@ export default function CreateBountyPage() {
 
   async function handleNetworkSelected(chain: SupportedChainData) {
     setCurrentNetwork(undefined)
-    handleAddNetwork(chain)
-        .then(() => {
-          if (currentUser?.walletAddress) return;
-
-          connect()
-        })
-        .catch(() => null);
+    handleAddNetwork(chain).catch((err) => console.log('handle Add Network error', err));
   }
 
   function section() {
@@ -501,7 +495,7 @@ export default function CreateBountyPage() {
       return (
         <SelectNetwork>
           <SelectChainDropdown 
-              onSelect={(chain) => handleNetworkSelected(chain)}
+              onSelect={handleNetworkSelected}
               isOnNetwork={false}
               className="select-network-dropdown w-max-none mb-4"
             />
