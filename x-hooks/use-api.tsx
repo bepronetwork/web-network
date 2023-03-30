@@ -34,7 +34,6 @@ import { Token } from "interfaces/token";
 import {api} from "services/api";
 import { WinStorage } from "services/win-storage";
 
-import {Entities, Events} from "types/dappkit";
 
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
