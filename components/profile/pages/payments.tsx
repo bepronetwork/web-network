@@ -21,11 +21,7 @@ import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
-<<<<<<<< HEAD:components/profile/pages/payments.tsx
 export default function PaymentsPage() {
-========
-export default function Payments() {
->>>>>>>> 6cae9a28 (Dev 961 multichain - vhcsilva (#931)):pages/[network]/[chain]/profile/payments.tsx
   const { t } = useTranslation(["common", "profile"]);
 
   const defaultOptions = [

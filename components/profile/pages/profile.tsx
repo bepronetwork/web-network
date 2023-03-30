@@ -15,12 +15,7 @@ import {truncateAddress} from "helpers/truncate-address";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-<<<<<<<< HEAD:components/profile/pages/profile.tsx
 export default function ProfilePage() {
-========
-
-export default function Profile() {
->>>>>>>> 6cae9a28 (Dev 961 multichain - vhcsilva (#931)):pages/[network]/[chain]/profile/index.tsx
   const { t } = useTranslation("profile");
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
