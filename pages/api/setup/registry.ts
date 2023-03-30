@@ -48,8 +48,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!registry)
       return resJsonMessage("Invalid Registry address", res, 400);
 
-    if ((await registry.governed._governor()) !== wallet)
-      return resJsonMessage("User must be registry governor", res, 400);
+
+    if (registryGovernor.toLowerCase() !== wallet.toLowerCase())
+      return res.status(401).json("User must be registry governor");
 
     await Database.settings.create({
       key: "networkRegistry",
