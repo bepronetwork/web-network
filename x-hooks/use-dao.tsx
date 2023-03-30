@@ -81,7 +81,6 @@ export function useDao() {
         return;
     }
 
-
     console.debug("Starting network");
 
     dispatch(changeStarting(true));
