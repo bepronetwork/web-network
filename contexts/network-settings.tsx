@@ -41,7 +41,7 @@ const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
-  
+
   /* NOTE - forced network might be renamed to `user network`,
             referred to user nework when he access `/my-network` page from/in another network.
   */
@@ -138,7 +138,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     const tokensLockedValidate = [
       Fields.amount.validator(newState.tokensLocked?.locked, newState.tokensLocked?.needed)
     ].every(condition => condition);
-      
+
     const detailsValidate = [
       newState.details.name.validated,
       newState.details.fullLogo.validated,
@@ -209,7 +209,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     setNetworkSettings(valitedState);
   }
-  
+
   const Fields = {
     amount: {
       setter: (value: string) => setFields('tokensLocked.amount', value),
@@ -221,8 +221,8 @@ export const NetworkSettingsProvider = ({ children }) => {
       },
       validator: async (value: string) => {
         let validated = undefined;
-  
-        if (value.trim() !== "" && !isSetup)
+
+        if (value.trim() !== "")
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
 
         return !!validated;
