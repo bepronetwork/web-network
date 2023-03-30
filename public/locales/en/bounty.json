@@ -38,7 +38,7 @@
     "details": "Enter the necessary information to understand your bounty",
     "github": "Inform the repository and the branch where the solution will be made",
     "reward": "When creating a new bounty, you have two options regarding the reward:",
-    "reward-1": "1. Self-fund: You use your own money to create the bounty. This means you will be responsible for providing the reward money that will begiven to the person who successfully completes the task.",
+    "reward-1": "1. Self-fund: You use your own money to create the bounty. This means you will be responsible for providing the reward money that will be given to the person who successfully completes the task.",
     "reward-2": "2. Seek funding: You can seek funding for the bounty. This means you can look for other individuals who are willing to contribute to the reward money.",
     "review": "In this step you will view the main information and get a sense of how your bounty is doing"
   },
