@@ -48,6 +48,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!registry)
       return resJsonMessage("Invalid Registry address", res, 400);
 
+    const registryGovernor = await registry.governed._governor();
 
     if (registryGovernor.toLowerCase() !== wallet.toLowerCase())
       return res.status(401).json("User must be registry governor");
