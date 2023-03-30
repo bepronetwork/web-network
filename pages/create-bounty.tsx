@@ -148,7 +148,8 @@ export default function CreateBountyPage() {
     }
   }
 
-  function verifyNextStepAndCreate() {
+  function verifyNextStepAndCreate(newSection?: number) {
+    const section = newSection || currentSection
     if (isLoadingCreateBounty) return true;
 
     const isIssueAmount =
@@ -156,10 +157,10 @@ export default function CreateBountyPage() {
     const isRewardAmount =
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
 
-    if (currentSection === 0 && !currentNetwork) return true;
+    if (section === 0 && !currentNetwork) return true;
 
     if (
-      currentSection === 1 &&
+      section === 1 &&
       (!bountyTitle ||
         !bountyDescription ||
         isUploading ||
@@ -169,20 +170,20 @@ export default function CreateBountyPage() {
     )
       return true;
 
-    if (currentSection === 1 && (!repository || !branch)) return true;
+    if (section === 1 && (!repository || !branch)) return true;
 
-    if (currentSection === 2 && !isFundingType && isIssueAmount) return true;
+    if (section === 2 && !isFundingType && isIssueAmount) return true;
     if (
-      currentSection === 2 &&
+      section === 2 &&
       isFundingType &&
       !rewardChecked &&
       isIssueAmount
     )
       return true;
-    if (currentSection === 2 && isFundingType && rewardChecked && isIssueAmount)
+    if (section === 2 && isFundingType && rewardChecked && isIssueAmount)
       return true;
     if (
-      currentSection === 2 &&
+      section === 2 &&
       isFundingType &&
       rewardChecked &&
       isRewardAmount
@@ -190,16 +191,16 @@ export default function CreateBountyPage() {
       return true;
 
     if (
-      currentSection === 2 &&
+      section === 2 &&
       isKyc &&
       Settings?.kyc?.tierList?.length &&
       !tierList.length
     )
       return true;
 
-    if (currentSection === 3 && !isTokenApproved) return true;
+    if (section === 3 && !isTokenApproved) return true;
 
-    return currentSection === 3 && isLoadingCreateBounty;
+    return section === 3 && isLoadingCreateBounty;
   }
 
   function addFilesInDescription(str) {
@@ -656,7 +657,7 @@ export default function CreateBountyPage() {
               steps={steps}
               currentSection={currentSection}
               updateCurrentSection={(i: number) => {
-                if(!verifyNextStepAndCreate() || currentSection > i){
+                if(!verifyNextStepAndCreate(i === 0 ? i : i-1) || currentSection > i){
                   setCurrentSection(i)
                 }
               }}
