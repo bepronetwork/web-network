@@ -22,7 +22,6 @@ import ScrollTopButton from "components/scroll-top-button";
 
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
-import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import {isProposalDisputable} from "helpers/proposal";
 
@@ -232,7 +231,7 @@ export default function ListIssues({
   }
 
   function handleNotFoundClick() {
-    if (!redirect) return dispatch(changeShowCreateBounty(true));
+    if (!redirect) return router.push('/create-bounty');
 
     router.push(redirect);
   }

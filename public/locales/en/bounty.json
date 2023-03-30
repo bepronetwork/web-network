@@ -27,11 +27,20 @@
     "finalized": "Finished",
     "validation": "validation & disputes",
     "closed": "closed & distributed",
-    "details": "details",
-    "bounty": "bounty",
-    "funding-request": "funding request",
-    "additional-details": "additional details", 
-    "review": "review"
+    "select-network": "Select Network",
+    "details": "Bounty details",
+    "reward": "Reward Information",
+    "review": "Review",
+    "github": "Github Information"
+  },
+  "descriptions": {
+    "select-network": "Select the chain and network you want to create your bounty",
+    "details": "Enter the necessary information to understand your bounty",
+    "github": "Inform the repository and the branch where the solution will be made",
+    "reward": "When creating a new bounty, you have two options regarding the reward:",
+    "reward-1": "1. Self-fund: You use your own money to create the bounty. This means you will be responsible for providing the reward money that will be given to the person who successfully completes the task.",
+    "reward-2": "2. Seek funding: You can seek funding for the bounty. This means you can look for other individuals who are willing to contribute to the reward money.",
+    "review": "In this step you will view the main information and get a sense of how your bounty is doing"
   },
   "status": {
     "ready": "ready",
@@ -84,26 +93,25 @@
   "title": "Create new Bounty",
   "fields": {
     "title": {
-      "label": "Bounty title",
-      "placeholder": "Your bounty title",
-      "tip": "Tip: Try to be as descriptive as possible"
+      "label": "Title",
+      "placeholder": "Your bounty title"
     },
     "description": {
       "label": "Description",
       "placeholder": "Type a description..."
     },
-    "preview-descripion": "Preview Description",
     "tags": "Tags",
     "tags-info": "Up to 3 tags",
+    "reward-type": "Reward Type",
     "select-token": {
-      "bounty": "{{set}} Bounty Token",
-      "reward": "{{set}} Reward Token"
+      "bounty": "Set Reward",
+      "reward": "Set Funded Reward"
     },
     "set": "Set",
     "amount": {
       "label": "amount",
       "info": "{{amount}} {{token}} Available",
-      "max": "Max"
+      "max": "Use max"
     },
     "conversion-token": {
       "invalid": "Could not convert this token",
@@ -111,11 +119,12 @@
     }
   },
   "reward-funders": "Reward Funders",
+  "reward-funders-description": "Reward anyone who funds this bounty.",
   "review": {
     "repository": "Repository",
     "branch": "Branch"
   },
-  "create-bounty": "Create Bounty",
+  "create-bounty": "Create Bounty", 
   "next-step": "Next Step",
   "bounty-created": "Bounty created",
   "in-bounties": "in Bounties",
@@ -131,6 +140,10 @@
   "save-changes": "Save Changes",
   "cancel-changes": "Cancel Changes",
   "preview": "preview",
+  "write": "write", 
+  "self-fund": "Self-fund",
+  "seek-funding": "Seek Funding",
+  "balance": "balance:",
   "edit": "edit",
   "most-active-network-empty": "Not found active networks",
   "kyc": {
@@ -143,5 +156,11 @@
     "identifying": "Identifying..",
     "label": "KYC",
     "steps": "{{current}} of {{total}} steps"
-  }
+  },
+  "bounty-examples": "See bounty examples",
+  "finding-yourself-lost": "Finding yourself lost?",
+  "terms-and-conditions": "terms and conditions.",
+  "creating-this-bounty": "By creating this bounty you agree to our",
+  "see-bounty": "See Bounty",
+  "created-success": "Bounty created successfully!"
 }

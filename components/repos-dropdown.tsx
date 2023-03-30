@@ -6,7 +6,12 @@ import ReactSelect from "components/react-select";
 
 import {useAppState} from "contexts/app-state";
 
-export default function ReposDropdown({ onSelected, value, disabled }: {
+import { ReposList } from "interfaces/repos-list";
+
+import BountyLabel from "./create-bounty/create-bounty-label";
+
+export default function ReposDropdown({ repositories, onSelected, value, disabled }: {
+  repositories?: ReposList;
   onSelected: (e: { value: { id: string; path: string; } }) => void,
   value?: { label: string, value: { id: string, path: string } }
   disabled?: boolean;
@@ -27,24 +32,34 @@ export default function ReposDropdown({ onSelected, value, disabled }: {
     });
   }
 
-  function setOptionMapper() {
-    if (!state.Service?.network?.repos?.list) return;
+  function setOptionMapper(list: ReposList) {
 
     function mapRepo({ id: value, githubPath: label }) {
       return { value: { id: value, path: label }, label };
     }
 
-    setOptions(state.Service?.network?.repos?.list.map(mapRepo));
+    setOptions(list.map(mapRepo));
   }
 
-  useEffect(setOptionMapper, [state.Service?.network?.repos?.list]);
+  useEffect(() => {
+    if (!state.Service?.network?.repos?.list) return;
+    
+    setOptionMapper(state.Service?.network?.repos?.list)
+  }, [state.Service?.network?.repos?.list])
+
+  useEffect(() => {
+    if(repositories?.length > 0) {
+      setOptionMapper(repositories)
+    }
+  }, [repositories])
+
   useEffect(() => { if(value?.value !== option?.value) setOption(value) }, [value]);
 
   return (
     <div>
-      <label className="caption-small mb-2 text-uppercase">
+      <BountyLabel className="mb-2" required>
         {t("select-a-repository")}
-      </label>
+      </BountyLabel>
       <ReactSelect
         options={options}
         value={option}
