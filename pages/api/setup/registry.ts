@@ -56,7 +56,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const registryGovernor = await registry.governed._governor();
 
-    if (registryGovernor !== wallet)
+    if (registryGovernor.toLowerCase() !== wallet.toLowerCase())
       return res.status(401).json("User must be registry governor");
 
     await Database.settings.create({
