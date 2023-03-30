@@ -22,6 +22,13 @@ import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
+export interface TotalFiatNetworks {
+  tokenAddress: string;
+  value: number;
+  price: number;
+  networkId: number;
+}
+
 export default function PaymentsPage() {
   const { t } = useTranslation(["common", "profile", "custom-network"]);
 
@@ -40,7 +47,8 @@ export default function PaymentsPage() {
     },
   ];
 
-  const [totalEuro, setTotalEuro] = useState(0);
+  const [totalFiat, setTotalFiat] = useState(0);
+  const [totalFiatNetworks, setTotalFiatNetworks] = useState<TotalFiatNetworks[]>([])
   const [payments, setPayments] = useState<Payment[]>([]);
   const [networks, setNetworks] = useState<Network[]>([]);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
@@ -90,12 +98,14 @@ export default function PaymentsPage() {
         tokenAddress: payment?.issue?.transactionalToken?.address,
         value: payment.ammount,
         price: await getCoinPrice(payment?.issue?.transactionalToken?.symbol, state?.Settings.currency.defaultFiat),
+        networkId: payment?.issue?.network_id
     }))).then((tokens) => {
       const totalConverted = tokens.reduce((acc, token) => acc + token.value * (token.price || 0),
                                            0);
       const noConverted = !!tokens.find((token) => token.price === undefined);
-
-      setTotalEuro(totalConverted);
+      
+      setTotalFiatNetworks(tokens)
+      setTotalFiat(totalConverted);
       setHasNoConvertedToken(noConverted);
     });
     
@@ -128,7 +138,7 @@ export default function PaymentsPage() {
                     </span>
                     <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
                       <span className="text-white">
-                        {formatNumberToCurrency(totalEuro)}
+                        {formatNumberToCurrency(totalFiat)}
                       </span>
 
                       <span className="text-gray ml-1">{state?.Settings?.currency?.defaultFiat}</span>
@@ -189,7 +199,7 @@ export default function PaymentsPage() {
               <PaymentsList
                 payments={payments}
                 networks={networks}
-                totalConverted={totalEuro}
+                totalNetworks={totalFiatNetworks}
                 symbol={state?.Settings?.currency?.defaultFiat?.toUpperCase()}
               />
             ) : (

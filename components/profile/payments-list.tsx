@@ -10,12 +10,13 @@ import { useNetwork } from "x-hooks/use-network";
 
 import NetworkColumns from "./network-columns";
 import NetworkItem from "./network-item";
+import { TotalFiatNetworks } from "./pages/payments";
 import { FlexColumn } from "./wallet-balance";
 
 interface PaymentsListProps {
   payments: Payment[];
   networks: Network[];
-  totalConverted: string | number;
+  totalNetworks: TotalFiatNetworks[];
   symbol: string;
 }
 
@@ -23,7 +24,7 @@ interface PaymentsListProps {
 export default function PaymentsList({
   payments,
   networks,
-  totalConverted,
+  totalNetworks,
   symbol
 }: PaymentsListProps) {
   const { push } = useRouter();
@@ -35,6 +36,12 @@ export default function PaymentsList({
     const [repoId, id] = issueId.split("/");
 
     push(getURLWithNetwork("/bounty", { id, repoId, chain: chainName, network: networkName}));
+  }
+
+  function handleAmount(networkId: number) {
+    return totalNetworks
+      .filter((n) => n?.networkId === networkId)
+      .reduce((acc, token) => acc + token.value * (token.price || 0), 0);
   }
 
   if (!payments || !networks) return null;
@@ -57,7 +64,7 @@ export default function PaymentsList({
             handleNetworkLink={() => {
               push(getURLWithNetwork("/", { chain: network?.chain?.chainName, network: network?.name }))
             }}
-            amount={totalConverted}
+            amount={handleAmount(network?.id)}
             symbol={symbol}
           >
             <FlexColumn className="col-12">
