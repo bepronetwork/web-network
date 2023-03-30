@@ -28,6 +28,7 @@ interface TokensDropdownProps {
   needsBalance?: boolean;
   showCurrencyValue?: boolean;
   token?: Token;
+  noLabel?: boolean;
 }
 
 interface Option {
@@ -47,7 +48,8 @@ export default function TokensDropdown({
   disabled = false,
   token,
   showCurrencyValue = true,
-  needsBalance
+  needsBalance,
+  noLabel,
 }: TokensDropdownProps) {
   const { t } = useTranslation("common");
 
@@ -196,7 +198,7 @@ export default function TokensDropdown({
     
   return (
     <div className="form-group">
-      <label className="caption-small mb-2">{label || t("misc.token")}</label>
+      {!noLabel && <label className="caption-small mb-2">{label || t("misc.token")}</label>}
       <Creatable
         className="react-select-container"
         classNamePrefix="react-select"

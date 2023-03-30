@@ -23,11 +23,18 @@ interface IDragAndDropProps {
   onUploading?: (isUploading: boolean) => void
   review?: boolean
   disabled?: boolean;
-  externalFiles?: IFilesProps[]
+  externalFiles?: IFilesProps[];
+  border?: boolean;
 }
 
-export default function DragAndDrop ({ externalFiles, onUpdateFiles, onUploading, review = false, disabled }
-                                      : IDragAndDropProps) {
+export default function DragAndDrop({
+  externalFiles,
+  onUpdateFiles,
+  onUploading,
+  review = false,
+  disabled,
+  border = false,
+}: IDragAndDropProps) {
   const [files, setFiles] = useState<IFilesProps[]>(externalFiles ? externalFiles : [] as IFilesProps[]);
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [errors, setErrors] = useState<{file: File, error: FileError}[]>([])
@@ -147,12 +154,19 @@ export default function DragAndDrop ({ externalFiles, onUpdateFiles, onUploading
 
   return (
     <>
-      <div className="d-flex flex-wrap align-items-center text-center">
+      <div
+        className={`d-flex ${
+          border && "border-dotter border-radius-4 border-gray-700"
+        } flex-wrap align-items-center text-center`}
+      >
         {!review && (
           <button
           {...getRootProps({
-            className:
-              "dropzone border border-dark-gray bg-transparent rounded-pill p-2 mr-2"
+            className: `${
+              border
+                ? "col-12 d-flex justify-content-start border-none"
+                : "border border-dark-gray"
+            } dropzone bg-transparent rounded-pill p-2 mr-2`,
           })}
         >
           <input {...getInputProps()} />
@@ -169,7 +183,7 @@ export default function DragAndDrop ({ externalFiles, onUpdateFiles, onUploading
         </button>
         )}
 
-        { !review &&
+        { (!review && !border)&&
           <span className="d-inline-flex align-items-center p-small text-warning text-center my-2 tran">
             <InfoIconEmpty
               width={12}

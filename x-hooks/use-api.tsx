@@ -389,7 +389,8 @@ export default function useApi() {
 
   async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
                               address?: string,
-                              params: PastEventsParams = {}) {
+                              params: PastEventsParams = {},
+                              currentNetworkName?: string) {
     const chainId = state.connectedChain?.id;
     const events = state.connectedChain?.events;
     const registryAddress = state.connectedChain?.registry;
@@ -402,7 +403,7 @@ export default function useApi() {
       throw new Error("Missing events url, chain id or address");
 
     const eventsURL = new URL(`/read/${chainId}/${addressToSend}/${event}`, state.connectedChain?.events);
-    const networkName = state.Service?.network?.active?.name;
+    const networkName = currentNetworkName || state.Service?.network?.active?.name;
 
     return axios.get(eventsURL.href, {
     params
