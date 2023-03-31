@@ -2,7 +2,6 @@ import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {signIn, signOut, useSession} from "next-auth/react";
-import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
 
@@ -49,7 +48,7 @@ const { publicRuntimeConfig } = getConfig();
 export function useAuthentication() {
   const session = useSession();
   const {asPath, push} = useRouter();
-  
+
   const {connect} = useDao();
   const { chain } = useChain();
   const transactions = useTransactions();
@@ -80,13 +79,14 @@ export function useAuthentication() {
 
     transactions.deleteFromStorage();
 
-    const lastNetwork = state.Service?.network?.lastVisited === "undefined" ? "" : state.Service?.network?.lastVisited;
-
     const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
 
     expirationStorage.removeItem();
 
-    signOut({callbackUrl: `${URL_BASE}/${lastNetwork}/${chain.chainShortName}`})
+    const lastNetwork = state.Service?.network?.lastVisited ? `/${state.Service?.network?.lastVisited}` : "";
+    const lastChain = state.Service?.network?.lastVisited ? `/${state.Service?.network?.lastVisited}` : "";
+
+    signOut({callbackUrl: `${URL_BASE}${lastNetwork}${lastChain}`})
       .then(() => {
         dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
       });
@@ -106,9 +106,9 @@ export function useAuthentication() {
       state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
       .then(_address => {
         if (Array.isArray(_address)) console.debug("eth_requestAccounts", _address);
-        
+
         const address = Array.isArray(_address) ? _address[0] : _address;
-        
+
         if (address !== state.currentUser?.walletAddress) {
           dispatch(changeCurrentUserWallet(address?.toLowerCase()));
           pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()});
@@ -170,7 +170,7 @@ export function useAuthentication() {
 
   function validateGhAndWallet() {
     const sessionUser = (session?.data as CustomSession)?.user;
-    
+
     if (!state.currentUser?.walletAddress || !sessionUser?.login || state.spinners?.matching)
       return;
 
@@ -226,8 +226,8 @@ export function useAuthentication() {
       state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
       state.Service.active.getBalance('settler', state.currentUser.walletAddress),
-      searchCurators({ 
-        address: state.currentUser.walletAddress, 
+      searchCurators({
+        address: state.currentUser.walletAddress,
         networkName: state.Service?.network?.active?.name,
         chainShortName: chain.chainShortName
       })
@@ -274,7 +274,7 @@ export function useAuthentication() {
   }
 
   function signMessage(message?: string) {
-    return new Promise<string>(async (resolve, reject) => { 
+    return new Promise<string>(async (resolve, reject) => {
       if (!state?.currentUser?.walletAddress ||
           !state?.connectedChain?.id ||
           state.Service?.starting ||
@@ -323,7 +323,7 @@ export function useAuthentication() {
           if (signature) {
             dispatch(changeCurrentUserSignature(signature));
             sessionStorage.setItem("currentSignature", signature);
-            
+
             resolve(signature);
             return;
           }
