@@ -1,6 +1,7 @@
 'use strict';
 
 const { QueryTypes } = require("sequelize");
+const { isZeroAddress } = require("ethereumjs-util");
 
 const { loadNetworkV2, getDAO } = require("../../helpers/db/dao");
 const { getAllFromTable, getTokenByAddressAndChainId } = require("../../helpers/db/rawQueries");
@@ -33,6 +34,8 @@ module.exports = {
 
       for (const issue of issues) {
         const bounty = await networkV2.getBounty(issue.contractId);
+
+        if (isZeroAddress(bounty.rewardToken)) continue;
 
         const [rewardToken] = await getTokenByAddressAndChainId(queryInterface, bounty.rewardToken, network.chain_id);
 
