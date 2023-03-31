@@ -100,7 +100,7 @@ export default function CreateBountyTokenAmount({
       <InputNumber
       groupClassName={isFunding ? `input-funded`: 'input-group-border'}
       className={isFunding ? `input-funded`: 'input-fund'}
-      classSymbol={isFunding ? "" : 'symbol-fund'}
+      classSymbol={isFunding ? "" : 'symbol-fund text-primary'}
       symbol={!isFunding && currentToken?.symbol}
       thousandSeparator
       fullWidth={!publicRuntimeConfig?.enableCoinGecko}
