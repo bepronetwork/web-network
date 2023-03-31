@@ -136,6 +136,15 @@ export default function CreateBountyPage() {
       });
   }
 
+  async function handleCustomTokens(tokens: Token[]) {
+    Promise.all(tokens?.map(async (token) => {
+      const newTokens = await getCoinInfoByContract(token?.symbol)
+        .then((tokenInfo) => ({ ...token, tokenInfo }))
+        .catch(() => token);
+      return newTokens
+    })).then(t => setCustomTokens(t))
+  }
+
   function onUpdateFiles(files: IFilesProps[]) {
     return setFiles(files);
   }
@@ -476,7 +485,8 @@ export default function CreateBountyPage() {
     if (tokens.length === customTokens.length)
       return;
 
-    setCustomTokens(currentNetwork?.tokens);
+    handleCustomTokens(tokens)
+
   }, [currentNetwork, connectedChain]);
 
   useEffect(() => {

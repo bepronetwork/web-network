@@ -29,6 +29,7 @@ interface TokensDropdownProps {
   showCurrencyValue?: boolean;
   token?: Token;
   noLabel?: boolean;
+  selectOptionName?: 'symbol' | 'name'
 }
 
 interface Option {
@@ -50,6 +51,7 @@ export default function TokensDropdown({
   showCurrencyValue = true,
   needsBalance,
   noLabel,
+  selectOptionName = 'symbol'
 }: TokensDropdownProps) {
   const { t } = useTranslation("common");
 
@@ -123,7 +125,7 @@ export default function TokensDropdown({
   }, [token, options, defaultToken]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
-    const { name, symbol, address, currentValue, tokenInfo } = data.value;
+    const { currentValue, symbol ,address, tokenInfo } = data.value;
 
     return (
       <div
@@ -146,7 +148,7 @@ export default function TokensDropdown({
               />
             )}
             <span className={`${tokenInfo ? null : "mx-2"}`}>
-              {tokenInfo ? tokenInfo.name : name}
+              {tokenInfo && selectOptionName === 'name' ? tokenInfo.name : symbol}
             </span>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
               { showCurrencyValue && 
@@ -185,7 +187,7 @@ export default function TokensDropdown({
                 />
               )}
               <span className={`${data.tokenInfo ? "mt-1" : "mx-2"}`}>
-                {data.tokenInfo ? data.tokenInfo.name : data.name}
+                {data.tokenInfo && selectOptionName === 'name' ? data.tokenInfo.name : symbol}
               </span>
           </div>
         <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">

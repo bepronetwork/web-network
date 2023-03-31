@@ -67,7 +67,7 @@ export default function CreateBountyDescription({
                 "border border-1 border-danger border-radius-8":
                   bodyLength > BODY_CHARACTERES_LIMIT,
               })}
-              rows={3}
+              rows={8}
               placeholder={t("fields.description.placeholder")}
               value={description}
               onChange={handleChangeDescription}
