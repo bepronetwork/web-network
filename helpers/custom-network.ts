@@ -70,6 +70,7 @@ export const DefaultNetworkSettings = {
   github: {
     repositories: [] as Repository[],
     botPermission: false,
+    allowMerge: true,
     validated: false,
   },
   tokens: {

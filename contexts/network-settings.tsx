@@ -304,7 +304,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value)
     },
     allowMerge: {
-      setter({value}) { return setFields(`details.allowMerge`, value) },
+      setter(value) { return setFields(`github.allowMerge`, value) },
       validator(value) { return typeof value === "boolean"; }
     }
   };
@@ -528,7 +528,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         raw: undefined
     });
 
-    defaultState.details.allowMerge = network?.allowMerge;
+    defaultState.github.allowMerge = network?.allowMerge;
 
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
@@ -544,12 +544,11 @@ export const NetworkSettingsProvider = ({ children }) => {
       cancelableTime: +cancelableTime / 1000,
       oracleExchangeRate: oracleExchangeRate,
       proposerFeeShare: proposerFeeShare,
-      mergeCreatorFeeShare: mergeCreatorFeeShare,
-      allowMerge: network?.allowMerge,
+      mergeCreatorFeeShare: mergeCreatorFeeShare
     }));
 
     setNetworkSettings(defaultState);
-    
+
     return defaultState;
   }
 
