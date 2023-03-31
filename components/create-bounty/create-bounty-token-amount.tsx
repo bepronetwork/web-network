@@ -176,7 +176,7 @@ export default function CreateBountyTokenAmount({
               </div>
               {publicRuntimeConfig?.enableCoinGecko && (
                 <div className="d-flex mt-0">
-                  <div className="pt-2 mx-4 mt-1" style={{ }}>
+                  <div className="pt-2 mx-4 mt-1">
                     <DoubleArrowRight className="text-gray" />
                   </div>
                   <div className="pt-1 mt-2 ms-2 convert-value">
