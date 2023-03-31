@@ -16,7 +16,12 @@ export default function IconOption(props) {
       ${props.data.isDisabled ? 'bg-transparent-hover text-light-gray' : ''}
     `}>
       <OverlayTrigger key={`overlay-${props.label}`} placement="right" overlay={popover}>
-        <div className="text-truncate text-uppercase d-flex bg-none flex-row align-items-center">
+        <div
+          className={`
+            text-truncate text-uppercase d-flex bg-none flex-row align-items-center
+            ${props.data.spaceBetween && "justify-content-between w-100" || ""}
+          `}
+        >
           { props.data.preIcon &&
             <span className="mr-1">
               {props.data.preIcon}
@@ -28,19 +33,19 @@ export default function IconOption(props) {
           </span>
 
           <span>
-          {
-            (props.data.isDisabled && props.data.disabledIcon) &&
-            <span className="me-2">
-              {props.data.disabledIcon}
-            </span>
-          }
+            {
+              (props.data.isDisabled && props.data.disabledIcon) &&
+              <span className="me-2">
+                {props.data.disabledIcon}
+              </span>
+            }
 
-          {
-            props.data.postIcon &&
-            <span>
-              {props.data.postIcon}
-            </span>
-          }
+            {
+              props.data.postIcon &&
+              <span>
+                {props.data.postIcon}
+              </span>
+            }
           </span>
         </div>
       </OverlayTrigger>
