@@ -22,7 +22,6 @@ import ScrollTopButton from "components/scroll-top-button";
 
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
-import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import {isProposalDisputable} from "helpers/proposal";
 
@@ -232,7 +231,7 @@ export default function ListIssues({
   }
 
   function handleNotFoundClick() {
-    if (!redirect) return dispatch(changeShowCreateBounty(true));
+    if (!redirect) return router.push('/create-bounty');
 
     router.push(redirect);
   }
@@ -300,7 +299,7 @@ export default function ListIssues({
         <div
           className={"row align-items-center list-actions sticky-top bg-gray-950"}
         >
-          <div className={`col-${isProfile ? "6" : "7"}`}>
+          <div className="col">
             <InputGroup className="border-radius-8">
               <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
@@ -325,7 +324,7 @@ export default function ListIssues({
             </InputGroup>
           </div>
 
-          <div className="col">
+          <div className="col-auto">
             <div className="d-flex align-items-center">
               <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
                 {t("sort.label")}
@@ -362,7 +361,7 @@ export default function ListIssues({
             </div>
           </div>
 
-          <div className={`col${isProfile ? "" : "-auto"}`}>
+          <div className="col-auto">
             {(!filterState && !isProfile) && <IssueFilters />}
 
             {(!filterState && isProfile) && <SelectNetwork isCurrentDefault={isProfile && isOnNetwork} />}

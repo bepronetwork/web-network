@@ -147,6 +147,7 @@ export interface NetworkSettings {
   github?: {
     repositories: Repository[];
     botPermission: boolean;
+    allowMerge: boolean;
     validated: boolean;
   };
   tokens?: {

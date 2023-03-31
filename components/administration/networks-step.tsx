@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {FormCheck} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
@@ -19,7 +20,6 @@ import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
 
 import useApi from "x-hooks/use-api";
-import {FormCheck} from "react-bootstrap";
 
 const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
@@ -39,7 +39,7 @@ export default function NetworksStep({
   const {state, dispatch} = useAppState();
   const { searchNetworks, updateNetwork } = useApi();
 
-  const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
+  const { forcedNetwork, github, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
   const MAX_PERCENTAGE_FOR_DISPUTE = +state.Settings?.networkParametersLimits?.disputePercentage?.max;
   const MIN_DRAFT_TIME = +state.Settings?.networkParametersLimits?.draftTime?.min;
@@ -52,7 +52,7 @@ export default function NetworksStep({
   const differentOrUndefined = (valueA, valueB) => valueA !== valueB ? valueA : undefined;
 
   const networkTokenSymbol = forcedNetwork?.networkToken?.symbol || t("misc.$token");
-  const networkAlreadyLoaded = 
+  const networkAlreadyLoaded =
     selectedNetworkAddress === state.Service?.active?.network?.contractAddress && !!forcedNetwork?.councilAmount;
   const nameInputClass = forcedNetwork?.name === details?.name?.value || details?.name?.validated === undefined ? "" : (
     details?.name?.validated && "is-valid" || "is-invalid"
@@ -66,7 +66,7 @@ export default function NetworksStep({
     +forcedNetwork?.councilAmount !== parameters?.councilAmount?.value && parameters?.councilAmount?.validated,
     forcedNetwork?.disputableTime !== parameters?.disputableTime?.value && parameters?.disputableTime?.validated,
     forcedNetwork?.draftTime !== parameters?.draftTime?.value && parameters?.draftTime?.validated,
-    forcedNetwork?.percentageNeededForDispute !== parameters?.percentageNeededForDispute?.value 
+    forcedNetwork?.percentageNeededForDispute !== parameters?.percentageNeededForDispute?.value
       && parameters?.percentageNeededForDispute?.validated,
     details?.iconLogo?.value?.raw && details?.iconLogo?.validated,
     details?.fullLogo?.value?.raw && details?.fullLogo?.validated,
@@ -99,34 +99,34 @@ export default function NetworksStep({
 
   function handleDisputableTimeChange({ floatValue }) {
     fields.parameter.setter({
-      label: "disputableTime", 
+      label: "disputableTime",
       value: floatValue
     });
   }
 
   function handlePercentageNeededForDisputeChange({ floatValue }) {
     fields.parameter.setter({
-      label: "percentageNeededForDispute", 
+      label: "percentageNeededForDispute",
       value: floatValue
     });
   }
 
   function handleDraftTimeChange({ floatValue }) {
     fields.parameter.setter({
-      label: "draftTime", 
+      label: "draftTime",
       value: floatValue
     });
   }
 
   function handleCouncilAmountChange({ floatValue }) {
     fields.parameter.setter({
-      label: "councilAmount", 
+      label: "councilAmount",
       value: floatValue
     });
   }
 
   function changeAllowMergeCheckbox(ele) {
-    fields.allowMerge.setter(ele?.target?.value || false);
+    fields.allowMerge.setter(ele?.target?.checked);
   }
 
   function showTextOrDefault(text: string, defaultText: string) {
@@ -160,13 +160,13 @@ export default function NetworksStep({
         state.Service?.active.network?.treasuryInfo(),
         state.Service?.active.getSettlerTokenData()
       ])
-      .then(([councilAmount, 
-              disputableTime, 
-              draftTime, 
-              oracleExchangeRate, 
+      .then(([councilAmount,
+              disputableTime,
+              draftTime,
+              oracleExchangeRate,
               mergeCreatorFeeShare,
               proposerFeeShare,
-              percentageNeededForDispute, 
+              percentageNeededForDispute,
               treasury,
               networkToken]) => setForcedNetwork({
                 ...network,
@@ -199,7 +199,7 @@ export default function NetworksStep({
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
-      allowMerge: differentOrUndefined(details?.allowMerge, forcedNetwork?.allowMerge),
+      allowMerge: differentOrUndefined(github?.allowMerge, forcedNetwork?.allowMerge),
       logoIcon:
         details?.iconLogo?.value?.raw !== undefined
           ? await psReadAsText(details?.iconLogo?.value?.raw)
@@ -248,7 +248,7 @@ export default function NetworksStep({
       await state.Service?.active.setNetworkParameter("percentageNeededForDispute",
                                                       parameters.percentageNeededForDispute.value).catch(console.log);
   }
- 
+
   return (
     <Step
       title="Networks"
@@ -262,7 +262,7 @@ export default function NetworksStep({
         </div>
 
         <div className="col">
-          <Button 
+          <Button
             disabled={isLoading || networkAlreadyLoaded}
             onClick={handleLoad}
           >
@@ -274,7 +274,7 @@ export default function NetworksStep({
       <div className="row mt-4">
         {isLoading && <div>Loading...</div>}
 
-        {(!isLoading && networkAlreadyLoaded) && 
+        {(!isLoading && networkAlreadyLoaded) &&
           <>
             <hr />
 
@@ -312,7 +312,7 @@ export default function NetworksStep({
 
               <div className="col ml-2">
                 <p className="h3 text-white mb-3">
-                  {showTextOrDefault(details?.name?.value, 
+                  {showTextOrDefault(details?.name?.value,
                                      t("custom-network:steps.network-information.fields.name.default"))}
                 </p>
                 <p className="caption-small text-light-gray mb-2">
@@ -321,7 +321,7 @@ export default function NetworksStep({
                 <p className="caption-small text-gray">
                   {urlWithoutProtocol(homeURL)}/
                   <span className="text-primary">
-                    {getQueryableText(details?.name?.value || 
+                    {getQueryableText(details?.name?.value ||
                                       t("custom-network:steps.network-information.fields.name.default"))}
                   </span>
                 </p>
@@ -471,7 +471,7 @@ export default function NetworksStep({
                   type="checkbox"
                   label={t("custom-network:allow-merge")}
                   onChange={changeAllowMergeCheckbox}
-                  checked={details?.allowMerge}
+                  checked={github?.allowMerge}
                 />
               </div>
             </div>
