@@ -10,7 +10,7 @@ const {
   NEXT_PUBLIC_NATIVE_TOKEN_NAME: defaultNativeTokenName,
   NEXT_PUBLIC_EVENTS_API: defaultEventsUrl,
   NEXT_PUBLIC_WEB3_CONNECTION: defaultRpc,
-  NEXT_PUBLIC_CHAIN_DECIMALS: defaultDecimals,
+  NEXT_PUBLIC_CHAIN_DECIMALS: defaultDecimals = 18,
   NEXT_PUBLIC_NETWORK_REGISTRY_ADDRESS: defaultRegisryAddress,
   SKIP_MIGRATION_MULTICHAIN = "true"
 } = process.env;
