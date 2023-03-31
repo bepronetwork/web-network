@@ -35,6 +35,7 @@ export default function CreateBountyTokenAmount({
   const { publicRuntimeConfig } = getConfig();
   const [inputError, setInputError] = useState("");
   const [convertedAmount, setConvertedAmount] = useState(0);
+  const [isErrorConverted, setIsErrorConverted] = useState(false);
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
     if (
@@ -69,6 +70,7 @@ export default function CreateBountyTokenAmount({
 
     getCoinPrice(currentToken?.symbol,
                  state?.Settings?.currency?.defaultFiat).then((price) => {
+                   if(isNaN(price) || price === 0) setIsErrorConverted(true)
                    if(!isNaN(price)) setConvertedAmount(issueAmount.value * price);
                  });
   }
@@ -81,6 +83,7 @@ export default function CreateBountyTokenAmount({
         tokens={customTokens}
         userAddress={userAddress}
         canAddToken={canAddCustomToken}
+        selectOptionName={isFunding ? 'symbol' : 'name'}
         addToken={addToken}
         setToken={setCurrentToken}
         disabled={review}
@@ -95,8 +98,10 @@ export default function CreateBountyTokenAmount({
   function inputNumber() {
     return(
       <InputNumber
+      groupClassName={isFunding ? `input-funded`: 'input-group-border'}
       className={isFunding ? `input-funded`: 'input-fund'}
-      classSymbol={isFunding ? "" : 'symbol-fund'}
+      classSymbol={isFunding ? "" : 'symbol-fund text-primary'}
+      symbol={!isFunding && currentToken?.symbol}
       thousandSeparator
       fullWidth={!publicRuntimeConfig?.enableCoinGecko}
       max={tokenBalance.toFixed()}
@@ -106,8 +111,9 @@ export default function CreateBountyTokenAmount({
       decimalScale={decimals}
       onValueChange={handleIssueAmountOnValueChange}
       onBlur={handleIssueAmountBlurChange}
-      error={!!inputError}
+      error={isFunding ? null : !!inputError}
       helperText={
+        isFunding ? null :
         <>
           {inputError && <p className="p-small my-2">{inputError}</p>}
         </>
@@ -115,7 +121,6 @@ export default function CreateBountyTokenAmount({
     />
     )
   } 
-
 
   useEffect(updateConversion, [issueAmount.value]);
 
@@ -128,11 +133,13 @@ export default function CreateBountyTokenAmount({
         <div className="d-flex justify-content-between col-md-6 p-2 border-radius-8 border border-gray-700">
           <div className="d-flex flex-column col-7">
             {inputNumber()}
-            <div className="text-white-30 ms-2 mt-1">
-              {convertedAmount} {state.Settings?.currency.defaultFiat}
+            <div className="text-white-30 ms-2">
+            {isErrorConverted
+                ? t("fields.conversion-token.invalid")
+                : `${convertedAmount} ${state.Settings?.currency.defaultFiat}`}
             </div>
           </div>
-          <div className="col-4 me-2 mt-3">{selectTokens()}</div>
+          <div className="col-4 me-2 mt-3 pt-1">{selectTokens()}</div>
         </div>
       ) : (
         <div className="p-2 border-radius-8 border border-gray-700">
@@ -141,7 +148,7 @@ export default function CreateBountyTokenAmount({
               <div className="col-md-6">{selectTokens()}</div>
               <div className="col-md-4 ms-2">
                 <Button
-                  className="bounty-outline-button"
+                  className="bounty-outline-button button-max"
                   onClick={() => {
                     setIssueAmount({
                       formattedValue: tokenBalance.toFixed(),
@@ -169,10 +176,10 @@ export default function CreateBountyTokenAmount({
               </div>
               {publicRuntimeConfig?.enableCoinGecko && (
                 <div className="d-flex mt-0">
-                  <div className="pt-2 mx-4">
+                  <div className="pt-2 mx-4 mt-1">
                     <DoubleArrowRight className="text-gray" />
                   </div>
-                  <div className="mt-2 ms-2 convert-value">
+                  <div className="pt-1 mt-2 ms-2 convert-value">
                     {convertedAmount} {state.Settings?.currency.defaultFiat}
                   </div>
                 </div>
