@@ -28,7 +28,7 @@ export default function CreateBountyReview({
             <div className="col-3 text-gray">
               {name.charAt(0).toUpperCase() + name.slice(1).replace("_", " ")}
             </div>
-            <div className="col-9">
+            <div className="col-9 text-truncate">
               {isArray(value) ? (
                 <div className="d-flex">
                   {value.map((item, key) => (
