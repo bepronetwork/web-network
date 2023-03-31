@@ -584,6 +584,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   background-color: rgba($white, 0.2);
 }
 
+.input-group-border {
+  border: none !important;
+
+  &:hover {
+    border: none !important;
+  }
+}
+
 .input-group {
   padding-left: 0;
   padding-right: 0;
@@ -703,6 +711,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border-radius: 4px;
   background-color: $gray-900;
   border: 1px solid $gray-700;
+  &.button-max {
+    padding: 0.90rem 1.25rem 0.75rem 1.25rem;
+  } 
   &:hover {
     border-radius: 4px;
     border-color: $gray-700;
@@ -730,6 +741,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   &:focus {
     border: none;
     background-color: $gray-900;
+  }
+  &:hover {
+    border: none;
   }
 }
 
