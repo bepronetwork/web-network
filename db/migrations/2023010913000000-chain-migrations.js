@@ -77,10 +77,10 @@ async function up(queryInterface, Sequelize) {
 }
 
 async function down(queryInterface, Sequelize) {
-  await queryInterface.dropTable('chains');
   await queryInterface.removeColumn('networks', 'chain_id');
   await queryInterface.removeColumn('issues', 'chain_id');
   await queryInterface.removeColumn('chain_events', 'chain_id');
+  await queryInterface.dropTable('chains');
   await queryInterface.addConstraint('chain_events', {
     type: 'unique',
     fields: ['name'],
