@@ -138,9 +138,11 @@ export default function NavAvatar({
           </div>
         </div>
 
-        <LinksSession>
-          {internalLinks.map(ProfileInternalLink)}
-        </LinksSession>
+        { onNetwork &&
+          <LinksSession>
+            {internalLinks.map(ProfileInternalLink)}
+          </LinksSession>
+        }
 
         <LinksSession>
           {externalLinks.map(ProfileExternalLink)}
@@ -175,9 +177,7 @@ export default function NavAvatar({
           <AvatarOrIdenticon
             user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
-            size="sm"
-            withBorder
-            active={visible}
+            size="md"
           />
         </div>
       </OverlayTrigger>

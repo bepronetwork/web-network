@@ -17,8 +17,8 @@ import {Network} from "interfaces/network";
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 
-function MyNetwork() {
-  const {t} = useTranslation(["common", "custom-network"]);
+export function MyNetwork() {
+  const { t } = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 
