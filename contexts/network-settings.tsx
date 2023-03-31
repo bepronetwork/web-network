@@ -9,7 +9,6 @@ import {useAppState} from "contexts/app-state";
 import {isSameSet} from "helpers/array";
 import {isColorsSimilar} from "helpers/colors";
 import {
-  DEFAULT_CANCELABLE_TIME,
   DEFAULT_CANCEL_FEE,
   DEFAULT_CANCELABLE_TIME,
   DEFAULT_CLOSE_FEE,
