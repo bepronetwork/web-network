@@ -227,7 +227,7 @@ export default function MainNav() {
                   uppercase
                   outline
                 />
-              )} 
+              )}
 
             <Button
               onClick={() => setShowHelp(true)}
@@ -240,7 +240,7 @@ export default function MainNav() {
             <ConnectWalletButton>
               <TransactionsStateIndicator />
 
-              <NavAvatar onNetwork={!noNeedNetworkInstance} />
+              <NavAvatar />
             </ConnectWalletButton>
           </div>
 
