@@ -26,7 +26,7 @@ export function useNetwork() {
 
   const [networkName, setNetworkName] = useState<string>('');
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
-  
+
   const {state, dispatch} = useAppState();
   const { chain, findSupportedChain } = useChain();
   const {searchNetworks, getNetworkTokens} = useApi();
@@ -53,7 +53,7 @@ export function useNetwork() {
 
     if (queryChainName) {
       const chain = findSupportedChain({ chainShortName: queryChainName });
-      
+
       if (chain) {
         const storageKey = getStorageKey(queryNetworkName, chain.chainId);
 
@@ -86,10 +86,10 @@ export function useNetwork() {
             else
               throw new Error("Network not registered");
           }
-  
+
           const newCachedData = new WinStorage(getStorageKey(data.name, data.chain.chainId), 3600, `sessionStorage`);
           newCachedData.value = data;
-  
+
           dispatch(changeNetworkLastVisited(queryNetworkName));
           dispatch(changeActiveNetwork(newCachedData.value));
         }
@@ -123,12 +123,12 @@ export function useNetwork() {
   }
 
   function goToProfilePage(profilePage: ProfilePages) {
-    const queryNetwork = query?.network;
-    const queryChain = query?.chain;
+    const queryNetwork = query?.network || "";
+    const queryChain = query?.chain || "";
 
     const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
 
-    if (queryNetwork)
+    if (queryNetwork !== "")
       return push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${queryChain}/${path}`);
 
     return push("/profile/[[...profilePage]]", `/${path}`);
@@ -161,7 +161,7 @@ export function useNetwork() {
     Promise.all([network.draftTime(), network.disputableTime()])
       .then(([draftTime, disputableTime]) => {
         dispatch(changeActiveNetworkTimes({
-          draftTime: +draftTime / 1000, 
+          draftTime: +draftTime / 1000,
           disputableTime: +disputableTime / 1000
         }));
       })
@@ -182,11 +182,11 @@ export function useNetwork() {
         network.treasuryInfo(),
         network.totalNetworkToken()
     ])
-      .then(([councilAmount, 
-              mergeCreatorFeeShare, 
-              proposerFeeShare, 
-              percentageNeededForDispute, 
-              oracleExchangeRate, 
+      .then(([councilAmount,
+              mergeCreatorFeeShare,
+              proposerFeeShare,
+              percentageNeededForDispute,
+              oracleExchangeRate,
               treasury,
               totalNetworkToken]) => {
         dispatch(changeActiveNetworkAmounts({
