@@ -26,4 +26,5 @@ export interface InputNumber extends NumberFormatProps {
   errorMessage?: string;
   description?: string;
   fullWidth?: boolean;
+  groupClassName?: string;
 }
