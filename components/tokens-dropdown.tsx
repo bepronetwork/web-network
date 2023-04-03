@@ -67,7 +67,7 @@ export default function TokensDropdown({
       : undefined;
 
   const tokenToOption = (token: Token): Option => ({
-    label: `${token?.tokenInfo ? token.tokenInfo.name : token.symbol}`,
+    label: `${token?.tokenInfo ? (token?.tokenInfo?.name || token?.name) : token.symbol}`,
     value: token,
   });
 

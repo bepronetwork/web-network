@@ -6,15 +6,15 @@ import {Op, Sequelize} from "sequelize";
 import Database from "db/models";
 
 import {chainFromHeader} from "helpers/chain-from-header";
-import { WANT_TO_CREATE_NETWORK } from "helpers/constants";
+import {WANT_TO_CREATE_NETWORK} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
-import { handlefindOrCreateTokens, handleRemoveTokens } from "helpers/handleNetworkTokens";
+import {handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
 
 import {withCors} from "middleware";
-import { LogAccess } from "middleware/log-access";
+import {LogAccess} from "middleware/log-access";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
 
 import DAO from "services/dao-service";
@@ -93,7 +93,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       allowedTokens,
       networkAddress,
       isDefault,
-      signedMessage
+      signedMessage,
+      allowMerge = true,
     } = req.body;
    
     const name = _name.replaceAll(" ", "-").toLowerCase();
@@ -196,7 +197,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       fullLogo: fullLogoHash,
       networkAddress,
       isDefault: isDefault || false,
-      chain_id: +chain?.chainId
+      chain_id: +chain?.chainId,
+      allowMerge
     });
 
     const repos = JSON.parse(repositories);
@@ -284,7 +286,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       networkAddress,
       repositoriesToAdd,
       repositoriesToRemove,
-      allowedTokens
+      allowedTokens,
+      allowMerge
     } = req.body;
 
     const isAdminOverriding = isAdmin(req) && !!override;
@@ -428,6 +431,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         Logger.error(error, 'Failed to store ipfs');
       }
     }
+
+    if (allowMerge !== undefined && allowMerge !== network.allowMerge)
+      network.allowMerge = allowMerge;
 
     network.save();
 
