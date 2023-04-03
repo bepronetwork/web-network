@@ -71,6 +71,7 @@ export const DefaultNetworkSettings = {
     repositories: [] as Repository[],
     botPermission: false,
     validated: false,
+    allowMerge: true,
   },
   tokens: {
     settler: "",
