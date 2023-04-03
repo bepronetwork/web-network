@@ -135,7 +135,6 @@ export default function CreateBountyTokenAmount({
   return (
     <div className="mt-4">
       <label className="mb-1 text-gray">
-      {console.log('isFudding', isFunding)}
       {isFunding
           ? isFunders
             ? t("fields.select-token.funding")
