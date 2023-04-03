@@ -338,7 +338,7 @@ async function main(option = 0) {
 
   await saveSettingsToDb( /** grab the result from having changed the network options and save it to db */
     await changeNetworkOptions( /** Load networkAddress and change settings on chain, return result */
-      await deployNetwork(tokensToUse[0], /** deploy a network, return contractAddress */
+      await deployNetwork(tokensToUse[1], /** deploy a network, return contractAddress */
         await deployRegistry(tokensToUse[1], tokensToUse[3])), tokensToUse)); /** Deploy Registry, return contractAddress */
 }
 

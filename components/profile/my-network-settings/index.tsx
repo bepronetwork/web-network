@@ -197,7 +197,8 @@ export default function MyNetworkSettings({
        transactional: tokens?.allowedTransactions.map((token) => token?.id).filter((v) => v),
        reward: tokens?.allowedRewards.map((token) => token?.id).filter((v) => v)
       },
-      parameters: success
+      parameters: success,
+      allowMerge: github?.allowMerge
     };
 
     updateNetwork(json)
@@ -249,7 +250,7 @@ export default function MyNetworkSettings({
         title: t("custom-network:tabs.logo-and-colours"),
         component: (
           <NetworkContainer>
-            <LogoAndColoursSettings 
+            <LogoAndColoursSettings
               network={network}
               networkNeedRegistration={networkNeedRegistration}
               updateEditingNetwork={updateEditingNetwork}
@@ -272,7 +273,7 @@ export default function MyNetworkSettings({
         title: t("custom-network:tabs.governance"),
         component: (
           <NetworkContainer>
-            <GovernanceSettings 
+            <GovernanceSettings
               address={network?.networkAddress}
               tokens={network?.tokens}
               network={network}
@@ -303,23 +304,23 @@ export default function MyNetworkSettings({
       {isCurrentNetwork && (
         <style>{colorsToCSS(settings?.theme?.colors)}</style>
       )}
-      
+
       {!state.currentUser?.login && <WarningGithub />}
-      
+
       <TabbedNavigation
         className="my-network-tabs border border-dark-gray"
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
-      
+
       {settings?.validated &&
         github?.validated &&
         !network?.isClosed &&
         !networkNeedRegistration && (
           <Row className="mt-3 mb-4">
             <Col>
-              <ContractButton 
-                onClick={handleSubmit} 
+              <ContractButton
+                onClick={handleSubmit}
                 disabled={isUpdating}
                 isLoading={isUpdating}
               >

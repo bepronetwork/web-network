@@ -39,7 +39,7 @@ export default function ListRecentIssues() {
       </div>
       
       <LoadingList loading={loading} />
-      <div className="row gy-3">
+      <div className="row gy-3 mb-3 mt-1">
         {bounties &&
           bounties?.map((bounty) => (
             <div className="col-md-4 col" key={bounty.id}>

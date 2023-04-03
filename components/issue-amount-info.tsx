@@ -35,7 +35,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
       }
     >
       <div
-        className={`row justify-content-md-center m-0 px-1 py-1 rounded-5 ${
+        className={`row mb-3 justify-content-md-center m-0 px-1 py-1 rounded-5 ${
           !isActive ? "bg-black" : "bg-dark-gray"
         } `}
       >

@@ -67,7 +67,7 @@ export default function TokensDropdown({
       : undefined;
 
   const tokenToOption = (token: Token): Option => ({
-    label: `${token?.tokenInfo ? token.tokenInfo.name : token.symbol}`,
+    label: `${token?.tokenInfo ? (token?.tokenInfo?.name || token?.name) : token.symbol}`,
     value: token,
   });
 
@@ -125,8 +125,7 @@ export default function TokensDropdown({
   }, [token, options, defaultToken]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
-    const { currentValue, symbol ,address, tokenInfo } = data.value;
-
+    const { currentValue, symbol ,address, tokenInfo, name } = data.value;
     return (
       <div
         ref={innerRef}
@@ -148,7 +147,7 @@ export default function TokensDropdown({
               />
             )}
             <span className={`${tokenInfo ? null : "mx-2"}`}>
-              {tokenInfo && selectOptionName === 'name' ? tokenInfo.name : symbol}
+              {tokenInfo && selectOptionName === 'name' ? (tokenInfo?.name || name) : symbol}
             </span>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
               { showCurrencyValue && 
@@ -187,7 +186,7 @@ export default function TokensDropdown({
                 />
               )}
               <span className={`${data.tokenInfo ? "mt-1" : "mx-2"}`}>
-                {data.tokenInfo && selectOptionName === 'name' ? data.tokenInfo.name : symbol}
+                {data.tokenInfo && selectOptionName === 'name' ? (data?.tokenInfo?.name || data?.name) : symbol}
               </span>
           </div>
         <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">

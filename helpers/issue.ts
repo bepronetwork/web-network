@@ -46,12 +46,12 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   createdAt: new Date(issue.createdAt),
   updatedAt: new Date(issue.updatedAt),
   fundedAt: new Date(issue.fundedAt),
-  isReady: bountyReadyPRsHasNoInvalidProposals(issue) !== 0,
+  isReady: issue?.mergeProposals && bountyReadyPRsHasNoInvalidProposals(issue) !== 0,
   amount: BigNumber(issue.amount),
   fundingAmount: BigNumber(issue.fundingAmount),
   fundedAmount: BigNumber(issue.fundedAmount),
   rewardAmount: BigNumber(issue.rewardAmount),
-  pullRequests: pullRequestParser(issue),
-  mergeProposals: mergeProposalParser(issue),
-  benefactors: benefactorsParser(issue)
+  pullRequests: issue?.pullRequests && pullRequestParser(issue),
+  mergeProposals: issue?.mergeProposals && mergeProposalParser(issue),
+  benefactors: issue?.benefactors && benefactorsParser(issue)
 });

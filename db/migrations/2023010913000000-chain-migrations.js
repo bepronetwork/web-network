@@ -52,6 +52,10 @@ async function up(queryInterface, Sequelize) {
     isDefault: {
       type: Sequelize.BOOLEAN
     },
+    color: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE
@@ -73,11 +77,15 @@ async function up(queryInterface, Sequelize) {
 }
 
 async function down(queryInterface, Sequelize) {
-  await queryInterface.dropTable('chains');
   await queryInterface.removeColumn('networks', 'chain_id');
   await queryInterface.removeColumn('issues', 'chain_id');
   await queryInterface.removeColumn('chain_events', 'chain_id');
-  await queryInterface.addConstraint('chain_events', {type: 'unique', fields: ['name']});
+  await queryInterface.dropTable('chains');
+  await queryInterface.addConstraint('chain_events', {
+    type: 'unique',
+    fields: ['name'],
+    name: "chain_events_name_key"
+  });
 }
 
 module.exports = {up, down}

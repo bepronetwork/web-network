@@ -25,7 +25,7 @@ export default function CreateBountyTokenAmount({
   tokenBalance,
   issueAmount,
   setIssueAmount,
-  review = false,
+  isFunders = false,
   needValueValidation,
   decimals = 18,
   isFunding = false,
@@ -75,6 +75,14 @@ export default function CreateBountyTokenAmount({
                  });
   }
 
+  function renderConvertedAmount() {
+    return (
+      isErrorConverted
+        ? t("fields.conversion-token.invalid")
+        : `${convertedAmount} ${state.Settings?.currency.defaultFiat}`
+    )
+  }
+
   function selectTokens() {
     return (
       <TokensDropdown
@@ -86,7 +94,7 @@ export default function CreateBountyTokenAmount({
         selectOptionName={isFunding ? 'symbol' : 'name'}
         addToken={addToken}
         setToken={setCurrentToken}
-        disabled={review}
+        disabled={false}
         defaultToken={defaultToken}
         showCurrencyValue={false}
         needsBalance={isFunding}
@@ -127,16 +135,18 @@ export default function CreateBountyTokenAmount({
   return (
     <div className="mt-4">
       <label className="mb-1 text-gray">
-        {isFunding ? t("fields.select-token.reward") : t("fields.select-token.bounty")}
+      {isFunding
+          ? isFunders
+            ? t("fields.select-token.funding")
+            : t("fields.select-token.reward")
+          : t("fields.select-token.bounty")}
       </label>
       {isFunding ? (
         <div className="d-flex justify-content-between col-md-6 p-2 border-radius-8 border border-gray-700">
           <div className="d-flex flex-column col-7">
             {inputNumber()}
             <div className="text-white-30 ms-2">
-            {isErrorConverted
-                ? t("fields.conversion-token.invalid")
-                : `${convertedAmount} ${state.Settings?.currency.defaultFiat}`}
+              {renderConvertedAmount()}
             </div>
           </div>
           <div className="col-4 me-2 mt-3 pt-1">{selectTokens()}</div>
@@ -180,7 +190,7 @@ export default function CreateBountyTokenAmount({
                     <DoubleArrowRight className="text-gray" />
                   </div>
                   <div className="pt-1 mt-2 ms-2 convert-value">
-                    {convertedAmount} {state.Settings?.currency.defaultFiat}
+                    {renderConvertedAmount()}
                   </div>
                 </div>
               )}

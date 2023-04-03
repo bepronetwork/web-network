@@ -24,4 +24,7 @@ module.exports = {
     await settings.save();
     console.log(`${name} - Settings Key: CouncilAmount params updated`);
   },
+  async down(queryInterface, Sequelize) {
+
+  }
 };

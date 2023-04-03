@@ -105,7 +105,8 @@
     "reward-type": "Reward Type",
     "select-token": {
       "bounty": "Set Reward",
-      "reward": "Set Funded Reward"
+      "reward": "Set Funded Reward",
+      "funding": "Set Funding Amount"
     },
     "set": "Set",
     "amount": {
