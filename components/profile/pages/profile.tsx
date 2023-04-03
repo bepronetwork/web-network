@@ -59,10 +59,13 @@ export default function ProfilePage() {
       </div>
 
       <GithubConnectionState handleClickDisconnect={handleClickDisconnect} />
+       
+       {state.Settings?.kyc?.isKycEnabled && (
+        <div className="mt-4">
+          <KycSessionModal/>
+        </div>
+       )}
 
-      <div className="mt-4">
-        <KycSessionModal/>
-      </div>
       <RemoveGithubAccount
         show={showRemoveModal}
         githubLogin={state.currentUser?.login}
