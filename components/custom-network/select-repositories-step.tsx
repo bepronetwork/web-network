@@ -25,6 +25,10 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
     fields.permission.setter(e.target.checked);
   }
 
+  function changeAllowMergeCheckbox(ele) {
+    fields.allowMerge.setter(ele?.target?.checked);
+  }
+
   return (
     <Step
       title={t("steps.repositories.title")}
@@ -61,6 +65,18 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
           <p className="p-small text-gray-70 px-0">
             {t("steps.repositories.you-need-to-accept")}
           </p>
+
+          <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
+            <FormCheck
+                className="form-control-lg px-0 pb-0 mr-1"
+                type="checkbox"
+                onChange={changeAllowMergeCheckbox}
+                checked={github?.allowMerge}
+              />
+            <span>
+              {t("allow-merge")}
+            </span>
+          </div>
         </div>
       )) || (
         <div className="pt-3">

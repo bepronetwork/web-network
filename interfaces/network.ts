@@ -148,6 +148,7 @@ export interface NetworkSettings {
     repositories: Repository[];
     botPermission: boolean;
     validated: boolean;
+    allowMerge: boolean;
   };
   tokens?: {
     settler: string;
