@@ -641,6 +641,7 @@ export default function CreateBountyPage() {
           issueAmount={fieldParams[type].amount}
           setIssueAmount={fieldParams[type].setAmount}
           tokenBalance={fieldParams[type].balance}
+          isFunders={type === "reward" ? false : true}
           needValueValidation={!isFundingType || type === "reward"}
           isFunding={isFundingType}
           labelSelect={fieldParams[type].label}
