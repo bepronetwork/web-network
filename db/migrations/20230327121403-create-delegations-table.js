@@ -8,7 +8,7 @@ const CuratorsModel = require("../models/curator-model");
 const IssueModel = require("../models/issue.model");
 const RepositoryModel = require("../models/repositories.model");
 const PullRequestModel = require("../models/pullRequest.model");
-const MergeProposalModel = require("../models/mergeProposal");
+const MergeProposalModel = require("../models/mergeproposal");
 const TokenModel = require("../models/tokens.model");
 const DelegationModel = require("../models/delegation.model");
 
