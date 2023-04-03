@@ -5,7 +5,19 @@
     justify-content: center;
 
     border: 3px solid var(--bs-primary);
-    
+
+    &.xsm {
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+    }
+
+    &.sm {
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+    }
+
     &.md {
       border-radius: 50%;
       width: 40px;

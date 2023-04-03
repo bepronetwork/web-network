@@ -1,4 +1,3 @@
-import { IssueRoute } from "middleware/issue-route";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
@@ -8,33 +7,39 @@ import models from "db/models";
 
 import * as IssueQueries from "graphql/issue";
 
+import { chainFromHeader } from "helpers/chain-from-header";
 import { getPropertyRecursively } from "helpers/object";
+
+import { IssueRoute } from "middleware/issue-route";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    ids: [repoId, ghId, networkName]
-  } = req.query;
+  const { ids: [repoId, ghId, networkName], chainId } = req.query;
+
   const issueId = [repoId, ghId].join("/");
 
   const include = [
     { association: "developers" },
     { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
-    { association: "mergeProposals", include: [{ association: "distributions" }]  },
+    { association: "mergeProposals", include: [{ association: "distributions" }, { association: "disputes" }]  },
     { association: "repository" },
-    { association: "token" },
+    { association: "transactionalToken" },
+    { association: "rewardToken" },
     { association: "benefactors" },
     { association: "disputes" }
   ];
+
+  const chain = await chainFromHeader(req);
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      }
+      },
+      chain_id: { [Op.eq]: chainId || chain.chainId }
     }
   });
 

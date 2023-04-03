@@ -10,6 +10,7 @@ import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
 import InfiniteScroll from "components/infinite-scroll";
 import IssueFilters from "components/issue-filters";
@@ -21,15 +22,17 @@ import ScrollTopButton from "components/scroll-top-button";
 
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";
-import {changeShowCreateBounty} from "contexts/reducers/update-show-prop";
 
 import {isProposalDisputable} from "helpers/proposal";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
+
+import SelectNetwork from "./bounties/select-network";
 
 type Filter = {
   label: string;
@@ -49,8 +52,8 @@ interface ListIssuesProps {
   pullRequesterAddress?: string;
   proposer?: string;
   disputableFilter?: "dispute" | "merge";
-  allNetworks?: boolean;
   inView?: boolean;
+  variant?: "bounty-hall" | "profile" | "network"
 }
 
 interface IssuesPage {
@@ -68,30 +71,34 @@ export default function ListIssues({
   proposer,
   redirect,
   disputableFilter,
-  allNetworks = false,
-  inView
+  inView,
+  variant = "network"
 }: ListIssuesProps) {
-  const {dispatch, state: appState} = useAppState();
-
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);
 
-  const { search, setSearch, clearSearch } = useSearch();
-  
   const [hasMore, setHasMore] = useState(false);
-  const [searchState, setSearchState] = useState(search);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
   const [totalBounties, setTotalBounties] = useState<number>(0);
 
   const searchTimeout = useRef(null);
 
-  const { searchIssues, getTotalBounties } = useApi();
+  const { chain } = useChain();
+  const { searchIssues } = useApi();
+  const { dispatch, state: appState } = useAppState();
   const { page, nextPage, goToFirstPage } = usePage();
+  const { search, setSearch, clearSearch } = useSearch();
 
-  const isProfilePage = router?.asPath?.includes("profile");
+  const [searchState, setSearchState] = useState(search);
 
-  const { repoId, time, state, sortBy, order } = router.query as {
+  const isProfile = variant === "profile";
+  const isBountyHall = variant === "bounty-hall";
+  const isOnNetwork = !!router?.query?.network;
+
+  const { network: queryNetwork, networkName, repoId, time, state, sortBy, order } = router.query as {
+    network: string;
+    networkName: string;
     repoId: string;
     time: string;
     state: string;
@@ -142,16 +149,16 @@ export default function ListIssues({
   }
 
   async function disputableFilterFn(bounties: IssueBigNumberData[]): Promise<IssueBigNumberData[]> {
-    const bountiesIds = 
+    const bountiesIds =
       (await Promise.all(bounties.map(async ({ contractId, mergeProposals}) => {
         const proposals = [];
 
         for await (const proposal of mergeProposals) {
           const isDisputed = await appState.Service?.active?.isProposalDisputed(contractId, proposal.contractId);
-          const isDisputable = isProposalDisputable(proposal?.createdAt, 
-                                                    +appState.Service?.network?.times?.disputableTime, 
+          const isDisputable = isProposalDisputable(proposal?.createdAt,
+                                                    +appState.Service?.network?.times?.disputableTime,
                                                     await appState.Service?.active.getTimeChain());
-          
+
           if (disputableFilter === "merge" && !isDisputed && !isDisputable) proposals.push(proposal);
           else if (disputableFilter === "dispute" && !isDisputed && isDisputable) proposals.push(proposal);
         }
@@ -165,11 +172,10 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!appState.Service?.network?.active?.name || inView === false) return;
+    if (router.pathname === "/[network]" && !queryNetwork ||
+        router.pathname.includes("/[network]/[chain]") && (!queryNetwork || !chain || inView === false)) return;
 
     dispatch(changeLoadState(true));
-
-    if(allNetworks) getTotalBounties().then(setTotalBounties)
 
     searchIssues({
       page,
@@ -179,14 +185,17 @@ export default function ListIssues({
       search,
       sortBy: sortBy || 'createdAt',
       order,
-      creator,
+      address: creator,
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: allNetworks ? "" : appState.Service?.network?.active?.name,
-      allNetworks: allNetworks ? allNetworks : ""
+      networkName: isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
+        networkName || appState.Service?.network?.active?.name,
+      allNetworks: isBountyHall || "",
+      chainId: chain?.chainId?.toString(),
     })
-      .then(async ({ rows, pages, currentPage }) => {
+      .then(async ({ count, rows, pages, currentPage }) => {
+        setTotalBounties(count);
         const issues = disputableFilter ? await disputableFilterFn(rows) : rows;
 
         if (currentPage > 1) {
@@ -208,7 +217,7 @@ export default function ListIssues({
         setHasMore(currentPage < pages);
       })
       .catch((error) => {
-        console.error("Error fetching issues", error);
+        console.debug("Error fetching issues", error);
       })
       .finally(() => {
         dispatch(changeLoadState(false));
@@ -222,13 +231,13 @@ export default function ListIssues({
   }
 
   function handleNotFoundClick() {
-    if (!redirect) return dispatch(changeShowCreateBounty(true));
+    if (!redirect) return router.push('/create-bounty');
 
     router.push(redirect);
   }
 
   useEffect(() => {
-    if (page) {
+    if (page && !!issuesPages.length) {
       const pagesToValidate = [...Array(+page).keys()].map((i) => i + 1);
 
       setTruncatedData(!pagesToValidate.every((pageV) =>
@@ -244,10 +253,13 @@ export default function ListIssues({
     state,
     sortBy,
     order,
+    chain,
     creator,
     proposer,
     appState.Service?.network?.active?.name,
-    inView
+    inView,
+    appState.supportedChains,
+    networkName
   ]);
 
   useEffect(() => {
@@ -260,33 +272,34 @@ export default function ListIssues({
     return () => clearTimeout(searchTimeout.current);
   }, [searchState]);
 
-  
-  function isRenderFilter() {
-    if(isMobile) return false
 
-    return (!isListEmpy() || (isListEmpy() && hasFilter()))
+  function isRenderFilter() {
+    if(isMobile) return false;
+
+    return (!isListEmpy() || (isListEmpy() && hasFilter()));
   }
-  
+
   if(inView !== null && inView === false) return null;
 
   return (
-    <CustomContainer 
-      className={isProfilePage && "px-0 mx-0" || ""}
-      childWrapperClassName={isProfilePage && "justify-content-left" || ""}
+    <CustomContainer
+      className={isProfile && "px-0 mx-0" || ""}
+      childWrapperClassName={isProfile && "justify-content-left" || ""}
+      col={isProfile ? "col-12" : undefined}
     >
-      {allNetworks && (
-        <div className="d-flex mt-2 p-1">
-          <h4 className="mt-1">{t("bounty:all-bounties")}</h4>
-          <div className="bg-shadow border-radius-8 p-1 ms-3 px-2">
-            <span className="p text-white-40">{totalBounties}</span>
+      {(isBountyHall || isProfile) && (
+        <div className="d-flex flex-row align-items-center">
+          <h3 className="text-capitalize font-weight-medium">{t("bounty:label_other")}</h3>
+          <div className="ms-2">
+            <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">{totalBounties}</span>
           </div>
         </div>
       )}
       {isRenderFilter() ? (
         <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-dark"}
+          className={"row align-items-center list-actions sticky-top bg-gray-950"}
         >
-          <div className="w-100">
+          <div className="col">
             <InputGroup className="border-radius-8">
               <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
@@ -302,7 +315,7 @@ export default function ListIssues({
 
               {showClearButton() && (
                 <button
-                  className="btn bg-black border-0 py-0 px-3"
+                  className="btn bg-gray-900 border-0 py-0 px-3"
                   onClick={handleClearSearch}
                 >
                   <CloseIcon width={10} height={10} />
@@ -311,42 +324,48 @@ export default function ListIssues({
             </InputGroup>
           </div>
 
-          <div className="d-flex align-items-center">
-            <span className="caption-small text-white-50 text-nowrap mr-1">
-              {t("sort.label")}
-            </span>
+          <div className="col-auto">
+            <div className="d-flex align-items-center">
+              <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
+                {t("sort.label")}
+              </span>
 
-            <ListSort
-              options={[
-                {
-                  value: "newest",
-                  sortBy: "createdAt",
-                  order: "DESC",
-                  label: t("sort.types.newest")
-                },
-                {
-                  value: "oldest",
-                  sortBy: "createdAt",
-                  order: "ASC",
-                  label: t("sort.types.oldest")
-                },
-                {
-                  value: "highest-bounty",
-                  sortBy: "amount,fundingAmount",
-                  order: "DESC",
-                  label: t("sort.types.highest-bounty")
-                },
-                {
-                  value: "lowest-bounty",
-                  sortBy: "amount,fundingAmount",
-                  order: "ASC",
-                  label: t("sort.types.lowest-bounty")
-                }
-              ]}
-            />
+              <ListSort
+                options={[
+                  {
+                    value: "newest",
+                    sortBy: "createdAt",
+                    order: "DESC",
+                    label: t("sort.types.newest")
+                  },
+                  {
+                    value: "oldest",
+                    sortBy: "createdAt",
+                    order: "ASC",
+                    label: t("sort.types.oldest")
+                  },
+                  {
+                    value: "highest-bounty",
+                    sortBy: "amount,fundingAmount",
+                    order: "DESC",
+                    label: t("sort.types.highest-bounty")
+                  },
+                  {
+                    value: "lowest-bounty",
+                    sortBy: "amount,fundingAmount",
+                    order: "ASC",
+                    label: t("sort.types.lowest-bounty")
+                  }
+                ]}
+              />
+            </div>
           </div>
 
-          {!filterState && <IssueFilters />}
+          <div className="col-auto">
+            {(!filterState && !isProfile) && <IssueFilters />}
+
+            {(!filterState && isProfile) && <SelectNetwork isCurrentDefault={isProfile && isOnNetwork} />}
+          </div>
         </div>
       ) : (
         ""
@@ -367,11 +386,11 @@ export default function ListIssues({
       !appState.loading?.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            {(appState.currentUser?.walletAddress && !allNetworks) && (
+            {(appState.currentUser?.walletAddress && !isBountyHall) && (
               <ReadOnlyButtonWrapper>
-                <Button onClick={handleNotFoundClick}>
+                <ContractButton onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
-                </Button>
+                </ContractButton>
                 </ReadOnlyButtonWrapper>
               )}
           </NothingFound>
@@ -385,7 +404,11 @@ export default function ListIssues({
           hasMore={hasMore}>
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (
-              <IssueListItem issue={issue} key={`${issue.repository_id}/${issue.githubId}`} />
+              <IssueListItem
+                issue={issue}
+                key={`${issue.repository_id}/${issue.githubId}`}
+                variant={isProfile || isBountyHall ? "multi-network" : "network"}
+              />
             ));
           })}
         </InfiniteScroll>

@@ -4,8 +4,9 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
+import {LogAccess} from "middleware/log-access";
+
 import {error as LogError} from "services/logging";
-import {LogAccess} from "../../../../middleware/log-access";
 
 enum Actions {
   REGISTER = "register",

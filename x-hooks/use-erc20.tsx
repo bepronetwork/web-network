@@ -1,19 +1,20 @@
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
 
 import {useAppState} from "contexts/app-state";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
 
+import {MetamaskErrors} from "interfaces/enums/Errors";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
+import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
-
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {MetamaskErrors} from "../interfaces/enums/Errors";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
@@ -32,11 +33,19 @@ export default function useERC20() {
   const logData = { 
     wallet: state.currentUser?.walletAddress,
     token: address, 
-    network: state.Service?.active?.network?.contractAddress
+    network: state.Service?.active?.network?.contractAddress,
+    service: state.Service?.active
   };
 
-  const updateAllowanceAndBalance = useCallback(() => {
-    if (!state.currentUser?.walletAddress || !address) return;
+  const isServiceReady = 
+    !state.Service?.starting && !state.spinners?.switchingChain && state.Service?.active?.web3Connection?.started;
+
+  function updateAllowanceAndBalance() {
+    if (!state.currentUser?.walletAddress ||
+        !address ||
+        !name ||
+        !isServiceReady ||
+        state.connectedChain?.name === UNSUPPORTED_CHAIN) return;
 
     state.Service?.active.getTokenBalance(address, state.currentUser.walletAddress)
       .then(setBalance)
@@ -48,12 +57,12 @@ export default function useERC20() {
       state.Service?.active.getAllowance(address, state.currentUser.walletAddress, realSpender)
         .then(setAllowance)
         .catch(error => console.debug("useERC20:getAllowance", logData, error));
-  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
+  }
 
   function approve(amount: string) {
     if (!state.currentUser?.walletAddress || !state.Service?.active || !address || !amount) return;
 
-    return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
+    return handleApproveToken(address, amount, undefined, symbol).then(updateAllowanceAndBalance);
   }
 
   function setDefaults() {
@@ -66,11 +75,14 @@ export default function useERC20() {
   }
 
   useEffect(() => {
-    if (!address) setLoadError(undefined);
-    if (!address && name) setDefaults();
-    if (state.Service?.active && address)
+    if (!address) {
+      setLoadError(undefined);
+      
+      if (name)
+        setDefaults();
+    } else if (address && !name && isServiceReady)
       state.Service?.active.getERC20TokenData(address)
-        .then(({ name, symbol, decimals, totalSupply }) => {
+        .then(async ({ name, symbol, decimals, totalSupply }) => {
           setName(name);
           setSymbol(symbol);
           setDecimals(decimals);
@@ -78,9 +90,11 @@ export default function useERC20() {
           setLoadError(false);
         })
         .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
-        
+  }, [state.currentUser?.walletAddress, address, name, isServiceReady]);
+
+  useEffect(() => {
     updateAllowanceAndBalance();
-  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
+  }, [state.currentUser?.walletAddress, isServiceReady, state.connectedChain, name]);
 
   async function deploy(name: string,
                         symbol: string,
@@ -90,13 +104,13 @@ export default function useERC20() {
       const transaction = addTx([{
         type: TransactionTypes.deployERC20Token,
         network: state.Service?.network?.active
-      } as any]);
+      }]);
 
       dispatch(transaction);
 
       await state.Service?.active.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as any)]));
+          dispatch(updateTx([parseTransaction(txInfo, transaction.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
         })
         .catch((err) => {
@@ -109,6 +123,16 @@ export default function useERC20() {
     });
   }
 
+  function _setAddress(_address: string) {
+    if (_address?.toLowerCase() !== address?.toLowerCase())
+      setAddress(_address);
+  }
+
+  function _setSpender(_address: string) {
+    if (_address?.toLowerCase() !== address?.toLowerCase())
+      setSpender(_address);
+  }
+
   return {
     name,
     symbol,
@@ -119,8 +143,8 @@ export default function useERC20() {
     allowance,
     totalSupply,
     approve,
-    setAddress,
-    setSpender,
+    setAddress: _setAddress,
+    setSpender: _setSpender,
     deploy,
     updateAllowanceAndBalance
   };

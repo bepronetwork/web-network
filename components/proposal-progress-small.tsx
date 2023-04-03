@@ -1,7 +1,5 @@
 import BigNumber from "bignumber.js";
 
-import { useAppState } from "contexts/app-state";
-
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 interface Options {
@@ -15,16 +13,9 @@ export default function ProposalProgressSmall({
   total = BigNumber(0),
   color = 'purple'
 }: Options) {
-  const {state} = useAppState()
   const dotStyle = { width: "4px", height: "14px" };
 
-  const disputePercentage = +state.Service?.network?.amounts?.percentageNeededForDispute || 3;
-
-  function toRepresentationPercent(value = 0, total = 5) {
-    return (value * 100) / total;
-  }
-
-  const percent = BigNumber(value.multipliedBy(100).toFixed(2,1) || 0).dividedBy(total);
+  const percent = value.multipliedBy(100).dividedBy(total).toNumber();
 
   return (
     <div className="text-center position-relative d-inline-flex flex-column w-100">
@@ -38,12 +29,12 @@ export default function ProposalProgressSmall({
         <div
           className={`progress-bar bg-${color}`}
           role="progressbar"
-          style={{ width: `${toRepresentationPercent(+percent, disputePercentage) - 15}%` }}
+          style={{ width: `${percent}%` }}
         >
           <div
             style={{ ...dotStyle, right: 22}}
             className={`position-absolute ${
-              percent.gte(disputePercentage) ? `bg-${color}` : "bg-gray-700"
+              value.gte(total) ? `bg-${color}` : "bg-gray-700"
             }`}
           />
         </div>

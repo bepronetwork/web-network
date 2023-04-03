@@ -7,12 +7,13 @@ import Button from "components/button";
 import TransactionModal from "components/transaction-modal";
 import TransactionsList from "components/transactions-list";
 
+import {useAppState} from "contexts/app-state";
+import {setTxList} from "contexts/reducers/change-tx-list";
+
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {Transaction} from "interfaces/transaction";
 
-import {useAppState} from "../contexts/app-state";
-import {setTxList} from "../contexts/reducers/change-tx-list";
-import {WinStorage} from "../services/win-storage";
+import {WinStorage} from "services/win-storage";
 
 export default function TransactionsStateIndicator() {
   const {state: {transactions, currentUser}, dispatch} = useAppState();
@@ -90,9 +91,8 @@ export default function TransactionsStateIndicator() {
         overlay={overlay}>
         <div>
           <Button
-            className="opacity-75 opacity-100-hover"
+            className="bg-gray-850 border-gray-850 rounded p-2"
             transparent
-            rounded
             onClick={() => setShowOverlay(!showOverlay)}
           >
             {(loading && (

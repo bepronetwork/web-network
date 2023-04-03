@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 
 class Tokens extends Model {
@@ -20,7 +21,10 @@ class Tokens extends Model {
         },
         address: {
           type: DataTypes.STRING,
-          allowNull: false
+          allowNull: false,
+          get() {
+            return getValueToLowerCase(this, "address");
+          }
         },
         isTransactional: {
           type: DataTypes.BOOLEAN,
@@ -33,6 +37,10 @@ class Tokens extends Model {
         isAllowed: {
           type: DataTypes.BOOLEAN,
           allowNull: true
+        },
+        chain_id: {
+          type: DataTypes.INTEGER,
+          unique: "network_chain_unique"
         }
       },
       {
@@ -44,10 +52,15 @@ class Tokens extends Model {
     );
   }
   static associate(models) {
-    this.belongsToMany(models.network, { through: 'network_tokens' });
     this.hasMany(models.issue, {
-      foreignKey: "tokenId",
+      foreignKey: "transactionalTokenId",
       sourceKey: "id"
+    });
+    this.belongsToMany(models.network, { through: 'network_tokens' });
+    this.belongsTo(models.chain, {
+      foreignKey: "chain_id",
+      targetKey: "chainId",
+      as: "chain"
     });
   }
 }

@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
-import { Col, Form, OverlayTrigger, Popover } from "react-bootstrap";
+import {ReactNode} from "react";
+import {Col, Form, OverlayTrigger, Popover} from "react-bootstrap";
 
 import InfoIcon from "assets/icons/info-icon";
 
 import InputNumber from "components/input-number";
-import { WarningSpan } from "components/warning-span";
+import {WarningSpan} from "components/warning-span";
 
 interface FormGroupProps {
   label: string;
@@ -18,9 +18,19 @@ interface FormGroupProps {
   variant?: "input" | "numberFormat";
   onBlur?: () => void;
   onChange?: (newValue: string) => void;
+  decimalScale?: number;
 }
 
-export function FormGroup({ label, onChange, error, hint, variant = "input", symbol, ...rest } : FormGroupProps) {
+export function FormGroup({
+                            label,
+                            onChange,
+                            error,
+                            hint,
+                            variant = "input",
+                            symbol,
+                            decimalScale,
+                            ...rest
+                          }: FormGroupProps) {
   const isNumberFormat = variant === "numberFormat";
 
   function handleChange(e) {
@@ -73,7 +83,7 @@ export function FormGroup({ label, onChange, error, hint, variant = "input", sym
           <InputNumber
             onValueChange={handleNumberFormatChange}
             allowNegative={false}
-            decimalScale={0}
+            decimalScale={decimalScale}
             error={!!error}
             thousandSeparator
             symbol={symbol}

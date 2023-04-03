@@ -3,7 +3,6 @@ import {SimpleAction} from "./reducer";
 
 interface ShowProps {
   web3Dialog?: boolean;
-  createBounty?: boolean;
   failedLoadSettings?: boolean;
   githubWalletDontMatch?: boolean;
   reAuthorizeGithub?: boolean;
@@ -20,6 +19,5 @@ export const updateShowProp = (payload: ShowProps) => changeShowProp.update(payl
  * to be able to use compounding show props you will need to extend SimpleAction to use destruction
  * as it is shown in change-service.ts */
 export const changeShowWeb3 = (web3Dialog: boolean) => updateShowProp({web3Dialog});
-export const changeShowCreateBounty = (createBounty: boolean) => updateShowProp({createBounty});
 export const changeGithubWalletDontMatch = (githubWalletDontMatch: boolean) => updateShowProp({githubWalletDontMatch});
 export const changeReAuthorizeGithub = (reAuthorizeGithub: boolean) => updateShowProp({reAuthorizeGithub});

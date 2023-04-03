@@ -5,6 +5,8 @@ import { useTranslation } from "next-i18next";
 
 import BountyDistributionItem from "components/bounty-distribution-item";
 
+import { useAppState } from "contexts/app-state";
+
 import { truncateAddress } from "helpers/truncate-address";
 
 import { DistributedAmounts } from "interfaces/proposal";
@@ -12,7 +14,6 @@ import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import { useAppState } from "../contexts/app-state";
 interface Props {
   distributedAmounts: DistributedAmounts;
 }
@@ -27,7 +28,7 @@ export default function ProposalListDistribution({
   const { state } = useAppState();
 
   async function getCoinInfo() {
-    await getCoinInfoByContract(state.Service?.network?.networkToken?.symbol)
+    await getCoinInfoByContract(state.Service?.network?.active?.networkToken?.symbol)
       .then((tokenInfo) => {
         setCoinInfo(tokenInfo);
       })
@@ -40,7 +41,7 @@ export default function ProposalListDistribution({
       .toFixed(4);
 
   const currentTokenSymbol =
-    state.currentBounty?.data?.token?.symbol || t("common:misc.token");
+    state.currentBounty?.data?.transactionalToken?.symbol || t("common:misc.token");
 
   useEffect(() => {
     if (state.Service?.network?.amounts) getCoinInfo();

@@ -1,11 +1,11 @@
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import PaymentItem from "components/profile/payment-item";
+
 import { Payment } from "interfaces/payments";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
-
-import PaymentItem from "./payment-item";
+import { useNetwork} from "x-hooks/use-network";
 
 interface PaymentsListProps {
   payments: Payment[];
@@ -16,7 +16,7 @@ export default function PaymentsList({ payments }: PaymentsListProps) {
   const { push } = useRouter();
   const { t } = useTranslation(["common", "profile", "bounty"]);
 
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
 
   function handleItemClick(issueId: string) {
     const [repoId, id] = issueId.split('/')

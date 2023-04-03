@@ -1,34 +1,44 @@
+import axios from "axios";
 import BigNumber from "bignumber.js";
+import {isZeroAddress} from "ethereumjs-util";
 import {head} from "lodash";
 
 import {useAppState} from "contexts/app-state";
 
-import { 
-  PastEventsParams, 
-  CreatePrePullRequestParams, 
-  SearchNetworkParams, 
-  User, 
-  CancelPrePullRequestParams, 
-  StartWorkingParams, 
-  PatchUserParams, 
-  MergeClosedIssueParams,
+import { issueParser } from "helpers/issue";
+
+import {
+  CancelPrePullRequestParams,
+  CreatePrePullRequestParams,
   CreateReviewParams,
+  MergeClosedIssueParams,
   SearchActiveNetworkParams,
+  PatchUserParams,
+  User,
+  PastEventsParams,
+  StartWorkingParams,
+  SearchNetworkParams,
   updateIssueParams
 } from "interfaces/api";
-import {Curator, SearchCuratorParams} from "interfaces/curators";
-import {HeaderNetworksProps} from "interfaces/header-information";
-import {IssueBigNumberData, IssueData, pullRequest} from "interfaces/issue-data";
-import {LeaderBoard, SearchLeaderBoard} from "interfaces/leaderboard";
-import {Network} from "interfaces/network";
-import {PaginatedData} from "interfaces/paginated-data";
-import {Proposal} from "interfaces/proposal";
-import {ReposList} from "interfaces/repos-list";
-import {Token} from "interfaces/token";
+import { Curator, SearchCuratorParams } from "interfaces/curators";
+import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
+import { HeaderNetworksProps } from "interfaces/header-information";
+import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
+import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
+import { Network } from "interfaces/network";
+import { PaginatedData } from "interfaces/paginated-data";
+import { Proposal } from "interfaces/proposal";
+import { ReposList } from "interfaces/repos-list";
+import { Token } from "interfaces/token";
 
-import {api, eventsApi} from "services/api";
+import {api} from "services/api";
+import { WinStorage } from "services/win-storage";
 
 import {Entities, Events} from "types/dappkit";
+
+import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
+import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
+import {SupportedChainData} from "../interfaces/supported-chain-data";
 
 interface NewIssueParams {
   title: string;
@@ -53,6 +63,9 @@ interface GetNetworkProps {
   name?: string;
   creator?: string;
   isDefault?: boolean;
+  address?: string;
+  byChainId?: boolean;
+  chainName?: string;
 }
 
 type FileUploadReturn = {
@@ -64,9 +77,9 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
-  const  {state} = useAppState()
+  const  {state, dispatch} = useAppState();
   const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
-  
+
   api.interceptors.request.use(config => {
 
     if (typeof window === 'undefined')
@@ -104,6 +117,7 @@ export default function useApi() {
     tokenAddress = "",
     networkName = "",
     allNetworks = undefined,
+    chainId = ""
   }) {
     const params = new URLSearchParams({
       address,
@@ -119,24 +133,21 @@ export default function useApi() {
       pullRequesterAddress,
       proposer,
       tokenAddress,
+      chainId,
       networkName: networkName.replaceAll(" ", "-"),
       ... (allNetworks !== undefined && { allNetworks: allNetworks.toString() } || {}),
     }).toString();
+
     return api
       .get<{
-        rows: IssueBigNumberData[];
+        rows: IssueData[];
         count: number;
         pages: number;
         currentPage: number;
-      }>(`/search/issues/?${params}`)
+      }>(`/search/issues?${params}`)
       .then(({ data }) => ({
         ...data,
-        rows: data.rows.map(row => ({
-          ...row,
-          amount: BigNumber(row.amount),
-          fundingAmount: BigNumber(row.fundingAmount),
-          fundedAmount: BigNumber(row.fundedAmount)
-        }))
+        rows: data.rows.map(issueParser)
       }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -158,14 +169,8 @@ export default function useApi() {
       networkName: networkName.replaceAll(" ", "-")
     }).toString();
     return api
-      .get<IssueBigNumberData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] =>
-        (data.map(bounty => ({
-          ...bounty,
-          amount: BigNumber(bounty.amount),
-          fundingAmount: BigNumber(bounty.fundingAmount),
-          fundedAmount: BigNumber(bounty.fundedAmount)
-        }))))
+      .get<IssueData[]>(`/search/issues/recent/?${params}`)
+      .then(({ data }): IssueBigNumberData[] => (data.map(issueParser)))
       .catch((): IssueBigNumberData[] => ([]));
   }
 
@@ -175,25 +180,33 @@ export default function useApi() {
     owner = "",
     name = "",
     path = "",
-    networkName = DEFAULT_NETWORK_NAME
+    networkName = DEFAULT_NETWORK_NAME,
+    chainId = "",
+    includeIssues = ""
   }) {
-    const params = new URLSearchParams({
+    const params = {
       page,
       owner,
       name,
       path,
-      networkName
-    }).toString();
+      networkName,
+      chainId,
+      includeIssues
+    };
+
     return api
-      .get<{ rows; count: number; pages: number; currentPage: number }>(`/search/repositories?${params}`)
+      .get<{ rows; count: number; pages: number; currentPage: number }>("/search/repositories", { params })
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string | number, ghId: string | number, networkName = DEFAULT_NETWORK_NAME) {
+  async function getIssue(repoId: string | number,
+                          ghId: string | number,
+                          networkName = DEFAULT_NETWORK_NAME,
+                          chainId?: string | number) {
     return api
-      .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
-      .then(({ data }) => data)
+      .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`, { params: { chainId } })
+      .then(({ data }) => issueParser(data))
       .catch(() => null);
   }
 
@@ -224,7 +237,7 @@ export default function useApi() {
   /**
    * Ping the API to create an issue on Github, if succeed returns the CID (Repository ID on database + Issue ID on Github)
    * @param payload
-   * @param networkName 
+   * @param networkName
    * @returns string
    */
   async function createPreBounty(payload: CreateBounty, networkName = DEFAULT_NETWORK_NAME): Promise<string> {
@@ -249,9 +262,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function createPrePullRequest({ 
+  async function createPrePullRequest({
     networkName = DEFAULT_NETWORK_NAME,
-    ...rest 
+    ...rest
   } : CreatePrePullRequestParams) {
     return api
       .post("/pull-request/", { networkName, ...rest })
@@ -295,17 +308,19 @@ export default function useApi() {
   async function getTotalUsers(): Promise<number> {
     return api.get<number>("/search/users/total").then(({ data }) => data);
   }
-  
-  async function getTotalBounties(state = "", networkName = ""): Promise<number> {
+
+  async function getTotalBounties(networkName = "", state = ""): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return api.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
 
-  async function getTotalNetworks(creatorAddress = "",
-                                  isClosed = undefined,
-                                  isRegistered = undefined): Promise<number> {
+  async function getTotalNetworks(name = "",
+                                  creatorAddress = "",
+                                  isClosed = false,
+                                  isRegistered = true): Promise<number> {
     const search = new URLSearchParams({
       creatorAddress,
+      name,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
     }).toString();
@@ -331,8 +346,28 @@ export default function useApi() {
       });
   }
 
-  async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME) {
-    const search = new URLSearchParams({ networkName }).toString();
+  async function getReposWithBounties() {
+    const cache = new WinStorage("getReposWithBounties", 10000, "sessionStorage");
+
+    if (cache.value)
+      return cache.value;
+
+    return api
+      .get<ReposList>("/repos", {
+        params: {
+          withBounties: "true"
+        }
+      })
+      .then(({ data }) => {
+        cache.value = data;
+
+        return data;
+      })
+      .catch(() => []);
+  }
+
+  async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME, chainId?: string) {
+    const search = new URLSearchParams({ networkName, chainId }).toString();
 
     if (!force && repoList.length)
       return Promise.resolve(repoList as ReposList);
@@ -350,14 +385,42 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function processEvent(entity: Entities, 
-                              event: Events, 
-                              networkName: string = DEFAULT_NETWORK_NAME,
-                              params: PastEventsParams = {}) {
-    
-    return eventsApi.get(`/past-events/${entity}/${event}`, {
-      params: { ...params, networkName }
-    }).then(({ data }) => data?.[networkName]);
+  async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
+                              address?: string,
+                              params: PastEventsParams = {},
+                              currentNetworkName?: string) {
+    const chainId = state.connectedChain?.id;
+    const events = state.connectedChain?.events;
+    const registryAddress = state.connectedChain?.registry;
+    const networkAddress = state.Service?.network?.active?.networkAddress;
+
+    const isRegistryEvent = event in RegistryEvents;
+    const addressToSend = address || (isRegistryEvent ? registryAddress : networkAddress);
+
+    if (!events || !addressToSend || !chainId)
+      throw new Error("Missing events url, chain id or address");
+
+    const eventsURL = new URL(`/read/${chainId}/${addressToSend}/${event}`, state.connectedChain?.events);
+    const networkName = currentNetworkName || state.Service?.network?.active?.name;
+
+    return axios.get(eventsURL.href, {
+    params
+    })
+      .then(({ data }) => {
+        if (isRegistryEvent) return data;
+
+        const entries = data.flatMap(i => {
+          if (!Object.keys(i).length) return [];
+
+          const keys = Object.keys(i[networkName]);
+
+          if (!Object.keys(i).length) return [];
+
+          return keys.map(key => [key, i[networkName][key]]);
+        });
+
+        return Object.fromEntries(entries);
+      });
   }
 
   async function getHealth() {
@@ -440,7 +503,7 @@ export default function useApi() {
         throw error;
       });
   }
-  
+
   async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
     const isArray = Array.isArray(files);
@@ -478,6 +541,13 @@ export default function useApi() {
       .catch(() => ({} as User));
   }
 
+  async function getUserAll(address: string, login: string): Promise<User> {
+    return api
+      .post<User[]>("/search/users/all/", [address,login])
+      .then(({ data }) => data[0])
+      .catch(() => ({} as User));
+  }
+
   async function isNetworkOwner(creatorAddress, networkAddress) {
     const params = new URLSearchParams({
       creatorAddress,
@@ -495,12 +565,15 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork({ name, creator, isDefault } : GetNetworkProps) {
-    const Params = {} as Omit<GetNetworkProps, "isDefault"> & { isDefault: string };
-    
+  async function getNetwork({ name, creator, isDefault, address, byChainId, chainName } : GetNetworkProps) {
+    const Params = {} as Omit<GetNetworkProps, "isDefault" | "byChainId"> & { isDefault: string; byChainId: string; };
+
     if (name) Params.name = name;
     if (creator) Params.creator = creator;
     if (isDefault) Params.isDefault = isDefault.toString();
+    if (byChainId) Params.byChainId = byChainId.toString();
+    if (address) Params.address = address;
+    if (chainName) Params.chainName = chainName;
 
     const search = new URLSearchParams(Params).toString();
 
@@ -508,6 +581,7 @@ export default function useApi() {
       .get<Network>(`/network?${search}`)
       .then((response) => response)
       .catch((error) => {
+        console.log(`failed to get`, error)
         throw error;
       });
   }
@@ -524,21 +598,21 @@ export default function useApi() {
       });
   }
 
-  async function getTokens() {
+  async function getTokens(chainId?: string) {
     return api
-      .get<Token[]>(`/tokens`)
+      .get<Token[]>("/search/tokens", { params: {chainId} })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
       });
   }
-  
+
   async function getNetworkTokens({
-    networkName = DEFAULT_NETWORK_NAME
+    networkName = DEFAULT_NETWORK_NAME,
+    chainId = ""
   }) {
-    const params = new URLSearchParams({networkName}).toString();
     return api
-      .get<Token[]>(`/tokens?${params}`)
+      .get<Token[]>("/search/tokens", { params: {networkName, chainId}})
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -556,9 +630,11 @@ export default function useApi() {
     isClosed = undefined,
     isRegistered = undefined,
     isDefault = undefined,
-    isNeedCountsAndTokensLocked = undefined
+    isNeedCountsAndTokensLocked = undefined,
+    chainId = "",
+    chainShortName = ""
   }: SearchNetworkParams) {
-    const params = new URLSearchParams({
+    const params = {
       page,
       name,
       creatorAddress,
@@ -566,14 +642,15 @@ export default function useApi() {
       sortBy,
       order,
       search,
+      chainId,
+      chainShortName,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {}),
       ... (isDefault !== undefined && { isDefault: isDefault.toString() } || {}),
       ...((isNeedCountsAndTokensLocked !== undefined && {
         isNeedCountsAndTokensLocked: isNeedCountsAndTokensLocked.toString(),
-      }) ||
-        {}),
-    }).toString();
+      }) || {})
+    };
 
     return api
       .get<{
@@ -581,7 +658,7 @@ export default function useApi() {
         count: number;
         pages: number;
         currentPage: number;
-      }>(`/search/networks/?${params}`)
+      }>(`/search/networks`, { params })
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -592,13 +669,15 @@ export default function useApi() {
     sortBy = "updatedAt",
     order = "DESC",
     isClosed = undefined,
-    isRegistered = undefined
+    isRegistered = undefined,
+    name = ""
   }: SearchActiveNetworkParams) {
     const params = new URLSearchParams({
       page,
       creatorAddress,
       sortBy,
       order,
+      name,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
     }).toString();
@@ -626,7 +705,8 @@ export default function useApi() {
     isCurrentlyCurator = undefined,
     networkName = DEFAULT_NETWORK_NAME,
     sortBy = "updatedAt",
-    order = "DESC"
+    order = "DESC",
+    chainShortName
   }: SearchCuratorParams) {
     const params = new URLSearchParams({
       page,
@@ -634,6 +714,7 @@ export default function useApi() {
       networkName,
       sortBy,
       order,
+      chainShortName,
       ...(isCurrentlyCurator !== undefined && { isCurrentlyCurator: isCurrentlyCurator.toString()} || {})
     }).toString();
 
@@ -664,7 +745,7 @@ export default function useApi() {
       sortBy,
       order
     }).toString();
-    
+
     return api
       .get<{
         rows: LeaderBoard[];
@@ -676,8 +757,8 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function repositoryHasIssues(repoPath) {
-    const search = new URLSearchParams({ repoPath }).toString();
+  async function repositoryHasIssues(repoPath, networkName, chainId) {
+    const search = new URLSearchParams({ repoPath, networkName, chainId }).toString();
 
     return api
       .get<{ rows: IssueData[]; count: number }>(`/search/issues/?${search}`)
@@ -707,12 +788,108 @@ export default function useApi() {
       });
   }
 
+  async function updateChainRegistry(chain: SupportedChainData) {
+
+    const model: any = {
+      chainId: chain.chainId,
+      name: chain.chainName,
+      shortName: chain.chainShortName,
+      activeRPC: chain.chainRpc,
+      networkId: chain.chainId,
+      nativeCurrency: {
+        decimals: +chain.chainCurrencyDecimals,
+        name: chain.chainCurrencyName,
+        symbol: chain.chainCurrencySymbol
+      },
+      blockScanner: chain.blockScanner,
+      eventsApi: chain.eventsApi,
+      registryAddress: chain.registryAddress
+    }
+
+    return api.patch<{registryAddress?: string}>(`chains`, model)
+      .then(response =>
+        response.status === 200 &&
+        !!response.data?.registryAddress &&
+        !isZeroAddress(response.data?.registryAddress))
+      .catch((e) => {
+        console.log(`error patching registry`, e)
+        return false;
+      })
+  }
+
   async function saveNetworkRegistry(wallet: string, registryAddress: string) {
-    return api.post("/setup/registry", { wallet, registryAddress })
+    return api.post("setup/registry", { wallet, registryAddress })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
       });
+  }
+
+  async function getSupportedChains(force = false, query: Partial<SupportedChainData> = null) {
+    if (!force && state?.supportedChains?.length)
+      return Promise.resolve(state?.supportedChains);
+
+    const params = new URLSearchParams(query as any);
+
+    return api.get<{result: SupportedChainData[], error?: string; }>(`/chains`, {... query ? {params} : {}})
+      .then(({data}) => data)
+      .then(data => {
+        if (!data.error)
+          dispatch(updateSupportedChains(data.result));
+        else {
+          console.error(`failed to fetch supported chains`, data.error);
+        }
+        return data?.result;
+      })
+      .catch(e => {
+        console.error(`failed to fetch supported chains`, e);
+        return [];
+      })
+  }
+
+  async function addSupportedChain(chain) {
+    chain.loading = true;
+    return api.post(`chains`, chain)
+      .then(({status}) => status === 200)
+      .catch(e => {
+        console.error(`failed to addSupportedChain`, e);
+        return false;
+      })
+      .finally(() => {
+        chain.loading = false;
+        getSupportedChains(true);
+      })
+  }
+
+  async function deleteSupportedChain(chain) {
+    chain.loading = true;
+
+    return api.delete(`chains?id=${chain.chainId}`)
+      .then(({status}) => {
+        dispatch(status === 200 ? toastSuccess('deleted chain') : toastError('failed to delete'));
+        return status === 200
+      })
+      .catch(e => {
+        console.error(`failed to addSupportedChain`, e);
+        return false;
+      })
+      .finally(() => {
+        chain.loading = false;
+        getSupportedChains(true);
+      })
+  }
+
+  async function patchSupportedChain(chain, patch: Partial<SupportedChainData>) {
+    return api.patch(`chains`, {...chain, ...patch})
+      .then(({status}) => status === 200)
+      .catch(e => {
+        console.error(`failed to patchSupportedChain`, e);
+        return false;
+      })
+      .finally(() => {
+        chain.loading = false;
+        getSupportedChains(true);
+      })
   }
 
   async function getKycSession(asNewSession = false){
@@ -740,6 +917,7 @@ export default function useApi() {
   }
 
   return {
+    getSupportedChains,
     createIssue,
     updateIssue,
     createNetwork,
@@ -759,6 +937,7 @@ export default function useApi() {
     getTotalUsers,
     getTotalBounties,
     getTotalNetworks,
+    getUserAll,
     getUserOf,
     getUserPullRequests,
     getUserWith,
@@ -788,7 +967,12 @@ export default function useApi() {
     getNetworkTokens,
     createNFT,
     saveNetworkRegistry,
+    addSupportedChain,
+    deleteSupportedChain,
+    updateChainRegistry,
+    patchSupportedChain,
     getKycSession,
-    validateKycSession
+    validateKycSession,
+    getReposWithBounties
   };
 }

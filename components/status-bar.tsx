@@ -63,11 +63,11 @@ export default function StatusBar() {
 
   return (
     <div
-      className={`position-fixed bg-shadow bottom-0 w-100 px-3 py-0 d-flex border-disabled 
+      className={`position-fixed bg-gray-950 bottom-0 w-100 px-3 py-0 d-flex border-gray-850 
         border-top d-flex flex-row align-items-center`}
       id="status-bar"
     >
-      <div className="border-disabled-right">
+      <div className="border-gray-850-right">
         {renderNetworkStatus()}
       </div>
 

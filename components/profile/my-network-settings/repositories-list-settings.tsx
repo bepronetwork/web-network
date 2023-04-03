@@ -1,4 +1,4 @@
-import { Row } from "react-bootstrap";
+import { FormCheck, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
@@ -10,8 +10,13 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 export default function RepositoriesListSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
-  const { fields, github } = useNetworkSettings();
+
   const { state } = useAppState();
+  const { fields, github } = useNetworkSettings();
+
+  function changeAllowMergeCheckbox(ele) {
+    fields.allowMerge.setter(ele?.target?.checked);
+  }
 
   return (
     <Row className="mt-4">
@@ -27,6 +32,18 @@ export default function RepositoriesListSettings() {
           botUser={state.Settings?.github?.botUser}
         />
       )}
+
+      <div className="d-flex align-items-center p-small text-white">
+        <FormCheck
+            className="form-control-lg px-0 pb-0 mr-1"
+            type="checkbox"
+            onChange={changeAllowMergeCheckbox}
+            checked={github?.allowMerge}
+          />
+        <span>
+          {t("custom-network:allow-merge")}
+        </span>
+      </div>
     </Row>
   );
 }

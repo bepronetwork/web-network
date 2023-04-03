@@ -28,6 +28,8 @@ interface TokensDropdownProps {
   needsBalance?: boolean;
   showCurrencyValue?: boolean;
   token?: Token;
+  noLabel?: boolean;
+  selectOptionName?: 'symbol' | 'name'
 }
 
 interface Option {
@@ -47,7 +49,9 @@ export default function TokensDropdown({
   disabled = false,
   token,
   showCurrencyValue = true,
-  needsBalance
+  needsBalance,
+  noLabel,
+  selectOptionName = 'symbol'
 }: TokensDropdownProps) {
   const { t } = useTranslation("common");
 
@@ -63,7 +67,7 @@ export default function TokensDropdown({
       : undefined;
 
   const tokenToOption = (token: Token): Option => ({
-    label: `${token?.tokenInfo ? token.tokenInfo.name : token.symbol}`,
+    label: `${token?.tokenInfo ? (token?.tokenInfo?.name || token?.name) : token.symbol}`,
     value: token,
   });
 
@@ -105,9 +109,9 @@ export default function TokensDropdown({
 
   useEffect(() => {
     if (!tokens?.length) return;
-    if (needsBalance) getBalanceTokens();
+    if (needsBalance && state.connectedChain?.matchWithNetworkChain) getBalanceTokens();
     else setOptions(tokens.map(tokenToOption));
-  }, [tokens]);
+  }, [tokens, state.connectedChain?.matchWithNetworkChain]);
 
   useEffect(() => {
     if(!!option || !options?.length) return;
@@ -121,8 +125,7 @@ export default function TokensDropdown({
   }, [token, options, defaultToken]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
-    const { name, symbol, address, currentValue, tokenInfo } = data.value;
-
+    const { currentValue, symbol ,address, tokenInfo, name } = data.value;
     return (
       <div
         ref={innerRef}
@@ -144,7 +147,7 @@ export default function TokensDropdown({
               />
             )}
             <span className={`${tokenInfo ? null : "mx-2"}`}>
-              {tokenInfo ? tokenInfo.name : name}
+              {tokenInfo && selectOptionName === 'name' ? (tokenInfo?.name || name) : symbol}
             </span>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
               { showCurrencyValue && 
@@ -183,7 +186,7 @@ export default function TokensDropdown({
                 />
               )}
               <span className={`${data.tokenInfo ? "mt-1" : "mx-2"}`}>
-                {data.tokenInfo ? data.tokenInfo.name : data.name}
+                {data.tokenInfo && selectOptionName === 'name' ? (data?.tokenInfo?.name || data?.name) : symbol}
               </span>
           </div>
         <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
@@ -196,7 +199,7 @@ export default function TokensDropdown({
     
   return (
     <div className="form-group">
-      <label className="caption-small mb-2">{label || t("misc.token")}</label>
+      {!noLabel && <label className="caption-small mb-2">{label || t("misc.token")}</label>}
       <Creatable
         className="react-select-container"
         classNamePrefix="react-select"

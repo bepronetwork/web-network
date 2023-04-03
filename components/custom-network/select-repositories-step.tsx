@@ -6,17 +6,16 @@ import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
+import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 
 import {StepWrapperProps} from "interfaces/stepper";
-
-import {useAppState} from "../../contexts/app-state";
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");
 
   const {state} = useAppState();
-  const { github, fields } = useNetworkSettings();
+  const { details, github, fields } = useNetworkSettings();
 
   function handleRepositoryCheck(fullName: string) {
     fields.repository.setter(fullName);
@@ -24,6 +23,10 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
 
   function handlePermissonCheck(e) {
     fields.permission.setter(e.target.checked);
+  }
+
+  function changeAllowMergeCheckbox(ele) {
+    fields.allowMerge.setter(ele?.target?.checked);
   }
 
   return (
@@ -36,7 +39,12 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
     >
       {(state.currentUser?.login && (
         <div>
-          <RepositoriesList repositories={github.repositories} onClick={handleRepositoryCheck} />
+          <RepositoriesList
+            repositories={github.repositories}
+            networkName={details?.name?.value}
+            networkCreator={state.currentUser?.walletAddress}
+            onClick={handleRepositoryCheck}
+          />
 
           <span className="caption-small text-gray px-0 mt-3">
             {state.Settings?.github?.botUser}
@@ -57,6 +65,18 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
           <p className="p-small text-gray-70 px-0">
             {t("steps.repositories.you-need-to-accept")}
           </p>
+
+          <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
+            <FormCheck
+                className="form-control-lg px-0 pb-0 mr-1"
+                type="checkbox"
+                onChange={changeAllowMergeCheckbox}
+                checked={github?.allowMerge}
+              />
+            <span>
+              {t("allow-merge")}
+            </span>
+          </div>
         </div>
       )) || (
         <div className="pt-3">

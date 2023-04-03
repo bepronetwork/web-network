@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react";
+import {ReactElement, ReactNode} from "react";
 
 export interface TabbedNavigationItem {
   eventKey: string;
@@ -10,6 +10,7 @@ export interface TabbedNavigationItem {
 
 export interface TabbedNavigationProps {
   className?: string;
+  forceActiveKey?: string;
   collapsable?: boolean;
   tabs: TabbedNavigationItem[];
   defaultActiveKey?: string;

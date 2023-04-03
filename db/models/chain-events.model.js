@@ -13,9 +13,11 @@ class ChainEvents extends Model {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
       },
       lastBlock: {
+        type: DataTypes.INTEGER
+      },
+      chain_id: {
         type: DataTypes.INTEGER
       },
       createdAt: {

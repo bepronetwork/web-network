@@ -6,13 +6,19 @@ export default function NetworkListBarColumn({
   isColumnActive,
   columnOrder = "asc",
   label,
-  onClick
+  onClick,
+  col = 3,
+  className,
+  labelWhite = false
 }: {
   hideOrder: boolean;
   isColumnActive: boolean;
   columnOrder: string;
   label: string;
-  onClick: () => void
+  onClick?: () => void;
+  col?: number;
+  className?: string;
+  labelWhite?: boolean;
 }) {
   const textClass = hideOrder
     ? "text-primary"
@@ -26,12 +32,12 @@ export default function NetworkListBarColumn({
 
   return (
     <div
-      className={`col-3 d-flex flex-row justify-content-center cursor-pointer align-items-center ${
+      className={`col-${col} d-flex flex-row justify-content-start cursor-pointer align-items-center ${
         isColumnActive ? "text-primary" : textClass
-      }`}
+      } ${className && className}`}
       onClick={onClick}
     >
-      <span className="caption-medium mr-1">{label}</span>
+      <span className={`${labelWhite ? 'text-white-30' : 'caption-medium'} mr-1`}>{label}</span>
       {(!hideOrder && ArrowComponent) || <></>}
     </div>
   );

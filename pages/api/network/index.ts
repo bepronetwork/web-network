@@ -1,31 +1,40 @@
-import {withCors} from "middleware";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import {Octokit} from "octokit";
-import Sequelize, {Op} from "sequelize";
+import {Op, Sequelize} from "sequelize";
 
 import Database from "db/models";
 
+import {chainFromHeader} from "helpers/chain-from-header";
+import {WANT_TO_CREATE_NETWORK} from "helpers/constants";
+import decodeMessage from "helpers/decode-message";
 import {handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
+import {isAdmin} from "helpers/is-admin";
+import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
+
+import {withCors} from "middleware";
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
 
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 import {Logger} from 'services/logging';
 
-import {UNAUTHORIZED} from "../../../helpers/error-messages";
-import {LogAccess} from "../../../middleware/log-access";
-
 const {serverRuntimeConfig} = getConfig();
 
+const isTrue = (value: string) => value === "true";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName, creator: creatorAddress, isDefault } = req.query;
+  const { name: networkName, creator: creatorAddress, isDefault, address, byChainId, chainName } = req.query;
+
+  const chain = await chainFromHeader(req);
 
   const where = {
+    ... isTrue(byChainId?.toString()) && chain ? { chain_id: { [Op.eq]: +chain?.chainId } } : {},
     ... networkName && {
       name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        [Op.iLike]: String(networkName)
       }
     } || {},
     ... creatorAddress && {
@@ -34,7 +43,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       }
     } || {},
     ... isDefault && {
-      isDefault: isDefault === "true"
+      isDefault: isTrue(isDefault.toString())
+    } || {},
+    ... address && {
+      networkAddress: { [Op.iLike]: String(address) },
     } || {}
   };
 
@@ -42,12 +54,25 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     attributes: { exclude: ["creatorAddress", "updatedAt"] },
     include: [
       { association: "tokens" },
-      { association: "curators" }
+      { association: "curators" },
+      { association: "networkToken" },
+      { 
+        association: "chain",
+        ... chainName ? {
+          where: {
+            chainShortName: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("chain.chainShortName")), 
+                                            "=",
+                                            chainName.toString().toLowerCase())
+          }
+        } : {},
+        required: !!chainName
+      },
     ],
     where
   });
   
-  if (!network) return res.status(404);
+  if (!network)
+    return res.status(200).json({});
 
   return res.status(200).json(network);
 }
@@ -67,23 +92,50 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       githubLogin,
       allowedTokens,
       networkAddress,
-      isDefault
+      isDefault,
+      signedMessage,
+      allowMerge = true,
     } = req.body;
+   
+    const name = _name.replaceAll(" ", "-").toLowerCase();
+    
+    if (!botPermission) return resJsonMessage("Bepro-bot authorization needed", res, 403);
+    
+    const chain = await chainFromHeader(req);
 
-    const name = _name?.replaceAll(" ", "-")?.toLowerCase()
+    const validateSignature = (assumedOwner: string) => 
+      decodeMessage(chain.chainId, WANT_TO_CREATE_NETWORK, signedMessage, assumedOwner);
 
-    if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
+    if (!validateSignature(creator))
+      return resJsonMessage("Invalid signature", res, 403);
 
     const hasNetwork = await Database.network.findOne({
       where: {
         creatorAddress: creator,
+        chain_id: +chain?.chainId,
         isClosed: false,
       }
     });
 
-    if(hasNetwork) {
-      return res.status(409).json("Already exists a network created for this wallet");
+    if (hasNetwork) {
+      return resJsonMessage("Already exists a network created for this wallet", res, 409);
     }
+
+    const sameNameOnOtherChain = await Database.network.findOne({
+      where: {
+        isClosed: false,
+        chain_id: {
+          [Op.not]: +chain?.chainId
+        },
+        name: {
+          [Op.iLike]: name
+        }
+      }
+    });
+
+    if (sameNameOnOtherChain)
+      if (!validateSignature(sameNameOnOtherChain.creatorAddress))
+        return resJsonMessage("Network name owned by other wallet", res, 403);
 
     const settings = await Database.settings.findAll({
       where: { visibility: "public" },
@@ -92,33 +144,32 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const publicSettings = (new Settings(settings)).raw();
 
-    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
-    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
-    if (isDefault && creator !== publicSettings?.defaultNetworkConfig?.adminWallet)
-      return res.status(401).json({message: UNAUTHORIZED});
-
     const defaultNetwork = await Database.network.findOne({
         where: {
-          isDefault: true
+          isDefault: true,
+          isClosed: false,
+          chain_id: +chain?.chainId,
         }
     });
-    
+
     if (isDefault && defaultNetwork)
-      return res.status(409).json("Default Network already saved");
+      return resJsonMessage("Default Network already saved", res, 409);
 
     // Contract Validations
     const DAOService = new DAO({ 
       skipWindowAssignment: true,
-      web3Host: publicSettings.urls.web3Provider,
-      registryAddress: publicSettings.contracts.networkRegistry
+      web3Host: chain.chainRpc,
+      registryAddress: chain.registryAddress,
     });
 
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    if (!await DAOService.start())
+      return resJsonMessage("Failed to connect with chain", res, 400);
     
-    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
+    if (!await DAOService.loadRegistry())
+      return resJsonMessage("Failed to load registry", res, 400);
 
     if (await DAOService.hasNetworkRegistered(creator))
-      return res.status(403).json("Already exists a network registered for this wallet");
+      return resJsonMessage("Already exists a network registered for this wallet", res, 403);
 
     // Uploading logos to IPFS
     let fullLogoHash = null
@@ -145,7 +196,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       logoIcon: logoIconHash,
       fullLogo: fullLogoHash,
       networkAddress,
-      isDefault: isDefault || false
+      isDefault: isDefault || false,
+      chain_id: +chain?.chainId,
+      allowMerge
     });
 
     const repos = JSON.parse(repositories);
@@ -157,8 +210,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
-    if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
-    if (!serverRuntimeConfig?.github?.token) return res.status(500).json("Missing github bot token");
+    if (!publicSettings?.github?.botUser) return resJsonMessage("Missing github bot user", res, 500);
+    if (!serverRuntimeConfig?.github?.token) return resJsonMessage("Missing github bot token", res, 500);
 
     const octokitUser = new Octokit({
       auth: accessToken
@@ -233,34 +286,39 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       networkAddress,
       repositoriesToAdd,
       repositoriesToRemove,
-      allowedTokens
+      allowedTokens,
+      allowMerge
     } = req.body;
 
-    const isAdminOverriding = !!override;
-
-    if (!accessToken && !isAdminOverriding) return res.status(401).json({message: "Unauthorized user"});
+    const isAdminOverriding = isAdmin(req) && !!override;
     
+    if (!accessToken && !isAdminOverriding) return resJsonMessage("Unauthorized user", res, 401);
+
+    const chain = await chainFromHeader(req);
+
     const network = await Database.network.findOne({
       where: {
-        ...(isAdminOverriding ? {} : { 
-          creatorAddress: 
-            Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("creatorAddress")), "=", creator.toLowerCase()) 
+        ...(isAdminOverriding ? {} : {
+          creatorAddress: {[Op.iLike]: creator}
         }),
-        networkAddress
+        networkAddress: {
+          [Op.iLike]: networkAddress
+        },
+        chain_id: chain.chainId
       },
       include: [{ association: "repositories" }]
     });
 
-    if (!network) return res.status(404).json("Invalid network");
+    if (!network) return resJsonMessage("Invalid network", res, 404);
     if (network.isClosed && !isAdminOverriding)
-      return res.status(404).json("Invalid network");
+      return resJsonMessage("Invalid network", res, 404);
 
     if (isClosed !== undefined) {
       network.isClosed = isClosed;
 
       await network.save();
 
-      return res.status(200).json("Network closed");
+      return resJsonMessage("Network closed", res, 200);
     }
 
     const settings = await Database.settings.findAll({
@@ -270,28 +328,31 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const publicSettings = (new Settings(settings)).raw();
 
-    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
-    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+    if (!chain.chainRpc)
+      return resJsonMessage("Missing chainRpc", res, 400);
+
+    if (!chain.registryAddress)
+      return resJsonMessage("Missing registryAddress", res, 400);
 
     // Contract Validations
     const DAOService = new DAO({ 
       skipWindowAssignment: true,
-      web3Host: publicSettings.urls.web3Provider,
-      registryAddress: publicSettings.contracts.networkRegistry
+      web3Host: chain.chainRpc,
+      registryAddress: chain.registryAddress,
     });
 
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");
+    if (!await DAOService.start()) return resJsonMessage("Failed to connect with chain", res, 500);
+    if (!await DAOService.loadRegistry()) return resJsonMessage("Failed to load registry contract", res, 500);
 
     if (!isAdminOverriding) {
       const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
-
-      if (checkingNetworkAddress !== networkAddress)
-        return res.status(403).json("Creator and network addresses do not match");
+      
+      if (checkingNetworkAddress?.toLowerCase() !== networkAddress?.toLowerCase())
+        return resJsonMessage("Creator and network addresses do not match", res, 403);
     } else {
       const isRegistryGovernor = await DAOService.isRegistryGovernor(creator);
 
-      if (!isRegistryGovernor) return res.status(403).json({message: UNAUTHORIZED});
+      if (!isRegistryGovernor) return resJsonMessage("Unauthorized", res, 403);
     }
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
@@ -301,13 +362,27 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const exists = await Database.repositories.findOne({
           where: {
             githubPath: { [Op.iLike]: String(repository.fullName) }
-          }
+          },
+          include: [
+            {
+              association: "network",
+              where: {
+                [Op.or]: [
+                  {
+                    name: { [Op.not]: network.name }
+                  },
+                  {
+                    name: network.name,
+                    creatorAddress: { [Op.not]: network.creatorAddress }
+                  }
+                ]
+              }
+            }
+          ]
         });
 
         if (exists)
-          return res
-            .status(403)
-            .json(`Repository ${repository.fullName} is already in use by another network `);
+          return resJsonMessage(`Repository ${repository.fullName} is already in use by another network `, res, 403);
       }
 
     const removingRepos = repositoriesToRemove
@@ -322,7 +397,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           }
         });
 
-        if (!exists) return res.status(404).json("Invalid repository");
+        if (!exists) return resJsonMessage("Invalid repository", res, 404);
 
         const hasIssues = await Database.issue.findOne({
           where: {
@@ -331,9 +406,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         });
 
         if (hasIssues)
-          return res
-            .status(403)
-            .json(`Repository ${repository.fullName} already has bounties and cannot be removed`);
+          return resJsonMessage(`Repository ${repository.fullName} already has bounties and cannot be removed`, 
+                                res,
+                                403);
       }
 
     if (isAdminOverriding && name) network.name = name;
@@ -357,6 +432,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
+    if (allowMerge !== undefined && allowMerge !== network.allowMerge)
+      network.allowMerge = allowMerge;
+
     network.save();
 
     if (addingRepos.length && !isAdminOverriding) {
@@ -365,8 +443,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       });
 
       const invitations = [];
-  
-      if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
+
+      if (!publicSettings?.github?.botUser) return resJsonMessage("Missing github bot user", res, 500);
 
       for (const repository of addingRepos) {
         const [owner, repo] = repository.fullName.split("/");
@@ -445,7 +523,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         if (exists) await exists.destroy();
       }
 
-    return res.status(200).json("Network updated");
+    return resJsonMessage("Network updated", res, 200);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
@@ -474,4 +552,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`Network`);
-export default LogAccess(withCors(handler));
+export default LogAccess(withCors(WithValidChainId(handler)));

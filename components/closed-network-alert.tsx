@@ -1,7 +1,13 @@
 import { useTranslation } from "next-i18next";
 
-export default function ClosedNetworkAlert() {
+interface ClosedNetworkAlertProps {
+  isVisible?: boolean;
+}
+
+export default function ClosedNetworkAlert({ isVisible } : ClosedNetworkAlertProps) {
   const { t } = useTranslation("common");
+
+  if (!isVisible) return <></>;
 
   return (
     <div className="bg-shadow">

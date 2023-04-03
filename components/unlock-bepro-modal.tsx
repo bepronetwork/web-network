@@ -5,20 +5,21 @@ import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
-import Button from "components/button";
+import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
 
+import {useAppState} from "contexts/app-state";
+
 import {formatStringToCurrency} from "helpers/formatNumber";
 
+import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
-
-import {useAppState} from "../contexts/app-state";
 
 export default function UnlockBeproModal({
   show = false,
@@ -71,10 +72,8 @@ export default function UnlockBeproModal({
   }
 
   function handleProcessEvent(blockNumber) {
-    processEvent("oracles",
-                 "changed",
-                 state.Service?.network?.lastVisited,
-      { fromBlock: blockNumber }).catch(console.debug);
+    processEvent(NetworkEvents.OraclesChanged, undefined, { fromBlock: blockNumber })
+      .catch(console.debug);
   }
 
   function handleUnlock() {
@@ -178,7 +177,7 @@ export default function UnlockBeproModal({
         </div>
 
         <div className="d-flex pt-2 justify-content-center">
-          <Button
+          <ContractButton
             className="mr-2"
             disabled={isButtonDisabled}
             onClick={handleUnlock}
@@ -192,7 +191,7 @@ export default function UnlockBeproModal({
                 formatStringToCurrency(amountToUnlock?.toFixed())}{" "}
               {t("$bepro")}
             </span>
-          </Button>
+          </ContractButton>
         </div>
       </div>
 

@@ -6,19 +6,19 @@ import Link from "next/link";
 import ArrowRight from "assets/icons/arrow-right";
 import CloseIcon from "assets/icons/close-icon";
 
+import Button from "components/button";
+
+import {useAppState} from "contexts/app-state";
+
 import {formatNumberToNScale} from "helpers/formatNumber";
 
-
-import useNetworkTheme from "x-hooks/use-network-theme";
-
-import {useAppState} from "../contexts/app-state";
-import Button from "./button";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function CardBecomeCouncil() {
   const { t } = useTranslation("council");
   const [show, setShow] = useState<boolean>(true);
   const {state} = useAppState();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
 
   if (!show) return null;
 
@@ -40,7 +40,7 @@ export default function CardBecomeCouncil() {
           {formatNumberToNScale(+state.Service?.network?.amounts?.councilAmount)}
         </span>{" "}
         <span className="text-primary">
-          {state.Service?.network?.networkToken?.symbol}
+          {state.Service?.network?.active?.networkToken?.symbol}
         </span>{" "}
         {t("become-council-description-part-two")}
       </div>

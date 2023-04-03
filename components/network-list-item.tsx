@@ -1,32 +1,38 @@
 import BigNumber from "bignumber.js";
 
+import ChainBadge from "components/chain-badge";
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {Network} from "interfaces/network";
 
-import {useAppState} from "../contexts/app-state";
-
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
-  handleRedirect: (networkName: string) => void;
+  handleRedirect: (networkName: string, chainName: string) => void;
 }
 
 export default function NetworkListItem({
-                                          network,
-                                          tokenSymbolDefault,
+  network,
+  tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
-  const {state: {Settings: settings}} = useAppState();
+  const { state: { supportedChains, Settings: settings } } = useAppState();
 
   const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
   const isNotUndefined = value => value !== undefined;
 
   function onClick() {
-    handleRedirect(network?.name);
+    const chainName = 
+      supportedChains?.
+        find(({ chainId }) => +chainId === +network?.chain_id)?.chainShortName?.
+        toLowerCase();
+
+    handleRedirect(network?.name, chainName);
   }
 
   return (
@@ -40,6 +46,8 @@ export default function NetworkListItem({
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
+
+          <ChainBadge chain={network?.chain} />
 
           {(network?.isClosed && <PullRequestLabels label="closed" />) || ""}
         </div>
@@ -57,7 +65,7 @@ export default function NetworkListItem({
         </span>
       </div>
 
-      <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
+      <div className="col-2 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white ml-3">
         {isNotUndefined(network?.tokensLocked) ? (
             formatNumberToNScale(BigNumber(network?.tokensLocked || 0).toFixed())
@@ -65,10 +73,10 @@ export default function NetworkListItem({
             <Spinner />
           )}
         </span>
+      </div>
 
-        <span
-          className="caption-medium mr-2 text-blue"
-        >
+      <div className="col-1 d-flex flex-row align-items-center justify-content-start">
+        <span className="caption-medium mr-2 text-blue">
           {network?.networkToken?.symbol || tokenSymbolDefault}
         </span>
       </div>

@@ -2,44 +2,39 @@ import {useState} from "react";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
-import {useRouter} from "next/router";
 
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
-import Avatar from "components/avatar";
+import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
-import Identicon from "components/identicon";
 
 import {useAppState} from "contexts/app-state";
 
 import {truncateAddress} from "helpers/truncate-address";
 
+import { ProfilePages } from "interfaces/utils";
+
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
-
 export default function NavAvatar() {
   const { t } = useTranslation("common");
-  const router = useRouter();
 
   const [visible, setVisible] = useState(false);
 
   const {state} = useAppState();
 
-  const { getURLWithNetwork } = useNetwork();
+  const { goToProfilePage } = useNetwork();
   const { disconnectWallet } = useAuthentication();
 
-  const avatar = () => state.currentUser?.login &&
-    <Avatar userLogin={state.currentUser.login} className="border-primary" size="md" /> ||
-    <Identicon address={state.currentUser?.walletAddress} />;
-  
-  const username = 
+  const username =
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
-  function handleInternalLinkClick(href) {
+  function handleInternalLinkClick(profilePage: ProfilePages) {
     setVisible(false);
-    router.push(href);
+
+    goToProfilePage(profilePage);
   }
 
   function handleDisconnectWallet() {
@@ -47,9 +42,7 @@ export default function NavAvatar() {
     setVisible(false);
   }
 
-  const Link = (label, href) => ({ label, href });
-
-  const ProfileInternalLink = ({ label, href, className = "" }) => 
+  const ProfileInternalLink = ({ label, href, className = "" }) =>
     <Button
       className={`mb-1 p family-Regular p-0 text-capitalize font-weight-normal mx-0 ${className}`}
       align="left"
@@ -62,9 +55,9 @@ export default function NavAvatar() {
 
   const ProfileExternalLink = ({ label, href, className = "" }) => (
     <div className={`d-flex flex-row align-items-center justify-content-between ${className}`} key={label}>
-      <a 
-        href={href} 
-        className={`text-decoration-none p family-Regular ${ className || "text-gray"}`} 
+      <a
+        href={href}
+        className={`text-decoration-none p family-Regular ${ className || "text-gray"}`}
         target="_blank"
       >
           {label}
@@ -74,8 +67,8 @@ export default function NavAvatar() {
   );
 
   const DisconnectWallet = ({ onClick }) => (
-    <div 
-      className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger" 
+    <div
+      className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger"
       onClick={onClick}
     >
       <span className="p family-Regular">{t("main-nav.nav-avatar.disconnect-wallet")}</span>
@@ -91,22 +84,17 @@ export default function NavAvatar() {
     </div>
   );
 
-  const internalLinks = [
-    Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.oracles"),
-         getURLWithNetwork("/profile/bepro-votes")),
-    Link(t("main-nav.nav-avatar.payments"),
-         getURLWithNetwork("/profile/payments")),
-    Link(t("main-nav.nav-avatar.bounties"),
-         getURLWithNetwork("/profile/bounties")),
-    Link(t("main-nav.nav-avatar.pull-requests"),
-         getURLWithNetwork("/profile/pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"),
-         getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.my-network"),
-         getURLWithNetwork("/profile/my-network")),
-  ];
+  const Link = (label, href) => ({ label, href });
 
+  const internalLinks = [
+    Link(t("main-nav.nav-avatar.wallet"), "wallet"),
+    Link(t("main-nav.nav-avatar.voting-power"), "voting-power"),
+    Link(t("main-nav.nav-avatar.payments"), "payments"),
+    Link(t("main-nav.nav-avatar.bounties"), "bounties"),
+    Link(t("main-nav.nav-avatar.pull-requests"), "pull-requests"),
+    Link(t("main-nav.nav-avatar.proposals"), "proposals"),
+    Link(t("main-nav.nav-avatar.my-network"), "my-network"),
+  ];
 
   const externalLinks = [
     Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
@@ -120,7 +108,11 @@ export default function NavAvatar() {
       <Popover.Body className="bg-shadow pt-3 px-4">
         <div className="row align-items-center border-bottom border-light-gray pb-2">
           <div className="col-3 px-0">
-            {avatar()}
+            <AvatarOrIdenticon
+              user={state.currentUser?.login}
+              address={state.currentUser?.walletAddress}
+              size="md"
+            />
           </div>
 
           <div className="col-9 p-0">
@@ -131,9 +123,9 @@ export default function NavAvatar() {
               </div>
 
               <div className="d-flex flex-row justify-content-left">
-                <ProfileInternalLink 
-                  href={getURLWithNetwork("/profile")} 
-                  label={t("main-nav.nav-avatar.view-profile")} 
+                <ProfileInternalLink
+                  href="profile"
+                  label={t("main-nav.nav-avatar.view-profile")}
                   className="text-gray p family-Regular"
                 />
               </div>
@@ -149,10 +141,10 @@ export default function NavAvatar() {
         </LinksSession>
 
         <LinksSession>
-          <ProfileExternalLink 
+          <ProfileExternalLink
             label={t("main-nav.nav-avatar.web-network-1")}
-            href="https://v1.bepro.network/" 
-            className="text-primary" 
+            href="https://v1.bepro.network/"
+            className="text-primary"
           />
         </LinksSession>
 
@@ -173,8 +165,12 @@ export default function NavAvatar() {
         onToggle={(next) => setVisible(next)}
         overlay={overlay}
       >
-        <div>
-          {avatar()} 
+        <div className="d-flex flex-column align-items-center justify-content-center">
+          <AvatarOrIdenticon
+            user={state.currentUser?.login}
+            address={state.currentUser?.walletAddress}
+            size="md"
+          />
         </div>
       </OverlayTrigger>
     </div>

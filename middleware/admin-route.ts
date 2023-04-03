@@ -22,9 +22,6 @@ export const AdminRoute = (handler: NextApiHandler, methods: string[] = [`POST`,
     const wallet = (headers.wallet as string)?.toLowerCase();
     const chainId = (headers.chain as string);
 
-    if (!chainId)
-      return res.status(401).json({message: MISSING_CHAIN_ID})
-
     if (!wallet || wallet !== adminWallet)
       return res.status(401).json({message: NOT_ADMIN_WALLET});
 

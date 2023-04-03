@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 
 class Benefactors extends Model {
@@ -17,6 +18,9 @@ class Benefactors extends Model {
         address: {
           type: DataTypes.STRING,
           allowNull: false,
+          get() {
+            return getValueToLowerCase(this, "address");
+          }
         },
         contractId: {
           type: DataTypes.INTEGER,
@@ -29,6 +33,10 @@ class Benefactors extends Model {
             model: "issue",
             key: "id"
           }
+        },
+        withdrawn: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
         }
       },
       {

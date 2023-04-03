@@ -4,25 +4,38 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import paginate, {calculateTotalPages} from "helpers/paginate";
-import {LogAccess} from "../../../../middleware/log-access";
-import WithCors from "../../../../middleware/withCors";
+import {resJsonMessage} from "helpers/res-json-message";
+
+import {LogAccess} from "middleware/log-access";
+import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
+
+import {error} from "services/logging";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, isCurrentlyCurator, networkName, page } = req.query || {};
+    const { address, isCurrentlyCurator, networkName, page, chainShortName } = req.query || {};
 
     if (networkName) {
       const network = await models.network.findOne({
         where: {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-          },
+          }
         },
+        include: [
+          { 
+            association: "chain",
+            where: {
+              chainShortName: chainShortName
+            }
+          }
+        ]
       });
 
-      if (!network) return res.status(404).json("Invalid network");
+      if (!network) return resJsonMessage("Invalid network", res, 404);
 
       whereCondition.networkId = network?.id;
     }
@@ -44,10 +57,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
         return Promise.all(items.rows.map(async (item) => {
-          const disputes = await models.dispute.count({
+          item.dataValues.disputes =
+            await models.dispute.count({
               where: { address: item.address },
-          });
-          item.dataValues.disputes = disputes;
+            });
           return item;
         }))
           .then((values) => ({ count: items.count, rows: values }))
@@ -60,7 +73,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pages: calculateTotalPages(curators.count),
     });
   } catch (e) {
-    console.error(e);
+    error(e)
     return res.status(500);
   }
 }
@@ -77,4 +90,4 @@ async function SearchCurators(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(SearchCurators));
+export default LogAccess(WithCors(WithValidChainId(SearchCurators)));

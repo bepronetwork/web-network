@@ -1,4 +1,5 @@
 "use strict";
+const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
 class MergeProposal extends Model {
   /**
@@ -12,7 +13,12 @@ class MergeProposal extends Model {
         pullRequestId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
         contractId: DataTypes.INTEGER,
-        creator: DataTypes.STRING,
+        creator: {
+          type: DataTypes.STRING,
+          get() {
+            return getValueToLowerCase(this, "creator");
+          }
+        },
         network_id: DataTypes.INTEGER,
         contractCreationDate: {
           type: DataTypes.STRING(255),
@@ -31,13 +37,13 @@ class MergeProposal extends Model {
           type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false
-        },
+        }
     },
-               {
-        sequelize,
-        modelName: "mergeProposal",
-        tableName: "merge_proposals"
-               });
+    {
+      sequelize,
+      modelName: "mergeProposal",
+      tableName: "merge_proposals"
+    });
   }
 
   static associate(models) {
@@ -46,6 +52,12 @@ class MergeProposal extends Model {
       foreignKey: "proposalId",
       sourceKey: "id",
       as: "distributions"
+    });
+
+    this.hasMany(models.dispute, {
+      foreignKey: "proposalId",
+      sourceKey: "id",
+      as: "disputes"
     });
 
     this.belongsTo(models.issue, {

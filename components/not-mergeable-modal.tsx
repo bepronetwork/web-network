@@ -3,13 +3,13 @@ import {useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
 import {useAppState} from "contexts/app-state";
 import {addToast} from "contexts/reducers/change-toaster";
 
-import {ProposalExtended} from "interfaces/bounty";
 import {pullRequest} from "interfaces/issue-data";
 import {Proposal} from "interfaces/proposal";
 
@@ -18,13 +18,11 @@ import useApi from "x-hooks/use-api";
 interface MergeableModalProps {
   proposal: Proposal;
   pullRequest: pullRequest;
-  networkProposal: ProposalExtended;
 }
 
 export default function NotMergeableModal({
-                                            proposal,
-  pullRequest,
-  networkProposal
+  proposal,
+  pullRequest
 }: MergeableModalProps) {
   const { t } = useTranslation("common");
 
@@ -40,20 +38,20 @@ export default function NotMergeableModal({
   const { mergeClosedIssue } = useApi();
 
   const isIssueOwner = !!state.currentBounty?.data && 
-    state.currentBounty?.data?.creatorAddress?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+    state.currentBounty?.data?.creatorAddress === state.currentUser?.walletAddress;
   const isPullRequestOwner = pullRequest?.githubLogin === state.currentUser?.login;
-  const isProposer =
-    networkProposal?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
+  const isProposer = proposal?.creator === state.currentUser?.walletAddress;
   const hasPRMerged = !!pullRequest?.merged;
 
   const whenNotShow = [
     hasPRMerged, // Already exists a Pull Request merged to this bounty.
-    pullRequest?.isMergeable && !state.currentBounty?.chainData?.closed, // The Pull Request was not merged year and the bounty is open.
+    pullRequest?.isMergeable && !state.currentBounty?.data?.isClosed, // The Pull Request was not merged year and the bounty is open.
     !(isIssueOwner || isPullRequestOwner || state.Service?.network?.active?.isCouncil || isProposer), // The user is not the bounty creator, nor the pull request creator,
     // nor the proposal creator and is not a council member.
     (isIssueOwner || state.Service?.network?.active?.isCouncil || isProposer) &&
       !isPullRequestOwner &&
-      !state.currentBounty?.chainData?.closed // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+      !state.currentBounty?.data?.isClosed, // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+    state.Service?.network?.active?.allowMerge === false
   ].some((values) => values);
 
   function handleRetryMerge() {
@@ -93,19 +91,17 @@ export default function NotMergeableModal({
   }
 
   useEffect(() => {
-    if (!pullRequest || !state.currentBounty?.data?.pullRequests?.length || mergeState === "success") return;
+    if (!pullRequest?.state || !state.currentBounty?.data?.pullRequests?.length || mergeState === "success") return;
 
     if (whenNotShow) {
       setVisible(false);
     } else if (isIssueOwner || isPullRequestOwner || state.Service?.network?.active?.isCouncil || isProposer) {
-      setVisible(pullRequest.state === "open");
+      setVisible(pullRequest.state.toLowerCase() === "open");
     }
   }, [
     state.currentBounty?.data,
     mergeState,
     pullRequest,
-    networkProposal,
-    state.currentBounty?.chainData,
     state.currentUser?.walletAddress,
     state.currentUser?.login,
     state.Service?.network?.active?.isCouncil
@@ -117,23 +113,22 @@ export default function NotMergeableModal({
       title={t("modals.not-mergeable.title")}
       titlePosition="center"
       onCloseClick={() => setVisible(false)}
-      centerTitle
-    >
+      centerTitle>
       <div>
         <div className="d-flex justify-content-center m-2 text-center">
           <p className="h4 mb-2 text-white">
-            {(state.currentBounty?.chainData?.closed &&
+            {(state.currentBounty?.data?.isClosed &&
               t("modals.not-mergeable.closed-bounty")) ||
               ""}
 
-            {(!state.currentBounty?.chainData?.closed &&
+            {(!state.currentBounty?.data?.isClosed &&
               t("modals.not-mergeable.open-bounty")) ||
               ""}
           </p>
         </div>
         <div className="d-flex justify-content-center">
-          {state.Service?.network?.active?.isCouncil && state.currentBounty?.chainData?.closed && (
-            <Button
+          {state.Service?.network?.active?.isCouncil && state.currentBounty?.data?.isClosed && (
+            <ContractButton
               color={`${
                 (mergeState === "error" && "transparent") || "primary"
               }`}
@@ -151,7 +146,7 @@ export default function NotMergeableModal({
               {mergeState === "loading" && (
                 <span className="spinner-border spinner-border-xs ml-1" />
               )}
-            </Button>
+            </ContractButton>
           )}
           {isPullRequestOwner && (
             <GithubLink

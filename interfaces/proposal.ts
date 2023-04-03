@@ -1,21 +1,34 @@
 import BigNumber from "bignumber.js";
 
-export interface Proposal {
-  creationDate: number;
-  createdAt: Date | number;
+import { BaseModel } from "interfaces/db/base";
+
+export interface ProposalDistribution extends BaseModel {
+  recipient: string;
+  percentage: number;
+  proposalId: number;
+}
+
+export interface ProposalDisputes extends BaseModel {
+  issueId: number;
+  proposalId: number;
+  address: string;
+  weight: BigNumber;
+}
+
+export interface Proposal extends BaseModel {
   githubLogin: string;
-  id: number;
   isMerged?: boolean;
   issueId?: number;
   pullRequestId?: number;
   contractId?: number;
   creator?: string;
   network_id: number;
-  distributions?: DistributedAmounts[]
-  contractCreationDate?: number;
+  distributions?: ProposalDistribution[];
+  contractCreationDate?: Date;
   disputeWeight?: BigNumber;
   refusedByBountyOwner?: boolean;
   isDisputed?: boolean;
+  disputes?: ProposalDisputes[];
 }
 
 export interface INetworkProposal {
