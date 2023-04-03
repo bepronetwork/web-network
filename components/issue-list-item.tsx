@@ -136,7 +136,9 @@ export default function IssueListItem({
           <div className="issue-body text-white-40 text-break text-truncate mb-3" >
             {issue?.body}
           </div>
-          <IssueAmountInfo issue={issue} size={size} />
+          <div className={!issue?.isFundingRequest && 'mt-4'}>
+            <IssueAmountInfo issue={issue} size={size} />
+          </div>
         </>
       </CardItem>
     );
