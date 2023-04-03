@@ -90,6 +90,10 @@ class Network extends Model {
         proposerFeeShare: {
           type: DataTypes.FLOAT,
           allowNull: true
+        },
+        allowMerge: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: true
         }
       },
       {
@@ -112,19 +116,19 @@ class Network extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
-    
+
     this.hasMany(models.pullRequest, {
       foreignKey: "network_id",
       sourceKey: "id",
       as: "pullRequests"
     });
-    
+
     this.hasMany(models.mergeProposal, {
       foreignKey: "network_id",
       sourceKey: "id",
       as: "mergeProposals"
     });
-    
+
     this.hasMany(models.curator, {
       foreignKey: "networkId",
       sourceKey: "id",

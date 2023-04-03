@@ -50,7 +50,8 @@ export default function NotMergeableModal({
     // nor the proposal creator and is not a council member.
     (isIssueOwner || state.Service?.network?.active?.isCouncil || isProposer) &&
       !isPullRequestOwner &&
-      !state.currentBounty?.data?.isClosed // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+      !state.currentBounty?.data?.isClosed, // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+    state.Service?.network?.active?.allowMerge === false
   ].some((values) => values);
 
   function handleRetryMerge() {
@@ -112,8 +113,7 @@ export default function NotMergeableModal({
       title={t("modals.not-mergeable.title")}
       titlePosition="center"
       onCloseClick={() => setVisible(false)}
-      centerTitle
-    >
+      centerTitle>
       <div>
         <div className="d-flex justify-content-center m-2 text-center">
           <p className="h4 mb-2 text-white">

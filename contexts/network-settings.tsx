@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
 
 import BigNumber from "bignumber.js";
-import { isZeroAddress } from "ethereumjs-util";
+import {isZeroAddress} from "ethereumjs-util";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
@@ -9,8 +9,8 @@ import {useAppState} from "contexts/app-state";
 import {isSameSet} from "helpers/array";
 import {isColorsSimilar} from "helpers/colors";
 import {
-  DEFAULT_CANCELABLE_TIME,
   DEFAULT_CANCEL_FEE,
+  DEFAULT_CANCELABLE_TIME,
   DEFAULT_CLOSE_FEE,
   DEFAULT_COUNCIL_AMOUNT,
   DEFAULT_DISPUTE_TIME,
@@ -22,9 +22,9 @@ import {
   UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
-import { NetworkValidator } from "helpers/network";
-import { RegistryValidator } from "helpers/registry";
-import { toLower } from "helpers/string";
+import {NetworkValidator} from "helpers/network";
+import {RegistryValidator} from "helpers/registry";
+import {toLower} from "helpers/string";
 
 import {Color, Network, NetworkSettings, Theme} from "interfaces/network";
 import {Token} from "interfaces/token";
@@ -301,6 +301,10 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     parameter: {
       setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value)
+    },
+    allowMerge: {
+      setter({value}) { return setFields(`details.allowMerge`, value) },
+      validator(value) { return typeof value === "boolean"; }
     }
   };
 
@@ -523,6 +527,8 @@ export const NetworkSettingsProvider = ({ children }) => {
         raw: undefined
     });
 
+    defaultState.details.allowMerge = network?.allowMerge;
+
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
     defaultState.github.repositories = await loadGHRepos();
@@ -537,7 +543,8 @@ export const NetworkSettingsProvider = ({ children }) => {
       cancelableTime: +cancelableTime / 1000,
       oracleExchangeRate: oracleExchangeRate,
       proposerFeeShare: proposerFeeShare,
-      mergeCreatorFeeShare: mergeCreatorFeeShare
+      mergeCreatorFeeShare: mergeCreatorFeeShare,
+      allowMerge: network?.allowMerge,
     }));
 
     setNetworkSettings(defaultState);
