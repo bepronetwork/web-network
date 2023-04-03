@@ -1,9 +1,9 @@
 import {TreasuryInfo} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 
-import { Curator } from "interfaces/curators";
-import { IssueData } from "interfaces/issue-data";
-import { SupportedChainData } from "interfaces/supported-chain-data";
+import {Curator} from "interfaces/curators";
+import {IssueData} from "interfaces/issue-data";
+import {SupportedChainData} from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
 
 export interface Network {
@@ -50,6 +50,7 @@ export interface Network {
   countIssues?: number;
   chain?: SupportedChainData;
   issues?: IssueData[];
+  allowMerge: boolean;
 }
 
 export interface ThemeColors {
@@ -115,6 +116,7 @@ export interface NetworkSettings {
   cleanStorage?: () => void;
   tokensLocked?: TokensLocked;
   details?: {
+    allowMerge: boolean;
     name: Field<string>;
     description: string;
     iconLogo?: Field<Icon>;
@@ -146,6 +148,7 @@ export interface NetworkSettings {
     repositories: Repository[];
     botPermission: boolean;
     validated: boolean;
+    allowMerge: boolean;
   };
   tokens?: {
     settler: string;

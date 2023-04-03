@@ -19,6 +19,7 @@ import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
 
 import useApi from "x-hooks/use-api";
+import {FormCheck} from "react-bootstrap";
 
 const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
@@ -124,6 +125,10 @@ export default function NetworksStep({
     });
   }
 
+  function changeAllowMergeCheckbox(ele) {
+    fields.allowMerge.setter(ele?.target?.value || false);
+  }
+
   function showTextOrDefault(text: string, defaultText: string) {
     return text.trim() === "" ? defaultText : text;
   }
@@ -194,6 +199,7 @@ export default function NetworksStep({
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
+      allowMerge: differentOrUndefined(details?.allowMerge, forcedNetwork?.allowMerge),
       logoIcon:
         details?.iconLogo?.value?.raw !== undefined
           ? await psReadAsText(details?.iconLogo?.value?.raw)
@@ -457,6 +463,18 @@ export default function NetworksStep({
                 </div>
               </div>
             )}
+
+            <div className="d-flex row ">
+              <div className="col-md-12">
+                <FormCheck
+                  className="form-control-md pb-0"
+                  type="checkbox"
+                  label={t("custom-network:allow-merge")}
+                  onChange={changeAllowMergeCheckbox}
+                  checked={details?.allowMerge}
+                />
+              </div>
+            </div>
 
             {(canSubmit && (
               <div className="d-flex flex-row justify-content-center mt-3 mb-2">
