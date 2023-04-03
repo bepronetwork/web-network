@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
-import Link from "next/link";
 import {useRouter} from "next/router";
 
 import EditIcon from "assets/icons/transactions/edit";
