@@ -27,6 +27,7 @@ export default function InputNumber({
   allowNegative = false,
   fullWidth = false,
   value,
+  groupClassName = "",
   onValueChange,
   ...params
 }: InputNumberProps) {
@@ -69,7 +70,7 @@ export default function InputNumber({
           ...errorStyle,
           ...successStyle,
           ...warningStyle
-        })}
+        }, groupClassName)}
       >
         <NumberFormat
           className={clsx("form-control border-radius-8",

@@ -24,31 +24,31 @@ export default function ProfilePage() {
 
   const { disconnectGithub } = useAuthentication();
 
-  const addressOrUsername = 
+  const addressOrUsername =
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
   const handleClickDisconnect = () => setShowRemoveModal(true);
   const hideRemoveModal = () => setShowRemoveModal(false);
-  
+
   return(
     <ProfileLayout>
       <div className="row mb-5">
         <div className="col">
-          <AvatarOrIdenticon 
+          <AvatarOrIdenticon
             user={state.currentUser?.login}
             address={state.currentUser?.walletAddress}
             size="lg"
           />
-          
+
           <div className="d-flex flex-row mt-3 align-items-center">
             <h4 className="text-gray text-uppercase mr-2">{addressOrUsername}</h4>
-            
+
             { state.Service?.network?.active?.isCouncil &&
-              <Badge 
-                label={t("council")} 
-                color="purple-30" 
+              <Badge
+                label={t("council")}
+                color="purple-30"
                 className="caption border border-purple text-purple border-radius-8"
-              /> 
+              />
             }
           </div>
         </div>

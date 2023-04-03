@@ -60,11 +60,6 @@ export default function SelectNetwork({
         networkName: newValue?.value?.name || "all"
       };
 
-      console.log({
-        newQuery,
-        asPath
-      })
-
       push({ pathname: pathname, query: newQuery }, asPath);
     }
   }

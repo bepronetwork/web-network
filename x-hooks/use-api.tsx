@@ -78,7 +78,7 @@ const repoList: ReposList = [];
 export default function useApi() {
   const  {state, dispatch} = useAppState();
   const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
-  
+
   api.interceptors.request.use(config => {
 
     if (typeof window === 'undefined')
@@ -199,7 +199,7 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string | number, 
+  async function getIssue(repoId: string | number,
                           ghId: string | number,
                           networkName = DEFAULT_NETWORK_NAME,
                           chainId?: string | number) {
@@ -236,7 +236,7 @@ export default function useApi() {
   /**
    * Ping the API to create an issue on Github, if succeed returns the CID (Repository ID on database + Issue ID on Github)
    * @param payload
-   * @param networkName 
+   * @param networkName
    * @returns string
    */
   async function createPreBounty(payload: CreateBounty, networkName = DEFAULT_NETWORK_NAME): Promise<string> {
@@ -261,9 +261,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function createPrePullRequest({ 
+  async function createPrePullRequest({
     networkName = DEFAULT_NETWORK_NAME,
-    ...rest 
+    ...rest
   } : CreatePrePullRequestParams) {
     return api
       .post("/pull-request/", { networkName, ...rest })
@@ -307,7 +307,7 @@ export default function useApi() {
   async function getTotalUsers(): Promise<number> {
     return api.get<number>("/search/users/total").then(({ data }) => data);
   }
-  
+
   async function getTotalBounties(networkName = "", state = ""): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return api.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
@@ -317,7 +317,7 @@ export default function useApi() {
                                   creatorAddress = "",
                                   isClosed = false,
                                   isRegistered = true): Promise<number> {
-    const search = new URLSearchParams({ 
+    const search = new URLSearchParams({
       creatorAddress,
       name,
       ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
@@ -350,7 +350,7 @@ export default function useApi() {
 
     if (cache.value)
       return cache.value;
-    
+
     return api
       .get<ReposList>("/repos", {
         params: {
@@ -359,8 +359,6 @@ export default function useApi() {
       })
       .then(({ data }) => {
         cache.value = data;
-
-        console.log("getReposWithBounties not cached")
 
         return data;
       })
@@ -388,7 +386,8 @@ export default function useApi() {
 
   async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
                               address?: string,
-                              params: PastEventsParams = {}) {
+                              params: PastEventsParams = {},
+                              currentNetworkName?: string) {
     const chainId = state.connectedChain?.id;
     const events = state.connectedChain?.events;
     const registryAddress = state.connectedChain?.registry;
@@ -401,7 +400,7 @@ export default function useApi() {
       throw new Error("Missing events url, chain id or address");
 
     const eventsURL = new URL(`/read/${chainId}/${addressToSend}/${event}`, state.connectedChain?.events);
-    const networkName = state.Service?.network?.active?.name;
+    const networkName = currentNetworkName || state.Service?.network?.active?.name;
 
     return axios.get(eventsURL.href, {
     params
@@ -503,7 +502,7 @@ export default function useApi() {
         throw error;
       });
   }
-  
+
   async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
     const isArray = Array.isArray(files);
@@ -567,7 +566,7 @@ export default function useApi() {
 
   async function getNetwork({ name, creator, isDefault, address, byChainId, chainName } : GetNetworkProps) {
     const Params = {} as Omit<GetNetworkProps, "isDefault" | "byChainId"> & { isDefault: string; byChainId: string; };
-    
+
     if (name) Params.name = name;
     if (creator) Params.creator = creator;
     if (isDefault) Params.isDefault = isDefault.toString();
@@ -597,7 +596,7 @@ export default function useApi() {
         throw error;
       });
   }
-  
+
   async function getTokens(chainId?: string) {
     return api
       .get<Token[]>("/search/tokens", { params: {chainId} })

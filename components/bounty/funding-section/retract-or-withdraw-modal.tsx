@@ -78,6 +78,8 @@ export default function RetractOrWithdrawModal({
       handleRetractFundBounty(state.currentBounty?.data?.contractId, funding.contractId)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+
+        getDatabaseBounty(true);
         
         return processEvent(NetworkEvents.BountyFunded, undefined, {
           fromBlock

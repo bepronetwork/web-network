@@ -78,6 +78,16 @@ li {
   border-color: var(--bs-purple);
 }
 
+
+.border {
+  &-dotter {
+    border: 1px dashed;
+  }
+  &-none {
+    border: none;
+  }
+}
+
 .account-link-active {
   border-bottom: 3px solid var(--bs-primary) !important;
   border-radius: 0;
@@ -184,9 +194,11 @@ li {
       }
       &--menu-is-open {
         border-color: var(--bs-primary) !important;
+        background-color: $gray-800;
       }
       &--is-disabled {
         border-color: transparent;
+        background-color: $gray-800;
         opacity: 0.4;
       }
     }
@@ -208,7 +220,7 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
-      // min-width: 210px;
+      min-width: fit-content;
       border-radius: 4px;
       border: 1px solid $gray-800;
       background-color: $gray-900;
@@ -544,6 +556,21 @@ label {
   }
 }
 
+.form-bounty {
+  background-color: $gray-800 !important;
+  border: 1px solid $gray-700 !important;
+  color: var(--bs-gray);
+  &:disabled,
+  &[readonly] {
+    background-color: $gray-800 !important;
+    opacity: 0.4;
+  }
+  &:focus {
+    border-color: #6873E9 !important;
+  }
+}
+
+
 input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 5px;
   content: url(../assets/CalendarBlank.svg);
@@ -552,6 +579,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   transform:scale(1.2);
   cursor:pointer;
+}
+
+.input-group-border {
+  border: none !important;
+
+  &:hover {
+    border: none !important;
+  }
 }
 
 .input-group {
@@ -650,6 +685,105 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   height: 6px;
   border-radius: 5px;
   margin-top: 6px;
+}
+
+.bg-gray-800 {
+  background-color: $gray-800;
+}
+
+.description-button {
+  border-radius: 0;
+  border: none;
+  &:hover {
+    color: white !important;
+  }
+}
+
+.bounty-button {
+  border-radius: 4px;
+
+}
+
+.bounty-outline-button {
+  border-radius: 4px;
+  background-color: $gray-900;
+  border: 1px solid $gray-700;
+  &.button-max {
+    padding: 0.90rem 1.25rem 0.75rem 1.25rem;
+  } 
+  &:hover {
+    border-radius: 4px;
+    border-color: $gray-700;
+    background-color: $gray-900;
+    color: $gray-300;
+  }
+  &:disabled {
+    border-radius: 4px;
+    border-color: $gray-700;
+    background-color: $gray-900;
+    color: $gray-300;
+  }
+  &:focus {
+    border-radius: 4px;
+    border-color: $gray-700;
+    background-color: $gray-900;
+    color: $gray-300;
+  }
+}
+
+.input-funded {
+  border: none;
+  background-color: $gray-900;
+  font-size: 24px;
+  &:focus {
+    border: none;
+    background-color: $gray-900;
+  }
+  &:hover {
+    border: none;
+  }
+}
+
+.input-fund {
+  border: 1px solid $gray-700;
+  background-color: $gray-900;
+  font-size: 24px;
+  &:focus {
+    border: 1px solid $gray-700;
+    background-color: $gray-900;
+  }
+}
+
+.symbol-fund {
+  border: 1px solid $gray-700 !important;
+  background-color: $gray-900 !important;
+  font-size: 24px;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.convert-value {
+  font-size: 20px;
+}
+
+.tag-ball {
+  width: 8px;
+  height: 8px;
+  background-color:#B3B9F4;
+  border-radius: 50%;
+}
+
+.active-description-button {
+  border-radius: 4px;
+  border: 1px solid $gray-700;
+  color: white;
+  background-color: $gray-800;
+  &:hover {
+    border-radius: 4px;
+    border: 1px solid $gray-700;
+    color: $gray-300;
+    background-color: $gray-800;
+  }
 }
 
 .badge-opaque {
@@ -825,6 +959,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     }
   }
 
+  .border-top {
+    border-top: 1px solid;
+  }
+
   .progress-bar {
     z-index: 1;
     &.bg-info {
@@ -878,7 +1016,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .issue-progress-vertical {
-  height: 2px;
+  margin-left: 10px;
+  height: 4px;
 }
 
 .material-icons {
@@ -1807,6 +1946,10 @@ input[type="color"] {
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 500px;
+}
+
+.w-max-none {
+  max-width: none !important;
 }
 
 .kyc-modal-body{
