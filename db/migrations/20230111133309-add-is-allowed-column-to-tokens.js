@@ -1,9 +1,10 @@
 'use strict';
 
-const { Web3Connection, BountyToken, NetworkRegistry } = require("@taikai/dappkit");
+const { Web3Connection, NetworkRegistry } = require("@taikai/dappkit");
 
 const Settings = require("../models/settings.model");
 const Tokens = require("../models/tokens.model");
+const { getAllFromTable } = require("../../helpers/db/rawQueries");
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -28,7 +29,7 @@ module.exports = {
       skipWindowAssignment: true,
       web3Host: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
     });
-    
+
     await web3Connection.start();
 
     const registry = new NetworkRegistry(web3Connection, registrySetting.value);
@@ -36,16 +37,16 @@ module.exports = {
 
     const allowedTokens = await registry.getAllowedTokens();
 
-    const tokens = await Tokens.findAll();
+    const tokens = await getAllFromTable(queryInterface, "tokens");
 
     for (const token of tokens) {
-      if (token.isTransactional && allowedTokens.transactional.includes(token.address) ||
-          !token.isTransactional && allowedTokens.reward.includes(token.address))
-        token.isAllowed = true;
-      else
-        token.isAllowed = false;
+      const isAllowed = allowedTokens.transactional.includes(token.address) || allowedTokens.reward.includes(token.address);
 
-      await token.save();
+      await queryInterface.bulkUpdate("tokens", {
+        isAllowed: isAllowed
+      }, {
+        id: token.id
+      });
     }
   },
 
