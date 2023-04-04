@@ -440,7 +440,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         </p>
         <ReactSelect
           id="pullRequestSelect"
-          isDisabled={participants.length === 0}
+
           components={{
             Option: SelectOptionComponent,
             SingleValue
@@ -467,7 +467,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             isDraft: items.status === "draft",
             isDisable: items.merged || !items.isMergeable || items.status === "draft"
           }))}
-          isOptionDisabled={(option) => option.isDisable}
+          isOptionDisabled={(option) => option.isDisable || participants.length === 0}
           onChange={handleChangeSelect}
           isSearchable={false}
         />
