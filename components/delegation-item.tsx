@@ -84,6 +84,7 @@ export default function DelegationItem({
         delegation={delegation}
         onTakeBackClick={isNetworkVariant && handleShow || null}
         tokenColor={tokenColor}
+        variant={variant}
       />
 
       <Modal
