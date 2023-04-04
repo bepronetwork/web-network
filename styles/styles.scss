@@ -226,7 +226,7 @@ li {
       background-color: $gray-900;
       z-index: 4;
       padding: 6px;
-
+      margin-bottom: 70px;
       &-list {
         padding-top: 0;
         padding-bottom: 0;
@@ -270,8 +270,6 @@ li {
     color: transparentize($white, 0.4);
   }
 }
-
-
 
 // familys
 .family-Regular {
@@ -574,14 +572,13 @@ label {
 
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  background-color: $white !important;
   border-radius: 5px;
+  content: url(../assets/CalendarBlank.svg);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   transform:scale(1.2);
   cursor:pointer;
-  background-color: rgba($white, 0.2);
 }
 
 .input-group-border {

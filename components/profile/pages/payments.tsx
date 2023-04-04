@@ -15,14 +15,22 @@ import {useAppState} from "contexts/app-state";
 
 import {formatNumberToCurrency} from "helpers/formatNumber";
 
+import { Network } from "interfaces/network";
 import {Payment} from "interfaces/payments";
 
 import {getCoinPrice} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 
+export interface TotalFiatNetworks {
+  tokenAddress: string;
+  value: number;
+  price: number;
+  networkId: number;
+}
+
 export default function PaymentsPage() {
-  const { t } = useTranslation(["common", "profile"]);
+  const { t } = useTranslation(["common", "profile", "custom-network"]);
 
   const defaultOptions = [
     {
@@ -39,8 +47,10 @@ export default function PaymentsPage() {
     },
   ];
 
-  const [totalEuro, setTotalEuro] = useState(0);
+  const [totalFiat, setTotalFiat] = useState(0);
+  const [totalFiatNetworks, setTotalFiatNetworks] = useState<TotalFiatNetworks[]>([])
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [networks, setNetworks] = useState<Network[]>([]);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
   const {state} = useAppState();
@@ -62,27 +72,43 @@ export default function PaymentsPage() {
   }
 
   useEffect(() => {
-    if (!state.currentUser?.walletAddress || !state.Service?.network?.active?.name) return;
+    if (!state.currentUser?.walletAddress) return;
 
-    getPayments(state.currentUser.walletAddress, state.Service?.network?.active.name, startDate, endDate)
-      .then(setPayments);
-  }, [state.currentUser?.walletAddress, state.Service?.network?.active?.name, startDate, endDate]);
+    getPayments(state.currentUser.walletAddress, startDate, endDate).then(setPayments);
+  }, [state.currentUser?.walletAddress, startDate, endDate]);
+
+  useEffect(() => {
+    if (!payments) return;
+    const allNetworks: Network[] = [];
+    payments.map((payment) => {
+      if (
+        !networks.find((network) => network?.id === payment?.issue?.network?.id) &&
+        !allNetworks.find((network) => network?.id === payment?.issue?.network?.id)
+      ) {
+        allNetworks.push(payment?.issue?.network);
+        setNetworks(allNetworks);
+      }
+    });
+  }, [payments]);
 
   useEffect(() => {
     if (!payments?.length) return;
 
     Promise.all(payments.map(async (payment) => ({
-        tokenAddress: payment.issue.transactionalToken.address,
+        tokenAddress: payment?.issue?.transactionalToken?.address,
         value: payment.ammount,
-        price: await getCoinPrice(payment.issue.transactionalToken.symbol, state?.Settings.currency.defaultFiat),
+        price: await getCoinPrice(payment?.issue?.transactionalToken?.symbol, state?.Settings.currency.defaultFiat),
+        networkId: payment?.issue?.network_id
     }))).then((tokens) => {
       const totalConverted = tokens.reduce((acc, token) => acc + token.value * (token.price || 0),
                                            0);
       const noConverted = !!tokens.find((token) => token.price === undefined);
-
-      setTotalEuro(totalConverted);
+      
+      setTotalFiatNetworks(tokens)
+      setTotalFiat(totalConverted);
       setHasNoConvertedToken(noConverted);
     });
+    
   }, [payments]);
 
   function onChangeDate(e: ChangeEvent<HTMLInputElement>,
@@ -112,10 +138,10 @@ export default function PaymentsPage() {
                     </span>
                     <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
                       <span className="text-white">
-                        {formatNumberToCurrency(totalEuro)}
+                        {formatNumberToCurrency(totalFiat)}
                       </span>
 
-                      <span className="text-gray ml-1">{t("currencies.euro")}</span>
+                      <span className="text-gray ml-1">{state?.Settings?.currency?.defaultFiat}</span>
                     </div>
                   </>
                 )}
@@ -168,9 +194,14 @@ export default function PaymentsPage() {
         </FlexRow>
 
         <FlexRow className="justify-content-center">
-          <FlexColumn>
-            {payments?.length > 0 ? (
-              <PaymentsList payments={payments} />
+          <FlexColumn className="col-12">
+            {networks?.length > 0 ? (
+              <PaymentsList
+                payments={payments}
+                networks={networks}
+                totalNetworks={totalFiatNetworks}
+                symbol={state?.Settings?.currency?.defaultFiat?.toUpperCase()}
+              />
             ) : (
               <NothingFound description={t("filters.no-records-found")} />
             )}
