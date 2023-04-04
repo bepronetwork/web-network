@@ -37,12 +37,12 @@ export default function TokenBalance({
 
   const symbolColor = {
     token: "primary",
-    oracle: "purple",
-    delegation: "purple"
+    oracle: "primary",
+    delegation: "primary"
   };
 
   const delegationSymbol =  delegation &&
-    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span className="ml-1 text-purple">{symbol}</span></>;
+    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span className="ml-1 text-primary">{symbol}</span></>;
 
   return (
     <FlexRow className={CONTAINER_CLASSES.join(" ")}>
