@@ -3,7 +3,7 @@ import Scribal from "@taikai/scribal";
 const ScribalConfig = {
   logService: {
     console: {
-      silent: false,
+      silent: process.env.LOG_TO_CONSOLE === 'false',
       logLevel: (process.env.LOG_LEVEL || 'debug') as any,
     },
     elastic: {
