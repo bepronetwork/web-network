@@ -15,7 +15,7 @@ export default function PaymentItem({
   handleItemClick,
 }: Payment) {
   const CONTAINER_CLASSES = [
-    "justify-content-between align-items-center bg-transparent",
+    "justify-content-between align-items-center bg-gray-950",
     "border border-dark-gray border-radius-8 mb-2 py-3 px-4",
   ];
 
@@ -38,7 +38,15 @@ export default function PaymentItem({
         </FlexRow>
       </FlexColumn>
 
-      <Button color="light-gray" onClick={() => handleItemClick(issue?.issueId)} outline>
+      <Button
+        color="light-gray"
+        onClick={() =>
+          handleItemClick(issue?.issueId,
+                          issue?.network?.chain?.chainShortName,
+                          issue?.network?.name)
+        }
+        outline
+      >
         <span className="text-white text-nowrap">
           {labelBounty} #{issue?.issueId}
         </span>

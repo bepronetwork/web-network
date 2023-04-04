@@ -271,8 +271,6 @@ li {
   }
 }
 
-
-
 // familys
 .family-Regular {
   font-family: "Space Grotesk", sans-serif;
@@ -574,14 +572,13 @@ label {
 
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  background-color: $white !important;
   border-radius: 5px;
+  content: url(../assets/CalendarBlank.svg);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   transform:scale(1.2);
   cursor:pointer;
-  background-color: rgba($white, 0.2);
 }
 
 .input-group-border {
