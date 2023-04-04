@@ -16,6 +16,7 @@ interface TokenBalanceProps {
   delegation?: DelegationExtended;
   overSymbol?: string;
   tokenColor?: string;
+  variant?: "network" | "multi-network";
   onTakeBackClick?: () => void;
 }
 
@@ -28,13 +29,15 @@ export default function TokenBalance({
   delegation,
   overSymbol,
   onTakeBackClick,
-  tokenColor
+  tokenColor,
+  variant = "network"
 } : TokenBalanceType & TokenBalanceProps) {
   const { t } = useTranslation(["common"]);
 
   const CONTAINER_CLASSES = [
-    "justify-content-between align-items-center bg-transparent bg-gray-900",
-    "border border-gray-800 border-radius-4 mb-2 py-3 px-4"
+    "justify-content-between align-items-center bg-transparent",
+    "border border-gray-800 border-radius-4 mb-2 py-3 px-4",
+    variant === "network" ? "bg-gray-900" : "bg-gray-950"
   ];
 
   function getTextColorProps(classes) {
