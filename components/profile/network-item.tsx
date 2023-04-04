@@ -114,7 +114,7 @@ export default function NetworkItem({
               <FlexRow>
                 {renderAmount()}
                 {handleNetworkLink && (
-                  <Button className="button-gray-850 ms-3">
+                  <Button className="button-gray-850 ms-3" onClick={handleNetworkLink}>
                     <span>{t("go-to-network")}</span>{" "}
                     <ArrowUpRight className="w-9-p h-9-p" />
                   </Button>
