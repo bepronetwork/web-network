@@ -881,8 +881,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 500 !important;
 }
 
-.min-w-fit{
+.min-w-fit {
   min-width: fit-content !important;
+}
+
+.min-h-card {
+  min-height: 220px;
 }
 
 .ico-metamask {
