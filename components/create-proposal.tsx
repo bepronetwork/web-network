@@ -322,6 +322,9 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
 
   function renderDistribution() {
+    if (!currentPullRequest)
+      return;
+
     if (isLoadingParticipants)
       return (
       <div className="d-flex justify-content-center mt-4">
@@ -448,9 +451,9 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
             value: currentPullRequest?.id,
-            label: `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
+            label: currentPullRequest && `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
               currentPullRequest?.githubLogin
-            }`,
+            }` || t("forms.select-placeholder"),
             githubId: currentPullRequest?.githubId,
             githubLogin: currentPullRequest?.githubLogin,
             marged: currentPullRequest?.merged,
@@ -467,7 +470,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             isDraft: items.status === "draft",
             isDisable: items.merged || !items.isMergeable || items.status === "draft"
           }))}
-          isOptionDisabled={(option) => option.isDisable || participants.length === 0}
+          isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
           isSearchable={false}
         />
