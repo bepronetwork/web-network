@@ -323,7 +323,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
   function renderDistribution() {
     if (!currentPullRequest)
-      return;
+      return <></>;
 
     if (isLoadingParticipants)
       return (
