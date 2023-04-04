@@ -12,6 +12,8 @@ import SelectChainDropdown from "components/select-chain-dropdown";
 import {useAppState} from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
 
+import { UNSUPPORTED_CHAIN } from "helpers/constants";
+
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
@@ -53,7 +55,8 @@ export default function WrongNetworkModal() {
 
     setShowModal([
       spinners?.needsToChangeChain,
-      !connectedChain?.matchWithNetworkChain && isRequired
+      connectedChain?.matchWithNetworkChain === false && isRequired,
+      connectedChain?.name === UNSUPPORTED_CHAIN && isRequired
     ].some(c => c));
   }
 
