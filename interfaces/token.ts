@@ -2,6 +2,8 @@ import { ReactElement } from "react";
 
 import BigNumber from "bignumber.js";
 
+import { Network } from "../interfaces/network";
+
 export type TokenType = 'reward' | 'transactional';
 
 export interface Token {
@@ -9,6 +11,7 @@ export interface Token {
   address: string;
   name: string;
   symbol: string;
+  networks?: Network[];
   currentValue?: number | string;
   tokenInfo?: TokenInfo;
   balance?: string | BigNumber;
