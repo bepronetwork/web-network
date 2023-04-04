@@ -49,21 +49,21 @@ export default function ListRecentIssues() {
 
   async function handleSearchRecentIssues(type: "open" | "funding") {
     const isOpen = type === "open";
-    const isLoading = (state: boolean) =>
+    const setLoading = (state: boolean) =>
       updateBounties(isOpen
           ? { loadingOpenBounties: state }
           : { loadingFundingBounties: state });
     const setBounties = (data: IssueBigNumberData[]) =>
       updateBounties(isOpen ? { openBounties: data } : { fundingBounties: data });
 
-    isLoading(true);
+    setLoading(true);
     searchRecentIssues({ networkName, state: type })
       .then(setBounties)
       .catch((err) => {
         console.debug(err);
-        isLoading(false);
+        setLoading(false);
       })
-      .finally(() => isLoading(false));
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
