@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import { components as RSComponents, SingleValueProps } from "react-select";
+import {useState} from "react";
+import {components as RSComponents, SingleValueProps} from "react-select";
 
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
@@ -21,7 +21,7 @@ import {useAppState} from "contexts/app-state";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import sumObj from "helpers/sumObj";
 
-import { NetworkEvents } from "interfaces/enums/events";
+import {NetworkEvents} from "interfaces/enums/events";
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -251,7 +251,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       })
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({ address }) => !!address);
-        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
+        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant?.githubHandle || '', 0])));
         setCurrentGithubId(githubId);
         setParticipants([])
         setParticipants(tmpParticipants);
@@ -311,14 +311,14 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
-  useEffect(() => {
-    if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
-      const defaultPr =
-        pullRequests.find((el) => el.isMergeable) || pullRequests[0];
-      setCurrentPullRequest(defaultPr);
-      getParticipantsPullRequest(defaultPr?.githubId);
-    }
-  }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
+  // useEffect(() => {
+  //   if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
+  //     const defaultPr =
+  //       pullRequests.find((el) => el.isMergeable) || pullRequests[0];
+  //     setCurrentPullRequest(defaultPr);
+  //     getParticipantsPullRequest(defaultPr?.githubId);
+  //   }
+  // }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
 
 
   function renderDistribution() {
