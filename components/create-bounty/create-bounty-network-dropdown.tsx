@@ -69,7 +69,9 @@ export default function CreateBountyNetworkDropdown({
   }
 
   function updateOptions() {
-    if (networks.length > 0) {
+    if(networks.length === 0) {
+      setOptions([])
+    }else {
       setOptions(networks.map(n => networkOption(n, false)));
     }
   }
