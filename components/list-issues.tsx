@@ -297,7 +297,7 @@ export default function ListIssues({
       )}
       {isRenderFilter() ? (
         <div
-          className={"row align-items-center list-actions sticky-top bg-gray-950"}
+          className={"row align-items-center list-actions sticky-top bg-body"}
         >
           <div className="col">
             <InputGroup className="border-radius-8">
