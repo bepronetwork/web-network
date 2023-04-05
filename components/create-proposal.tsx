@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import { components as RSComponents, SingleValueProps } from "react-select";
+import {useState} from "react";
+import {components as RSComponents, SingleValueProps} from "react-select";
 
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
@@ -21,7 +21,7 @@ import {useAppState} from "contexts/app-state";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import sumObj from "helpers/sumObj";
 
-import { NetworkEvents } from "interfaces/enums/events";
+import {NetworkEvents} from "interfaces/enums/events";
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -251,7 +251,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       })
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({ address }) => !!address);
-        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
+        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant?.githubHandle || '', 0])));
         setCurrentGithubId(githubId);
         setParticipants([])
         setParticipants(tmpParticipants);
@@ -311,17 +311,20 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
-  useEffect(() => {
-    if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
-      const defaultPr =
-        pullRequests.find((el) => el.isMergeable) || pullRequests[0];
-      setCurrentPullRequest(defaultPr);
-      getParticipantsPullRequest(defaultPr?.githubId);
-    }
-  }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
+  // useEffect(() => {
+  //   if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
+  //     const defaultPr =
+  //       pullRequests.find((el) => el.isMergeable) || pullRequests[0];
+  //     setCurrentPullRequest(defaultPr);
+  //     getParticipantsPullRequest(defaultPr?.githubId);
+  //   }
+  // }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
 
 
   function renderDistribution() {
+    if (!currentPullRequest?.id)
+      return <></>;
+
     if (isLoadingParticipants)
       return (
       <div className="d-flex justify-content-center mt-4">
@@ -440,7 +443,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         </p>
         <ReactSelect
           id="pullRequestSelect"
-          isDisabled={participants.length === 0}
+
           components={{
             Option: SelectOptionComponent,
             SingleValue
@@ -448,9 +451,9 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
             value: currentPullRequest?.id,
-            label: `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
+            label: currentPullRequest && `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
               currentPullRequest?.githubLogin
-            }`,
+            }` || t("forms.select-placeholder"),
             githubId: currentPullRequest?.githubId,
             githubLogin: currentPullRequest?.githubLogin,
             marged: currentPullRequest?.merged,
