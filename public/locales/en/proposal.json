@@ -20,7 +20,8 @@
     "distribution-cant-done": "This distribution can't be done try another one.",
     "proposal-refused": "Proposal Refused",
     "in-disputable-time": "{{time}} before proposal can be merged.",
-    "owner-pull-request": "You will not be able to close bounties using a proposal that has their own pull-request"
+    "owner-pull-request": "You will not be able to close bounties using a proposal that has their own pull-request",
+    "owner-proposal": "Curators should not be able to close bounties using their own proposals"
   },
   "errors": {
     "not-found": "No proposals found",
