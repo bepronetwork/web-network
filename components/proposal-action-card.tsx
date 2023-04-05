@@ -61,6 +61,10 @@ export default function ProposalActionCard({
     currentPullRequest?.userAddress?.toLowerCase() ===
     state.currentUser?.walletAddress?.toLowerCase()
   )
+  const isProposalOwner = (
+    proposal?.creator?.toLowerCase() ===
+    state.currentUser?.walletAddress?.toLowerCase()
+  )
 
   const proposalCanBeDisputed = () => [
     isProposalDisputable(proposal?.contractCreationDate, 
@@ -96,6 +100,7 @@ export default function ProposalActionCard({
     allowMergeCommit === true,
     !prsNeedsApproval,
     !isPrOwner,
+    !isProposalOwner
     // state.Service?.network?.active?.allowMerge === true
   ].every(v => v);
 
@@ -220,10 +225,18 @@ export default function ProposalActionCard({
             </div> || ""
           }
 
-          { isPrOwner && (
+          {isPrOwner && (
             <div className="row mt-2">
               <ContextualSpan context="warning" classNameIcon="mb-4">
                 {t("proposal:messages.owner-pull-request")}
+              </ContextualSpan>
+            </div>
+          )}
+
+          {isProposalOwner && (
+            <div className="row mt-2">
+              <ContextualSpan context="warning">
+                {t("proposal:messages.owner-proposal")}
               </ContextualSpan>
             </div>
           )}
