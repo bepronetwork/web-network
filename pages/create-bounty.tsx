@@ -406,10 +406,8 @@ export default function CreateBountyPage() {
       order: "asc",
       isNeedCountsAndTokensLocked: true,
     })
-      .then(async ({ count, rows }) => {
-        if (count > 0) {
-          setNetworks(rows);
-        }
+      .then(async ({ rows }) => {
+        setNetworks(rows);
       })
       .catch((error) => {
         console.log("Failed to retrieve networks list", error);
