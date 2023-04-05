@@ -17,11 +17,11 @@ import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { RegistryEvents } from "interfaces/enums/events";
+import {RegistryEvents} from "interfaces/enums/events";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
 
@@ -184,7 +184,7 @@ export function RegistrySetup({
       .then(parameters => {
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
-        setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
+        setNetworkCreationFeePercentage((+parameters[2]).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
         setCloseFeePercentage((+parameters[3]/+parameters[6]).toString());
         setCancelFeePercentage((+parameters[4]/+parameters[6]).toString());
         setBountyTokenDispatcher(parameters[5].toString().toLowerCase());
