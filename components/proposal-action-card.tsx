@@ -57,6 +57,10 @@ export default function ProposalActionCard({
       branchProtectionRules[state.currentBounty?.data?.branch]?.requiredApprovingReviewCount || 0 : 0;
   const approvalsCurrentPr = currentPullRequest?.approvals?.total || 0;
   const prsNeedsApproval = approvalsCurrentPr < approvalsRequired;
+  const isPrOwner = (
+    currentPullRequest?.userAddress?.toLowerCase() ===
+    state.currentUser?.walletAddress?.toLowerCase()
+  )
 
   const proposalCanBeDisputed = () => [
     isProposalDisputable(proposal?.contractCreationDate, 
@@ -91,6 +95,7 @@ export default function ProposalActionCard({
     !isDisputing,
     allowMergeCommit === true,
     !prsNeedsApproval,
+    !isPrOwner,
     // state.Service?.network?.active?.allowMerge === true
   ].every(v => v);
 
@@ -214,6 +219,14 @@ export default function ProposalActionCard({
               </ContextualSpan>
             </div> || ""
           }
+
+          { isPrOwner && (
+            <div className="row mt-2">
+              <ContextualSpan context="warning" classNameIcon="mb-4">
+                {t("proposal:messages.owner-pull-request")}
+              </ContextualSpan>
+            </div>
+          )}
 
           { allowMergeCommit === false &&
             <div className="row mt-2">
