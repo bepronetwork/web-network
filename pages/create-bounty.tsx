@@ -12,6 +12,7 @@ import CheckCircle from "assets/icons/check-circle";
 
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
+import { ContextualSpan } from "components/contextual-span";
 import ContractButton from "components/contract-button";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
@@ -89,6 +90,7 @@ export default function CreateBountyPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [currentNetwork, setCurrentNetwork] = useState<Network>();
   const [networks, setNetworks] = useState<Network[]>([]);
+  const [notFoundNetworks, setNotFoundNetwork] = useState<boolean>(false);
   const [showModalSuccess, setShowModalSuccess] = useState<boolean>(false);
   const [currentCid, setCurrentCid] = useState<string>("");
 
@@ -406,8 +408,9 @@ export default function CreateBountyPage() {
       order: "asc",
       isNeedCountsAndTokensLocked: true,
     })
-      .then(async ({ rows }) => {
+      .then(async ({ count ,rows }) => {
         setNetworks(rows);
+        setNotFoundNetwork(count > 0 ? false : true);
       })
       .catch((error) => {
         console.log("Failed to retrieve networks list", error);
@@ -512,6 +515,11 @@ export default function CreateBountyPage() {
             networks={networks}
             onSelect={setCurrentNetwork}
           />
+          {notFoundNetworks && (
+            <ContextualSpan context="danger" className="my-3">
+              {t("bounty:errors.no-networks-chain")}
+            </ContextualSpan>
+          )}
         </SelectNetwork>
       );
 
