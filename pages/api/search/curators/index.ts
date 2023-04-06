@@ -17,14 +17,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, isCurrentlyCurator, networkName, page, chainShortName } = req.query || {};
+    const { address, isCurrentlyCurator, networkName, page, chainShortName } =
+      req.query || {};
 
     if (networkName) {
       const network = await models.network.findOne({
         where: {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-          }
+          },
         },
         include: [
           {
@@ -32,10 +33,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             where: {
               ...(chainShortName
                 ? {
-                  chainShortName: Sequelize.where(Sequelize.fn("lower",
-                    Sequelize.col("chain.chainShortName")),
-                    chainShortName.toString().toLowerCase()),
-                }
+                    chainShortName: Sequelize.where(
+                      Sequelize.fn(
+                        "lower",
+                        Sequelize.col("chain.chainShortName")
+                      ),
+                      chainShortName.toString().toLowerCase()
+                    ),
+                  }
                 : {}),
             },
           },
@@ -58,10 +63,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
               where: {
                 ...(chainShortName
                   ? {
-                    chainShortName: Sequelize.where(Sequelize.fn("lower",
-                      Sequelize.col("network.chain.chainShortName")),
-                      chainShortName.toString().toLowerCase()),
-                  }
+                      chainShortName: Sequelize.where(
+                        Sequelize.fn(
+                          "lower",
+                          Sequelize.col("network.chain.chainShortName")
+                        ),
+                        chainShortName.toString().toLowerCase()
+                      ),
+                    }
                   : {}),
               },
               required: true,
@@ -69,34 +78,47 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           ],
           required: true,
         },
-        { association: "delegations" }
+        { association: "delegations" },
       ],
     };
 
     if (address)
-      whereCondition.address = Sequelize.where(Sequelize.fn("lower", Sequelize.col("curator.address")),
-        address.toString().toLowerCase());
+      whereCondition.address = Sequelize.where(
+        Sequelize.fn("lower", Sequelize.col("curator.address")),
+        address.toString().toLowerCase()
+      );
 
     if (isCurrentlyCurator)
       whereCondition.isCurrentlyCurator = isCurrentlyCurator;
 
     const curators = await models.curator
-      .findAndCountAll(paginate({
-        attributes: {
-          exclude: ["id"],
-        },
-        where: whereCondition,
-        nest: true,
-        ...queryParams,
-      }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
+      .findAndCountAll(
+        paginate(
+          {
+            attributes: {
+              exclude: ["id"],
+            },
+            where: whereCondition,
+            nest: true,
+            ...queryParams,
+          },
+          req.query,
+          [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]
+        )
+      )
       .then(async (items) => {
-        return Promise.all(items.rows.map(async (item) => {
-          item.dataValues.disputes = await models.dispute.count({
-            where: { address: item.address },
-          });
-          return item;
-        }))
-          .then((values) => ({ count: items.count, rows: handleNetworkValues(values) }))
+        return Promise.all(
+          items.rows.map(async (item) => {
+            item.dataValues.disputes = await models.dispute.count({
+              where: { address: item.address },
+            });
+            return item;
+          })
+        )
+          .then((values) => ({
+            count: items.count,
+            rows: handleNetworkValues(values),
+          }))
           .catch(() => items);
       });
 
@@ -124,4 +146,3 @@ async function SearchCurators(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 export default LogAccess(WithCors(WithValidChainId(SearchCurators)));
-
