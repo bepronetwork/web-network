@@ -9,7 +9,7 @@ export interface SearchLeaderBoard {
 
 export interface LeaderBoard {
     address: string;
-    githubHandle?: string;
+    githubLogin?: string;
     numberNfts?: number;
     ownedBountiesOpened?: number;
     ownedBountiesClosed?: number;
