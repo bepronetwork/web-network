@@ -6,22 +6,45 @@ import models from "db/models";
 import {LogAccess} from "middleware/log-access";
 import WithCors from "middleware/withCors";
 
-const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 3) => (models.issue.findAll({
-  where: {
-    ...whereCondition,
-    state,
-  },
-  order: [[ String(sortBy), String(order) ]],
-  include: [ 
-    { 
-      association: "network",
-      include: [ { association: "chain" }]
+const handleWhereState = (state: string) => {
+  if(state === 'funding'){
+    return ({
+      [Op.and]: [
+        { state: { [Op.in]: ["draft", "open"] } },
+        { fundingAmount: { [Op.ne]: "0" } },
+      ],
+    })
+  }
+
+  if(state === 'open'){
+    return ({
+      state: state,
+      fundingAmount: { [Op.eq]: "0" }
+    })
+  }
+
+  return ({ state: state })
+}
+
+const getLastIssuesByStatus = async (state, whereCondition, sortBy, order, limit = 3) => 
+  models.issue.findAll({
+    where: {
+      ...whereCondition,
+      ...(state
+        ? handleWhereState(state)
+        : {}),
     },
-    { association: "repository" },
-    { association: "transactionalToken" }
-  ],
-  limit
-}))
+    order: [[String(sortBy), String(order)]],
+    include: [
+      {
+        association: "network",
+        include: [{ association: "chain" }],
+      },
+      { association: "repository" },
+      { association: "transactionalToken" },
+    ],
+    limit,
+  });
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
@@ -29,6 +52,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     repoId,
     creator,
     address,
+    state,
     networkName,
     sortBy,
     order
@@ -65,12 +89,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.network_id = {[Op.in]: networks.map(network => network.id)}
   }
 
-  const issuesOpen = await getLastIssuesByStatus("open",
-                                                 whereCondition,
-                                                 sortBy,
-                                                 order);
-  
-  return res.status(200).json(issuesOpen);
+  const issues = await getLastIssuesByStatus(state,
+                                             whereCondition,
+                                             sortBy,
+                                             order);
+                                            
+  return res.status(200).json(issues);
 }
 
 async function getAll(req: NextApiRequest, res: NextApiResponse) {
