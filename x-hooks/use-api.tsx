@@ -34,7 +34,6 @@ import { Token } from "interfaces/token";
 import {api} from "services/api";
 import { WinStorage } from "services/win-storage";
 
-import {Entities, Events} from "types/dappkit";
 
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
 import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
@@ -158,7 +157,8 @@ export default function useApi() {
     order = "DESC",
     address = "",
     creator = "",
-    networkName = ""
+    networkName = "",
+    state = "open",
   }) {
     const params = new URLSearchParams({
       address,
@@ -166,11 +166,15 @@ export default function useApi() {
       sortBy,
       order,
       creator,
-      networkName: networkName.replaceAll(" ", "-")
+      networkName: networkName.replaceAll(" ", "-"),
+      state
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => (data.map(issueParser)))
+      .then(({ data }): IssueBigNumberData[] => {
+        console.log(data.map(issue => ({type: typeof issue?.fundingAmount, value: issue?.fundingAmount})))
+        return (data.map(issueParser))
+      })
       .catch((): IssueBigNumberData[] => ([]));
   }
 
@@ -217,9 +221,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getPayments(wallet: string, networkName = DEFAULT_NETWORK_NAME, startDate: string, endDate: string) {
+  async function getPayments(wallet: string, startDate: string, endDate: string) {
     const dates = startDate ? { startDate, endDate } : { endDate }
-    const params = new URLSearchParams({ wallet, networkName, ...dates }).toString();
+    const params = new URLSearchParams({ wallet, ...dates }).toString();
 
     return api
       .get<IssueData[]>(`/payments?${params}`)
@@ -597,10 +601,10 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function getTokens(chainId?: string) {
+  
+  async function getTokens(chainId?: string, networkName?: string) {
     return api
-      .get<Token[]>("/search/tokens", { params: {chainId} })
+      .get<Token[]>("/search/tokens", { params: {chainId, networkName} })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;

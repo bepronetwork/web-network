@@ -83,7 +83,7 @@ export default function NetworkItem({
         <FlexRow className={`${!isNetworkType && "justify-content-between"}`}>
           <FlexRow className={`${isNetworkType && "col-3"}`}>
             <FlexColumn className="justify-content-center me-2">
-              { typeof iconNetwork === "string" ? <NetworkLogo
+            { typeof iconNetwork === "string" ? <NetworkLogo
                 src={`${settings?.urls?.ipfs}/${iconNetwork}`}
                 alt={`${networkName} logo`}
                 isBepro={networkName?.toLowerCase() === "bepro"}
@@ -129,7 +129,7 @@ export default function NetworkItem({
               <FlexRow>
                 {renderAmount()}
                 {handleNetworkLink && (
-                  <Button className="button-gray-850 ms-3 cursor-pointer">
+                  <Button className="button-gray-850 ms-3 cursor-pointer" onClick={handleNetworkLink}>
                     <span>{t("go-to-network")}</span>{" "}
                     <ArrowUpRight className="w-9-p h-9-p" />
                   </Button>

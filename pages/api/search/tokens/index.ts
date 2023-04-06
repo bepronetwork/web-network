@@ -30,13 +30,20 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         include: [
           {
             association: "networks",
-            attributes: [],
             required: true,
             where: {
               name: Sequelize.where(colToLower("networks.name"), "=", (networkName as string).toLowerCase())
             }
           }
         ]
+      };
+    } else {
+      queryParams = {
+        include: [
+          {
+            association: "networks",
+          },
+        ],
       };
     }
       

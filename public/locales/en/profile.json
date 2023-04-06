@@ -1,5 +1,8 @@
 {
   "balance": "Balance",
+  "wallet": "Wallet",
+  "tokens": "Tokens",
+  "received-in-total": "Received in total",
   "oracle-name-placeholder": "Locked Network Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",
