@@ -77,24 +77,24 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (address)
       whereCondition.address = Sequelize.where(Sequelize.fn("lower", Sequelize.col("curator.address")),
-                                               address.toString().toLowerCase());
+        address.toString().toLowerCase());
 
     if (isCurrentlyCurator)
       whereCondition.isCurrentlyCurator = isCurrentlyCurator;
 
     const curators = await models.curator
       .findAndCountAll(paginate({
-      attributes: {
-        exclude: ["id"],
-      },
-      where: whereCondition,
-      nest: true,
-      ...queryParams,
-    }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
+        attributes: {
+          exclude: ["id"],
+        },
+        where: whereCondition,
+        nest: true,
+        ...queryParams,
+      }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
         return Promise.all(items.rows.map(async (item) => {
           item.dataValues.disputes = await models.dispute.count({
-              where: { address: item.address },
+            where: { address: item.address },
           });
           return item;
         }))
