@@ -41,7 +41,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             const user = await models.user.findOne({
                 where: { address: item.address.toLowerCase() },
             });
-            item.dataValues.githubHandle = user?.githubHandle || null;
+            item.dataValues.githubLogin = user?.githubLogin || null;
             return item;
           }))
             .then((values) => values)
@@ -51,7 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       const result = [];
 
       result.push(...leaderboard.filter(({ address, dataValues }) =>
-          [address, dataValues?.githubHandle].some((text) =>
+          [address, dataValues?.githubLogin].some((text) =>
             searchPatternInText(text || "", String(search)))));
 
       const paginatedData = paginateArray(result, 10, page || 1);
@@ -79,7 +79,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                 where: { address: item.address.toLowerCase() },
             });
 
-            item.dataValues.githubHandle = user?.githubHandle || null;
+            item.dataValues.githubLogin = user?.githubLogin || null;
             
             return item;
           }))
