@@ -157,7 +157,8 @@ export default function useApi() {
     order = "DESC",
     address = "",
     creator = "",
-    networkName = ""
+    networkName = "",
+    state = "open",
   }) {
     const params = new URLSearchParams({
       address,
@@ -165,11 +166,15 @@ export default function useApi() {
       sortBy,
       order,
       creator,
-      networkName: networkName.replaceAll(" ", "-")
+      networkName: networkName.replaceAll(" ", "-"),
+      state
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => (data.map(issueParser)))
+      .then(({ data }): IssueBigNumberData[] => {
+        console.log(data.map(issue => ({type: typeof issue?.fundingAmount, value: issue?.fundingAmount})))
+        return (data.map(issueParser))
+      })
       .catch((): IssueBigNumberData[] => ([]));
   }
 
@@ -596,10 +601,10 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function getTokens(chainId?: string) {
+  
+  async function getTokens(chainId?: string, networkName?: string) {
     return api
-      .get<Token[]>("/search/tokens", { params: {chainId} })
+      .get<Token[]>("/search/tokens", { params: {chainId, networkName} })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -702,7 +707,7 @@ export default function useApi() {
     page = "1",
     address = "",
     isCurrentlyCurator = undefined,
-    networkName = DEFAULT_NETWORK_NAME,
+    networkName = "",
     sortBy = "updatedAt",
     order = "DESC",
     chainShortName
