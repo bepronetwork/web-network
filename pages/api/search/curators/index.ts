@@ -71,6 +71,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           ],
           required: true,
         },
+        { association: "delegations" }
       ],
     };
 
@@ -83,25 +84,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const curators = await models.curator
       .findAndCountAll(paginate({
-            attributes: {
-              exclude: ["id"],
-            },
-            where: whereCondition,
-            nest: true,
-            ...queryParams,
+      attributes: {
+        exclude: ["id"],
       },
       where: whereCondition,
       nest: true,
-      include: [
-        {
-          association: "network",
-          include: [
-            { association: "networkToken" },
-            { association: "chain" },
-          ]
-        },
-        { association: "delegations" },
-      ]
+      ...queryParams,
     }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
         return Promise.all(items.rows.map(async (item) => {
