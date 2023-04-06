@@ -35,14 +35,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             where: {
               ...(chainShortName
                 ? {
-                    chainShortName: Sequelize.where(
-                      Sequelize.fn(
-                        "lower",
-                        Sequelize.col("chain.chainShortName")
-                      ),
-                      chainShortName.toString().toLowerCase()
-                    ),
-                  }
+                    chainShortName: Sequelize.where(Sequelize.fn("lower",
+                                                                 Sequelize.col("chain.chainShortName")),
+                                                    chainShortName.toString().toLowerCase()),
+                }
                 : {}),
             },
           },
@@ -65,14 +61,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
               where: {
                 ...(chainShortName
                   ? {
-                      chainShortName: Sequelize.where(
-                        Sequelize.fn(
-                          "lower",
-                          Sequelize.col("network.chain.chainShortName")
-                        ),
-                        chainShortName.toString().toLowerCase()
-                      ),
-                    }
+                      chainShortName: Sequelize.where(Sequelize.fn("lower",
+                                                                   Sequelize.col("network.chain.chainShortName")),
+                                                      chainShortName.toString().toLowerCase()),
+                  }
                   : {}),
               },
               required: true,
@@ -85,38 +77,30 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     };
 
     if (address)
-      whereCondition.address = Sequelize.where(
-        Sequelize.fn("lower", Sequelize.col("curator.address")),
-        address.toString().toLowerCase()
-      );
+      whereCondition.address = Sequelize.where(Sequelize.fn("lower", Sequelize.col("curator.address")),
+                                               address.toString().toLowerCase());
 
     if (isCurrentlyCurator)
       whereCondition.isCurrentlyCurator = isCurrentlyCurator;
 
     const curators = await models.curator
-      .findAndCountAll(
-        paginate(
-          {
+      .findAndCountAll(paginate({
             attributes: {
               exclude: ["id"],
             },
             where: whereCondition,
             nest: true,
             ...queryParams,
-          },
-          req.query,
-          [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]
-        )
-      )
+      },
+                                req.query,
+          [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
-        return Promise.all(
-          items.rows.map(async (item) => {
-            item.dataValues.disputes = await models.dispute.count({
+        return Promise.all(items.rows.map(async (item) => {
+          item.dataValues.disputes = await models.dispute.count({
               where: { address: item.address },
-            });
-            return item;
-          })
-        )
+          });
+          return item;
+        }))
           .then((values) => ({
             count: items.count,
             rows: handleNetworkValues(values),
@@ -137,12 +121,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
 async function SearchCurators(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();
