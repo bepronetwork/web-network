@@ -106,7 +106,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const [isLoadingParticipants, setIsLoadingParticipants] = useState<boolean>(false);
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
+  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>();
   const [showDecimalsError, setShowDecimalsError] = useState(false)
 
   const {state} = useAppState();
@@ -138,7 +138,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
-          currentDistrbuition.prAddressAmount.find((p) => 
+          currentDistrbuition.prAddressAmount.find((p) =>
           ap.amount === p.amount && ap.address.toLowerCase() === p.address.toLowerCase()));
       } else {
         return false;
@@ -183,13 +183,13 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         handleInputColor("success");
       }
 
-      const proposalDetails = 
+      const proposalDetails =
         currentDistrbuition.prAddressAmount.map(({ amount, address }) => ({ percentage: amount, recipient: address }));
 
-      const distributedAmounts = 
+      const distributedAmounts =
         calculateDistributedAmounts(treasury, mergeCreator, proposerFeeShare, bountyAmount, proposalDetails);
 
-      if (distributedAmounts.proposals.some(({ value, percentage }) => 
+      if (distributedAmounts.proposals.some(({ value, percentage }) =>
         BigNumber(value).lt(1e-15) && BigNumber(percentage).gt(0))) {
         handleInputColor("error");
         setShowExceptionalMessage(true);
@@ -234,7 +234,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
     getPullRequestParticipants(state.Service?.network?.repos?.active.githubPath, +githubId)
       .then((participants) => {
-        const tmpParticipants = 
+        const tmpParticipants =
           participants.filter(p => p.toLowerCase() !== state.Settings.github.botUser.toLowerCase());
 
         pullRequests
@@ -310,6 +310,21 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   }
 
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
+
+  function pullRequestToOption(pr) {
+    if (!pr) return;
+
+    return {
+      value: pr?.id,
+      label: `PR #${pr?.githubId} ${t("misc.by")} @${pr?.githubLogin}`,
+      githubId: pr?.githubId,
+      githubLogin: pr?.githubLogin,
+      marged: pr?.merged,
+      isMergeable: pr?.isMergeable,
+      isDraft: pr?.status === "draft",
+      isDisable: pr?.merged || !pr?.isMergeable || pr?.status === "draft"
+    }
+  }
 
   // useEffect(() => {
   //   if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
@@ -401,8 +416,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   return (
     <div className="d-flex">
       <ReadOnlyButtonWrapper >
-        <ContractButton 
-          className="read-only-button" 
+        <ContractButton
+          className="read-only-button"
           onClick={() => setShow(true)}
         >
           {t("proposal:actions.create")}
@@ -449,27 +464,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
             SingleValue
           }}
           placeholder={t("forms.select-placeholder")}
-          defaultValue={{
-            value: currentPullRequest?.id,
-            label: currentPullRequest && `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
-              currentPullRequest?.githubLogin
-            }` || t("forms.select-placeholder"),
-            githubId: currentPullRequest?.githubId,
-            githubLogin: currentPullRequest?.githubLogin,
-            marged: currentPullRequest?.merged,
-            isMergeable: currentPullRequest?.isMergeable,
-            isDisable: false
-          }}
-          options={pullRequests?.map((items: pullRequest) => ({
-            value: items.id,
-            label: `PR #${items.githubId} ${t("misc.by")} @${items.githubLogin}`,
-            githubId: items.githubId,
-            githubLogin: items.githubLogin,
-            marged: items.merged,
-            isMergeable: items.isMergeable,
-            isDraft: items.status === "draft",
-            isDisable: items.merged || !items.isMergeable || items.status === "draft"
-          }))}
+          value={pullRequestToOption(currentPullRequest)}
+          options={pullRequests?.map(pullRequestToOption)}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
           isSearchable={false}
