@@ -6,11 +6,20 @@
   "oracle-name-placeholder": "Locked Network Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",
+  "total-votes": "Total Votes",
+  "locked-by-me": "Locked by me",
   "connect-wallet": "Connect Wallet",
   "council": "Curator",
   "connect-github": "Connect Github",
   "go-to-network": "Go to Network",
   "connections": "Connections",
+  "voting-power": "Voting Power",
+  "need-network-to-manage": "To manage your voting power you need to be in a especific network",
+  "network-columns": {
+    "network-name": "Network name",
+    "total-votes": "Total votes",
+    "network-link": "Network link"
+  },
   "payments": {
     "period": "Period"
   },

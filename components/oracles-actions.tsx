@@ -60,7 +60,7 @@ function OraclesActions({
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
   const oracleExchangeRate = Service?.network?.amounts?.oracleExchangeRate || 1;
-  const oracleAmount = action === t("my-oracles:actions.lock.label") ? 
+  const oracleAmount = action === t("my-oracles:actions.lock.label") ?
     BigNumber(tokenAmount || 0).multipliedBy(oracleExchangeRate).toFixed() :
     BigNumber(tokenAmount || 0).dividedBy(oracleExchangeRate).toFixed();
 
@@ -74,29 +74,29 @@ function OraclesActions({
   const renderInfo = {
     Lock: {
       title: t("my-oracles:actions.lock.title", { currency: networkTokenSymbol }),
-      description: 
-             t("my-oracles:actions.lock.description", { 
-               currency: networkTokenSymbol, 
+      description:
+             t("my-oracles:actions.lock.description", {
+               currency: networkTokenSymbol,
                token: Service?.network?.active?.networkToken?.symbol
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: formatNumberToNScale(oracleAmount),
+        amount: formatNumberToNScale(oracleAmount, undefined, ""),
         token: Service?.network?.active?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-purple">
-                            {t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })}
+                            {t("misc.votes")}
                           </span>{" "}
           {t("misc.from")} <span className="text-primary">
             {networkTokenSymbol}
           </span>
         </>
       ),
-      body: 
-        t("my-oracles:actions.lock.body", { 
-          amount: formatNumberToNScale(tokenAmount),
-          oracleAmount: formatNumberToNScale(oracleAmount),
+      body:
+        t("my-oracles:actions.lock.body", {
+          amount: formatNumberToNScale(tokenAmount, undefined, ""),
+          oracleAmount: formatNumberToNScale(oracleAmount, undefined, ""),
           currency: networkTokenSymbol,
           token: Service?.network?.active?.networkToken?.symbol
         }),
@@ -105,10 +105,10 @@ function OraclesActions({
       }
     },
     Unlock: {
-      title: 
+      title:
         t("my-oracles:actions.unlock.title", { currency: networkTokenSymbol }),
-      description: 
-        t("my-oracles:actions.unlock.description", { 
+      description:
+        t("my-oracles:actions.unlock.description", {
           currency: networkTokenSymbol,
           token: Service?.network?.active?.networkToken?.symbol
         }),
@@ -126,7 +126,7 @@ function OraclesActions({
                            </span>
         </>
       ),
-      body: t("my-oracles:actions.unlock.body", { 
+      body: t("my-oracles:actions.unlock.body", {
         amount: formatNumberToNScale(tokenAmount),
         oracleAmount: formatNumberToNScale(oracleAmount),
         currency: networkTokenSymbol,
@@ -204,7 +204,7 @@ function OraclesActions({
   function getCurrentLabel() {
     return action === t("my-oracles:actions.lock.label")
       ? networkTokenSymbol
-      : t("$oracles", { token: Service?.network?.active?.networkToken?.symbol });
+      : t("token-votes", { token: "" });
   }
 
   function getMaxAmount(trueValue = false): string {
@@ -218,7 +218,7 @@ function OraclesActions({
     if (trueValue)
       return amount;
 
-    return formatNumberToNScale(amount);
+    return formatNumberToNScale(amount, undefined, "");
   }
 
   function setMaxAmount() {
@@ -231,7 +231,7 @@ function OraclesActions({
       : TransactionTypes.unlock;
   }
 
-  const needsApproval = () => 
+  const needsApproval = () =>
     networkTokenERC20.allowance.isLessThan(tokenAmount) && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
@@ -242,27 +242,28 @@ function OraclesActions({
   return (
     <>
       <div className="col-md-6">
-        <div className="content-wrapper h-100">
+        <div className="bg-gray-950 border border-gray-800 border-radius-4 p-4 h-100">
           <OraclesBoxHeader
             actions={actions}
             onChange={setAction}
             currentAction={action}
           />
 
-          <p className="caption-small text-white text-uppercase mt-2 mb-3">
+          <p className="caption-small text-gray-500 font-weight-500 text-uppercase mt-2 mb-3">
             {renderInfo?.description}
           </p>
 
           <InputNumber
             disabled={!wallet?.address}
+            className="bg-gray-900"
             label={t("my-oracles:fields.amount.label", {
               currency: getCurrentLabel()
             })}
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${
               getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })
-                ? "text-purple"
-                : "text-primary"
+                ? "text-purple bg-gray-900"
+                : "text-primary bg-gray-900"
             }`}
             max={wallet?.balance?.bepro?.toFixed()}
             error={!!error}
@@ -282,8 +283,8 @@ function OraclesActions({
                 {getCurrentLabel()} {t("misc.available")}
                 <span onClick={setMaxAmount}
                       className={`caption-small ml-1 cursor-pointer text-uppercase ${(
-                        getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol }) 
-                          ? "text-purple" 
+                        getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })
+                          ? "text-purple"
                           : "text-primary"
                       )}`}>
                   {t("misc.max")}

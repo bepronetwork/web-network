@@ -12,37 +12,50 @@ import { TokenInfo } from "interfaces/token";
 export type TokenBalanceType = Partial<TokenInfo>;
 
 interface TokenBalanceProps {
-  type: "token" | "oracle" | "delegation";
+  type?: "token" | "oracle" | "delegation";
   delegation?: DelegationExtended;
   overSymbol?: string;
+  tokenColor?: string;
+  variant?: "network" | "multi-network";
   onTakeBackClick?: () => void;
 }
 
-export default function TokenBalance({ 
-  icon, 
-  name, 
-  symbol, 
+export default function TokenBalance({
+  icon,
+  name,
+  symbol,
   balance,
-  type,
+  type = "token",
   delegation,
   overSymbol,
-  onTakeBackClick
+  onTakeBackClick,
+  tokenColor,
+  variant = "network"
 } : TokenBalanceType & TokenBalanceProps) {
   const { t } = useTranslation(["common"]);
 
   const CONTAINER_CLASSES = [
     "justify-content-between align-items-center bg-transparent",
-    "border border-dark-gray border-radius-8 mb-2 py-3 px-4"
+    "border border-gray-800 border-radius-4 mb-2 py-3 px-4",
+    variant === "network" ? "bg-gray-900" : "bg-gray-950"
   ];
 
-  const symbolColor = {
-    token: "primary",
-    oracle: "purple",
-    delegation: "purple"
-  };
+  function getTextColorProps(classes) {
+    if (tokenColor)
+      return {
+        style: {
+          color: tokenColor
+        },
+        className: classes
+      };
 
-  const delegationSymbol =  delegation && 
-    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span className="ml-1 text-purple">{symbol}</span></>;
+    return {
+      className: `${classes} text-primary`
+    };
+  }
+
+  const delegationSymbol =  delegation &&
+    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span {...getTextColorProps("ml-1")}>{symbol}</span></>;
 
   return (
     <FlexRow className={CONTAINER_CLASSES.join(" ")}>
@@ -52,19 +65,33 @@ export default function TokenBalance({
         </FlexColumn>
 
         <FlexColumn>
-          <span className="caption text-white">{overSymbol ? overSymbol : (delegationSymbol || symbol)}</span>
-          <span className="caption text-gray text-capitalize font-weight-normal">{delegation?.to || name}</span>
+          <span className="caption text-white font-weight-500">
+            {overSymbol ? overSymbol : (delegationSymbol || symbol)}
+          </span>
+          <span className="caption text-gray-500 text-capitalize font-weight-500">{delegation?.to || name}</span>
         </FlexColumn>
       </FlexRow>
 
       <FlexRow>
-        {type === "delegation" && 
-          <ContractButton onClick={onTakeBackClick} color="purple" outline  textClass="text-white">
+        {(type === "delegation" && onTakeBackClick) &&
+          <ContractButton
+            onClick={onTakeBackClick}
+            color="gray-850"
+            textClass="text-gray-200 font-weight-500 text-capitalize"
+            className="border-radius-4 border border-gray-800"
+          >
             {t("actions.take-back")}
-          </ContractButton> ||
+          </ContractButton>
+        }
+
+        { type !== "delegation" &&
           <>
-            <span className="caption text-white mr-1">{formatStringToCurrency(BigNumber(balance).toFixed())}</span>
-            <span className={`caption text-${symbolColor[type]}`}>{symbol}</span>
+            <span className="caption text-white mr-1 font-weight-500">
+              {formatStringToCurrency(BigNumber(balance).toFixed())}
+            </span>
+            <span {...getTextColorProps("caption font-weight-500")}>
+              {symbol}
+            </span>
           </>
         }
       </FlexRow>

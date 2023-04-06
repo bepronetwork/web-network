@@ -1,33 +1,33 @@
 {
-  "how-to-use": "How to use bv{{token}} ?",
-  "oracles-usage": "bv{{token}} can be used for Curators or as a requirement to create Distributions in the Network",
+  "how-to-use": "How to use Votes ?",
+  "oracles-usage": "Votes can be used for Curators or as a requirement to create Distributions in the Network",
   "available": "Available",
   "delegated": "Delegated",
   "list-of-delegations": "List of Delegations",
   "descriptions": {
-    "oracles-delegated-to-others": "bv{{token}} delegated by me to others users",
-    "oracles-delegated-to-me": "bv{{token}} delegated to me by others users"
+    "oracles-delegated-to-others": "Votes delegated by me to others users",
+    "oracles-delegated-to-me": "Votes delegated to me by others users"
   },
   "actions": {
     "lock": {
       "label": "Lock",
       "title": "Lock {{currency}}",
-      "description": "Lock {{currency}} to receive bv{{token}}",
-      "get-amount-oracles": "Get {{amount}} bv{{token}}",
-      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get /oracles{{oracleAmount}} bv{{token}}"
+      "description": "Lock {{currency}} to receive Votes",
+      "get-amount-oracles": "Get {{amount}} Votes",
+      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get /oracles{{oracleAmount}} Votes"
     },
     "unlock": {
       "label": "Unlock",
       "title": "Unlock {{currency}}",
-      "description": "Get {{currency}} from bv{{token}}",
+      "description": "Get {{currency}} from Votes",
       "get-amount-bepro": "Get {{amount}} {{currency}}",
-      "body": "Give away /oracles{{amount}} bv{{token}}/ /br/ to get back /bepro{{oracleAmount}} {{currency}}"
+      "body": "Give away /oracles{{amount}} Votes/ /br/ to get back /bepro{{oracleAmount}} {{currency}}"
     },
     "delegate": {
       "label": "Delegate",
-      "title": "Delegate bv{{token}}",
-      "delegate-to-address": "Delegate bv{{token}} to an address",
-      "description": "Delegate bv{{token}} to help curators"
+      "title": "Delegate Votes",
+      "delegate-to-address": "Delegate Votes to an address",
+      "description": "Delegate Votes to help curators"
     }
   },
   "fields": {
@@ -36,8 +36,8 @@
       "placeholder": "Insert an amount of {{currency}}"
     },
     "oracles": {
-      "label": "bv{{token}} Amount",
-      "placeholder": "Insert an amount of bv{{token}}"
+      "label": "Votes Amount",
+      "placeholder": "Insert an amount of Votes"
     },
     "address": {
       "label": "Delegation Address",
@@ -48,7 +48,7 @@
     "amount-greater": "Amount is greater than your {{amount}} amount",
     "amount-higher-0": "{{currency}} amount needs to be higher than 0.",
     "fill-required-fields": "Please fill all required fields.",
-    "self-delegate": "You can't delegate bv{{token}} to your own address.",
+    "self-delegate": "You can't delegate Votes to your own address.",
     "approve-transactions": "Please approve {{currency}} Transactions First. Check it and try again.",
     "no-delegates": "No delegations found",
     "invalid-wallet": "Wallet Address Invalid."
