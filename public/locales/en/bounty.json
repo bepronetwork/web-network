@@ -88,7 +88,8 @@
     "exceeds-allowance": "Bounty amount exceeds your allowance",
     "exceeds-minimum-amount": "Minimum amount is {{amount}}",
     "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
-    "description-limit": "Exceeds allowed limit of characters and files: {{value}}" 
+    "description-limit": "Exceeds allowed limit of characters and files: {{value}}",
+    "no-networks-chain": "The selected chain has no active networks"
   },
   "title": "Create new Bounty",
   "fields": {
