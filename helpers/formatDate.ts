@@ -11,7 +11,6 @@ export const formatDate = (date: number | string | Date, joiner = "/") => {
       d.getFullYear()
     ].join(joiner);
   } catch (e) {
-    console.debug(e);
     return `0`;
   }
 };
@@ -20,7 +19,6 @@ export const getTimeDifferenceInWords = (date: Date, dateToCompare: Date) => {
   try {
     return formatDistanceStrict(date, dateToCompare);
   } catch (e) {
-    console.debug(e);
     return `0`;
   }
 };
