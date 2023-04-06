@@ -467,10 +467,8 @@ export default class DAO {
   async getRegistryCreatorFee(): Promise<number> {
     if (!this.registry) await this.loadRegistry();
 
-    const creatorFee = await this.registry.networkCreationFeePercentage();
-    
     // networkCreationFeePercentage is aready dived per divisor on sdk
-    return (creatorFee * 100)
+    return await this.registry.networkCreationFeePercentage()
   }
 
   async isRegistryGovernor(address: string): Promise<boolean> {
