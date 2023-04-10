@@ -23,7 +23,7 @@ export default function IssueProposalProgressBar() {
 
   const {state} = useAppState();
 
-  const getChainTime = () => state.Service.active.getTimeChain().then(setChainTime).catch(console.log);
+  const getChainTime = () => state?.Service?.active?.getTimeChain().then(setChainTime).catch(console.log);
 
   const { isClosed, isCanceled, isDraft, isFundingRequest, isFunded } = state.currentBounty?.data || {};
 
