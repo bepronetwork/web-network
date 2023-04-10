@@ -16,6 +16,7 @@ $light-warning: #CCAB38;
 $dark-gray: #20222b;
 $gray: #c4c7d3;
 $gray-100: #E3E3E8;
+$gray-200: #C7C8D1;
 $gray-150: #D5D6DC;
 $gray-300: #ABACBA;
 $gray-400: #8F91A3;
@@ -84,6 +85,7 @@ $more-bg: (
   "warning-30": rgba($warning, 0.3),
   "gray-70": rgba($gray, 0.7),
   "gray-100": $gray-100,
+  "gray-200": $gray-200,
   "gray-150": $gray-150,
   "gray-300": $gray-300,
   "gray-400": $gray-400,
@@ -107,6 +109,7 @@ $more-colors: (
   "purple": $purple,
   "gray": $gray,
   "gray-100": $gray-100,
+  "gray-200": $gray-200,
   "gray-150": $gray-150,
   "gray-300": $gray-300,
   "gray-400": $gray-400,
