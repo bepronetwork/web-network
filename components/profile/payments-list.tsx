@@ -62,7 +62,7 @@ export default function PaymentsList({
             networkName={network?.name}
             iconNetwork={network?.logoIcon}
             handleNetworkLink={() => {
-              push(getURLWithNetwork("/", { chain: network?.chain?.chainName, network: network?.name }))
+              push(getURLWithNetwork("/", { chain: network?.chain?.chainShortName, network: network?.name }))
             }}
             amount={handleAmount(network?.id)}
             symbol={symbol}
