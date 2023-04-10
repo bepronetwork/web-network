@@ -3,6 +3,7 @@ import { Op, Sequelize, WhereOptions } from "sequelize";
 
 import models from "db/models";
 
+import handleNetworkValues from "helpers/handleNetworksValuesApi";
 import paginate, { calculateTotalPages } from "helpers/paginate";
 import { resJsonMessage } from "helpers/res-json-message";
 
@@ -16,7 +17,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, isCurrentlyCurator, networkName, page, chainShortName } = req.query || {};
+    const { address, isCurrentlyCurator, networkName, page, chainShortName } =
+      req.query || {};
 
     let queryParams = {};
 
@@ -25,7 +27,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         where: {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-          }
+          },
         },
         include: [
           {
@@ -70,6 +72,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           ],
           required: true,
         },
+        { association: "delegations" },
       ],
     };
 
@@ -98,7 +101,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           });
           return item;
         }))
-          .then((values) => ({ count: items.count, rows: values }))
+          .then((values) => ({
+            count: items.count,
+            rows: handleNetworkValues(values),
+          }))
           .catch(() => items);
       });
 
