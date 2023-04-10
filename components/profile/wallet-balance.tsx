@@ -121,7 +121,7 @@ export default function WalletBalance() {
         typeof token.balance === "string"
           ? BigNumber(token.balance)
           : token.balance,
-      price: await getCoinPrice(token.symbol,
+      price: await getCoinPrice(token?.symbol,
                                 state?.Settings.currency.defaultFiat),
     }))).then((tokens) => {
       const totalConverted = tokens.reduce((acc, token) =>
@@ -155,7 +155,7 @@ export default function WalletBalance() {
         <span className="h4 family-Regular text-white font-weight-medium">{t("profile:tokens")}</span>
         <FlexRow className="align-items-center">
           <span className="text-white mr-2">{t("labels.recivedintotal")}</span>
-          <span className="caption-medium text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
+          <span className="d-flex caption-medium text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
             {formatStringToCurrency(totalAmount)}
             <span className="text-white-30 ml-1 mr-2">
               {!hasNoConvertedToken ? state?.Settings?.currency?.defaultFiat : t("misc.token_other")}
