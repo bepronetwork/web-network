@@ -58,7 +58,8 @@ export default function BountiesPage() {
     Promise.all([
       searchIssues({
         networkName: query.network.toString(),
-        chainId: chain.chainId.toString()
+        chainId: chain.chainId.toString(),
+        visible: true
       }).then(({ rows } : { rows: IssueBigNumberData[] }) => rows),
       searchCurators({
         networkName: query.network.toString(),
