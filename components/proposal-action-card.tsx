@@ -225,7 +225,7 @@ export default function ProposalActionCard({
             </div> || ""
           }
 
-          {(isPrOwner && !chainDisputable && (proposalCanBeDisputed() || isRefusable())) && (
+          {(isPrOwner && !chainDisputable && !proposalCanBeDisputed()) && (
             <div className="row mt-2">
               <ContextualSpan context="warning" classNameIcon="mb-4">
                 {t("proposal:messages.owner-pull-request")}
@@ -233,7 +233,7 @@ export default function ProposalActionCard({
             </div>
           )}
 
-          {(isProposalOwner && !chainDisputable && (proposalCanBeDisputed() || isRefusable())) && (
+          {(isProposalOwner && !chainDisputable && !proposalCanBeDisputed()) && (
             <div className="row mt-2">
               <ContextualSpan context="warning">
                 {t("proposal:messages.owner-proposal")}
