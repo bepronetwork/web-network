@@ -38,8 +38,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       allNetworks,
       repoPath,
       tokenAddress,
-      chainId
+      chainId,
+      visible
     } = req.query || {};
+
+    if(visible) whereCondition.visible = visible;
 
     if (state) whereCondition.state = state;
 
