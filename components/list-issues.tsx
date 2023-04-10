@@ -192,6 +192,7 @@ export default function ListIssues({
       networkName: isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
         networkName || appState.Service?.network?.active?.name,
       allNetworks: isBountyHall || "",
+      visible: true,
       chainId: chain?.chainId?.toString(),
     })
       .then(async ({ count, rows, pages, currentPage }) => {
