@@ -51,7 +51,7 @@ export default function LeaderBoardListItem({ user }: LeaderBoardListItemProps) 
 
       <div className="col-3 d-flex align-items-center justify-content-center">
         <span className="caption-small text-white text-truncate">
-          {user?.githubHandle || "-"}
+          {user?.githubLogin || "-"}
         </span>
       </div>
 
