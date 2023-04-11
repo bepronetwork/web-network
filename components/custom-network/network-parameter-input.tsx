@@ -49,7 +49,7 @@ export default function NetworkParameterInput({
   return(
     <div className={`form-group col-3 mb-0 ${className}`}>
       <InputNumber
-        classSymbol={"text-primary"}
+        classSymbol={"blue-200"}
         min={0}
         placeholder={"0"}
         thousandSeparator

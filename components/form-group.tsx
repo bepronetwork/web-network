@@ -58,8 +58,8 @@ export function FormGroup({
     return (
       <>
         <OverlayTrigger placement="bottom" overlay={popover}>
-          <span>
-            <InfoIcon width={14} height={14} color="text-white-10" />
+          <span className="text-gray-500">
+            <InfoIcon width={14} height={14} color="gray-500" />
           </span>
         </OverlayTrigger>
       </>
@@ -69,7 +69,10 @@ export function FormGroup({
   return(
     <Col>
       <Form.Group className="form-group my-0">
-        <Form.Label className="caption-small d-flex flex-row align-items-center mb-1">
+        <Form.Label 
+          className={`caption-medium text-gray-50 text-capitalize 
+            font-weight-500 d-flex flex-row align-items-center mb-2`}
+        >
           <span className="mr-1">{label}</span>
           {renderDescription(rest?.description)}
         </Form.Label>
@@ -81,6 +84,7 @@ export function FormGroup({
             {...rest}
           /> ||
           <InputNumber
+            classSymbol={"blue-200"}
             onValueChange={handleNumberFormatChange}
             allowNegative={false}
             decimalScale={decimalScale}

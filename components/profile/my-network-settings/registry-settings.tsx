@@ -3,7 +3,10 @@ import {Col, Row} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
+import Button from "components/button";
+import Card from "components/card";
 import ContractButton from "components/contract-button";
+import CopyButton from "components/copy-button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import {FormGroup} from "components/form-group";
@@ -113,60 +116,103 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
 
   return (
     <>
-      {isGovernorRegistry && (
-        <Row className="mb-3">
-          <h3 className="text-capitalize family-Regular text-white">
-            {t("custom-network:registry.title-governor")}
-          </h3>
-        </Row>
-      )}
+      <Row className="my-3 align-items-center">
+        <Col>
+          <span className="caption-large text-white text-capitalize font-weight-medium mb-3">
+            {isGovernorRegistry
+              ? t("custom-network:registry.config-fees")
+              : t("custom-network:steps.network-settings.fields.fees.title")}
+          </span>
+        </Col>
+        
+        <Col xs="auto">
+          <Button
+            className="border-radius-4"
+            disabled
+          >
+            Save Changes
+          </Button>
+        </Col>
+      </Row>
 
-      <Row className="mt-2">
-        <span className="caption-medium text-white mb-3">
-          {isGovernorRegistry
-            ? t("custom-network:registry.config-fees")
-            : t("custom-network:steps.network-settings.fields.fees.title")}
-        </span>
-        <Row className="mb-4">
-          <Col xs={8}>
-            <TreasuryAddressField
-              value={settings?.treasury?.address?.value}
-              onChange={fields.treasury.setter}
-              validated={settings?.treasury?.address?.validated}
-              disabled={true}
-            />
-          </Col>
-        </Row>
-        <Col>
-          <NetworkParameterInput
-            disabled={!isGovernorRegistry}
-            key="cancel-fee"
-            label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
-            description={
-              t("custom-network:steps.treasury.fields.cancel-fee.description", REGISTRY_LIMITS["cancelFeePercentage"])
-            }
-            symbol="%"
-            value={settings?.treasury?.cancelFee?.value}
-            error={settings?.treasury?.cancelFee?.validated === false}
-            onChange={fields.cancelFee.setter}
-          />
+      <Row className="mb-4">
+        <Col xs="6">
+          <Card>
+            <Row className="mb-3">
+              <span className="caption-medium text-capitalize font-weight-medium text-gray-200">
+                {t("custom-network:steps.treasury.fields.address.label")}
+              </span>
+            </Row>
+            
+            <Row className="align-items-center">
+              <Col>
+                <span className="caption-medium text-capitalize font-weight-normal text-gray-50">
+                  {settings?.treasury?.address?.value}
+                </span>
+              </Col>
+
+              <Col xs="auto">
+                <CopyButton
+                  value={settings?.treasury?.address?.value}
+                />
+              </Col>
+            </Row>
+          </Card>
         </Col>
+      </Row>
+
+      <Row className="align-items-center">
+        <NetworkParameterInput
+          disabled={!isGovernorRegistry}
+          key="cancel-fee"
+          label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
+          description={
+            t("custom-network:steps.treasury.fields.cancel-fee.description", REGISTRY_LIMITS["cancelFeePercentage"])
+          }
+          symbol="%"
+          value={settings?.treasury?.cancelFee?.value}
+          error={settings?.treasury?.cancelFee?.validated === false}
+          onChange={fields.cancelFee.setter}
+        />
           
-        <Col>
-          <NetworkParameterInput
-            disabled={!isGovernorRegistry}
-            key="close-fee"
-            label={t("custom-network:steps.treasury.fields.close-fee.label")}
-            description={
-              t("custom-network:steps.treasury.fields.close-fee.description", REGISTRY_LIMITS["closeFeePercentage"])
-            }
-            symbol="%"
-            value={settings?.treasury?.closeFee?.value}
-            error={settings?.treasury?.closeFee?.validated === false}
-            onChange={fields.closeFee.setter}
-          />
-        </Col>
-        {isGovernorRegistry && (
+        <NetworkParameterInput
+          disabled={!isGovernorRegistry}
+          key="close-fee"
+          label={t("custom-network:steps.treasury.fields.close-fee.label")}
+          description={
+            t("custom-network:steps.treasury.fields.close-fee.description", REGISTRY_LIMITS["closeFeePercentage"])
+          }
+          symbol="%"
+          value={settings?.treasury?.closeFee?.value}
+          error={settings?.treasury?.closeFee?.validated === false}
+          onChange={fields.closeFee.setter}
+        />
+
+        <FormGroup
+          label={t("setup:registry.fields.network-creation-fee.label")}
+          placeholder="0"
+          symbol="%"
+          value={networkCreationFeePercentage}
+          onChange={setNetworkCreationFeePercentage}
+          variant="numberFormat"
+          description={t("setup:registry.fields.network-creation-fee.description")}
+          error={params.creationFee.error}
+          readOnly={!isGovernorRegistry}
+        />
+
+        <FormGroup
+          label={t("setup:registry.fields.network-creation-amount.label")}
+          placeholder="0"
+          value={lockAmountForNetworkCreation}
+          onChange={setLockAmountForNetworkCreation}
+          variant="numberFormat"
+          description={t("setup:registry.fields.network-creation-amount.description")}
+          readOnly={!isGovernorRegistry}
+          error={params.creationAmount.error}
+        />
+      </Row>
+
+        {/* {isGovernorRegistry && (
           <Col xs={4}>
             <ContractButton 
               onClick={saveFeeSettings} 
@@ -178,22 +224,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
               <span>{t("custom-network:registry.save-fees-config")}</span>
             </ContractButton>
           </Col>
-        )}
-      </Row>
-      <Row className="mb-2">
-        <Col>
-          <FormGroup
-            label={t("setup:registry.fields.network-creation-fee.label")}
-            placeholder="0"
-            symbol="%"
-            value={networkCreationFeePercentage}
-            onChange={setNetworkCreationFeePercentage}
-            variant="numberFormat"
-            description={t("setup:registry.fields.network-creation-fee.description")}
-            error={params.creationFee.error}
-            readOnly={!isGovernorRegistry}
-          />
-        </Col>
+        )} */}
+      {/* <Row className="mb-2">
+        
         {isGovernorRegistry && (
           <Col xs={5}>
             <ContractButton 
@@ -207,18 +240,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             </ContractButton>
           </Col>
         )}
-      </Row>
-      <Row className="mb-2">
-        <FormGroup
-          label={t("setup:registry.fields.network-creation-amount.label")}
-          placeholder="0"
-          value={lockAmountForNetworkCreation}
-          onChange={setLockAmountForNetworkCreation}
-          variant="numberFormat"
-          description={t("setup:registry.fields.network-creation-amount.description")}
-          readOnly={!isGovernorRegistry}
-          error={params.creationAmount.error}
-        />
+      </Row> */}
+      {/* <Row className="mb-2">
+        
         {isGovernorRegistry && (
           <Col xs={5}>
             <ContractButton 
@@ -232,7 +256,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             </ContractButton>
           </Col>
         )}
-      </Row>
+      </Row> */}
       {!isGovernorRegistry && (
           <Row className="mb-4">
             <WarningSpan

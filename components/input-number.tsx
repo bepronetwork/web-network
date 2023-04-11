@@ -55,10 +55,10 @@ export default function InputNumber({
   useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
 
   return (
-    <Component {...(shouldBeWrapped && { className: `form-group ${fullWidth ? 'w-100' : ''}` })}>
+    <Component {...(shouldBeWrapped && { className: `form-group mb-0 ${fullWidth ? 'w-100' : ''}` })}>
       {label && typeof label === 'string' ? (
         <label
-          className="caption-medium mb-2 text-gray-500 font-weight-500 d-flex align-items-center"
+          className="caption-medium mb-2 text-gray-50 font-weight-500 d-flex align-items-center text-capitalize"
           id={id}
         >
           <span className="mr-1">{label}</span>{" "}
