@@ -605,7 +605,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #fff;
   }
 
-  .form-control:not(:only-child), > input:not(:only-child) {
+  .form-control, > input {
     border: none !important;
   }
 
@@ -1512,11 +1512,18 @@ textarea.form-control {
 }
 
 .react-select__multi-value {
-  background-color: $white !important;
+  background-color: $gray-800 !important;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid $gray-700;
+  
+  &__label {
+    color: $gray-150 !important;
+  }
 }
 
 .react-select__multi-value__remove {
-  color: $black;
+  color: $gray-150;
 }
 
 .scroll-top-button {

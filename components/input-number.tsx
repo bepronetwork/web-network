@@ -69,15 +69,15 @@ export default function InputNumber({
         className={clsx("input-group border-radius-4", {
           ...errorStyle,
           ...successStyle,
-          ...warningStyle
+          ...warningStyle,
+          "border border-1 border-success border-radius-4": success,
+          "border border-1 border-danger border-radius-4": error,
+          "border border-1 border-warning border-radius-4": warning,
         }, groupClassName)}
       >
         <NumberFormat
           className={clsx("form-control border-radius-4",
                           {
-              "border border-1 border-success border-radius-4": success,
-              "border border-1 border-danger border-radius-4": error,
-              "border border-1 border-warning border-radius-4": warning,
               ...successStyle,
               ...warningStyle,
               ...errorStyle
@@ -96,9 +96,6 @@ export default function InputNumber({
             className={clsx("input-group-text caption-small border-radius-4",
                             classSymbol,
                             {
-                "border border-1 border-success border-radius-4": success,
-                "border border-1 border-danger border-radius-4": error,
-                "border border-1 border-warning border-radius-4": warning,
                 "group-disabled": params?.disabled,
                 ...errorStyle
                             })}
@@ -113,9 +110,6 @@ export default function InputNumber({
                             {
                 "group-disabled": params?.disabled,
                 "cursor-pointer": !params?.disabled,
-                "border border-1 border-success": success,
-                "border border-1 border-danger": error,
-                "border border-1 border-warning": warning,
                 ...errorStyle
                             })}
             onClick={setMaxValue}
