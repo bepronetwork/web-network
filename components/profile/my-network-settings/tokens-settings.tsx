@@ -222,11 +222,6 @@ export default function TokensSettings({
     return(
       <>
         <Col xs={col} key={`col-${type}`}>{handleSelectTokens(type)}</Col>
-        {isGovernorRegistry && (
-          <Col xs={4} className="mt-4 pt-1">
-            {renderButtons(type)}
-          </Col>
-        )}
       </>
     )
   } 
@@ -234,7 +229,7 @@ export default function TokensSettings({
   return (
     <>
       <Row className="mt-1">
-        <span className="caption-medium text-white mb-3">
+        <span className="caption-large text-white text-capitalize font-weight-medium mb-3">
           {isGovernorRegistry
             ? t("custom-network:config-tokens-registry")
             : t("custom-network:config-tokens")}

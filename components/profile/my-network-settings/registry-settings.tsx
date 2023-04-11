@@ -29,6 +29,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
   const { t } = useTranslation(["common", "custom-network", "setup"]);
 
   const [executingTx, setExecutingTx] = useState<Executing>();
+  const [registryTokenSymbol, setRegistryTokenSymbol] = useState<string>();
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState<string>();
   const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState<string>();
   
@@ -109,8 +110,14 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
   useEffect(() => {
     if(!state.Service?.active) return;
 
-    state.Service.active.getRegistryCreatorAmount().then(v => setLockAmountForNetworkCreation(v.toFixed()))
-    state.Service.active.getRegistryCreatorFee().then(v => v.toString()).then(setNetworkCreationFeePercentage)
+    state.Service.active.getRegistryCreatorAmount()
+      .then(v => setLockAmountForNetworkCreation(v.toFixed()));
+    state.Service.active.getRegistryCreatorFee()
+      .then(v => v.toString()).then(setNetworkCreationFeePercentage);
+    
+    if (!registryTokenSymbol)
+      state.Service?.active?.network?.registry?.token?.symbol()
+        .then(setRegistryTokenSymbol);
     
   },[state.Service.active]);
 
@@ -135,7 +142,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
       </Row>
 
-      <Row className="mb-4">
+      <Row className="mb-5">
         <Col xs="6">
           <Card>
             <Row className="mb-3">
@@ -161,7 +168,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
       </Row>
 
-      <Row className="align-items-center">
+      <Row className="align-items-center mb-5">
         <NetworkParameterInput
           disabled={!isGovernorRegistry}
           key="cancel-fee"
@@ -209,6 +216,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
           description={t("setup:registry.fields.network-creation-amount.description")}
           readOnly={!isGovernorRegistry}
           error={params.creationAmount.error}
+          symbol={registryTokenSymbol}
         />
       </Row>
 

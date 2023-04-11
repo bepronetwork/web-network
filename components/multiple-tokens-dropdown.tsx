@@ -93,7 +93,9 @@ export default function MultipleTokensDropdown({
 
   return (
     <div className="form-group">
-      <label className="caption-small mb-2">{label || t("misc.token")}</label>
+      <label className="caption-medium mb-2 text-gray-50 font-weight-500 text-capitalize">
+        {label || t("misc.token")}
+      </label>
       <CreatableSelect
         className="react-select-container"
         classNamePrefix="react-select"

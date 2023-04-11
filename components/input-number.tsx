@@ -66,18 +66,18 @@ export default function InputNumber({
         </label>
       ): label}
       <div
-        className={clsx("input-group border-radius-8", {
+        className={clsx("input-group border-radius-4", {
           ...errorStyle,
           ...successStyle,
           ...warningStyle
         }, groupClassName)}
       >
         <NumberFormat
-          className={clsx("form-control border-radius-8",
+          className={clsx("form-control border-radius-4",
                           {
-              "border border-1 border-success border-radius-8": success,
-              "border border-1 border-danger border-radius-8": error,
-              "border border-1 border-warning border-radius-8": warning,
+              "border border-1 border-success border-radius-4": success,
+              "border border-1 border-danger border-radius-4": error,
+              "border border-1 border-warning border-radius-4": warning,
               ...successStyle,
               ...warningStyle,
               ...errorStyle
@@ -93,12 +93,12 @@ export default function InputNumber({
         />
         {symbol && (
           <span
-            className={clsx("input-group-text caption-small border-radius-8",
+            className={clsx("input-group-text caption-small border-radius-4",
                             classSymbol,
                             {
-                "border border-1 border-success border-radius-8": success,
-                "border border-1 border-danger border-radius-8": error,
-                "border border-1 border-warning border-radius-8": warning,
+                "border border-1 border-success border-radius-4": success,
+                "border border-1 border-danger border-radius-4": error,
+                "border border-1 border-warning border-radius-4": warning,
                 "group-disabled": params?.disabled,
                 ...errorStyle
                             })}
@@ -108,7 +108,7 @@ export default function InputNumber({
         )}
         {setMaxValue && (
           <span
-            className={clsx("input-group-text caption-medium border-radius-8",
+            className={clsx("input-group-text caption-medium border-radius-4",
                             classSymbol,
                             {
                 "group-disabled": params?.disabled,
