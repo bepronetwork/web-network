@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
+
+import ArrowUpRightGray from "assets/icons/arrow-up-right-gray";
+import EyeIcon from "assets/icons/eye-icon";
+import EyeSlashIcon from "assets/icons/eye-slash-icon";
+import TrashIcon from "assets/icons/trash-icon";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
@@ -20,12 +25,16 @@ import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
+import useApi from "x-hooks/use-api";
 import { useNetwork } from "x-hooks/use-network";
+
+import { FlexColumn } from "./profile/wallet-balance";
+
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
   xClick?: () => void;
   size?: "sm" | "lg";
-  variant?: "network" | "multi-network";
+  variant?: "network" | "multi-network" | "management";
 }
 
 export default function IssueListItem({
@@ -36,9 +45,12 @@ export default function IssueListItem({
 }: IssueListItemProps) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common"]);
-
+  const [visible, setVisible] = useState<boolean>();
   const {state} = useAppState();
+  const {updateVisibleBounty} = useApi();
   const { getURLWithNetwork } = useNetwork();
+
+  const isVisible = visible !== undefined ? visible : issue?.visible
 
   const issueState = getIssueState({
     state: issue?.state,
@@ -61,12 +73,25 @@ export default function IssueListItem({
     }));
   }
 
-  function IssueTag() {
+  function handleHideBounty() {
+    updateVisibleBounty({
+      issueId: issue?.issueId,
+      creator: state?.currentUser?.walletAddress,
+      networkAddress: issue?.network?.networkAddress,
+      visible: !isVisible,
+      override: true,
+    })
+      .then(() => setVisible(!isVisible))
+      .catch((e) => console.debug("updateVisibleBounty error", e));
+  }
+  
+
+  function IssueTag({uppercase = true}) {
     const tag = issue?.network?.name;
     const id = issue?.githubId;
 
     return (
-      <span className={`${tag && 'text-uppercase'} h6 text-white-40 me-2`}>
+      <span className={`${(tag && uppercase) && 'text-uppercase'} h6 text-white-40 me-2`}>
         {tag ? `${tag}-${id}` : `#${id}`}
       </span>
     );
@@ -140,6 +165,52 @@ export default function IssueListItem({
             <IssueAmountInfo issue={issue} size={size} />
           </div>
         </>
+      </CardItem>
+    );
+  }
+
+  if (variant === "management") {
+    return (
+      <CardItem
+        variant="management"
+        hide={!isVisible}
+      >
+        <div className="row align-center">
+          <div className="col-md-6">
+            <span className={`text-truncate ${!isVisible && 'text-decoration-line'}`}>
+              {(issue?.title !== null && issue?.title) || (
+                <Translation ns="bounty" label={"errors.fetching"} />
+              )}
+            </span>
+            <div className={!isVisible && 'text-decoration-line'}>
+              <IssueTag uppercase={false} />
+            </div>
+          </div>
+          <div className="col-md-2 d-flex justify-content-center">
+            <FlexColumn className="me-3 justify-content-center">
+              <div
+                className="cursor-pointer"
+                onClick={handleClickCard}
+              >
+                <ArrowUpRightGray />
+              </div>
+            </FlexColumn>
+          </div>
+          <div className="col-md-2 d-flex justify-content-center">
+          <FlexColumn className="justify-content-center">
+              <div className="cursor-pointer" onClick={handleHideBounty}>
+                {isVisible ? <EyeIcon /> : <EyeSlashIcon />}
+              </div>
+          </FlexColumn>
+          </div>
+          <div className="col-md-2 d-flex justify-content-center">
+          <FlexColumn className="justify-content-center me-4">
+              <div>
+                <TrashIcon />
+              </div>
+          </FlexColumn>
+          </div>
+        </div>
       </CardItem>
     );
   }
