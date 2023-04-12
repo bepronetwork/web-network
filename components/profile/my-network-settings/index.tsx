@@ -308,7 +308,7 @@ export default function MyNetworkSettings({
       {!state.currentUser?.login && <WarningGithub />}
 
       <TabbedNavigation
-        className="my-network-tabs border border-dark-gray"
+        className="my-network-tabs"
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
       />
