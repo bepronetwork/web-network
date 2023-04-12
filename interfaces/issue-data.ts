@@ -68,6 +68,7 @@ export interface IssueData {
   hasReward?: boolean;
   fundedPercent: number;
   isKyc: boolean;
+  visible: boolean;
   kycTierList: number[];
 }
 
