@@ -32,6 +32,8 @@ import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
+import Management from "./management";
+
 interface MyNetworkSettingsProps {
   network: Network;
   updateEditingNetwork: () => void;
@@ -299,6 +301,15 @@ export default function MyNetworkSettings({
           </NetworkContainer>
         ),
       },
+      {
+        eventKey: "management",
+        title: "Management",
+        component: (
+          <NetworkContainer>
+            <Management />
+          </NetworkContainer>
+        )
+      }
     ])
   },[
     network,
