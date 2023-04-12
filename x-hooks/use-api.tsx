@@ -535,6 +535,21 @@ export default function useApi() {
       });
   }
 
+  async function updateVisibleBounty(managmentInfo: {
+    issueId: string;
+    visible: boolean;
+    creator: string;
+    networkAddress: string;
+    override: boolean;
+  }) {
+    return api
+      .put("/network/management", { ...managmentInfo })
+      .then((response) => response)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   async function getProposal(dbId: string | number): Promise<Proposal> {
     return api
       .get<Proposal>(`/merge-proposal/${dbId}`)
@@ -965,6 +980,7 @@ export default function useApi() {
     searchLeaderBoard,
     startWorking,
     updateNetwork,
+    updateVisibleBounty,
     uploadFiles,
     userHasPR,
     createPreBounty,
