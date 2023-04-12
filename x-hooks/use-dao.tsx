@@ -170,14 +170,14 @@ export function useDao() {
     daoService.start()
       .then(async started => {
         if (started) {
+          if (state.currentUser?.walletAddress)
+            await daoService.connect();
+
           if (registryAddress)
             await daoService.loadRegistry()
               .catch(error => console.debug("Failed to load registry", error));
 
           console.debug("DAOService started", { web3Host, registryAddress });
-
-          if (state.currentUser?.walletAddress)
-            await daoService.connect();
 
           window.DAOService = daoService;
           dispatch(changeActiveDAO(daoService));
