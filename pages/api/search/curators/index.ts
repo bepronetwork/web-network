@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op, WhereOptions} from "sequelize";
+import {Op, Sequelize, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
@@ -19,6 +19,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const { address, isCurrentlyCurator, networkName, page, chainShortName } =
       req.query || {};
+
+    let queryParams = {};
 
     if (networkName) {
       const network = await models.network.findOne({
