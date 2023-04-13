@@ -706,7 +706,7 @@ export default function useApi() {
     networkName = "",
     sortBy = "updatedAt",
     order = "DESC",
-    chainShortName
+    chainShortName = ""
   }: SearchCuratorParams) {
     const params = new URLSearchParams({
       page,
