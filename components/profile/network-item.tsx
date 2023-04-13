@@ -147,7 +147,7 @@ export default function NetworkItem({
   return (
     <div
       className={
-        `bg-gray-${ !isNetworkVariant && isNetworkType ? "900" : "950"} p-3 border border-gray-800 border-radius-4 my-2`
+        `bg-gray-${ isNetworkVariant || isNetworkType ? "900" : "950"} p-3 border border-gray-800 border-radius-4 my-2`
       }
       key={key}
     >

@@ -67,6 +67,7 @@ export default function Delegations({
     icon: <Indicator bg={tokenColor || state.Service?.network?.active?.colors?.primary} size="lg" />
   };
 
+  const isNetworkVariant = variant === "network";
   const networkTokenName = state.Service?.network?.active?.networkToken?.name || oracleToken.name;
 
   function getTextColorProps() {
@@ -91,7 +92,8 @@ export default function Delegations({
 
         <FlexRow className={clsx([
           "d-flex justify-content-center align-items-center gap-2 caption-large",
-          "text-white bg-gray-900 py-2 px-3 border-radius-4 border border-gray-800 font-weight-medium"
+          "text-white py-2 px-3 border-radius-4 border border-gray-800 font-weight-medium",
+          isNetworkVariant && "bg-gray-900" || "bg-gray-950" 
         ])}>
           <span>
             {formatStringToCurrency(renderInfo[type].total)}
