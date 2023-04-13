@@ -47,7 +47,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
   useEffect(onWalletChange, [state.currentUser?.walletAddress]);
 
   if (asModal) {
-    if (state?.loading?.isLoading) return <></>;
+    if (state?.loading?.isLoading || state.Service?.starting) return <></>;
 
     return (
       <Modal

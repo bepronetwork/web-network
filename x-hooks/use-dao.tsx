@@ -154,8 +154,6 @@ export function useDao() {
     const isProviderConnected = state.Service?.active?.web3Connection?.web3?.currentProvider?.connected;
     const isConnectedChainSupported = connectedChain.name !== UNSUPPORTED_CHAIN;
 
-    console.log("DAOService", isSameWeb3Host, isSameRegistry, isProviderConnected, isConnectedChainSupported);
-
     if (isSameWeb3Host && isSameRegistry && (isProviderConnected || !isConnectedChainSupported ) || 
         state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
