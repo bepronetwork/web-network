@@ -41,6 +41,32 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       whereCondition.networkId = network?.id;
     }
 
+    queryParams = {
+      include: [
+        {
+          association: "network",
+          include: [
+            { association: "networkToken" },
+            {
+              association: "chain",
+              where: {
+                ...(chainShortName
+                  ? {
+                      chainShortName: Sequelize.where(Sequelize.fn("lower",
+                                                                   Sequelize.col("network.chain.chainShortName")),
+                                                      chainShortName.toString().toLowerCase()),
+                  }
+                  : {}),
+              },
+              required: true,
+            },
+          ],
+          required: true,
+        },
+        { association: "delegations" }
+      ],
+    };
+
     if (address)
       whereCondition.address = {
         [Op.iLike]: address.toString()
@@ -49,22 +75,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     if (isCurrentlyCurator)
       whereCondition.isCurrentlyCurator = isCurrentlyCurator;
 
-    const curators = await models.curator.findAndCountAll(paginate({
+    const curators = await models.curator
+      .findAndCountAll(paginate({
       attributes: {
         exclude: ["id"],
       },
       where: whereCondition,
       nest: true,
-      include: [
-        {
-          association: "network",
-          include: [
-            { association: "networkToken" },
-            { association: "chain" },
-          ]
-        },
-        { association: "delegations" },
-      ]
+      ...queryParams,
     }, req.query, [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
         return Promise.all(items.rows.map(async (item) => {
