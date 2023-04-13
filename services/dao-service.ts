@@ -11,7 +11,7 @@ import {
 } from "@taikai/dappkit";
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
-import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
+import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core, provider as Provider} from "web3-core";
 import {Contract} from "web3-eth-contract";
 
 import {BountyExtended} from "interfaces/bounty";
@@ -25,6 +25,7 @@ interface DAOServiceProps {
   web3Connection?: Web3Connection;
   web3Host?: string;
   registryAddress?: string;
+  provider?: Provider;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,15 +44,16 @@ export default class DAO {
   get web3Host() { return this._web3Host; }
   get registryAddress() { return this._registryAddress; }
 
-  constructor({ skipWindowAssignment, web3Connection, web3Host, registryAddress } : DAOServiceProps = {}) {
-    if (!web3Host && !web3Connection)
-      throw new Error("Missing web3 provider URL or web3 connection");
+  constructor({ skipWindowAssignment, web3Connection, web3Host, registryAddress, provider } : DAOServiceProps = {}) {
+    if (!web3Host && !web3Connection && !provider)
+      throw new Error("Missing web3 provider URL, web3 connection or provider object");
 
     this._web3Host = web3Host;
     this._registryAddress = registryAddress;
 
     this._web3Connection = web3Connection || new Web3Connection({
       web3Host,
+      web3CustomProvider: provider,
       skipWindowAssignment
     });
   }
