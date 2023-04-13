@@ -30,16 +30,15 @@ export const GlobalEffectsProvider = ({children}) => {
   const auth = useAuthentication();
   const transactions = useTransactions();
 
-  const { supportedChains, connectedChain, currentUser, Service } = state;
+  const { connectedChain, currentUser, Service } = state;
 
   // function updateLoadingState() {
   //   dispatch(changeLoadState(Object.values(state.spinners).some(v => v)));
   // }
 
   useEffect(dao.start, [
-    supportedChains,
     Service?.network?.active?.chain_id,
-    connectedChain
+    connectedChain?.id
   ]);
 
   useEffect(dao.changeNetwork, [
