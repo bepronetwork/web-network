@@ -100,7 +100,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    const url = state.Settings?.urls?.blockScan
+    const url = transaction?.network?.chain?.blockScanner;
     const validUrl = isValidUrl(url) ? url : `https://${url}`
     return `${validUrl}/${tx}`;
   }
