@@ -50,6 +50,7 @@ export default function NetworkItem({
 
   const isNetworkVariant = variant === "network";
   const isNetworkType = type === "network";
+  const isVotingType = type === "voting";
 
   function ArrowComponent() {
     if (isCollapsed) return <ArrowDown width={10} height={8} />;
@@ -93,7 +94,7 @@ export default function NetworkItem({
             <FlexColumn className="justify-content-center">
               <FlexRow>{networkName}</FlexRow>
 
-              {subNetworkText && (
+              {(subNetworkText && !isVotingType || isVotingType && variant !== "network") && (
                 <FlexRow>
                   <span className="text-gray">{subNetworkText}</span>
                 </FlexRow>
