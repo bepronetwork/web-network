@@ -15,6 +15,7 @@
   "connections": "Connections",
   "voting-power": "Voting Power",
   "need-network-to-manage": "To manage your voting power you need to be in a especific network",
+  "tokens-of-chain": "Listing {{chain}} tokens, if you want to see tokens from other chains, change the chain using the selector in the navigation bar.",
   "network-columns": {
     "network-name": "Network name",
     "total-votes": "Total votes",

@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import { useRouter } from "next/router";
 
+import { ContextualSpan } from "components/contextual-span";
 import InfoTooltip from "components/info-tooltip";
 import {TokenBalanceType} from "components/profile/token-balance";
 import SelectChainDropdown from "components/select-chain-dropdown";
@@ -86,8 +87,8 @@ export default function WalletBalance() {
         const tokenInformation = await getCoinInfoByContract(curator?.network?.networkToken?.symbol);
 
         return ({
-            symbol: t("$oracles",  { token: curator?.network?.networkToken?.symbol }),
-            name: `${t("misc.locked")} ${curator?.network?.networkToken?.name}`,
+            symbol: t("token-votes",  { token: curator?.network?.networkToken?.symbol }),
+            name: curator?.network?.networkToken?.name,
             address: curator?.network?.networkToken?.address,
             icon: <TokenIcon src={tokenInformation?.icon as string} />,
             oraclesLocked: BigNumber(curator.tokensLocked),
@@ -143,19 +144,30 @@ export default function WalletBalance() {
         <span className="h3 family-Regular text-white font-weight-medium">{t("profile:wallet")}</span>
       </FlexRow>
       {!query?.network && (
-        <FlexRow className="justify-content-end align-items-center mb-4">
-          <SelectChainDropdown
-            onSelect={handleNetworkSelected}
-            isOnNetwork={false}
-            className="select-network-dropdown"
-          />
-        </FlexRow>
+        // <FlexRow className="justify-content-end align-items-center mb-4">
+        //   <SelectChainDropdown
+        //     onSelect={handleNetworkSelected}
+        //     isOnNetwork={false}
+        //     className="select-network-dropdown"
+        //   />
+        // </FlexRow>
+        <ContextualSpan
+          context="info"
+          className="mb-3"
+          isAlert
+          isDismissable
+        >
+          <span>{t("profile:tokens-of-chain", { chain: state.connectedChain?.name })}</span>
+        </ContextualSpan>
       )}
       <FlexRow className="justify-content-between align-items-center mb-4">
         <span className="h4 family-Regular text-white font-weight-medium">{t("profile:tokens")}</span>
         <FlexRow className="align-items-center">
           <span className="text-white mr-2">{t("labels.recivedintotal")}</span>
-          <span className="caption-medium text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
+          <span 
+            className={`d-flex flex-row align-items-center caption-medium 
+              text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium`}
+          >
             {formatStringToCurrency(totalAmount)}
             <span className="text-white-30 ml-1 mr-2">
               {!hasNoConvertedToken ? state?.Settings?.currency?.defaultFiat : t("misc.token_other")}
