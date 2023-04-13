@@ -4,8 +4,8 @@ import {Op, WhereOptions} from "sequelize";
 import models from "db/models";
 
 import handleNetworkValues from "helpers/handleNetworksValuesApi";
-import paginate, {calculateTotalPages} from "helpers/paginate";
-import {resJsonMessage} from "helpers/res-json-message";
+import paginate, { calculateTotalPages } from "helpers/paginate";
+import { resJsonMessage } from "helpers/res-json-message";
 
 import {LogAccess} from "middleware/log-access";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
@@ -30,10 +30,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           {
             association: "chain",
             where: {
-              chainShortName: chainShortName
-            }
-          }
-        ]
+              ...(chainShortName
+                ? {
+                  chainShortName: Sequelize.where(Sequelize.fn("lower",
+                    Sequelize.col("chain.chainShortName")),
+                    chainShortName.toString().toLowerCase()),
+                }
+                : {}),
+            },
+          },
+        ],
       });
 
       if (!network) return resJsonMessage("Invalid network", res, 404);
@@ -52,9 +58,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
               where: {
                 ...(chainShortName
                   ? {
-                      chainShortName: Sequelize.where(Sequelize.fn("lower",
-                                                                   Sequelize.col("network.chain.chainShortName")),
-                                                      chainShortName.toString().toLowerCase()),
+                    chainShortName: Sequelize.where(Sequelize.fn("lower",
+                      Sequelize.col("network.chain.chainShortName")),
+                      chainShortName.toString().toLowerCase()),
                   }
                   : {}),
               },
@@ -107,14 +113,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
 async function SearchCurators(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-  case "get":
-    await get(req, res);
-    break;
+    case "get":
+      await get(req, res);
+      break;
 
-  default:
-    res.status(405);
+    default:
+      res.status(405);
   }
 
   res.end();
 }
 export default LogAccess(WithCors(WithValidChainId(SearchCurators)));
+
