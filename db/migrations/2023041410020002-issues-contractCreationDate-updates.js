@@ -83,11 +83,8 @@ async function up(queryInterface, Sequelize) {
 
           if (!bounty?.creationDate && !issue?.contractCreationDate) continue;
 
-          const dbBounty = await IssueModel.findOne({
-            where: { id: issue?.id }
-          })
-          dbBounty.contractCreationDate = bounty.creationDate.toString()
-          await dbBounty.save()
+          issue.contractCreationDate = bounty.creationDate.toString()
+          await issue.save()
         }
       }
     }
