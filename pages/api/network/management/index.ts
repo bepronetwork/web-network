@@ -63,7 +63,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     return resJsonMessage("Bounty updated", res, 200);
   } catch (error) {
-    console.log(error);
+    Logger.error(error, 'Failed to update visible bounty');
     return res.status(500).json(error);
   }
 }
