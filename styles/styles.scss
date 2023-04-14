@@ -1369,39 +1369,35 @@ a.row-button svg {
 }
 
 .my-network-tabs {
-  border-radius: math.div($m, 2) math.div($m, 2) 0 0;
+  border: none;
+  border-bottom: 1px solid $gray-800;
+
+  .nav {
+    gap: 32px;
+  }
 
   .nav-item {
+    width: fit-content;
+
     .nav-link {
-      font-family: "Space Grotesk", sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      line-height: 160%;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
+      @extend .family-Regular;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 133%;
 
-      border: 0;
-      border-radius: math.div($m, 2) math.div($m, 2) 0 0;
-      padding: 20px;
+      border: none;
+      padding: 20px 0;
 
-      color: rgba($white, 0.4);
+      color: $gray-500;
 
+      span {
+        margin: 0;
+      }
 
       &.active {
         color: $white;
-        background-color: $bg-shadow;
-      }
-    }
-  }
 
-  &.collapsed {
-    border-radius: math.div($m, 2);
-
-    .nav-item {
-      &:first-child {
-        .nav-link {
-          border-bottom-left-radius: math.div($m, 2);
-        }
+        border-bottom: 1px solid var(--bs-primary);
       }
     }
   }
