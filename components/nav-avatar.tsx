@@ -99,7 +99,7 @@ export default function NavAvatar() {
   const externalLinks = [
     Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
     Link(t("main-nav.nav-avatar.guides"), "https://docs.bepro.network/"),
-    Link(t("main-nav.nav-avatar.join-discord"), "https://discord.gg/9aUufhzhfm"),
+    Link(t("main-nav.nav-avatar.join-discord"), "https://discord.gg/layerx"),
     Link(t("main-nav.nav-avatar.follow-on-twitter"), "https://twitter.com/bepronet"),
   ];
 

@@ -17,11 +17,11 @@ import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { RegistryEvents } from "interfaces/enums/events";
+import {RegistryEvents} from "interfaces/enums/events";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
+import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
 

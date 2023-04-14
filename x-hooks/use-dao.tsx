@@ -151,8 +151,11 @@ export function useDao() {
 
     const isSameWeb3Host = chainToConnect.chainRpc === state.Service?.active?.web3Host;
     const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
+    const isProviderConnected = state.Service?.active?.web3Connection?.web3?.currentProvider?.connected;
+    const isConnectedChainSupported = connectedChain.name !== UNSUPPORTED_CHAIN;
 
-    if (isSameWeb3Host && isSameRegistry || state.Service?.starting) {
+    if (isSameWeb3Host && isSameRegistry && (isProviderConnected || !isConnectedChainSupported ) || 
+        state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
       return;
     }
@@ -164,8 +167,9 @@ export function useDao() {
     const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
     const registryAddress = isConfigured ? _registry : undefined;
+    const provider = +chainToConnect.chainId === +connectedChain.id ? (window as any)?.web3?.givenProvider : undefined;
 
-    const daoService = new DAO({ web3Host, registryAddress });
+    const daoService = new DAO({ web3Host, registryAddress, provider });
 
     daoService.start()
       .then(async started => {
@@ -174,9 +178,10 @@ export function useDao() {
             await daoService.loadRegistry()
               .catch(error => console.debug("Failed to load registry", error));
 
+          console.debug("DAOService started", { web3Host, registryAddress });
+
           window.DAOService = daoService;
           dispatch(changeActiveDAO(daoService));
-          console.debug("DAOService started", { web3Host, registryAddress });
         }
       })
       .catch(error => {

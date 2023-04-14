@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ContractButton from "components/contract-button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
-import { FormGroup } from "components/form-group";
+import {FormGroup} from "components/form-group";
 import TokensSettings from "components/profile/my-network-settings/tokens-settings";
-import { WarningSpan } from "components/warning-span";
+import {WarningSpan} from "components/warning-span";
 
-import { useAppState } from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { RegistryValidator, REGISTRY_LIMITS } from "helpers/registry";
+import {REGISTRY_LIMITS, RegistryValidator} from "helpers/registry";
 
-import { RegistryParameters } from "types/dappkit";
+import {RegistryParameters} from "types/dappkit";
 
 import useBepro from "x-hooks/use-bepro";
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 
 type Executing = "bountyFees" | "creationFee" | "creationAmount";
 
@@ -88,7 +88,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
   async function saveCreateNetworkFee() {
     setExecutingTx("creationFee");
 
-    await handleFeeNetworkCreation(Number(networkCreationFeePercentage) / 100)
+    await handleFeeNetworkCreation(Number(networkCreationFeePercentage))
       .then(() => updateActiveNetwork(true))
       .catch(console.debug)
       .finally(() => setExecutingTx(undefined));

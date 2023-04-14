@@ -11,7 +11,7 @@ export default function Loading() {
 
   return (
     <Modal
-      show={state.loading?.isLoading}
+      show={state.loading?.isLoading || state.Service?.starting}
       size="sm"
       backdrop="static"
       aria-labelledby="loading-modal"

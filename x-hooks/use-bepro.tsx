@@ -41,7 +41,7 @@ export default function useBepro() {
 
   async function handlerDisputeProposal(proposalContractId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
-      const disputeTxAction = addTx([{ 
+      const disputeTxAction = addTx([{
         type: TransactionTypes.dispute,
         network: state.Service?.network?.active,
       }] as any);
@@ -118,7 +118,7 @@ export default function useBepro() {
   }
 
   async function handleCloseIssue(bountyId: number,
-                                  proposalContractId: number, 
+                                  proposalContractId: number,
                                   tokenUri: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTx([{
@@ -126,7 +126,7 @@ export default function useBepro() {
         network: state.Service?.network?.active
       } as any]);
       dispatch(closeIssueTx);
-      
+
       await state.Service?.active.closeBounty(+bountyId, +proposalContractId, tokenUri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0] as SimpleBlockTransactionPayload)]))
@@ -138,8 +138,8 @@ export default function useBepro() {
     });
   }
 
-  async function handleUpdateBountyAmount(bountyId: number, 
-                                          amount: string, 
+  async function handleUpdateBountyAmount(bountyId: number,
+                                          amount: string,
                                           currency: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
@@ -192,7 +192,7 @@ export default function useBepro() {
         });
     })
   }
-  
+
   async function handleHardCancelBounty(): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
@@ -205,9 +205,9 @@ export default function useBepro() {
       await state.Service?.active.hardCancel(state.currentBounty?.data?.contractId)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
-          
+
           return processEvent(NetworkEvents.BountyCanceled, undefined, {
-            fromBlock: txInfo.blockNumber, 
+            fromBlock: txInfo.blockNumber,
             id: state.currentBounty?.data?.contractId
           });
         })
@@ -229,7 +229,7 @@ export default function useBepro() {
                                     amounts: number[] ): Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
-      
+
       const tx = addTx([{
         type: TransactionTypes.proposeMerge,
         network: state.Service?.network?.active
@@ -248,16 +248,16 @@ export default function useBepro() {
     });
   }
 
-  async function handleApproveToken(tokenAddress: string, 
-                                    amount: string, 
+  async function handleApproveToken(tokenAddress: string,
+                                    amount: string,
                                     tokenType: "transactional" | "network" = "transactional",
                                     currency: string):
     Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
-      const type = tokenType === "transactional" ? 
+      const type = tokenType === "transactional" ?
         TransactionTypes.approveTransactionalERC20Token : TransactionTypes.approveSettlerToken ;
-      
+
       const tx = addTx([{ type, network: state.Service?.network?.active, amount, currency } as any]);
       dispatch(tx);
 
@@ -276,13 +276,13 @@ export default function useBepro() {
   }
 
   async function handleTakeBack(delegationId: number,
-                                amount: string, 
+                                amount: string,
                                 currency: TransactionCurrency): Promise<{ blockNumber: number; } | Error> {
 
     return new Promise(async (resolve, reject) => {
-      const tx = addTx([{ 
-        type: TransactionTypes.takeBackOracles, 
-        amount, 
+      const tx = addTx([{
+        type: TransactionTypes.takeBackOracles,
+        amount,
         currency,
         network: state.Service?.network?.active
       } as any]);
@@ -295,8 +295,8 @@ export default function useBepro() {
             throw new Error(t("errors.approve-transaction", {currency: networkTokenSymbol}));
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
 
-          processEvent(NetworkEvents.OraclesTransfer, undefined, { 
-            fromBlock: txInfo.blockNumber 
+          processEvent(NetworkEvents.OraclesTransfer, undefined, {
+            fromBlock: txInfo.blockNumber
           })
             .catch(console.debug);
 
@@ -322,8 +322,13 @@ export default function useBepro() {
       } as any]);
       dispatch(tx);
 
-      await state.Service?.active
-        .createPullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid)
+      await state.Service?.active?.createPullRequest(bountyId,
+                                                     originRepo,
+                                                     originBranch,
+                                                     originCID,
+                                                     userRepo,
+                                                     userBranch,
+                                                     cid)
         .then((txInfo: unknown) => {
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
           resolve(txInfo);
@@ -559,9 +564,9 @@ export default function useBepro() {
 
   async function handleRetractFundBounty(bountyId: number, fundingId: number, amount?: string, currency?: string) {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTx([{ 
-        type: TransactionTypes.retractFundBounty, 
-        amount, 
+      const transaction = addTx([{
+        type: TransactionTypes.retractFundBounty,
+        amount,
         currency,
         network: state.Service?.network?.active
       } as any]);
@@ -579,14 +584,14 @@ export default function useBepro() {
     });
   }
 
-  async function handleWithdrawFundRewardBounty(bountyId: number, 
-                                                fundingId: number, 
-                                                amount?: string, 
+  async function handleWithdrawFundRewardBounty(bountyId: number,
+                                                fundingId: number,
+                                                amount?: string,
                                                 currency?: string) {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
-        type: TransactionTypes.withdrawFundRewardBounty, 
-        amount, 
+        type: TransactionTypes.withdrawFundRewardBounty,
+        amount,
         currency,
         network: state.Service?.network?.active
       } as any]);
