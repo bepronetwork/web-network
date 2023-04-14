@@ -31,7 +31,7 @@ export default function IssueProposalProgressBar() {
   const creationDate = state.currentBounty?.data?.createdAt;
   const fundedDate = state.currentBounty?.data?.fundedAt;
   const closedDate = isClosed ? state.currentBounty?.data?.updatedAt : undefined;
-  const lastProposalCreationDate = 
+  const lastProposalCreationDate =
     state.currentBounty?.data?.mergeProposals?.
       filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
       .reduce((acc, curr) => +curr.contractCreationDate > +acc ? new Date(curr.contractCreationDate) : acc,
@@ -47,13 +47,13 @@ export default function IssueProposalProgressBar() {
 
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
-    const isHigher = creationDate && 
+    const isHigher = creationDate &&
                     (new Date(chainTime) > addSeconds(creationDate, +state.Service?.network?.times?.draftTime));
 
     const item = (date, toAdd = 0) => ({
       Warning: {
         text: t("bounty:status.until-open", {
-          distance: isHigher ? '0 seconds' 
+          distance: isHigher ? '0 seconds'
             : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date(chainTime))
         }),
         color: "warning",
@@ -75,12 +75,12 @@ export default function IssueProposalProgressBar() {
       text: ""
     };
 
-    if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest) 
+    if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest)
       currentValue = item(addSeconds(creationDate, +state.Service?.network?.times?.draftTime)).Started;
 
-    if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isClosed) 
+    if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isClosed)
       currentValue = item(creationDate, +state.Service?.network?.times?.draftTime).Warning;
-    
+
     if (
         index === currentStep &&
         currentStep === 2 &&
@@ -105,9 +105,9 @@ export default function IssueProposalProgressBar() {
       }
     }
 
-    if (closedDate && index === currentStep && currentStep === 3) 
+    if (closedDate && index === currentStep && currentStep === 3)
       currentValue = isFundingRequest ? item(lastProposalCreationDate).Started : item(closedDate).At;
-    
+
     if (closedDate && index === currentStep && currentStep === 4) item(closedDate).At;
 
     if (currentValue)
@@ -174,7 +174,7 @@ export default function IssueProposalProgressBar() {
       currentState.splice(1,0,t("bounty:steps.funding"))
       return currentState
     })
-    
+
     if (!isFundingRequest && isFundingStep) setSteps((currentState) => {
       return currentState.filter(state => state !== t("bounty:steps.funding"))
     })
@@ -188,7 +188,7 @@ export default function IssueProposalProgressBar() {
     //Dispute Window -> mergeProposalAmount > 0
     //Closed and Distributed -> finalized == true
     const addIsFunding = isFundingRequest ? 1 : 0
-    
+
     let step = 0 + addIsFunding;
     let stepColor = "primary"
 

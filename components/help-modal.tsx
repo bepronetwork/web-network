@@ -30,11 +30,11 @@ export default function HelpModal({ show = false, onCloseClick }: { show: boolea
     helpItem("modals.help-modal.live-chat.title",
              "modals.help-modal.live-chat.content",
              <ChatIcon />,
-             "https://discord.gg/bepronetwork"),
+             "https://discord.gg/layerx"),
     helpItem("modals.help-modal.provide-feedback.title",
              "modals.help-modal.provide-feedback.content",
              <FeedbackIcon />,
-             "https://discord.gg/bepronetwork")
+             "https://discord.gg/layerx")
   ];
 
   function HelpItemRow(item) {

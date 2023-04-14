@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import { components as RSComponents, SingleValueProps } from "react-select";
+import {useState} from "react";
+import {components as RSComponents, SingleValueProps} from "react-select";
 
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
@@ -21,7 +21,7 @@ import {useAppState} from "contexts/app-state";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import sumObj from "helpers/sumObj";
 
-import { NetworkEvents } from "interfaces/enums/events";
+import {NetworkEvents} from "interfaces/enums/events";
 import {pullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -106,7 +106,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   const [isLoadingParticipants, setIsLoadingParticipants] = useState<boolean>(false);
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
+  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>();
   const [showDecimalsError, setShowDecimalsError] = useState(false)
 
   const {state} = useAppState();
@@ -138,7 +138,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
-          currentDistrbuition.prAddressAmount.find((p) => 
+          currentDistrbuition.prAddressAmount.find((p) =>
           ap.amount === p.amount && ap.address.toLowerCase() === p.address.toLowerCase()));
       } else {
         return false;
@@ -183,13 +183,13 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         handleInputColor("success");
       }
 
-      const proposalDetails = 
+      const proposalDetails =
         currentDistrbuition.prAddressAmount.map(({ amount, address }) => ({ percentage: amount, recipient: address }));
 
-      const distributedAmounts = 
+      const distributedAmounts =
         calculateDistributedAmounts(treasury, mergeCreator, proposerFeeShare, bountyAmount, proposalDetails);
 
-      if (distributedAmounts.proposals.some(({ value, percentage }) => 
+      if (distributedAmounts.proposals.some(({ value, percentage }) =>
         BigNumber(value).lt(1e-15) && BigNumber(percentage).gt(0))) {
         handleInputColor("error");
         setShowExceptionalMessage(true);
@@ -234,7 +234,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
     getPullRequestParticipants(state.Service?.network?.repos?.active.githubPath, +githubId)
       .then((participants) => {
-        const tmpParticipants = 
+        const tmpParticipants =
           participants.filter(p => p.toLowerCase() !== state.Settings.github.botUser.toLowerCase());
 
         pullRequests
@@ -251,7 +251,7 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
       })
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({ address }) => !!address);
-        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
+        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant?.githubHandle || '', 0])));
         setCurrentGithubId(githubId);
         setParticipants([])
         setParticipants(tmpParticipants);
@@ -311,17 +311,35 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
 
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
-  useEffect(() => {
-    if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
-      const defaultPr =
-        pullRequests.find((el) => el.isMergeable) || pullRequests[0];
-      setCurrentPullRequest(defaultPr);
-      getParticipantsPullRequest(defaultPr?.githubId);
+  function pullRequestToOption(pr) {
+    if (!pr) return;
+
+    return {
+      value: pr?.id,
+      label: `PR #${pr?.githubId} ${t("misc.by")} @${pr?.githubLogin}`,
+      githubId: pr?.githubId,
+      githubLogin: pr?.githubLogin,
+      marged: pr?.merged,
+      isMergeable: pr?.isMergeable,
+      isDraft: pr?.status === "draft",
+      isDisable: pr?.merged || !pr?.isMergeable || pr?.status === "draft"
     }
-  }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
+  }
+
+  // useEffect(() => {
+  //   if (pullRequests.length && state.Service?.network?.repos?.active && state.Settings?.github?.botUser) {
+  //     const defaultPr =
+  //       pullRequests.find((el) => el.isMergeable) || pullRequests[0];
+  //     setCurrentPullRequest(defaultPr);
+  //     getParticipantsPullRequest(defaultPr?.githubId);
+  //   }
+  // }, [pullRequests, state.Service?.network?.repos?.active, state.Settings?.github?.botUser]);
 
 
   function renderDistribution() {
+    if (!currentPullRequest?.id)
+      return <></>;
+
     if (isLoadingParticipants)
       return (
       <div className="d-flex justify-content-center mt-4">
@@ -398,8 +416,8 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
   return (
     <div className="d-flex">
       <ReadOnlyButtonWrapper >
-        <ContractButton 
-          className="read-only-button" 
+        <ContractButton
+          className="read-only-button"
           onClick={() => setShow(true)}
         >
           {t("proposal:actions.create")}
@@ -440,33 +458,14 @@ export default function NewProposal({amountTotal, pullRequests = []}) {
         </p>
         <ReactSelect
           id="pullRequestSelect"
-          isDisabled={participants.length === 0}
+
           components={{
             Option: SelectOptionComponent,
             SingleValue
           }}
           placeholder={t("forms.select-placeholder")}
-          defaultValue={{
-            value: currentPullRequest?.id,
-            label: `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
-              currentPullRequest?.githubLogin
-            }`,
-            githubId: currentPullRequest?.githubId,
-            githubLogin: currentPullRequest?.githubLogin,
-            marged: currentPullRequest?.merged,
-            isMergeable: currentPullRequest?.isMergeable,
-            isDisable: false
-          }}
-          options={pullRequests?.map((items: pullRequest) => ({
-            value: items.id,
-            label: `PR #${items.githubId} ${t("misc.by")} @${items.githubLogin}`,
-            githubId: items.githubId,
-            githubLogin: items.githubLogin,
-            marged: items.merged,
-            isMergeable: items.isMergeable,
-            isDraft: items.status === "draft",
-            isDisable: items.merged || !items.isMergeable || items.status === "draft"
-          }))}
+          value={pullRequestToOption(currentPullRequest)}
+          options={pullRequests?.map(pullRequestToOption)}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
           isSearchable={false}
