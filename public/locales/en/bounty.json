@@ -76,6 +76,13 @@
       "identify-to-start": "Start KYC"
     }
   },
+  "management": {
+    "label": "Management",
+    "name": "Name",
+    "link": "Bounty Link",
+    "hide": "Hide Bounty",
+    "cancel": "Cancel"
+  },
   "errors": {
     "fetching": "Error fetching bounty",
     "no-workers": "No one is working",
