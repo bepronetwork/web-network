@@ -171,6 +171,13 @@ export function useDao() {
     const provider = 
       +chainToConnect.chainId === +connectedChain.id && window.ethereum ? window.ethereum as Provider : undefined;
 
+
+    if (provider)
+      console.debug("Will change provider", {
+        chainIdToConnect: +chainToConnect.chainId,
+        connectedChainId: +connectedChain.id
+      });
+
     const daoService = new DAO({ web3Host, registryAddress, provider });
 
     daoService.start()
