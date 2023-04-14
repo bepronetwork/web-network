@@ -84,7 +84,7 @@ See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for our guide to contributing to w
 
 ## 6. Join the community
 
-- [Discord](https://discord.gg/9aUufhzhfm)
+- [Discord](https://discord.gg/layerx)
 - [Telegram](https://t.me/betprotocol)
 - [Medium](https://bepronetwork.medium.com)
 - [WebSite](https://www.bepro.network)
