@@ -49,7 +49,7 @@ export default function MyNetworkSettings({
   network,
   updateEditingNetwork,
 }: MyNetworkSettingsProps) {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const { t } = useTranslation(["common", "custom-network", "bounty"]);
 
   const [errorBigImages, setErrorBigImages] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -303,7 +303,7 @@ export default function MyNetworkSettings({
       },
       {
         eventKey: "management",
-        title: "Management",
+        title: t("bounty:management.label"),
         component: (
           <NetworkContainer>
             <Management />

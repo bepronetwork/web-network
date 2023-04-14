@@ -98,7 +98,12 @@ export default function ListIssues({
   const isBountyHall = variant === "bounty-hall";
   const isOnNetwork = !!router?.query?.network;
   const variantIssueItem = isManagement ? variant : (isProfile || isBountyHall) ? "multi-network" : "network"
-  const columns = ["Name", "Bounty Link", "Hide Bounty", "Cancel"];
+  const columns = [
+    t("bounty:management.name"),
+    t("bounty:management.link"),
+    t("bounty:management.hide"),
+    t("bounty:management.cancel"),
+  ];
   
 
   const { network: queryNetwork, networkName, repoId, time, state, sortBy, order } = router.query as {
@@ -197,7 +202,7 @@ export default function ListIssues({
       networkName: (isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
         networkName || appState.Service?.network?.active?.name),
       allNetworks: isBountyHall || "",
-      visible: isManagement ? "" : true,
+      visible: isManagement ? undefined : true,
       chainId: chain?.chainId?.toString(),
     })
       .then(async ({ count, rows, pages, currentPage }) => {
