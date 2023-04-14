@@ -88,7 +88,6 @@ export default function CouncilLayout({ children }) {
       }).then(({ rows }) => rows),
       searchIssues({
         state: "closed",
-        visible: true,
         networkName: state.Service.network.active.name,
         tokenAddress: state.Service?.network?.active?.networkToken?.address,
         chainId: chain.chainId.toString()
