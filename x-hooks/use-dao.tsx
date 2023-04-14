@@ -1,5 +1,6 @@
 import {isZeroAddress} from "ethereumjs-util";
 import {useRouter} from "next/router";
+import {provider as Provider} from "web3-core";
 import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
@@ -167,7 +168,8 @@ export function useDao() {
     const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
     const registryAddress = isConfigured ? _registry : undefined;
-    const provider = +chainToConnect.chainId === +connectedChain.id ? (window as any)?.web3?.givenProvider : undefined;
+    const provider = 
+      +chainToConnect.chainId === +connectedChain.id && window.ethereum ? window.ethereum as Provider : undefined;
 
     const daoService = new DAO({ web3Host, registryAddress, provider });
 
