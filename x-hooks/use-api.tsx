@@ -116,7 +116,7 @@ export default function useApi() {
     tokenAddress = "",
     networkName = "",
     allNetworks = undefined,
-    visible = undefined,
+    visible = true,
     chainId = ""
   }) {
     const params = new URLSearchParams({
@@ -161,7 +161,7 @@ export default function useApi() {
     creator = "",
     networkName = "",
     state = "open",
-    visible = undefined
+    visible = true
   }) {
     const params = new URLSearchParams({
       address,

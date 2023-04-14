@@ -57,7 +57,7 @@ export default function ListRecentIssues() {
       updateBounties(isOpen ? { openBounties: data } : { fundingBounties: data });
 
     setLoading(true);
-    searchRecentIssues({ networkName, state: type, visible: true })
+    searchRecentIssues({ networkName, state: type })
       .then(setBounties)
       .catch((err) => {
         console.debug(err);
