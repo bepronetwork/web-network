@@ -280,7 +280,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       logoIcon,
       fullLogo,
       isClosed,
-      override,
       accessToken,
       description,
       githubLogin,
@@ -288,12 +287,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       repositoriesToAdd,
       repositoriesToRemove,
       allowedTokens,
+      isAdminOverriding,
       allowMerge
     } = req.body;
-
-    const isAdminOverriding = isAdmin(req) && !!override;
-    
-    if (!accessToken && !isAdminOverriding) return resJsonMessage("Unauthorized user", res, 401);
 
     const chain = await chainFromHeader(req);
 
