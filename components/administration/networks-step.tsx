@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {FormCheck} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
@@ -13,13 +14,15 @@ import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 import {addToast} from "contexts/reducers/change-toaster";
 
+import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
 import {psReadAsText} from "helpers/file-reader";
 import {formatNumberToCurrency} from "helpers/formatNumber";
 import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
 
 import useApi from "x-hooks/use-api";
-import {FormCheck} from "react-bootstrap";
+import { useAuthentication } from "x-hooks/use-authentication";
+
 
 const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
@@ -38,7 +41,7 @@ export default function NetworksStep({
 
   const {state, dispatch} = useAppState();
   const { searchNetworks, updateNetwork } = useApi();
-
+  const { signMessage } = useAuthentication();
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
   const MAX_PERCENTAGE_FOR_DISPUTE = +state.Settings?.networkParametersLimits?.disputePercentage?.max;
@@ -210,7 +213,19 @@ export default function NetworksStep({
           : undefined
     };
 
-    await updateNetwork(json)
+    const handleError = (error) => {
+      dispatch(addToast({
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("custom-network:errors.failed-to-update-network", {
+            error
+          })
+      }));
+      console.log(error);
+    }
+
+    signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
+      await updateNetwork(json)
       .then(() => {
         dispatch(addToast({
             type: "success",
@@ -220,18 +235,11 @@ export default function NetworksStep({
 
         setIsUpdatingNetwork(false);
       })
-      .catch((error) => {
-        dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("custom-network:errors.failed-to-update-network", {
-              error
-            })
-        }));
+      .catch(handleError)
+    })
+    .catch(handleError)
+    .finally(() => setIsUpdatingNetwork(false))
 
-        setIsUpdatingNetwork(false);
-        console.log(error);
-      });
 
     if (forcedNetwork.draftTime !== parameters.draftTime.value)
       await state.Service?.active.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
