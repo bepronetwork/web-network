@@ -127,7 +127,7 @@ export default function IssueListItem({
       setShowHardCancelModal(false)
       setHideTrashIcon(true)
     }).catch(handleToastError)
-    .finally(() => setIsLoadingHardCancel(true))
+    .finally(() => setIsLoadingHardCancel(false))
   } 
 
   useEffect(() => {
@@ -279,6 +279,7 @@ export default function IssueListItem({
             onCloseClick={() => setShowHardCancelModal(false)}
             cancelLabel={t("common:actions.close")}
             okLabel={t("common:actions.continue")}
+            isExecuting={isLoadingHardCancel}
             okDisabled={isLoadingHardCancel}
             onOkClick={handleHardCancel}
       >
