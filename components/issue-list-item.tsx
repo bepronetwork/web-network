@@ -56,6 +56,7 @@ export default function IssueListItem({
   const [isCancelable, setIsCancelable] = useState(false);
   const [hideTrashIcon, setHideTrashIcon] = useState<boolean>();
   const [showHardCancelModal, setShowHardCancelModal] = useState(false);
+  const [isLoadingHardCancel, setIsLoadingHardCancel] = useState(false);
   const {updateVisibleBounty} = useApi();
   const { getURLWithNetwork } = useNetwork();
   const { handleHardCancelBounty } = useBepro();
@@ -83,6 +84,15 @@ export default function IssueListItem({
     }));
   }
 
+  function handleToastError(err?: string) {
+    dispatch(addToast({
+      type: "danger",
+      title: t("common:actions.failed"),
+      content: t("common:errors.failed-update-bounty")
+    }));
+    console.debug(t("common:errors.failed-update-bounty"), err);
+  }
+
   async function handleHideBounty() {
     await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
       updateVisibleBounty({
@@ -101,18 +111,12 @@ export default function IssueListItem({
         }));
         setVisible(!isVisible)
       })
-      .catch((error) => {
-        dispatch(addToast({
-            type: "danger",
-            title: t("common:actions.failed"),
-            content: t("common:errors.failed-update-bounty")
-        }));
-        console.debug(t("common:errors.failed-update-bounty"), error);
-      });
+      .catch(handleToastError);
     })
   }
 
   function handleHardCancel() {
+    setIsLoadingHardCancel(true)
     handleHardCancelBounty(issue?.contractId, issue?.issueId)
     .then(() => {
       dispatch(addToast({
@@ -122,7 +126,8 @@ export default function IssueListItem({
       }));
       setShowHardCancelModal(false)
       setHideTrashIcon(true)
-    }).catch(err => console.log('err', err))
+    }).catch(handleToastError)
+    .finally(() => setIsLoadingHardCancel(true))
   } 
 
   useEffect(() => {
@@ -267,17 +272,18 @@ export default function IssueListItem({
           </div>
         </div>
       </CardItem>
-            <Modal
+      <Modal
             title={t("common:modals.hard-cancel.title")}
             centerTitle
             show={showHardCancelModal}
             onCloseClick={() => setShowHardCancelModal(false)}
             cancelLabel={t("common:actions.close")}
             okLabel={t("common:actions.continue")}
+            okDisabled={isLoadingHardCancel}
             onOkClick={handleHardCancel}
-          >
+      >
             <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content"/></h5>
-          </Modal>
+      </Modal>
       </>
     );
   }
