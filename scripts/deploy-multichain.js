@@ -335,7 +335,9 @@ async function main(option = 0) {
     }
 
     /** Slice the BountyNFT from the saveTokens array and send transfers */
-    await Promise.all(tokens.slice(0, 3).map(mapper)).then(transfers);
+    const tks = await Promise.all(tokens.slice(0, 3).map(mapper));
+
+    await transfers(tks);
 
     return tokens;
   }
