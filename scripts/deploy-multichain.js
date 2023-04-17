@@ -14,6 +14,10 @@ const RepositoryModel = require("../db/models/repositories.model");
 
 const StagingAccounts = require('./staging-accounts');
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl) =>
   ({[name]: {rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl}})
 
@@ -323,21 +327,19 @@ async function main(option = 0) {
       return _token;
     }
 
-    const transfers = async ([payment, governance, rwd]) => {
-      for (const address of accounts) {
-        console.debug(`Sending tokens to ${address}...`);
-        await payment.transferTokenAmount(address, 10000000);
-        await governance.transferTokenAmount(address, 10000000);
-        await rwd.transferTokenAmount(address, 10000000);
-      }
+    /** Slice the BountyNFT from the saveTokens array and send transfers */
+    const [payment, governance, rwd] = await Promise.all(tokens.slice(0, 3).map(mapper));
 
-      console.debug(`All tokens sent!`);
+    for (const address of accounts) {
+      console.debug(`Sending tokens to ${address}...`);
+      await payment.transferTokenAmount(address, 10000000);
+      await sleep(2000);
+      await governance.transferTokenAmount(address, 10000000);
+      await sleep(2000);
+      await rwd.transferTokenAmount(address, 10000000);
     }
 
-    /** Slice the BountyNFT from the saveTokens array and send transfers */
-    const tks = await Promise.all(tokens.slice(0, 3).map(mapper));
-
-    await transfers(tks);
+    console.debug(`All tokens sent!`);
 
     return tokens;
   }
