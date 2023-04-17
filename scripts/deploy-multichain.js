@@ -42,10 +42,12 @@ const options = yargs(hideBin(process.argv))
 async function main(option = 0) {
   let chainData;
 
-  if (_xNetworks[options.network[option]])
+  const isXNetwork = !!_xNetworks[options.network[option]];
+
+  if (isXNetwork)
     chainData = _xNetworks[options.network[option]];
   else chainData =
-    await fetch(`https://chainid.network/chains_mini.json`)
+    await fetch(`https://chainid.network/chains.json`)
       .then(d => d.json())
       .then(data => data.find(d => d.networkId === +options.network[option]));
 
@@ -67,6 +69,7 @@ async function main(option = 0) {
     DEPLOY_DRAFT_TIME = 60 * 5, // 5 minutes
     DEPLOY_DISPUTABLE_TIME = 60 * 10, // 10 minutes
     DEPLOY_COUNCIL_AMOUNT = 105000,
+    NEXT_PUBLIC_HOME_URL
   } = env;
 
   const connection = new Web3Connection({web3Host, privateKey});
@@ -183,7 +186,7 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {chainTokenName, chainId, chainName, chainScan, eventsUrl,} = chainData;
+    const {chainTokenName, chainId, chainName, explorers, eventsUrl,} = chainData;
     const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
@@ -194,6 +197,9 @@ async function main(option = 0) {
       ChainModel.init(sequelize);
       TokensModel.init(sequelize);
       NetworkTokensModel.init(sequelize);
+
+      const chainScan = explorers?.length ? explorers[0].url : undefined;
+      const eventsApi = isXNetwork ? eventsUrl : `${NEXT_PUBLIC_HOME_URL}:2096`
 
       await ChainModel.findOrCreate({
         where: {
@@ -208,7 +214,7 @@ async function main(option = 0) {
           chainCurrencySymbol: chainData?.nativeCurrency?.symbol || chainTokenName,
           chainCurrencyDecimals: chainData?.nativeCurrency?.decimals || 18,
           registryAddress: registry,
-          eventsApi: eventsUrl,
+          eventsApi: eventsApi,
           blockScanner: chainScan,
           isDefault: false,
           color: "#29b6af"
