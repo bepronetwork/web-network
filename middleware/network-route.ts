@@ -9,6 +9,7 @@ import {
   MISSING_CREATOR_NETWORK_SIGNATURE
 } from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
+import { isAdmin } from "helpers/is-admin";
 
 export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT` ]) => {
 
@@ -16,6 +17,7 @@ export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT
     if (!methods.includes(req.method.toUpperCase()))
       return handler(req, res);
 
+    const { override } = req.body;
     const headers = req.headers;
     const wallet = (headers.wallet as string)?.toLowerCase();
     const chainId = (headers.chain as string);
@@ -26,6 +28,8 @@ export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT
         chain_id: chainId
       }
     });
+
+    const isAdminOverriding = isAdmin(req) && !!override;
   
     if (!network) return res.status(401).json({message:"Invalid network"});
 
