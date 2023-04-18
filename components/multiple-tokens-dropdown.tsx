@@ -45,8 +45,8 @@ export default function MultipleTokensDropdown({
   };
 
   const handleOptions = () =>
-    options.filter((opt) =>
-      !selectedOptions.find((s) => s?.value?.address === opt?.value?.address));
+    options?.filter((opt) =>
+      !selectedOptions?.find((s) => s?.value?.address === opt?.value?.address));
 
   useEffect(() => {
     if (!tokens?.length) return;
