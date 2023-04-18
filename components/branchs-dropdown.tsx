@@ -76,6 +76,16 @@ export default function BranchsDropdown({
         onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
       />
+      {!option && (
+        <div className="mt-2">
+          <p className="text-gray">
+            {t("support-text-branch")}{" "}
+            <a href="https://discord.gg/layerx" target="_blank">
+              {t("the-community")}.
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
