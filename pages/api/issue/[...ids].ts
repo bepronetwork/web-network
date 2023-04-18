@@ -1,7 +1,7 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
-import {Op} from "sequelize";
+import {Op, Sequelize} from "sequelize";
 
 import models from "db/models";
 
@@ -17,7 +17,7 @@ import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { ids: [repoId, ghId, networkName], chainId } = req.query;
+  const { ids: [repoId, ghId, networkName, chainName], chainId } = req.query;
 
   const issueId = [repoId, ghId].join("/");
 
@@ -32,14 +32,21 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "disputes" }
   ];
 
-  const chain = await chainFromHeader(req);
+  const chainHeader = await chainFromHeader(req);
+
+  const chain = chainHeader ? chainHeader : await models.chain.findOne({
+    where: {
+      chainShortName: Sequelize.where(Sequelize.fn("lower", Sequelize.col("chain.chainShortName")), 
+                                      chainName.toString().toLowerCase())
+    }
+  });
 
   const network = await models.network.findOne({
     where: {
       name: {
         [Op.iLike]: String(networkName).replaceAll(" ", "-")
       },
-      chain_id: { [Op.eq]: chainId || chain.chainId }
+      chain_id: { [Op.eq]: chainId || chain?.chainId }
     }
   });
 
