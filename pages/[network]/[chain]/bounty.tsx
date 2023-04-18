@@ -16,7 +16,6 @@ import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import {IM_AM_CREATOR_ISSUE} from "helpers/constants";
-import { issueParser } from "helpers/issue";
 
 import { IssueData } from "interfaces/issue-data";
 

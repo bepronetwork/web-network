@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 import removeMarkdown from "markdown-to-text";
 import {DefaultSeo, NextSeo} from "next-seo";
