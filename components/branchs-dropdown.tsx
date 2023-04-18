@@ -27,7 +27,7 @@ export default function BranchsDropdown({
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
-
+  const preSelectOptions = ["master", "main", "dev", "develop"]
 
   function mapOptions(list: string[]) {
     setOptions(list.map((branch: string) => ({value: branch, label: branch})));
@@ -47,9 +47,20 @@ export default function BranchsDropdown({
     }
   }, [branches])
 
+  useEffect(() => {
+    if(options?.length > 0 && !option){
+      const opt = preSelectOptions.find(branch => options.find(opt => opt?.value?.toLowerCase() === branch))
+      if(opt) handleSetOption(opt)
+    }
+  }, [options])
+
   function onChangeSelect(e: { value: string }) {
-    onSelected({value: e.value, label: e.value})
-    setOption({value: e.value, label: e.value})
+    handleSetOption(e.value)
+  }
+
+  function handleSetOption(value: string){
+    onSelected({value: value, label: value})
+    setOption({value: value, label: value})
   }
 
   return (
