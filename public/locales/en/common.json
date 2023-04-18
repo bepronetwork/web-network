@@ -89,6 +89,8 @@
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",
+  "support-text-branch": "If you’re unsure of what branch to choose, ask",
+  "the-community": "the community",
   "select-multiple": {
     "allowed-transactional-tokens": "Allowed Transactional tokens",
     "add-transactional-tokens": "Add Transactional tokens",
