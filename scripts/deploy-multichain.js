@@ -14,10 +14,6 @@ const RepositoryModel = require("../db/models/repositories.model");
 
 const StagingAccounts = require('./staging-accounts');
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 const _xNetwork = (name, rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl) =>
   ({[name]: {rpc, chainTokenName, chainId, chainName, shortName, chainScan, eventsUrl}})
 
@@ -336,7 +332,6 @@ async function main(option = 0) {
         await payment.transferTokenAmount(address, 10000000);
         await governance.transferTokenAmount(address, 10000000);
         await rwd.transferTokenAmount(address, 10000000);
-        await sleep(2000);
       } catch (error) {
         console.debug(`Failed to send tokens to ${address}`, error.toString());
       }
