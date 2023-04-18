@@ -224,7 +224,7 @@ export default function NetworksStep({
       console.log(error);
     }
 
-    signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
+    await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
       await updateNetwork(json)
       .then(() => {
         dispatch(addToast({
