@@ -100,7 +100,7 @@ export default function MultipleTokensDropdown({
         isMulti
         onChange={handleChange}
         onCreateOption={handleOnCreateOption}
-        options={options}
+        options={handleOptions()}
         components={{
           Option: SelectOptionComponent,
         }}
