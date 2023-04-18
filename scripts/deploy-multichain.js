@@ -331,12 +331,15 @@ async function main(option = 0) {
     const [payment, governance, rwd] = await Promise.all(tokens.slice(0, 3).map(mapper));
 
     for (const address of accounts) {
-      console.debug(`Sending tokens to ${address}...`);
-      await payment.transferTokenAmount(address, 10000000);
-      await sleep(2000);
-      await governance.transferTokenAmount(address, 10000000);
-      await sleep(2000);
-      await rwd.transferTokenAmount(address, 10000000);
+      try {
+        console.debug(`Sending tokens to ${address}...`);
+        await payment.transferTokenAmount(address, 10000000);
+        await governance.transferTokenAmount(address, 10000000);
+        await rwd.transferTokenAmount(address, 10000000);
+        await sleep(2000);
+      } catch (error) {
+        console.debug(`Failed to send tokens to ${address}`, error.toString());
+      }
     }
 
     console.debug(`All tokens sent!`);
