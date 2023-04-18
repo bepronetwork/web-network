@@ -97,7 +97,7 @@ export function RegistrySetup({
 
   function exceedsFeesLimitsError(fee) {
     if (+fee < 0 || +fee > 100)
-      return t("registry.errors.exceeds-limit");
+      return t("registry.errors.exceeds-limit", { min: 0 });
 
     return undefined;
   }
