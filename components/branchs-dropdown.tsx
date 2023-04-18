@@ -28,6 +28,7 @@ export default function BranchsDropdown({
   const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
   const preSelectOptions = ["master", "main", "dev", "develop"]
+  const sortOptions = (a: { value: string }) => preSelectOptions.includes(a.value) ? -1 : 0 
 
   function mapOptions(list: string[]) {
     setOptions(list.map((branch: string) => ({value: branch, label: branch})));
@@ -71,7 +72,7 @@ export default function BranchsDropdown({
       <ReactSelect
         key={`select_repo-${repoId}`}
         isDisabled={disabled || !options?.length}
-        options={options}
+        options={options?.sort(sortOptions)}
         value={option}
         onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
