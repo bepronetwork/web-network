@@ -111,7 +111,6 @@ export default function MainNav() {
       href: "/explore",
       label: t("main-nav.explore"),
       isVisible: true,
-      blank: !noNeedNetworkInstance,
       icon: !noNeedNetworkInstance ? <ExternalLinkIcon className="mb-1" width={12} height={12} /> : null
     }
   ];
