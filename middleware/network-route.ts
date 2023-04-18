@@ -15,12 +15,15 @@ import { resJsonMessage } from "helpers/res-json-message";
 export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT` ]) => {
 
   return async (req, res) => {
+    if (!methods.includes(req.method.toUpperCase()))
+      return handler(req, res);
+
     const { accessToken, override } = req.body;
     const isAdminOverriding = isAdmin(req) && !!override;
-
+  
     req.body.isAdminOverriding = isAdminOverriding;
 
-    if (!methods.includes(req.method.toUpperCase()) || (isAdminOverriding && accessToken))
+    if (isAdminOverriding && accessToken)
       return handler(req, res);
 
     const headers = req.headers;
