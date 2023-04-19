@@ -63,6 +63,7 @@
     "redeem": "Redeem",
     "update-amount": "Update Amount",
     "edit-bounty": "Edit Bounty",
+    "update-bounty": "Bounty updated",
     "recognize-finished": {
       "title": "Recognize as finished",
       "error": "Failed to mark bounty as finished"
