@@ -10,6 +10,7 @@ interface FormGroupProps {
   label: string;
   value: string;
   readOnly?: boolean;
+  disabled?: boolean;
   placeholder?: string;
   error?: string | ReactNode;
   hint?: string | ReactNode;
