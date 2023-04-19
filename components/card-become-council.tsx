@@ -44,7 +44,7 @@ export default function CardBecomeCouncil() {
         </span>{" "}
         {t("become-council-description-part-two")}
       </div>
-      <Link href={getURLWithNetwork("/profile/bepro-votes")}>
+      <Link href={getURLWithNetwork("/profile/voting-power")}>
         <a className="text-decoration-none text-purple text-uppercase">
           {t("go-to-lock-unlock")}{" "}
           <ArrowRight className="text-purple ms-2 mb-1" />

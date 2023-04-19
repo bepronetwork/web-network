@@ -56,9 +56,14 @@ export default function CouncilLayout({ children }) {
 
   const internalLinks = [
     {
+      onClick: () => handleUrlCurators("curators-list"),
+      label: t("council:council-list"),
+      active: query?.type === "curators-list" || !query?.type
+    },
+    {
       onClick: () => handleUrlCurators("ready-to-propose"),
       label: t("council:ready-to-propose"),
-      active: query?.type === "ready-to-propose" || !query?.type
+      active: query?.type === "ready-to-propose" 
     },
     {
       onClick: () => handleUrlCurators("ready-to-dispute"),
@@ -69,11 +74,6 @@ export default function CouncilLayout({ children }) {
       onClick: () => handleUrlCurators("ready-to-close"),
       label: t("council:ready-to-close"),
       active: query?.type === "ready-to-close"
-    },
-    {
-      onClick: () => handleUrlCurators("curators-list"),
-      label: t("council:council-list"),
-      active: query?.type === "curators-list"
     }
   ]
 
@@ -131,6 +131,10 @@ export default function CouncilLayout({ children }) {
   useEffect(() => {
     loadTotals();
   }, [state.Service?.network?.active?.name, chain]);
+
+  useEffect(() => {
+    if(!query?.type) handleUrlCurators("curators-list")
+  }, [query?.type])
 
   return (
     <div>
