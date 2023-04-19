@@ -135,7 +135,7 @@ export default function InputNumber({
             ...errorStyle
           })}
         >
-          {error}
+          {errorMessage}
         </p>
       )}
     </Component>
