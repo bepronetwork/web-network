@@ -15,14 +15,13 @@ export default function PullRequestsPage() {
 
   return(
     <ProfileLayout>
-      <span className="family-Regular h4 text-white text-capitalize">{t("label_other")}</span>
-
       <ListIssues
         redirect={getURLWithNetwork("/bounties")}
         buttonMessage={t('bounty:label_other')}
         pullRequesterAddress={state.currentUser?.walletAddress || null}
         pullRequesterLogin={state.currentUser?.login || null}
         emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
+        variant="profile"
       />
     </ProfileLayout>
   );

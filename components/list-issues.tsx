@@ -76,7 +76,7 @@ export default function ListIssues({
   variant = "network"
 }: ListIssuesProps) {
   const router = useRouter();
-  const { t } = useTranslation(["common", "bounty"]);
+  const { t } = useTranslation(["common", "bounty", "pull-request", "proposal"]);
 
   const [hasMore, setHasMore] = useState(false);
   const [truncatedData, setTruncatedData] = useState(false);
@@ -138,6 +138,10 @@ export default function ListIssues({
       emptyState: t("filters.bounties.closed-not-found")
     }
   ];
+
+  const listTitle = proposer ? t("proposal:label_other") : 
+                    pullRequesterLogin || pullRequesterAddress ? t("pull-request:label_other") : 
+                    t("bounty:label_other");
 
   const [filterByState,] = useState<Filter>(filtersByIssueState[0]);
 
@@ -300,7 +304,7 @@ export default function ListIssues({
     >
       {(isBountyHall || isProfile) && (
         <div className="d-flex flex-row align-items-center">
-          <h3 className="text-capitalize font-weight-medium">{t("bounty:label_other")}</h3>
+          <h3 className="text-capitalize font-weight-medium">{listTitle}</h3>
           <div className="ms-2">
             <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">{totalBounties}</span>
           </div>
