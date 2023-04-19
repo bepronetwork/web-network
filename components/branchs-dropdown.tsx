@@ -4,6 +4,8 @@ import {useTranslation} from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
+import { DISCORD_LINK } from "helpers/constants";
+
 import {useAppState} from "../contexts/app-state";
 import BountyLabel from "./create-bounty/create-bounty-label";
 
@@ -81,7 +83,7 @@ export default function BranchsDropdown({
         <div className="mt-2">
           <p className="text-gray">
             {t("support-text-branch")}{" "}
-            <a href="https://discord.gg/layerx" target="_blank">
+            <a href={DISCORD_LINK} target="_blank">
               {t("the-community")}.
             </a>
           </p>
