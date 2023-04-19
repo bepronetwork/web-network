@@ -20,12 +20,14 @@ import {
   toastSuccess
 } from "contexts/reducers/change-toaster";
 
+import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
 import { psReadAsText } from "helpers/file-reader";
 
 import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
@@ -57,6 +59,7 @@ export default function MyNetworkSettings({
   const { updateActiveNetwork } = useNetwork();
   const { updateNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
+  const { signMessage } = useAuthentication();
   const {
     details,
     github,
@@ -201,22 +204,27 @@ export default function MyNetworkSettings({
       allowMerge: github?.allowMerge
     };
 
-    updateNetwork(json)
+    const handleError = (error) => {
+      dispatch(toastError(t("custom-network:errors.failed-to-update-network", { error }),
+                          t("actions.failed")));
+      console.log(error);
+    }
+
+    signMessage(IM_AM_CREATOR_NETWORK)
       .then(async () => {
-        if (isCurrentNetwork) updateActiveNetwork(true);
+        await updateNetwork(json)
+          .then(async () => {
+            if (isCurrentNetwork) updateActiveNetwork(true);
 
-        return updateEditingNetwork();
+            return updateEditingNetwork();
+          })
+          .then(() => {
+            dispatch(toastSuccess(t("custom-network:messages.refresh-the-page"),
+                                  t("actions.success")));
+          })
+          .catch(handleError);
       })
-      .then(() => {
-        dispatch(toastSuccess(t("custom-network:messages.refresh-the-page"),
-                              t("actions.success")));
-      })
-      .catch((error) => {
-        dispatch(toastError(t("custom-network:errors.failed-to-update-network", { error }),
-                            t("actions.failed")));
-
-        console.log(error);
-      })
+      .catch(handleError)
       .finally(() => setIsUpdating(false));
   }
 

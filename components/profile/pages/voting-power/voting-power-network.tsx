@@ -15,6 +15,7 @@ import TotalVotes from "components/profile/pages/voting-power/total-votes";
 import { useAppState } from "contexts/app-state";
 
 import { useAuthentication } from "x-hooks/use-authentication";
+import useChain from "x-hooks/use-chain";
 
 export default function VotingPowerNetwork() {
   const { query } = useRouter();
@@ -22,6 +23,7 @@ export default function VotingPowerNetwork() {
 
   const { state } = useAppState();
   const { updateWalletBalance } = useAuthentication();
+  const { chain } = useChain();
 
   const { curatorAddress } = query;
 
@@ -36,7 +38,11 @@ export default function VotingPowerNetwork() {
   const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber("0");
   const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber("0");
 
-  useEffect(() => { updateWalletBalance(true) }, []);
+  useEffect(() => {
+    if(!state.currentUser?.walletAddress || !state.Service?.active?.network || !chain) return;
+
+    updateWalletBalance(true);
+  }, [state.currentUser?.walletAddress, state.Service?.active?.network, chain]);
 
   return(
     <>

@@ -44,6 +44,10 @@ export default function MultipleTokensDropdown({
       changeSelectedTokens(newValue.map(({ value }) => value));
   };
 
+  const handleOptions = () =>
+    options?.filter((opt) =>
+      !selectedOptions?.find((s) => s?.value?.address === opt?.value?.address));
+
   useEffect(() => {
     if (!tokens?.length) return;
     else setOptions(tokens.map(tokenToOption));
@@ -96,7 +100,7 @@ export default function MultipleTokensDropdown({
         isMulti
         onChange={handleChange}
         onCreateOption={handleOnCreateOption}
-        options={options}
+        options={handleOptions()}
         components={{
           Option: SelectOptionComponent,
         }}
