@@ -540,6 +540,7 @@ export default function useApi() {
     visible: boolean;
     creator: string;
     networkAddress: string;
+    accessToken: string;
     override: boolean;
   }) {
     return api
