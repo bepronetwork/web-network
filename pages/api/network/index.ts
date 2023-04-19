@@ -15,6 +15,7 @@ import {Settings} from "helpers/settings";
 
 import {withCors} from "middleware";
 import {LogAccess} from "middleware/log-access";
+import { NetworkRoute } from "middleware/network-route";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
 
 import DAO from "services/dao-service";
@@ -279,7 +280,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       logoIcon,
       fullLogo,
       isClosed,
-      override,
       accessToken,
       description,
       githubLogin,
@@ -287,12 +287,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       repositoriesToAdd,
       repositoriesToRemove,
       allowedTokens,
+      isAdminOverriding,
       allowMerge
     } = req.body;
-
-    const isAdminOverriding = isAdmin(req) && !!override;
-    
-    if (!accessToken && !isAdminOverriding) return resJsonMessage("Unauthorized user", res, 401);
 
     const chain = await chainFromHeader(req);
 
@@ -552,4 +549,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`Network`);
-export default LogAccess(withCors(WithValidChainId(handler)));
+export default LogAccess(withCors(WithValidChainId(NetworkRoute(handler))));
