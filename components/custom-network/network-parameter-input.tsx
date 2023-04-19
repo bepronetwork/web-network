@@ -16,6 +16,7 @@ interface NetworkParameterInputProps {
   className?: string;
   disabled?: boolean;
   helperText?: string;
+  errorMessage?: string;
 }
 
 export default function NetworkParameterInput({

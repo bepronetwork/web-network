@@ -27,6 +27,7 @@ export default function MultipleTokensDropdown({
   canAddToken,
   changeSelectedTokens,
   isloading = false,
+  disabled = false,
 }) {
   const [options, setOptions] = useState<Option[]>();
   const [selectedOptions, setSelectedOptions] = useState<Option[] | OnChangeValue<Option, true>>();
@@ -108,6 +109,7 @@ export default function MultipleTokensDropdown({
         }}
         value={selectedOptions}
         isLoading={isloading}
+        isDisabled={disabled}
       />
       <ChangeTokenModal
         show={isModalVisible}
