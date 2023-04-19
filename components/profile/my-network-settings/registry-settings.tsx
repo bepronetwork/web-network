@@ -8,13 +8,12 @@ import Card from "components/card";
 import ContractButton from "components/contract-button";
 import CopyButton from "components/copy-button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
-import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import {FormGroup} from "components/form-group";
 import TokensSettings from "components/profile/my-network-settings/tokens-settings";
 import {WarningSpan} from "components/warning-span";
 
 import {useAppState} from "contexts/app-state";
-import {useNetworkSettings} from "contexts/network-settings";
+import { useNetworkSettings } from "contexts/network-settings";
 
 import {REGISTRY_LIMITS, RegistryValidator} from "helpers/registry";
 
@@ -25,18 +24,60 @@ import {useNetwork} from "x-hooks/use-network";
 
 type Executing = "bountyFees" | "creationFee" | "creationAmount";
 
+interface Field {
+  value?: string | string[] | number;
+  originalValue?: string | string[] | number;
+  error?: string;
+}
+
+const defaultField = {
+  value: "",
+  originalValue: ""
+};
+
 export default function RegistrySettings({ isGovernorRegistry = false }) {
   const { t } = useTranslation(["common", "custom-network", "setup"]);
 
-  const [executingTx, setExecutingTx] = useState<Executing>();
+  const [executingTx, setExecutingTx] = useState<Executing>("bountyFees");
   const [registryTokenSymbol, setRegistryTokenSymbol] = useState<string>();
-  const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState<string>();
-  const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState<string>();
-  
+
+  const [treasuryAddress, setTreasuryAddress] = useState<string>();
+  const [allowedReward, setAllowedReward] = useState<Field>(defaultField);
+  const [closeFeePercentage, setCloseFeePercentage] = useState<Field>(defaultField);
+  const [cancelFeePercentage, setCancelFeePercentage] = useState<Field>(defaultField);
+  const [allowedTransactional, setAllowedTransactional] = useState<Field>(defaultField);
+  const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState<Field>(defaultField);
+  const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState<Field>(defaultField);
+
   const {state} = useAppState();
+  const { tokens } = useNetworkSettings();
   const { updateActiveNetwork } = useNetwork();
-  const { fields, settings } = useNetworkSettings();
   const { handleFeeSettings, handleAmountNetworkCreation, handleFeeNetworkCreation } = useBepro();
+
+  function isSameAdresses(adressesA: string[], adressesB: string[]) {
+    return [...adressesA as string[]].sort().join() === [...adressesB as string[]].sort().join();
+  }
+
+  const isExecuting = !!executingTx;
+
+  const { changedFields, hasError } = [
+    { field: "closeFeePercentage", data: closeFeePercentage },
+    { field: "cancelFeePercentage", data: cancelFeePercentage },
+    { field: "networkCreationFeePercentage", data: networkCreationFeePercentage },
+    { field: "lockAmountForNetworkCreation", data: lockAmountForNetworkCreation },
+    { field: "allowedReward", data: allowedReward },
+    { field: "allowedTransactional", data: allowedTransactional },
+  ].reduce((acc, curr) => {
+    const { field, data: { value, originalValue, error } } = curr;
+
+    const isChanged = Array.isArray(value) ? 
+      !isSameAdresses(value, originalValue as string[]) : value?.toString() !== originalValue?.toString();
+
+    return {
+      changedFields: isChanged ? [...acc.changedFields, field] : acc.changedFields,
+      hasError: acc.hasError || !!error
+    }
+  }, { changedFields: [], hasError: false });
 
   function validateLimits(param: RegistryParameters, value: string | number) {
     if (RegistryValidator(param, value)) return undefined;
@@ -55,71 +96,107 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
     return t("setup:registry.errors.missing-limits");
   }
 
-  const params = {
-    creationFee: {
-      isExecuting: executingTx === "creationFee",
-      error: validateLimits("networkCreationFeePercentage", networkCreationFeePercentage)
-    },
-    creationAmount: {
-      isExecuting: executingTx === "creationAmount",
-      error: validateLimits("lockAmountForNetworkCreation", lockAmountForNetworkCreation)
-    },
-    closeFee: {
-      isExecuting: executingTx === "bountyFees",
-      error: validateLimits("closeFeePercentage", settings?.treasury?.closeFee?.value)
-    },
-    cancelFee: {
-      isExecuting: executingTx === "bountyFees",
-      error: validateLimits("cancelFeePercentage", settings?.treasury?.cancelFee?.value)
-    }
-  };
-
-  const isExecuting = Object.entries(params).map(([, {isExecuting}]) => isExecuting).some(c => c);
-
-  const isSaveBountyFeesBtnDisabled = !!params.closeFee.error || !!params.cancelFee.error || isExecuting;
-  const isSaveCreationFeeBtnDisabled = !!params.creationFee.error || isExecuting;
-  const isSaveCreationAmountBtnDisabled = !!params.creationAmount.error || isExecuting;
-
-  async function saveFeeSettings() {
-    setExecutingTx("bountyFees");
-
-    handleFeeSettings(settings?.treasury?.closeFee?.value, settings?.treasury?.cancelFee?.value)
-      .then(() => updateActiveNetwork(true))
-      .catch(console.debug)
-      .finally(() => setExecutingTx(undefined));
+  function handleChange(parameter) {
+    const setters = {
+      "closeFeePercentage": setCloseFeePercentage,
+      "cancelFeePercentage": setCancelFeePercentage,
+      "networkCreationFeePercentage": setNetworkCreationFeePercentage,
+      "lockAmountForNetworkCreation": setLockAmountForNetworkCreation,
+    };
+    return(value => {
+      setters[parameter](previous => ({
+        ...previous,
+        value,
+        error: validateLimits(parameter, value)
+      }));
+    });
   }
 
-  async function saveCreateNetworkFee() {
-    setExecutingTx("creationFee");
+  async function processChanges() {
+    if (hasError) return;
 
-    await handleFeeNetworkCreation(Number(networkCreationFeePercentage))
-      .then(() => updateActiveNetwork(true))
-      .catch(console.debug)
-      .finally(() => setExecutingTx(undefined));
+    // { field: "closeFeePercentage", data: closeFeePercentage },
+    // { field: "cancelFeePercentage", data: cancelFeePercentage },
+    // { field: "networkCreationFeePercentage", data: networkCreationFeePercentage },
+    // { field: "lockAmountForNetworkCreation", data: lockAmountForNetworkCreation },
+    // { field: "allowedReward", data: allowedReward },
+    // { field: "allowedTransactional", data: allowedTransactional },
   }
 
-  async function saveCreateNetworkAmount() {
-    setExecutingTx("creationAmount");
+  // async function saveFeeSettings() {
+  //   setExecutingTx("bountyFees");
 
-    await handleAmountNetworkCreation(lockAmountForNetworkCreation)
-      .then(() => updateActiveNetwork(true))
-      .catch(console.debug)
-      .finally(() => setExecutingTx(undefined));
-  }
+  //   handleFeeSettings(settings?.treasury?.closeFee?.value, settings?.treasury?.cancelFee?.value)
+  //     .then(() => updateActiveNetwork(true))
+  //     .catch(console.debug)
+  //     .finally(() => setExecutingTx(undefined));
+  // }
+
+  // async function saveCreateNetworkFee() {
+  //   setExecutingTx("creationFee");
+
+  //   await handleFeeNetworkCreation(Number(networkCreationFeePercentage))
+  //     .then(() => updateActiveNetwork(true))
+  //     .catch(console.debug)
+  //     .finally(() => setExecutingTx(undefined));
+  // }
+
+  // async function saveCreateNetworkAmount() {
+  //   setExecutingTx("creationAmount");
+
+  //   await handleAmountNetworkCreation(lockAmountForNetworkCreation)
+  //     .then(() => updateActiveNetwork(true))
+  //     .catch(console.debug)
+  //     .finally(() => setExecutingTx(undefined));
+  // }
 
   useEffect(() => {
-    if(!state.Service?.active) return;
+    if(!state.Service?.active?.network?.contractAddress) return;
 
-    state.Service.active.getRegistryCreatorAmount()
-      .then(v => setLockAmountForNetworkCreation(v.toFixed()));
-    state.Service.active.getRegistryCreatorFee()
-      .then(v => v.toString()).then(setNetworkCreationFeePercentage);
+    Promise.all([
+      state.Service.active.getTreasury(),
+      state.Service.active.getRegistryCreatorAmount(),
+      state.Service.active.getRegistryCreatorFee(),
+      state.Service.active.getAllowedTokens(),
+    ])
+      .then(([{ treasury, closeFee, cancelFee }, creationAmount, creationFee, { transactional, reward }]) => {
+        const getField = (value) => ({ value, originalValue: value });
+        const toLower = (value: string) => value.toLowerCase();
+
+        setTreasuryAddress(treasury);
+        setCloseFeePercentage(getField(closeFee));
+        setCancelFeePercentage(getField(cancelFee));
+        setNetworkCreationFeePercentage(getField(creationFee));
+        setLockAmountForNetworkCreation(getField(creationAmount.toFixed()));
+        setAllowedReward(previous => ({
+          ...previous,
+          originalValue: reward.map(toLower)
+        }));
+        setAllowedTransactional(previous => ({
+          ...previous,
+          originalValue: transactional.map(toLower)
+        }));
+      });
+  },[state.Service?.active?.network?.contractAddress]);
+
+  useEffect(() => {
+    if (!tokens?.allowedRewards || !tokens?.allowedTransactions) return;
     
-    if (!registryTokenSymbol)
-      state.Service?.active?.network?.registry?.token?.symbol()
-        .then(setRegistryTokenSymbol);
-    
-  },[state.Service.active]);
+    const rwdAddresses = tokens?.allowedRewards?.map(({ address }) => address?.toLowerCase());
+    const trsAddresses = tokens?.allowedTransactions?.map(({ address }) => address?.toLowerCase());
+
+    if (isSameAdresses(rwdAddresses, trsAddresses)) return;
+
+    setAllowedReward(previous => ({
+      ...previous,
+      value: tokens?.allowedRewards?.map(({ address }) => address)
+    }));
+
+    setAllowedTransactional(previous => ({
+      ...previous,
+      value: tokens?.allowedTransactions?.map(({ address }) => address)
+    }));
+  }, [tokens?.allowedRewards, tokens?.allowedTransactions]);
 
   return (
     <>
@@ -135,7 +212,8 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         <Col xs="auto">
           <Button
             className="border-radius-4"
-            disabled
+            disabled={!changedFields.length || hasError}
+            onClick={processChanges}
           >
             Save Changes
           </Button>
@@ -154,13 +232,13 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             <Row className="align-items-center">
               <Col>
                 <span className="caption-medium text-capitalize font-weight-normal text-gray-50">
-                  {settings?.treasury?.address?.value}
+                  {treasuryAddress}
                 </span>
               </Col>
 
               <Col xs="auto">
                 <CopyButton
-                  value={settings?.treasury?.address?.value}
+                  value={treasuryAddress}
                 />
               </Col>
             </Row>
@@ -168,54 +246,61 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
       </Row>
 
-      <Row className="align-items-center mb-5">
+      <Row 
+        xs="1"
+        sm="2"
+        md="4"
+        className="align-items-top mb-5"
+      >
         <NetworkParameterInput
-          disabled={!isGovernorRegistry}
+          disabled={!isGovernorRegistry || isExecuting}
           key="cancel-fee"
           label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
           description={
             t("custom-network:steps.treasury.fields.cancel-fee.description", REGISTRY_LIMITS["cancelFeePercentage"])
           }
           symbol="%"
-          value={settings?.treasury?.cancelFee?.value}
-          error={settings?.treasury?.cancelFee?.validated === false}
-          onChange={fields.cancelFee.setter}
+          value={+cancelFeePercentage?.value}
+          error={!!cancelFeePercentage?.error}
+          errorMessage={cancelFeePercentage?.error}
+          onChange={handleChange("cancelFeePercentage")}
         />
           
         <NetworkParameterInput
-          disabled={!isGovernorRegistry}
+          disabled={!isGovernorRegistry || isExecuting}
           key="close-fee"
           label={t("custom-network:steps.treasury.fields.close-fee.label")}
           description={
             t("custom-network:steps.treasury.fields.close-fee.description", REGISTRY_LIMITS["closeFeePercentage"])
           }
           symbol="%"
-          value={settings?.treasury?.closeFee?.value}
-          error={settings?.treasury?.closeFee?.validated === false}
-          onChange={fields.closeFee.setter}
+          value={+closeFeePercentage?.value}
+          error={!!closeFeePercentage?.error}
+          errorMessage={closeFeePercentage?.error}
+          onChange={handleChange("closeFeePercentage")}
         />
 
         <FormGroup
           label={t("setup:registry.fields.network-creation-fee.label")}
           placeholder="0"
           symbol="%"
-          value={networkCreationFeePercentage}
-          onChange={setNetworkCreationFeePercentage}
+          value={networkCreationFeePercentage?.value?.toString()}
+          onChange={handleChange("networkCreationFeePercentage")}
           variant="numberFormat"
           description={t("setup:registry.fields.network-creation-fee.description")}
-          error={params.creationFee.error}
-          readOnly={!isGovernorRegistry}
+          error={networkCreationFeePercentage?.error}
+          disabled={!isGovernorRegistry || isExecuting}
         />
 
         <FormGroup
           label={t("setup:registry.fields.network-creation-amount.label")}
           placeholder="0"
-          value={lockAmountForNetworkCreation}
-          onChange={setLockAmountForNetworkCreation}
+          value={lockAmountForNetworkCreation?.value?.toString()}
+          onChange={handleChange("lockAmountForNetworkCreation")}
           variant="numberFormat"
           description={t("setup:registry.fields.network-creation-amount.description")}
-          readOnly={!isGovernorRegistry}
-          error={params.creationAmount.error}
+          disabled={!isGovernorRegistry || isExecuting}
+          error={lockAmountForNetworkCreation?.error}
           symbol={registryTokenSymbol}
         />
       </Row>
@@ -273,7 +358,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
           </Row>
         )}
 
-      {isGovernorRegistry && <TokensSettings isGovernorRegistry={true} />}
+      {isGovernorRegistry && <TokensSettings isGovernorRegistry={true} disabled={!isGovernorRegistry || isExecuting} />}
     </>
   );
 }
