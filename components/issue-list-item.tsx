@@ -20,12 +20,15 @@ import IssueAmountInfo from "components/issue-amount-info";
 import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
+import { addToast } from "contexts/reducers/change-toaster";
 
+import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import { useNetwork } from "x-hooks/use-network";
 
 import { FlexColumn } from "./profile/wallet-balance";
@@ -44,11 +47,12 @@ export default function IssueListItem({
   variant = "network"
 }: IssueListItemProps) {
   const router = useRouter();
-  const { t } = useTranslation(["bounty", "common"]);
+  const { t } = useTranslation(["bounty", "common", "custom-network"]);
   const [visible, setVisible] = useState<boolean>();
-  const {state} = useAppState();
+  const {state,dispatch} = useAppState();
   const {updateVisibleBounty} = useApi();
   const { getURLWithNetwork } = useNetwork();
+  const { signMessage } = useAuthentication();
 
   const isVisible = visible !== undefined ? visible : issue?.visible
 
@@ -73,16 +77,33 @@ export default function IssueListItem({
     }));
   }
 
-  function handleHideBounty() {
-    updateVisibleBounty({
+  async function handleHideBounty() {
+    await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
+      updateVisibleBounty({
       issueId: issue?.issueId,
       creator: state?.currentUser?.walletAddress,
       networkAddress: issue?.network?.networkAddress,
       visible: !isVisible,
+      accessToken: state.currentUser?.accessToken,
       override: true,
+      })
+      .then(() => {
+        dispatch(addToast({
+          type: "success",
+          title: t("common:actions.success"),
+          content: t("bounty:actions.update-bounty")
+        }));
+        setVisible(!isVisible)
+      })
+      .catch((error) => {
+        dispatch(addToast({
+            type: "danger",
+            title: t("common:actions.failed"),
+            content: t("common:errors.failed-update-bounty")
+        }));
+        console.debug(t("common:errors.failed-update-bounty"), error);
+      });
     })
-      .then(() => setVisible(!isVisible))
-      .catch((e) => console.debug("updateVisibleBounty error", e));
   }
   
 
