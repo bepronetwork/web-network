@@ -10,6 +10,7 @@ import {FormGroup} from "components/form-group";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
+import { DAPPKIT_LINK } from "helpers/constants";
 import {formatStringToCurrency} from "helpers/formatNumber";
 
 import useERC20 from "x-hooks/use-erc20";
@@ -116,7 +117,7 @@ export function ERC20Details({
             <>
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
               {" "}
-              <a href="https://sdk.dappkit.dev/classes/ERC20.html" target="_blank">
+              <a href={`${DAPPKIT_LINK}classes/ERC20.html`} target="_blank">
                 {t("custom-network:steps.token-configuration.fields.nft-token.error.mid")}
               </a>
               {" "}
