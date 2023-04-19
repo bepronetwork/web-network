@@ -5,11 +5,11 @@ import Database from "db/models";
 import models from "db/models";
 
 import { chainFromHeader } from "helpers/chain-from-header";
-import { isAdmin } from "helpers/is-admin";
 import { resJsonMessage } from "helpers/res-json-message";
 
 import { withCors } from "middleware";
 import { LogAccess } from "middleware/log-access";
+import { NetworkRoute } from "middleware/network-route";
 import { WithValidChainId } from "middleware/with-valid-chain-id";
 
 import { Logger } from "services/logging";
@@ -20,15 +20,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       issueId,
       visible,
       creator,
-      override,
-      accessToken,
+      isAdminOverriding,
       networkAddress
     } = req.body;
-
-    const isAdminOverriding = isAdmin(req) && !!override;
-
-    if (!accessToken && !isAdminOverriding)
-      return resJsonMessage("Unauthorized user", res, 401);
 
     const chain = await chainFromHeader(req);
 
@@ -88,4 +82,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`network/Management`);
-export default LogAccess(withCors(WithValidChainId(handler)));
+export default LogAccess(withCors(WithValidChainId(NetworkRoute(handler))));
