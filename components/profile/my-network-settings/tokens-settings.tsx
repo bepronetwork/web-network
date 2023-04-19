@@ -22,9 +22,11 @@ interface SelectedTokens {
 
 export default function TokensSettings({
   isGovernorRegistry = false,
-  defaultSelectedTokens
+  defaultSelectedTokens,
+  disabled
 }: {
   isGovernorRegistry?: boolean;
+  disabled?: boolean;
   defaultSelectedTokens?: Token[];
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -212,7 +214,7 @@ export default function TokensSettings({
     }
 
     return (
-      <MultipleTokensDropdown {...tokenData[type]}/>
+      <MultipleTokensDropdown {...tokenData[type]} disabled={disabled} />
     )
   }
 
