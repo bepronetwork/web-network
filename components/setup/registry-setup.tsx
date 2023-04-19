@@ -17,6 +17,8 @@ import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 import {useAppState} from "contexts/app-state";
 import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
+import { DAPPKIT_LINK } from "helpers/constants";
+
 import {RegistryEvents} from "interfaces/enums/events";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
@@ -378,7 +380,7 @@ export function RegistrySetup({
           contractName="Network Registry"
           onChange={_setRegistry}
           mustBeAddress
-          docsLink="https://sdk.dappkit.dev/classes/Network_Registry.html"
+          docsLink={`${DAPPKIT_LINK}classes/Network_Registry.html`}
           action={registry?.value && isAddress(registry?.value) && !isZeroAddress(registry?.value) ? {
               label: t("registry.actions.save-registry"),
               executing: false, disabled: false,
@@ -393,7 +395,7 @@ export function RegistrySetup({
           onChange={setErc20}
           contractName={t("registry.fields.governance-token.label")}
           validator="isERC20"
-          docsLink="https://sdk.dappkit.dev/classes/ERC20.html"
+          docsLink={`${DAPPKIT_LINK}classes/ERC20.html`}
           readOnly={hasRegistryAddress}
           action={{
             disabled: hasRegistryAddress,
@@ -410,7 +412,7 @@ export function RegistrySetup({
           onChange={setBountyToken}
           contractName={t("registry.fields.nft-token.label")}
           validator="isBountyToken"
-          docsLink="https://sdk.dappkit.dev/classes/BountyToken.html"
+          docsLink={`${DAPPKIT_LINK}classes/BountyToken.html`}
           readOnly={hasRegistryAddress}
           action={{
             disabled: hasRegistryAddress,
