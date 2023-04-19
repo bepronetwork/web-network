@@ -36,8 +36,11 @@ export function useDao() {
    * Enables the user/dapp to connect to the active DAOService
    */
   function connect() {
-    const handleToastError = (err?: string) =>
+    const handleError = (err?: string) => {
+      console.debug(`Failed to connect`, err ? err : state.Service);
       dispatch(toastError(`Failed to connect`, err));
+      return false
+    }
 
     dispatch(changeConnecting(true));
 
@@ -47,22 +50,14 @@ export function useDao() {
         : window.ethereum.request({ method: "eth_requestAccounts" })
     )
       .then((connected) => {
-        if (!connected) {
-          console.debug(`Failed to connect`, state.Service);
-          handleToastError();
-          return false;
-        }
+        if (!connected) handleError()
 
         dispatch(changeCurrentUserConnected(true));
         dispatch(changeCurrentUserWallet(connected[0] as string));
 
         return true;
       })
-      .catch((error) => {
-        console.debug(`Failed to connect`, error);
-        handleToastError(error);
-        return false;
-      })
+      .catch(handleError)
       .finally(() => {
         dispatch(changeConnecting(false));
       });
