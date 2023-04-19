@@ -403,6 +403,7 @@ export default function CreateBountyPage() {
 
     searchNetworks({
       isRegistered: true,
+      isClosed: false,
       chainId: connectedChain?.id,
       sortBy: "name",
       order: "asc",

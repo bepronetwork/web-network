@@ -34,7 +34,7 @@ export default function InputNumber({
   const { t } = useTranslation(["common"]);
   const [inputValue, setInputValue] = useState<number | string | null>()
   const debounce = useRef(null)
-  
+
   const id = kebabCase(typeof label === 'string' ? label : "");
   const errorStyle = { "text-danger bg-opacity-100": error };
   const successStyle = { "text-success bg-opacity-100": success };
@@ -46,7 +46,7 @@ export default function InputNumber({
     setInputValue(e?.target?.value || null)
 
     clearTimeout(debounce.current)
-    
+
     debounce.current = setTimeout(() => {
       onValueChange?.(e)
     }, 500)
@@ -58,7 +58,7 @@ export default function InputNumber({
     <Component {...(shouldBeWrapped && { className: `form-group ${fullWidth ? 'w-100' : ''}` })}>
       {label && typeof label === 'string' ? (
         <label
-          className="caption-small mb-2 text-gray d-flex align-items-center"
+          className="caption-medium mb-2 text-gray-500 font-weight-500 d-flex align-items-center"
           id={id}
         >
           <span className="mr-1">{label}</span>{" "}
@@ -126,8 +126,7 @@ export default function InputNumber({
       </div>
       {helperText && (
         <div
-          className={clsx("p-small text-gray my-2", {
-            trans: !error,
+          className={clsx("caption-medium text-gray-500 font-weight-500 my-2", {
             className,
             ...errorStyle
           })}

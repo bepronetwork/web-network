@@ -1,90 +1,126 @@
 import BigNumber from "bignumber.js";
+import clsx from "clsx";
 import {useTranslation} from "next-i18next";
 
-import OracleIcon from "assets/icons/oracle-icon";
-
 import DelegationItem from "components/delegation-item";
+import Indicator from "components/indicator";
+import InfoTooltip from "components/info-tooltip";
+import {FlexRow} from "components/profile/wallet-balance";
+
+import {useAppState} from "contexts/app-state";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
-import {useAppState} from "../contexts/app-state";
-import InfoTooltip from "./info-tooltip";
-import {FlexRow} from "./profile/wallet-balance";
+import { Delegation } from "interfaces/curators";
+import { DelegationExtended } from "interfaces/oracles-state";
 
 interface DelegationsProps {
   type?: "toMe" | "toOthers";
+  delegations?: Delegation[];
+  variant?: "network" | "multi-network";
+  tokenColor?: string;
 }
 
+type JoinedDelegation = Delegation | DelegationExtended;
+
 export default function Delegations({
-  type = "toMe"
+  type = "toMe",
+  delegations,
+  variant = "network",
+  tokenColor
 } : DelegationsProps) {
   const { t } = useTranslation(["common", "profile", "my-oracles"]);
 
   const {state} = useAppState();
-  const walletDelegations = state.currentUser?.balance?.oracles?.delegations || [];
+
+  const walletDelegations =
+    (delegations || state.currentUser?.balance?.oracles?.delegations || []) as JoinedDelegation[];
+  const totalAmountDelegations =
+    walletDelegations.reduce((acc, delegation) => BigNumber(delegation.amount).plus(acc), BigNumber(0)).toFixed();
+
+  const votesSymbol = t("token-votes", { token: state.Service?.network?.active?.networkToken.symbol })
 
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
-      description: 
-        t("my-oracles:descriptions.oracles-delegated-to-me", { 
+      description:
+        t("my-oracles:descriptions.oracles-delegated-to-me", {
           token: state.Service?.network?.active?.networkToken?.symbol
         }),
       total: undefined,
-      delegations: [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
+      delegations: walletDelegations || [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) =>
-        delegation.amount.plus(acc), BigNumber(0)).toFixed()),
-      description: 
-             t("my-oracles:descriptions.oracles-delegated-to-others", { 
+      total: formatStringToCurrency(totalAmountDelegations),
+      description:
+             t("my-oracles:descriptions.oracles-delegated-to-others", {
               token: state.Service?.network?.active?.networkToken?.symbol
              }),
-      delegations: state.currentUser?.balance?.oracles?.delegations || []
+      delegations: walletDelegations || state.currentUser?.balance?.oracles?.delegations || []
     }
   };
 
   const oracleToken = {
-    symbol: t("$oracles", { token: state.Service?.network?.active?.networkToken?.symbol }),
-    name: t("profile:oracle-name-placeholder"),
-    icon: <OracleIcon />
+    symbol: state.Service?.network?.active?.networkToken?.symbol || t("misc.token"),
+    name: state.Service?.network?.active?.networkToken?.name || t("profile:oracle-name-placeholder"),
+    icon: <Indicator bg={tokenColor || state.Service?.network?.active?.colors?.primary} size="lg" />
   };
 
   const networkTokenName = state.Service?.network?.active?.networkToken?.name || oracleToken.name;
 
+  function getTextColorProps() {
+    if (tokenColor)
+      return {
+        style: {
+          color: tokenColor
+        }
+      };
+
+    return {
+      className: "text-primary"
+    };
+  }
+
   return (
     <div className="mb-3">
       <FlexRow className="mb-3 justify-content-between align-items-center">
-        <span className="h4 family-Regular text-white font-weight-medium">
-          <span className="mr-1">{renderInfo[type].title}</span>
+        <span className="h4 family-Regular text-white font-weight-500">
+        {renderInfo[type].title}
+        </span>
+
+        <FlexRow className={clsx([
+          "d-flex justify-content-center align-items-center gap-2 caption-large",
+          "text-white bg-gray-900 py-2 px-3 border-radius-4 border border-gray-800 font-weight-medium"
+        ])}>
+          <span>
+            {formatStringToCurrency(renderInfo[type].total)}
+          </span>
+
+          <span {...getTextColorProps()}>
+            {votesSymbol}
+          </span>
+
           <InfoTooltip
             description={renderInfo[type].description}
             secondaryIcon
           />
-        </span>
-
-        { renderInfo[type].total !== undefined && 
-          <FlexRow className="align-items-center">
-            <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
-            <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-              {formatStringToCurrency(renderInfo[type].total)}
-            </span>
-          </FlexRow>
-        }
+        </FlexRow>
       </FlexRow>
 
       <div className="row">
         <div className="col">
           { (type === "toOthers" && !renderInfo[type].delegations?.length) && t("my-oracles:errors.no-delegates") }
 
-          { (type === "toMe" || !!renderInfo[type].delegations?.length) && 
-            renderInfo[type].delegations.map(delegation => 
+          { (type === "toMe" || !!renderInfo[type].delegations?.length) &&
+            renderInfo[type].delegations.map(delegation =>
               <DelegationItem
                 key={`delegation-${delegation.id}-${delegation.to}`}
                 type={type}
-                delegation={type === "toMe" ? {amount: delegation} : delegation} 
+                delegation={type === "toMe" ? {amount: delegation} : delegation}
                 tokenName={networkTokenName}
+                variant={variant}
+                tokenColor={tokenColor}
               />)
           }
         </div>

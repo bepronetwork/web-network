@@ -1,38 +1,48 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import {Op, WhereOptions} from "sequelize";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Op, Sequelize, WhereOptions } from "sequelize";
 
 import models from "db/models";
 
-import paginate, {calculateTotalPages} from "helpers/paginate";
-import {resJsonMessage} from "helpers/res-json-message";
+import handleNetworkValues from "helpers/handleNetworksValuesApi";
+import paginate, { calculateTotalPages } from "helpers/paginate";
+import { resJsonMessage } from "helpers/res-json-message";
 
-import {LogAccess} from "middleware/log-access";
-import {WithValidChainId} from "middleware/with-valid-chain-id";
+import { LogAccess } from "middleware/log-access";
+import { WithValidChainId } from "middleware/with-valid-chain-id";
 import WithCors from "middleware/withCors";
 
-import {error} from "services/logging";
+import { error } from "services/logging";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     const whereCondition: WhereOptions = {};
 
-    const { address, isCurrentlyCurator, networkName, page, chainShortName } = req.query || {};
+    const { address, isCurrentlyCurator, networkName, page, chainShortName } =
+      req.query || {};
+
+    let queryParams = {};
 
     if (networkName) {
       const network = await models.network.findOne({
         where: {
           name: {
             [Op.iLike]: String(networkName).replaceAll(" ", "-"),
-          }
+          },
         },
         include: [
-          { 
+          {
             association: "chain",
             where: {
-              chainShortName: chainShortName
-            }
-          }
-        ]
+              ...(chainShortName
+                ? {
+                    chainShortName: Sequelize.where(Sequelize.fn("lower",
+                                                                 Sequelize.col("chain.chainShortName")),
+                                                    chainShortName.toString().toLowerCase()),
+                }
+                : {}),
+            },
+          },
+        ],
       });
 
       if (!network) return resJsonMessage("Invalid network", res, 404);
@@ -40,7 +50,35 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       whereCondition.networkId = network?.id;
     }
 
-    if (address) whereCondition.address = address;
+    queryParams = {
+      include: [
+        {
+          association: "network",
+          include: [
+            { association: "networkToken" },
+            {
+              association: "chain",
+              where: {
+                ...(chainShortName
+                  ? {
+                      chainShortName: Sequelize.where(Sequelize.fn("lower",
+                                                                   Sequelize.col("network.chain.chainShortName")),
+                                                      chainShortName.toString().toLowerCase()),
+                  }
+                  : {}),
+              },
+              required: true,
+            },
+          ],
+          required: true,
+        },
+        { association: "delegations" },
+      ],
+    };
+
+    if (address)
+      whereCondition.address = Sequelize.where(Sequelize.fn("lower", Sequelize.col("curator.address")),
+                                               address.toString().toLowerCase());
 
     if (isCurrentlyCurator)
       whereCondition.isCurrentlyCurator = isCurrentlyCurator;
@@ -52,18 +90,21 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             },
             where: whereCondition,
             nest: true,
+            ...queryParams,
       },
                                 req.query,
           [[req.query.sortBy || "acceptedProposals", req.query.order || "DESC"]]))
       .then(async (items) => {
         return Promise.all(items.rows.map(async (item) => {
-          item.dataValues.disputes =
-            await models.dispute.count({
+          item.dataValues.disputes = await models.dispute.count({
               where: { address: item.address },
-            });
+          });
           return item;
         }))
-          .then((values) => ({ count: items.count, rows: values }))
+          .then((values) => ({
+            count: items.count,
+            rows: handleNetworkValues(values),
+          }))
           .catch(() => items);
       });
 
@@ -73,7 +114,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pages: calculateTotalPages(curators.count),
     });
   } catch (e) {
-    error(e)
+    error(e);
     return res.status(500);
   }
 }

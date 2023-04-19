@@ -30,6 +30,11 @@ class Curators extends Model {
           type: DataTypes.STRING,
           allowNull: true,
         },
+        delegatedToMe: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          defaultValue: "0"
+        },
         networkId: {
           type: DataTypes.INTEGER,
           allowNull: false,
@@ -55,6 +60,12 @@ class Curators extends Model {
     this.belongsTo(models.network, {
       foreignKey: "networkId",
       sourceKey: "id"
+    });
+
+    this.hasMany(models.delegation, {
+      foreignKey: "curatorId",
+      sourceKey: "id",
+      as: "delegations"
     });
   }
 }
