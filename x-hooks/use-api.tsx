@@ -136,7 +136,7 @@ export default function useApi() {
       chainId,
       networkName: networkName.replaceAll(" ", "-"),
       ... (allNetworks !== undefined && { allNetworks: allNetworks.toString() } || {}),
-      ... (visible !== undefined && { visible: visible.toString() } || {})
+      ... (visible === true && { visible: visible.toString() } || {})
     }).toString();
 
     return api
