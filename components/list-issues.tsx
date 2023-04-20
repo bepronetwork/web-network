@@ -202,7 +202,7 @@ export default function ListIssues({
       networkName: (isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
         networkName || appState.Service?.network?.active?.name),
       allNetworks: isBountyHall || "",
-      visible: isManagement ? undefined : true,
+      visible: !isManagement,
       chainId: chain?.chainId?.toString(),
     })
       .then(async ({ count, rows, pages, currentPage }) => {
@@ -393,17 +393,18 @@ export default function ListIssues({
         </div>
       )) || <></>}
       {isManagement && (
-        <div className="row justify-content-start mb-2 svg-with-text-color">
+        <div className="row row align-center mb-2 px-3">
           {columns?.map((item, key) => (
-            <NetworkListBarColumn
-              key={key}
-              label={item}
-              hideOrder={true}
-              columnOrder={item}
-              isColumnActive={false}
-              labelWhite={true}
-              col={item === columns[0] ? 6 : 2}
-            />
+            <>
+              <div
+                className={`d-flex col-${
+                  item === "Name" ? "6" : "2 justify-content-center"
+                }`}
+                key={key}
+              >
+                <span>{item}</span>
+              </div>
+            </>
           ))}
         </div>
       )}
