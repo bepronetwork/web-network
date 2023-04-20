@@ -11,7 +11,7 @@ import {WithValidChainId} from "middleware/with-valid-chain-id";
 import WithCors from "middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
-  const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
+  const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}, visible: true};
   const {
     state,
     issueId,

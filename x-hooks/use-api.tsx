@@ -116,6 +116,7 @@ export default function useApi() {
     tokenAddress = "",
     networkName = "",
     allNetworks = undefined,
+    visible = true,
     chainId = ""
   }) {
     const params = new URLSearchParams({
@@ -135,6 +136,7 @@ export default function useApi() {
       chainId,
       networkName: networkName.replaceAll(" ", "-"),
       ... (allNetworks !== undefined && { allNetworks: allNetworks.toString() } || {}),
+      ... (visible !== undefined && { visible: visible.toString() } || {})
     }).toString();
 
     return api
@@ -159,6 +161,7 @@ export default function useApi() {
     creator = "",
     networkName = "",
     state = "open",
+    visible = true
   }) {
     const params = new URLSearchParams({
       address,
@@ -167,7 +170,8 @@ export default function useApi() {
       order,
       creator,
       networkName: networkName.replaceAll(" ", "-"),
-      state
+      state,
+      ... (visible !== undefined && { visible: visible.toString() } || {})
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
