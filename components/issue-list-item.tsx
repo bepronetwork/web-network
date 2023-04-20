@@ -155,7 +155,7 @@ export default function IssueListItem({
 
   if (size === "sm") {
     return (
-      <CardItem onClick={handleClickCard}>
+      <CardItem onClick={handleClickCard} key="sm-card">
         <>
           <div className="d-flex flex-row align-items-center justify-content-between">
             <div className="d-flex flex-row align-items-center gap-3">
@@ -195,6 +195,7 @@ export default function IssueListItem({
       <CardItem
         variant="management"
         hide={!isVisible}
+        key="management"
       >
         <div className="row align-center">
           <div className="col-md-6">
@@ -208,7 +209,7 @@ export default function IssueListItem({
             </div>
           </div>
           <div className="col-md-2 d-flex justify-content-center">
-            <FlexColumn className="me-3 justify-content-center">
+            <FlexColumn className="justify-content-center">
               <div
                 className="cursor-pointer"
                 onClick={handleClickCard}
@@ -225,7 +226,7 @@ export default function IssueListItem({
           </FlexColumn>
           </div>
           <div className="col-md-2 d-flex justify-content-center">
-          <FlexColumn className="justify-content-center me-4">
+          <FlexColumn className="justify-content-center">
               <div>
                 <TrashIcon />
               </div>
@@ -238,7 +239,7 @@ export default function IssueListItem({
 
 
   return (
-    <CardItem onClick={handleClickCard}>
+    <CardItem onClick={handleClickCard} key='default-card'>
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate mb-3">
