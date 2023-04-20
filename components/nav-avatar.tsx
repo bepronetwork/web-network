@@ -11,6 +11,7 @@ import Button from "components/button";
 
 import {useAppState} from "contexts/app-state";
 
+import { DISCORD_LINK, DOCS_LINK, SUPPORT_LINK, TWITTER_LINK } from "helpers/constants";
 import {truncateAddress} from "helpers/truncate-address";
 
 import { ProfilePages } from "interfaces/utils";
@@ -97,10 +98,10 @@ export default function NavAvatar() {
   ];
 
   const externalLinks = [
-    Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
-    Link(t("main-nav.nav-avatar.guides"), "https://docs.bepro.network/"),
-    Link(t("main-nav.nav-avatar.join-discord"), "https://discord.gg/layerx"),
-    Link(t("main-nav.nav-avatar.follow-on-twitter"), "https://twitter.com/bepronet"),
+    Link(t("main-nav.nav-avatar.support-center"), SUPPORT_LINK),
+    Link(t("main-nav.nav-avatar.guides"), DOCS_LINK),
+    Link(t("main-nav.nav-avatar.join-discord"), DISCORD_LINK),
+    Link(t("main-nav.nav-avatar.follow-on-twitter"), TWITTER_LINK),
   ];
 
   const overlay = (
