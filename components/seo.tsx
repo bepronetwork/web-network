@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 import removeMarkdown from "markdown-to-text";
 import {DefaultSeo, NextSeo} from "next-seo";
@@ -6,9 +6,7 @@ import SEO_CONFIG from "next-seo-config";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
-import {useAppState} from "contexts/app-state";
-
-import {IssueBigNumberData, IssueData} from "interfaces/issue-data";
+import {IssueData} from "interfaces/issue-data";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -16,15 +14,8 @@ interface ISeoProps {
   issueMeta?: IssueData;
 }
 
-const Seo: React.FC<ISeoProps> = () => {
+const Seo: React.FC<ISeoProps> = ({ issueMeta }) => {
   const {query} = useRouter();
-  const [issueMeta, setIssueMeta] = useState<IssueBigNumberData>(null);
-
-  const {state} = useAppState();
-
-  useEffect(() => {
-    setIssueMeta(state.currentBounty?.data);
-  }, [state.currentBounty?.data]);
 
   if (issueMeta?.issueId && query?.id && query?.repoId) {
     // eslint-disable-next-line no-unsafe-optional-chaining

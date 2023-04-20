@@ -17,8 +17,13 @@ import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import {IM_AM_CREATOR_ISSUE} from "helpers/constants";
 
+import { IssueData } from "interfaces/issue-data";
+
+import { api } from "services/api";
+
 import {useAuthentication} from "x-hooks/use-authentication";
 import useOctokit from "x-hooks/use-octokit";
+
 
 export default function PageIssue() {
   // useBounty();
@@ -123,9 +128,17 @@ export default function PageIssue() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
+  const { id, repoId, network, chain } = query;
+  
+  const currentIssue = await api
+    .get<IssueData>(`/issue/${repoId}/${id}/${network}/${chain}`)
+    .then(({ data }) => data)
+    .catch(() => null);
+
   return {
     props: {
+      currentIssue,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",
