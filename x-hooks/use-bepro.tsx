@@ -610,7 +610,9 @@ export default function useBepro() {
     });
   }
 
-  async function handleChangeAllowedTokens(addresses: string[], isTransactional: boolean, add = true) {
+  async function handleChangeAllowedTokens(addresses: string[], 
+                                           isTransactional: boolean, 
+                                           add = true): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
 
       const transaction = addTx([{

@@ -195,7 +195,9 @@
     "latest": "Latest",
     "network": "Network",
     "unsupported": "Unsupported",
-    "votes": "Votes"
+    "votes": "Votes",
+    "changing": "Changing",
+    "save-changes": "Save Changes"
   },
   "modals": {
     "help-modal": {

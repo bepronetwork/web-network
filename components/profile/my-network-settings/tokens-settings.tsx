@@ -23,11 +23,13 @@ interface SelectedTokens {
 export default function TokensSettings({
   isGovernorRegistry = false,
   defaultSelectedTokens,
-  disabled
+  disabled,
+  onChangeCb
 }: {
   isGovernorRegistry?: boolean;
   disabled?: boolean;
   defaultSelectedTokens?: Token[];
+  onChangeCb?: (transactional: Token[], reward: Token[]) => void;
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
@@ -170,6 +172,7 @@ export default function TokensSettings({
   useEffect(() => {
     fields.allowedTransactions.setter(selectedTransactionalTokens);
     fields.allowedRewards.setter(selectedRewardTokens);
+    onChangeCb?.(selectedTransactionalTokens, selectedRewardTokens);
   }, [selectedRewardTokens, selectedTransactionalTokens]);
 
 

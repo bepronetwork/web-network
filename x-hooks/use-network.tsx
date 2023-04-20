@@ -45,7 +45,7 @@ export function useNetwork() {
       new WinStorage(getStorageKey(networkName, chainId), 0, `sessionStorage`).delete();
   }
 
-  function updateActiveNetwork(forceUpdate = false) {
+  async function updateActiveNetwork(forceUpdate = false) {
     const queryNetworkName = query?.network?.toString();
     const queryChainName = query?.chain?.toString();
 
@@ -68,7 +68,7 @@ export function useNetwork() {
       }
     }
 
-    searchNetworks({ name: queryNetworkName, chainShortName: queryChainName })
+    await searchNetworks({ name: queryNetworkName, chainShortName: queryChainName })
       .then(({count, rows}) => {
         if (count === 0) {
           throw new Error("No networks found");
