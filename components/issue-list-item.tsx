@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
 
@@ -29,8 +29,10 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
+import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 
+import Modal from "./modal";
 import { FlexColumn } from "./profile/wallet-balance";
 
 interface IssueListItemProps {
@@ -50,9 +52,14 @@ export default function IssueListItem({
   const { t } = useTranslation(["bounty", "common", "custom-network"]);
   const [visible, setVisible] = useState<boolean>();
   const {state,dispatch} = useAppState();
+  const { signMessage } = useAuthentication();
+  const [isCancelable, setIsCancelable] = useState(false);
+  const [hideTrashIcon, setHideTrashIcon] = useState<boolean>();
+  const [showHardCancelModal, setShowHardCancelModal] = useState(false);
+  const [isLoadingHardCancel, setIsLoadingHardCancel] = useState(false);
   const {updateVisibleBounty} = useApi();
   const { getURLWithNetwork } = useNetwork();
-  const { signMessage } = useAuthentication();
+  const { handleHardCancelBounty } = useBepro();
 
   const isVisible = visible !== undefined ? visible : issue?.visible
 
@@ -77,6 +84,15 @@ export default function IssueListItem({
     }));
   }
 
+  function handleToastError(err?: string) {
+    dispatch(addToast({
+      type: "danger",
+      title: t("common:actions.failed"),
+      content: t("common:errors.failed-update-bounty")
+    }));
+    console.debug(t("common:errors.failed-update-bounty"), err);
+  }
+
   async function handleHideBounty() {
     await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
       updateVisibleBounty({
@@ -95,17 +111,35 @@ export default function IssueListItem({
         }));
         setVisible(!isVisible)
       })
-      .catch((error) => {
-        dispatch(addToast({
-            type: "danger",
-            title: t("common:actions.failed"),
-            content: t("common:errors.failed-update-bounty")
-        }));
-        console.debug(t("common:errors.failed-update-bounty"), error);
-      });
+      .catch(handleToastError);
     })
   }
-  
+
+  function handleHardCancel() {
+    setIsLoadingHardCancel(true)
+    handleHardCancelBounty(issue?.contractId, issue?.issueId)
+    .then(() => {
+      dispatch(addToast({
+        type: "success",
+        title: t("common:actions.success"),
+        content: t("bounty:actions.canceled-bounty")
+      }));
+      setShowHardCancelModal(false)
+      setHideTrashIcon(true)
+    }).catch(handleToastError)
+    .finally(() => setIsLoadingHardCancel(false))
+  } 
+
+  useEffect(() => {
+    if (state.Service?.active && issue)
+      (async () => {
+        const cancelableTime = await state.Service?.active.getCancelableTime();
+        const canceable =
+          +new Date(await state.Service?.active.getTimeChain()) >=
+          +new Date(+issue?.contractCreationDate + cancelableTime);
+        setIsCancelable(canceable);
+      })();
+  }, [state.Service?.active, issue]);
 
   function IssueTag({uppercase = true}) {
     const tag = issue?.network?.name;
@@ -192,6 +226,7 @@ export default function IssueListItem({
 
   if (variant === "management") {
     return (
+      <>
       <CardItem
         variant="management"
         hide={!isVisible}
@@ -227,13 +262,30 @@ export default function IssueListItem({
           </div>
           <div className="col-md-2 d-flex justify-content-center">
           <FlexColumn className="justify-content-center">
-              <div>
-                <TrashIcon />
-              </div>
+            {!hideTrashIcon && isCancelable && !['canceled', 'closed', 'proposal'].includes(issue?.state) ? (
+            <div className="cursor-pointer m-0 p-0" onClick={() => setShowHardCancelModal(true)}>
+              <TrashIcon />
+            </div>
+            ): '-'}
+
           </FlexColumn>
           </div>
         </div>
       </CardItem>
+      <Modal
+            title={t("common:modals.hard-cancel.title")}
+            centerTitle
+            show={showHardCancelModal}
+            onCloseClick={() => setShowHardCancelModal(false)}
+            cancelLabel={t("common:actions.close")}
+            okLabel={t("common:actions.continue")}
+            isExecuting={isLoadingHardCancel}
+            okDisabled={isLoadingHardCancel}
+            onOkClick={handleHardCancel}
+      >
+            <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content"/></h5>
+      </Modal>
+      </>
     );
   }
 

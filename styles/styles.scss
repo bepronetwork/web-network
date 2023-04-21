@@ -1841,6 +1841,11 @@ input[type="color"] {
   }
 }
 
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
 .border-disabled {
   &-left {
     border-left: 1px solid $disabled;

@@ -70,6 +70,7 @@ export interface IssueData {
   isKyc: boolean;
   visible: boolean;
   kycTierList: number[];
+  contractCreationDate?: string;
 }
 
 export interface Disputes {

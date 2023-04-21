@@ -96,6 +96,10 @@ class Issue extends Model {
         type: DataTypes.BOOLEAN,
         defaultValue: true
       },
+      contractCreationDate: {
+        type: DataTypes.STRING,
+        allowNull: true
+      }
     },
     {
       sequelize,

@@ -192,8 +192,8 @@ export default function useBepro() {
         });
     })
   }
-
-  async function handleHardCancelBounty(): Promise<TransactionReceipt | Error> {
+  
+  async function handleHardCancelBounty(contractId?: number, issueId?: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
         type: TransactionTypes.redeemIssue,
@@ -202,18 +202,19 @@ export default function useBepro() {
       dispatch(transaction);
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.hardCancel(state.currentBounty?.data?.contractId)
+      await state.Service?.active.hardCancel(contractId || state.currentBounty?.data?.contractId)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
 
           return processEvent(NetworkEvents.BountyCanceled, undefined, {
-            fromBlock: txInfo.blockNumber,
-            id: state.currentBounty?.data?.contractId
+            fromBlock: txInfo.blockNumber, 
+            id: contractId || state.currentBounty?.data?.contractId
           });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
+          if (!canceledBounties?.[issueId || state.currentBounty?.data?.issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
+          resolve(canceledBounties)
           // getChainBounty(true);
           // getDatabaseBounty(true);
         })
