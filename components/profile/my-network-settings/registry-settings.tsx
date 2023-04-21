@@ -71,11 +71,11 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
   const isFieldsDisabled = !isGovernorRegistry || isExecuting;
 
   const changingLabels = {
-    "bountyFees": "Bounty Fees",
-    "creationFee": "Network Creation Fee",
-    "creationAmount": "Network Creation Amount",
-    "transactional": "Transactional Tokens",
-    "reward": "Reward Tokens",
+    "bountyFees": t("setup:registry.changing-labels.bounty-fees"),
+    "creationFee": t("setup:registry.changing-labels.network-creation-fee"),
+    "creationAmount": t("setup:registry.changing-labels.network-creation-amount"),
+    "transactional": t("setup:registry.changing-labels.transactional"),
+    "reward": t("setup:registry.changing-labels.reward"),
   };
 
   const { changedFields, hasError } = [
@@ -182,8 +182,6 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
 
   async function processChanges() {
     if (!changedFields.length || hasError) return;
-
-    console.log("changedFields", changedFields)
 
     const wasChanged = parameter => changedFields.includes(parameter);
 

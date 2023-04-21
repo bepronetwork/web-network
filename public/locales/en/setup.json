@@ -2,6 +2,13 @@
   "title": "Environment Setup",
   "registry": {
     "title": "Registry",
+    "changing-labels": {
+      "bounty-fess": "Bounty Fees",
+      "network-creation-fee": "Network Creation Fee",
+      "network-creation-amount": "Network Creation Amount",
+      "transactional": "Transactional Tokens",
+      "reward": "Reward Tokens"
+    },
     "fields": {
       "contract-field": {
         "placeholder": "{{contract}} contract address",
