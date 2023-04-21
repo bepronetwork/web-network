@@ -33,6 +33,7 @@ import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
 import SelectNetwork from "./bounties/select-network";
+import NetworkListBarColumn from "./network-list-bar-column";
 
 type Filter = {
   label: string;
@@ -53,7 +54,7 @@ interface ListIssuesProps {
   proposer?: string;
   disputableFilter?: "dispute" | "merge";
   inView?: boolean;
-  variant?: "bounty-hall" | "profile" | "network"
+  variant?: "bounty-hall" | "profile" | "network" | "management"
 }
 
 interface IssuesPage {
@@ -92,9 +93,18 @@ export default function ListIssues({
 
   const [searchState, setSearchState] = useState(search);
 
+  const isManagement = variant === 'management';
   const isProfile = variant === "profile";
   const isBountyHall = variant === "bounty-hall";
   const isOnNetwork = !!router?.query?.network;
+  const variantIssueItem = isManagement ? variant : (isProfile || isBountyHall) ? "multi-network" : "network"
+  const columns = [
+    t("bounty:management.name"),
+    t("bounty:management.link"),
+    t("bounty:management.hide"),
+    t("bounty:management.cancel"),
+  ];
+  
 
   const { network: queryNetwork, networkName, repoId, time, state, sortBy, order } = router.query as {
     network: string;
@@ -189,10 +199,10 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
-        networkName || appState.Service?.network?.active?.name,
+      networkName: (isBountyHall || networkName === "all" || (isProfile && !isOnNetwork && !networkName) ? "" :
+        networkName || appState.Service?.network?.active?.name),
       allNetworks: isBountyHall || "",
-      visible: true,
+      visible: !isManagement,
       chainId: chain?.chainId?.toString(),
     })
       .then(async ({ count, rows, pages, currentPage }) => {
@@ -286,7 +296,7 @@ export default function ListIssues({
     <CustomContainer
       className={isProfile && "px-0 mx-0" || ""}
       childWrapperClassName={isProfile && "justify-content-left" || ""}
-      col={isProfile ? "col-12" : undefined}
+      col={isProfile || isManagement ? "col-12" : undefined}
     >
       {(isBountyHall || isProfile) && (
         <div className="d-flex flex-row align-items-center">
@@ -363,7 +373,7 @@ export default function ListIssues({
           </div>
 
           <div className="col-auto">
-            {(!filterState && !isProfile) && <IssueFilters />}
+            {(!filterState && !isProfile && !isManagement) && <IssueFilters />}
 
             {(!filterState && isProfile) && <SelectNetwork isCurrentDefault={isProfile && isOnNetwork} />}
           </div>
@@ -382,7 +392,22 @@ export default function ListIssues({
           </div>
         </div>
       )) || <></>}
-
+      {isManagement && (
+        <div className="row row align-center mb-2 px-3">
+          {columns?.map((item, key) => (
+            <>
+              <div
+                className={`d-flex col-${
+                  item === "Name" ? "6" : "2 justify-content-center"
+                }`}
+                key={key}
+              >
+                <span>{item}</span>
+              </div>
+            </>
+          ))}
+        </div>
+      )}
       {issuesPages.every((el) => el.issues?.length === 0) &&
       !appState.loading?.isLoading ? (
         <div className="pt-4">
@@ -397,7 +422,6 @@ export default function ListIssues({
           </NothingFound>
         </div>
       ) : null}
-
       {(issuesPages.some((el) => el.issues?.length > 0) && (
         <InfiniteScroll
           handleNewPage={nextPage}
@@ -408,7 +432,7 @@ export default function ListIssues({
               <IssueListItem
                 issue={issue}
                 key={`${issue.repository_id}/${issue.githubId}`}
-                variant={isProfile || isBountyHall ? "multi-network" : "network"}
+                variant={variantIssueItem}
               />
             ));
           })}

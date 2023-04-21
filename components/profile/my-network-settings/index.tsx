@@ -32,6 +32,8 @@ import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
+import Management from "./management";
+
 interface MyNetworkSettingsProps {
   network: Network;
   updateEditingNetwork: () => void;
@@ -47,7 +49,7 @@ export default function MyNetworkSettings({
   network,
   updateEditingNetwork,
 }: MyNetworkSettingsProps) {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const { t } = useTranslation(["common", "custom-network", "bounty"]);
 
   const [errorBigImages, setErrorBigImages] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -299,6 +301,15 @@ export default function MyNetworkSettings({
           </NetworkContainer>
         ),
       },
+      {
+        eventKey: "management",
+        title: t("bounty:management.label"),
+        component: (
+          <NetworkContainer>
+            <Management />
+          </NetworkContainer>
+        )
+      }
     ])
   },[
     network,
