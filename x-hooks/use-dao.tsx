@@ -6,6 +6,7 @@ import {useAppState} from "contexts/app-state";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
+import { toastError } from "contexts/reducers/change-toaster";
 
 import { UNSUPPORTED_CHAIN } from "helpers/constants";
 
@@ -35,26 +36,28 @@ export function useDao() {
    * Enables the user/dapp to connect to the active DAOService
    */
   function connect() {
+    const handleError = (err?: string) => {
+      console.debug(`Failed to connect`, err ? err : state.Service);
+      dispatch(toastError(`Failed to connect`, err));
+      return false
+    }
+
     dispatch(changeConnecting(true));
 
-    return (state.Service?.active ? state.Service.active.connect() : 
-      window.ethereum.request({method: 'eth_requestAccounts'}))
+    return (
+      state.Service?.active
+        ? state.Service.active.connect()
+        : window.ethereum.request({ method: "eth_requestAccounts" })
+    )
       .then((connected) => {
-        if (!connected) {
-          console.debug(`Failed to connect`, state.Service);
-
-          return false;
-        }
+        if (!connected) handleError()
 
         dispatch(changeCurrentUserConnected(true));
         dispatch(changeCurrentUserWallet(connected[0] as string));
 
         return true;
       })
-      .catch(error => {
-        console.debug(`Failed to connect`, error);
-        return false;
-      })
+      .catch(handleError)
       .finally(() => {
         dispatch(changeConnecting(false));
       });
