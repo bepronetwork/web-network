@@ -54,7 +54,8 @@ export default function MyNetworkSettings({
   const [errorBigImages, setErrorBigImages] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isGovernorRegistry, setIsGovernorRegistry] = useState(false);
-  const [tabs, setTabs] = useState<TabsProps[]>([])
+  const [tabs, setTabs] = useState<TabsProps[]>([]);
+  const [activeTab, setActiveTab] = useState("logo-and-colours");
 
   const { state, dispatch } = useAppState();
   const { colorsToCSS } = useNetworkTheme();
@@ -330,12 +331,17 @@ export default function MyNetworkSettings({
         className="my-network-tabs"
         defaultActiveKey="logo-and-colours"
         tabs={tabs}
+        onTransition={setActiveTab}
       />
 
-      {settings?.validated &&
-        github?.validated &&
-        !network?.isClosed &&
-        !networkNeedRegistration && (
+      {
+        (
+          settings?.validated &&
+          github?.validated &&
+          !network?.isClosed &&
+          !networkNeedRegistration &&
+          activeTab !== "registry"
+        ) && (
           <Row className="mt-3 mb-4">
             <Col>
               <ContractButton

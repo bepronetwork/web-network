@@ -78,7 +78,7 @@
       "bounties": "Bounties",
       "pull-requests": "Pull Requests",
       "proposals": "Proposals",
-      "my-network": "My Network",
+      "my-network": "Custom Network",
       "support-center": "Support Center",
       "guides": "Guides",
       "join-discord": "Join the Discord",
@@ -195,7 +195,9 @@
     "latest": "Latest",
     "network": "Network",
     "unsupported": "Unsupported",
-    "votes": "Votes"
+    "votes": "Votes",
+    "changing": "Changing",
+    "save-changes": "Save Changes"
   },
   "modals": {
     "help-modal": {

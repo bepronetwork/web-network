@@ -605,8 +605,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #fff;
   }
 
-  .form-control:not(:only-child), > input:not(:only-child) {
-    border-right: none !important;
+  .form-control, > input {
+    border: none !important;
   }
 
   &:hover {
@@ -614,14 +614,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 
   &:focus-within {
-    .input-group-text {
-      border-left: none !important;
-
-      &:not(.border) {
-        border: 1px solid var(--bs-primary);
-        border-left: none;
-      }
-    }
+    border: 1px solid var(--bs-primary);
   }
 
   .input-group-text {
@@ -1519,11 +1512,18 @@ textarea.form-control {
 }
 
 .react-select__multi-value {
-  background-color: $white !important;
+  background-color: $gray-800 !important;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid $gray-700;
+  
+  &__label {
+    color: $gray-150 !important;
+  }
 }
 
 .react-select__multi-value__remove {
-  color: $black;
+  color: $gray-150;
 }
 
 .scroll-top-button {
@@ -1977,4 +1977,8 @@ input[type="color"] {
   svg path {
     fill: white;
   }
+}
+
+.modal-md {
+  max-width: 500px;
 }
