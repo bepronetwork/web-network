@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
 
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
 
-import { useNetworkSettings } from "contexts/network-settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
-import { StepWrapperProps } from "interfaces/stepper";
+import {StepWrapperProps} from "interfaces/stepper";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -31,14 +31,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
   }
 
   function handleInputChange(e) {
-    
-    setNameInput(e.target.value)
-
-    clearTimeout(debounce.current)
-    
-    debounce.current = setTimeout(() => {
-      fields.name.setter(e.target.value);
-    }, 500)
+    fields.name.setter(e.target.value);
   }
 
   function handleBlur(e) {
