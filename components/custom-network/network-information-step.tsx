@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
 
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
 
-import { useNetworkSettings } from "contexts/network-settings";
+import {useNetworkSettings} from "contexts/network-settings";
 
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
-import { StepWrapperProps } from "interfaces/stepper";
+import {StepWrapperProps} from "interfaces/stepper";
+import {useDebounce} from "use-debounce";
+
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -22,23 +24,14 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
   const { details, fields } = useNetworkSettings();
   const [nameInput, setNameInput] = useState("")
   const [descriptionInput, setDescriptionInput] = useState("")
+  const [dName] = useDebounce(nameInput, 100);
+  const [dDescription] = useDebounce(descriptionInput, 100);
 
   const name = details.name;
   const nameInputClass = name.validated !== undefined ? (name.validated === true && "is-valid") || "is-invalid" : "";
 
   function showTextOrDefault(text: string, defaultText: string) {
     return text.trim() === "" ? defaultText : text;
-  }
-
-  function handleInputChange(e) {
-    
-    setNameInput(e.target.value)
-
-    clearTimeout(debounce.current)
-    
-    debounce.current = setTimeout(() => {
-      fields.name.setter(e.target.value);
-    }, 500)
   }
 
   function handleBlur(e) {
@@ -53,24 +46,8 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
     fields.logo.setter(value, "full");
   }
 
-  function handleDescriptionChange(e) {
-    setDescriptionInput(e.target.value)
-
-
-    clearTimeout(debounce.current)
-    
-    debounce.current = setTimeout(() => {
-      fields.description.setter(e.target.value);
-    }, 500)
-  }
-
-  useEffect(()=>{
-    if(name?.value !== nameInput)
-      setNameInput(name?.value)
-
-    if(details?.description !== descriptionInput)
-      setDescriptionInput(details?.description)
-  },[name?.value, details?.description])
+  useEffect(() => { fields.name.setter(dName); }, [dName])
+  useEffect(() => { fields.description.setter(dDescription); }, [dDescription])
 
   return (
     <Step
@@ -144,8 +121,8 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
             id="display-name"
             placeholder={t("custom-network:steps.network-information.fields.name.default")}
             className={`form-control ${nameInputClass}`}
-            value={nameInput}
-            onChange={handleInputChange}
+            defaultValue={nameInput}
+            onChange={(e) => { setNameInput(e?.target?.value || '') }}
             onBlur={handleBlur}
           />
 
@@ -179,8 +156,8 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
             cols={30}
             rows={5}
             className="form-control"
-            value={descriptionInput}
-            onChange={handleDescriptionChange}
+            defaultValue={descriptionInput}
+            onChange={(e) => { setDescriptionInput(e?.target?.value || ``)} }
           ></textarea>
         </div>
       </div>
