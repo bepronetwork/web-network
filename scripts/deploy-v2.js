@@ -205,8 +205,10 @@ async function main() {
 
   try {
     // 1. Deploying Contracts
+    console.log(`Address`, web3Connection)
     console.log(`Deploying Contracts...`);
     const networkReceiptAddress = await getNetworkReceipt();
+    console.log(`networkToken address`, networkReceiptAddress)
     const transactionalReceiptAddress = await getTransactionalReceipt();
     const rewardReceiptAddress = await getRewardReceipt();
 
@@ -221,10 +223,10 @@ async function main() {
 
     const bountyToken = new BountyToken(web3Connection, nftReceiptAddress);
 
-    await networkToken.loadContract();
-    await bountyTransactional.loadContract();
-    await rewardToken.loadContract();
-    await bountyToken.loadContract();
+    await networkToken.start();
+    await bountyTransactional.start();
+    await rewardToken.start();
+    await bountyToken.start();
 
     // Transfer BEPRO to dev accounts
     if ((argv.network !== 'custom' || argv.network !== 'local') && !argv.production)
@@ -244,7 +246,7 @@ async function main() {
 
     
     const network = new Network_v2(web3Connection, networkReceipt.contractAddress);
-    await network.loadContract();
+    await network.start();
 
     console.log(`Changing Network_V2 Settings...`);
     await network.changeDraftTime(60 * 5);//  5 minutes
