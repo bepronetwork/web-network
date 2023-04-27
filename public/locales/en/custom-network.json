@@ -121,7 +121,7 @@
           "title": "Other Settings",
           "parameters-warning": "Changing these parameters will launch a new transaction for each one.",
           "warning-registry": "These values were chosen by the network registry and are subject to change",
-          "warning-add-remove-allowed-tokens": "if there is removal and addition of tokens, two transactions will be required"
+          "warning-add-remove-allowed-tokens": "If there is removal and addition of tokens, two transactions will be required"
         },
         "fees": {
           "title": "Fees"

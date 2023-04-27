@@ -32,7 +32,12 @@ $only-child: 14px;
     filter: brightness(0.85);
   }
 
-  &:disabled,
+  &:disabled {
+    background-color: $gray-850;
+    border-color: $gray-850;
+    color: $gray-700;
+  }
+
   &:focus {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);

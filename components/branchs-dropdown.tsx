@@ -4,6 +4,8 @@ import {useTranslation} from "next-i18next";
 
 import ReactSelect from "components/react-select";
 
+import { DISCORD_LINK } from "helpers/constants";
+
 import {useAppState} from "../contexts/app-state";
 import BountyLabel from "./create-bounty/create-bounty-label";
 
@@ -27,7 +29,8 @@ export default function BranchsDropdown({
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
-
+  const preSelectOptions = ["master", "main", "dev", "develop"]
+  const sortOptions = (a: { value: string }) => preSelectOptions.includes(a.value) ? -1 : 0 
 
   function mapOptions(list: string[]) {
     setOptions(list.map((branch: string) => ({value: branch, label: branch})));
@@ -47,9 +50,20 @@ export default function BranchsDropdown({
     }
   }, [branches])
 
+  useEffect(() => {
+    if(options?.length > 0 && !option){
+      const opt = preSelectOptions.find(branch => options.find(opt => opt?.value?.toLowerCase() === branch))
+      if(opt) handleSetOption(opt)
+    }
+  }, [options])
+
   function onChangeSelect(e: { value: string }) {
-    onSelected({value: e.value, label: e.value})
-    setOption({value: e.value, label: e.value})
+    handleSetOption(e.value)
+  }
+
+  function handleSetOption(value: string){
+    onSelected({value: value, label: value})
+    setOption({value: value, label: value})
   }
 
   return (
@@ -60,11 +74,21 @@ export default function BranchsDropdown({
       <ReactSelect
         key={`select_repo-${repoId}`}
         isDisabled={disabled || !options?.length}
-        options={options}
+        options={options?.sort(sortOptions)}
         value={option}
         onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
       />
+      {!option && (
+        <div className="mt-2">
+          <p className="text-gray">
+            {t("support-text-branch")}{" "}
+            <a href={DISCORD_LINK} target="_blank">
+              {t("the-community")}.
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

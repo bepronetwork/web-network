@@ -11,6 +11,8 @@ import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
+import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
+
 import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
@@ -37,7 +39,7 @@ export default function GovernanceSettings({
   const {state, dispatch} = useAppState();
   const { updateNetwork } = useApi();
   const { handleCloseNetwork } = useBepro();
-  const { updateWalletBalance } = useAuthentication();
+  const { updateWalletBalance, signMessage } = useAuthentication();
   const { updateActiveNetwork } = useNetwork();
   const {
     isAbleToClosed,
@@ -62,13 +64,13 @@ export default function GovernanceSettings({
 
     handleCloseNetwork()
       .then(() => {
-        return updateNetwork({
+        return signMessage(IM_AM_CREATOR_NETWORK).then(async () => updateNetwork({
           githubLogin: state.currentUser.login,
           isClosed: true,
           creator: state.currentUser.walletAddress,
           networkAddress: network?.networkAddress,
           accessToken: state.currentUser?.accessToken,
-        });
+        }))
       })
       .then(() => {
         updateWalletBalance(true);

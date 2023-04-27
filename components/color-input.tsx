@@ -9,22 +9,25 @@ export default function ColorInput({ label, code, onChange, onlyColorCode = fals
     if (event.target.value === "#000000") {
       event.preventDefault();
       event.stopPropagation();
-    } else onChange(onlyColorCode ? color : { label, code: color });
+    } else onChange(onlyColorCode ? color : { label, code: event.target.value.toUpperCase() });
   }
 
   function handleChange(event) {
-    setColor(event.target.value.toUpperCase());
+    const newColor = event.target.value.toUpperCase();
+    setColor(newColor);
 
-    clearTimeout(debounce.current)
+    // Clear the previous timeout, if it exists
+    if (debounce.current) {
+      clearTimeout(debounce.current);
+    }
     
     debounce.current = setTimeout(() => {
-      onChange(onlyColorCode ? color : { label, code: event.target.value.toUpperCase() });
+      onChange(onlyColorCode ? newColor : { label, code: event.target.value.toUpperCase() });
     }, 500)
   }
 
   function focusInput(){
-    if(inputRef?.current)
-      inputRef?.current?.click();
+    if(inputRef?.current) inputRef?.current?.click();
   }
 
   return (

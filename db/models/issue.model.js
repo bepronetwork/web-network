@@ -91,6 +91,14 @@ class Issue extends Model {
       kycTierList:{
         type: DataTypes.ARRAY(DataTypes.INTEGER),
         default: []
+      },
+      visible:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+      },
+      contractCreationDate: {
+        type: DataTypes.STRING,
+        allowNull: true
       }
     },
     {

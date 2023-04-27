@@ -55,10 +55,10 @@ export default function InputNumber({
   useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
 
   return (
-    <Component {...(shouldBeWrapped && { className: `form-group ${fullWidth ? 'w-100' : ''}` })}>
+    <Component {...(shouldBeWrapped && { className: `form-group mb-0 ${fullWidth ? 'w-100' : ''}` })}>
       {label && typeof label === 'string' ? (
         <label
-          className="caption-medium mb-2 text-gray-500 font-weight-500 d-flex align-items-center"
+          className="caption-medium mb-2 text-gray-50 font-weight-500 d-flex align-items-center text-capitalize"
           id={id}
         >
           <span className="mr-1">{label}</span>{" "}
@@ -66,18 +66,18 @@ export default function InputNumber({
         </label>
       ): label}
       <div
-        className={clsx("input-group border-radius-8", {
+        className={clsx("input-group border-radius-4", {
           ...errorStyle,
           ...successStyle,
-          ...warningStyle
+          ...warningStyle,
+          "border border-1 border-success border-radius-4": success,
+          "border border-1 border-danger border-radius-4": error,
+          "border border-1 border-warning border-radius-4": warning,
         }, groupClassName)}
       >
         <NumberFormat
-          className={clsx("form-control border-radius-8",
+          className={clsx("form-control border-radius-4",
                           {
-              "border border-1 border-success border-radius-8": success,
-              "border border-1 border-danger border-radius-8": error,
-              "border border-1 border-warning border-radius-8": warning,
               ...successStyle,
               ...warningStyle,
               ...errorStyle
@@ -93,12 +93,9 @@ export default function InputNumber({
         />
         {symbol && (
           <span
-            className={clsx("input-group-text caption-small border-radius-8",
+            className={clsx("input-group-text caption-small border-radius-4",
                             classSymbol,
                             {
-                "border border-1 border-success border-radius-8": success,
-                "border border-1 border-danger border-radius-8": error,
-                "border border-1 border-warning border-radius-8": warning,
                 "group-disabled": params?.disabled,
                 ...errorStyle
                             })}
@@ -108,14 +105,11 @@ export default function InputNumber({
         )}
         {setMaxValue && (
           <span
-            className={clsx("input-group-text caption-medium border-radius-8",
+            className={clsx("input-group-text caption-medium border-radius-4",
                             classSymbol,
                             {
                 "group-disabled": params?.disabled,
                 "cursor-pointer": !params?.disabled,
-                "border border-1 border-success": success,
-                "border border-1 border-danger": error,
-                "border border-1 border-warning": warning,
                 ...errorStyle
                             })}
             onClick={setMaxValue}
@@ -141,7 +135,7 @@ export default function InputNumber({
             ...errorStyle
           })}
         >
-          {error}
+          {errorMessage}
         </p>
       )}
     </Component>

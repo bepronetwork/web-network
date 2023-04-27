@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
+
+import ArrowUpRightGray from "assets/icons/arrow-up-right-gray";
+import EyeIcon from "assets/icons/eye-icon";
+import EyeSlashIcon from "assets/icons/eye-slash-icon";
+import TrashIcon from "assets/icons/trash-icon";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
@@ -15,17 +20,26 @@ import IssueAmountInfo from "components/issue-amount-info";
 import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
+import { addToast } from "contexts/reducers/change-toaster";
 
+import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
+import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
+import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
+
+import Modal from "./modal";
+import { FlexColumn } from "./profile/wallet-balance";
+
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
   xClick?: () => void;
   size?: "sm" | "lg";
-  variant?: "network" | "multi-network";
+  variant?: "network" | "multi-network" | "management";
 }
 
 export default function IssueListItem({
@@ -35,10 +49,19 @@ export default function IssueListItem({
   variant = "network"
 }: IssueListItemProps) {
   const router = useRouter();
-  const { t } = useTranslation(["bounty", "common"]);
-
-  const {state} = useAppState();
+  const { t } = useTranslation(["bounty", "common", "custom-network"]);
+  const [visible, setVisible] = useState<boolean>();
+  const {state,dispatch} = useAppState();
+  const { signMessage } = useAuthentication();
+  const [isCancelable, setIsCancelable] = useState(false);
+  const [hideTrashIcon, setHideTrashIcon] = useState<boolean>();
+  const [showHardCancelModal, setShowHardCancelModal] = useState(false);
+  const [isLoadingHardCancel, setIsLoadingHardCancel] = useState(false);
+  const {updateVisibleBounty} = useApi();
   const { getURLWithNetwork } = useNetwork();
+  const { handleHardCancelBounty } = useBepro();
+
+  const isVisible = visible !== undefined ? visible : issue?.visible
 
   const issueState = getIssueState({
     state: issue?.state,
@@ -61,12 +84,69 @@ export default function IssueListItem({
     }));
   }
 
-  function IssueTag() {
+  function handleToastError(err?: string) {
+    dispatch(addToast({
+      type: "danger",
+      title: t("common:actions.failed"),
+      content: t("common:errors.failed-update-bounty")
+    }));
+    console.debug(t("common:errors.failed-update-bounty"), err);
+  }
+
+  async function handleHideBounty() {
+    await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
+      updateVisibleBounty({
+      issueId: issue?.issueId,
+      creator: state?.currentUser?.walletAddress,
+      networkAddress: issue?.network?.networkAddress,
+      visible: !isVisible,
+      accessToken: state.currentUser?.accessToken,
+      override: true,
+      })
+      .then(() => {
+        dispatch(addToast({
+          type: "success",
+          title: t("common:actions.success"),
+          content: t("bounty:actions.update-bounty")
+        }));
+        setVisible(!isVisible)
+      })
+      .catch(handleToastError);
+    })
+  }
+
+  function handleHardCancel() {
+    setIsLoadingHardCancel(true)
+    handleHardCancelBounty(issue?.contractId, issue?.issueId)
+    .then(() => {
+      dispatch(addToast({
+        type: "success",
+        title: t("common:actions.success"),
+        content: t("bounty:actions.canceled-bounty")
+      }));
+      setShowHardCancelModal(false)
+      setHideTrashIcon(true)
+    }).catch(handleToastError)
+    .finally(() => setIsLoadingHardCancel(false))
+  } 
+
+  useEffect(() => {
+    if (state.Service?.active && issue)
+      (async () => {
+        const cancelableTime = await state.Service?.active.getCancelableTime();
+        const canceable =
+          +new Date(await state.Service?.active.getTimeChain()) >=
+          +new Date(+issue?.contractCreationDate + cancelableTime);
+        setIsCancelable(canceable);
+      })();
+  }, [state.Service?.active, issue]);
+
+  function IssueTag({uppercase = true}) {
     const tag = issue?.network?.name;
     const id = issue?.githubId;
 
     return (
-      <span className={`${tag && 'text-uppercase'} h6 text-white-40 me-2`}>
+      <span className={`${(tag && uppercase) && 'text-uppercase'} h6 text-white-40 me-2`}>
         {tag ? `${tag}-${id}` : `#${id}`}
       </span>
     );
@@ -109,7 +189,7 @@ export default function IssueListItem({
 
   if (size === "sm") {
     return (
-      <CardItem onClick={handleClickCard}>
+      <CardItem onClick={handleClickCard} key="sm-card">
         <>
           <div className="d-flex flex-row align-items-center justify-content-between">
             <div className="d-flex flex-row align-items-center gap-3">
@@ -144,9 +224,74 @@ export default function IssueListItem({
     );
   }
 
+  if (variant === "management") {
+    return (
+      <>
+      <CardItem
+        variant="management"
+        hide={!isVisible}
+        key="management"
+      >
+        <div className="row align-center">
+          <div className="col-md-6">
+            <span className={`text-truncate ${!isVisible && 'text-decoration-line'}`}>
+              {(issue?.title !== null && issue?.title) || (
+                <Translation ns="bounty" label={"errors.fetching"} />
+              )}
+            </span>
+            <div className={!isVisible && 'text-decoration-line'}>
+              <IssueTag uppercase={false} />
+            </div>
+          </div>
+          <div className="col-md-2 d-flex justify-content-center">
+            <FlexColumn className="justify-content-center">
+              <div
+                className="cursor-pointer"
+                onClick={handleClickCard}
+              >
+                <ArrowUpRightGray />
+              </div>
+            </FlexColumn>
+          </div>
+          <div className="col-md-2 d-flex justify-content-center">
+          <FlexColumn className="justify-content-center">
+              <div className="cursor-pointer" onClick={handleHideBounty}>
+                {isVisible ? <EyeIcon /> : <EyeSlashIcon />}
+              </div>
+          </FlexColumn>
+          </div>
+          <div className="col-md-2 d-flex justify-content-center">
+          <FlexColumn className="justify-content-center">
+            {!hideTrashIcon && isCancelable && !['canceled', 'closed', 'proposal'].includes(issue?.state) ? (
+            <div className="cursor-pointer m-0 p-0" onClick={() => setShowHardCancelModal(true)}>
+              <TrashIcon />
+            </div>
+            ): '-'}
+
+          </FlexColumn>
+          </div>
+        </div>
+      </CardItem>
+      <Modal
+            title={t("common:modals.hard-cancel.title")}
+            centerTitle
+            show={showHardCancelModal}
+            onCloseClick={() => setShowHardCancelModal(false)}
+            cancelLabel={t("common:actions.close")}
+            okLabel={t("common:actions.continue")}
+            isExecuting={isLoadingHardCancel}
+            okDisabled={isLoadingHardCancel}
+            onOkClick={handleHardCancel}
+      >
+            <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content"/></h5>
+      </Modal>
+      </>
+    );
+  }
+
 
   return (
-    <CardItem onClick={handleClickCard}>
+    <CardItem onClick={handleClickCard} key='default-card'>
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate mb-3">

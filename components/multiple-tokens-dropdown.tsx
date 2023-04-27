@@ -27,6 +27,7 @@ export default function MultipleTokensDropdown({
   canAddToken,
   changeSelectedTokens,
   isloading = false,
+  disabled = false,
 }) {
   const [options, setOptions] = useState<Option[]>();
   const [selectedOptions, setSelectedOptions] = useState<Option[] | OnChangeValue<Option, true>>();
@@ -43,6 +44,10 @@ export default function MultipleTokensDropdown({
     changeSelectedTokens &&
       changeSelectedTokens(newValue.map(({ value }) => value));
   };
+
+  const handleOptions = () =>
+    options?.filter((opt) =>
+      !selectedOptions?.find((s) => s?.value?.address === opt?.value?.address));
 
   useEffect(() => {
     if (!tokens?.length) return;
@@ -89,19 +94,22 @@ export default function MultipleTokensDropdown({
 
   return (
     <div className="form-group">
-      <label className="caption-small mb-2">{label || t("misc.token")}</label>
+      <label className="caption-medium mb-2 text-gray-50 font-weight-500 text-capitalize">
+        {label || t("misc.token")}
+      </label>
       <CreatableSelect
         className="react-select-container"
         classNamePrefix="react-select"
         isMulti
         onChange={handleChange}
         onCreateOption={handleOnCreateOption}
-        options={options}
+        options={handleOptions()}
         components={{
           Option: SelectOptionComponent,
         }}
         value={selectedOptions}
         isLoading={isloading}
+        isDisabled={disabled}
       />
       <ChangeTokenModal
         show={isModalVisible}

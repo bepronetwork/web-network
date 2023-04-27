@@ -9,6 +9,8 @@ import PageIcon from "assets/icons/page-icon";
 
 import Modal from "components/modal";
 
+import { DISCORD_LINK, DAPPKIT_LINK, SUPPORT_LINK } from "helpers/constants";
+
 export default function HelpModal({ show = false, onCloseClick }: { show: boolean; onCloseClick: () => void }) {
   const { t } = useTranslation("common");
   const helpItem = (title = "", tagline = "", icon, href = "") => ({
@@ -22,19 +24,19 @@ export default function HelpModal({ show = false, onCloseClick }: { show: boolea
     helpItem("modals.help-modal.help-center.title",
              "modals.help-modal.help-center.content",
              <HelpIcon />,
-             "http://support.bepro.network"),
+             SUPPORT_LINK),
     helpItem("modals.help-modal.api-documentation.title",
              "modals.help-modal.api-documentation.content",
              <PageIcon />,
-             "https://sdk.dappkit.dev/"),
+             DAPPKIT_LINK),
     helpItem("modals.help-modal.live-chat.title",
              "modals.help-modal.live-chat.content",
              <ChatIcon />,
-             "https://discord.gg/layerx"),
+             DISCORD_LINK),
     helpItem("modals.help-modal.provide-feedback.title",
              "modals.help-modal.provide-feedback.content",
              <FeedbackIcon />,
-             "https://discord.gg/layerx")
+             DISCORD_LINK)
   ];
 
   function HelpItemRow(item) {
