@@ -223,7 +223,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     name: {
       setter: async (value: string) => {
-        setFields('details.name', {value, validated: await Fields.name.validator(value)})
+        await setFields('details.name', {value, validated: await Fields.name.validator(value)})
       },
       validator: async (value: string) => {
         if (value.trim() === "")
