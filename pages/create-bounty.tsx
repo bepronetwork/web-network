@@ -495,6 +495,9 @@ export default function CreateBountyPage() {
     cleanFields();
     transactionalERC20.updateAllowanceAndBalance();
     rewardERC20.updateAllowanceAndBalance();
+
+    if (query?.type === "funding")
+      setIsFundingType(true);
   }, []);
 
   async function handleNetworkSelected(chain: SupportedChainData) {
@@ -665,6 +668,7 @@ export default function CreateBountyPage() {
       {!(query?.created?.toString() === "true") && (
         <>
           <CustomContainer>
+
           <CreateBountySteps
               steps={steps}
               currentSection={currentSection}

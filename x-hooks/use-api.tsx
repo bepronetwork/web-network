@@ -175,10 +175,7 @@ export default function useApi() {
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => {
-        console.log(data.map(issue => ({type: typeof issue?.fundingAmount, value: issue?.fundingAmount})))
-        return (data.map(issueParser))
-      })
+      .then(({ data }): IssueBigNumberData[] => data.map(issueParser))
       .catch((): IssueBigNumberData[] => ([]));
   }
 

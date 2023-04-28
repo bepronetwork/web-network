@@ -77,6 +77,9 @@ export default function ListRecentIssues() {
       ? bounties.openBounties?.length
       : bounties.fundingBounties?.length || 0;
 
+    const goToPage = 
+      () => type === "open" ? push("/create-bounty") : push("/create-bounty?type=funding", "/create-bounty", )
+
     return (
       <div className={`col-md-${numberOfColumns(lenBounties)}`}>
         <NothingFound
@@ -85,7 +88,7 @@ export default function ListRecentIssues() {
         >
           <div className="d-flex justify-content-center">
             <ContractButton
-              onClick={() => push('/create-bounty')}
+              onClick={goToPage}
               textClass="text-white-50"
               className="read-only-button bg-gray-850 border-gray-850 mt-3"
             >
