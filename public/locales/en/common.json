@@ -78,7 +78,7 @@
       "bounties": "Bounties",
       "pull-requests": "Pull Requests",
       "proposals": "Proposals",
-      "my-network": "My Network",
+      "my-network": "Custom Network",
       "support-center": "Support Center",
       "guides": "Guides",
       "join-discord": "Join the Discord",
@@ -89,6 +89,8 @@
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",
+  "support-text-branch": "If you’re unsure of what branch to choose, ask",
+  "the-community": "the community",
   "select-multiple": {
     "allowed-transactional-tokens": "Allowed Transactional tokens",
     "add-transactional-tokens": "Add Transactional tokens",
@@ -193,7 +195,9 @@
     "latest": "Latest",
     "network": "Network",
     "unsupported": "Unsupported",
-    "votes": "Votes"
+    "votes": "Votes",
+    "changing": "Changing",
+    "save-changes": "Save Changes"
   },
   "modals": {
     "help-modal": {

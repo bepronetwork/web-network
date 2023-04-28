@@ -20,19 +20,19 @@ export default function InfoTooltip({
 
   return (
     <OverlayTrigger placement="bottom" overlay={popover}>
-      <span className="d-flex align-items-center text-white-30">
+      <span className="d-flex align-items-center text-gray-500">
         {!secondaryIcon ? (
           <InfoIcon
             width={14}
             height={14}
-            color="text-white-10"
+            color="gray-500"
             className="info"
           />
         ) : (
           <InfoIconEmpty
             width={14}
             height={14}
-            color="colors-light-gray"
+            color="gray-500"
             className="empty-info"
           />
         )}

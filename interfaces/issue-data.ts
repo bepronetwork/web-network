@@ -68,7 +68,9 @@ export interface IssueData {
   hasReward?: boolean;
   fundedPercent: number;
   isKyc: boolean;
+  visible: boolean;
   kycTierList: number[];
+  contractCreationDate?: string;
 }
 
 export interface Disputes {

@@ -30,7 +30,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "tokens" },
     { association: "issues",
       where: { 
-        state: {[Op.not]: "pending" }
+        state: {[Op.not]: "pending" },
+        visible: true
       }
     },
     { association: "curators" },

@@ -116,6 +116,7 @@ export default function useApi() {
     tokenAddress = "",
     networkName = "",
     allNetworks = undefined,
+    visible = true,
     chainId = ""
   }) {
     const params = new URLSearchParams({
@@ -135,6 +136,7 @@ export default function useApi() {
       chainId,
       networkName: networkName.replaceAll(" ", "-"),
       ... (allNetworks !== undefined && { allNetworks: allNetworks.toString() } || {}),
+      ... (visible === true && { visible: visible.toString() } || {})
     }).toString();
 
     return api
@@ -159,6 +161,7 @@ export default function useApi() {
     creator = "",
     networkName = "",
     state = "open",
+    visible = true
   }) {
     const params = new URLSearchParams({
       address,
@@ -167,7 +170,8 @@ export default function useApi() {
       order,
       creator,
       networkName: networkName.replaceAll(" ", "-"),
-      state
+      state,
+      ... (visible !== undefined && { visible: visible.toString() } || {})
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
@@ -525,6 +529,22 @@ export default function useApi() {
   async function updateNetwork(networkInfo) {
     return api
       .put("/network", { ...networkInfo })
+      .then((response) => response)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  async function updateVisibleBounty(managmentInfo: {
+    issueId: string;
+    visible: boolean;
+    creator: string;
+    networkAddress: string;
+    accessToken: string;
+    override: boolean;
+  }) {
+    return api
+      .put("/network/management", { ...managmentInfo })
       .then((response) => response)
       .catch((error) => {
         throw error;
@@ -961,6 +981,7 @@ export default function useApi() {
     searchLeaderBoard,
     startWorking,
     updateNetwork,
+    updateVisibleBounty,
     uploadFiles,
     userHasPR,
     createPreBounty,

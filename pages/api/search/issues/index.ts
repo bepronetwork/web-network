@@ -38,8 +38,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       allNetworks,
       repoPath,
       tokenAddress,
-      chainId
+      chainId,
+      visible
     } = req.query || {};
+
+    if(visible) whereCondition.visible = visible;
 
     if (state) whereCondition.state = state;
 
@@ -183,7 +186,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       });
 
     if (networks.length > 0)
-      include.push({ association: "network", attributes: ["colors", "name"] });
+      include.push({ association: "network", attributes: ["colors", "name", "networkAddress"] });
 
     const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
                                     .replaceAll(',',`,+,`)

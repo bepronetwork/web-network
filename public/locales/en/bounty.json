@@ -63,6 +63,8 @@
     "redeem": "Redeem",
     "update-amount": "Update Amount",
     "edit-bounty": "Edit Bounty",
+    "update-bounty": "Bounty updated successfully",
+    "canceled-bounty": "Bounty canceled successfully",
     "recognize-finished": {
       "title": "Recognize as finished",
       "error": "Failed to mark bounty as finished"
@@ -75,6 +77,13 @@
     "kyc": {
       "identify-to-start": "Start KYC"
     }
+  },
+  "management": {
+    "label": "Management",
+    "name": "Name",
+    "link": "Bounty Link",
+    "hide": "Hide Bounty",
+    "cancel": "Cancel"
   },
   "errors": {
     "fetching": "Error fetching bounty",
@@ -89,7 +98,8 @@
     "exceeds-minimum-amount": "Minimum amount is {{amount}}",
     "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
     "description-limit": "Exceeds allowed limit of characters and files: {{value}}",
-    "no-networks-chain": "The selected chain has no active networks"
+    "no-networks-chain": "The selected chain has no active networks",
+    "bounty-update": "Bounty update failed"
   },
   "title": "Create new Bounty",
   "fields": {

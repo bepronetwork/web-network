@@ -16,6 +16,7 @@ interface NetworkParameterInputProps {
   className?: string;
   disabled?: boolean;
   helperText?: string;
+  errorMessage?: string;
 }
 
 export default function NetworkParameterInput({
@@ -49,7 +50,7 @@ export default function NetworkParameterInput({
   return(
     <div className={`form-group col-3 mb-0 ${className}`}>
       <InputNumber
-        classSymbol={"text-primary"}
+        classSymbol={"blue-200"}
         min={0}
         placeholder={"0"}
         thousandSeparator

@@ -55,8 +55,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     state,
     networkName,
     sortBy,
+    visible,
     order
   } = req.query || {};
+
+  if(visible) whereCondition.visible = visible;
 
   if (repoId) whereCondition.repository_id = repoId;
 

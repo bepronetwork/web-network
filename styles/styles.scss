@@ -460,23 +460,27 @@ li {
 }
 
 .list-item {
-  background-color: $bg-shadow;
-  padding: $m * 2;
-  border-radius: math.div($m, 2);
   transition: 0.8 ease-in-out;
-  margin-bottom: $m;
   max-height: 220px;
+  margin-bottom: $m;
   &:last-child {
     margin-bottom: 0;
   }
-
   &:hover {
     background-color: lighten($bg-shadow, 5);
-    cursor: pointer;
     .h4 {
       color: $white;
     }
   }
+}
+
+.p-list-item {
+  padding: $m * 2;
+}
+
+.text-decoration-line {
+  text-decoration: line-through;
+  color: $gray-600;
 }
 
 .curator-list-item {
@@ -601,8 +605,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #fff;
   }
 
-  .form-control:not(:only-child), > input:not(:only-child) {
-    border-right: none !important;
+  .form-control, > input {
+    border: none !important;
   }
 
   &:hover {
@@ -610,14 +614,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 
   &:focus-within {
-    .input-group-text {
-      border-left: none !important;
-
-      &:not(.border) {
-        border: 1px solid var(--bs-primary);
-        border-left: none;
-      }
-    }
+    border: 1px solid var(--bs-primary);
   }
 
   .input-group-text {
@@ -1515,11 +1512,18 @@ textarea.form-control {
 }
 
 .react-select__multi-value {
-  background-color: $white !important;
+  background-color: $gray-800 !important;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid $gray-700;
+  
+  &__label {
+    color: $gray-150 !important;
+  }
 }
 
 .react-select__multi-value__remove {
-  color: $black;
+  color: $gray-150;
 }
 
 .scroll-top-button {
@@ -1837,6 +1841,11 @@ input[type="color"] {
   }
 }
 
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
 .border-disabled {
   &-left {
     border-left: 1px solid $disabled;
@@ -1968,4 +1977,8 @@ input[type="color"] {
   svg path {
     fill: white;
   }
+}
+
+.modal-md {
+  max-width: 500px;
 }
