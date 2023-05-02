@@ -2,13 +2,15 @@ import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 interface TokenIconProps {
   src?: string;
+  size?: string;
 }
 
 export default function TokenIcon({
-  src
+  src,
+  size = "24"
 } : TokenIconProps) {
   if (src)
-    return <img className="rounded-circle" src={src} height="24px" width="24px" />
+    return <img className="rounded-circle" src={src} height={size} width={size} />
 
-  return <TokenIconPlaceholder />;
+  return <TokenIconPlaceholder height={size} width={size} />;
 }

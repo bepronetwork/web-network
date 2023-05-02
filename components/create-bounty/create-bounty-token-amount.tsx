@@ -91,7 +91,6 @@ export default function CreateBountyTokenAmount({
         tokens={customTokens}
         userAddress={userAddress}
         canAddToken={canAddCustomToken}
-        selectOptionName={isFunding ? 'symbol' : 'name'}
         addToken={addToken}
         setToken={setCurrentToken}
         disabled={false}

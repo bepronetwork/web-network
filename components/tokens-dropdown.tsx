@@ -13,6 +13,7 @@ import {formatNumberToCurrency} from "helpers/formatNumber";
 import {Token} from "interfaces/token";
 
 import {useAppState} from "../contexts/app-state";
+import TokenIcon from "./token-icon";
 
 
 interface TokensDropdownProps {
@@ -138,14 +139,12 @@ export default function TokensDropdown({
           <span className="mx-2">{formatCreateLabel(data?.value)}</span>
         ) : (
           <>
-            {tokenInfo?.icon && (
-              <img
+            <span className="mx-2">
+              <TokenIcon
                 src={tokenInfo.icon}
-                width={14}
-                height={14}
-                className="mx-2"
+                size="14"
               />
-            )}
+            </span>
             <span className={`${tokenInfo ? null : "mx-2"}`}>
               {tokenInfo && selectOptionName === 'name' ? (tokenInfo?.name || name) : symbol}
             </span>
@@ -171,24 +170,22 @@ export default function TokensDropdown({
 
     return (
     <RSComponents.SingleValue {...props}>
-      <div className="
-        cursor-pointer d-inline-flex 
-        align-items-center justify-content-between 
-        text-center w-100
-      ">
-      <div className="flex-grow-0 proposal__select-options d-flex align-items-center text-center p-small p-1">
-              {data.tokenInfo?.icon && (
-                <img
-                  src={data.tokenInfo.icon}
-                  width={14}
-                  height={14}
-                  className="mx-2"
-                />
-              )}
-              <span className={`${data.tokenInfo ? "mt-1" : "mx-2"}`}>
-                {data.tokenInfo && selectOptionName === 'name' ? (data?.tokenInfo?.name || data?.name) : symbol}
-              </span>
-          </div>
+      <div 
+        className="cursor-pointer d-inline-flex align-items-center justify-content-between text-center w-100"
+      >
+        <div className="flex-grow-0 proposal__select-options d-flex align-items-center text-center p-small p-1">
+          <span className="mx-2">
+            <TokenIcon
+              src={data?.tokenInfo?.icon}
+              size="14"
+            />
+          </span>
+          
+          <span className={`${data.tokenInfo ? "mt-1" : "mx-2"}`}>
+            {data.tokenInfo && selectOptionName === 'name' ? (data?.tokenInfo?.name || data?.name) : symbol}
+          </span>
+        </div>
+
         <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
           { showCurrencyValue && 
               `${formatNumberToCurrency(data?.currentValue)} ${symbol}`}
