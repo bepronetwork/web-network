@@ -112,9 +112,9 @@ export default function IssueProposalProgressBar() {
 
     if (currentValue)
       return (
-        <div className="position-absolute" style={secondaryTextStyle}>
+        <div>
           <span
-            className={`text-${
+            className={`text-wrap text-${
               currentValue.color && currentValue.color
             } text-uppercase caption-small `}
           >
