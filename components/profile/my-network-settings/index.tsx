@@ -340,7 +340,7 @@ export default function MyNetworkSettings({
           github?.validated &&
           !network?.isClosed &&
           !networkNeedRegistration &&
-          activeTab !== "registry"
+          !["registry", "governance"].includes(activeTab)
         ) && (
           <Row className="mt-3 mb-4">
             <Col>
