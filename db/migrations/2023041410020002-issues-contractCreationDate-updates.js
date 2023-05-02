@@ -14,7 +14,7 @@ const DisputeModel = require("../models/dispute-model");
 const UserPaymentsModel = require("../models/user-payments");
 const DeveloperModel = require("../models/developer.model");
 
-const { SKIP_MIGRATION_SEED_CONTRACT_DATE_ISSUE = "true" } = process.env;
+const { SKIP_MIGRATION_SEED_CONTRACT_DATE_ISSUE } = process.env;
 
 async function up(queryInterface, Sequelize) {
     
