@@ -439,5 +439,9 @@
     "seconds": "second",
     "seconds_other": "seconds",
     "text-data": "Opened {{value}} Ago"
+  },
+  "cookie-consent": {
+    "message": "This website uses cookies to enhance the user experience.",
+    "button-label": "Accept"
   }
 }

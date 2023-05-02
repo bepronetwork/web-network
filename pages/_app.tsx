@@ -8,6 +8,7 @@ import getConfig from "next/config";
 import {useRouter} from "next/router";
 import {GoogleAnalytics} from "nextjs-google-analytics";
 
+import ConsentCookie from "components/consent-cokie";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 import Loading from "components/loading";
 import MainNav from "components/main-nav";
@@ -53,6 +54,7 @@ function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: 
           </ReadOnlyContainer>
         </RootProviders>
       </SessionProvider>
+      <ConsentCookie />
     </>
   );
 }
