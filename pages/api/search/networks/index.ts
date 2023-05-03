@@ -100,7 +100,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       "network.id",
       "network.name",
       [
-        Sequelize.literal(`sum(cast("curators"."tokensLocked" as FLOAT)) / ${caseZeroThen1('COUNT(distinct("issues".id))')} / ${caseZeroThen1('COUNT(distinct("openIssues".id))')}`), // eslint-disable-line
+        Sequelize.literal(`sum(cast("curators"."tokensLocked" as FLOAT) + cast("curators"."delegatedToMe" as FLOAT)) / ${caseZeroThen1('COUNT(distinct("issues".id))')} / ${caseZeroThen1('COUNT(distinct("openIssues".id))')}`), // eslint-disable-line
         "tokensLocked",
       ],
       [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],

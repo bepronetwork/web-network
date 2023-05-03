@@ -750,6 +750,35 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
+  async function getCuratorsResume({
+    isCurrentlyCurator = undefined,
+    networkName = "",
+    chainShortName = ""
+  }) {
+    const params = {
+      networkName,
+      chainShortName,
+      ...(isCurrentlyCurator !== undefined && { isCurrentlyCurator: isCurrentlyCurator.toString()} || {})
+    };
+
+    return api
+      .get<{
+        totalCurators: number;
+        totalLocked: string;
+        totalDelegated: string;
+        totalValue: string;
+        totalActiveCurators: number;
+      }>("/search/curators/total", { params })
+      .then(({ data }) => data)
+      .catch(() => ({ 
+        totalCurators: 0, 
+        totalLocked: "0", 
+        totalDelegated: "0", 
+        totalValue: "0", 
+        totalActiveCurators: 0
+      }));
+  }
+
   async function searchLeaderBoard({
     address = "",
     page = "1",
@@ -995,6 +1024,7 @@ export default function useApi() {
     patchSupportedChain,
     getKycSession,
     validateKycSession,
-    getReposWithBounties
+    getReposWithBounties,
+    getCuratorsResume
   };
 }
