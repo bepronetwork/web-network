@@ -194,7 +194,7 @@ async function main() {
     }
   }
 
-  const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS || await web3Connection.getAddress();
+  const ownerAddress = argv.ownerAddress || process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS || await web3Connection.getAddress();
 
   const getNetworkReceipt = async () =>
     argv.networkTokenAddress || (await Deployer(ERC20, [tokens.network.name, tokens.network.symbol, tokens.network.cap, ownerAddress]))?.contractAddress;
