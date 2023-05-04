@@ -98,6 +98,7 @@ export default function ListIssues({
   const isBountyHall = variant === "bounty-hall";
   const isOnNetwork = !!router?.query?.network;
   const variantIssueItem = isManagement ? variant : (isProfile || isBountyHall) ? "multi-network" : "network"
+  const isNotFound = issuesPages.every((el) => el.issues?.length === 0) && !appState.loading?.isLoading
   const columns = [
     t("bounty:management.name"),
     t("bounty:management.link"),
@@ -396,7 +397,7 @@ export default function ListIssues({
           </div>
         </div>
       )) || <></>}
-      {isManagement && (
+      {isManagement && !isNotFound && (
         <div className="row row align-center mb-2 px-3">
           {columns?.map((item, key) => (
             <>
@@ -412,8 +413,7 @@ export default function ListIssues({
           ))}
         </div>
       )}
-      {issuesPages.every((el) => el.issues?.length === 0) &&
-      !appState.loading?.isLoading ? (
+      {isNotFound ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {(appState.currentUser?.walletAddress && !isBountyHall) && (
