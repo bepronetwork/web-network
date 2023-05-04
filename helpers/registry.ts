@@ -14,7 +14,7 @@ const limits = (min?: StrOrNmb, max?: StrOrNmb) => ({ min, max });
 export const REGISTRY_LIMITS = {
   closeFeePercentage: limits(0, 90),
   cancelFeePercentage: limits(0, 100),
-  networkCreationFeePercentage: limits(0, 100),
+  networkCreationFeePercentage: limits(0, 99),
   lockAmountForNetworkCreation: limits(0)
 }
 

@@ -26,6 +26,8 @@ import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useSettings} from "x-hooks/use-settings";
+import { RegistryParameters } from "types/dappkit";
+import { REGISTRY_LIMITS } from "helpers/registry";
 
 interface RegistrySetupProps { 
   isVisible?: boolean;
@@ -86,9 +88,9 @@ export function RegistrySetup({
     treasury.trim() === "",
     hasRegistryAddress,
     !Service?.active?.isAddress(treasury),
-    !!exceedsFeesLimitsError(closeFeePercentage),
-    !!exceedsFeesLimitsError(cancelFeePercentage),
-    !!exceedsFeesLimitsError(networkCreationFeePercentage),
+    !!exceedsFeesLimitsError(closeFeePercentage, 'closeFeePercentage'),
+    !!exceedsFeesLimitsError(cancelFeePercentage, 'cancelFeePercentage'),
+    !!exceedsFeesLimitsError(networkCreationFeePercentage, 'networkCreationFeePercentage'),
     erc20.validated !== true,
     bountyToken.validated !== true,
     isEmpty(closeFeePercentage),
@@ -97,9 +99,11 @@ export function RegistrySetup({
     isEmpty(networkCreationFeePercentage)
   ].some(c => c);
 
-  function exceedsFeesLimitsError(fee) {
-    if (+fee < 0 || +fee > 100)
-      return t("registry.errors.exceeds-limit", { min: 0, max: 100 });
+  function exceedsFeesLimitsError(fee, type: RegistryParameters) {
+    const { min, max } = REGISTRY_LIMITS[type] || {};
+
+    if (+fee < min || +fee > max)
+      return t("registry.errors.exceeds-limit", { min, max });
 
     return undefined;
   }
@@ -132,7 +136,7 @@ export function RegistrySetup({
     handleDeployRegistry( erc20.value,
                           lockAmountForNetworkCreation,
                           treasury,
-                          `${+networkCreationFeePercentage / 100}`, // TO NORMALIZE INPUT BETWEEN 0 AND 100
+                          networkCreationFeePercentage,
                           closeFeePercentage,
                           cancelFeePercentage,
                           bountyToken.value )
@@ -186,7 +190,7 @@ export function RegistrySetup({
       .then(parameters => {
         setTreasury(parameters[0].toString());
         setLockAmountForNetworkCreation(parameters[1].toString());
-        setNetworkCreationFeePercentage((+parameters[2] * 100).toString()); // networkCreationFeePercentage is aready dived per divisor on sdk
+        setNetworkCreationFeePercentage((+parameters[2]).toString());
         setCloseFeePercentage((+parameters[3]/+parameters[6]).toString());
         setCancelFeePercentage((+parameters[4]/+parameters[6]).toString());
         setBountyTokenDispatcher(parameters[5].toString().toLowerCase());
@@ -454,7 +458,7 @@ export function RegistrySetup({
           variant="numberFormat"
           decimalScale={7}
           description={t("registry.fields.network-creation-fee.description")}
-          error={exceedsFeesLimitsError(networkCreationFeePercentage)}
+          error={exceedsFeesLimitsError(networkCreationFeePercentage, 'networkCreationFeePercentage')}
           readOnly={hasRegistryAddress}
         />
 
@@ -467,7 +471,7 @@ export function RegistrySetup({
           variant="numberFormat"
           decimalScale={7}
           description={t("registry.fields.close-bounty-fee.description")}
-          error={exceedsFeesLimitsError(closeFeePercentage)}
+          error={exceedsFeesLimitsError(closeFeePercentage, 'closeFeePercentage')}
           readOnly={hasRegistryAddress}
         />
 
@@ -480,7 +484,7 @@ export function RegistrySetup({
           variant="numberFormat"
           decimalScale={7}
           description={t("registry.fields.cancel-bounty-fee.description")}
-          error={exceedsFeesLimitsError(cancelFeePercentage)}
+          error={exceedsFeesLimitsError(cancelFeePercentage, 'cancelFeePercentage')}
           readOnly={hasRegistryAddress}
         />
       </Row>
