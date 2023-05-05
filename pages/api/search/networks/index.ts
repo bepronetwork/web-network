@@ -92,7 +92,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       required: false,
       attributes: [],
       where: { 
-          state: {[Op.ne]: "pending" }
+          state: { [Op.notIn]: ["pending", "canceled"] }
       }
     })
     include.push({
