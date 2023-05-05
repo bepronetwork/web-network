@@ -95,7 +95,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           state: {[Op.ne]: "pending" }
       }
     })
-    include.push({ association: 'openIssues', required: false, attributes: [], where: {state: 'open'}},)
+    include.push({
+      association: "openIssues",
+      required: false,
+      attributes: [],
+      where: { state: ["open", "ready", "proposal"] },
+    });
     attributes.include = [
       "network.id",
       "network.name",
