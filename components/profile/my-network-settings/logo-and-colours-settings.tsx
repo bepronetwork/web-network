@@ -7,7 +7,6 @@ import getConfig from "next/config";
 import InfoIconEmpty from "assets/icons/info-icon-empty";
 
 import ContractButton from "components/contract-button";
-import AmountCard from "components/custom-network/amount-card";
 import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
 
@@ -44,51 +43,25 @@ export default function LogoAndColoursSettings({
   const { t } = useTranslation(["common", "custom-network"]);
   const [isRegistering, setIsRegistering] = useState(false);
 
-  const {state, dispatch} = useAppState();
-
   const { processEvent } = useApi();
-  const { handleAddNetworkToRegistry } = useBepro();
+  const {state, dispatch} = useAppState();
   const { updateActiveNetwork } = useNetwork();
-  const isObjectEmpty = (objectName) => {
-    return Object.keys(objectName).length === 0
-  }
-
+  const { handleAddNetworkToRegistry } = useBepro();
   const {
     details,
     fields,
     settings,
-    forcedNetwork,
   } = useNetworkSettings();
+  
+  const isObjectEmpty = (objectName) => {
+    return Object.keys(objectName).length === 0
+  }
 
   const handleColorChange = (value) => fields.colors.setter(value);
 
   const isCurrentNetwork = (!!network &&
                             !!state.Service?.network?.active &&
                             network?.networkAddress === state.Service?.network?.active?.networkAddress)
-
-  const tvl = (+forcedNetwork?.tokensStaked || 0) + (+forcedNetwork?.tokensLocked || 0);
-
-  const NetworkAmount = (title, description, amount) => ({
-    title,
-    description,
-    amount,
-  });
-
-  const networkAmounts = [
-    NetworkAmount(t("custom-network:tokens-staked", {
-        symbol: forcedNetwork?.networkToken?.symbol,
-    }),
-                  t("custom-network:tokens-staked-description"),
-                  forcedNetwork?.tokensStaked || 0),
-    NetworkAmount(t("custom-network:oracles-staked", {
-        symbol: forcedNetwork?.networkToken?.symbol,
-    }),
-                  t("custom-network:oracles-staked-description"),
-                  forcedNetwork?.tokensLocked || 0),
-    NetworkAmount(t("custom-network:tvl"),
-                  t("custom-network:tvl-description"),
-                  tvl),
-  ];
 
   const showTextOrDefault = (text: string, defaultText: string) =>
     text?.trim() === "" ? defaultText : text;
@@ -231,6 +204,7 @@ export default function LogoAndColoursSettings({
           />
         </Col>
       </Row>
+
       <Row className="mb-2 justify-content-center">
         <Col xs="auto">
           {errorBigImages && (
@@ -240,13 +214,7 @@ export default function LogoAndColoursSettings({
           )}
         </Col>
       </Row>
-      <Row>
-        {networkAmounts.map((amount) => (
-          <Col xs={3} key={amount.title}>
-            <AmountCard {...amount} />
-          </Col>
-        ))}
-      </Row>
+
       <Row className="mt-4">
         <Col>
           <span className="caption-medium text-white mb-3">

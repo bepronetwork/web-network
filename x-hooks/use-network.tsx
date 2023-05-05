@@ -68,7 +68,11 @@ export function useNetwork() {
       }
     }
 
-    await searchNetworks({ name: queryNetworkName, chainShortName: queryChainName })
+    await searchNetworks({
+      name: queryNetworkName,
+      chainShortName: queryChainName,
+      isNeedCountsAndTokensLocked: true
+    })
       .then(({count, rows}) => {
         if (count === 0) {
           throw new Error("No networks found");

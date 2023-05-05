@@ -9,6 +9,7 @@ import {UrlObject} from "url";
 import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
 
+import SelectNetwork from "components/bounties/select-network";
 import Button from "components/button";
 import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
@@ -31,9 +32,6 @@ import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
-
-import SelectNetwork from "./bounties/select-network";
-import NetworkListBarColumn from "./network-list-bar-column";
 
 type Filter = {
   label: string;
@@ -399,17 +397,15 @@ export default function ListIssues({
       )) || <></>}
       {isManagement && !isNotFound && (
         <div className="row row align-center mb-2 px-3">
-          {columns?.map((item, key) => (
-            <>
-              <div
-                className={`d-flex col-${
-                  item === "Name" ? "6" : "2 justify-content-center"
-                }`}
-                key={key}
-              >
-                <span>{item}</span>
-              </div>
-            </>
+          {columns?.map((item) => (
+            <div
+              className={`d-flex col-${
+                item === "Name" ? "6" : "2 justify-content-center"
+              }`}
+              key={item}
+            >
+              <span>{item}</span>
+            </div>
           ))}
         </div>
       )}

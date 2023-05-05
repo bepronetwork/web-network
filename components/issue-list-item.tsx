@@ -234,12 +234,12 @@ export default function IssueListItem({
       >
         <div className="row align-center">
           <div className="col-md-6">
-            <span className={`text-truncate ${!isVisible && 'text-decoration-line'}`}>
+            <span className={`text-truncate ${!isVisible && 'text-decoration-line' || ""}`}>
               {(issue?.title !== null && issue?.title) || (
                 <Translation ns="bounty" label={"errors.fetching"} />
               )}
             </span>
-            <div className={!isVisible && 'text-decoration-line'}>
+            <div className={!isVisible && 'text-decoration-line' || ""}>
               <IssueTag uppercase={false} />
             </div>
           </div>

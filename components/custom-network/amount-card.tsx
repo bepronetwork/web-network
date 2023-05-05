@@ -6,16 +6,18 @@ interface AmountCardProps {
   title: string;
   amount?: number;
   description: string;
+  fixed?: number;
 }
 
 export default function AmountCard({
   title,
   amount = 0,
-  description
+  description,
+  fixed
 }: AmountCardProps) {
   
   return (
-    <div className="d-flex flex-column bg-shadow p-3 border-radius-8">
+    <div className="d-flex flex-column bg-gray-900 p-3 border border-gray-800 border-radius-8">
       <div className="d-flex flex-row align-items-center justify-content-between">
         <span className="caption-medium text-gray font-weight-normal">{title}</span>
 
@@ -24,7 +26,7 @@ export default function AmountCard({
 
       <div className="d-flex flex-row align-items-center mt-3">
         <h4 className="family-Regular text-white">
-          {formatNumberToNScale(amount)}
+          {formatNumberToNScale(amount, fixed)}
         </h4>
       </div>
     </div>
