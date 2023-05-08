@@ -132,7 +132,7 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
   const { id, repoId, network, chain } = query;
   
   const currentIssue = await api
-    .get<IssueData>(`/issue/${repoId}/${id}/${network}/${chain}`)
+    .get<IssueData>(`/issue/seo/${repoId}/${id}/${network}/${chain}`)
     .then(({ data }) => data)
     .catch(() => null);
 

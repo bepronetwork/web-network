@@ -37,7 +37,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const chain = chainHeader ? chainHeader : await models.chain.findOne({
     where: {
       chainShortName: Sequelize.where(Sequelize.fn("lower", Sequelize.col("chain.chainShortName")), 
-                                      chainName.toString().toLowerCase())
+                                      chainName?.toString()?.toLowerCase())
     }
   });
 
