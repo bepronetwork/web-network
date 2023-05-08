@@ -1014,6 +1014,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .issue-proposal-progress {
   min-height: 360px;
+
+  .secondary-text {
+    width: 10vw;
+  }
 }
 
 .issue-progress-horizontal {

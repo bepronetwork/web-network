@@ -65,7 +65,9 @@ export default function useERC20() {
     return handleApproveToken(address, amount, undefined, symbol).then(updateAllowanceAndBalance);
   }
 
-  function setDefaults() {
+  function setDefaults(newAddress?: string) {
+    if (newAddress)
+      setAddress(newAddress);
     setName("");
     setSymbol("");
     setDecimals(18);
@@ -125,7 +127,7 @@ export default function useERC20() {
 
   function _setAddress(_address: string) {
     if (_address?.toLowerCase() !== address?.toLowerCase())
-      setAddress(_address);
+      setDefaults(_address);
   }
 
   function _setSpender(_address: string) {

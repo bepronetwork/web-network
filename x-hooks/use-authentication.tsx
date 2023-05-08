@@ -83,8 +83,9 @@ export function useAuthentication() {
 
     expirationStorage.removeItem();
 
-    const lastNetwork = state.Service?.network?.lastVisited ? `/${state.Service?.network?.lastVisited}` : "";
-    const lastChain = state.Service?.network?.lastVisited ? `/${state.Service?.network?.lastVisited}` : "";
+    const lastNetwork = state.Service?.network?.active ? `/${state.Service?.network?.active?.name?.toLowerCase()}` : "";
+    const lastChain = 
+      state.Service?.network?.active ? `/${state.Service?.network?.active?.chain?.chainShortName?.toLowerCase()}` : "";
 
     signOut({callbackUrl: `${URL_BASE}${lastNetwork}${lastChain}`})
       .then(() => {
@@ -240,10 +241,11 @@ export function useAuthentication() {
         update({oracles, bepro, staked});
         updateNetwork({isCouncil, isGovernor});
       })
+      .catch(error => console.debug("Failed to updateWalletBalance", error))
       .finally(() => {
         dispatch(changeSpinners.update({balance: false}));
         console.debug(`should have updated state`, state.currentUser.balance)
-      })
+      });
 
     loadNetworkAmounts();
   }

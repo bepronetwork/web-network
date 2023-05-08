@@ -169,6 +169,7 @@ export function useNetwork() {
           disputableTime: +disputableTime / 1000
         }));
       })
+      .catch(error => console.debug("Failed to loadNetworkTimes", error));
   }
 
   function loadNetworkAmounts() {
@@ -203,6 +204,7 @@ export function useNetwork() {
           totalNetworkToken
         }));
       })
+      .catch(error => console.debug("Failed to loadNetworkAmounts", error));
   }
 
   function updateNetworkAndChainMatch() {

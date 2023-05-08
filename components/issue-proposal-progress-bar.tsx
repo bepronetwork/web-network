@@ -112,15 +112,13 @@ export default function IssueProposalProgressBar() {
 
     if (currentValue)
       return (
-        <div>
-          <span
-            className={`text-wrap text-${
-              currentValue.color && currentValue.color
-            } text-uppercase caption-small `}
-          >
-            {currentValue.text}
-          </span>
-        </div>
+        <span
+          className={`white-space text-${
+            currentValue.color && currentValue.color
+          } text-uppercase caption-small secondary-text`}
+        >
+          {currentValue.text}
+        </span>
       );
   }
 
@@ -130,7 +128,7 @@ export default function IssueProposalProgressBar() {
       currentStep >= index ? stepColor : "light-gray"
     }`;
     const dotStyle = { width: "12px", height: "12px" };
-    const labelStyle = { left: "40px" };
+    const labelStyle = { left: "25px"};
     const currentItem = currentStep === index;
     const isLastItem = currentStep === steps.length - 1;
 
@@ -147,12 +145,14 @@ export default function IssueProposalProgressBar() {
               }`}
               style={{ width: "6px", height: "6px" }}
             ></div>
-            <div
-              className="position-absolute d-flex align-items-start flex-column mt-1"
+            
+          </div>
+          <div
+              className="position-absolute d-flex align-items-start flex-column w-100"
               style={labelStyle}
             >
               <label
-                className={`white-space text-uppercase caption mb-1 text-${
+                className={`white-space text-uppercase caption text-${
                   isCanceled ? "danger" : `${currentItem ? stepColor : "gray"}`
                 }`}
               >
@@ -160,7 +160,6 @@ export default function IssueProposalProgressBar() {
               </label>
               {currentItem && renderSecondaryText(stepLabel, index)}
             </div>
-          </div>
         </div>
       </Fragment>
     );
@@ -222,10 +221,10 @@ export default function IssueProposalProgressBar() {
                     style={{
                       height: `${toRepresentationHeight()}`
                     }}
-                  >
-                    {steps.map(renderColumn)}
-                  </div>
+                  ></div>
                 </div>
+
+                {steps.map(renderColumn)}
               </div>
             </div>
           </div>

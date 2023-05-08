@@ -131,14 +131,16 @@ export default function IssueListItem({
   } 
 
   useEffect(() => {
-    if (state.Service?.active && issue)
-      (async () => {
-        const cancelableTime = await state.Service?.active.getCancelableTime();
-        const canceable =
-          +new Date(await state.Service?.active.getTimeChain()) >=
-          +new Date(+issue?.contractCreationDate + cancelableTime);
-        setIsCancelable(canceable);
-      })();
+    if (state.Service?.active && issue && variant === "management")
+      Promise.all([
+        state.Service?.active.getCancelableTime(),
+        state.Service?.active.getTimeChain()
+      ])
+        .then(([cancelableTime, chainTime]) => {
+          const canceable = +new Date(chainTime) >= +new Date(+issue?.contractCreationDate + cancelableTime);
+          setIsCancelable(canceable);
+        })
+        .catch(error => console.debug("Failed to get cancelable time", error));
   }, [state.Service?.active, issue]);
 
   function IssueTag({uppercase = true}) {
