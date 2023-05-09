@@ -284,7 +284,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </If>
       </Row>
 
-      <Row className="mb-5">
+      <Row className="mb-4">
         <Col xs="6">
           <Card>
             <Row className="mb-3">
@@ -310,11 +310,19 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
         </Col>
       </Row>
 
+      <If condition={isGovernorRegistry}>
+        <TokensSettings 
+          isGovernorRegistry={true}
+          disabled={isFieldsDisabled}
+          onChangeCb={onTokensChanged}
+        />
+      </If>
+
       <Row 
         xs="1"
         sm="2"
         md="4"
-        className="align-items-top mb-5"
+        className="align-items-top mt-4 mb-5"
       >
         <NetworkParameterInput
           disabled={isFieldsDisabled}
@@ -375,14 +383,6 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
             text={t("custom-network:steps.network-settings.fields.other-settings.warning-registry")}
           />
         </Row>
-      </If>
-
-      <If condition={isGovernorRegistry}>
-        <TokensSettings 
-          isGovernorRegistry={true}
-          disabled={isFieldsDisabled}
-          onChangeCb={onTokensChanged}
-        />
       </If>
     </>
   );

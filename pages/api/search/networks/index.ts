@@ -18,7 +18,7 @@ interface includeProps {
   required?: boolean;
   attributes?: string[];
   where?: {
-    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb | Where } | Where
+    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb | Where } | Where | boolean
   };
 }
 
@@ -92,14 +92,18 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       required: false,
       attributes: [],
       where: { 
-          state: { [Op.notIn]: ["pending", "canceled"] }
+          state: { [Op.notIn]: ["pending", "canceled"] },
+          visible: true
       }
     })
     include.push({
       association: "openIssues",
       required: false,
       attributes: [],
-      where: { state: ["open", "ready", "proposal"] },
+      where: { 
+        state: ["open", "ready", "proposal"],
+        visible: true
+      },
     });
     attributes.include = [
       "network.id",
