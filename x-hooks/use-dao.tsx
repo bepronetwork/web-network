@@ -162,7 +162,7 @@ export function useDao() {
     const web3Connection = state.Service?.web3Connection;
     const isConnected = web3Connection?.web3?.currentProvider?._state?.isConnected;
 
-    if (isSameWeb3Host && isSameRegistry && !isConnected|| state.Service?.starting) {
+    if (isSameWeb3Host && isSameRegistry && !isConnected || state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
       return;
     }
