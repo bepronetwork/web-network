@@ -1,3 +1,5 @@
+import { Web3Connection } from "@taikai/dappkit";
+
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import { RepositoryPermissions } from "types/octokit";
@@ -108,3 +110,6 @@ export const changeNetworkReposActive = (active: ServiceNetworkReposActive) => c
 
 export const changeNetworkReposActiveViewerPerm = 
   (viewerPermission: RepositoryPermissions) => changeActiveRepoProps.update({viewerPermission});
+
+export const changeWeb3Connection = (web3Connection: Web3Connection) => 
+  changeServiceProp.update(web3Connection, "web3Connection");
