@@ -72,32 +72,16 @@ export function useDao() {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
     const chain_id = chainId || state.Service?.network?.active?.chain_id;
 
-    console.log("changeNetwork 1")
-
-    if (!state.Service?.active || 
-        !networkAddress || 
-        !chain_id || 
-        state.spinners.switchingChain)
+    if (!state.Service?.active || !networkAddress || !chain_id || state.spinners.switchingChain)
       return;
 
-    console.log("changeNetwork 2")
-
-    if (state.Service?.active?.network?.contractAddress === networkAddress && !state.Service?.web3Connection?.web3)
+    if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    console.log("changeNetwork 3")
     const service = state.Service.active;
 
     if(chain) {
       const withWeb3Host = !!state.Service?.active?.web3Host;
-
-      console.log("changeNetwork 4", {
-        withWeb3Host,
-        chain_id,
-        chain,
-        providerChainId: state.Service?.web3Connection?.web3?.currentProvider.chainId,
-        web3Host: state.Service?.active?.web3Host
-      })
 
       if (+chain_id !== +chain?.chainId ||
           !withWeb3Host && +chain_id !== +state.Service?.web3Connection?.web3?.currentProvider.chainId ||
@@ -105,7 +89,7 @@ export function useDao() {
         return;
     }
 
-    console.debug("Starting network", state.Service.active);
+    console.debug("Starting network");
 
     dispatch(changeStarting(true));
 
