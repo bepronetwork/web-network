@@ -127,6 +127,9 @@ export default function CreateBountyPage() {
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) =>
     !tokenAllowance.lt(amount);
 
+  const handleIsLessThan = (v: number, min: string) =>
+    BigNumber(v).isLessThan(BigNumber(min));
+
   async function addToken(newToken: Token) {
     await getCoinInfoByContract(newToken?.symbol)
       .then((tokenInfo) => {
@@ -164,9 +167,13 @@ export default function CreateBountyPage() {
     if (isLoadingCreateBounty) return true;
 
     const isIssueAmount =
-      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
+      issueAmount.floatValue <= 0 ||
+      issueAmount.floatValue === undefined ||
+      handleIsLessThan(issueAmount.floatValue, transactionalToken?.minimum);
     const isRewardAmount =
-      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
+      rewardAmount.floatValue <= 0 ||
+      rewardAmount.floatValue === undefined ||
+      handleIsLessThan(rewardAmount.floatValue, rewardToken?.minimum);
 
     if (section === 0 && !currentNetwork) return true;
 
@@ -398,6 +405,18 @@ export default function CreateBountyPage() {
     transactionalERC20.setAddress(undefined);
   }
 
+  function handleMinAmount(type: "reward" | "transactional") {
+    if(currentSection === 3){
+      const amount = type === "reward" ? rewardAmount : issueAmount 
+      const isAmount =
+      amount.floatValue <= 0 ||
+      amount.floatValue === undefined ||
+      handleIsLessThan(amount.floatValue, transactionalToken?.minimum);
+
+      if(isAmount) setCurrentSection(2)
+    }
+  }
+
   useEffect(() => {
     if(!connectedChain) return;
 
@@ -491,6 +510,9 @@ export default function CreateBountyPage() {
 
   }, [currentNetwork, connectedChain]);
 
+  useEffect(() => handleMinAmount('transactional'), [issueAmount])
+  useEffect(() => handleMinAmount('reward'), [rewardAmount])
+
   useEffect(() => {
     cleanFields();
     transactionalERC20.updateAllowanceAndBalance();
@@ -566,8 +588,9 @@ export default function CreateBountyPage() {
               setIsFundingType(e);
             }}
           >
-            {renderBountyToken("bounty")}
-            {isFundingType && (
+            {isFundingType ? (
+              <>
+              {renderBountyToken("bounty")}
               <div className="col-md-12 my-4">
                 <FormCheck
                   className="form-control-md pb-0"
@@ -580,7 +603,8 @@ export default function CreateBountyPage() {
                 {t("bounty:reward-funders-description")}
                 </p>
               </div>
-            )}
+              </>
+            ): renderBountyToken("bounty")}
             {rewardChecked && isFundingType && renderBountyToken("reward")}
           </CreateBountyRewardInfo>
         </>

@@ -10,6 +10,7 @@ import Modal from "components/modal";
 import {Token} from "interfaces/token";
 
 import {useAppState} from "../contexts/app-state";
+import { FormGroup } from "./form-group";
 
 export default function ChangeTokenModal({
   show,
@@ -29,6 +30,7 @@ export default function ChangeTokenModal({
   const [isValidAddress, setIsValidAddress] = useState<boolean>();
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
+  const [minAmount, setMinAmount] = useState('');
 
   const {state} = useAppState();
 
@@ -74,7 +76,7 @@ export default function ChangeTokenModal({
   function handleConfirm() {
     if (isValidAddress !== true) return;
 
-    const token = { address, name, symbol };
+    const token = { address, name, symbol, minimum: minAmount };
     
     setClose();
     setToken(token);
@@ -140,6 +142,14 @@ export default function ChangeTokenModal({
 
               <input type="text" className="form-control rounded-4" value={symbol} readOnly />
             </div>
+          </div>
+          <div className="col-12"> 
+          <FormGroup
+            label={t("change-token-modal:fields.min-amount.label")}
+            value={minAmount}
+            variant="numberFormat"
+            onChange={setMinAmount}
+          />
           </div>
         </div>
 

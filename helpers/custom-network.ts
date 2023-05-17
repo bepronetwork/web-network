@@ -75,6 +75,7 @@ export const DefaultNetworkSettings = {
   },
   tokens: {
     settler: "",
+    settlerTokenMinAmount: "",
     allowedTransactions: [] as Token[],
     allowedRewards: [] as Token[],
     validated: false,

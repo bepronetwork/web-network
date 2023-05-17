@@ -23,6 +23,7 @@ import { Token } from "interfaces/token";
 import {RegistryParameters} from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
+import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useNetwork} from "x-hooks/use-network";
 
@@ -50,11 +51,13 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
   const [closeFeePercentage, setCloseFeePercentage] = useState<Field>(defaultField);
   const [cancelFeePercentage, setCancelFeePercentage] = useState<Field>(defaultField);
   const [allowedTransactional, setAllowedTransactional] = useState<Field>(defaultField);
+  const [transactionalTokens, setTransactionalTokens] = useState<Token[]>([]);
+  const [rewardTokens, setRewardTokens] = useState<Token[]>([]);
   const [networkCreationFeePercentage, setNetworkCreationFeePercentage] = useState<Field>(defaultField);
   const [lockAmountForNetworkCreation, setLockAmountForNetworkCreation] = useState<Field>(defaultField);
 
   const {state} = useAppState();
-  const { processEvent } = useApi();
+  const { processEvent, createToken } = useApi();
   const { updateActiveNetwork } = useNetwork();
   const { 
     handleFeeSettings,
@@ -62,6 +65,7 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
     handleFeeNetworkCreation,
     handleChangeAllowedTokens
   } = useBepro();
+  const { signMessage } = useAuthentication();
 
   function isSameAdresses(adressesA: string[], adressesB: string[]) {
     return [...adressesA as string[]].sort().join() === [...adressesB as string[]].sort().join();
@@ -167,10 +171,22 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
 
     const getBlock = ({ blockNumber }) => blocks.push(blockNumber);
 
-    if (toAdd.length)
+    const findMinAmount = (tokens: Token[], newAddress: string) =>
+      tokens.find(({ address }) => address.toLowerCase() === newAddress.toLowerCase());
+
+    if (toAdd.length){
+      await Promise.all(toAdd.map(async (address) => {
+        const currentToken = findMinAmount(isTransactional ? transactionalTokens : rewardTokens, address)
+        if(currentToken?.minimum !== '0'){
+          await signMessage();
+          return createToken({address, minAmount: currentToken?.minimum, chainId: +state.connectedChain.id})
+        }
+      }))
+
       await handleChangeAllowedTokens(toAdd, isTransactional)
         .then(getBlock)
         .catch(error => console.debug("Failed to add tokens", error));
+    }
 
     if (toRemove.length)
       await handleChangeAllowedTokens(toRemove, isTransactional, false)
@@ -239,6 +255,9 @@ export default function RegistrySettings({ isGovernorRegistry = false }) {
     const rwdAddresses = reward?.map(({ address }) => address?.toLowerCase());
     const trsAddresses = transactional?.map(({ address }) => address?.toLowerCase());
 
+    setTransactionalTokens(transactional)
+    setRewardTokens(reward)
+    
     setAllowedReward(previous => ({
       ...previous,
       value: rwdAddresses

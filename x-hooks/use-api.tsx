@@ -239,6 +239,13 @@ export default function useApi() {
       .catch(() => null);
   }
 
+  async function createToken(payload: {address: string; minAmount: string; chainId: number }) {
+    return api
+      .post("/token", { ...payload })
+      .then(({ data }) => data)
+      .catch(() => null);
+  }
+
   /**
    * Ping the API to create an issue on Github, if succeed returns the CID (Repository ID on database + Issue ID on Github)
    * @param payload
@@ -969,6 +976,7 @@ export default function useApi() {
   return {
     getSupportedChains,
     createIssue,
+    createToken,
     updateIssue,
     createNetwork,
     createPrePullRequest,

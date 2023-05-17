@@ -111,7 +111,7 @@ function NewNetwork() {
       creator: state.currentUser.walletAddress,
       accessToken: state.currentUser.accessToken,
       githubLogin: state.currentUser.login,
-      allowedTokens: tokens,
+      tokens,
       networkAddress: deployedNetworkAddress,
       isDefault: isSetupPage,
       signedMessage,

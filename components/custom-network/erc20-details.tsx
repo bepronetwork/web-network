@@ -19,22 +19,27 @@ interface ERC20DetailsProps {
   address?: string;
   readOnly?: boolean;
   deployer?: boolean;
+  minimum?: boolean;
   adressPlaceholder?: string;
   onChange?: (value: string) => void;
+  onChangeMinAmount?: (value: string) => void;
 }
 
 export function ERC20Details({
   address,
   readOnly,
   deployer,
+  minimum,
   adressPlaceholder,
-  onChange
+  onChange,
+  onChangeMinAmount,
 } : ERC20DetailsProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenAddress, setTokenAddress] = useState("");
+  const [tokenMinAmount, setTokenMinAmount] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
   const [tokenTotalSupply, setTokenTotalSupply] = useState("");
 
@@ -54,6 +59,7 @@ export function ERC20Details({
     symbol: isDeployer ? tokenSymbol : erc20?.symbol,
     decimals: isDeployer ? "18" : erc20?.decimals?.toString(),
     totalSupply: isDeployer ? tokenTotalSupply : formatStringToCurrency(erc20?.totalSupply?.toFixed()),
+    minimumValue: isDeployer ? tokenMinAmount : undefined
   }
 
   const isAddressFieldReadOnly = !!readOnly || isDeployer;
@@ -159,6 +165,18 @@ export function ERC20Details({
           variant="numberFormat"
           error={hasTotalSupplyError && numberError(tokenInfo.totalSupply) || ""}
         />
+
+      {minimum && (
+          <FormGroup
+            label={"Minimum Token value"}
+            value={tokenInfo.minimumValue}
+            variant="numberFormat"
+            onChange={(e) => {
+              setTokenMinAmount(e);
+              onChangeMinAmount(e);
+            }}
+          />
+        )}
 
         <FormGroup
           label={t("custom-network:steps.token-configuration.fields.your-balance.label")}

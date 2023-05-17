@@ -13,6 +13,9 @@
    },
    "symbol": {
       "label": "Symbol"
+   },
+   "min-amount": {
+     "label": "Minimum Token Amount"
    }
  }
 }

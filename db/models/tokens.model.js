@@ -41,7 +41,12 @@ class Tokens extends Model {
         chain_id: {
           type: DataTypes.INTEGER,
           unique: "network_chain_unique"
-        }
+        },
+        minimum: {
+          type: DataTypes.STRING,
+          allowNull: true,
+          defaultValue: "0"
+        },
       },
       {
         sequelize,

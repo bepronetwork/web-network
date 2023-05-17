@@ -8,8 +8,7 @@ import Database from "db/models";
 import {chainFromHeader} from "helpers/chain-from-header";
 import {WANT_TO_CREATE_NETWORK} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
-import {handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
-import {isAdmin} from "helpers/is-admin";
+import {handleCreateSettlerToken, handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
 import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
 
@@ -91,7 +90,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       botPermission,
       accessToken,
       githubLogin,
-      allowedTokens,
+      tokens,
       networkAddress,
       isDefault,
       signedMessage,
@@ -171,6 +170,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (await DAOService.hasNetworkRegistered(creator))
       return resJsonMessage("Already exists a network registered for this wallet", res, 403);
+    
+    if (tokens?.settler && tokens?.settlerTokenMinAmount) {
+      handleCreateSettlerToken(tokens?.settler,
+                               tokens?.settlerTokenMinAmount,
+                               chain.chainRpc,
+                               +chain?.chainId);
+    }
+
 
     // Uploading logos to IPFS
     let fullLogoHash = null
@@ -252,14 +259,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
 
     //TODO: move tokens logic to new endpoint   
-    if(allowedTokens?.allowedTransactions?.length > 0){
-      for (const token of allowedTokens.allowedTransactions) {
+    if(tokens?.allowedTransactions?.length > 0){
+      for (const token of tokens.allowedTransactions) {
         await handlefindOrCreateTokens(token.id, network.id, 'transactional')
       }
     }
 
-    if(allowedTokens?.allowedRewards?.length > 0){
-      for (const token of allowedTokens.allowedRewards) {
+    if(tokens?.allowedRewards?.length > 0){
+      for (const token of tokens.allowedRewards) {
         await handlefindOrCreateTokens(token.id, network.id, 'reward')
       }
     }

@@ -48,10 +48,11 @@ export default function CreateBountyTokenAmount({
       setIssueAmount({ formattedValue: "" });
     } else if (
       values.floatValue !== 0 &&
-      BigNumber(values.floatValue).isLessThan(BigNumber(state.Settings?.minBountyValue))
+      BigNumber(values.floatValue).isLessThan(BigNumber(currentToken?.minimum))
     ) {
+      setIssueAmount(values);
       setInputError(t("bounty:errors.exceeds-minimum-amount", {
-          amount: state.Settings?.minBountyValue,
+          amount: currentToken?.minimum,
       }));
     } else {
       setIssueAmount(values);
@@ -118,9 +119,8 @@ export default function CreateBountyTokenAmount({
       decimalScale={decimals}
       onValueChange={handleIssueAmountOnValueChange}
       onBlur={handleIssueAmountBlurChange}
-      error={isFunding ? null : !!inputError}
+      error={!!inputError}
       helperText={
-        isFunding ? null :
         <>
           {inputError && <p className="p-small my-2">{inputError}</p>}
         </>
@@ -129,7 +129,18 @@ export default function CreateBountyTokenAmount({
     )
   } 
 
+  function handleUpdateToken() {
+    if(issueAmount?.floatValue === 0) return;
+
+    if (BigNumber(issueAmount?.floatValue).isLessThan(BigNumber(currentToken?.minimum))) {
+      setInputError(t("bounty:errors.exceeds-minimum-amount", {
+          amount: currentToken?.minimum,
+      }));
+    } else setInputError("");
+  }
+
   useEffect(updateConversion, [issueAmount.value]);
+  useEffect(handleUpdateToken, [currentToken?.minimum]);
 
   return (
     <div className="mt-4">
