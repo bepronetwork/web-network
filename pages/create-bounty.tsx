@@ -470,7 +470,11 @@ export default function CreateBountyPage() {
       return;
     }
 
-    if (!currentNetwork?.networkAddress || !connectedChain) return;
+    if (!currentNetwork?.networkAddress ||
+        !connectedChain ||
+        Service?.starting ||
+        !Service?.active ||
+        currentNetwork?.networkAddress === Service?.active?.network?.contractAddress) return;
 
     changeNetwork(connectedChain?.id, currentNetwork?.networkAddress);
 
@@ -489,7 +493,7 @@ export default function CreateBountyPage() {
 
     handleCustomTokens(tokens)
 
-  }, [currentNetwork, connectedChain]);
+  }, [currentNetwork, connectedChain, Service?.active]);
 
   useEffect(() => {
     cleanFields();
