@@ -72,7 +72,11 @@ export function useDao() {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
     const chain_id = chainId || state.Service?.network?.active?.chain_id;
 
-    if (!state.Service?.active || !networkAddress || !chain_id || state.spinners.switchingChain)
+    if (!state.Service?.active ||
+        !networkAddress ||
+        !chain_id ||
+        state.spinners.switchingChain ||
+        state.Service?.starting)
       return;
 
     if (state.Service?.active?.network?.contractAddress === networkAddress)
@@ -193,8 +197,8 @@ export function useDao() {
     console.debug("DAOService started", daoProps);
 
     window.DAOService = daoService;
-    dispatch(changeActiveDAO(daoService));
     dispatch(changeStarting(false));
+    dispatch(changeActiveDAO(daoService));
   }
 
   function changeChain() {
