@@ -246,6 +246,7 @@ export default function CreateBountyPage() {
       .then(() => {
         return tokenERC20.updateAllowanceAndBalance();
       })
+      .catch(error => console.debug("Failed to approve", error))
       .finally(() => setIsLoadingApprove(false));
   }
 
