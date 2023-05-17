@@ -672,6 +672,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
+.hide-bounty-item-lg {
+  @media (max-width: 1199px) {
+    display: none;
+  }
+}
+
+.hide-bounty-item-md {
+  @media (max-width: 991px) {
+    display: none;
+  }
+}
+
 .status {
   padding: math.div($m, 4);
   border-radius: 50px;
@@ -763,11 +775,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-size: 20px;
 }
 
-.tag-ball {
+.ball {
   width: 8px;
   height: 8px;
-  background-color:#B3B9F4;
   border-radius: 50%;
+  &.tag {
+    background-color:#B3B9F4;
+  }
 }
 
 .active-description-button {

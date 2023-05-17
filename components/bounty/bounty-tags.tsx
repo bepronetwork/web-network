@@ -2,27 +2,24 @@ import Badge from "components/badge";
 
 interface BountyTagsProps {
   tags: string[];
-  color?: string;
-  opacity?: boolean;
 }
 
 export default function BountyTags({
-  tags,
-  color,
-  opacity = true
-} : BountyTagsProps) {
+  tags
+}: BountyTagsProps) {
   if (!tags) return <></>;
-  
-  return(
+
+  return (
     <div className="d-flex gap-1">
-      {tags.map(tag => 
+      {tags.map((tag) => (
         <Badge
           key={tag}
-          label={tag} 
-          className={`caption-small ${!color && "border border-primary"} border-radius-8`}
-          color={opacity ? 'primary-30' : 'primary'}
-          style={color ? { backgroundColor: `${color}90`, border: `1px solid ${color}` }: null}
-        /> )}
+          label={tag}
+          className={`caption-medium border border-gray-800
+           border-radius-4 text-uppercase text-white-40`}
+          color="bg-gray"
+        />
+      ))}
     </div>
   );
 }

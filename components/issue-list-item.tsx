@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {isMobile} from "react-device-detect";
 
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -10,7 +11,6 @@ import EyeIcon from "assets/icons/eye-icon";
 import EyeSlashIcon from "assets/icons/eye-slash-icon";
 import TrashIcon from "assets/icons/trash-icon";
 
-import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
@@ -32,6 +32,7 @@ import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 
+import BountyItemLabel from "./bounty-item-label";
 import Modal from "./modal";
 import { FlexColumn } from "./profile/wallet-balance";
 
@@ -68,11 +69,11 @@ export default function IssueListItem({
     amount: issue?.amount,
     fundingAmount: issue?.fundingAmount,
   })
-
-  const badgeStyle = {
-    backgroundColor: `${issue?.network?.colors?.primary}90`,
-    border: `1px solid ${issue?.network?.colors?.primary}`
-  };
+  const fundedAmount = issue?.fundedAmount.isNaN() ? BigNumber(0) : issue?.fundedAmount
+  const percentage =
+  BigNumber(fundedAmount.multipliedBy(100).toFixed(2, 1))
+    .dividedBy(issue?.fundingAmount)
+    .toFixed(0, 1) || 0;
 
   function handleClickCard() {
     if (xClick) return xClick();
@@ -148,7 +149,7 @@ export default function IssueListItem({
     const id = issue?.githubId;
 
     return (
-      <span className={`${(tag && uppercase) && 'text-uppercase'} h6 text-white-40 me-2`}>
+      <span className={`${(tag && uppercase) && 'text-uppercase'} text-gray me-2`}>
         {tag ? `${tag}-${id}` : `#${id}`}
       </span>
     );
@@ -156,6 +157,10 @@ export default function IssueListItem({
 
   function RenderIssueData({ state }: {state: IssueState}) {
     const types = {
+      funding: {
+        value: percentage,
+        translation: t("info.funded")
+      },
       open: {
         value: issue?.working?.length,
         translation: t("info.working"),
@@ -174,16 +179,16 @@ export default function IssueListItem({
       },
     };
 
-    if (["open", "ready", "proposal"].includes(state?.toLowerCase())) {
+    if (["open", "ready", "proposal", "funding"].includes(state?.toLowerCase())) {
+      const isFunding = state?.toLowerCase() === 'funding'
       const { value, translation } = types[state?.toLowerCase()];
       return (
-        <div className="d-flex align-items-center" key={issue.githubId}>
-          <span className="caption-medium mr-1 text-white">
-            {value || 0}
-          </span>
-          <span className="caption-medium text-white-40 text-uppercase">
-            {translation}
-          </span>
+        <div className="hide-bounty-item-lg">
+          <BountyItemLabel label={translation} key={issue.githubId}>
+            <span className={`${ isFunding ? 'text-light-warning': "text-gray"}`}>
+              {value || 0}{isFunding && '%'}
+            </span>
+          </BountyItemLabel>
         </div>
       );
     } else return <></>;
@@ -212,7 +217,7 @@ export default function IssueListItem({
               <ChainBadge chain={issue?.network?.chain} />
             </div>
 
-            <BountyStatusInfo issueState={issueState} className="mt-1 px-2 " />
+            <BountyStatusInfo issueState={issueState} />
           </div>
           <div className="text-truncate mb-2 mt-4">{issue?.title}</div>
           <div className="issue-body text-white-40 text-break text-truncate mb-3" >
@@ -293,74 +298,111 @@ export default function IssueListItem({
 
 
   return (
-    <CardItem onClick={handleClickCard} key='default-card'>
+    <CardItem onClick={handleClickCard} key="default-card">
       <div className="row align-center">
-        <div className="col-md-10 mb-3 mb-md-0">
-          <h4 className="h4 text-truncate mb-3">
-            <IssueTag/>
-            {(issue?.title !== null && issue?.title) || (
-              <Translation ns="bounty" label={"errors.fetching"} />
-            )}
-          </h4>
-          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            {!isMobile && (
-              <>
-                <BountyStatusInfo issueState={issueState} />
-                {issue?.isKyc ? <Badge
-                  className={
-                    `d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
-                  label={t("bounty:kyc.label")}
-                /> : null}
-                <div className="d-flex align-items-center gap-20">
-                  <AvatarOrIdenticon
-                    address={issue?.creatorAddress}
-                    user={issue?.creatorGithub}
-                    size="sm"
-                  />
-
-                  {(variant === "network" && issue?.repository) && (
-                    <OverlayTrigger
-                      key="bottom-githubPath"
-                      placement="bottom"
-                      overlay={
-                        <Tooltip id={"tooltip-bottom"}>
-                          {issue?.repository?.githubPath}
-                        </Tooltip>
-                      }
+        <div className="col-md-12 mb-3 mb-md-0">
+          <div className="d-flex">
+            <div className="d-flex col-md-10 text-truncate">
+              <div className="me-2">
+                <BountyStatusInfo
+                  issueState={issueState}
+                  fundedAmount={fundedAmount}
+                />
+              </div>
+              <span className="span text-truncate mb-3">
+                {(issue?.title !== null && issue?.title) || (
+                  <Translation ns="bounty" label={"errors.fetching"} />
+                )}
+              </span>
+            </div>
+            <div className="d-flex d-none d-lg-block justify-content-end col-md-2">
+              <div className="d-flex justify-content-end">
+                {variant === "multi-network" && !isMobile && (
+                  <div>
+                    <div
+                      className={`d-flex py-1 pe-2 justify-content-center text-truncate border border-gray-800
+            border-radius-4 text-white-40 bg-gray-850`}
                     >
-                      <div className={`${!issue?.network?.colors?.primary && "bg-primary"} rounded-4 px-2 py-1`}
-                        style={badgeStyle}>
-                        <span className="caption-medium text-uppercase mw-github-info">
+                      <div className="d-flex flex-column justify-content-center">
+                        <div
+                          className="d-flex ball mx-2"
+                          style={{
+                            backgroundColor: issue?.network?.chain?.color,
+                          }}
+                        />
+                      </div>
+                      {issue?.network?.chain?.chainShortName}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          {!isMobile && (
+            <div className="d-flex justify-content-md-start mb-3">
+              <BountyTags tags={issue?.tags} />
+              {issue?.isKyc ? (
+                <Badge
+                  className={`d-flex status caption-medium py-1 px-3 
+                  ms-2 bg-transparent border border-gray-700 text-gray-300`}
+                  label={t("bounty:kyc.label")}
+                />
+              ) : null}
+            </div>
+          )}
+
+          <div
+            className={`${isMobile ? "" : "d-flex border-top border-gray-850"}`}
+          >
+            {!isMobile && (
+              <div className="col-md-10 mt-3 
+              d-flex align-center flex-wrap align-items-center justify-content-md-start gap-20">
+                <div className="d-flex">
+                  <BountyItemLabel label="ID">
+                    <IssueTag />
+                  </BountyItemLabel>
+                  <div className="d-sm-none d-md-block d-none d-sm-block">
+                    <BountyItemLabel label="Repository">
+                      <OverlayTrigger
+                        key="bottom-githubPath"
+                        placement="bottom"
+                        overlay={
+                          <Tooltip id={"tooltip-bottom"}>
+                            {issue?.repository?.githubPath}
+                          </Tooltip>
+                        }
+                      >
+                        <span className={`text-gray me-2 text-truncate`}>
                           {issue?.repository?.githubPath.split("/")?.[1]}
                         </span>
-                      </div>
-                    </OverlayTrigger>
-                  )}
-
-                  { variant === "multi-network" &&
-                    <Badge
-                      label={issue?.network?.name}
-                      style={badgeStyle}
-                    />
-                  }
+                      </OverlayTrigger>
+                    </BountyItemLabel>
+                  </div>
+                  <RenderIssueData state={issueState} />
+                  <div className="hide-bounty-item-md">
+                    <BountyItemLabel
+                      label="Opened on"
+                      className=".d-md-none .d-lg-block"
+                    >
+                      <span className="text-gray text-truncate">
+                        {issue?.createdAt?.toLocaleDateString("PT")}
+                      </span>
+                    </BountyItemLabel>
+                  </div>
                 </div>
-              </>
+              </div>
             )}
-
-            <RenderIssueData state={issueState} />
-
-            <span className="text-gray-500 font-weight-medium">
-              {issue?.createdAt?.toLocaleDateString("PT")}
-            </span>
-
-            <BountyTags tags={issue?.tags} color={issue?.network?.colors?.primary}/>
+            <div
+              className={`d-flex col-md-2 mt-3 ${
+                isMobile ? "justify-content-between" : "justify-content-end"
+              }`}
+            >
+              {isMobile && <BountyTags tags={[issue?.network?.name]} />}
+              <IssueAmountInfo issue={issue} size={size} />
+            </div>
           </div>
-        </div>
-
-        <div className="col-md-2 my-auto text-center">
-          <IssueAmountInfo issue={issue} size={size} />
         </div>
       </div>
     </CardItem>
-  )
+  );
 }

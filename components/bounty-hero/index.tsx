@@ -53,6 +53,7 @@ export default function BountyHero() {
                       amount: state.currentBounty?.data?.amount,
                       fundingAmount: state.currentBounty?.data?.fundingAmount,
                     })}
+                    fundedAmount={state.currentBounty?.data?.fundedAmount}
                   />
 
                   {state.currentBounty?.data?.isKyc
@@ -121,7 +122,6 @@ export default function BountyHero() {
                   <div className="mt-3">
                     <BountyTags
                       tags={state.currentBounty?.data?.tags}
-                      color={state?.Service?.network?.active?.colors?.primary}
                     />
                   </div>
                 </If>

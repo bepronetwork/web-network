@@ -16,6 +16,7 @@ export type IssueState =
   | "done"
   | "disputed"
   | "funding"
+  | "partial-funded"
   | "proposal";
 
 export type CID = `${string}/${string}`;
