@@ -21,7 +21,7 @@ const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
     let networks = [];
-    const whereCondition: WhereOptions = {state: {[Op.not]: "pending"}};
+
     const {
       state,
       issueId,
@@ -41,6 +41,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       chainId,
       visible
     } = req.query || {};
+
+    const whereCondition: WhereOptions = visible
+      ? { state: { [Op.notIn]: ["pending", "canceled"] } }
+      : { state: { [Op.not]: "pending" } };
 
     if(visible) whereCondition.visible = visible;
 

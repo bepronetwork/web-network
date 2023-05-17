@@ -71,7 +71,7 @@ export default function CreateBountyTokenAmount({
     getCoinPrice(currentToken?.symbol,
                  state?.Settings?.currency?.defaultFiat).then((price) => {
                    if(isNaN(price) || price === 0) setIsErrorConverted(true)
-                   if(!isNaN(price)) setConvertedAmount(issueAmount.value * price);
+                   if(!isNaN(price)) setConvertedAmount((issueAmount.value || 0) * price);
                  });
   }
 
@@ -91,7 +91,6 @@ export default function CreateBountyTokenAmount({
         tokens={customTokens}
         userAddress={userAddress}
         canAddToken={canAddCustomToken}
-        selectOptionName={isFunding ? 'symbol' : 'name'}
         addToken={addToken}
         setToken={setCurrentToken}
         disabled={false}

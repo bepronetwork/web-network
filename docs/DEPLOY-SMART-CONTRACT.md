@@ -4,7 +4,7 @@ Fill in the `governor` wallet private key and address.
 
 ```
 # Deploy Contract
-DEPLOY_OWNER_ADDRESS=
+NEXT_PUBLIC_ADMIN_WALLET_ADDRESS=
 DEPLOY_PRIVATE_KEY=
 
 ```

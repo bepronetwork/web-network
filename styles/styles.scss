@@ -23,6 +23,7 @@
 @import "components/profile-menu";
 @import "components/mini-tabs";
 @import "components/nav-avatar";
+@import "components/cookie-consent";
 
 @import "components/swagger-ui";
 
@@ -752,7 +753,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .symbol-fund {
-  border: 1px solid $gray-700 !important;
   background-color: $gray-900 !important;
   font-size: 24px;
   font-weight: 400;
@@ -1014,6 +1014,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .issue-proposal-progress {
   min-height: 360px;
+
+  .secondary-text {
+    width: 10vw;
+  }
 }
 
 .issue-progress-horizontal {

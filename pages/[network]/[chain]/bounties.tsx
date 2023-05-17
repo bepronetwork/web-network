@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
 
-import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/dist/client/router";
@@ -12,7 +11,6 @@ import PageHero, {InfosHero} from "components/page-hero";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
-import { Curator } from "interfaces/curators";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -26,7 +24,7 @@ export default function BountiesPage() {
 
   const { chain } = useChain();
   const {state} = useAppState();
-  const { getTotalUsers, searchCurators, searchIssues } = useApi();
+  const { getTotalUsers, getCuratorsResume, searchIssues } = useApi();
 
   const zeroInfo = [
     {
@@ -60,20 +58,18 @@ export default function BountiesPage() {
         networkName: query.network.toString(),
         chainId: chain.chainId.toString()
       }).then(({ rows } : { rows: IssueBigNumberData[] }) => rows),
-      searchCurators({
+      getCuratorsResume({
         networkName: query.network.toString(),
         chainShortName: query.chain.toString()
-      }).then(({ rows }) => rows),
+      }),
       getTotalUsers(),
       state.Service?.network?.active?.networkToken?.symbol,
     ])
-      .then(([bounties, curators, totalUsers, symbol]) => {
+      .then(([bounties, { totalValue }, totalUsers, symbol]) => {
         const closedBounties = bounties.filter(({ state }) => state === "closed").length;
         const inProgress = bounties.filter(({ state }) => !["pending", "canceled", "closed"].includes(state)).length;
-        const onNetwork = (curators as Curator[]).reduce((acc, curator) =>
-          new BigNumber(acc).plus(curator.tokensLocked).toFixed(), "0");
 
-        return [closedBounties, inProgress, onNetwork, totalUsers, symbol];
+        return [closedBounties, inProgress, totalValue, totalUsers, symbol];
       })
       .then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
         setInfos([

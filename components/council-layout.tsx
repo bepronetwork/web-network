@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 
-import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -9,9 +8,7 @@ import { MiniTabs } from "components/mini-tabs";
 import PageHero, {InfosHero} from "components/page-hero";
 
 import {useAppState} from "contexts/app-state";
-import { changeActiveNetwork } from "contexts/reducers/change-service";
 
-import { Curator } from "interfaces/curators";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -23,9 +20,9 @@ export default function CouncilLayout({ children }) {
   const { t } = useTranslation(["common", "council"]);
 
   const { chain } = useChain();
-  const { state, dispatch} = useAppState();
+  const { state } = useAppState();
   const { getURLWithNetwork } = useNetwork();
-  const { getTotalBounties, searchCurators, searchIssues } = useApi();
+  const { getTotalBounties, getCuratorsResume, searchIssues } = useApi();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -80,12 +77,12 @@ export default function CouncilLayout({ children }) {
   async function loadTotals() {
     if (!state.Service?.network?.active?.name || !chain) return;
     
-    const [totalBounties, onNetwork, curators, distributed] = await Promise.all([
+    const [totalBounties, { totalActiveCurators, totalValue }, distributed] = await Promise.all([
       getTotalBounties(state.Service?.network?.active?.name, "ready"),
-      searchCurators({
+      getCuratorsResume({
         networkName: state.Service?.network?.active?.name,
         chainShortName: chain.chainShortName
-      }).then(({ rows }) => rows),
+      }),
       searchIssues({
         state: "closed",
         networkName: state.Service.network.active.name,
@@ -94,17 +91,7 @@ export default function CouncilLayout({ children }) {
       })
         .then(({ rows } : { rows: IssueBigNumberData[] }) => 
           rows.reduce((acc, { payments }) => acc + payments.reduce((acc, { ammount }) => acc + ammount, 0), 0))
-    ])
-      .then(([totalBounties, curators, distributed]) => {
-        const { onNetwork, totalCurators } = (curators as Curator[]).reduce((acc, curator) => ({
-          onNetwork: new BigNumber(acc.onNetwork).plus(curator.tokensLocked).toFixed(),
-          totalCurators: acc.totalCurators + (curator.isCurrentlyCurator ? 1 : 0 )
-        }), { onNetwork: "0", totalCurators: 0 });
-
-        return [totalBounties, onNetwork, totalCurators, distributed];
-      });
-
-    dispatch(changeActiveNetwork(Object.assign(state.Service.network.active, { curators })));
+    ]);
 
     setInfos([
       {
@@ -112,7 +99,7 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: curators,
+        value: totalActiveCurators,
         label: t("council:council-members"),
       },
       {
@@ -121,7 +108,7 @@ export default function CouncilLayout({ children }) {
         currency: state.Service?.network?.active?.networkToken?.symbol,
       },
       {
-        value: onNetwork,
+        value: totalValue,
         label: t("heroes.in-network"),
         currency: state.Service?.network?.active?.networkToken?.symbol,
       },

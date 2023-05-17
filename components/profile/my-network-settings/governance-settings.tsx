@@ -4,6 +4,7 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import ContractButton from "components/contract-button";
+import AmountCard from "components/custom-network/amount-card";
 import NetworkContractSettings from "components/custom-network/network-contract-settings";
 import TokensSettings from "components/profile/my-network-settings/tokens-settings";
 
@@ -13,6 +14,7 @@ import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
 
+import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
@@ -35,16 +37,45 @@ export default function GovernanceSettings({
   updateEditingNetwork
 }: GovernanceProps) {
   const { t } = useTranslation(["common", "custom-network"]);
+
   const [isClosing, setIsClosing] = useState(false);
-  const {state, dispatch} = useAppState();
-  const { updateNetwork } = useApi();
-  const { handleCloseNetwork } = useBepro();
-  const { updateWalletBalance, signMessage } = useAuthentication();
-  const { updateActiveNetwork } = useNetwork();
-  const {
-    isAbleToClosed,
-  } = useNetworkSettings();
+  const [isUpdating, setIsUpdating] = useState(false);
   const [networkToken, setNetworkToken] = useState<Token[]>();
+  
+  const {state, dispatch} = useAppState();
+  const { updateActiveNetwork } = useNetwork();
+  const { updateNetwork, processEvent } = useApi();
+  const { updateWalletBalance, signMessage } = useAuthentication();
+  const { handleCloseNetwork, handleChangeNetworkParameter } = useBepro();
+  const {
+    settings,
+    tokens: settingsTokens,
+    isAbleToClosed,
+    forcedNetwork,
+  } = useNetworkSettings();
+
+  const networkTokenSymbol = forcedNetwork?.networkToken?.symbol;
+
+  const NetworkAmount = (title, description, amount, fixed = undefined) => ({
+    title,
+    description,
+    amount,
+    fixed
+  });
+
+  const networkAmounts = [
+    NetworkAmount(t("custom-network:oracles-staked", { symbol: networkTokenSymbol, }),
+                  t("custom-network:oracles-staked-description"),
+                  forcedNetwork?.tokensLocked || 0),
+    NetworkAmount(t("custom-network:open-bounties"),
+                  t("custom-network:open-bounties-description"),
+                  state.Service?.network?.active?.totalOpenIssues || 0,
+                  0),
+    NetworkAmount(t("custom-network:total-bounties"),
+                  t("custom-network:total-bounties-description"),
+                  state.Service?.network?.active?.totalIssues || 0,
+                  0),
+  ];
 
   const isCurrentNetwork = (!!network &&
     !!state.Service?.network?.active &&
@@ -90,6 +121,132 @@ export default function GovernanceSettings({
       });
   }
 
+  async function handleSubmit() {
+    if (
+      !state.currentUser?.walletAddress ||
+      !state.Service?.active ||
+      !forcedNetwork ||
+      forcedNetwork?.isClosed ||
+      isClosing
+    )
+      return;
+
+    setIsUpdating(true);
+
+    const {
+      parameters: {
+        draftTime: { value: draftTime },
+        disputableTime: { value: disputableTime },
+        councilAmount: { value: councilAmount },
+        percentageNeededForDispute: { value: percentageForDispute },
+      },
+    } = settings;
+
+    const networkAddress = network?.networkAddress;
+    const failed = [];
+    const success = {};
+
+    const promises = await Promise.allSettled([
+      ...(draftTime !== forcedNetwork.draftTime
+        ? [
+            handleChangeNetworkParameter("draftTime",
+                                         draftTime,
+                                         networkAddress)
+              .then(() => ({ param: "draftTime", value: draftTime })),
+        ]
+        : []),
+      ...(disputableTime !== forcedNetwork.disputableTime
+        ? [
+            handleChangeNetworkParameter("disputableTime",
+                                         disputableTime,
+                                         networkAddress)
+              .then(() => ({ param: "disputableTime", value: disputableTime })),
+        ]
+        : []),
+      ...(councilAmount !== +forcedNetwork.councilAmount
+        ? [
+            handleChangeNetworkParameter("councilAmount",
+                                         councilAmount,
+                                         networkAddress)
+              .then(() => ({ param: "councilAmount", value: councilAmount })),
+        ]
+        : []),
+      ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
+        ? [
+            handleChangeNetworkParameter("percentageNeededForDispute",
+                                         percentageForDispute,
+                                         networkAddress)
+              .then(() => ({ param: "percentageNeededForDispute", value: percentageForDispute })),
+        ]
+        : []),
+    ]);
+
+    promises.forEach((promise) => {
+      if (promise.status === "fulfilled") success[promise.value.param] = promise.value.value;
+      else failed.push(promise.reason);
+    });
+
+    if (failed.length) {
+      dispatch(toastError(t("custom-network:errors.updated-parameters", {
+            failed: failed.length,
+      }),
+                          t("custom-network:errors.updating-values")));
+      console.error(failed);
+    }
+
+    const successQuantity = Object.keys(success).length;
+
+    if (successQuantity) {
+      if(draftTime !== forcedNetwork.draftTime)
+        Promise.all([
+          await processEvent(StandAloneEvents.UpdateBountiesToDraft),
+          await processEvent(StandAloneEvents.BountyMovedToOpen)
+        ]);
+
+      await processEvent(StandAloneEvents.UpdateNetworkParams)
+        .catch(error => console.debug("Failed to update network parameters", error));
+
+      dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
+          updated: successQuantity,
+          total: promises.length,
+      })));
+    }
+
+    const json = {
+      creator: state.currentUser.walletAddress,
+      githubLogin: state.currentUser.login,
+      networkAddress: network.networkAddress,
+      accessToken: state.currentUser.accessToken,
+      allowedTokens: {
+       transactional: settingsTokens?.allowedTransactions?.map((token) => token?.id).filter((v) => v),
+       reward: settingsTokens?.allowedRewards?.map((token) => token?.id).filter((v) => v)
+      }
+    };
+
+    const handleError = (error) => {
+      dispatch(toastError(t("custom-network:errors.failed-to-update-network", { error }),
+                          t("actions.failed")));
+      console.log(error);
+    }
+
+    signMessage(IM_AM_CREATOR_NETWORK)
+      .then(async () => {
+        await updateNetwork(json)
+          .then(async () => {
+            if (isCurrentNetwork) updateActiveNetwork(true);
+
+            return updateEditingNetwork();
+          })
+          .then(() => {
+            dispatch(toastSuccess(t("custom-network:messages.refresh-the-page"),
+                                  t("actions.success")));
+          })
+          .catch(handleError);
+      })
+      .catch(handleError)
+      .finally(() => setIsUpdating(false));
+  }
+
   useEffect(() => {
     if(tokens.length > 0) setNetworkToken(tokens.map((token) => ({
       ...token,
@@ -98,12 +255,43 @@ export default function GovernanceSettings({
     })));
   }, [tokens]);
 
+  useEffect(() => {
+    updateActiveNetwork(true);
+  }, []);
+
   return (
     <>
-      <Row className="mt-4">
+      <Row className="mt-4 mb-3">
         <span className="caption-medium text-white mb-3">
           {t("custom-network:network-info")}
         </span>
+
+        {networkAmounts.map((amount) => (
+          <Col key={amount.title}>
+            <AmountCard {...amount} />
+          </Col>
+        ))}
+      </Row>
+
+      <Row>
+        <Col>
+          <span className="caption-large text-white text-capitalize font-weight-medium mb-3">
+            {t("custom-network:network-info")}
+          </span>
+        </Col>
+
+        <Col xs="auto">
+          <ContractButton
+            className="border-radius-4"
+            disabled={!settings?.validated || isUpdating || forcedNetwork?.isClosed || isClosing}
+            onClick={handleSubmit}
+          >
+            {t("misc.save-changes")}
+          </ContractButton>
+        </Col>
+      </Row>
+
+      <Row className="mt-1">
         <Col>
           <label className="caption-small mb-2">
             {t("custom-network:network-address")}
@@ -119,18 +307,19 @@ export default function GovernanceSettings({
           <ContractButton
             color="dark-gray"
             disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
-            className="ml-2"
+            className="ml-2 border-radius-4"
             onClick={handleCloseMyNetwork}
             isLoading={isClosing}
-            withLockIcon={!isAbleToClosed || !state.currentUser?.login}
           >
             <span>{t("custom-network:close-network")}</span>
           </ContractButton>
         </Col>
       </Row>
+      
       <Row className="mt-4">
        <TokensSettings defaultSelectedTokens={networkToken} />
       </Row>
+
       <Row className="mt-4">
         <span className="caption-medium text-white mb-3">
           {t("custom-network:steps.network-settings.fields.other-settings.title")}

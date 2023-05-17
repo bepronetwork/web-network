@@ -36,7 +36,10 @@ export default function NetworkListItem({
   }
 
   return (
-    <div className="list-item p-20 d-flex flex-row" onClick={onClick}>
+    <div 
+      className="list-item p-20 d-flex flex-row border-radius-8 border border-gray-800 bg-gray-900 cursor-pointer" 
+      onClick={onClick}
+    >
       <div className="col-3">
         <div className="d-flex flex-row align-items-center gap-20">
           <NetworkLogo

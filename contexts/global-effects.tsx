@@ -39,6 +39,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(dao.start, [
     Service?.network?.active?.chain_id,
     connectedChain?.id,
+    connectedChain?.registry,
     currentUser?.walletAddress,
   ]);
 

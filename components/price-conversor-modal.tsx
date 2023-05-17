@@ -15,9 +15,13 @@ import {formatNumberToNScale} from "helpers/formatNumber";
 
 import {getCoinInfoByContract} from "services/coingecko";
 
-interface IPriceConversiorModalProps{
+interface IPriceConversiorModalProps {
   show: boolean;
   onClose: ()=> void;
+}
+interface Options {
+  value: string;
+  label: string;
 }
 
 const defaultValue = [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}]
@@ -31,12 +35,13 @@ export default function PriceConversorModal({
   const [options, setOptions] = useState([]);
   const [currentValue, setValue] = useState<number>(1);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
+  const [currentToken, setCurrentToken] = useState<string>();
   const [errorCoinInfo, setErrorCoinInfo] = useState<boolean>(false);
   const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
 
   const {state} = useAppState();
 
-  async function handlerChange({value, label}){
+  async function handlerChange({value, label}: Options){
     if (!state.Service?.network?.active?.networkToken?.address) return;
 
     const data = 
@@ -48,6 +53,7 @@ export default function PriceConversorModal({
 
     if(data.prices[value] > 0) setErrorCoinInfo(false)
     setCurrentCurrency({value, label});
+    setCurrentToken(value.toUpperCase())
     setCurrentPrice(data.prices[value]);
   }
 
@@ -132,7 +138,7 @@ export default function PriceConversorModal({
         </div>
       </div>
       <div className="d-flex flex-row justify-content-center mt-4">
-        {formatNumberToNScale(currentPrice * currentValue)} {state.Service?.network?.active?.networkToken?.symbol}
+        {formatNumberToNScale(currentPrice * currentValue)} {currentToken}
       </div>
     </Modal>
   );

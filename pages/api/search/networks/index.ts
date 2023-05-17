@@ -18,7 +18,7 @@ interface includeProps {
   required?: boolean;
   attributes?: string[];
   where?: {
-    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb | Where } | Where
+    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb | Where } | Where | boolean
   };
 }
 
@@ -92,15 +92,24 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       required: false,
       attributes: [],
       where: { 
-          state: {[Op.ne]: "pending" }
+          state: { [Op.notIn]: ["pending", "canceled"] },
+          visible: true
       }
     })
-    include.push({ association: 'openIssues', required: false, attributes: [], where: {state: 'open'}},)
+    include.push({
+      association: "openIssues",
+      required: false,
+      attributes: [],
+      where: { 
+        state: ["open", "ready", "proposal"],
+        visible: true
+      },
+    });
     attributes.include = [
       "network.id",
       "network.name",
       [
-        Sequelize.literal(`sum(cast("curators"."tokensLocked" as FLOAT)) / ${caseZeroThen1('COUNT(distinct("issues".id))')} / ${caseZeroThen1('COUNT(distinct("openIssues".id))')}`), // eslint-disable-line
+        Sequelize.literal(`sum(cast("curators"."tokensLocked" as FLOAT) + cast("curators"."delegatedToMe" as FLOAT)) / ${caseZeroThen1('COUNT(distinct("issues".id))')} / ${caseZeroThen1('COUNT(distinct("openIssues".id))')}`), // eslint-disable-line
         "tokensLocked",
       ],
       [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],

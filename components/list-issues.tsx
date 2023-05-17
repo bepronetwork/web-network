@@ -9,6 +9,7 @@ import {UrlObject} from "url";
 import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
 
+import SelectNetwork from "components/bounties/select-network";
 import Button from "components/button";
 import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
@@ -31,9 +32,6 @@ import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
-
-import SelectNetwork from "./bounties/select-network";
-import NetworkListBarColumn from "./network-list-bar-column";
 
 type Filter = {
   label: string;
@@ -98,6 +96,7 @@ export default function ListIssues({
   const isBountyHall = variant === "bounty-hall";
   const isOnNetwork = !!router?.query?.network;
   const variantIssueItem = isManagement ? variant : (isProfile || isBountyHall) ? "multi-network" : "network"
+  const isNotFound = issuesPages.every((el) => el.issues?.length === 0) && !appState.loading?.isLoading
   const columns = [
     t("bounty:management.name"),
     t("bounty:management.link"),
@@ -396,24 +395,21 @@ export default function ListIssues({
           </div>
         </div>
       )) || <></>}
-      {isManagement && (
+      {isManagement && !isNotFound && (
         <div className="row row align-center mb-2 px-3">
-          {columns?.map((item, key) => (
-            <>
-              <div
-                className={`d-flex col-${
-                  item === "Name" ? "6" : "2 justify-content-center"
-                }`}
-                key={key}
-              >
-                <span>{item}</span>
-              </div>
-            </>
+          {columns?.map((item) => (
+            <div
+              className={`d-flex col-${
+                item === "Name" ? "6" : "2 justify-content-center"
+              }`}
+              key={item}
+            >
+              <span>{item}</span>
+            </div>
           ))}
         </div>
       )}
-      {issuesPages.every((el) => el.issues?.length === 0) &&
-      !appState.loading?.isLoading ? (
+      {isNotFound ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {(appState.currentUser?.walletAddress && !isBountyHall) && (

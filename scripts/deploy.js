@@ -106,7 +106,7 @@ const networks = {
 
 async function main() {
 
-  const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS;
+  const ownerAddress = argv.ownerAddress || process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS;
   const ownerPrivKey = argv.ownerKey || process.env.DEPLOY_PRIVATE_KEY;
 
   let rpcUrl = "";

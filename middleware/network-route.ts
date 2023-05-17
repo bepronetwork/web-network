@@ -18,7 +18,7 @@ export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT
     if (!methods.includes(req.method.toUpperCase()))
       return handler(req, res);
 
-    const { accessToken, override } = req.body;
+    const { accessToken, override, repositoriesToAdd, repositoriesToRemove, allowMerge } = req.body;
     const isAdminOverriding = isAdmin(req) && !!override;
   
     req.body.isAdminOverriding = isAdminOverriding;
@@ -37,7 +37,9 @@ export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT
       }
     });
 
-    if (!accessToken) return resJsonMessage("Unauthorized user", res, 401);
+    const isChangingGithubOptions = !!repositoriesToAdd || !!repositoriesToRemove || allowMerge !== undefined;
+
+    if (!accessToken && isChangingGithubOptions) return resJsonMessage("Unauthorized user", res, 401);
   
     if (!network) return resJsonMessage("Invalid network", res, 401);
 

@@ -131,14 +131,16 @@ export default function IssueListItem({
   } 
 
   useEffect(() => {
-    if (state.Service?.active && issue)
-      (async () => {
-        const cancelableTime = await state.Service?.active.getCancelableTime();
-        const canceable =
-          +new Date(await state.Service?.active.getTimeChain()) >=
-          +new Date(+issue?.contractCreationDate + cancelableTime);
-        setIsCancelable(canceable);
-      })();
+    if (state.Service?.active && issue && variant === "management")
+      Promise.all([
+        state.Service?.active.getCancelableTime(),
+        state.Service?.active.getTimeChain()
+      ])
+        .then(([cancelableTime, chainTime]) => {
+          const canceable = +new Date(chainTime) >= +new Date(+issue?.contractCreationDate + cancelableTime);
+          setIsCancelable(canceable);
+        })
+        .catch(error => console.debug("Failed to get cancelable time", error));
   }, [state.Service?.active, issue]);
 
   function IssueTag({uppercase = true}) {
@@ -234,12 +236,12 @@ export default function IssueListItem({
       >
         <div className="row align-center">
           <div className="col-md-6">
-            <span className={`text-truncate ${!isVisible && 'text-decoration-line'}`}>
+            <span className={`text-truncate ${!isVisible && 'text-decoration-line' || ""}`}>
               {(issue?.title !== null && issue?.title) || (
                 <Translation ns="bounty" label={"errors.fetching"} />
               )}
             </span>
-            <div className={!isVisible && 'text-decoration-line'}>
+            <div className={!isVisible && 'text-decoration-line' || ""}>
               <IssueTag uppercase={false} />
             </div>
           </div>

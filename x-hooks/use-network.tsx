@@ -68,7 +68,11 @@ export function useNetwork() {
       }
     }
 
-    await searchNetworks({ name: queryNetworkName, chainShortName: queryChainName })
+    await searchNetworks({
+      name: queryNetworkName,
+      chainShortName: queryChainName,
+      isNeedCountsAndTokensLocked: true
+    })
       .then(({count, rows}) => {
         if (count === 0) {
           throw new Error("No networks found");
@@ -165,6 +169,7 @@ export function useNetwork() {
           disputableTime: +disputableTime / 1000
         }));
       })
+      .catch(error => console.debug("Failed to loadNetworkTimes", error));
   }
 
   function loadNetworkAmounts() {
@@ -199,6 +204,7 @@ export function useNetwork() {
           totalNetworkToken
         }));
       })
+      .catch(error => console.debug("Failed to loadNetworkAmounts", error));
   }
 
   function updateNetworkAndChainMatch() {
