@@ -18,12 +18,6 @@
 
 ---
 
-<h3 align="center">
-  We are delighted to announce the release of <a href="https://app.bepro.network/">Bepro Network's v2 </a> protocol and we would invite to try it.
-</h3>
-
----
-
 ## 1. Prerequisites
 
 - [NodeJS](https://nodejs.dev/) in v16.13 or newer.

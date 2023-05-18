@@ -14,7 +14,7 @@ module.exports = {
     logging: false
   }),
 
-  ...(process.env.NEXT_DB_HOST
+  ...(process.env.NEXT_DB_SSL === "true"
     ? {
       dialectOptions: {
 
