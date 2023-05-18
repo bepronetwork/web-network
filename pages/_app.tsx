@@ -15,7 +15,6 @@ import MainNav from "components/main-nav";
 import ReadOnlyContainer from "components/read-only-container";
 import ReAuthorizeGithubModal from "components/reauthorize-github-modal";
 import Seo from "components/seo";
-import StatusBar from "components/status-bar";
 import Toaster from "components/toaster";
 import WebThreeDialog from "components/web3-dialog";
 import WrongNetworkModal from "components/wrong-network-modal";
@@ -48,7 +47,6 @@ function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: 
               <Component {...pageProps} />
             </div>
             <WrongNetworkModal />
-            <StatusBar />
             <Toaster />
             <Loading />
           </ReadOnlyContainer>
