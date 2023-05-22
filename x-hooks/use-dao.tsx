@@ -3,6 +3,7 @@ import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
+import { changeChain as changeChainReducer } from "contexts/reducers/change-chain";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
@@ -19,9 +20,9 @@ import useNetworkChange from "x-hooks/use-network-change";
 export function useDao() {
   const { replace, asPath, pathname } = useRouter();
 
-  const { chain } = useChain();
   const {state, dispatch} = useAppState();
   const { handleAddNetwork } = useNetworkChange();
+  const { chain, findSupportedChain } = useChain();
 
   function isChainConfigured(chain: SupportedChainData) {
     return isAddress(chain?.registryAddress) && !isZeroAddress(chain?.registryAddress);
@@ -217,11 +218,45 @@ export function useDao() {
         .finally(() => dispatch(changeChangingChain(false)));
   }
 
+  function dispatchChainUpdate(chainId: number) {
+    const chain = findSupportedChain({ chainId });
+
+    sessionStorage.setItem("currentChainId", chainId.toString());
+    
+    return dispatch(changeChainReducer.update({
+      id: (chain?.chainId || chainId)?.toString(),
+      name: chain?.chainName || UNSUPPORTED_CHAIN,
+      shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
+      explorer: chain?.blockScanner,
+      events: chain?.eventsApi,
+      registry: chain?.registryAddress
+    }));
+  }
+
+  function listenChainChanged() {
+    if (!window.ethereum || !state.supportedChains?.length)
+      return;
+
+    window.ethereum.removeAllListeners(`chainChanged`);
+
+    if (window.ethereum.isConnected())
+      dispatchChainUpdate(+window.ethereum.chainId);
+
+    window.ethereum.on(`connected`, evt => {
+      console.debug(`Metamask connected`, evt);
+    });
+
+    window.ethereum.on(`chainChanged`, evt => {
+      dispatchChainUpdate(+evt);
+    });
+  }
+
   return {
     changeNetwork,
     changeChain,
     connect,
     start,
-    isServiceReady
+    isServiceReady,
+    listenChainChanged
   };
 }

@@ -32,7 +32,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const transactions = useTransactions();
   const { state, dispatch } = useAppState();
 
-  const { connectedChain, currentUser, Service } = state;
+  const { connectedChain, currentUser, Service, supportedChains } = state;
 
   useEffect(() => {
     const web3Connection = new Web3Connection({
@@ -41,6 +41,10 @@ export const GlobalEffectsProvider = ({children}) => {
 
     dispatch(changeWeb3Connection(web3Connection));
   }, []);
+
+  useEffect(dao.listenChainChanged, [
+    supportedChains
+  ]);
 
   useEffect(() => {
     dao.start();
