@@ -555,10 +555,10 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if (!network || !state.Service?.active || state.Service?.starting)
       setForcedService(undefined);
-    else if (network?.chain?.chainRpc === state.Service?.active?.web3Connection?.options?.web3Host)
+    else if (+network?.chain?.chainId === +state.connectedChain?.id)
       loadForcedService()
         .then(setForcedService);
-  }, [network, state.Service?.active, state.Service?.starting]);
+  }, [network, state.Service?.active, state.Service?.starting, state.connectedChain?.id]);
 
   useEffect(() => {
     if ([

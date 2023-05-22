@@ -1,9 +1,11 @@
 import {createContext, useEffect} from "react";
 
+import { Web3Connection } from "@taikai/dappkit";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
+import { changeWeb3Connection } from "contexts/reducers/change-service";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 import useChain from "x-hooks/use-chain";
@@ -18,35 +20,41 @@ const _context = {};
 export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
-  const {state} = useAppState();
   const {query} = useRouter();
   const session = useSession();
-
+  
   const dao = useDao();
   const repos = useRepos();
-  const { chain } = useChain();
   const network = useNetwork();
+  const { chain } = useChain();
   const settings = useSettings();
   const auth = useAuthentication();
   const transactions = useTransactions();
+  const { state, dispatch } = useAppState();
 
   const { connectedChain, currentUser, Service } = state;
 
-  // function updateLoadingState() {
-  //   dispatch(changeLoadState(Object.values(state.spinners).some(v => v)));
-  // }
+  useEffect(() => {
+    const web3Connection = new Web3Connection({
+      skipWindowAssignment: true
+    });
 
-  useEffect(dao.start, [
+    dispatch(changeWeb3Connection(web3Connection));
+  }, []);
+
+  useEffect(() => {
+    dao.start();
+  }, [
     Service?.network?.active?.chain_id,
     connectedChain?.id,
     connectedChain?.registry,
-    currentUser?.walletAddress,
+    currentUser?.connected,
   ]);
 
   useEffect(dao.changeNetwork, [
     Service?.active,
     Service?.network?.active?.networkAddress,
-    chain
+    Service?.network?.active?.chain_id,
   ]);
 
   useEffect(repos.loadRepos, [

@@ -1,6 +1,7 @@
 import {Dispatch} from "react";
 
 import {TreasuryInfo} from "@taikai/dappkit";
+import { Web3Connection } from "@taikai/dappkit";
 
 import {XReducerAction} from "contexts/reducers/reducer";
 
@@ -68,6 +69,7 @@ export interface ServiceState {
   microReady: boolean | null;
   active: DAO | null;
   network: ServiceNetwork | null;
+  web3Connection: Web3Connection
 }
 
 export interface ConnectedChain {
