@@ -253,6 +253,7 @@ export default function CreateBountyPage() {
       .then(() => {
         return tokenERC20.updateAllowanceAndBalance();
       })
+      .catch(error => console.debug("Failed to approve", error))
       .finally(() => setIsLoadingApprove(false));
   }
 
@@ -480,6 +481,16 @@ export default function CreateBountyPage() {
   }, [repository]);
 
   useEffect(() => {
+    if (!currentNetwork?.networkAddress ||
+      !connectedChain ||
+      Service?.starting ||
+      !Service?.active ||
+      currentNetwork?.networkAddress === Service?.active?.network?.contractAddress) return;
+
+    changeNetwork(connectedChain?.id, currentNetwork?.networkAddress);
+  }, [currentNetwork?.networkAddress, connectedChain, Service?.active, Service?.starting]);
+
+  useEffect(() => {
     if (!currentNetwork?.tokens) {
       setTransactionalToken(undefined);
       setRewardToken(undefined);
@@ -487,28 +498,18 @@ export default function CreateBountyPage() {
       transactionalERC20.setAddress(undefined);
       rewardERC20.setAddress(undefined);
       return;
+    } else {
+      const tokens = currentNetwork?.tokens
+
+      if (tokens.length === 1) {
+        setTransactionalToken(tokens[0]);
+        setRewardToken(tokens[0]);
+      }
+
+      if (tokens.length !== customTokens.length)
+        handleCustomTokens(tokens)
     }
-
-    if (!currentNetwork?.networkAddress || !connectedChain) return;
-
-    changeNetwork(connectedChain?.id, currentNetwork?.networkAddress);
-
-    const tokens = currentNetwork?.tokens
-
-    if (tokens.length === customTokens.length)
-      return;
-
-    if (tokens.length === 1) {
-      setTransactionalToken(tokens[0]);
-      setRewardToken(tokens[0]);
-    }
-
-    if (tokens.length === customTokens.length)
-      return;
-
-    handleCustomTokens(tokens)
-
-  }, [currentNetwork, connectedChain]);
+  }, [currentNetwork?.tokens]);
 
   useEffect(() => handleMinAmount('transactional'), [issueAmount])
   useEffect(() => handleMinAmount('reward'), [rewardAmount])

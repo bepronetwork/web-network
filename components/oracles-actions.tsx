@@ -198,7 +198,8 @@ function OraclesActions({
     setIsApproving(true);
 
     networkTokenERC20.approve(tokenAmount)
-     .finally(() => setIsApproving(false));
+      .catch(error => console.debug("Failed to approve", error))
+      .finally(() => setIsApproving(false));
   }
 
   function getCurrentLabel() {

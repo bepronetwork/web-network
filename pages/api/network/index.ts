@@ -96,9 +96,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       signedMessage,
       allowMerge = true,
     } = req.body;
-   
+
+    if (!_name) {
+      return resJsonMessage("Wrong payload", res, 400);
+    }
+
     const name = _name.replaceAll(" ", "-").toLowerCase();
-    
+
     if (!botPermission) return resJsonMessage("Bepro-bot authorization needed", res, 403);
     
     const chain = await chainFromHeader(req);

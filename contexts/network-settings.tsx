@@ -223,7 +223,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     name: {
       setter: async (value: string) => {
-        setFields('details.name', {value, validated: await Fields.name.validator(value)})
+        await setFields('details.name', {value, validated: await Fields.name.validator(value)})
       },
       validator: async (value: string) => {
         if (value.trim() === "")
@@ -558,10 +558,10 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if (!network || !state.Service?.active || state.Service?.starting)
       setForcedService(undefined);
-    else if (network?.chain?.chainRpc === state.Service?.active?.web3Connection?.options?.web3Host)
+    else if (+network?.chain?.chainId === +state.connectedChain?.id)
       loadForcedService()
         .then(setForcedService);
-  }, [network, state.Service?.active, state.Service?.starting]);
+  }, [network, state.Service?.active, state.Service?.starting, state.connectedChain?.id]);
 
   useEffect(() => {
     if ([

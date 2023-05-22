@@ -37,8 +37,7 @@ export default function useERC20() {
     service: state.Service?.active
   };
 
-  const isServiceReady = 
-    !state.Service?.starting && !state.spinners?.switchingChain && state.Service?.active?.web3Connection?.started;
+  const isServiceReady = !state.Service?.starting && !state.spinners?.switchingChain && state.Service?.active;
 
   function updateAllowanceAndBalance() {
     if (!state.currentUser?.walletAddress ||
@@ -82,7 +81,7 @@ export default function useERC20() {
       
       if (name)
         setDefaults();
-    } else if (address && !name && isServiceReady)
+    } else if (address && !name && isServiceReady && state.connectedChain?.matchWithNetworkChain !== false)
       state.Service?.active.getERC20TokenData(address)
         .then(async ({ name, symbol, decimals, totalSupply }) => {
           setName(name);
@@ -92,7 +91,14 @@ export default function useERC20() {
           setLoadError(false);
         })
         .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
-  }, [state.currentUser?.walletAddress, address, name, isServiceReady]);
+  }, [
+    state.currentUser?.walletAddress, 
+    state.Service?.active, 
+    address, 
+    name, 
+    isServiceReady, 
+    state.connectedChain?.matchWithNetworkChain
+  ]);
 
   useEffect(() => {
     updateAllowanceAndBalance();

@@ -91,7 +91,7 @@ export function RegistrySetup({
   const isDeployRegistryBtnDisabled = [
     treasury.trim() === "",
     hasRegistryAddress,
-    !Service?.active?.isAddress(treasury),
+    !isAddress(treasury),
     !!exceedsFeesLimitsError(closeFeePercentage, "closeFeePercentage"),
     !!exceedsFeesLimitsError(cancelFeePercentage, "cancelFeePercentage"),
     !!exceedsFeesLimitsError(networkCreationFeePercentage, "networkCreationFeePercentage"),

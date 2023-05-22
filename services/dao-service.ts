@@ -98,7 +98,7 @@ export default class DAO {
 
       return registry;
     } catch (error) {
-      console.debug("Error loading NetworkRegistry: ", error);
+      console.debug("Error loading NetworkRegistry: ", registryAddress || this.registryAddress, error);
     }
 
     return false;
