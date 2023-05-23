@@ -37,7 +37,7 @@ export default function CreateBountyTokenAmount({
   const [convertedAmount, setConvertedAmount] = useState(0);
   const [isErrorConverted, setIsErrorConverted] = useState(false);
 
-  function handleIssueAmountOnValueChange(values: NumberFormatValues) {
+  function handleIssueAmountOnValueChange(values) {
     if (
       needValueValidation &&
       +values.floatValue > +currentToken?.currentValue

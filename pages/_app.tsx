@@ -1,12 +1,12 @@
 import React from "react";
 
-import {GetServerSideProps} from "next";
-import {SessionProvider} from "next-auth/react";
-import {appWithTranslation} from "next-i18next";
-import {AppProps} from "next/app";
+import { GetServerSideProps } from "next";
+import { SessionProvider } from "next-auth/react";
+import { appWithTranslation } from "next-i18next";
+import { AppProps } from "next/app";
 import getConfig from "next/config";
-import {useRouter} from "next/router";
-import {GoogleAnalytics} from "nextjs-google-analytics";
+import { useRouter } from "next/router";
+import { GoogleAnalytics } from "nextjs-google-analytics";
 
 import ConsentCookie from "components/consent-cokie";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
@@ -24,23 +24,30 @@ import RootProviders from "contexts";
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
 
-function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: AppProps) {
+function App({
+  Component,
+  pageProps: { session, currentIssue, ...pageProps },
+}: AppProps) {
+  const { asPath } = useRouter();
+  const { publicRuntimeConfig } = getConfig();
 
-  const {asPath} = useRouter();
-  const {publicRuntimeConfig} = getConfig();
-
-  if (asPath.includes('api-doc'))
-    return <Component {...pageProps}></Component>
+  if (asPath.includes("api-doc"))
+    return (
+        <Component {...pageProps}></Component>
+    );
 
   return (
     <>
-      <GoogleAnalytics gaMeasurementId={publicRuntimeConfig.gaMeasureID} trackPageViews />
+      <GoogleAnalytics
+        gaMeasurementId={publicRuntimeConfig.gaMeasureID}
+        trackPageViews
+      />
       <SessionProvider session={session}>
         <RootProviders>
-          <Seo  issueMeta={currentIssue} />
+          <Seo issueMeta={currentIssue} />
           <ReadOnlyContainer>
             <WebThreeDialog />
-            <InvalidAccountWalletModal/>
+            <InvalidAccountWalletModal />
             <ReAuthorizeGithubModal />
             <MainNav />
             <div id="root-container">

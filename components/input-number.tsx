@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from "react";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 
 import clsx from "clsx";
 import { kebabCase } from "lodash";
@@ -75,7 +75,7 @@ export default function InputNumber({
           "border border-1 border-warning border-radius-4": warning,
         }, groupClassName)}
       >
-        <NumberFormat
+        <NumericFormat
           className={clsx("form-control border-radius-4",
                           {
               ...successStyle,
