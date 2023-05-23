@@ -91,7 +91,7 @@ module.exports = () => {
             },
             {
               key: 'Content-Security-Policy',
-              value: "none",
+              value: "default-src 'none'; img-src 'self';",
             },
             {
               key: 'X-Content-Type-Options',
