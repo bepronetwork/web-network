@@ -2,19 +2,21 @@ import React from "react";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
-import {AppStateContextProvider} from "./app-state";
-import {GlobalEffectsProvider} from "./global-effects";
+import { AppStateContextProvider } from "./app-state";
+import { GlobalEffectsProvider } from "./global-effects";
 
-const RootProviders: React.FC = ({children}) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const RootProviders: React.FC<Props> = ({ children }) => {
   return (
-
     <AppStateContextProvider>
       <GlobalEffectsProvider>
         <NetworkThemeInjector />
         {children}
       </GlobalEffectsProvider>
     </AppStateContextProvider>
-
   );
 };
 

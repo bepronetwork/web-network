@@ -27,4 +27,7 @@ export interface InputNumber extends NumberFormatProps {
   description?: string;
   fullWidth?: boolean;
   groupClassName?: string;
+  inputClassName?: string;
+  allowNegative?: boolean;
+  isAllowed?: (values) => boolean;
 }
