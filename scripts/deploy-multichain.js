@@ -352,7 +352,11 @@ async function main(option = 0) {
 
 (async () => {
   for (let index = 0; index < options.network.length; index++)
+    try  {
     await main(index);
+    } catch (e) {
+      console.error(e)
+    }
 
   process.exit(0);
 })();

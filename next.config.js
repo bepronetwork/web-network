@@ -89,6 +89,14 @@ module.exports = () => {
               key: "X-Frame-Options",
               value: "DENY"
             },
+            {
+              key: 'Content-Security-Policy',
+              value: "none",
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff',
+            },
           ]
         },
         {
