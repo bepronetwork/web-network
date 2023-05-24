@@ -41,7 +41,7 @@
     "@metamask/jazzicon": "^2.0.0",
     "@primer/css": "^20.8.0",
     "@synaps-io/react-verify": "^1.0.3",
-    "@taikai/dappkit": "^2.1.11",
+    "@taikai/dappkit": "2.1.11",
     "@taikai/scribal": "^1.0.3",
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
     "abort-controller": "^3.0.0",
