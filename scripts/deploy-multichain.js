@@ -355,7 +355,8 @@ async function main(option = 0) {
     try  {
     await main(index);
     } catch (e) {
-      console.error(e)
+      console.error(e);
+      process.exit(1);
     }
 
   process.exit(0);
