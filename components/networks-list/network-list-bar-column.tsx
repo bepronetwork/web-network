@@ -7,7 +7,6 @@ export default function NetworkListBarColumn({
   columnOrder = "asc",
   label,
   onClick,
-  col = 3,
   className,
   labelWhite = false
 }: {
@@ -16,7 +15,6 @@ export default function NetworkListBarColumn({
   columnOrder: string;
   label: string;
   onClick?: () => void;
-  col?: number;
   className?: string;
   labelWhite?: boolean;
 }) {
@@ -32,7 +30,7 @@ export default function NetworkListBarColumn({
 
   return (
     <div
-      className={`col-${col} d-flex flex-row justify-content-start cursor-pointer align-items-center ${
+      className={`col d-flex flex-row cursor-pointer align-items-center ${
         isColumnActive ? "text-primary" : textClass
       } ${className && className}`}
       onClick={onClick}

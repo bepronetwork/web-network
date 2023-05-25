@@ -5,8 +5,8 @@ import {useRouter} from "next/router";
 
 import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
-import NetworkListBar from "components/network-list-bar";
-import NetworkListItem from "components/network-list-item";
+import NetworkListBar from "components/networks-list/network-list-bar";
+import NetworkListItem from "components/networks-list/network-list-item";
 import NothingFound from "components/nothing-found";
 
 import {useAppState} from "contexts/app-state";
@@ -76,34 +76,38 @@ export default function NetworksList() {
   }, []);
 
   return (
-    <CustomContainer>
-      {(!networks.length && (
-        <NothingFound description={t("custom-network:errors.not-found")}>
-          {state.Service?.network?.active ? (
-            <InternalLink
-              href="/new-network"
-              label={String(t("actions.create-one"))}
-              uppercase
-              blank={state.Service?.network?.active.name !== state.Settings?.defaultNetworkConfig?.name}
-            />
-          ) : (
-            ""
-          )}
-        </NothingFound>
-      )) || (
-        <>
-          <NetworkListBar order={order} setOrder={handleOrderChange} />
+    <div className="container-xl px-4 px-xl-0">
+      <div className="row justify-content-center">
+        <div className="col-xs-12 col-xl-10">
+          {(!networks.length && (
+          <NothingFound description={t("custom-network:errors.not-found")}>
+            {state.Service?.network?.active ? (
+              <InternalLink
+                href="/new-network"
+                label={String(t("actions.create-one"))}
+                uppercase
+                blank={state.Service?.network?.active.name !== state.Settings?.defaultNetworkConfig?.name}
+              />
+            ) : (
+              ""
+            )}
+          </NothingFound>
+        )) || (
+          <>
+            <NetworkListBar order={order} setOrder={handleOrderChange} />
 
-          {orderByProperty(networks, order[0], order[1]).map((networkItem) => (
-            <NetworkListItem
-              key={`network-list-item-${networkItem.name}-${networkItem.chain.chainShortName}`}
-              network={networkItem}
-              handleRedirect={handleRedirect}
-              tokenSymbolDefault={t("misc.token")}
-            />
-          ))}
-        </>
-      )}
-    </CustomContainer>
+            {orderByProperty(networks, order[0], order[1]).map((networkItem) => (
+              <NetworkListItem
+                key={`network-list-item-${networkItem.name}-${networkItem.chain.chainShortName}`}
+                network={networkItem}
+                handleRedirect={handleRedirect}
+                tokenSymbolDefault={t("misc.token")}
+              />
+            ))}
+          </>
+        )}
+        </div>
+      </div>
+    </div>
   );
 }

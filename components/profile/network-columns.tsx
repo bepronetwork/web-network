@@ -1,4 +1,4 @@
-import NetworkListBarColumn from "../network-list-bar-column";
+import NetworkListBarColumn from "components/networks-list/network-list-bar-column";
 
 export default function NetworkColumns({ columns }: { columns: string[] }) {
   return (

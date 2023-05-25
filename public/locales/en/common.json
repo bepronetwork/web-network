@@ -5,6 +5,7 @@
   "$bepro": "BEPRO",
   "bepro": "BEPRO",
   "token-votes": "{{token}} Votes",
+  "tokens-locked": "Tokens Locked",
   "please-wait": "Please wait",
   "close": "Close",
   "currencies": {
