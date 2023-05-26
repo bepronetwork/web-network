@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {isMobile} from "react-device-detect";
+import React, { useState} from "react";
+import {Button} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
@@ -11,7 +11,6 @@ import {ContextualSpan} from "components/contextual-span";
 import ContractButton from "components/contract-button";
 import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
-import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
 import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
@@ -27,11 +26,9 @@ import {getIssueState} from "helpers/handleTypeIssue";
 import {NetworkEvents} from "interfaces/enums/events";
 
 import useApi from "x-hooks/use-api";
-import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import {useBounty} from "x-hooks/use-bounty";
 import {useNetwork} from "x-hooks/use-network";
-import {Button} from "react-bootstrap";
 
 interface PageActionsProps {
   isRepoForked?: boolean;
@@ -53,15 +50,11 @@ export default function PageActions({
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
   const [showGHModal, setShowGHModal] = useState(false);
-  const [showHardCancelModal, setShowHardCancelModal] = useState(false);
   const [showUpdateAmount, setShowUpdateAmount] = useState(false);
-
-  const [isCancelable, setIsCancelable] = useState(false);
 
   const { state, dispatch } = useAppState();
   const { getDatabaseBounty } = useBounty();
-  const { updateWalletBalance } = useAuthentication();
-  const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
+  const { handleCreatePullRequest } = useBepro();
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
   const { goToProfilePage } = useNetwork();
 
@@ -80,7 +73,6 @@ export default function PageActions({
     amount: state.currentBounty?.data?.amount,
     fundingAmount: state.currentBounty?.data?.fundingAmount
   })
-  const isBountyFunded = state.currentBounty?.data?.fundedAmount?.isEqualTo(state.currentBounty?.data?.fundingAmount)
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
@@ -90,40 +82,6 @@ export default function PageActions({
 
   const hasPullRequests =
     !!state.currentBounty?.data?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
-
-  const hasOpenPullRequest = 
-    !!state.currentBounty?.data?.pullRequests?.find(pullRequest => 
-      pullRequest?.githubLogin === state.currentUser?.login && pullRequest?.status !== "canceled");
-
-  async function handleRedeem() {
-    handleReedemIssue(getIssueState({
-      state: state.currentBounty?.data?.state,
-      amount: state.currentBounty?.data?.amount,
-      fundingAmount: state.currentBounty?.data?.fundingAmount
-    }) === "funding")
-      .then(() => {
-        updateWalletBalance(true);
-        getDatabaseBounty(true);
-      });
-  }
-
-  async function handleHardCancel() {
-    setShowHardCancelModal(false);
-    handleHardCancelBounty()
-      .then(() => {
-        updateWalletBalance();
-        getDatabaseBounty(true);
-      });
-  }
-
-  useEffect(() => {
-    if (state.Service?.active && state.currentBounty?.data)
-      (async () => {
-        const cancelableTime = await state.Service?.active.getCancelableTime();
-        const canceable = +new Date() >= +new Date(+state.currentBounty?.data.createdAt + cancelableTime)
-        setIsCancelable(canceable)
-      })()
-  }, [state.Service?.active, state.currentBounty?.data])
 
   async function handlePullrequest({
     title: prTitle,
@@ -231,7 +189,8 @@ export default function PageActions({
         <GithubLink
           forcePath={state.currentBounty?.data?.repository?.githubPath}
           hrefPath="fork"
-          color="primary">
+          className="btn btn-primary bounty-outline-button"
+          >
           <Translation label="actions.fork-repository"/>
         </GithubLink>);
   }
@@ -261,7 +220,7 @@ export default function PageActions({
               <ContractButton
                 color="primary"
                 onClick={handleStartWorking}
-                className="read-only-button"
+                className="read-only-button bounty-outline-button"
                 disabled={isExecuting}
                 isLoading={isExecuting}
               >
@@ -285,42 +244,11 @@ export default function PageActions({
       return (
         <ReadOnlyButtonWrapper>
           <ContractButton
-            className="read-only-button"
+            className="read-only-button bounty-outline-button"
             onClick={() => setShowPRModal(true)}
             disabled={!state.currentUser?.login || !isWalletConnected}
           >
             <Translation ns="pull-request" label="actions.create.title"/>
-          </ContractButton>
-        </ReadOnlyButtonWrapper>
-      );
-  }
-
-  function renderHardCancelButton() {
-    if (state.Service?.network?.active?.isGovernor && isCancelable)
-      return (
-        <ReadOnlyButtonWrapper>
-          <ContractButton
-            color="danger"
-            className="read-only-button me-1"
-            onClick={() => setShowHardCancelModal(true)}
-          >
-            <Translation ns="common" label="actions.cancel"/>
-          </ContractButton>
-        </ReadOnlyButtonWrapper>
-      );
-  }
-
-  function renderCancelButton() {
-    const isDraftOrNotFunded = isFundingRequest ? !isBountyFunded : isBountyInDraft;
-
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded && !isEditIssue)
-      return (
-        <ReadOnlyButtonWrapper>
-          <ContractButton
-            className="read-only-button me-1"
-            onClick={handleRedeem}
-          > 
-            <Translation ns="common" label="actions.cancel"/>
           </ContractButton>
         </ReadOnlyButtonWrapper>
       );
@@ -331,7 +259,7 @@ export default function PageActions({
       return (
         <ReadOnlyButtonWrapper>
           <ContractButton
-            className="read-only-button me-1"
+            className="read-only-button bounty-outline-button me-1"
             onClick={() => setShowUpdateAmount(true)}
           >
             <Translation ns="bounty" label="actions.update-amount"/>
@@ -350,28 +278,12 @@ export default function PageActions({
       );
   }
 
-  function renderViewPullRequestLink() {
-    if (isWalletConnected && 
-        isGithubConnected &&
-        !isBountyInDraft &&
-        hasOpenPullRequest)
-      return (
-        <GithubLink
-          forcePath={state.currentBounty?.data?.repository?.githubPath}
-          hrefPath={`pull?q=base:${state.currentBounty?.data?.branch}`}
-          color="primary"
-        >
-          <Translation ns="pull-request" label="actions.view"/>
-        </GithubLink>
-      );
-  }
-
   function renderEditButton() {
     if (isWalletConnected && isBountyInDraft && isBountyOwner)
       return (
         <ReadOnlyButtonWrapper>
           <ContractButton
-            className="read-only-button me-1"
+            className="read-only-button bounty-outline-button me-1"
             onClick={handleEditIssue}
           >
             <EditIcon className="me-1"/>
@@ -396,39 +308,20 @@ export default function PageActions({
             </h4>
 
             <div className="d-flex flex-row align-items-center gap-20">
-              {!isMobile &&
-                <ForksAvatars forks={state.Service?.network?.repos?.active?.forks || []}
-                              repositoryPath={state.currentBounty?.data?.repository?.githubPath}/>}
-
-              {renderHardCancelButton()}
-
               {renderForkRepositoryLink()}
 
               {renderStartWorkingButton()}
 
               {renderCreatePullRequestButton()}
 
-              {renderCancelButton()}
-
               {renderUpdateAmountButton()}
 
               {renderCreateProposalButton()}
-
-              {renderViewPullRequestLink()}
 
               {renderEditButton()}
 
               {!isGithubConnected && isWalletConnected && <ConnectGithub size="sm"/>}
 
-              <GithubLink
-                onClick={!state.Service?.network?.repos?.active?.ghVisibility ? () => setShowGHModal(true) : null}
-                forcePath={state.currentBounty?.data?.repository?.githubPath}
-                hrefPath={`${(state.currentBounty?.data?.state?.toLowerCase() === "pull request" && "pull") ||
-                "issues"
-                }/${issueGithubID || ""}`}
-              >
-                {t("actions.view-on-github")}
-              </GithubLink>
             </div>
           </div>
         </div>
@@ -467,18 +360,6 @@ export default function PageActions({
         onOkClick={() => setShowGHModal(false)}
       >
         <h5 className="text-center"><Translation ns="common" label="modals.gh-access.content"/></h5>
-      </Modal>
-
-      <Modal
-        title={t("modals.hard-cancel.title")}
-        centerTitle
-        show={showHardCancelModal}
-        onCloseClick={() => setShowHardCancelModal(false)}
-        cancelLabel={t("actions.close")}
-        okLabel={t("actions.continue")}
-        onOkClick={handleHardCancel}
-      >
-        <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content"/></h5>
       </Modal>
     </div>
   );

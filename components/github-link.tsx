@@ -9,6 +9,7 @@ interface GithubLinkParams {
   children: ReactNode;
   onClick?: (e: MouseEvent) => void;
   color?: string;
+  className?: string;
 }
 
 export default function GithubLink({
@@ -16,13 +17,14 @@ export default function GithubLink({
   children,
   forcePath,
   onClick,
+  className,
   color = "dark-gray"
 }: GithubLinkParams) {
   return (
     <a
       href={`https://github.com/${forcePath}/${hrefPath}`}
       target="_blank"
-      className={`btn btn-${color} text-uppercase d-flex align-items-center github-link`}
+      className={className ? className : `btn btn-${color} text-uppercase d-flex align-items-center github-link`}
       rel="noreferrer"
       onClick={onClick}
     >

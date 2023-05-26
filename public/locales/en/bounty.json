@@ -64,6 +64,7 @@
     "redeem": "Redeem",
     "update-amount": "Update Amount",
     "edit-bounty": "Edit Bounty",
+    "owner-cancel": "Owner cancel",
     "update-bounty": "Bounty updated successfully",
     "canceled-bounty": "Bounty canceled successfully",
     "recognize-finished": {
@@ -167,6 +168,7 @@
     "is-required": "Required KYC validation",
     "refresh": "Refresh Session",
     "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
+    "bounty-tool-tip": "This bounty requires KYC , you can activate it in your profile",
     "identify-to-start": "Start KYC",
     "identify-kyc": "Start KYC",
     "identified": "Successfully identified, you can close this modal",

@@ -199,6 +199,10 @@
     "votes": "Votes",
     "changing": "Changing",
     "save-changes": "Save Changes",
+    "repository": "Repository",
+    "branch": "Branch",
+    "opened-on": "Opened on",
+    "owner": "Owner",
     "apply": "apply"
   },
   "modals": {

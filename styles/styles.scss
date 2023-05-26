@@ -1433,6 +1433,16 @@ textarea.form-control {
   }
 }
 
+.break-title {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.bounty-settings {
+  width: 180px;
+}
+
 .comment {
   a {
     color: var(--bs-primary);

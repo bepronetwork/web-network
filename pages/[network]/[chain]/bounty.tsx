@@ -97,7 +97,10 @@ export default function PageIssue() {
 
   return (
     <BountyEffectsProvider>
-      <BountyHero />
+      <BountyHero 
+        handleEditIssue={handleEditIssue}
+        isEditIssue={isEditIssue}
+      />
 
       <If condition={!!state.currentBounty?.data?.isFundingRequest}>
         <FundingSection /> 
