@@ -7,7 +7,7 @@ import {GetServerSideProps} from "next/types";
 
 import {useAppState} from "contexts/app-state";
 
-import ExplorePage from "pages/explore";
+import ExplorePage from "pages/bounty-hall";
 
 const { publicRuntimeConfig } = getConfig();
 

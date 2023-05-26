@@ -20,8 +20,7 @@ export default function BrandLogo({
   const icon = showDefaultBepro || logoUrl ? 
     <img
       src={showDefaultBepro ? defaultLogo : logoUrl}
-      width={104}
-      height={40}
+      height={32}
     /> : 
     <LogoPlaceholder />; 
 

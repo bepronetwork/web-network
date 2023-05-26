@@ -197,6 +197,24 @@ $tooltip-bg: $white;
 $tooltip-color: $light-gray;
 $tooltip-arrow-color: $white;
 
+// Breakpoints
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1238px,
+  xxl: 1400px
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 1024px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";
 

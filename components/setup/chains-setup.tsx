@@ -42,7 +42,7 @@ export default function ChainsSetup() {
       return;
 
     dispatch(changeLoadState(true))
-    axios.get(`https://chainid.network/chains_mini.json`)
+    axios.get(`https://chainid.network/chains.json`)
       .then(({data}) => data)
       .then(setChains)
       .catch(e => {

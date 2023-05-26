@@ -50,7 +50,8 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
     isDefault: body.isDefault,
     blockScanner: body.explorer,
     eventsApi: body.eventsApi,
-    color: body.color
+    color: body.color,
+    icon: body.icon
   }
 
   const chain = await models.chain.findOne({where: {chainId: {[Op.eq]: model.chainId}}});

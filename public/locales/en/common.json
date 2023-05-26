@@ -63,8 +63,9 @@
     "council": "Curators",
     "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
-    "new-bounty": "New bounty",
+    "new-bounty": "Create bounty",
     "explore": "Explore",
+    "bounty-hall": "Bounty Hall",
     "get-started": "Get Started",
     "connect": "Connect Wallet",
     "new-network": "New Network",
@@ -203,7 +204,8 @@
     "branch": "Branch",
     "opened-on": "Opened on",
     "owner": "Owner",
-    "apply": "apply"
+    "apply": "apply",
+    "create": "Create"
   },
   "modals": {
     "help-modal": {

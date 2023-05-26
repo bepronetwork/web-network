@@ -24,6 +24,7 @@
 @import "components/mini-tabs";
 @import "components/nav-avatar";
 @import "components/cookie-consent";
+@import "components/multi-action-button";
 
 @import "components/swagger-ui";
 
@@ -214,8 +215,9 @@ li {
       color: $gray-500;
     }
     &__single-value {
-      @extend .p-small;
-      color: $white;
+      @extend .caption-small;
+      @extend .font-weight-medium;
+      color: $gray-300;
     }
     &__control--is-focused &__single-value {
       color: transparentize($white, 0.4);
@@ -248,7 +250,8 @@ li {
       }
     }
     &__option {
-      @extend .p;
+      @extend .caption-small;
+      @extend .font-weight-medium;
       background-color: transparent;
       color: $gray-500;
 
@@ -391,6 +394,13 @@ li {
   min-height: $navbar-height;
   background-color: var(--bs-dark);
 
+  border-bottom: 1px solid $dark-gray;
+
+  .btn:not(.brand, .not-svg) svg:only-child {
+    width: 16px;
+    height: 16px;
+  }
+
   .brand {
     padding: 0;
   }
@@ -405,16 +415,15 @@ li {
     margin: 0px;
     padding: 0px;
     list-style: none;
-    li {
-      margin-left: $m * 2;
-    }
+    gap: 44px;
+
     a:not(.brand) {
-      color: rgba($white, 0.7);
+      color: $gray-500;
       padding: math.div($m, 4) 0px;
       transition: 0.2s ease-in-out;
       &:hover,
       &.active {
-        color: $white;
+        color: $gray-50;
         text-decoration: none;
       }
     }
@@ -1296,15 +1305,6 @@ $c_props: (
 
 .w-65 {
   width: 65%;
-}
-
-.main-nav {
-  border-bottom: 1px solid $dark-gray;
-
-  .btn:not(.brand) svg:only-child {
-    width: 16px;
-    height: 16px;
-  }
 }
 
 svg {
