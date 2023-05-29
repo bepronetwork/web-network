@@ -40,11 +40,8 @@ export default function BountyHero({
   function renderPriceConversor() {
     return (
       <PriceConversor
-        currentValue={state.currentBounty?.data?.amount?.toFixed() || "0"}
-        currency={
-          state.currentBounty?.data?.transactionalToken?.symbol ||
-          t("common:misc.token")
-        }
+        currentValue={state.currentBounty?.data?.amount}
+        currency={state.currentBounty?.data?.transactionalToken?.symbol || t("common:misc.token")}
       />
     );
   }
