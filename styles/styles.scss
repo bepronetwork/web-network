@@ -791,6 +791,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   &.tag {
     background-color:#B3B9F4;
   }
+  &-sm {
+    width: 4px !important;
+    height: 4px !important;
+    border-radius: 50% !important;
+  }
 }
 
 .active-description-button {
@@ -896,6 +901,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .font-weight-500 {
   font-weight: 500 !important;
+}
+
+.font-weight-400 {
+  font-weight: 400 !important;
 }
 
 .font-weight-medium {

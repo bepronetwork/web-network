@@ -19,6 +19,8 @@ interface ContextualSpanProps {
   classNameIcon?: string;
   isAlert?: boolean;
   isDismissable?: boolean;
+  icon?: boolean;
+  classNameChildren?: string;
 }
 
 export function ContextualSpan({
@@ -28,13 +30,15 @@ export function ContextualSpan({
   className = "",
   isAlert,
   classNameIcon,
-  isDismissable = false
+  isDismissable = false,
+  icon = true,
+  classNameChildren,
 }: ContextualSpanProps) {
   const [visible, setVisible] = useState(true);
 
   const contextColor = color || context;
   const CLASSES = clsx([
-    "p family-Regular font-weight-medium border-radius-4 align-items-center mx-0",
+    `p family-Regular ${icon ? 'font-weight-500 align-items-center' : 'font-weight-400'} border-radius-4  mx-0`,
     `text-${contextColor} ${className}`,
     isAlert && `bg-${contextColor}-25 p-3 border border-${contextColor} border-radius-8 justify-content-between`
   ]);
@@ -61,12 +65,19 @@ export function ContextualSpan({
   return(
     <FlexRow className={CLASSES}>
       <FlexColumn>
-        <FlexRow className="align-items-center">
-          <span className={`mr-1 svg-${contextColor} ${classNameIcon}`}>
-            <Icon width={12} height={12} />
-          </span>
-
-          {children}
+        <FlexRow className={`${icon ? 'align-items-center': 'align-items-start'}`}>
+          <div>
+            {icon ? (
+              <span className={`mr-1 svg-${contextColor} ${classNameIcon}`}>
+                <Icon width={12} height={12} />
+              </span>
+            ) : (
+              <div className="ball-sm bg-warning me-2 mt-2" />
+            )}
+          </div>
+          <div className={`col-12 ${classNameChildren}`}>
+            {children}  
+          </div>
         </FlexRow>
       </FlexColumn>
 
