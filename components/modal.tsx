@@ -76,7 +76,9 @@ export default function Modal({
       {...params}
     >
       <ModalBootstrap.Header
-        className={`relative d-flex w-100 flex-column justify-content-${titlePosition} `}
+        className={`relative d-flex  flex-column justify-content-${titlePosition} ${
+          titlePosition ? "text-center" : ""
+        } text-break`}
       >
         <ModalBootstrap.Title
           className={`pt-3 text-white ${titleClass || ""} ${

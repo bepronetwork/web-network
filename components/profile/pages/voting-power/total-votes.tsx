@@ -7,6 +7,7 @@ import { useTranslation } from "next-i18next";
 import InfoTooltip from "components/info-tooltip";
 import NetworkItem from "components/profile/network-item";
 import { FlexRow } from "components/profile/wallet-balance";
+import TokenSymbolView from "components/common/token-symbol/view";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -75,9 +76,7 @@ export default function TotalVotes({
             {formatStringToCurrency(votesLocked.plus(votesDelegatedToMe).toFixed())}
           </span>
 
-          <span {...getTextColorProps()}>
-            {votesSymbol}
-          </span>
+          <TokenSymbolView name={votesSymbol} {...getTextColorProps()} />
 
           <InfoTooltip
             description={t("profile:tips.total-oracles", {

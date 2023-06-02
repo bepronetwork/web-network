@@ -6,6 +6,7 @@ import NetworkParameterInput from "components/custom-network/network-parameter-i
 import {useAppState} from "contexts/app-state";
 import {useNetworkSettings} from "contexts/network-settings";
 
+import { SMALL_TOKEN_SYMBOL_LENGTH } from "helpers/constants";
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import { NETWORK_LIMITS } from "helpers/network";
 
@@ -87,7 +88,10 @@ export default function NetworkContractSettings() {
       disabled: totalNetworkToken.gt(0),
       helperText: totalNetworkToken.gt(0) ? t("custom-network:oracle-exchange-rate.unable-to-change", {
         amount: formatNumberToNScale(totalNetworkToken.toFixed()),
-        symbol: networkTokenSymbol
+        symbol:
+          networkTokenSymbol?.length > SMALL_TOKEN_SYMBOL_LENGTH
+            ? `${networkTokenSymbol.slice(0, SMALL_TOKEN_SYMBOL_LENGTH)}...`
+            : networkTokenSymbol,
       }) : ""
     },
     { 

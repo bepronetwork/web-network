@@ -28,7 +28,7 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
       }
     >
       <div
-        className={`m-0 px-1 py-1 border-radius-4 border border-gray-800 ${
+        className={`m-0 text-truncate px-1 py-1 border-radius-4 border border-gray-800 ${
           !isActive ? "bg-gray-950" : "bg-dark-gray"
         } `}
       >
@@ -43,11 +43,11 @@ export default function IssueAmountInfo({ issue, size = "lg" }: { issue: IssueBi
               {(+bountyAmount >= 1e-6 &&
                 formatNumberToNScale(bountyAmount?.toFixed())) ||
                 bountyAmount?.toExponential()}{" "}
-              <label
+              <span
                 className={`text-uppercase text-white-40`}
               >
                 {issue?.transactionalToken?.symbol || t("common:misc.token")}
-              </label>
+              </span>
             </span>
           </div>
       </div>

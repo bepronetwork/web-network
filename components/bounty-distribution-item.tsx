@@ -8,6 +8,7 @@ import { BountyDistribution } from "interfaces/bounty-distribution";
 
 import Avatar from "./avatar";
 import InfoTooltip from "./info-tooltip";
+import TokenSymbolView from "./common/token-symbol/view";
 
 export default function BountyDistributionItem({
   percentage = "0",
@@ -24,7 +25,7 @@ export default function BountyDistributionItem({
   return (
     <>
       <li
-        className="d-flex align-items-center bg-gray-850 px-3 py-2"
+        className="d-flex align-items-center bg-gray-850 px-3 py-2 text-truncate"
         key={name}
       >
         <div className="d-flex flex-grow-1 flex-column">
@@ -43,20 +44,18 @@ export default function BountyDistributionItem({
           )}
         </div>
         
-        <div className={"d-flex flex-shrink-0 w-40 flex-column"}>
+        <div className={"d-flex flex-column text-truncate"}>
           <div className="d-flex align-items-center gap-2 justify-content-end">
-            <span className="text-gray label-m">
+            <span className="ms-1 text-gray label-m ">
               {percentage}%
             </span>
             
             <ArrowRight color="text-gray" width={14}/>
 
-            <span className="caption-medium text-white">
+            <span className="caption-medium text-white text-truncate">
               {formatNumberToNScale(amounts[0])}{" "}
 
-              <label className="ps-1 pt-1 caption-small text-uppercase text-primary">
-              {symbols[0]}
-            </label>
+              <TokenSymbolView name={symbols[0]} className="ps-1 pt-1 caption-small text-uppercase text-primary"/>
             </span>
             
           </div>
@@ -65,9 +64,7 @@ export default function BountyDistributionItem({
             <div className="d-flex justify-content-end">
               <span className="caption-small text-light-gray">
                 {amounts[1]}{" "}
-                <label className="ps-1 caption-small text-uppercase text-light-gray">
-                  {symbols[1]}
-                </label>
+                <TokenSymbolView name={symbols[1]} className="ps-1 caption-small text-uppercase text-light-gray"/>
               </span>
             </div>
           )}

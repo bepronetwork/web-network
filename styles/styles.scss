@@ -2002,6 +2002,10 @@ input[type="color"] {
   max-width: none !important;
 }
 
+.token-symbol {
+  max-width: 120px;
+}
+
 .kyc-modal-body{
   min-height: 630px !important;
 }

@@ -7,6 +7,7 @@ import ArrowUp from "assets/icons/arrow-up";
 import ArrowUpRight from "assets/icons/arrow-up-right";
 
 import Button from "components/button";
+import TokenSymbolView from "components/common/token-symbol/view";
 import NetworkLogo from "components/network-logo";
 
 import { useAppState } from "contexts/app-state";
@@ -63,12 +64,11 @@ export default function NetworkItem({
         <span className="text-white mr-1">
           {formatNumberToCurrency(amount)}
         </span>
-        <span
+        <TokenSymbolView
+          name={symbol}
           className={`${isNetworkVariant ? "text-primary" : ""} text-uppercase`}
           style={{ color: primaryColor }}
-        >
-            {symbol}
-        </span>
+        />
       </FlexRow>
     );
   }

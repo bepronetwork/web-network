@@ -2,11 +2,11 @@ import {useEffect, useState} from "react";
 
 import {useTranslation} from "next-i18next";
 
-import Translation from "components/translation";
-
 import {useAppState} from "contexts/app-state";
 
 import {formatNumberToNScale} from "helpers/formatNumber";
+
+import TokenSymbolView from "./common/token-symbol/view";
 
 export default function ProposalProgressBar({
   isDisputed = null,
@@ -127,15 +127,13 @@ export default function ProposalProgressBar({
           >
             {issueState}
           </h4>
-          <div className="caption-small d-flex align-items-center mb-4">
+          <div className="caption-small d-flex align-items-center mb-4 text-truncate">
             <span className={`text-${issueColor} text-uppercase`}>
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
-            /{formatNumberToNScale(totalNetworkToken || 0)}{" "}
-            <Translation 
-              label="$oracles" 
-              params={{ token: state.Service?.network?.active?.networkToken?.symbol }}
-            />{" "}
+            <span className="me-1">/{formatNumberToNScale(totalNetworkToken || 0)}{" "}</span>
+            <TokenSymbolView name={t("common:$oracles", { token: state.Service?.network?.active?.networkToken?.symbol })}/>
+             {" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>
         </div>

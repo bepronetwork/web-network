@@ -182,7 +182,7 @@ export default function CreateBountyTokenAmount({
               </div>
             </div>
             <div className="col-md-4 ">
-              <div className="p-1 ps-3 border-radius-4 border border-gray-700 text-gray">
+              <div className="p-1 ps-3 border-radius-4 border border-gray-700 text-gray text-truncate">
               {t("balance")} {tokenBalance.toFixed()}{" "}
                 {currentToken?.symbol || t("common:misc.token")}
               </div>

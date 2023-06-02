@@ -1,3 +1,4 @@
+import TokenSymbolView from "components/common/token-symbol/view";
 import If from "components/If";
 
 interface ItemAmountProps {
@@ -18,9 +19,10 @@ export default function ItemAmount({
       </span>
 
       <If condition={!!currency}>
-        <span className="caption-small font-weight-medium text-primary mr-1">
-          {currency}
-        </span>
+        <TokenSymbolView
+            name={currency}
+            className="caption-small font-weight-medium text-primary mr-1"
+        />
       </If>
 
       <span className="caption-small font-weight-medium text-gray-500">
