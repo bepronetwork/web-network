@@ -35,4 +35,10 @@
       list-style-type: square;
     }
   }
+
+  ol {
+    li {
+      list-style: decimal;
+    }
+  }
 }
