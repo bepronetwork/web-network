@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
-import {isMobile} from "react-device-detect";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
@@ -12,11 +11,16 @@ import EyeSlashIcon from "assets/icons/eye-slash-icon";
 import TrashIcon from "assets/icons/trash-icon";
 
 import Badge from "components/badge";
+import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
 import CardItem from "components/card-item";
 import ChainBadge from "components/chain-badge";
+import If from "components/If";
 import IssueAmountInfo from "components/issue-amount-info";
+import Modal from "components/modal";
+import { FlexColumn } from "components/profile/wallet-balance";
+import ResponsiveWrapper from "components/responsive-wrapper";
 import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
@@ -31,10 +35,6 @@ import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
-
-import BountyItemLabel from "./bounty-item-label";
-import Modal from "./modal";
-import { FlexColumn } from "./profile/wallet-balance";
 
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
@@ -51,18 +51,20 @@ export default function IssueListItem({
 }: IssueListItemProps) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common", "custom-network"]);
-  const [visible, setVisible] = useState<boolean>();
+  
   const {state,dispatch} = useAppState();
-  const { signMessage } = useAuthentication();
+  const [visible, setVisible] = useState<boolean>();
   const [isCancelable, setIsCancelable] = useState(false);
   const [hideTrashIcon, setHideTrashIcon] = useState<boolean>();
   const [showHardCancelModal, setShowHardCancelModal] = useState(false);
   const [isLoadingHardCancel, setIsLoadingHardCancel] = useState(false);
-  const {updateVisibleBounty} = useApi();
+  
+  const { updateVisibleBounty } = useApi();
   const { getURLWithNetwork } = useNetwork();
+  const { signMessage } = useAuthentication();
   const { handleHardCancelBounty } = useBepro();
 
-  const isVisible = visible !== undefined ? visible : issue?.visible
+  const isVisible = visible !== undefined ? visible : issue?.visible;
 
   const issueState = getIssueState({
     state: issue?.state,
@@ -149,7 +151,7 @@ export default function IssueListItem({
     const id = issue?.githubId;
 
     return (
-      <span className={`${(tag && uppercase) && 'text-uppercase'} text-gray me-2`}>
+      <span className={`${(tag && uppercase) && 'text-uppercase' || ""} text-gray me-2`}>
         {tag ? `${tag}-${id}` : `#${id}`}
       </span>
     );
@@ -179,17 +181,18 @@ export default function IssueListItem({
       },
     };
 
-    if (["open", "ready", "proposal", "funding"].includes(state?.toLowerCase())) {
-      const isFunding = state?.toLowerCase() === 'funding'
-      const { value, translation } = types[state?.toLowerCase()];
+    const lowerState = state?.toLowerCase();
+
+    if (["open", "ready", "proposal", "funding"].includes(lowerState)) {
+      const isFunding = lowerState === 'funding';
+      const { value, translation } = types[lowerState];
+
       return (
-        <div className="hide-bounty-item-lg">
-          <BountyItemLabel label={translation} key={issue.githubId}>
-            <span className={`${ isFunding ? 'text-light-warning': "text-gray"}`}>
-              {value || 0}{isFunding && '%'}
-            </span>
-          </BountyItemLabel>
-        </div>
+        <BountyItemLabel label={translation} key={issue.githubId} className="col-auto">
+          <span className={`${ isFunding ? 'text-light-warning': "text-gray"}`}>
+            {value || 0}{isFunding && '%'}
+          </span>
+        </BountyItemLabel>
       );
     } else return <></>;
   }
@@ -223,7 +226,7 @@ export default function IssueListItem({
           <div className="issue-body text-white-40 text-break text-truncate mb-3" >
             {issue?.body}
           </div>
-          <div className={!issue?.isFundingRequest && 'mt-4'}>
+          <div className={!issue?.isFundingRequest && 'mt-4' || ""}>
             <IssueAmountInfo issue={issue} size={size} />
           </div>
         </>
@@ -299,8 +302,8 @@ export default function IssueListItem({
 
   return (
     <CardItem onClick={handleClickCard} key="default-card">
-      <div className="row align-center">
-        <div className="col-md-12 mb-3 mb-md-0">
+      <div className="row align-items-center">
+        <div className="col-md-12 mb-3">
           <div className="d-flex">
             <div className="d-flex col-md-10 text-truncate">
               <div className="me-2">
@@ -317,11 +320,11 @@ export default function IssueListItem({
             </div>
             <div className="d-flex d-none d-lg-block justify-content-end col-md-2">
               <div className="d-flex justify-content-end">
-                {variant === "multi-network" && !isMobile && (
-                  <div>
+                <If condition={variant === "multi-network"}>
+                  <ResponsiveWrapper xs={false} xl={true}>
                     <div
                       className={`d-flex py-1 pe-2 justify-content-center text-truncate border border-gray-800
-            border-radius-4 text-white-40 bg-gray-850`}
+                        border-radius-4 text-white-40 bg-gray-850 text-uppercase`}
                     >
                       <div className="d-flex flex-column justify-content-center">
                         <div
@@ -333,73 +336,83 @@ export default function IssueListItem({
                       </div>
                       {issue?.network?.chain?.chainShortName}
                     </div>
-                  </div>
-                )}
+                  </ResponsiveWrapper>
+                </If>
               </div>
             </div>
           </div>
-          {!isMobile && (
+          
+          <ResponsiveWrapper xs={false} xl={true}>
             <div className="d-flex justify-content-md-start mb-3">
               <BountyTags tags={issue?.tags} />
-              {issue?.isKyc ? (
+
+              <If condition={issue?.isKyc}>
                 <Badge
                   className={`d-flex status caption-medium py-1 px-3 
                   ms-2 bg-transparent border border-gray-700 text-gray-300`}
                   label={t("bounty:kyc.label")}
                 />
-              ) : null}
+              </If>
             </div>
-          )}
+          </ResponsiveWrapper>
 
-          <div
-            className={`${isMobile ? "" : "d-flex border-top border-gray-850"}`}
-          >
-            {!isMobile && (
-              <div className="col-md-10 mt-3 
-              d-flex align-center flex-wrap align-items-center justify-content-md-start gap-20">
-                <div className="d-flex">
-                  <BountyItemLabel label="ID">
-                    <IssueTag />
-                  </BountyItemLabel>
-                  <div className="d-sm-none d-md-block d-none d-sm-block">
-                    <BountyItemLabel label="Repository">
-                      <OverlayTrigger
-                        key="bottom-githubPath"
-                        placement="bottom"
-                        overlay={
-                          <Tooltip id={"tooltip-bottom"}>
-                            {issue?.repository?.githubPath}
-                          </Tooltip>
-                        }
-                      >
-                        <span className={`text-gray me-2 text-truncate`}>
-                          {issue?.repository?.githubPath.split("/")?.[1]}
-                        </span>
-                      </OverlayTrigger>
-                    </BountyItemLabel>
-                  </div>
+          <ResponsiveWrapper xs={false} xl={true}>
+            <div className="w-100 border-top border-gray-850"></div>
+          </ResponsiveWrapper>
+
+          <div className="row mt-3 align-items-center">
+            <ResponsiveWrapper xs={false} xl={true}>
+              <div className="row w-100 align-items-center justify-content-md-start">
+                <BountyItemLabel label="ID" className="col-auto">
+                  <IssueTag />
+                </BountyItemLabel>
+
+                <BountyItemLabel label="Repository" className="col-auto">
+                  <OverlayTrigger
+                    key="bottom-githubPath"
+                    placement="bottom"
+                    overlay={
+                      <Tooltip id={"tooltip-bottom"}>
+                        {issue?.repository?.githubPath}
+                      </Tooltip>
+                    }
+                  >
+                    <span className={`text-gray me-2 text-truncate`}>
+                      {issue?.repository?.githubPath.split("/")?.[1]}
+                    </span>
+                  </OverlayTrigger>
+                </BountyItemLabel>
+
+                <ResponsiveWrapper xs={false} xxl={true} className="col-auto">
                   <RenderIssueData state={issueState} />
-                  <div className="hide-bounty-item-md">
-                    <BountyItemLabel
-                      label="Opened on"
-                      className=".d-md-none .d-lg-block"
-                    >
-                      <span className="text-gray text-truncate">
-                        {issue?.createdAt?.toLocaleDateString("PT")}
-                      </span>
-                    </BountyItemLabel>
-                  </div>
+                </ResponsiveWrapper>
+
+                <BountyItemLabel
+                  label="Opened on"
+                  className="col-auto"
+                >
+                  <span className="text-gray text-truncate">
+                    {issue?.createdAt?.toLocaleDateString("PT")}
+                  </span>
+                </BountyItemLabel>
+
+                <div className="col d-flex justify-content-end px-0">
+                  <IssueAmountInfo issue={issue} size={size} />
                 </div>
               </div>
-            )}
-            <div
-              className={`d-flex col-md-2 mt-3 ${
-                isMobile ? "justify-content-between" : "justify-content-end"
-              }`}
-            >
-              {isMobile && <BountyTags tags={[issue?.network?.name]} />}
-              <IssueAmountInfo issue={issue} size={size} />
-            </div>
+            </ResponsiveWrapper>
+
+            <ResponsiveWrapper xs={true} xl={false}>
+              <div className="row w-100 justify-content-between">
+                <div className="col">
+                  <BountyTags tags={[issue?.network?.name]} />
+                </div>
+                
+                <div className="col-auto px-0">
+                  <IssueAmountInfo issue={issue} size={size} />
+                </div>
+              </div>
+            </ResponsiveWrapper>
           </div>
         </div>
       </div>

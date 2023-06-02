@@ -4,41 +4,19 @@ import { useRouter } from "next/router";
 import InternalLink from "components/internal-link";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
-import { useAppState } from "contexts/app-state";
-
-import useChain from "x-hooks/use-chain";
 import { useNetwork } from "x-hooks/use-network";
 
-export default function NavLinks() {
-  const { t } = useTranslation("common");
+export default function NavBarLinks() {
   const { pathname } = useRouter();
+  const { t } = useTranslation("common");
 
-  const { chain } = useChain();
-  const { state } = useAppState();
   const { getURLWithNetwork } = useNetwork();
 
   const isOnNetwork = pathname?.includes("[network]/[chain]");
 
-  function getChainShortName() {
-    const availableChains = state.Service?.network?.availableChains;
-    const isOnAvailableChain = availableChains?.find(({ chainId }) => +chainId === +state.connectedChain?.id);
-
-    if (chain) return chain.chainShortName;
-
-    if (isOnAvailableChain) {
-      return isOnAvailableChain.chainShortName;
-    }
-
-    if (availableChains?.length) return availableChains[0].chainShortName;
-
-    return null;
-  }
-
   const links = [
     {
-      href: getURLWithNetwork("/bounties", {
-        chain: getChainShortName()
-      }),
+      href: getURLWithNetwork("/bounties"),
       label: t("main-nav.nav-avatar.bounties"),
       isVisible: isOnNetwork
     },
@@ -48,8 +26,8 @@ export default function NavLinks() {
       isVisible: isOnNetwork
     },
     {
-      href: "/bounty-hall",
-      label: t("main-nav.bounty-hall"),
+      href: "/explore",
+      label: t("main-nav.explore"),
       isVisible: true
     },
     {

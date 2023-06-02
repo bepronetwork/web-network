@@ -129,7 +129,7 @@ export default function CreatePullRequestModal({
           disabledIcon,
           postIcon,
           isSelected: !!selectedBranch && branch === selectedBranch,
-          spaceBetween: true
+          justify: "between"
         };
       }))
       .then(setOptions)

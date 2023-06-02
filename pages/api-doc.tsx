@@ -5,6 +5,7 @@ import axios from "axios";
 import getConfig from "next/config";
 import dynamic from "next/dynamic";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SwaggerUI = dynamic<{ spec: Record<string, any>; }>(import('swagger-ui-react'), { ssr: false });
 
 export const getServerSideProps = async () => {

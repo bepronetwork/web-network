@@ -3,22 +3,15 @@ import {Col, Row} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import ContractButton from "components/contract-button";
 import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import {WarningSpan} from "components/warning-span";
 
 import {useAppState} from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 
-import { RegistryEvents } from "interfaces/enums/events";
 import {Token, TokenType} from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
-import useBepro from "x-hooks/use-bepro";
-
-interface SelectedTokens {
-  [tokenType: TokenType | string]: string[];
-}
 
 export default function TokensSettings({
   isGovernorRegistry = false,
@@ -38,18 +31,15 @@ export default function TokensSettings({
   const [isLoadingTokens, setIsLoadingTokens] = useState<boolean>(false);
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>();
   const [allowedRewardTokensList, setAllowedRewardTokensList] = useState<Token[]>();
-  const [currentAllowedTokens, setCurrentAllowedTokens] = useState<SelectedTokens>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
   const [allowedTransactionalTokensList, setAllowedTransactionalTokensList] = useState<Token[]>();
 
-  const { getTokens, processEvent } = useApi();
-  const { handleChangeAllowedTokens } = useBepro();
+  const { getTokens } = useApi();
 
   const {
     fields
   } = useNetworkSettings();
 
-  const tokenToAddress = ({ address } : Token) => address;
   const tokenNotInSelected = ({ address }: Token,
     selecteds: Token[],
     type: "transactional" | "reward") => {
@@ -95,11 +85,6 @@ export default function TokensSettings({
           availableTransactional[dbToken.address] = dbToken;
       });
 
-      setCurrentAllowedTokens({
-        "transactional": dbTransactionalAllowed.map(tokenToAddress),
-        "reward": dbRewardAllowed.map(tokenToAddress)
-      });
-
       if (isGovernorRegistry) {
         setAllowedRewardTokensList(Object.values(availableReward));
         setAllowedTransactionalTokensList(Object.values(availableTransactional));
@@ -127,34 +112,6 @@ export default function TokensSettings({
     setAllowedTransactionalTokensList((oldState) =>  [...(oldState || []), newToken]);
   }
 
-  async function updateTransactionalTokens(tokenType: TokenType){
-    const isTransactional = tokenType === 'transactional';
-    const currentTokens = currentAllowedTokens[tokenType]
-
-    const selectedTokens = isTransactional ? selectedTransactionalTokens : selectedRewardTokens;
-    if(!currentTokens || !selectedTokens) return
-    const selectedTokensAddress = selectedTokens.map(({address})=> address)
-    
-    const toAdd = selectedTokensAddress.filter((address)=> !currentTokens.includes(address))
-    const toRemove = currentTokens.filter((address)=> !selectedTokensAddress.includes(address))
-
-    const transactions = []
-
-    if (toAdd.length)
-      transactions.push(handleChangeAllowedTokens(toAdd, isTransactional))
-    if (toRemove.length)
-      transactions.push(handleChangeAllowedTokens(toRemove, isTransactional, false))
-
-    Promise.all(transactions).then(async (txs : { blockNumber: number }[]) => {
-      const fromBlock = txs.reduce((acc, tx) => Math.min(acc, tx.blockNumber), Number.MAX_SAFE_INTEGER)
-
-      await processEvent(RegistryEvents.ChangeAllowedTokens, undefined, { fromBlock });
-
-      await getAllowedTokensContract();
-    })
-  }
-
-
   useEffect(() => {
     if (!state.Service?.active || !state.connectedChain?.id) return;
 
@@ -174,22 +131,6 @@ export default function TokensSettings({
     fields.allowedRewards.setter(selectedRewardTokens);
     onChangeCb?.(selectedTransactionalTokens, selectedRewardTokens);
   }, [selectedRewardTokens, selectedTransactionalTokens]);
-
-
-  function renderButtons(tokenType: TokenType) {
-    return (
-      <div className="d-flex" key={`col-${tokenType}`}>
-        <ContractButton className="mb-2" onClick={()=> updateTransactionalTokens(tokenType)}>
-          <span>
-          {tokenType === 'transactional'
-              ? t("custom-network:save-transactional-config")
-              : t("custom-network:save-reward-config")}
-          </span>
-        </ContractButton>
-      </div>
-    );
-  }
-  
 
   function handleSelectTokens(type: TokenType) {
     const tokenData = {

@@ -77,7 +77,7 @@ export default function PriceConversorModal({
     setValue(value?.toNumber())
   },[value])
 
-  const SingleValue = ({children, ...props}: SingleValueProps<any>) => {
+  const SingleValue = ({children, ...props}: SingleValueProps) => {
 
     return (
     <RSComponents.SingleValue {...props} className="proposal__select__currency">

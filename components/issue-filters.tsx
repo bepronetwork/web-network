@@ -102,7 +102,7 @@ export default function IssueFilters({ onlyTimeFrame = false }) {
           <FilterTimeFrame />
         ) : (
           <>
-            {!["/bounty-hall"].includes(pathname) && (
+            {!["/explore"].includes(pathname) && (
               <div className="bg-gray-900">
                 <IssueFilterBox
                   className="h-100 border border-right border-gray-800"

@@ -10,6 +10,7 @@ interface ResponsiveWrapperProps {
   xl?: boolean;
   xxl?: boolean;
   children?: ReactNode;
+  className?: string;
 }
 
 export default function ResponsiveWrapper({
@@ -19,7 +20,8 @@ export default function ResponsiveWrapper({
   lg,
   xl,
   xxl,
-  children
+  children,
+  className
 } : ResponsiveWrapperProps) {
   function getClass(condition, ifTrue, ifFalse) {
     if (typeof condition === "boolean")
@@ -37,6 +39,7 @@ export default function ResponsiveWrapper({
         getClass(lg, "d-lg-flex", "d-lg-none"),
         getClass(xl, "d-xl-flex", "d-xl-none"),
         getClass(xxl, "d-xxl-flex", "d-xxl-none"),
+        className,
       ])}
     >
       {children}

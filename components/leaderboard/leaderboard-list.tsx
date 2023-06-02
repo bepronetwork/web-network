@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import {FormControl, InputGroup} from "react-bootstrap";
-import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
@@ -10,12 +9,14 @@ import SearchIcon from "assets/icons/search-icon";
 
 import Button from "components/button";
 import CustomContainer from "components/custom-container";
+import If from "components/If";
 import InfiniteScroll from "components/infinite-scroll";
 import IssueFilters from "components/issue-filters";
 import LeaderBoardListBar from "components/leaderboard/leaderboard-list-bar";
 import LeaderBoardListItem from "components/leaderboard/leaderboard-list-item";
 import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
+import ResponsiveWrapper from "components/responsive-wrapper";
 import ScrollTopButton from "components/scroll-top-button";
 
 import {useAppState} from "contexts/app-state";
@@ -148,8 +149,6 @@ export default function LeaderBoardList() {
 
   
   function isRenderFilter() {
-    if(isMobile) return false
-
     return (!isListEmpy() || (isListEmpy() && hasFilter()))
   }
 
@@ -158,76 +157,80 @@ export default function LeaderBoardList() {
       className={isProfilePage && "px-0 mx-0" || ""}
       childWrapperClassName={isProfilePage && "justify-content-left" || ""}
     >
-      {isRenderFilter() ? (
-        <div
-          className={"d-flex align-items-center gap-20 list-actions sticky-top bg-dark"}
-        >
-          <div className="w-100">
-            <InputGroup className="border-radius-8">
-              <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
-                <SearchIcon />
-              </InputGroup.Text>
+      <If condition={isRenderFilter()}>
+        <ResponsiveWrapper xs={false} xl={true}>
+          <div
+            className={"row w-100 align-items-center list-actions sticky-top bg-dark"}
+          >
+            <div className="col">
+              <InputGroup className="border-radius-8">
+                <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
+                  <SearchIcon />
+                </InputGroup.Text>
 
-              <FormControl
-                value={searchState}
-                onChange={(e) => setSearchState(e.target.value)}
-                className="p-2"
-                placeholder={t("leaderboard:search")}
-                onKeyDown={handleSearch}
+                <FormControl
+                  value={searchState}
+                  onChange={(e) => setSearchState(e.target.value)}
+                  className="p-2"
+                  placeholder={t("leaderboard:search")}
+                  onKeyDown={handleSearch}
+                />
+
+                {showClearButton() && (
+                  <button
+                    className="btn bg-black border-0 py-0 px-3"
+                    onClick={handleClearSearch}
+                  >
+                    <CloseIcon width={10} height={10} />
+                  </button>
+                )}
+              </InputGroup>
+            </div>
+
+            <div className="col-auto d-flex align-items-center">
+              <span className="caption-small text-white-50 text-nowrap mr-1">
+                {t("sort.label")}
+              </span>
+
+              <ListSort
+                options={[
+                  {
+                    value: "most-nfts",
+                    sortBy: "numberNfts",
+                    order: "DESC",
+                    label: t("leaderboard:sort.most-nfts")
+                  },
+                  {
+                    value: "lowest-nfts",
+                    sortBy: "numberNfts",
+                    order: "ASC",
+                    label: t("leaderboard:sort.lowest-nfts")
+                  },
+                  {
+                    value: "newest",
+                    sortBy: "updatedAt",
+                    order: "DESC",
+                    label: t("sort.types.newest")
+                  },
+                  {
+                    value: "oldest",
+                    sortBy: "updatedAt",
+                    order: "ASC",
+                    label: t("sort.types.oldest")
+                  },
+                ]}
               />
+            </div>
 
-              {showClearButton() && (
-                <button
-                  className="btn bg-black border-0 py-0 px-3"
-                  onClick={handleClearSearch}
-                >
-                  <CloseIcon width={10} height={10} />
-                </button>
-              )}
-            </InputGroup>
+            <div className="col-auto">
+              <IssueFilters onlyTimeFrame={true} />
+            </div>
           </div>
-
-          <div className="d-flex align-items-center">
-            <span className="caption-small text-white-50 text-nowrap mr-1">
-              {t("sort.label")}
-            </span>
-
-            <ListSort
-              options={[
-                {
-                  value: "most-nfts",
-                  sortBy: "numberNfts",
-                  order: "DESC",
-                  label: t("leaderboard:sort.most-nfts")
-                },
-                {
-                  value: "lowest-nfts",
-                  sortBy: "numberNfts",
-                  order: "ASC",
-                  label: t("leaderboard:sort.lowest-nfts")
-                },
-                {
-                  value: "newest",
-                  sortBy: "updatedAt",
-                  order: "DESC",
-                  label: t("sort.types.newest")
-                },
-                {
-                  value: "oldest",
-                  sortBy: "updatedAt",
-                  order: "ASC",
-                  label: t("sort.types.oldest")
-                },
-              ]}
-            />
-          </div>
-
-          <IssueFilters onlyTimeFrame={true} />
-        </div>
-      ) : (
-        ""
-      )}
-        <LeaderBoardListBar/>
+        </ResponsiveWrapper>
+      </If>
+      
+      <LeaderBoardListBar/>
+      
       {(truncatedData && (
         <div className="row justify-content-center mb-3 pt-5">
           <div className="d-flex col-6 align-items-center justify-content-center">

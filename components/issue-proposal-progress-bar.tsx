@@ -46,7 +46,6 @@ export default function IssueProposalProgressBar() {
   }
 
   function renderSecondaryText(stepLabel, index) {
-    const secondaryTextStyle = { top: "20px" };
     const isHigher = creationDate &&
                     (new Date(chainTime) > addSeconds(creationDate, +state.Service?.network?.times?.draftTime));
 

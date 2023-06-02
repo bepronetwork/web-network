@@ -69,7 +69,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
 
   useEffect(auth.validateGhAndWallet, [session?.data, currentUser?.walletAddress]);
-  useEffect(auth.updateWalletAddress, [currentUser]);
+  useEffect(auth.updateWalletAddress, [currentUser?.connected]);
   useEffect(auth.listenToAccountsChanged, [Service]);
   useEffect(auth.updateWalletBalance, [currentUser?.walletAddress, Service?.active?.network]);
   useEffect(auth.updateKycSession, [state?.currentUser?.login,

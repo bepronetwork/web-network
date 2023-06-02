@@ -3,7 +3,7 @@ import React from "react";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {GetServerSideProps} from "next/types";
 
-import ExplorePage from "pages/bounty-hall";
+import ExplorePage from "pages/explore";
 
 export default function NetworkBountyHall() {
   return <ExplorePage/>;

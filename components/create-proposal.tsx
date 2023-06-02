@@ -43,7 +43,15 @@ interface SameProposal {
   }[];
 }
 
-function SingleValue (props: SingleValueProps<any>) {
+interface SingleValueData {
+  githubLogin: string;
+  label: string;
+  isMergeable: boolean;
+  merged: boolean;
+  isDraft: boolean;
+}
+
+function SingleValue (props: SingleValueProps<SingleValueData>) {
   const data = props.getValue()[0];
   return (
   <RSComponents.SingleValue {...props}>

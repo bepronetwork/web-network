@@ -95,12 +95,12 @@ export default function SelectChainDropdown({
   async function updateOptions() {
     if (!supportedChains || (isOnNetwork && !Service?.network?.availableChains)) return;
 
-    const configuredChains = supportedChains.filter(isChainConfigured);
-
-    const chainsWithIcon = await Promise.all(configuredChains.map(async (chain) => ({
-      ...chain,
-      icon: await getChainIcon(chain.icon)
-    })));
+    const chainsWithIcon = await Promise.all(supportedChains
+      .filter(isChainConfigured)
+      .map(async (chain) => ({
+        ...chain,
+        icon: await getChainIcon(chain.icon)
+      })));
 
     if (isOnNetwork)
       setOptions(chainsWithIcon.map(chain =>

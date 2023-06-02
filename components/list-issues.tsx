@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import {FormControl, InputGroup} from "react-bootstrap";
-import {isMobile} from "react-device-detect";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
@@ -288,8 +287,6 @@ export default function ListIssues({
 
 
   function isRenderFilter() {
-    if(isMobile) return false;
-
     return (!isListEmpy() || (isListEmpy() && hasFilter()));
   }
 
@@ -302,7 +299,7 @@ export default function ListIssues({
       col={isProfile || isManagement ? "col-12" : undefined}
     >
       {(isBountyHall || isProfile) && (
-        <div className="d-flex flex-row align-items-center">
+        <div className="d-flex flex-row align-items-center mb-2">
           <h3 className="text-capitalize font-weight-medium">{listTitle}</h3>
           <div className="ms-2">
             <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">{totalBounties}</span>

@@ -1,23 +1,22 @@
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { isMobile } from "react-device-detect";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import Avatar from "components/avatar";
+import BountySettings from "components/bounty-hero/bounty-settings";
 import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyTags from "components/bounty/bounty-tags";
 import CustomContainer from "components/custom-container";
 import If from "components/If";
 import PriceConversor from "components/price-conversor";
+import ResponsiveWrapper from "components/responsive-wrapper";
 
 import { useAppState } from "contexts/app-state";
 
 import { getIssueState } from "helpers/handleTypeIssue";
 import { truncateAddress } from "helpers/truncate-address";
-
-import BountySettings from "./bounty-settings";
 
 export default function BountyHero({
   handleEditIssue,
@@ -30,7 +29,9 @@ export default function BountyHero({
   const { t } = useTranslation(["bounty", "common"]);
 
   const { state } = useAppState();
+
   const { network } = router.query;
+  
   const currentState = getIssueState({
     state: state.currentBounty?.data?.state,
     amount: state.currentBounty?.data?.amount,
@@ -52,7 +53,7 @@ export default function BountyHero({
         <div className="d-flex flex-row">
           <div className="col-12">
             <div className="d-flex justify-content-between">
-              <div>
+              <div className="d-flex align-items-center">
                 <span className="me-1 text-white-30 text-uppercase">
                   {network} /
                 </span>
@@ -106,7 +107,7 @@ export default function BountyHero({
               </div>
               <div>{renderPriceConversor()}</div>
             </div>
-            <h5 className="mt-3 break-title">
+            <h5 className="mt-4 break-title">
               {state.currentBounty?.data?.title}
             </h5>
             <If condition={!!state.currentBounty?.data?.tags?.length}>
@@ -114,64 +115,60 @@ export default function BountyHero({
                 <BountyTags tags={state.currentBounty?.data?.tags} />
               </div>
             </If>
-            {!isMobile && (
-              <>
-                <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
-                  <If condition={!!state.currentBounty?.data?.repository}>
-                    <BountyItemLabel label={t("common:misc.repository")}>
-                      <span className={`text-gray me-2 text-truncate`}>
-                        {
-                          state.currentBounty?.data?.repository?.githubPath.split("/")?.[0]
-                        }
-                      </span>
-                    </BountyItemLabel>
-                  </If>
-
-                  <BountyItemLabel label={t("common:misc.branch")}>
+            
+            <ResponsiveWrapper xs={false} lg={true}>
+              <div className="row mt-3 align-items-center justify-content-md-start gap-20">
+                <If condition={!!state.currentBounty?.data?.repository}>
+                  <BountyItemLabel label={t("common:misc.repository")} className="col-auto">
                     <span className={`text-gray me-2 text-truncate`}>
-                      {state.currentBounty?.data?.branch}
+                      {
+                        state.currentBounty?.data?.repository?.githubPath.split("/")?.[0]
+                      }
                     </span>
                   </BountyItemLabel>
+                </If>
 
-                  <BountyItemLabel label={t("info.working")}>
-                    <span className={`text-gray me-2 text-truncate`}>
-                      {state.currentBounty?.data?.working?.length}
+                <BountyItemLabel label={t("common:misc.branch")} className="col-auto">
+                  <span className={`text-gray me-2 text-truncate`}>
+                    {state.currentBounty?.data?.branch}
+                  </span>
+                </BountyItemLabel>
+
+                <BountyItemLabel label={t("info.working")} className="col-auto">
+                  <span className={`text-gray me-2 text-truncate`}>
+                    {state.currentBounty?.data?.working?.length}
+                  </span>
+                </BountyItemLabel>
+
+                <BountyItemLabel label={t("common:misc.owner")} className="col-auto">
+                  <>
+                    <div className="d-flex flex-column justify-content-center">
+                      <Avatar
+                        size="xsm"
+                        className="me-2"
+                        userLogin={state.currentBounty?.data?.creatorGithub}
+                      />{" "}
+                    </div>
+                    <span>
+                      {state.currentBounty?.data?.creatorGithub
+                        ? state.currentBounty?.data?.creatorGithub
+                        : truncateAddress(state.currentBounty?.data?.creatorAddress)}
+                    </span>
+                  </>
+                </BountyItemLabel>
+
+                <If condition={!!state.currentBounty?.data?.createdAt}>
+                  <BountyItemLabel
+                    label={t("common:misc.opened-on")}
+                    className="col-auto"
+                  >
+                    <span className="text-gray text-truncate">
+                      {state.currentBounty?.data?.createdAt?.toLocaleDateString("PT")}
                     </span>
                   </BountyItemLabel>
-                </div>
-
-                <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
-                  <div className="d-flex align-items-center">
-                    <BountyItemLabel label={t("common:misc.owner")}>
-                      <>
-                        <div className="d-flex flex-column justify-content-center">
-                          <Avatar
-                            size="xsm"
-                            className="me-2"
-                            userLogin={state.currentBounty?.data?.creatorGithub}
-                          />{" "}
-                        </div>
-                        <span>
-                          {state.currentBounty?.data?.creatorGithub
-                            ? state.currentBounty?.data?.creatorGithub
-                            : truncateAddress(state.currentBounty?.data?.creatorAddress)}
-                        </span>
-                      </>
-                    </BountyItemLabel>
-                  </div>
-                  <If condition={!!state.currentBounty?.data?.createdAt}>
-                    <BountyItemLabel
-                      label={t("common:misc.opened-on")}
-                      className=".d-md-none .d-lg-block"
-                    >
-                      <span className="text-gray text-truncate">
-                        {state.currentBounty?.data?.createdAt?.toLocaleDateString("PT")}
-                      </span>
-                    </BountyItemLabel>
-                  </If>
-                </div>
-              </>
-            )}
+                </If>
+              </div>
+            </ResponsiveWrapper>
           </div>
         </div>
       </CustomContainer>

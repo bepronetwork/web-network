@@ -3,7 +3,6 @@ import {useContext, useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
-import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
 import NetworkListBar from "components/networks-list/network-list-bar";
 import NetworkListItem from "components/networks-list/network-list-item";

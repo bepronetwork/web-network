@@ -234,21 +234,24 @@ $utilities: map-merge(
       map-merge(
         map-get($utilities, "border"),
         (
-          state: hover
+          state: hover,
+          responsive: true
         )
       ),
     "border-bottom":
       map-merge(
         map-get($utilities, "border-bottom"),
         (
-          state: hover
+          state: hover,
+          responsive: true
         )
       ),
     "border-top":
       map-merge(
         map-get($utilities, "border-top"),
         (
-          state: hover
+          state: hover,
+          responsive: true
         )
       ),
     "border-color":

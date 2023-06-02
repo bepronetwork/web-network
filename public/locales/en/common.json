@@ -72,7 +72,7 @@
     "my-network": "My Network",
     "networks": "Networks",
     "nav-avatar": {
-      "view-profile": "View profile",
+      "my-profile": "My profile",
       "profile": "Profile",
       "wallet": "Wallet",
       "voting-power": "Voting Power",
@@ -205,7 +205,9 @@
     "opened-on": "Opened on",
     "owner": "Owner",
     "apply": "apply",
-    "create": "Create"
+    "create": "Create",
+    "bounty": "Bounty",
+    "choose-one": "Choose one"
   },
   "modals": {
     "help-modal": {
@@ -267,12 +269,12 @@
       "title": "Set bounty as draft"
     },
     "mobile-information": {
-      "our-web-application": "Our web application currently does not support a mobile version.",
-      "if-you-want": "If you want to use it you must connect to our web application via desktop.",
-      "stay-updated": "Stay updated on"
+      "title": "MetaMask Mobile",
+      "description": "MetaMask is not available on this mobile browser. In order to interact with this DApp on a mobile you need to access using Metamask app built-in browser.",
+      "open-in-metamask": "Open in MetaMask"
     },
     "web3-dialog": {
-      "title": "MetaMask not detected.",
+      "title": "MetaMask not Detected",
       "eth-not-available": "No ETH account available",
       "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
     },

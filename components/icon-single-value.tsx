@@ -1,12 +1,17 @@
 import { components } from "react-select";
 
+import clsx from "clsx";
+
 export default function IconSingleValue(props) {
   const { SingleValue } = components;
 
   return(
     <SingleValue
       {...props}
-      className={`d-flex flex-row align-items-center ${props.data.spaceBetween && "justify-content-between" || ""}`}
+      className={clsx([
+        "d-flex flex-row align-items-center",
+        props.data.justify && `justify-content-${props.data.justify}` || ""
+      ])}
     >
       { props.data.preIcon &&
         <span className="mr-1">

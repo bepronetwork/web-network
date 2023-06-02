@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, {useState} from "react";
 import {Button} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";

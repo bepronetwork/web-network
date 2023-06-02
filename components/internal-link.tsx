@@ -19,6 +19,7 @@ interface InternalLinkProps {
   style?: CSSProperties;
   outline?: boolean;
   title?: string;
+  onClick?: () => void;
 }
 
 export default function InternalLink({
@@ -33,6 +34,7 @@ export default function InternalLink({
   activeClass,
   style,
   outline,
+  onClick,
   ...props
 }: InternalLinkProps) {
   const { asPath, pathname } = useRouter();
@@ -67,6 +69,7 @@ export default function InternalLink({
         target={`${blank ? "_blank" : ""}`}
         style={{ ...style }}
         title={props?.title}
+        onClick={onClick}
       >
         {(iconBefore && props.icon) || ""}
         {(props.label && <span>{props.label}</span>) || ""}

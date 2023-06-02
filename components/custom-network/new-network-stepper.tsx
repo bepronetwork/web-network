@@ -18,7 +18,6 @@ import Stepper from "components/stepper";
 import {useAppState} from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import {changeLoadState} from "contexts/reducers/change-load";
-import {changeNeedsToChangeChain} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {

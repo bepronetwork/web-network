@@ -7,7 +7,7 @@ export default function ArrowRight(props: SVGProps<SVGSVGElement>) {
       height="8"
       viewBox="0 0 8 8"
       fill="none"
-      color="white"
+      color="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
