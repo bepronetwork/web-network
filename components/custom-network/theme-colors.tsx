@@ -8,6 +8,7 @@ import CopyIcon from "assets/icons/copy-icon";
 
 import Button from "components/button";
 import ColorInput from "components/color-input";
+import { ThemeColors } from "interfaces/network";
 
 const MoreColoursButton = ({label, isVisible, onClick}) => {
   const posfix = isVisible ? <ArrowUp width={6.33} height={3.22} /> : <ArrowDown width={6.33} height={3.22} />;
@@ -83,7 +84,7 @@ const ThemeStringInput = ({label, updateKey=0, initialText, error, onChange, onB
   </>
 }
 
-export default function ThemeColors({ colors, similar, setColor }) {
+export default function ThemeColors ({ colors, similar, setColor } : {colors:ThemeColors, similar:string[], setColor: any}) {
   const { t } = useTranslation("custom-network");
 
   const [colorsEntries, setColorsEntries] = useState([]);
