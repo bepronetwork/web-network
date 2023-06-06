@@ -227,6 +227,10 @@
       "provide-feedback": {
         "title": "provide feedback",
         "content": "Product feedback and requests."
+      },
+      "terms-and-conditions": {
+        "title": "Terms and Conditions",
+        "content": "Product feedback and requests."
       }
     },
     "invalid-account-wallet": {

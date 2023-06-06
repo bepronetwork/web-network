@@ -144,7 +144,7 @@ li {
     padding-bottom: 0;
   }
   &-content {
-    background-color: $bg-shadow;
+    background-color: $gray-900;
   }
   &-header,
   &-footer {
@@ -152,8 +152,9 @@ li {
     border: 0;
   }
   .close-button {
-    width: 20px;
-    top: 1.5%;
+    width: 24px;
+    top: 16px;
+    right: 16px;
   }
 
   .close-icon-search {
@@ -1327,7 +1328,7 @@ a.row-button svg {
   height: 24px;
 }
 
-.text-white:hover, .text-gray-150:hover {
+.text-white:hover:not(.btn), .text-gray-150:hover {
   svg path {
     fill: white;
   }

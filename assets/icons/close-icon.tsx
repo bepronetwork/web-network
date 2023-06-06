@@ -3,16 +3,34 @@ import { SVGProps } from "react";
 export default function CloseIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      viewBox="0 0 18 18"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
       fill="none"
-      color="white"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <path
-        d="M17.4142 3.41421C18.1953 2.63317 18.1953 1.36684 17.4142 0.585787C16.6332 -0.195262 15.3668 -0.195262 14.5858 0.585786L9 6.17157L3.41421 0.585787C2.63317 -0.195262 1.36683 -0.195262 0.585786 0.585787C-0.195262 1.36684 -0.195262 2.63317 0.585786 3.41421L6.17157 9L0.585786 14.5858C-0.195262 15.3668 -0.195262 16.6332 0.585786 17.4142C1.36683 18.1953 2.63316 18.1953 3.41421 17.4142L9 11.8284L14.5858 17.4142C15.3668 18.1953 16.6332 18.1953 17.4142 17.4142C18.1953 16.6332 18.1953 15.3668 17.4142 14.5858L11.8284 9L17.4142 3.41421Z"
-        fill="currentColor"
-      />
+      <g clipPath="url(#clip0_728_14315)">
+        <path
+          d="M18.75 5.25L5.25 18.75"
+          stroke="white"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M18.75 18.75L5.25 5.25"
+          stroke="white"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_728_14315">
+          <rect width="24" height="24" fill="white" />
+        </clipPath>
+      </defs>
     </svg>
   );
 }

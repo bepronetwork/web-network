@@ -4,9 +4,11 @@ import { kebabCase } from "lodash";
 
 import CloseIcon from "assets/icons/close-icon";
 
+import Button from "components/button";
+
 import { Modal as ModalProps } from "types/modal";
 
-import Button from "./button";
+import useBreakPoint from "x-hooks/use-breakpoint";
 
 export default function Modal({
   title = "",
@@ -30,9 +32,10 @@ export default function Modal({
   isExecuting = false,
   ...params
 }: ModalProps) {
+  const { isMobileView } = useBreakPoint();
 
   if (!params.show)
-    return <></>
+    return <></>;
 
   const modalTitle = `${kebabCase(key || title)}-modal`;
 
@@ -73,6 +76,7 @@ export default function Modal({
       aria-describedby={modalTitle}
       id={modalTitle}
       backdrop={backdrop}
+      fullscreen={isMobileView as string | true}
       {...params}
     >
       <ModalBootstrap.Header
@@ -81,11 +85,11 @@ export default function Modal({
         } text-break`}
       >
         <ModalBootstrap.Title
-          className={`pt-3 text-white ${titleClass || ""} ${
+          className={`text-white ${titleClass || ""} ${
             centerTitle ? "text-center w-100" : ""
           }`}
         >
-          <h3>{titleComponent || title}</h3>
+          <h4>{titleComponent || title}</h4>
         </ModalBootstrap.Title>
 
         {subTitle || subTitleComponent && <p className="text-white caption-small">{subTitleComponent || subTitle }</p>}
@@ -93,7 +97,7 @@ export default function Modal({
         {onCloseClick && (
           <Button
             transparent
-            className="close-button p-1 position-absolute end-94 text-gray"
+            className="close-button p-0 position-absolute text-gray not-svg"
             onClick={onCloseClick}
             disabled={isExecuting||onCloseDisabled}
           >
