@@ -17,6 +17,7 @@ import {error} from "services/logging";
 const COLS_TO_CAST = ["amount", "fundingAmount"];
 const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
 const iLikeCondition = (key, value) => ({[key]: {[Op.iLike]: value}});
+const isZero = { [Op.eq]: "0" };
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -48,7 +49,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if(visible) whereCondition.visible = visible;
 
-    if (state) whereCondition.state = state;
+    if (['open', 'ready', 'proposal'].includes(state?.toString())){
+      whereCondition.state = {
+        [Op.in]: ['open', 'ready', 'proposal']
+      };
+      whereCondition.fundingAmount = isZero
+    } else if(state === 'funding'){
+      whereCondition.fundingAmount = {
+        [Op.not]: "0"
+      };
+    } else if(state) {
+      whereCondition.state = state
+      whereCondition.fundingAmount = isZero
+    }
 
     if (issueId) whereCondition.issueId = issueId;
 
