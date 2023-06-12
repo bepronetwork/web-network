@@ -104,7 +104,7 @@ export default function NetworksPage() {
         </div>
 
         <div className="d-flex d-xl-none py-4 px-3 border-bottom border-gray-850">
-          <span className="xl-semibold text-white">Networks</span>
+          <span className="xl-semibold text-white">{t("misc.networks")}</span>
         </div>
 
         <div className="mt-4">

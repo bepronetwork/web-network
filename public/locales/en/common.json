@@ -207,7 +207,8 @@
     "apply": "apply",
     "create": "Create",
     "bounty": "Bounty",
-    "choose-one": "Choose one"
+    "choose-one": "Choose one",
+    "networks": "Networks"
   },
   "modals": {
     "help-modal": {
