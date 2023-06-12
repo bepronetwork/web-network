@@ -56,7 +56,7 @@ async function main(option = 0) {
     return;
   }
 
-  const web3Host = chainData.rpc[0];
+  const web3Host = chainData.rpc.length > 1 ? chainData.rpc[1] : chainData.rpc[0];
   const env = require('dotenv').config({path: options.envFile[option]}).parsed;
   const privateKey = options.privateKey;
 
