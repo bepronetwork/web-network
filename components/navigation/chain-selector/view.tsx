@@ -11,7 +11,6 @@ export default function ChainSelectorView({
   isOnNetwork,
   onSelect,
 }: ChainSelectorViewProps) {
-  if (!isOnNetwork) return <></>;
 
   return(
     <SelectChainDropdown
