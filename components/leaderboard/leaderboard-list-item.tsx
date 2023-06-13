@@ -1,15 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { Overlay, Popover } from "react-bootstrap";
-
 import { useTranslation } from "next-i18next";
 
-import CopyIcon from "assets/icons/copy-icon";
-
-import Button from "components/button";
+import CopyButton from "components/common/buttons/copy/controller";
 import ResponsiveListItem from "components/common/responsive-list-item/view";
 import Identicon from "components/identicon";
 
-import { CopyValue } from "helpers/copy-value";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { LeaderBoard } from "interfaces/leaderboard";
@@ -20,35 +14,20 @@ interface LeaderBoardListItemProps {
 
 export default function LeaderBoardListItem({ user }: LeaderBoardListItemProps) {
   const { t } = useTranslation(["common", "council"]);
-  const [showCopy, setShowCopy] = useState(false);
-  const [target, setTarget] = useState(null);
-  const ref = useRef(null);
 
   const columns = [
     {
       secondaryLabel: user?.githubLogin || "-",
       breakpoints: { xs: false, md: true },
+      justify: "center",
     },
     {
       label: "NFTs",
       secondaryLabel: `${user?.numberNfts || 0}`,
       breakpoints: { xs: false, md: true },
-    },
+      justify: "center"
+    }
   ];
-
-  function handleCopy(event) {
-    CopyValue(user?.address)
-    setShowCopy(!showCopy)
-    setTarget(event.target)
-  }
-
-  useEffect(() => {
-    const timerId = setInterval(() => {
-      setShowCopy(false);
-    }, 1500);
-
-    return () => clearInterval(timerId);
-  }, [showCopy === true]);
 
   return (
     <ResponsiveListItem
@@ -60,6 +39,13 @@ export default function LeaderBoardListItem({ user }: LeaderBoardListItemProps) 
       }
       label={truncateAddress(user?.address)}
       columns={columns}
+      mobileColumnIndex={1}
+      action={
+        <CopyButton
+          value={user?.address}
+          popOverLabel="Address copied"
+        />
+      }
     />
   );
 }
