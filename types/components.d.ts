@@ -1,7 +1,7 @@
 import { BreakpointOptions } from "types/utils";
 
 export interface ResponsiveListItemColumnProps {
-  label: string;
+  label?: string;
   secondaryLabel?: string;
   breakpoints?: BreakpointOptions;
   currency?: string;
