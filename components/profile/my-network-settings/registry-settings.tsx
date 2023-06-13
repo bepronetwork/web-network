@@ -4,8 +4,8 @@ import {Col, Row} from "react-bootstrap";
 import {useTranslation} from "next-i18next";
 
 import Card from "components/card";
+import CopyButton from "components/common/buttons/copy/controller";
 import ContractButton from "components/contract-button";
-import CopyButton from "components/copy-button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import {FormGroup} from "components/form-group";
 import If from "components/If";

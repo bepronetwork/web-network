@@ -5,4 +5,10 @@ export interface ResponsiveListItemColumnProps {
   secondaryLabel?: string;
   breakpoints?: BreakpointOptions;
   currency?: string;
+  justify?: string;
+}
+
+export interface CopyButtonProps {
+  value: string;
+  popOverLabel?: string;
 }

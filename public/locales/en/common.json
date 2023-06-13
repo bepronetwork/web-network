@@ -208,7 +208,8 @@
     "create": "Create",
     "bounty": "Bounty",
     "choose-one": "Choose one",
-    "networks": "Networks"
+    "networks": "Networks",
+    "copied": "Copied"
   },
   "modals": {
     "help-modal": {
