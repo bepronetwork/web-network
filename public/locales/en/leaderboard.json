@@ -9,7 +9,7 @@
 "not-found": "Not found",
 "table": {
     "address": "Address",
-    "github-handle": "GithubHandle",
+    "github-handle": "Github Handle",
     "nfts": "NFTS",
     "actions": "Actions"
 }
