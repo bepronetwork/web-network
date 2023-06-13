@@ -6,7 +6,7 @@ import { ResponsiveListItemColumnProps } from "types/components";
 export default function ResponsiveListItemColumn(column: ResponsiveListItemColumnProps) {
   return(
     <ResponsiveWrapper
-      className={`col d-flex flex-row align-items-center mt-1`}
+      className={`col d-flex flex-row align-items-center justify-content-${column?.justify || "start"}`}
       {...column?.breakpoints}
     >
       <ItemAmount
