@@ -24,7 +24,7 @@ import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "context
 import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/constants";
+import {IM_AN_ADMIN, NOT_AN_ADMIN, SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
 
 import {EventName} from "interfaces/analytics";
@@ -124,7 +124,7 @@ export function useAuthentication() {
           id: (chain?.chainId || windowChainId)?.toString(),
           name: chain?.chainName || UNSUPPORTED_CHAIN,
           shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
-          explorer: chain?.blockScanner,
+          explorer: chain?.blockScanner || SUPPORT_LINK,
           events: chain?.eventsApi,
           registry: chain?.registryAddress
         }));

@@ -8,7 +8,7 @@ import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/redu
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 
-import { UNSUPPORTED_CHAIN } from "helpers/constants";
+import { SUPPORT_LINK, UNSUPPORTED_CHAIN } from "helpers/constants";
 
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
@@ -227,7 +227,7 @@ export function useDao() {
       id: (chain?.chainId || chainId)?.toString(),
       name: chain?.chainName || UNSUPPORTED_CHAIN,
       shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
-      explorer: chain?.blockScanner,
+      explorer: chain?.blockScanner || SUPPORT_LINK,
       events: chain?.eventsApi,
       registry: chain?.registryAddress
     }));

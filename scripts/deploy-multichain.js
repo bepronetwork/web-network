@@ -186,7 +186,7 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {chainTokenName, chainId, chainName, explorers, eventsUrl,} = chainData;
+    const {chainTokenName, chainId, chainName, explorers, eventsUrl, chainScan} = chainData;
     const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
@@ -198,7 +198,8 @@ async function main(option = 0) {
       TokensModel.init(sequelize);
       NetworkTokensModel.init(sequelize);
 
-      const chainScan = explorers?.length ? explorers[0].url : undefined;
+      const linkScan = explorers?.length ? explorers[0].url : chainScan;
+      const blockScanner = linkScan.indexOf("https://") == 0 ? linkScan : `https://bepro.network/`
       const eventsApi = isXNetwork ? eventsUrl : `${NEXT_PUBLIC_HOME_URL}:2096`
 
       await ChainModel.findOrCreate({
@@ -215,7 +216,7 @@ async function main(option = 0) {
           chainCurrencyDecimals: chainData?.nativeCurrency?.decimals || 18,
           registryAddress: registry,
           eventsApi: eventsApi,
-          blockScanner: chainScan,
+          blockScanner: blockScanner,
           isDefault: false,
           color: "#29b6af"
         }

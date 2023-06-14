@@ -7,7 +7,7 @@ import Indicator from "components/indicator";
 import {useAppState} from "contexts/app-state";
 import {changeChain} from "contexts/reducers/change-chain";
 
-import { UNSUPPORTED_CHAIN } from "helpers/constants";
+import { SUPPORT_LINK, UNSUPPORTED_CHAIN } from "helpers/constants";
 
 import {NetworkColors} from "interfaces/enums/network-colors";
 
@@ -29,7 +29,7 @@ export default function NetworkIdentifier() {
       id: (chain?.chainId || chainId)?.toString(),
       name: chain?.chainName || UNSUPPORTED_CHAIN,
       shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
-      explorer: chain?.blockScanner,
+      explorer: chain?.blockScanner || SUPPORT_LINK,
       events: chain?.eventsApi,
       registry: chain?.registryAddress
     }));
