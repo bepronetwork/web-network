@@ -460,6 +460,10 @@ li {
   border-bottom: 1px solid $dark-gray;
 }
 
+.min-w-bounty-hero {
+  min-height: 164px;
+}
+
 // Todo: check if can move to boostrap
 .price-conversor {
   &:hover {

@@ -1,4 +1,4 @@
-import IssueAvatars from "components/issue-avatars";
+import BountyAvatarsView from "components/bounty/avatars/view";
 import Translation from "components/translation";
 
 import { ForkInfo } from "interfaces/repos-list";
@@ -22,7 +22,7 @@ export default function ForksAvatars({
       target="_blank"
       rel="noreferrer"
     >
-      <IssueAvatars users={forks} />
+      <BountyAvatarsView users={forks} />
       <span className="caption-small">
         <Translation label="misc.forks" />
       </span>

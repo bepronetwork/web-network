@@ -41,7 +41,7 @@ export const benefactorsParser = (issue: IssueData) =>
     amount: BigNumber(benefactor.amount)
   }));
 
-export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
+export const issueParser = (issue: IssueData, overwritePr = true) : IssueBigNumberData => ({
   ...issue,
   createdAt: new Date(issue.createdAt),
   updatedAt: new Date(issue.updatedAt),
@@ -51,7 +51,7 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   fundingAmount: BigNumber(issue.fundingAmount),
   fundedAmount: BigNumber(issue.fundedAmount),
   rewardAmount: BigNumber(issue.rewardAmount),
-  pullRequests: issue?.pullRequests && pullRequestParser(issue),
+  pullRequests: (issue?.pullRequests && overwritePr) && pullRequestParser(issue),
   mergeProposals: issue?.mergeProposals && mergeProposalParser(issue),
   benefactors: issue?.benefactors && benefactorsParser(issue)
 });

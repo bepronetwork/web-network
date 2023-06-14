@@ -16,7 +16,7 @@ import Translation from "components/translation";
 
 import { useAppState } from "contexts/app-state";
 
-import { pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import { useNetwork } from "x-hooks/use-network";
@@ -24,9 +24,10 @@ import { useNetwork } from "x-hooks/use-network";
 interface ItemProps {
   data: Proposal[] | pullRequest[],
   isProposal: boolean,
+  currentBounty: IssueBigNumberData;
 }
 
-function ItemSections({ data, isProposal }: ItemProps) {
+function ItemSections({ data, isProposal, currentBounty }: ItemProps) {
   const { t } = useTranslation(["proposal", "pullrequest", "common"]);
   const {state} = useAppState();
   const router = useRouter();
@@ -35,25 +36,25 @@ function ItemSections({ data, isProposal }: ItemProps) {
   const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
   const approvalsRequired =
     branchProtectionRules ?
-      branchProtectionRules[state.currentBounty?.data?.branch]?.requiredApprovingReviewCount || 0 : 0;
+      branchProtectionRules[currentBounty?.branch]?.requiredApprovingReviewCount || 0 : 0;
   const canUserApprove = state.Service?.network?.repos?.active?.viewerPermission !== "READ";
 
   return (
     <section className="content-wrapper border-top-0 p-20 d-flex flex-column gap-2 bg-gray-900">
       {
-        data.length ?
-          React.Children.toArray(data.map((item) => {
+        data?.length ?
+          React.Children.toArray(data?.map((item) => {
             const pathRedirect = isProposal ? '/proposal' : '/pull-request';
             const valueRedirect = {
-              id: state.currentBounty?.data?.githubId,
-              repoId: state.currentBounty?.data?.repository_id,
+              id: currentBounty?.githubId,
+              repoId: currentBounty?.repository_id,
               prId: undefined,
               proposalId: undefined
             };
             const status = []
 
             const proposal =
-              state.currentBounty?.data?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
+              currentBounty?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
             const isDisputed = !!proposal?.isDisputed
             const isMerged = item?.isMerged;
 

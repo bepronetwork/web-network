@@ -9,7 +9,7 @@ import ReactSelect from "components/react-select";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
 
-interface Action {
+export interface Action {
   onClick: () => void;
   label: string;
 }

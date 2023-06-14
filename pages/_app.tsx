@@ -24,7 +24,7 @@ import RootProviders from "contexts";
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
 
-function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: AppProps) {
+function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppProps) {
 
   const {asPath} = useRouter();
   const {publicRuntimeConfig} = getConfig();
@@ -37,7 +37,7 @@ function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: 
       <GoogleAnalytics gaMeasurementId={publicRuntimeConfig.gaMeasureID} trackPageViews />
       <SessionProvider session={session}>
         <RootProviders>
-          <Seo  issueMeta={currentIssue} />
+          <Seo issueMeta={seoData} />
           <ReadOnlyContainer>
             <NoMetamaskModal />
             <InvalidAccountWalletModal/>

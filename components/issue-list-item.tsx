@@ -13,11 +13,10 @@ import TrashIcon from "assets/icons/trash-icon";
 import Badge from "components/badge";
 import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
-import BountyTags from "components/bounty/bounty-tags";
+import BountyAmountController from "components/bounty/amount-info/controller";
 import CardItem from "components/card-item";
 import ChainBadge from "components/chain-badge";
 import If from "components/If";
-import IssueAmountInfo from "components/issue-amount-info";
 import Modal from "components/modal";
 import { FlexColumn } from "components/profile/wallet-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
@@ -34,7 +33,10 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
+import useBreakPoint from "x-hooks/use-breakpoint";
 import { useNetwork } from "x-hooks/use-network";
+
+import BountyTagsView from "./bounty/bounty-tags/view";
 
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
@@ -52,6 +54,7 @@ export default function IssueListItem({
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common", "custom-network"]);
   
+  const { isMobileView } = useBreakPoint();
   const {state,dispatch} = useAppState();
   const [visible, setVisible] = useState<boolean>();
   const [isCancelable, setIsCancelable] = useState(false);
@@ -227,7 +230,7 @@ export default function IssueListItem({
             {issue?.body}
           </div>
           <div className={!issue?.isFundingRequest && 'mt-4' || ""}>
-            <IssueAmountInfo issue={issue} size={size} />
+            <BountyAmountController bounty={issue} size={size} />
           </div>
         </>
       </CardItem>
@@ -344,7 +347,7 @@ export default function IssueListItem({
           
           <ResponsiveWrapper xs={false} xl={true}>
             <div className="d-flex justify-content-md-start mb-3">
-              <BountyTags tags={issue?.tags} />
+              <BountyTagsView tags={issue?.tags} />
 
               <If condition={issue?.isKyc}>
                 <Badge
@@ -397,23 +400,18 @@ export default function IssueListItem({
                 </BountyItemLabel>
 
                 <div className="col d-flex justify-content-end px-0">
-                  <IssueAmountInfo issue={issue} size={size} />
+                  <BountyAmountController bounty={issue} size={size} />
                 </div>
               </div>
             </ResponsiveWrapper>
-
-            <ResponsiveWrapper xs={true} xl={false}>
-              <div className="row w-100 justify-content-between">
-                <div className="col">
-                  <BountyTags tags={[issue?.network?.name]} />
-                </div>
-                
-                <div className="col-auto px-0">
-                  <IssueAmountInfo issue={issue} size={size} />
-                </div>
+            <ResponsiveWrapper md={true} sm={true} xs={true} lg={false}>
+              <div className={`col d-flex justify-content-between`} >
+                {isMobileView && <BountyTagsView tags={[issue?.network?.name]} />}
+                <BountyAmountController bounty={issue} size={size} />
               </div>
             </ResponsiveWrapper>
           </div>
+
         </div>
       </div>
     </CardItem>

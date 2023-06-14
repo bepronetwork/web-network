@@ -1,43 +1,76 @@
 import React, {useEffect, useState} from "react";
 
+import { SSRConfig } from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {useRouter} from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import BountyHero from "components/bounty-hero";
-import FundingSection from "components/bounty/funding-section";
-import IssueBody from "components/bounty/issue-body";
+import BountyBody from "components/bounty/body/controller";
+import BountyHero from "components/bounty/bounty-hero/controller";
+import BountyComments from "components/bounty/comments/controller";
+import FundingSection from "components/bounty/funding-section/controller";
+import PageActions from "components/bounty/page-actions/controller";
 import TabSections from "components/bounty/tabs-sections";
 import If from "components/If";
-import IssueComments from "components/issue-comments";
-import PageActions from "components/page-actions";
 
 import {useAppState} from "contexts/app-state";
-import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import {IM_AM_CREATOR_ISSUE} from "helpers/constants";
+import { issueParser } from "helpers/issue";
 
-import { IssueData } from "interfaces/issue-data";
+import { CurrentBounty } from "interfaces/application-state";
+import { IssueData, IssueDataComment } from "interfaces/issue-data";
 
 import { api } from "services/api";
 
+import { getBountyData, getBountyComments, getPullRequestsDetails } from "x-hooks/api/get-bounty-data";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useOctokit from "x-hooks/use-octokit";
 
+interface PageBountyProps {
+  bounty: {
+    comments: IssueDataComment[];
+    data: IssueData;
+}
+  _nextI18Next?: SSRConfig;
+}
 
-export default function PageIssue() {
-  // useBounty();
-  const router = useRouter();
-
-  const [commentsIssue, setCommentsIssue] = useState([]);
+export default function PageIssue({ bounty }: PageBountyProps) {
+  const [currentBounty, setCurrentBounty] = useState<CurrentBounty>({
+    data: issueParser(bounty?.data),
+    comments: bounty?.comments,
+    lastUpdated: 0,
+  });
+  const [commentsIssue, setCommentsIssue] = useState([...currentBounty?.comments || []]);
   const [isRepoForked, setIsRepoForked] = useState<boolean>();
   const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
 
   const {state} = useAppState();
   const { getUserRepository } = useOctokit();
   const { signMessage } = useAuthentication();
+  const router = useRouter();
 
   const { id } = router.query;
+
+  async function updateBountyData(updatePrData = false) {
+    const bountyDatabase = await getBountyData(router.query)
+
+    if(updatePrData) {
+      const pullRequests = await getPullRequestsDetails(bountyDatabase?.repository?.githubPath,
+                                                        bountyDatabase?.pullRequests);
+      setCurrentBounty({
+        data: { ...issueParser(bountyDatabase), pullRequests},
+        comments: commentsIssue,
+        lastUpdated: 0
+      })
+    } else {
+      setCurrentBounty({
+        data: { ...issueParser(bountyDatabase, false), pullRequests: currentBounty?.data?.pullRequests },
+        comments: commentsIssue,
+        lastUpdated: 0
+      })
+    }
+  }
 
   async function handleEditIssue() {
     signMessage(IM_AM_CREATOR_ISSUE)
@@ -54,7 +87,7 @@ export default function PageIssue() {
   function checkForks(){
     if (!state.Service?.network?.repos?.active?.githubPath || isRepoForked !== undefined) return;
 
-    if (state.currentBounty?.data?.working?.includes(state.currentUser?.login))
+    if (bounty?.data?.working?.includes(state.currentUser?.login))
       return setIsRepoForked(true);
 
     const [, activeName] = state.Service.network.repos.active.githubPath.split("/");
@@ -75,35 +108,36 @@ export default function PageIssue() {
   function addNewComment(comment) {
     setCommentsIssue([...commentsIssue, comment]);
   }
-
-  useEffect(() => {
-    if (state.currentBounty?.comments) setCommentsIssue([...state.currentBounty?.comments || []]);
-  }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
-
+  
   useEffect(() => {
     if (!state.currentUser?.login ||
         !state.currentUser?.walletAddress ||
         !state.Service?.network?.repos?.active ||
-        !state.currentBounty?.data ||
+        !currentBounty?.data ||
         isRepoForked !== undefined) 
       return;
     checkForks();
   },[
     state.currentUser?.login, 
-    state.currentBounty?.data?.working, 
+    currentBounty?.data?.working, 
     state.Service?.network?.repos?.active,
     !state.currentUser?.walletAddress
   ]);
 
   return (
-    <BountyEffectsProvider>
+    <>
       <BountyHero 
+        currentBounty={currentBounty?.data}
+        updateBountyData={updateBountyData}
         handleEditIssue={handleEditIssue}
         isEditIssue={isEditIssue}
       />
 
-      <If condition={!!state.currentBounty?.data?.isFundingRequest}>
-        <FundingSection /> 
+      <If condition={!!currentBounty?.data?.isFundingRequest}>
+        <FundingSection 
+          currentBounty={currentBounty?.data}
+          updateBountyData={updateBountyData}
+        /> 
       </If>
 
       <PageActions
@@ -111,37 +145,54 @@ export default function PageIssue() {
         addNewComment={addNewComment}
         handleEditIssue={handleEditIssue}
         isEditIssue={isEditIssue}
+        currentBounty={currentBounty?.data}
+        updateBountyData={updateBountyData}
       />
 
       <If condition={!!state.currentUser?.walletAddress}>
-        <TabSections/>
+        <TabSections currentBounty={currentBounty?.data} />
       </If>
 
-      <IssueBody 
+      <BountyBody 
+        currentBounty={currentBounty?.data}
+        updateBountyData={updateBountyData}
         isEditIssue={isEditIssue} 
         cancelEditIssue={handleCancelEditIssue}
-        />
+      />
 
-      <IssueComments
+      <BountyComments
         comments={commentsIssue}
-        repo={state.currentBounty?.data?.repository?.githubPath}
+        repo={currentBounty?.data?.repository?.githubPath}
         issueId={id}
       />
-    </BountyEffectsProvider>
+      {console.log('currentBounty', currentBounty)}
+    </>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
-  const { id, repoId, network, chain } = query;
+  const bountyDatabase = await getBountyData(query)
+
+  const githubComments = await getBountyComments(bountyDatabase?.repository?.githubPath, +bountyDatabase?.githubId)
+
+  const pullRequestsDetails = await getPullRequestsDetails(bountyDatabase?.repository?.githubPath,
+                                                           bountyDatabase?.pullRequests);
   
-  const currentIssue = await api
-    .get<IssueData>(`/issue/seo/${repoId}/${id}/${network}/${chain}`)
-    .then(({ data }) => data)
-    .catch(() => null);
+  const bounty = {
+    comments: githubComments,
+    data: {...bountyDatabase, pullRequests: pullRequestsDetails}
+  }
+  
+  const seoData: Partial<IssueData> = {
+    title: bountyDatabase?.title,
+    body: bountyDatabase?.body,
+    issueId: bountyDatabase?.issueId
+  }
 
   return {
     props: {
-      currentIssue,
+      seoData,
+      bounty,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

@@ -1,22 +1,19 @@
-import { useEffect, useState } from "react";
-
 import { useTranslation } from "next-i18next";
 
 import ItemSections from "components/bounty/tabs-sections/item-sections";
 import CustomContainer from "components/custom-container";
 import TabbedNavigation from "components/tabbed-navigation";
 
-import { useAppState } from "contexts/app-state";
-
+import { IssueBigNumberData } from "interfaces/issue-data";
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
-function TabSections(){
+function TabSections({
+  currentBounty
+}: { currentBounty: IssueBigNumberData }){
   const { t } = useTranslation("bounty");
-
-  const {state} = useAppState();
   
-  const [pullRequests, setPullRequests] = useState(state.currentBounty?.data?.pullRequests)
-  const [proposals, setProposals] = useState(state.currentBounty?.data?.mergeProposals)
+  const pullRequests = currentBounty?.pullRequests
+  const proposals = currentBounty?.mergeProposals
 
   const tabs: TabbedNavigationItem[] = [
     {
@@ -24,20 +21,17 @@ function TabSections(){
       eventKey: "proposals",
       title: t("proposal:labelWithCount", { count: proposals?.length || 0 }),
       description: t("description_proposal"),
-      component: <ItemSections isProposal data={proposals}/>
+      component: <ItemSections isProposal data={proposals} currentBounty={currentBounty}/>
     },
     {
       isEmpty: !pullRequests?.length,
       eventKey: "pull-requests",
       title: t("pull-request:labelWithCount", { count: pullRequests?.length || 0 }),
       description: t("description_pull-request"),
-      component: <ItemSections isProposal={false} data={pullRequests}/>
+      component: <ItemSections isProposal={false} data={pullRequests} currentBounty={currentBounty}/>
 
     }
   ];
-
-  useEffect(()=> setPullRequests(state.currentBounty?.data?.pullRequests),[state.currentBounty?.data?.pullRequests])
-  useEffect(()=> setProposals(state.currentBounty?.data?.mergeProposals),[state.currentBounty?.data?.mergeProposals])
   
   if(!proposals?.length  && !pullRequests?.length)
     return <></>;

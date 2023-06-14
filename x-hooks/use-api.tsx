@@ -148,7 +148,7 @@ export default function useApi() {
       }>(`/search/issues?${params}`)
       .then(({ data }) => ({
         ...data,
-        rows: data.rows.map(issueParser)
+        rows: data.rows.map(issue => issueParser(issue))
       }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -175,7 +175,7 @@ export default function useApi() {
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => data.map(issueParser))
+      .then(({ data }): IssueBigNumberData[] => data.map(issue => issueParser(issue)))
       .catch((): IssueBigNumberData[] => ([]));
   }
 
