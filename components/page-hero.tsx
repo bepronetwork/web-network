@@ -61,27 +61,33 @@ function InfoComponent(info: InfosHero) {
 
 export default function PageHero({ title, subtitle, infos }: PageHeroProps) {
   return (
-    <div className="banner-shadow">
-      <CustomContainer>
-        <div className="d-flex flex-column">
-          <div className="d-flex flex-row">
-            <h2 className="text-white mr-1">{title}</h2>
-          </div>
+    <div>
+      <div className="d-flex d-xl-none py-4 px-3 border-bottom border-gray-850">
+        <span className="xl-semibold text-white">{title}</span>
+      </div>
 
-          {subtitle && (
-            <span
+      <div className="banner-shadow d-none d-xl-flex">
+        <CustomContainer>
+          <div className="d-flex flex-column">
+            <div className="d-flex flex-row">
+              <h2 className="text-white mr-1">{title}</h2>
+            </div>
+
+            {subtitle && (
+              <span
               className="mt-1 caption-medium text-white-70"
-              dangerouslySetInnerHTML={{
-                __html: highlightText(subtitle)
-              }}
-            />
-          )}
+                dangerouslySetInnerHTML={{
+                  __html: highlightText(subtitle)
+                }}
+                />
+                )}
 
-          <div className="row mt-3 pt-1">
-            {React.Children.toArray(infos.map(InfoComponent))}
+            <div className="row mt-3 pt-1">
+              {React.Children.toArray(infos.map(InfoComponent))}
+            </div>
           </div>
-        </div>
-      </CustomContainer>
+        </CustomContainer>
+      </div>
     </div>
   );
 }

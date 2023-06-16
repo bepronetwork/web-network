@@ -45,7 +45,7 @@ export default function Modal({
       return (
         <div className="mb-2 d-flex flex-row justify-content-between">
           {cancelLabel && (
-            <button className="btn btn-outline-gray" onClick={() => onCloseClick()} disabled={onCloseDisabled}>
+            <button className="btn btn-gray-850" onClick={() => onCloseClick()} disabled={onCloseDisabled}>
               {cancelLabel}
             </button>
           )}

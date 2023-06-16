@@ -95,17 +95,11 @@ export default function NetworksPage() {
   return (
     <NetworksPageContext.Provider value={contextValue}>
       <div>
-        <div className="d-none d-xl-flex">
-          <PageHero
-            title={t("custom-network:hero.title")}
-            subtitle={t("custom-network:hero.explanatory-text")}
-            infos={infos}
-          />
-        </div>
-
-        <div className="d-flex d-xl-none py-4 px-3 border-bottom border-gray-850">
-          <span className="xl-semibold text-white">Networks</span>
-        </div>
+        <PageHero
+          title={t("custom-network:hero.title")}
+          subtitle={t("custom-network:hero.explanatory-text")}
+          infos={infos}
+        />
 
         <div className="mt-4">
           <NetworksList />

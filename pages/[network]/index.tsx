@@ -1,24 +1,17 @@
-import React from "react";
-
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {GetServerSideProps} from "next/types";
 
-import ExplorePage from "pages/explore";
+import ExplorePage from "components/pages/explore/controller";
 
-export default function NetworkBountyHall() {
-  return <ExplorePage/>;
-}
+import getExplorePageData from "x-hooks/api/get-explore-page-data";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export default ExplorePage;
+
+export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, [
-        "common",
-        "bounty",
-        "connect-wallet-button",
-        "custom-network",
-        "leaderboard",
-      ])),
-    },
+      ...(await getExplorePageData(query)),
+      ...(await serverSideTranslations(locale, ["common", "custom-network", "bounty", "connect-wallet-button"]))
+    }
   };
 };

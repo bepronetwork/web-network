@@ -18,9 +18,7 @@ export default function usePage() {
           ...router.query,
           page: String(newPage)
         }
-    },
-                router.asPath,
-      { shallow: false, scroll: false });
+    }, router.asPath, { shallow: false, scroll: false });
   }
 
   function nextPage() {

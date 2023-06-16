@@ -15,7 +15,6 @@ import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyAmountController from "components/bounty/amount-info/controller";
 import CardItem from "components/card-item";
-import ChainBadge from "components/chain-badge";
 import If from "components/If";
 import Modal from "components/modal";
 import { FlexColumn } from "components/profile/wallet-balance";
@@ -26,6 +25,7 @@ import {useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
+import { formatNumberToCurrency } from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
@@ -33,7 +33,6 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
-import useBreakPoint from "x-hooks/use-breakpoint";
 import { useNetwork } from "x-hooks/use-network";
 
 import BountyTagsView from "./bounty/bounty-tags/view";
@@ -54,7 +53,6 @@ export default function IssueListItem({
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common", "custom-network"]);
   
-  const { isMobileView } = useBreakPoint();
   const {state,dispatch} = useAppState();
   const [visible, setVisible] = useState<boolean>();
   const [isCancelable, setIsCancelable] = useState(false);
@@ -73,8 +71,11 @@ export default function IssueListItem({
     state: issue?.state,
     amount: issue?.amount,
     fundingAmount: issue?.fundingAmount,
-  })
-  const fundedAmount = issue?.fundedAmount.isNaN() ? BigNumber(0) : issue?.fundedAmount
+  });
+  
+  const fundedAmount = issue?.fundedAmount?.isNaN() ? BigNumber(0) : issue?.fundedAmount;
+  const fundingAmount = issue?.fundingAmount?.isNaN() ? BigNumber(0) : issue?.fundingAmount;
+
   const percentage =
   BigNumber(fundedAmount.multipliedBy(100).toFixed(2, 1))
     .dividedBy(issue?.fundingAmount)
@@ -201,12 +202,14 @@ export default function IssueListItem({
   }
 
   if (size === "sm") {
+    const isSeekingFund = ["funding", "partial-funded"].includes(issueState);
+
     return (
       <CardItem onClick={handleClickCard} key="sm-card">
         <>
           <div className="d-flex flex-row align-items-center justify-content-between">
-            <div className="d-flex flex-row align-items-center gap-3">
-              <div className="network-name bg-dark-gray p-1 border-radius-8">
+            <div className="d-flex flex-row align-items-center gap-3 d-none d-md-flex">
+              <div className="network-name bg-gray-850 p-1 border-radius-8 border border-gray-800">
                 {issue?.network?.logoIcon && (
                   <img
                     src={`${state.Settings?.urls?.ipfs}/${issue?.network?.logoIcon}`}
@@ -219,18 +222,52 @@ export default function IssueListItem({
                   {issue?.network?.name}
                 </span>
               </div>
-
-              <ChainBadge chain={issue?.network?.chain} />
             </div>
 
+            <div className="d-none d-md-flex">
+              <Badge
+                color="transparent"
+                className={`d-flex align-items-center gap-1 border border-gray-800 caption-medium 
+                  font-weight-normal text-capitalize border-radius-8`}
+              >
+                <>
+                  <BountyStatusInfo issueState={issueState} />
+                  <span>{isSeekingFund ? t("seeking-funding") : issueState}</span>
+                </>
+              </Badge>
+            </div>
+          </div>
+
+          <div className="d-flex d-md-none align-items-center gap-2 mb-3">
             <BountyStatusInfo issueState={issueState} />
+            <span className="text-truncate">{issue?.title}</span>
           </div>
-          <div className="text-truncate mb-2 mt-4">{issue?.title}</div>
-          <div className="issue-body text-white-40 text-break text-truncate mb-3" >
-            {issue?.body}
+          
+          <div className="mt-3 d-none d-md-flex">
+            <span className="text-truncate">
+              {issue?.title}
+            </span>
           </div>
-          <div className={!issue?.isFundingRequest && 'mt-4' || ""}>
-            <BountyAmountController bounty={issue} size={size} />
+
+
+          <div className="row align-items-center mt-2">
+            <div className="col caption-medium font-weight-normal text-capitalize">
+              <div className="d-none d-md-flex">
+                <If condition={isSeekingFund}>
+                  <span className="mr-1">{t("info.funded")}</span>
+                  <span className="text-yellow-500">{formatNumberToCurrency(issue?.fundedPercent)}%</span>
+                </If>
+              </div>
+
+              <div className="d-flex d-md-none">
+                <span className="caption-small me-1 text-uppercase">
+                  {issue?.network?.name}
+                </span>
+              </div>
+            </div>
+            <div className="col">
+              <BountyAmountController bounty={issue} size={size} />
+            </div>
           </div>
         </>
       </CardItem>
@@ -306,13 +343,14 @@ export default function IssueListItem({
   return (
     <CardItem onClick={handleClickCard} key="default-card">
       <div className="row align-items-center">
-        <div className="col-md-12 mb-3">
+        <div className="col-md-12">
           <div className="d-flex">
             <div className="d-flex col-md-10 text-truncate">
               <div className="me-2">
                 <BountyStatusInfo
                   issueState={issueState}
                   fundedAmount={fundedAmount}
+                  fundingAmount={fundingAmount}
                 />
               </div>
               <span className="span text-truncate mb-3">
@@ -359,11 +397,7 @@ export default function IssueListItem({
             </div>
           </ResponsiveWrapper>
 
-          <ResponsiveWrapper xs={false} xl={true}>
-            <div className="w-100 border-top border-gray-850"></div>
-          </ResponsiveWrapper>
-
-          <div className="row mt-3 align-items-center">
+          <div className="row align-items-center border-xl-top border-gray-850 pt-3">
             <ResponsiveWrapper xs={false} xl={true}>
               <div className="row w-100 align-items-center justify-content-md-start">
                 <BountyItemLabel label="ID" className="col-auto">
@@ -391,7 +425,7 @@ export default function IssueListItem({
                 </ResponsiveWrapper>
 
                 <BountyItemLabel
-                  label="Opened on"
+                  label={t("info.opened-on")}
                   className="col-auto"
                 >
                   <span className="text-gray text-truncate">
@@ -404,9 +438,9 @@ export default function IssueListItem({
                 </div>
               </div>
             </ResponsiveWrapper>
-            <ResponsiveWrapper md={true} sm={true} xs={true} lg={false}>
+            <ResponsiveWrapper xs={true} xl={false}>
               <div className={`col d-flex justify-content-between`} >
-                {isMobileView && <BountyTagsView tags={[issue?.network?.name]} />}
+                <BountyTagsView tags={[issue?.network?.name]} />
                 <BountyAmountController bounty={issue} size={size} />
               </div>
             </ResponsiveWrapper>

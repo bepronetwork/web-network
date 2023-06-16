@@ -21,12 +21,14 @@ export default function NetworkContractSettings() {
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.$token");
   const totalNetworkToken = BigNumber(state.Service?.network?.amounts?.totalNetworkToken);
 
+  const formatOptions = { maximumFractionDigits: 0 };
+
   const parameterInputs = [
     { 
       label: t("custom-network:dispute-time"), 
       description: t("custom-network:errors.dispute-time", {
         min: NETWORK_LIMITS.disputableTime.min,
-        max: formatNumberToCurrency(NETWORK_LIMITS.disputableTime.max, 0)
+        max: formatNumberToCurrency(NETWORK_LIMITS.disputableTime.max, formatOptions)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.disputableTime?.value,
@@ -46,7 +48,7 @@ export default function NetworkContractSettings() {
       label: t("custom-network:redeem-time"), 
       description: t("custom-network:errors.redeem-time", {
         min: NETWORK_LIMITS.draftTime.min,
-        max: formatNumberToCurrency(NETWORK_LIMITS.draftTime.max, 0)
+        max: formatNumberToCurrency(NETWORK_LIMITS.draftTime.max, formatOptions)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.draftTime?.value,
@@ -58,8 +60,8 @@ export default function NetworkContractSettings() {
       label: t("custom-network:council-amount"), 
       description: t("custom-network:errors.council-amount", {
         token: networkTokenSymbol,
-        min: formatNumberToCurrency(NETWORK_LIMITS.councilAmount.min, 0),
-        max: formatNumberToCurrency(NETWORK_LIMITS.councilAmount.max, 0)
+        min: formatNumberToCurrency(NETWORK_LIMITS.councilAmount.min, formatOptions),
+        max: formatNumberToCurrency(NETWORK_LIMITS.councilAmount.max, formatOptions)
       }),
       symbol: networkTokenSymbol || "Token", 
       value: settings?.parameters?.councilAmount?.value,
@@ -69,7 +71,7 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:cancelable-time.label"), 
       description: t("custom-network:cancelable-time.description", {
-        min: formatNumberToCurrency(NETWORK_LIMITS.cancelableTime.min, 0)
+        min: formatNumberToCurrency(NETWORK_LIMITS.cancelableTime.min, formatOptions)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.cancelableTime?.value,

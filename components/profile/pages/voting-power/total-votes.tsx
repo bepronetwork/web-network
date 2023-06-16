@@ -4,10 +4,10 @@ import { BigNumber } from "bignumber.js";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 
+import TokenSymbolView from "components/common/token-symbol/view";
 import InfoTooltip from "components/info-tooltip";
 import NetworkItem from "components/profile/network-item";
 import { FlexRow } from "components/profile/wallet-balance";
-import TokenSymbolView from "components/common/token-symbol/view";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 

@@ -396,7 +396,7 @@ export default function NetworksStep({
                     max={MAX_DISPUTE_TIME}
                     description={t("custom-network:errors.dispute-time", {
                       min: MIN_DISPUTE_TIME,
-                      max: formatNumberToCurrency(MAX_DISPUTE_TIME, 0)
+                      max: formatNumberToCurrency(MAX_DISPUTE_TIME, { maximumFractionDigits: 0 })
                     })}
                     value={parameters?.disputableTime?.value}
                     error={parameters?.disputableTime?.validated === false}
@@ -434,7 +434,7 @@ export default function NetworksStep({
                     max={MAX_DRAFT_TIME}
                     description={t("custom-network:errors.redeem-time", {
                       min: MIN_DRAFT_TIME,
-                      max: formatNumberToCurrency(MAX_DRAFT_TIME, 0)
+                      max: formatNumberToCurrency(MAX_DRAFT_TIME, { maximumFractionDigits: 0 })
                     })}
                     symbol="seconds"
                     value={parameters?.draftTime?.value}
@@ -456,8 +456,8 @@ export default function NetworksStep({
                   max={MAX_COUNCIL_AMOUNT}
                     description={t("custom-network:errors.council-amount", {
                       token: networkTokenSymbol,
-                      min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
-                      max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, 0)
+                      min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, { maximumFractionDigits: 0 }),
+                      max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, { maximumFractionDigits: 0 })
                     })}
                     value={parameters?.councilAmount?.value}
                     error={parameters?.councilAmount?.validated === false}

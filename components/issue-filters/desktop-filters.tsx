@@ -12,7 +12,7 @@ import Translation from "components/translation";
 
 import useFilters from "x-hooks/use-filters";
 
-export default function IssueFilters({ onlyTimeFrame = false }) {
+export default function IssueDesktopFilters({ onlyTimeFrame = false }) {
   const node = useRef();
   const [show, setShow] = useState(false);
   const [

@@ -132,7 +132,9 @@ export default function ProposalProgressBar({
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
             <span className="me-1">/{formatNumberToNScale(totalNetworkToken || 0)}{" "}</span>
-            <TokenSymbolView name={t("common:$oracles", { token: state.Service?.network?.active?.networkToken?.symbol })}/>
+            <TokenSymbolView 
+              name={t("common:$oracles", { token: state.Service?.network?.active?.networkToken?.symbol })}
+            />
              {" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>

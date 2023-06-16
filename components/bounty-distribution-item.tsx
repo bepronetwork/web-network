@@ -2,13 +2,13 @@ import BigNumber from "bignumber.js";
 
 import ArrowRight from "assets/icons/arrow-right";
 
+import Avatar from "components/avatar";
+import TokenSymbolView from "components/common/token-symbol/view";
+import InfoTooltip from "components/info-tooltip";
+
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { BountyDistribution } from "interfaces/bounty-distribution";
-
-import Avatar from "./avatar";
-import InfoTooltip from "./info-tooltip";
-import TokenSymbolView from "./common/token-symbol/view";
 
 export default function BountyDistributionItem({
   percentage = "0",

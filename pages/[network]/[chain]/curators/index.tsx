@@ -1,59 +1,36 @@
-import React from "react";
-
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
 
-import CouncilLayout from "components/council-layout";
-import CuratorsList from "components/curators-list";
-import ListIssues from "components/list-issues";
+import NetworkCurators from "components/pages/network-curators/controller";
 
-export default function PageCouncil() {
-  const { t } = useTranslation(["council"]);
-  const router = useRouter();
-  const { type } = router.query;
+import { emptyBountiesPaginated } from "helpers/api";
 
-  const types = {
-    "curators-list": <CuratorsList key={"curators-list"} inView={type === 'curators-list'} />,
-    "ready-to-close": (
-      <ListIssues
-        key={"ready-to-close"}
-        filterState="proposal"
-        emptyMessage={t("council:empty")}
-        disputableFilter="merge"
-        inView={type === 'ready-to-close'}
-      />
-    ),
-    "ready-to-dispute": (
-      <ListIssues
-        key={"ready-to-dispute"}
-        filterState="proposal"
-        emptyMessage={t("council:empty")}
-        disputableFilter="dispute"
-        inView={type === 'ready-to-dispute'}
-      />
-    ),
-    "ready-to-propose": (
-      <ListIssues
-        key={"ready-to-propose"}
-        filterState="ready"
-        emptyMessage={t("council:empty")}
-        inView={!type || type === 'ready-to-propose'}
-      />
-    ),
-  };
+import getBountiesListData from "x-hooks/api/get-bounties-list-data";
 
-  return (
-    <CouncilLayout>
-      {types[type?.toString()]}
-    </CouncilLayout>
-  );
-}
+export default NetworkCurators;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
+  const { type } = query;
+
+  const state = {
+    "ready-to-propose": "proposable",
+    "ready-to-dispute": "disputable",
+    "ready-to-close": "mergeable",
+  }[type?.toString()];
+
+  const getBountiesList = (filters) => getBountiesListData(filters)
+    .then(({ data }) => data)
+    .catch(() => emptyBountiesPaginated);
+
+  const [bounties, totalReadyBounties] = await Promise.all([
+    state ? getBountiesList({ ...query, state }) : emptyBountiesPaginated,
+    getBountiesList({ state: "ready" }).then(({ count }) => count)
+  ]);
+    
   return {
     props: {
+      bounties,
+      totalReadyBounties,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

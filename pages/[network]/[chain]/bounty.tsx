@@ -65,7 +65,7 @@ export default function PageIssue({ bounty }: PageBountyProps) {
       })
     } else {
       setCurrentBounty({
-        data: { ...issueParser(bountyDatabase, false), pullRequests: currentBounty?.data?.pullRequests },
+        data: { ...issueParser(bountyDatabase), pullRequests: currentBounty?.data?.pullRequests },
         comments: commentsIssue,
         lastUpdated: 0
       })

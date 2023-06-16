@@ -19,8 +19,7 @@ export default function useSearch() {
           page: "1",
           search: String(newSearch)
         }
-    },
-                router.asPath);
+    }, router.asPath, { shallow: false, scroll: false });
   }
 
   function clearSearch() {

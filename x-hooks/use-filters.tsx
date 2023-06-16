@@ -9,18 +9,22 @@ import {RepoInfo} from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
 
+type FiltersTypes = "time" | "repo" | "state";
+
 type FilterStateUpdater = (
   opts: IssueFilterBoxOption[],
   opt: IssueFilterBoxOption,
   checked: boolean,
-  type: "time" | "repo" | "state",
+  type: FiltersTypes,
   multi?: boolean
 ) => void;
 
 export default function useFilters(): [
   IssueFilterBoxOption[][],
   FilterStateUpdater,
-  () => void
+  () => void,
+  (option: IssueFilterBoxOption, type: FiltersTypes) => void,
+  () => void,
 ] {
   const router = useRouter();
 
@@ -53,7 +57,7 @@ export default function useFilters(): [
       page: "1"
     };
 
-    router.push({ pathname: router.pathname, query }, router.asPath);
+    router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
   }
 
   function makeFilterOption(label, value, checked = false) {
@@ -122,6 +126,23 @@ export default function useFilters(): [
     updateRouterQuery();
   }
 
+  function checkOption(option: IssueFilterBoxOption, type: FiltersTypes) {
+    if (!option || !type) return;
+
+    const updateChecked = (newChecked, options) => options.map(o => ({
+      ...o,
+      checked: o.value === newChecked.value ? true : false
+    }));
+
+    const checker = {
+      repo: () => setRepoFilters(updateChecked(option, repoFilters)),
+      time: () => setTimeFilters(updateChecked(option, timeFilters)),
+      state: () => setStateFilters(updateChecked(option, stateFilters)),
+    }
+
+    checker[type]();
+  }
+
   function clearFilters() {
     const query = {
       ...(router.query.sortBy ? { sortBy: router.query.sortBy } : { sortBy: undefined }),
@@ -131,8 +152,8 @@ export default function useFilters(): [
       page: "1"
     };
 
-    router.push({ pathname: router.pathname, query }, router.asPath);
+    router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
   }
 
-  return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters];
+  return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters, checkOption, updateRouterQuery];
 }

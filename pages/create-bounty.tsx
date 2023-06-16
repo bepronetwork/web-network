@@ -726,7 +726,6 @@ export default function CreateBountyPage() {
             <div className="d-flex justify-content-between my-4 me-4">
               <Button
                 className="col-6 bounty-outline-button me-3"
-                upperCase={false}
                 onClick={() => {
                   currentSection !== 0 &&
                     setCurrentSection((prevState) => prevState - 1);

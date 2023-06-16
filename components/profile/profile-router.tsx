@@ -11,8 +11,20 @@ import PullRequestsPage from "components/profile/pages/pull-requests";
 import VotingPowerPage from "components/profile/pages/voting-power";
 import WalletPage from "components/profile/pages/wallet";
 
-export default function ProfileRouter() {
-  const { asPath, push } = useRouter();
+import { useAppState } from "contexts/app-state";
+
+import { SearchBountiesPaginated } from "types/api";
+
+interface ProfileRouterProps {
+  bounties: SearchBountiesPaginated;
+}
+
+export default function ProfileRouter({
+  bounties
+}: ProfileRouterProps) {
+  const { pathname, asPath, query, push } = useRouter();
+
+  const { state: { currentUser } } = useAppState();
 
   const Route = (path, page) => ({ path, page });
 
@@ -34,8 +46,31 @@ export default function ProfileRouter() {
       push("/404");
   }, [currentRoute]);
 
+  useEffect(() => {
+    if (!currentUser?.walletAddress || !query) return;
+
+    const type = {
+      "/profile/bounties": "creator",
+      "/profile/pull-requests": "pullRequester",
+      "/profile/proposals": "proposer"
+    }[currentRoute.path];
+
+    if (type && query[type] !== currentUser?.walletAddress)
+      push({
+        pathname,
+        query: {
+          ...query,
+          [type]: currentUser?.walletAddress,
+        }
+      }, asPath, {
+        shallow: false,
+        scroll: false,
+      });
+
+  }, [currentUser?.walletAddress, asPath]);
+
   if (currentRoute)
-    return <currentRoute.page />;
+    return <currentRoute.page bounties={bounties} />;
 
   return <></>;
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
@@ -15,14 +15,22 @@ import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 import {useNetwork} from "x-hooks/use-network";
 
-export default function CouncilLayout({ children }) {
+interface CouncilLayoutProps {
+  children?: ReactNode;
+  totalReadyBounties?: number;
+}
+
+export default function CouncilLayout({ 
+  children,
+  totalReadyBounties,
+}: CouncilLayoutProps) {
   const { asPath, query, push } = useRouter();
   const { t } = useTranslation(["common", "council"]);
 
   const { chain } = useChain();
   const { state } = useAppState();
   const { getURLWithNetwork } = useNetwork();
-  const { getTotalBounties, getCuratorsResume, searchIssues } = useApi();
+  const { getCuratorsResume, searchIssues } = useApi();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -48,7 +56,7 @@ export default function CouncilLayout({ children }) {
   function handleUrlCurators (type: string) {
     return push(getURLWithNetwork("/curators", {
       type
-    }), asPath, { shallow: true  });
+    }), asPath, { shallow: false, scroll: false });
   }
 
   const internalLinks = [
@@ -77,8 +85,7 @@ export default function CouncilLayout({ children }) {
   async function loadTotals() {
     if (!state.Service?.network?.active?.name || !chain) return;
     
-    const [totalBounties, { totalActiveCurators, totalValue }, distributed] = await Promise.all([
-      getTotalBounties(state.Service?.network?.active?.name, "ready"),
+    const [{ totalActiveCurators, totalValue }, distributed] = await Promise.all([
       getCuratorsResume({
         networkName: state.Service?.network?.active?.name,
         chainShortName: chain.chainShortName
@@ -95,7 +102,7 @@ export default function CouncilLayout({ children }) {
 
     setInfos([
       {
-        value: totalBounties,
+        value: totalReadyBounties,
         label: t("council:ready-bountys"),
       },
       {

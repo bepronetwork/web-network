@@ -1,99 +1,77 @@
-import { useEffect, useReducer } from "react";
-
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import PlusIcon from "assets/icons/plus-icon";
 
-import LoadingList from "components/bounties/loading-list";
 import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
+import HorizontalList from "components/horizontal-list";
+import If from "components/If";
 import IssueListItem from "components/issue-list-item";
 import NothingFound from "components/nothing-found";
 
-import { IssueBigNumberData } from "interfaces/issue-data";
+import { issueParser } from "helpers/issue";
 
-import useApi from "x-hooks/use-api";
-import { useNetwork } from "x-hooks/use-network";
+import { IssueData } from "interfaces/issue-data";
 
-interface BountiesStates {
-  openBounties?: IssueBigNumberData[];
-  loadingOpenBounties?: boolean;
-  fundingBounties?: IssueBigNumberData[];
-  loadingFundingBounties?: boolean;
+interface ListRecentIssuesProps {
+  type?: "bounty" | "funding";
+  recentBounties: IssueData[];
 }
 
-export default function ListRecentIssues() {
-  const { t } = useTranslation(["bounty"]);
+export default function ListRecentIssues({
+  type = "bounty",
+  recentBounties,
+}: ListRecentIssuesProps) {
   const { push } = useRouter();
+  const { t } = useTranslation(["bounty"]);
 
-  const [bounties, updateBounties] = useReducer((prev: BountiesStates, next: Partial<BountiesStates>) => {
-    return { ...prev, ...next };
-  },
-                                                {
-      openBounties: [],
-      loadingOpenBounties: false,
-      loadingFundingBounties: false,
-      fundingBounties: [],
-                                                });
+  const isBountyType = type === "bounty";
+  const MIN_COLS = 3;
 
-  const { networkName } = useNetwork();
-  const { searchRecentIssues } = useApi();
+  const LABELS = {
+    bounty: {
+      title: t("recent-bounties"),
+      notFound: t("not-found-bounty"),
+      create: t("create-bounty"),
+    },
+    funding: {
+      title: t("recent-funding"),
+      notFound: t("not-found-funding"),
+      create: t("create-funding"),
+    }
+  };
 
-  function numberOfColumns(numberBounties: number) {
-    if (numberBounties === 1) return 8;
-    if (numberBounties === 2) return 4;
-
-    return 12;
-  }
-
-  async function handleSearchRecentIssues(type: "open" | "funding") {
-    const isOpen = type === "open";
-    const setLoading = (state: boolean) =>
-      updateBounties(isOpen
-          ? { loadingOpenBounties: state }
-          : { loadingFundingBounties: state });
-    const setBounties = (data: IssueBigNumberData[]) =>
-      updateBounties(isOpen ? { openBounties: data } : { fundingBounties: data });
-
-    setLoading(true);
-    searchRecentIssues({ networkName, state: type })
-      .then(setBounties)
-      .catch((err) => {
-        console.debug(err);
-        setLoading(false);
-      })
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    handleSearchRecentIssues("open");
-    handleSearchRecentIssues("funding");
-  }, [networkName]);
-
-  function renderNothingFound(type: "open" | "funding") {
-    const isOpen = type === "open";
-    const lenBounties = isOpen
-      ? bounties.openBounties?.length
-      : bounties.fundingBounties?.length || 0;
-
+  function renderNothingFound() {
     const goToPage = 
-      () => type === "open" ? push("/create-bounty") : push("/create-bounty?type=funding", "/create-bounty", )
+      () => isBountyType ? push("/create-bounty") : push("/create-bounty?type=funding", "/create-bounty");
 
     return (
-      <div className={`col-md-${numberOfColumns(lenBounties)}`}>
+      <div className="col-12 col-sm-6 col-md">
         <NothingFound
-          description={isOpen ? t("not-found-bounty") : t("not-found-funding")}
+          description={
+          <>
+            <span className="d-none d-md-flex justify-content-center">
+              {LABELS[type].notFound}
+            </span>
+
+            <span className="d-flex d-md-none text-truncate">
+              {LABELS[type].notFound}
+            </span>
+          </>
+        }
           type="dashed"
         >
           <div className="d-flex justify-content-center">
             <ContractButton
               onClick={goToPage}
               textClass="text-white-50"
-              className="read-only-button bg-gray-850 border-gray-850 mt-3"
+              className="read-only-button bg-gray-850 border-gray-850 mt-3 text-nowrap"
             >
               <PlusIcon className="text-gray-400" />
-              <span>{isOpen ? t("create-bounty") : t("create-funding")}</span>
+              <span>
+                {LABELS[type].create}
+              </span>
             </ContractButton>
           </div>
         </NothingFound>
@@ -101,44 +79,27 @@ export default function ListRecentIssues() {
     );
   }
 
-  function renderBounties(type: "open" | "funding") {
-    const isOpen = type === "open";
-
-    const currentBounties = isOpen
-      ? bounties.openBounties
-      : bounties.fundingBounties;
-    const loadingState = isOpen
-      ? bounties.loadingOpenBounties
-      : bounties.loadingFundingBounties;
-
-    return (
-      <CustomContainer>
-        <div className="d-flex mt-2 p-1">
-          <h4 className="mt-1">
-            {isOpen ? t("recent-bounties") : t("recent-funding")}
-          </h4>
-        </div>
-
-        <LoadingList loading={loadingState} />
-        <div className="row gy-3 mb-3 mt-1">
-          {currentBounties &&
-            currentBounties?.map((bounty) => (
-              <div className="col-md-4 col" key={bounty.id}>
-                <IssueListItem issue={bounty} key={bounty.id} size="sm" />
-              </div>
-            ))}
-          {currentBounties?.length < 3 &&
-            !loadingState &&
-            renderNothingFound(isOpen ? "open" : "funding")}
-        </div>
-      </CustomContainer>
-    );
-  }
-
   return (
-    <>
-      {renderBounties("open")}
-      {renderBounties("funding")}
-    </>
+    <CustomContainer className="px-xl-0">
+      <div className="d-flex mt-2 p-1">
+        <h4 className="mt-1">
+          {LABELS[type].title}
+        </h4>
+      </div>
+
+      <div className="row mb-3 mt-1">
+        <HorizontalList>
+          {recentBounties?.map((bounty) => (
+              <div className="col-12 col-sm-6 col-md-5 col-lg-4" key={bounty.id}>
+                <IssueListItem issue={issueParser(bounty)} key={bounty.id} size="sm" />
+              </div>
+          ))}
+            
+          <If condition={recentBounties?.length < MIN_COLS}>
+            {renderNothingFound()}
+          </If>
+        </HorizontalList>
+      </div>
+    </CustomContainer>
   );
 }

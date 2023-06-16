@@ -25,6 +25,7 @@
 @import "components/nav-avatar";
 @import "components/cookie-consent";
 @import "components/multi-action-button";
+@import "components/horizontal-list";
 
 @import "components/swagger-ui";
 
@@ -391,11 +392,12 @@ li {
 }
 
 .main-nav {
+  @extend .border-xl-bottom;
+  @extend .border-dark-gray;
+  
   width: 100%;
   min-height: $navbar-height;
   background-color: var(--bs-dark);
-
-  border-bottom: 1px solid $dark-gray;
 
   .btn:not(.brand, .not-svg) svg:only-child {
     width: 16px;
@@ -1484,7 +1486,7 @@ textarea.form-control {
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.30em;
+    top: 4.4em;
   }
 
   .input-group {
@@ -2027,4 +2029,15 @@ input[type="color"] {
 
 .modal-md {
   max-width: 500px;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.overflow-noscrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

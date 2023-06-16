@@ -5,7 +5,7 @@ import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/dist/client/router";
 import {GetServerSideProps} from "next/types";
 
-import ListIssues from "components/list-issues";
+import BountiesList from "components/bounty/bounties-list/controller";
 import PageHero, {InfosHero} from "components/page-hero";
 
 import {useAppState} from "contexts/app-state";
@@ -13,11 +13,20 @@ import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 
+import { SearchBountiesPaginated } from "types/api";
+
+import getBountiesListData from "x-hooks/api/get-bounties-list-data";
 import useApi from "x-hooks/use-api";
 import {useBounty} from "x-hooks/use-bounty";
 import useChain from "x-hooks/use-chain";
 
-export default function BountiesPage() {
+interface BountiesPageProps {
+  bounties: SearchBountiesPaginated;
+}
+
+export default function BountiesPage({
+  bounties
+}: BountiesPageProps) {
   useBounty();
   const { t } = useTranslation(["common"]);
   const { query } = useRouter();
@@ -102,14 +111,22 @@ export default function BountiesPage() {
         infos={infos}
       />
 
-      <ListIssues variant="network" />
+      <BountiesList
+        bounties={bounties}
+        variant="network"
+      />
     </BountyEffectsProvider>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
+  const bounties = await getBountiesListData(query)
+    .then(({ data }) => data)
+    .catch(() => ({ count: 0, rows: [], currentPage: 1, pages: 1 }));
+
   return {
     props: {
+      bounties,
       ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button"]))
     }
   };
