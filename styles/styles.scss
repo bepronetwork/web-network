@@ -486,7 +486,7 @@ li {
     margin-bottom: 0;
   }
   &:hover {
-    background-color: lighten($bg-shadow, 5);
+    background-color: $gray-950 !important;
     .h4 {
       color: $white;
     }
