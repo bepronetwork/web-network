@@ -92,7 +92,7 @@ export default function NetworksList() {
             )}
           </NothingFound>
         )) || (
-          <>
+          <div className="d-flex flex-column gap-3">
             <NetworkListBar order={order} setOrder={handleOrderChange} />
 
             {orderByProperty(networks, order[0], order[1]).map((networkItem) => (
@@ -103,7 +103,7 @@ export default function NetworksList() {
                 tokenSymbolDefault={t("misc.token")}
               />
             ))}
-          </>
+          </div>
         )}
         </div>
       </div>

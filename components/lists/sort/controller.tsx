@@ -1,17 +1,12 @@
 import { useRouter } from "next/router";
 
-import ReactSelect from "components/react-select";
+import ListSortView from "components/lists/sort/view";
 
-interface Option {
-  value: string;
-  label: string;
-  sortBy: string;
-  order: string;
-}
+import { CustomDropdownItem, SortOption } from "types/components";
 
 interface ListSortProps {
   defaultOptionIndex?: number;
-  options: Option[];
+  options: SortOption[];
 }
 
 export default function ListSort({
@@ -29,10 +24,10 @@ export default function ListSort({
       page: "1"
     };
 
-    router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
+    router.push({ pathname: `${router.pathname}`, query }, router.asPath, { shallow: false, scroll: false });
   }
 
-  function getDefaultValue(): Option {
+  function getDefaultValue(): SortOption {
     if (sortBy && order) {
       const optionExists = options.find((option) => option.sortBy === sortBy && option.order === order);
 
@@ -42,13 +37,20 @@ export default function ListSort({
     return options[defaultOptionIndex];
   }
 
+  function optionsToDropdownItems(): CustomDropdownItem[] {
+    return options?.map(option => ({
+      content: option?.label,
+      onClick: () => handleSelectChange(option)
+    }));
+  }
+
 
   return (
-    <ReactSelect
-      defaultValue={getDefaultValue()}
+    <ListSortView
+      defaultOption={getDefaultValue()}
       options={options}
-      isSearchable={false}
       onChange={handleSelectChange}
+      dropdownItems={optionsToDropdownItems()}
     />
   );
 }

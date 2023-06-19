@@ -7,9 +7,11 @@
 },
 "search": "Search for developers",
 "not-found": "Not found",
+"address-copied": "Address copied",
+"nfts": "NFTs",
 "table": {
     "address": "Address",
-    "github-handle": "GithubHandle",
+    "github-handle": "Github Handle",
     "nfts": "NFTS",
     "actions": "Actions"
 }

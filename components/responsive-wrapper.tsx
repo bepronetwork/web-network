@@ -2,13 +2,9 @@ import { ReactNode } from "react";
 
 import clsx from "clsx";
 
-interface ResponsiveWrapperProps {
-  xs?: boolean;
-  sm?: boolean;
-  md?: boolean;
-  lg?: boolean;
-  xl?: boolean;
-  xxl?: boolean;
+import { BreakpointOptions } from "types/utils";
+
+interface ResponsiveWrapperProps extends BreakpointOptions {
   children?: ReactNode;
   className?: string;
 }

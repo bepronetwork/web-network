@@ -57,7 +57,10 @@ class LeaderBoard extends Model {
   }
 
   static associate(models) {
-
+    this.belongsTo(models.user, {
+      foreignKey: "address",
+      targetKey: "address"
+    });
   }
 }
 

@@ -4,13 +4,15 @@ interface InfiniteScrollProps {
   isLoading?: boolean;
   hasMore: boolean;
   children: ReactNode | ReactNode[];
+  className?: string;
 }
 
 export default function InfiniteScroll({
   handleNewPage,
   hasMore,
   isLoading,
-  children
+  children,
+  className
 }: InfiniteScrollProps) {
   const divRef = useRef(null);
 
@@ -42,5 +44,5 @@ export default function InfiniteScroll({
     };
   }, [hasMore, isLoading, children]);
 
-  return <div id="infinite-scroll" ref={divRef}>{children}</div>;
+  return <div id="infinite-scroll" className={className}>{children}</div>;
 }

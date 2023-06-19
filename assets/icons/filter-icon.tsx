@@ -1,6 +1,6 @@
-import { memo } from "react";
+import { SVGProps, memo } from "react";
 
-function FilterIcon() {
+function FilterIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="16"
@@ -8,8 +8,9 @@ function FilterIcon() {
       viewBox="0 0 16 17"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
-      <g clipPath="url(#clip0_871_9953)">
+      <g clipPath="url(#clip0_549_15573)">
         <path
           d="M4 8.33838H12"
           stroke="#D5D6DD"
@@ -30,7 +31,7 @@ function FilterIcon() {
         />
       </g>
       <defs>
-        <clipPath id="clip0_871_9953">
+        <clipPath id="clip0_549_15573">
           <rect
             width="16"
             height="16"

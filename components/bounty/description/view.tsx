@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { ChangeEvent } from "react";
 
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
@@ -10,7 +10,7 @@ import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 
 interface DescriptionViewProps {
   body: string;
-  handleChangeBody: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleChangeBody: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   onUpdateFiles: (files: IFilesProps[]) => void;
   onUploading?: (v: boolean) => void;
   files?: IFilesProps[];

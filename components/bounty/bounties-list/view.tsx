@@ -12,7 +12,7 @@ import If from "components/If";
 import InfiniteScroll from "components/infinite-scroll";
 import IssueFilters from "components/issue-filters";
 import IssueListItem from "components/issue-list-item";
-import ListSort from "components/list-sort";
+import ListSort from "components/lists/sort/controller";
 import NothingFound from "components/nothing-found";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ScrollTopButton from "components/scroll-top-button";
