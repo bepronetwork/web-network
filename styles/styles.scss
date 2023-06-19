@@ -1357,7 +1357,7 @@ a.row-button svg {
   border: 0;
   border-radius: math.div($m, 2) math.div($m, 2) 0 0;
 
-  background-color: $bg-shadow;
+  background-color: $gray-900;
 
   .nav-item {
     .nav-link {
@@ -1373,11 +1373,11 @@ a.row-button svg {
       padding: 20px;
 
       color: rgba($white, 0.4);
-      background-color: $bg-shadow;
+      background-color: $gray-900;
 
       &.active {
         color: $white;
-        background-color: $dark-gray;
+        background-color: $gray-850;
       }
     }
   }

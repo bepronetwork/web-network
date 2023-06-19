@@ -10,7 +10,7 @@ import BountyHero from "components/bounty/bounty-hero/controller";
 import BountyComments from "components/bounty/comments/controller";
 import FundingSection from "components/bounty/funding-section/controller";
 import PageActions from "components/bounty/page-actions/controller";
-import TabSections from "components/bounty/tabs-sections";
+import TabSections from "components/bounty/tabs-sections/controller";
 import If from "components/If";
 
 import {useAppState} from "contexts/app-state";
@@ -165,7 +165,6 @@ export default function PageIssue({ bounty }: PageBountyProps) {
         repo={currentBounty?.data?.repository?.githubPath}
         issueId={id}
       />
-      {console.log('currentBounty', currentBounty)}
     </>
   );
 }

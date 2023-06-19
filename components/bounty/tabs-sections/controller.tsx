@@ -1,6 +1,6 @@
 import { useTranslation } from "next-i18next";
 
-import ItemSections from "components/bounty/tabs-sections/item-sections";
+import ItemSections from "components/bounty/tabs-sections/item-sections/controller";
 import CustomContainer from "components/custom-container";
 import TabbedNavigation from "components/tabbed-navigation";
 
@@ -37,13 +37,14 @@ function TabSections({
     return <></>;
 
   return (
-    <CustomContainer className="mb-4">
+    <CustomContainer className="mb-4" col='col-12'>
       <TabbedNavigation
         className="issue-tabs"
         tabs={tabs}
         collapsable
       />
-  </CustomContainer>)
+  </CustomContainer>
+  )
 }
 
 export default TabSections;

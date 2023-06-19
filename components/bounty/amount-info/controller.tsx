@@ -4,7 +4,7 @@ import { IssueBigNumberData } from "interfaces/issue-data";
 
 import BountyAmountView from "./view";
 
-export default function BountyAmountController({
+export default function BountyAmount({
   bounty,
   size = "lg",
 }: {

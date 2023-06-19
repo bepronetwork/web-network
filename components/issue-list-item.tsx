@@ -13,7 +13,7 @@ import TrashIcon from "assets/icons/trash-icon";
 import Badge from "components/badge";
 import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
-import BountyAmountController from "components/bounty/amount-info/controller";
+import BountyAmount from "components/bounty/amount-info/controller";
 import CardItem from "components/card-item";
 import If from "components/If";
 import Modal from "components/modal";
@@ -33,6 +33,7 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
+import useBreakPoint from "x-hooks/use-breakpoint";
 import { useNetwork } from "x-hooks/use-network";
 
 import BountyTagsView from "./bounty/bounty-tags/view";
@@ -64,6 +65,7 @@ export default function IssueListItem({
   const { getURLWithNetwork } = useNetwork();
   const { signMessage } = useAuthentication();
   const { handleHardCancelBounty } = useBepro();
+  const { isMobileView } = useBreakPoint();
 
   const isVisible = visible !== undefined ? visible : issue?.visible;
 
@@ -248,8 +250,6 @@ export default function IssueListItem({
               {issue?.title}
             </span>
           </div>
-
-
           <div className="row align-items-center mt-2">
             <div className="col caption-medium font-weight-normal text-capitalize">
               <div className="d-none d-md-flex">
@@ -266,7 +266,7 @@ export default function IssueListItem({
               </div>
             </div>
             <div className="col">
-              <BountyAmountController bounty={issue} size={size} />
+              <BountyAmount bounty={issue} size={size} />
             </div>
           </div>
         </>
@@ -434,14 +434,14 @@ export default function IssueListItem({
                 </BountyItemLabel>
 
                 <div className="col d-flex justify-content-end px-0">
-                  <BountyAmountController bounty={issue} size={size} />
+                  <BountyAmount bounty={issue} size={size} />
                 </div>
               </div>
             </ResponsiveWrapper>
             <ResponsiveWrapper xs={true} xl={false}>
               <div className={`col d-flex justify-content-between`} >
-                <BountyTagsView tags={[issue?.network?.name]} />
-                <BountyAmountController bounty={issue} size={size} />
+                {isMobileView && <BountyTagsView tags={[issue?.network?.name]} />}
+                <BountyAmount bounty={issue} size={size} />
               </div>
             </ResponsiveWrapper>
           </div>
