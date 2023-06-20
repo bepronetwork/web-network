@@ -21,7 +21,7 @@ import { issueParser } from "helpers/issue";
 import { CurrentBounty } from "interfaces/application-state";
 import { IssueData, IssueDataComment } from "interfaces/issue-data";
 
-import { getBountyData, getBountyComments, getPullRequestsDetails } from "x-hooks/api/get-bounty-data";
+import { getBountyData, getBountyOrPullRequestComments, getPullRequestsDetails } from "x-hooks/api/get-bounty-data";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useOctokit from "x-hooks/use-octokit";
 
@@ -29,7 +29,7 @@ interface PageBountyProps {
   bounty: {
     comments: IssueDataComment[];
     data: IssueData;
-}
+  }
   _nextI18Next?: SSRConfig;
 }
 
@@ -170,7 +170,8 @@ export default function PageIssue({ bounty }: PageBountyProps) {
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
   const bountyDatabase = await getBountyData(query)
 
-  const githubComments = await getBountyComments(bountyDatabase?.repository?.githubPath, +bountyDatabase?.githubId)
+  const githubComments = await getBountyOrPullRequestComments(bountyDatabase?.repository?.githubPath, 
+                                                              +bountyDatabase?.githubId);
 
   const pullRequestsDetails = await getPullRequestsDetails(bountyDatabase?.repository?.githubPath,
                                                            bountyDatabase?.pullRequests);

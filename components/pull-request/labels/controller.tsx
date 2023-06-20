@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import PullRequestLabelsView from "./view";
+
 export type PRLabel =
   | "ready to merge"
   | "broken tests"
@@ -23,7 +25,7 @@ export interface IPRLabel {
   isMergeable?: boolean | null;
 }
 
-function PullRequestLabels({
+export default function PullRequestLabels({
   label,
   className,
   merged,
@@ -93,15 +95,11 @@ function PullRequestLabels({
 
   if (!state) return <></>;
 
-  return (
-    <div className={getPullRequestLabelClass()}>
-      <span
-        className={`caption-small text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}
-      >
-        {state}
-      </span>
-    </div>
+  return ( 
+    <PullRequestLabelsView 
+      state={state}
+      className={getPullRequestLabelClass()}
+      colorLabel={getColorLabel()}
+    />
   );
 }
-
-export default PullRequestLabels;

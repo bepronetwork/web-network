@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import Avatar from "components/avatar";
 import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
-import PullRequestLabels from "components/pull-request-labels";
+import PullRequestLabels from "components/pull-request/labels/controller";
 import Translation from "components/translation";
 
 import { useAppState } from "contexts/app-state";

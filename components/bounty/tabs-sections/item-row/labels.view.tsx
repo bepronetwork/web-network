@@ -1,4 +1,4 @@
-import PullRequestLabels, { IPRLabel } from "components/pull-request-labels";
+import PullRequestLabels, { IPRLabel } from "components/pull-request/labels/controller";
 
 export default function ItemRowLabelsView({
     status,

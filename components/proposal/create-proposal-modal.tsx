@@ -12,7 +12,7 @@ import Button from "components/button";
 import ContractButton from "components/contract-button";
 import CreateProposalDistributionItem from "components/create-proposal-distribution-item";
 import Modal from "components/modal";
-import PullRequestLabels from "components/pull-request-labels";
+import PullRequestLabels from "components/pull-request/labels/controller";
 import ReactSelect from "components/react-select";
 
 import {useAppState} from "contexts/app-state";

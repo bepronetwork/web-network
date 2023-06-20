@@ -24,14 +24,29 @@ export async function getBountyData(query: ParsedUrlQuery): Promise<IssueData | 
 }
 
 /**
- * Get comments in github on bounty from api based on query filters
+ * Get issue or pull request comments in github on bounty from api based on query filters
  * @param githubPath and @param githubId
  * @returns list of comments
  */
-export async function getBountyComments(repositoryPath: string, id: number) {
+export async function getBountyOrPullRequestComments(repositoryPath: string, id: number) {
   return useOctokit().getIssueOrPullRequestComments(repositoryPath, id);
 }
 
+/**
+ * Get pull request reviews in github on bounty from api based on query filters
+ * @param githubPath and @param githubId
+ * @returns list of reviews
+ */
+export async function getPullRequestReviews(repositoryPath: string, id: number) {
+  return useOctokit().getPullRequestReviews(repositoryPath, id);
+}
+
+
+/**
+ * Get pull requests details in github on bounty from api based on query filters
+ * @param repositoryPath and @param pullRequests
+ * @returns list of pullRequests
+ */
 export async function getPullRequestsDetails(repositoryPath: string,
                                              pullRequests: pullRequest[]): Promise<pullRequest[]> {
 
