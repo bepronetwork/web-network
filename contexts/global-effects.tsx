@@ -51,7 +51,9 @@ export const GlobalEffectsProvider = ({children}) => {
     currentUser?.connected,
   ]);
 
-  useEffect(() => dao.changeNetwork(), [
+  useEffect(() => {
+    dao.changeNetwork();
+  }, [
     Service?.active,
     Service?.network?.active?.networkAddress,
     Service?.network?.active?.chain_id,
