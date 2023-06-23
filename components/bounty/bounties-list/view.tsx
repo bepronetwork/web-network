@@ -152,13 +152,7 @@ export default function BountiesListView({
           </div>
 
           <div className="col-auto d-none d-xl-flex">
-            <div className="d-flex align-items-center">
-              <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
-                {t("sort.label")}
-              </span>
-
-              <ListSort options={sortOptions} />
-            </div>
+            <ListSort options={sortOptions} />
           </div>
 
           <div className="col-auto">

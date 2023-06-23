@@ -29,8 +29,8 @@ export default function ListSortView({
 
   if (isDesktopView)
     return (
-      <>
-        <span className="caption-small text-white-50 text-nowrap mr-1">
+      <div className="d-flex align-items-center">
+        <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
           {t("sort.label")}
         </span>
 
@@ -40,7 +40,7 @@ export default function ListSortView({
           isSearchable={false}
           onChange={onChange}
         />
-      </>
+      </div>
     );
 
   return (

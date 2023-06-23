@@ -66,13 +66,19 @@ export default function ResponsiveListItem({
             </div>
 
             <If condition={!!thirdLabel}>
-              <div className="mt-1">
+              <div className="mt-2">
                 {thirdLabel}
               </div>
             </If>
 
             <If condition={!!firstColumn}>
-              <ResponsiveListItemColumn {...firstColumn} justify="start" breakpoints={{ xs: true, md: false }} />
+              <div className="mt-2">
+                <ResponsiveListItemColumn
+                  {...firstColumn}
+                  justify="start"
+                  breakpoints={{ xs: true, md: false }}
+                />
+              </div>
             </If>
           </div>
         </div>

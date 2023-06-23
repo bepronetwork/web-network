@@ -171,9 +171,7 @@ export default async function get(query: ParsedUrlQuery) {
     sort.push("updatedAt");
 
   const issues = await models.issue.findAndCountAll(paginate({
-    logging: console.log,
     where: whereCondition,
-    subQuery: false,
     include: [
       networkAssociation,
       proposalAssociation,
