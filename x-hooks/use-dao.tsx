@@ -7,9 +7,9 @@ import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/redu
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 
-import { UNSUPPORTED_CHAIN } from "helpers/constants";
+import {UNSUPPORTED_CHAIN} from "helpers/constants";
 
-import { SupportedChainData } from "interfaces/supported-chain-data";
+import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import DAO from "services/dao-service";
 
@@ -68,7 +68,7 @@ export function useDao() {
    * Change network to a known address if not the same
    * @param networkAddress
    */
-  function changeNetwork(chainId = '', address = '') {
+  async function changeNetwork(chainId = '', address = '') {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
     const chain_id = chainId || state.Service?.network?.active?.chain_id;
 
@@ -97,7 +97,7 @@ export function useDao() {
 
     dispatch(changeStarting(true));
 
-    state.Service.active
+    return state.Service.active
         .loadNetwork(networkAddress)
         .then(started => {
           if (!started) {
