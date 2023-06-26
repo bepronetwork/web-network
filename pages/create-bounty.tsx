@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import { FormCheck } from "react-bootstrap";
-import { NumberFormatValues } from "react-number-format";
+import {useEffect, useState} from "react";
+import {FormCheck} from "react-bootstrap";
+import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import router, { useRouter } from "next/router";
-import { GetServerSideProps } from "next/types";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import router, {useRouter} from "next/router";
+import {GetServerSideProps} from "next/types";
 
 import CheckCircle from "assets/icons/check-circle";
 
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
-import { ContextualSpan } from "components/contextual-span";
+import {ContextualSpan} from "components/contextual-span";
 import ContractButton from "components/contract-button";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
@@ -23,35 +23,35 @@ import CreateBountySteps from "components/create-bounty/create-bounty-steps";
 import CreateBountyTokenAmount from "components/create-bounty/create-bounty-token-amount";
 import SelectNetwork from "components/create-bounty/select-network";
 import CustomContainer from "components/custom-container";
-import { IFilesProps } from "components/drag-and-drop";
+import {IFilesProps} from "components/drag-and-drop";
 import Modal from "components/modal";
 import SelectChainDropdown from "components/select-chain-dropdown";
 
-import { useAppState } from "contexts/app-state";
-import { toastError, toastWarning } from "contexts/reducers/change-toaster";
-import { addTx, updateTx } from "contexts/reducers/change-tx-list";
+import {useAppState} from "contexts/app-state";
+import {toastError, toastWarning} from "contexts/reducers/change-toaster";
+import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
-import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
-import { parseTransaction } from "helpers/transactions";
+import {BODY_CHARACTERES_LIMIT} from "helpers/constants";
+import {parseTransaction} from "helpers/transactions";
 
-import { BountyPayload } from "interfaces/create-bounty";
-import { MetamaskErrors } from "interfaces/enums/Errors";
-import { NetworkEvents } from "interfaces/enums/events";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Network } from "interfaces/network";
-import { ReposList } from "interfaces/repos-list";
-import { SupportedChainData } from "interfaces/supported-chain-data";
-import { Token } from "interfaces/token";
-import { SimpleBlockTransactionPayload } from "interfaces/transaction";
+import {BountyPayload} from "interfaces/create-bounty";
+import {MetamaskErrors} from "interfaces/enums/Errors";
+import {NetworkEvents} from "interfaces/enums/events";
+import {TransactionStatus} from "interfaces/enums/transaction-status";
+import {TransactionTypes} from "interfaces/enums/transaction-types";
+import {Network} from "interfaces/network";
+import {ReposList} from "interfaces/repos-list";
+import {SupportedChainData} from "interfaces/supported-chain-data";
+import {Token} from "interfaces/token";
+import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
-import { getCoinInfoByContract } from "services/coingecko";
+import {getCoinInfoByContract} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import { useDao } from "x-hooks/use-dao";
+import {useDao} from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 import useOctokit from "x-hooks/use-octokit";
 
@@ -462,16 +462,6 @@ export default function CreateBountyPage() {
   }, [repository]);
 
   useEffect(() => {
-    if (!currentNetwork?.networkAddress ||
-      !connectedChain ||
-      Service?.starting ||
-      !Service?.active ||
-      currentNetwork?.networkAddress === Service?.active?.network?.contractAddress) return;
-
-    changeNetwork(connectedChain?.id, currentNetwork?.networkAddress);
-  }, [currentNetwork?.networkAddress, connectedChain, Service?.active, Service?.starting]);
-
-  useEffect(() => {
     if (!currentNetwork?.tokens) {
       setTransactionalToken(undefined);
       setRewardToken(undefined);
@@ -503,7 +493,14 @@ export default function CreateBountyPage() {
 
   async function handleNetworkSelected(chain: SupportedChainData) {
     setCurrentNetwork(undefined)
-    handleAddNetwork(chain).catch((err) => console.log('handle Add Network error', err));
+    handleAddNetwork(chain)
+      .then(_ => setCurrentNetwork(networks[0]))
+      .catch((err) => console.log('handle Add Network error', err));
+  }
+
+  async function onNetworkSelected(opt) {
+    changeNetwork(connectedChain?.id, opt?.networkAddress)
+      .then(_ => setCurrentNetwork(opt));
   }
 
   function section() {
@@ -518,7 +515,7 @@ export default function CreateBountyPage() {
           <CreateBountyNetworkDropdown
             value={currentNetwork}
             networks={networks}
-            onSelect={setCurrentNetwork}
+            onSelect={onNetworkSelected}
           />
           {notFoundNetworks && (
             <ContextualSpan context="danger" className="my-3">
