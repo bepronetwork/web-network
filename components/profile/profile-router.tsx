@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import BountiesPage from "components/profile/pages/bounties";
 import MyNetworkPage from "components/profile/pages/my-network";
 import PaymentsPage from "components/profile/pages/payments";
-import ProfilePage from "components/profile/pages/profile";
+import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
 import PullRequestsPage from "components/profile/pages/pull-requests";
 import VotingPowerPage from "components/profile/pages/voting-power";
