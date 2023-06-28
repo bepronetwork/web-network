@@ -17,7 +17,10 @@ const COINGECKO_API = axios.create({baseURL: "https://api.coingecko.com/api/v3"}
 const DEFAULT_TOKEN = settings?.currency?.defaultToken || "bepro-network";
 
 const DEFAULT_CURRENCIES = settings?.currency?.conversionList || 
-  [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}, {value: "btc", label: "BTC"}, {value: "eth", label: "ETH"}];
+  [
+    {value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}, 
+    {value: "btc", label: "BTC"}, {value: "eth", label: "ETH"}
+  ];
 
 /**
  * Get the price of a coin from CoinGecko by its currencyID
@@ -56,13 +59,13 @@ const getCoinInfoByContract = async (search: string): Promise<TokenInfo> => {
   if (!publicRuntimeConfig.enableCoinGecko)
     return {prices: {}} as any; // eslint-disable-line
 
-  const storage = new WinStorage(`coingecko:${search.toLowerCase()}`);
+  const storage = new WinStorage(`coingecko:${search?.toLowerCase()}`);
 
   if (storage.value)
     return storage.value;
 
   const coins = await getCoinList();
-  const coinEntry = coins.find(({symbol}) => symbol === search.toLowerCase());
+  const coinEntry = coins.find(({symbol}) => symbol === search?.toLowerCase());
 
   if (!coinEntry)
     return {prices: {}} as any; // eslint-disable-line
@@ -90,12 +93,12 @@ async function getCoinPrice(search: string, fiat = settings?.currency.defaultFia
   if (!publicRuntimeConfig.enableCoinGecko)
     return 0;
 
-  const storage = new WinStorage(`coingecko:${search.toLowerCase()}`);
+  const storage = new WinStorage(`coingecko:${search?.toLowerCase()}`);
   if (storage.value?.prices[fiat || 'eur'])
     return storage.value.prices[fiat || 'eur'];
 
   const coins = await getCoinList();
-  const coinEntry = coins.find(({symbol}) => symbol === search.toLowerCase());
+  const coinEntry = coins.find(({symbol}) => symbol === search?.toLowerCase());
 
   if (!coinEntry)
     return 0;

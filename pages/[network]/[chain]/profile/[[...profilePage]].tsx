@@ -5,7 +5,7 @@ import ProfileRouter from "components/profile/profile-router";
 
 import { SearchBountiesPaginated } from "types/api";
 
-import getBountiesListData from "x-hooks/api/get-bounties-list-data";
+import getBountiesListData from "x-hooks/api/bounty/get-bounties-list-data";
 
 interface ProfilePageProps {
   bounties: SearchBountiesPaginated;

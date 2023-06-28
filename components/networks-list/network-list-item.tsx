@@ -37,17 +37,20 @@ export default function NetworkListItem({
       label: t("label", { count: totalBounties }),
       secondaryLabel: formatNumberToNScale(totalBounties, 0),
       breakpoints: { xs: false, md: true },
+      
     },
     {
       label: `${t("status.open")} ${t("label", { count: openBounties })}`,
       secondaryLabel: formatNumberToNScale(openBounties || 0, 0),
       breakpoints: { xs: false, md: true },
+      
     },
     {
       label: t("common:tokens-locked"),
       secondaryLabel: formatNumberToNScale(BigNumber(network?.tokensLocked || 0).toFixed()),
       breakpoints: { xs: false, lg: true },
       currency: network?.networkToken?.symbol || tokenSymbolDefault,
+      
     },
   ];
 

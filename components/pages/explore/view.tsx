@@ -3,7 +3,8 @@ import { useTranslation } from "next-i18next";
 import ListActiveNetworks from "components/bounties/list-active-networks";
 import ListRecentIssues from "components/bounties/list-recent-issues";
 import BountiesList from "components/bounty/bounties-list/controller";
-import PageHero from "components/page-hero";
+import PageHero from "components/common/page-hero/view";
+import CustomContainer from "components/custom-container";
 
 import { BountyEffectsProvider } from "contexts/bounty-effects";
 
@@ -34,9 +35,12 @@ export default function ExplorePageView({
   ];
 
   const heroTitle = networkName ? 
-    `${networkName.replace(/^\w/, c => c.toUpperCase())} Bounty Hall` : t("bounty:title-bounties");
+    t("custom-network:network-bounty-hall.title", { network: networkName }) : 
+    t("bounty:title-bounties");
+
   const heroSubTitle = networkName ? 
-    `A collection of the most recent bounties of ${networkName} networks` : t("bounty:sub-title-bounties");
+    t("custom-network:network-bounty-hall.description", { network: networkName }) : 
+    t("bounty:sub-title-bounties");
 
   return (
     <BountyEffectsProvider>
@@ -57,10 +61,12 @@ export default function ExplorePageView({
         recentBounties={recentFunding}
       />
 
-      <BountiesList 
-        bounties={bounties}
-        variant="bounty-hall"
-      />
+      <CustomContainer>
+        <BountiesList 
+          bounties={bounties}
+          variant="bounty-hall"
+        />
+      </CustomContainer>
     </BountyEffectsProvider>
   );
 }

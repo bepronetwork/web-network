@@ -39,7 +39,7 @@ export default function ProfileRouter({
     Route("/profile/my-network", MyNetworkPage),
   ];
 
-  const currentRoute = routes.find(({ path }) => asPath.endsWith(path));
+  const currentRoute = routes.find(({ path }) => asPath.split("?")[0].endsWith(path));
 
   useEffect(() => {
     if (!currentRoute)

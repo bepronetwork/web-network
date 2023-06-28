@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import ScrollTopIcon from "assets/icons/scroll-top-icon";
+import GoTopButtonView from "components/go-top-button/view";
 
-export default function ScrollTopButton() {
+export default function GoTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
   function handleGoTop() {
@@ -24,12 +24,9 @@ export default function ScrollTopButton() {
   }, []);
 
   return (
-    <>
-      {(isVisible && (
-        <button className="scroll-top-button" onClick={handleGoTop}>
-          <ScrollTopIcon />
-        </button>
-      )) || <></>}
-    </>
+    <GoTopButtonView
+      isVisible={isVisible}
+      onClick={handleGoTop}
+    />
   );
 }

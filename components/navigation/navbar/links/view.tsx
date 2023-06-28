@@ -1,48 +1,28 @@
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import InternalLink from "components/internal-link";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
+import { NAVIGATION_LINKS } from "helpers/navigation-links";
+import { isOnNetworkPath } from "helpers/network";
+
+import { Link } from "types/utils";
+
 import { useNetwork } from "x-hooks/use-network";
 
 export default function NavBarLinks() {
   const { pathname } = useRouter();
-  const { t } = useTranslation("common");
 
   const { getURLWithNetwork } = useNetwork();
 
-  const isOnNetwork = pathname?.includes("[network]/[chain]");
+  const isOnNetwork = isOnNetworkPath(pathname);
 
-  const links = [
-    {
-      href: getURLWithNetwork("/bounties"),
-      label: t("main-nav.nav-avatar.bounties"),
-      isVisible: isOnNetwork
-    },
-    {
-      href: getURLWithNetwork("/curators"),
-      label: t("main-nav.council"),
-      isVisible: isOnNetwork
-    },
-    {
-      href: "/explore",
-      label: t("main-nav.explore"),
-      isVisible: true
-    },
-    {
-      href: "/networks",
-      label: t("main-nav.networks"),
-      isVisible: true
-    },
-    {
-      href: "/leaderboard",
-      label: t("main-nav.leaderboard"),
-      isVisible: true
-    },
-  ];
+  const { network, global, both } = NAVIGATION_LINKS;
 
-  const isVisible = ({ isVisible }) => isVisible;
+  const links = ((isOnNetwork ? network.map(({ label, href }) => ({
+    href: getURLWithNetwork(href),
+    label
+  })) : global) as Link[]).concat(both as Link[]);
 
   return(
     <ResponsiveWrapper
@@ -50,7 +30,7 @@ export default function NavBarLinks() {
       xl={true}
     >
       <ul className="nav-links">
-        {links.filter(isVisible).map(({ href, label}) => 
+        {links.map(({ href, label}) => 
           <li key={`nav-${label}`}>
             <InternalLink
               href={href}

@@ -1,6 +1,6 @@
 import { IssueData } from "interfaces/issue-data";
 
-import { SearchBountiesPaginated, LeaderBoardPaginated } from "types/api";
+import { SearchBountiesPaginated, LeaderBoardPaginated, CuratorsListPaginated } from "types/api";
 
 export interface ExplorePageProps {
   numberOfNetworks: number;
@@ -11,7 +11,10 @@ export interface ExplorePageProps {
 
 export interface NetworkCuratorsPageProps {
   bounties: SearchBountiesPaginated;
+  curators: CuratorsListPaginated;
   totalReadyBounties: number;
+  totalDistributed: number;
+  totalLocked: number;
 }
 
 export interface LeaderBoardPageProps {

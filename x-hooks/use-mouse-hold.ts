@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { MouseEvents } from "types/utils";
+
 interface useMouseHoldProps {
   delay?: number;
   forceStop?: boolean;
@@ -8,7 +10,7 @@ interface useMouseHoldProps {
 export default function useMouseHold(fn: () => void, props: useMouseHoldProps = {
   delay: 5,
   forceStop: false,
-}) {
+}): MouseEvents {
   const intervalRef = useRef(null);
 
   const { delay, forceStop } = props;

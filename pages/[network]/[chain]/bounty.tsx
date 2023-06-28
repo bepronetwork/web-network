@@ -21,7 +21,11 @@ import { issueParser } from "helpers/issue";
 import { CurrentBounty } from "interfaces/application-state";
 import { IssueData, IssueDataComment } from "interfaces/issue-data";
 
-import { getBountyData, getBountyOrPullRequestComments, getPullRequestsDetails } from "x-hooks/api/get-bounty-data";
+import { 
+  getBountyData,
+  getBountyOrPullRequestComments,
+  getPullRequestsDetails
+} from "x-hooks/api/bounty/get-bounty-data";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useOctokit from "x-hooks/use-octokit";
 

@@ -11,12 +11,14 @@ import useBreakPoint from "x-hooks/use-breakpoint";
 interface NativeSelectWrapperProps {
   children: ReactNode;
   options: SelectOption[];
+  selectedIndex?: number;
   onChange: (value) => void;
 }
 
 export default function NativeSelectWrapper({
   children,
   options,
+  selectedIndex,
   onChange,
 }: NativeSelectWrapperProps) {
   const { t } = useTranslation("common");
@@ -37,7 +39,7 @@ export default function NativeSelectWrapper({
         <select
           className="native-select"
           onChange={handleChange}
-          value="choose"
+          value={selectedIndex >= 0 ? selectedIndex : "choose"}
         >
           <option value="choose" disabled hidden>{t("misc.choose-one")}</option>
           {options.map(({ label }, i) => <option value={i} key={label}>{label}</option>)}

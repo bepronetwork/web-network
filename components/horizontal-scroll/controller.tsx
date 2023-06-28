@@ -1,30 +1,27 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 
-import ChevronLeftIcon from "assets/icons/chevronleft-icon";
-import ChevronRightIcon from "assets/icons/chevronright-icon";
-
-import Button from "components/button";
-import If from "components/If";
+import HorizontalScrollView from "components/horizontal-scroll/view";
 
 import useMouseHold from "x-hooks/use-mouse-hold";
 
-interface HorizontalListProps {
+interface HorizontalScrollProps {
   children?: ReactNode;
   className?: string;
 }
 
 type Direction = "left" | "right";
 
-export default function HorizontalList({
+export default function HorizontalScroll({
   children,
   className
-}: HorizontalListProps) {
+}: HorizontalScrollProps) {
   const divRef = useRef(null);
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const HOLD_STEP = 2;
+  const ARROW_WIDTH = 10;
 
   function updateCanScroll(entries) {
     const { isIntersecting, target } = entries.shift();
@@ -41,7 +38,8 @@ export default function HorizontalList({
         const newScrollValue = divRef.current.scrollLeft + (direction === "left" ? -HOLD_STEP : HOLD_STEP);
         const maxScroll = divRef.current.scrollWidth - divRef.current.clientWidth;
   
-        if (direction === "left" && newScrollValue >= 0 || direction === "right" && newScrollValue <= maxScroll)
+        if (direction === "left" && newScrollValue >= -ARROW_WIDTH || 
+            direction === "right" && newScrollValue <= (maxScroll + 2 * ARROW_WIDTH))
           divRef.current.scrollLeft = newScrollValue;
       }
     });
@@ -61,7 +59,10 @@ export default function HorizontalList({
     const lastChild = divRef.current?.lastChild;
 
     if (firstChild) observer.observe(firstChild);
-    if (lastChild) observer.observe(lastChild);
+    if (lastChild) {
+      observer.observe(lastChild);
+      setCanScrollRight((lastChild.offsetLeft + lastChild.offsetWidth) > lastChild.parentElement?.clientWidth);
+    }
 
     return () => {
       if (firstChild) observer.unobserve(firstChild);
@@ -70,28 +71,15 @@ export default function HorizontalList({
   }, [children]);
 
   return(
-    <div className="horizontal-list">
-      <If condition={canScrollLeft}>
-        <Button 
-          className="leftButton p-0 rounded-0 h-100 border-0 d-xl-none"
-          {...mouseEventsLeft}
-        >
-          <ChevronLeftIcon />
-        </Button>
-      </If>
-      
-      <div className={`row flex-nowrap overflow-auto ${className} overflow-noscrollbar px-1`} ref={divRef}>
-        {children}
-      </div>
-
-      <If condition={canScrollRight}>
-        <Button 
-          className="rightButton p-0 rounded-0 h-100 border-0 d-xl-none"
-          {...mouseEventsRight}
-        >
-          <ChevronRightIcon />
-        </Button>
-      </If>
-    </div>
+    <HorizontalScrollView
+      className={className}
+      canScrollLeft={canScrollLeft}
+      canScrollRight={canScrollRight}
+      mouseEventsLeft={mouseEventsLeft}
+      mouseEventsRight={mouseEventsRight}
+      divRef={divRef}
+    >
+      {children}
+    </HorizontalScrollView>
   );
 }

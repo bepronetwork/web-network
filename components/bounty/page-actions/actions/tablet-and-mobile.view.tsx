@@ -1,7 +1,8 @@
-import MultiActionButton, { Action } from "components/common/buttons/multi-action/view";
+import StartWorkingButton from "components/bounty/page-actions/actions/start-working.view";
+import MultiActionButton from "components/common/buttons/multi-action/view";
 import ConnectGithub from "components/connect-github";
 
-import StartWorkingButton from "./start-working.view";
+import { Action } from "types/utils";
 
 interface TabletAndMobileButtonProps {
   isCreatePr: boolean;

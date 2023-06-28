@@ -4,9 +4,11 @@ import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
+import PageHero from "components/common/page-hero/view";
 import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
-import PageHero, {InfosHero} from "components/page-hero";
+
+import { HeroInfo } from "types/components";
 
 interface price_used {
   [name: string]: number;
@@ -45,7 +47,7 @@ export default function NetworksPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [convertedTokens, setConvertedTokens] = useState<ConvertedTokens>();
 
-  const [infos, setInfos] = useState<InfosHero[]>([
+  const [infos, setInfos] = useState<HeroInfo[]>([
     {
       value: 0,
       label: t("custom-network:hero.number-of-networks")

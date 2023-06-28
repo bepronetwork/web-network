@@ -126,16 +126,22 @@ export function useNetwork() {
     };
   }
 
-  function goToProfilePage(profilePage: ProfilePages) {
+  function goToProfilePage(profilePage: ProfilePages, params = undefined) {
     const queryNetwork = query?.network || "";
     const queryChain = query?.chain || "";
 
     const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
 
     if (queryNetwork !== "")
-      return push(getURLWithNetwork("/profile/[[...profilePage]]"), `/${queryNetwork}/${queryChain}/${path}`);
+      return push(getURLWithNetwork(`/profile/[[...profilePage]]`, params), `/${queryNetwork}/${queryChain}/${path}`);
 
-    return push("/profile/[[...profilePage]]", `/${path}`);
+    return push({
+      pathname: "/profile/[[...profilePage]]",
+      query: {
+        ...query,
+        ...params
+      }
+    }, `/${path}`);
   }
 
   function loadNetworkAllowedTokens() {

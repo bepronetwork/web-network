@@ -3,9 +3,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 
 import BountiesList from "components/bounty/bounties-list/controller";
-import CouncilLayout from "components/council-layout";
-import CuratorsList from "components/curators-list";
 import If from "components/If";
+import CuratorsPageLayout from "components/layouts/curators-page/controller";
+import CuratorsList from "components/lists/curators/controller";
 
 import { NetworkCuratorsPageProps } from "types/pages";
 
@@ -15,16 +15,22 @@ interface NetworkCuratorsViewProps extends NetworkCuratorsPageProps {
 
 export default function NetworkCuratorsView({
   bounties,
+  curators,
   totalReadyBounties,
-  type
+  totalDistributed,
+  totalLocked,
+  type,
 }: NetworkCuratorsViewProps) {
   const { t } = useTranslation(["council"]);
 
-  const isCuratorView = type === "curators-list";
+  const isCuratorView = !type || type === "curators-list";
 
   return (
-    <CouncilLayout
+    <CuratorsPageLayout
       totalReadyBounties={totalReadyBounties}
+      totalCurators={curators.totalCurators}
+      totalDistributed={totalDistributed}
+      totalLocked={totalLocked}
     >
       <If 
         condition={isCuratorView}
@@ -33,14 +39,15 @@ export default function NetworkCuratorsView({
             key={type}
             emptyMessage={t("council:empty")}
             bounties={bounties}
+            hideFilter
           />
         }
       >
-        <CuratorsList 
+        <CuratorsList
           key={"curators-list"} 
-          inView={isCuratorView}
+          curators={curators}
         />
       </If>
-    </CouncilLayout>
+    </CuratorsPageLayout>
   );
 }

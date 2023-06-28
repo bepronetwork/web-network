@@ -60,17 +60,19 @@
     "wallet": {}
   },
   "main-nav": {
-    "council": "Curators",
+    "curators": "Curators",
     "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
     "new-bounty": "Create bounty",
     "explore": "Explore",
     "bounty-hall": "Bounty Hall",
     "get-started": "Get Started",
-    "connect": "Connect Wallet",
+    "connect": "Connect",
+    "connect-wallet": "Connect Wallet",
     "new-network": "New Network",
     "my-network": "My Network",
     "networks": "Networks",
+    "bounties": "Bounties",
     "nav-avatar": {
       "my-profile": "My profile",
       "profile": "Profile",
@@ -150,7 +152,8 @@
     "hide": "Hide",
     "remove": "Remove",
     "register": "Register",
-    "clear-all": "Clear All"
+    "clear-all": "Clear All",
+    "apply": "Apply"
   },
   "misc": {
     "by": "by",
@@ -209,7 +212,9 @@
     "bounty": "Bounty",
     "choose-one": "Choose one",
     "networks": "Networks",
-    "copied": "Copied"
+    "copied": "Copied",
+    "address-copied": "Address Copied",
+    "empty-list": "Empty List"
   },
   "modals": {
     "help-modal": {

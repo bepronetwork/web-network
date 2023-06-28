@@ -15,8 +15,9 @@ import InternalLink from "components/internal-link";
 import ChainSelector from "components/navigation/chain-selector/controller";
 import ProfileLinks from "components/profile/profile-links";
 
-import { NAVIGATION_LINKS } from "helpers/navigation-links";
 import { truncateAddress } from "helpers/truncate-address";
+
+import { Link } from "types/utils";
 
 interface HamburgerMenuViewProps {
   show: boolean;
@@ -24,6 +25,7 @@ interface HamburgerMenuViewProps {
   userAddress: string;
   isConnected: boolean;
   isProfileLinksVisible: boolean;
+  links: Link[];
   onDisconnect: () => void;
   onShowProfileLinks: () => void;
   onHideProfileLinks: () => void;
@@ -36,6 +38,7 @@ export default function HamburgerMenuView({
   userAddress,
   isConnected,
   isProfileLinksVisible,
+  links,
   onDisconnect,
   onShowProfileLinks,
   onHideProfileLinks,
@@ -128,7 +131,7 @@ export default function HamburgerMenuView({
                   actionCallBack={onHideHamburger}
                 />
 
-                {NAVIGATION_LINKS.global.map(GlobalLink)}
+                {links.map(GlobalLink)}
               </div>
             </If>
 

@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 
+import clsx from "clsx";
+
 import ResponsiveListItemColumn from "components/common/responsive-list-item/column/view";
 import If from "components/If";
 import ResponsiveWrapper from "components/responsive-wrapper";
@@ -31,32 +33,35 @@ export default function ResponsiveListItem({
 
   return (
     <div 
-      className="p-3 row border-radius-8 border border-gray-850 bg-gray-900 cursor-pointer" 
+      className={clsx([
+        "p-3 row border-radius-8 border border-gray-850 bg-gray-900 mx-0",
+        !!onClick && "cursor-pointer",
+      ])} 
       onClick={onClick}
     >
-      <div className="col-sm-12 col-md-auto col-lg">
+      <div className="col-sm-12 col-md px-0">
         <div className="row align-items-center">
           <div className="col-auto">
             {icon}
           </div>
 
-          <div className="col-auto px-0">
+          <div className="col px-0">
             <div className="row align-items-center">
               <div className="col-auto">
                 <span className="caption-small font-weight-medium text-white d-flex align-items-center gap-2">
                   {label}
-
-                  <If condition={!!action}>
-                    <ResponsiveWrapper
-                      className={`col d-flex flex-row align-items-center justify-content-center`}
-                      xs={true}
-                      md={false}
-                    >
-                      {action}
-                    </ResponsiveWrapper>
-                  </If>
                 </span>
               </div>
+
+              <If condition={!!action}>
+                <ResponsiveWrapper
+                  className={`col align-items-center justify-content-end mb-1 mr-2`}
+                  xs={true}
+                  md={false}
+                >
+                  {action}
+                </ResponsiveWrapper>
+              </If>
 
               <If condition={!!secondaryLabel}>
                 <div className="col-auto px-0">

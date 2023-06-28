@@ -1,5 +1,5 @@
 {
-  "title": "Bounties ready to propose",
+  "title": "Curators",
   "subtitle": "Use your *bv{{token}}* to create bounty distributions within the Network",
   "ready-bountys": "Ready Bounties",
   "council-members": "Curators",
@@ -15,7 +15,7 @@
   "council-list": "Curators List",
   "council-table": {
     "address": "Address",
-    "closed-proposals": "Closed Proposals",
+    "closed-proposals": "Accepted Proposals",
     "disputed-proposals": "Disputed Proposals",
     "disputes": "Disputes",
     "total-votes": "Total Votes",

@@ -23,6 +23,7 @@ interface BountiesListProps {
   buttonMessage?: string;
   variant?: "bounty-hall" | "profile" | "network" | "management"
   type?: "bounties" | "pull-requests" | "proposals";
+  hideFilter?: boolean;
 }
 
 export default function BountiesList({
@@ -31,7 +32,8 @@ export default function BountiesList({
   redirect,
   variant = "network",
   bounties,
-  type = "bounties"
+  type = "bounties",
+  hideFilter,
 }: BountiesListProps) {
   const router = useRouter();
   
@@ -110,6 +112,7 @@ export default function BountiesList({
       onNextPage={nextPage}
       onEnterPressed={handleSearch}
       onSearchInputChange={handleSearchChange}
+      hideFilter={hideFilter}
     />
   );
 }

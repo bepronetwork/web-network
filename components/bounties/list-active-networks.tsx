@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import ListActiveNetworksItem from "components/bounties/list-active-networks-item";
 import LoadingList from "components/bounties/loading-list";
 import CustomContainer from "components/custom-container";
-import HorizontalList from "components/horizontal-list";
+import HorizontalScroll from "components/horizontal-scroll/controller";
 import If from "components/If";
 import NothingFound from "components/nothing-found";
 
@@ -59,12 +59,12 @@ export default function ListActiveNetworks() {
           condition={!!networks.length}
           otherwise={<NothingFound description={t("most-active-network-empty")} />}
         >
-          <HorizontalList>
+          <HorizontalScroll>
             {networks.map((network) => 
               <div className="col-12 col-sm-6 col-md-5 col-lg-4">
                 <ListActiveNetworksItem network={network} key={`${network.name}-${network.chain.chainShortName}`} />
               </div>)}
-          </HorizontalList>
+          </HorizontalScroll>
         </If>
       </div>
     </CustomContainer>

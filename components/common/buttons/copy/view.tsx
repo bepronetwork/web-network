@@ -28,7 +28,7 @@ export default function CopyButtonView({
     <div ref={ref}>
       <Button
         onClick={onClick}
-        color="gray-800"
+        color="gray-900"
         textClass="text-gray-50"
         className="border-radius-4 p-1 border-gray-700 not-svg"
       >

@@ -7,12 +7,9 @@ import IconSingleValue from "components/icon-single-value";
 import If from "components/If";
 import ReactSelect from "components/react-select";
 
-import useBreakPoint from "x-hooks/use-breakpoint";
+import { Action } from "types/utils";
 
-export interface Action {
-  onClick: () => void;
-  label: string;
-}
+import useBreakPoint from "x-hooks/use-breakpoint";
 
 interface MultiActionButtonProps {
   actions: Action[];

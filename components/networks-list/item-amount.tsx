@@ -1,5 +1,6 @@
 import TokenSymbolView from "components/common/token-symbol/view";
 import If from "components/If";
+import ResponsiveWrapper from "components/responsive-wrapper";
 
 interface ItemAmountProps {
   amount: string | number;
@@ -21,17 +22,19 @@ export default function ItemAmount({
       </If>
 
       <If condition={!!currency}>
-        <TokenSymbolView
-            name={currency}
-            className="caption-small font-weight-medium text-primary"
-        />
+          <TokenSymbolView
+              name={currency}
+              className="caption-small font-weight-medium text-primary"
+          />
       </If>
 
-      <If condition={!!label}>
-        <span className="caption-small font-weight-medium text-gray-500">
-          {label}
-        </span>
-      </If>
+      <ResponsiveWrapper xs={true} xl={false}>
+        <If condition={!!label}>
+          <span className="caption-small font-weight-medium text-gray-500">
+            {label}
+          </span>
+        </If>
+      </ResponsiveWrapper>
     </div>
   );
 }

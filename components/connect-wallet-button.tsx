@@ -13,6 +13,8 @@ import {changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
+import ResponsiveWrapper from "./responsive-wrapper";
+
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
@@ -105,7 +107,15 @@ export default function ConnectWalletButton({children = null, asModal = false, f
         color="white"
         className="text-dark bg-opacity-100"
         onClick={handleLogin}>
-        <span>{t("main-nav.connect")}</span>
+        <span>
+          <ResponsiveWrapper xs={true} xl={false}>
+            {t("main-nav.connect")}
+          </ResponsiveWrapper>
+
+          <ResponsiveWrapper xs={false} xl={true}>
+            {t("main-nav.connect-wallet")}
+          </ResponsiveWrapper>
+        </span>
       </Button>
     );
 

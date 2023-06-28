@@ -1,16 +1,12 @@
 import clsx from "clsx";
 
-interface MiniTabsItem {
-  onClick: () => void;
-  label: string;
-  active: boolean;
-}
+import { MiniTabsItem } from "types/components";
 
 interface MiniTabsProps {
   items: MiniTabsItem[];
 }
 
-export function MiniTabs({
+export default function MiniTabs({
   items = []
 } : MiniTabsProps) {
   return(

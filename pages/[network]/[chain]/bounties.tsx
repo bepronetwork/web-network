@@ -6,7 +6,8 @@ import { useRouter } from "next/dist/client/router";
 import {GetServerSideProps} from "next/types";
 
 import BountiesList from "components/bounty/bounties-list/controller";
-import PageHero, {InfosHero} from "components/page-hero";
+import PageHero from "components/common/page-hero/view";
+import CustomContainer from "components/custom-container";
 
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
@@ -14,8 +15,9 @@ import {BountyEffectsProvider} from "contexts/bounty-effects";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import { SearchBountiesPaginated } from "types/api";
+import { HeroInfo } from "types/components";
 
-import getBountiesListData from "x-hooks/api/get-bounties-list-data";
+import getBountiesListData from "x-hooks/api/bounty/get-bounties-list-data";
 import useApi from "x-hooks/use-api";
 import {useBounty} from "x-hooks/use-bounty";
 import useChain from "x-hooks/use-chain";
@@ -55,7 +57,7 @@ export default function BountiesPage({
     }
   ];
 
-  const [infos, setInfos] = useState<InfosHero[]>(zeroInfo);
+  const [infos, setInfos] = useState<HeroInfo[]>(zeroInfo);
 
   useEffect(() => {
     if (!state.Service?.network?.active || !chain || !query?.network) return;
@@ -111,10 +113,12 @@ export default function BountiesPage({
         infos={infos}
       />
 
-      <BountiesList
-        bounties={bounties}
-        variant="network"
-      />
+      <CustomContainer>
+        <BountiesList
+          bounties={bounties}
+          variant="network"
+        />
+      </CustomContainer>
     </BountyEffectsProvider>
   );
 }

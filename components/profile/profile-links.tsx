@@ -31,7 +31,7 @@ export default function ProfileLinks({
   const getUrl = () =>
     query?.network ? getURLWithNetwork("/profile/[[...profilePage]]") : "/profile/[[...profilePage]]";
   const getTranslation = page => t(`main-nav.nav-avatar.${page}`);
-  const isActive = href => href !== "" ? asPath.endsWith(href) : asPath.endsWith("/profile");
+  const isActive = href => asPath.endsWith(`/profile${href ? `/${href}` : ""}`);
 
   const ProfileLink = ({ label, href, icon }) => (
     <li className="mb-2" key={label}>

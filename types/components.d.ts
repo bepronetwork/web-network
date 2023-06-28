@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { Currency } from "interfaces/currency";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import { SearchBountiesPaginated } from "types/api";
@@ -31,4 +32,18 @@ export interface SortOption extends Omit<SelectOption, "value"> {
 export interface CustomDropdownItem {
   content: ReactNode;
   onClick?: () => void;
+}
+
+export interface HeroInfo {
+  value: number | string;
+  label: string;
+  currency?: Currency;
+  hasConvertedTokens?: boolean;
+  setListedModalVisibility?: (visible: boolean) => void;
+}
+
+interface MiniTabsItem {
+  onClick: () => void;
+  label: string;
+  active: boolean;
 }

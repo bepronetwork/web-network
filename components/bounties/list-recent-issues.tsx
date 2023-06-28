@@ -5,7 +5,7 @@ import PlusIcon from "assets/icons/plus-icon";
 
 import ContractButton from "components/contract-button";
 import CustomContainer from "components/custom-container";
-import HorizontalList from "components/horizontal-list";
+import HorizontalScroll from "components/horizontal-scroll/controller";
 import If from "components/If";
 import IssueListItem from "components/issue-list-item";
 import NothingFound from "components/nothing-found";
@@ -88,7 +88,7 @@ export default function ListRecentIssues({
       </div>
 
       <div className="row mb-3 mt-1">
-        <HorizontalList>
+        <HorizontalScroll>
           {recentBounties?.map((bounty) => (
               <div className="col-12 col-sm-6 col-md-5 col-lg-4" key={bounty.id}>
                 <IssueListItem issue={issueParser(bounty)} key={bounty.id} size="sm" />
@@ -98,7 +98,7 @@ export default function ListRecentIssues({
           <If condition={recentBounties?.length < MIN_COLS}>
             {renderNothingFound()}
           </If>
-        </HorizontalList>
+        </HorizontalScroll>
       </div>
     </CustomContainer>
   );

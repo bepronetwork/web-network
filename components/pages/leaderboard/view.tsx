@@ -1,7 +1,8 @@
 import { useTranslation } from "next-i18next";
 
+import PageHero from "components/common/page-hero/view";
+import CustomContainer from "components/custom-container";
 import LeaderBoardList from "components/lists/leaderboard/controller";
-import PageHero from "components/page-hero";
 
 import { LeaderBoardPageProps } from "types/pages";
 
@@ -16,9 +17,11 @@ export default function LeaderBoardPage({ leaderboard }: LeaderBoardPageProps) {
         infos={[]}
       />
 
-      <LeaderBoardList
-        leaderboard={leaderboard}
-      />
+      <CustomContainer>
+        <LeaderBoardList
+          leaderboard={leaderboard}
+        />
+      </CustomContainer>
     </>
   );
 }
