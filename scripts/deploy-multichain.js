@@ -83,7 +83,9 @@ async function main(option = 0) {
   const hasGovernance = options.governanceToken ? !!options.governanceToken[option] : false;
   const hasBountyNFT = options.bountyNFT ? !!options.bountyNFT[option] : false;
 
-  async function getContractAddress({contractAddress}) {
+  const startBlock = await connection.eth.getBlockNumber();
+
+  function getContractAddress({contractAddress}) {
     return contractAddress;
   }
 
@@ -91,7 +93,9 @@ async function main(option = 0) {
     const deployer = new _class(connection);
     deployer.loadAbi();
     console.debug(`Deploying ${deployer.constructor?.name} with args:`, ...(args || []));
-    return getContractAddress(await deployer.deployJsonAbi(...(args || [])));
+    const address = getContractAddress(await deployer.deployJsonAbi(...(args || [])));
+    console.debug(`Deployed address`, address);
+    return address;
   }
 
   async function deployNetwork(governanceToken, registryAddress) {
@@ -142,6 +146,7 @@ async function main(option = 0) {
 
     for (const [fn, value] of changeFunctions) {
       await network[fn](value);
+      console.debug(`Changed ${fn} to ${value}`);
     }
 
     const transactionTokensAllowed = [tokens[1], tokens[0]];
@@ -279,6 +284,14 @@ async function main(option = 0) {
           network_id: networkDb.id
         }
       });
+
+      await ChainEvents.findOrCreate({
+        where: {
+          chain_id: chainId,
+          name: "global",
+          lastBlock: startBlock,
+        }
+      })
 
 
       const saveNetworkTokensRelation = async (token, isTransactional, isReward) => {
