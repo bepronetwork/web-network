@@ -69,7 +69,7 @@ export function useDao() {
    * Change network to a known address if not the same
    * @param networkAddress
    */
-  function changeNetwork(chainId = '', address = '') {
+  async function changeNetwork(chainId = '', address = '') {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
     const chain_id = chainId || state.Service?.network?.active?.chain_id;
 
@@ -98,7 +98,7 @@ export function useDao() {
 
     dispatch(changeStarting(true));
 
-    state.Service.active
+    return state.Service.active
         .loadNetwork(networkAddress)
         .then(started => {
           if (!started) {
@@ -222,7 +222,7 @@ export function useDao() {
     const chain = findSupportedChain({ chainId });
 
     sessionStorage.setItem("currentChainId", chainId.toString());
-    
+
     return dispatch(changeChainReducer.update({
       id: (chain?.chainId || chainId)?.toString(),
       name: chain?.chainName || UNSUPPORTED_CHAIN,
