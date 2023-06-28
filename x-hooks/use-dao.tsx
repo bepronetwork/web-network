@@ -3,14 +3,14 @@ import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
-import { changeChain as changeChainReducer } from "contexts/reducers/change-chain";
+import {changeChain as changeChainReducer} from "contexts/reducers/change-chain";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 
-import { SUPPORT_LINK, UNSUPPORTED_CHAIN } from "helpers/constants";
+import {SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
 
-import { SupportedChainData } from "interfaces/supported-chain-data";
+import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import DAO from "services/dao-service";
 
@@ -69,7 +69,7 @@ export function useDao() {
    * Change network to a known address if not the same
    * @param networkAddress
    */
-  function changeNetwork(chainId = '', address = '') {
+  async function changeNetwork(chainId = '', address = '') {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
     const chain_id = chainId || state.Service?.network?.active?.chain_id;
 
@@ -83,7 +83,7 @@ export function useDao() {
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    const service = state.Service.active;
+    // const service = state.Service.active;
 
     if(chain) {
       const withWeb3Host = !!state.Service?.active?.web3Host;
@@ -98,14 +98,14 @@ export function useDao() {
 
     dispatch(changeStarting(true));
 
-    state.Service.active
+    return state.Service.active
         .loadNetwork(networkAddress)
         .then(started => {
           if (!started) {
             console.error("Failed to load network", networkAddress);
             return;
           }
-          dispatch(changeActiveDAO(service));
+          // dispatch(changeActiveDAO(service));
           console.debug("Network started");
         })
         .catch(error => {
@@ -222,7 +222,7 @@ export function useDao() {
     const chain = findSupportedChain({ chainId });
 
     sessionStorage.setItem("currentChainId", chainId.toString());
-    
+
     return dispatch(changeChainReducer.update({
       id: (chain?.chainId || chainId)?.toString(),
       name: chain?.chainName || UNSUPPORTED_CHAIN,
