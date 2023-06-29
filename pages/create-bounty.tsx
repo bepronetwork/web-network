@@ -31,7 +31,7 @@ import {useAppState} from "contexts/app-state";
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
-import {BODY_CHARACTERES_LIMIT} from "helpers/constants";
+import {BODY_CHARACTERES_LIMIT, UNSUPPORTED_CHAIN} from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
 
 import {BountyPayload} from "interfaces/create-bounty";
@@ -421,21 +421,24 @@ export default function CreateBountyPage() {
   useEffect(() => {
     if(!connectedChain) return;
 
-    searchNetworks({
-      isRegistered: true,
-      isClosed: false,
-      chainId: connectedChain?.id,
-      sortBy: "name",
-      order: "asc",
-      isNeedCountsAndTokensLocked: true,
-    })
-      .then(async ({ count, rows }) => {
-        setNetworks(rows);
-        setNotFoundNetwork(count > 0 ? false : true);
+    if (connectedChain.name === UNSUPPORTED_CHAIN)
+      setCurrentNetwork(undefined);
+    else 
+      searchNetworks({
+        isRegistered: true,
+        isClosed: false,
+        chainId: connectedChain?.id,
+        sortBy: "name",
+        order: "asc",
+        isNeedCountsAndTokensLocked: true,
       })
-      .catch((error) => {
-        console.log("Failed to retrieve networks list", error);
-      });
+        .then(async ({ count, rows }) => {
+          setNetworks(rows);
+          setNotFoundNetwork(!count);
+        })
+        .catch((error) => {
+          console.log("Failed to retrieve networks list", error);
+        });
   }, [connectedChain]);
 
   useEffect(() => {

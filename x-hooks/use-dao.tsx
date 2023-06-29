@@ -21,8 +21,8 @@ export function useDao() {
   const { replace, asPath, pathname } = useRouter();
 
   const {state, dispatch} = useAppState();
+  const { findSupportedChain } = useChain();
   const { handleAddNetwork } = useNetworkChange();
-  const { chain, findSupportedChain } = useChain();
 
   function isChainConfigured(chain: SupportedChainData) {
     return isAddress(chain?.registryAddress) && !isZeroAddress(chain?.registryAddress);
@@ -71,7 +71,7 @@ export function useDao() {
    */
   async function changeNetwork(chainId = '', address = '') {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
-    const chain_id = chainId || state.Service?.network?.active?.chain_id;
+    const chain_id = +(chainId || state.Service?.network?.active?.chain_id);
 
     if (!state.Service?.active ||
         !networkAddress ||
@@ -83,16 +83,15 @@ export function useDao() {
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    // const service = state.Service.active;
+    const networkChain = findSupportedChain({ chainId: chain_id });
 
-    if(chain) {
-      const withWeb3Host = !!state.Service?.active?.web3Host;
+    if (!networkChain) return;
 
-      if (+chain_id !== +chain?.chainId ||
-          !withWeb3Host && +chain_id !== +state.Service?.web3Connection?.web3?.currentProvider.chainId ||
-          withWeb3Host && chain?.chainRpc !== state.Service?.active?.web3Host)
-        return;
-    }
+    const withWeb3Host = !!state.Service?.active?.web3Host;
+
+    if (!withWeb3Host && chain_id !== +state.Service?.web3Connection?.web3?.currentProvider?.chainId ||
+        withWeb3Host && networkChain.chainRpc !== state.Service?.active?.web3Host)
+      return;
 
     console.debug("Starting network");
 

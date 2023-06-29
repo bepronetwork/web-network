@@ -13,14 +13,14 @@ export default function CloseIcon(props: SVGProps<SVGSVGElement>) {
       <g clipPath="url(#clip0_728_14315)">
         <path
           d="M18.75 5.25L5.25 18.75"
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M18.75 18.75L5.25 5.25"
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -28,7 +28,7 @@ export default function CloseIcon(props: SVGProps<SVGSVGElement>) {
       </g>
       <defs>
         <clipPath id="clip0_728_14315">
-          <rect width="24" height="24" fill="white" />
+          <rect width="24" height="24" fill="currentColor" />
         </clipPath>
       </defs>
     </svg>

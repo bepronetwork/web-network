@@ -52,7 +52,7 @@ export default function SelectChainDropdown({
       preIcon: (<ChainIcon src={chain.icon} />),
       isDisabled,
       tooltip: isDisabled
-      ? "Not available on this chain"
+      ? t("errors.not-available-chain")
       : chain?.chainShortName?.length > 12
       ? chain.chainShortName
       : undefined,
@@ -84,6 +84,7 @@ export default function SelectChainDropdown({
         options?.find(({ value: { chainId } }) => chainId === +(defaultChain?.chainId || connectedChain.id))?.value;
 
     if (!chain) {
+      setSelectedChain(null);
       return;
     }
 
