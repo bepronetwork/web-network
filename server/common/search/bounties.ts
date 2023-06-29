@@ -1,13 +1,13 @@
-import { subHours, subMonths, subWeeks, subYears } from "date-fns";
-import { ParsedUrlQuery } from "querystring";
-import { Op, Sequelize, WhereOptions } from "sequelize";
+import {subHours, subMonths, subWeeks, subYears} from "date-fns";
+import {ParsedUrlQuery} from "querystring";
+import {Op, Sequelize, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import { caseInsensitiveEqual } from "helpers/db/conditionals";
-import { getAssociation } from "helpers/db/models";
-import paginate, { calculateTotalPages } from "helpers/paginate";
-import { isTrue } from "helpers/string";
+import {caseInsensitiveEqual} from "helpers/db/conditionals";
+import {getAssociation} from "helpers/db/models";
+import paginate, {calculateTotalPages} from "helpers/paginate";
+import {isTrue} from "helpers/string";
 
 export default async function get(query: ParsedUrlQuery) {
   const {
@@ -129,7 +129,7 @@ export default async function get(query: ParsedUrlQuery) {
 
   const networkAssociation = 
     getAssociation( "network", 
-                    ["colors", "name", "networkAddress", "disputableTime"], 
+                    ["colors", "name", "networkAddress", "disputableTime", "logoIcon"],
                     true, 
                     networkName || network ? { 
                       networkName: caseInsensitiveEqual("network.name", (networkName || network).toString())
