@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import NavBarView from "components/navigation/navbar/view";
 
-import { useAppState } from "contexts/app-state";
-import { changeCurrentUserHasRegisteredNetwork } from "contexts/reducers/change-current-user";
+import {useAppState} from "contexts/app-state";
+import {changeCurrentUserHasRegisteredNetwork} from "contexts/reducers/change-current-user";
 
 import useApi from "x-hooks/use-api";
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 
 export default function NavBar() {
   const { pathname } = useRouter();
@@ -17,6 +17,7 @@ export default function NavBar() {
   const { dispatch } = useAppState();
   const { searchNetworks } = useApi();
   const { getURLWithNetwork } = useNetwork();
+  const [checkedNetworkExistance, setCheckedNetworkExistance] = useState('');
 
   const isOnNetwork = pathname?.includes("[network]");
 
@@ -29,6 +30,11 @@ export default function NavBar() {
   useEffect(() => {
     if (!state.currentUser?.walletAddress || !state.connectedChain?.id)
       return;
+
+    if (state.currentUser.walletAddress.concat(state.connectedChain.id) === checkedNetworkExistance)
+      return;
+
+    setCheckedNetworkExistance(state.currentUser.walletAddress.concat(state.connectedChain.id));
 
     searchNetworks({
       creatorAddress: state.currentUser?.walletAddress,

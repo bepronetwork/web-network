@@ -1,7 +1,7 @@
 import axios from "axios";
 import getConfig from "next/config";
 
-import { WinStorage } from "services/win-storage";
+import {WinStorage} from "services/win-storage";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -13,6 +13,7 @@ async function getChainIconsList() {
 
   try {
     const { data } = await axios.get("https://chainid.network/chain_icons.json");
+    storage.value = data;
 
     return data;
   } catch (error) {

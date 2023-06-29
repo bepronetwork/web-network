@@ -45,7 +45,7 @@ import {SupportedChainData} from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
 import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
-import {getCoinInfoByContract} from "services/coingecko";
+import {getCoinInfoByContract, getCoinList} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -142,6 +142,8 @@ export default function CreateBountyPage() {
   }
 
   async function handleCustomTokens(tokens: Token[]) {
+    await getCoinList() // ask for list so it we don't do that on the loop;
+
     Promise.all(tokens?.map(async (token) => {
       const newTokens = await getCoinInfoByContract(token?.symbol)
         .then((tokenInfo) => ({ ...token, tokenInfo }))
@@ -418,12 +420,16 @@ export default function CreateBountyPage() {
     }
   }
 
+  const [searchForNetwork, setSearchingForNetwork] = useState<string|null>(null);
+
   useEffect(() => {
-    if(!connectedChain) return;
+    if(!connectedChain || searchForNetwork === connectedChain?.id) return;
+
+    setSearchingForNetwork(connectedChain?.id);
 
     if (connectedChain.name === UNSUPPORTED_CHAIN)
       setCurrentNetwork(undefined);
-    else 
+    else
       searchNetworks({
         isRegistered: true,
         isClosed: false,
@@ -438,7 +444,8 @@ export default function CreateBountyPage() {
         })
         .catch((error) => {
           console.log("Failed to retrieve networks list", error);
-        });
+        })
+        .finally(() => setSearchingForNetwork(null));
   }, [connectedChain]);
 
   useEffect(() => {

@@ -1,10 +1,9 @@
-
 import axios from "axios";
 import getConfig from "next/config";
 
-import { getSettingsFromSessionStorage } from "helpers/settings";
+import {getSettingsFromSessionStorage} from "helpers/settings";
 
-import { TokenInfo } from "interfaces/token";
+import {TokenInfo} from "interfaces/token";
 
 import {WinStorage} from "./win-storage";
 
@@ -114,5 +113,6 @@ async function getCoinPrice(search: string, fiat = settings?.currency.defaultFia
 export {
   getCurrencyByToken,
   getCoinInfoByContract,
-  getCoinPrice
+  getCoinPrice,
+  getCoinList
 };
