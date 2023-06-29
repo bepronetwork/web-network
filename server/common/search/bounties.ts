@@ -44,9 +44,12 @@ export default async function get(query: ParsedUrlQuery) {
         [Op.ne]: "0",
         [Op.ne]: Sequelize.literal('"issue"."fundedAmount"'),
       };
-    else if (state === "open")
+    else if (state === "open") {
       whereCondition.state[Op.in] = ["open", "ready", "proposal"];
-    else if (state === "proposable")
+      whereCondition.fundingAmount = {
+        [Op.eq]: Sequelize.literal('"issue"."fundedAmount"')
+      };
+    } else if (state === "proposable")
       whereCondition.state[Op.eq] = "ready";
     else
       whereCondition.state[Op.eq] = state;

@@ -81,7 +81,7 @@ export default function ListView(props: ListViewProps) {
           </div>
 
           <If condition={!!sortOptions}>
-            <div className="col-auto d-flex align-items-center px-0">
+            <div className="col-auto px-0">
               <ListSort options={sortOptions} />
             </div>
           </If>

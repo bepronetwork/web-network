@@ -38,7 +38,7 @@ export default function ListSortView({
   if (isDesktopView || asSelect)
     return (
       <div className="d-flex align-items-center">
-        <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
+        <span className={labelClass}>
           {t("sort.label")}
         </span>
 
