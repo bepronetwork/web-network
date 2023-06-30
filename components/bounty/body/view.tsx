@@ -52,7 +52,7 @@ export default function BountyBodyView({
 
   if (walletAddress)
     return (
-      <div className="container mb-1">
+      <div className="mb-1">
         <div className="row justify-content-center">
           <div className="col-md-8">
             <div className="border-radius-8 p-3 bg-gray-850 mb-3">
@@ -121,12 +121,10 @@ export default function BountyBodyView({
     );
   else
     return (
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-12">
-            <div className="border-radius-8 p-3 bg-gray-850 mb-3">
-              <BountyDescription body={body || ""} />
-            </div>
+      <div className="row justify-content-center">
+        <div className="col-md-12">
+          <div className="border-radius-8 p-3 bg-gray-850 mb-3">
+            <BountyDescription body={body || ""} />
           </div>
         </div>
       </div>

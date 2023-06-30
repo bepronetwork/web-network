@@ -10,8 +10,6 @@ import GithubInfo from "components/github-info";
 
 import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
 
-import useBreakPoint from "x-hooks/use-breakpoint";
-
 import PullRequestLabels from "../labels/controller";
 
 interface PullRequestHeroViewProps {
@@ -27,14 +25,9 @@ export default function PullRequestHeroView({
 }: PullRequestHeroViewProps) {
   const { t } = useTranslation(["common", "pull-request"]);
 
-  const { isMobileView, isTabletView } = useBreakPoint();
-
   return (
-    <>
-      <CustomContainer
-        className="banner-shadow"
-        col={isTabletView || isMobileView ? "col-12" : "col-10"}
-      >
+    <div className="mt-3 pb-2 border-bottom border-gray-850">
+      <CustomContainer>
         <div className="d-flex flex-row flex-column">
           <div className="col">
             <div className="d-flex">
@@ -111,6 +104,6 @@ export default function PullRequestHeroView({
           </div>
         </div>
       </CustomContainer>
-    </>
+    </div>
   );
 }

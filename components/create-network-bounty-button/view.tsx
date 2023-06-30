@@ -29,11 +29,11 @@ export default function CreateNetworkBountyButtonView({
         condition={isOnNetwork}
         otherwise={
           <MultiActionButton
-          label={t("misc.create")}
-          className="read-only-button w-100"
-          icon={<PlusIcon />}
-          actions={actions}
-        />
+            label={t("misc.create")}
+            className="read-only-button w-100"
+            icon={<PlusIcon />}
+            actions={actions}
+          />
         }
       >
         <InternalLink

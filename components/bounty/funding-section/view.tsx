@@ -19,7 +19,6 @@ import Collapsable from "components/collapsable";
 import ConnectWalletButton from "components/connect-wallet-button";
 import ContractButton from "components/contract-button";
 
-
 import {IssueBigNumberData, fundingBenefactor} from "interfaces/issue-data";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
@@ -73,7 +72,7 @@ export default function FundingSectionView({
   if (isBountyFunded && !walletFunds?.length) return <></>;
 
   return(
-    <div className="container mt-3">
+    <div className="mt-3">
       { (!isConnected && showFundModal) && <ConnectWalletButton asModal={true} />}
 
       <FundModal 

@@ -11,6 +11,7 @@ import BountyComments from "components/bounty/comments/controller";
 import FundingSection from "components/bounty/funding-section/controller";
 import PageActions from "components/bounty/page-actions/controller";
 import TabSections from "components/bounty/tabs-sections/controller";
+import CustomContainer from "components/custom-container";
 import If from "components/If";
 
 import {useAppState} from "contexts/app-state";
@@ -134,39 +135,41 @@ export default function PageIssue({ bounty }: PageBountyProps) {
         handleEditIssue={handleEditIssue}
         isEditIssue={isEditIssue}
       />
+    
+      <CustomContainer>
+        <If condition={!!currentBounty?.data?.isFundingRequest}>
+          <FundingSection 
+            currentBounty={currentBounty?.data}
+            updateBountyData={updateBountyData}
+          /> 
+        </If>
 
-      <If condition={!!currentBounty?.data?.isFundingRequest}>
-        <FundingSection 
+        <PageActions
+          isRepoForked={!!isRepoForked}
+          addNewComment={addNewComment}
+          handleEditIssue={handleEditIssue}
+          isEditIssue={isEditIssue}
           currentBounty={currentBounty?.data}
           updateBountyData={updateBountyData}
-        /> 
-      </If>
+        />
 
-      <PageActions
-        isRepoForked={!!isRepoForked}
-        addNewComment={addNewComment}
-        handleEditIssue={handleEditIssue}
-        isEditIssue={isEditIssue}
-        currentBounty={currentBounty?.data}
-        updateBountyData={updateBountyData}
-      />
+        <If condition={!!state.currentUser?.walletAddress}>
+          <TabSections currentBounty={currentBounty?.data} />
+        </If>
 
-      <If condition={!!state.currentUser?.walletAddress}>
-        <TabSections currentBounty={currentBounty?.data} />
-      </If>
+        <BountyBody 
+          currentBounty={currentBounty?.data}
+          updateBountyData={updateBountyData}
+          isEditIssue={isEditIssue} 
+          cancelEditIssue={handleCancelEditIssue}
+        />
 
-      <BountyBody 
-        currentBounty={currentBounty?.data}
-        updateBountyData={updateBountyData}
-        isEditIssue={isEditIssue} 
-        cancelEditIssue={handleCancelEditIssue}
-      />
-
-      <BountyComments
-        comments={commentsIssue}
-        repo={currentBounty?.data?.repository?.githubPath}
-        issueId={id}
-      />
+        <BountyComments
+          comments={commentsIssue}
+          repo={currentBounty?.data?.repository?.githubPath}
+          issueId={id}
+        />
+      </CustomContainer>
     </>
   );
 }

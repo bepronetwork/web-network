@@ -46,7 +46,7 @@ export default function BountyAmountView({
             {(+bountyAmount >= 1e-6 &&
               formatNumberToNScale(bountyAmount?.toFixed())) ||
               bountyAmount?.toExponential()}{" "}
-            <span className={`text-uppercase text-white-40`}>
+            <span className={`text-uppercase text-gray-500`}>
               {symbol || t("common:misc.token")}
             </span>
           </span>

@@ -91,7 +91,7 @@ export default function PullRequestLabels({
 
   useEffect(() => {
     setState(getLabel());
-  }, [merged, isMergeable, label]);
+  }, [merged, isMergeable, label, isDraft]);
 
   if (!state) return <></>;
 

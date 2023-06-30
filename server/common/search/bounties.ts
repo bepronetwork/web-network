@@ -129,7 +129,7 @@ export default async function get(query: ParsedUrlQuery) {
 
   const networkAssociation = 
     getAssociation( "network", 
-                    ["colors", "name", "networkAddress", "disputableTime", "logoIcon"],
+                    ["colors", "name", "networkAddress", "disputableTime", "logoIcon", "fullLogo"], 
                     true, 
                     networkName || network ? { 
                       networkName: caseInsensitiveEqual("network.name", (networkName || network).toString())

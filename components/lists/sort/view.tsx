@@ -34,10 +34,11 @@ export default function ListSortView({
   const labelClass = asSelect ? 
     "caption-small font-weight-medium text-gray-100 text-capitalize" : 
     "caption-small text-white-50 text-nowrap mr-1";
+  const containerClass = asSelect ? "d-flex flex-column gap-1" : "d-flex align-items-center";
 
   if (isDesktopView || asSelect)
     return (
-      <div className="d-flex align-items-center">
+      <div className={containerClass}>
         <span className={labelClass}>
           {t("sort.label")}
         </span>

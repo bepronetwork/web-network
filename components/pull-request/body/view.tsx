@@ -117,7 +117,7 @@ export default function PullRequestBodyView({
 
   return (
     <div className="mx-3 mt-3">
-      <CustomContainer col={(isTabletView || isMobileView) ? 'col-12' : 'col-10'}>
+      <CustomContainer>
         {(isMobileView || isTabletView) && (
           <div className="mb-3">
             <RenderMakeReviewButton className="col-12 mb-3"/>

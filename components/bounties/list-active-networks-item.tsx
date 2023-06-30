@@ -32,7 +32,7 @@ export default function ListActiveNetworksItem({
       })}
     >
       <div className={`cursor-pointer border border-gray-800 border-radius-8 bg-gray-900 p-3`}>
-        <div className="row align-items-center gap-2">
+        <div className="row align-items-center gx-5">
             <div className="col-2">
               <If condition={!!network?.logoIcon}>
                 <img
@@ -43,29 +43,30 @@ export default function ListActiveNetworksItem({
               </If>
             </div>
 
-            <div className="col-9">
-              <div className="d-flex flex-row align-items-center gap-3">
-                <span className="caption-medium">{network.name}</span>
+            <div className="col-10">
+              <div className="d-flex flex-row justify-content-between align-items-center gap-3">
+                <span className="caption-medium network-name">{network.name}</span>
               
                 <div className="d-none d-xl-flex">
                   <ChainBadge chain={network.chain} />
                 </div>
                 
               </div>
-              <div className="d-flex justify-content-between mt-2 text-nowrap">
-                <span className="bg-dark-gray p-1 border-radius-8 px-2 me-1">
+              <div className="d-flex align-items-center justify-content-between mt-2 text-nowrap">
+                <div className="bg-dark-gray p-1 px-2 border-radius-8">
                   {formatNumberToNScale(network?.totalValueLock.toFixed(0),
                                         0) || 0}{" "}
-                  <span className="text-uppercase text-white-40">
+                  <span className="text-uppercase text-gray-500">
                     TVL
                   </span>
-                </span>
-                <span className="bg-dark-gray p-1 border-radius-8 px-2">
+                </div>
+
+                <div className="bg-dark-gray p-1 border-radius-8 px-2">
                   {network?.totalIssues || 0}{" "}
-                  <span className="text-uppercase text-white-40">
+                  <span className="text-uppercase text-gray-500">
                     {t("label", { count: network?.countIssues || 0 })}
                   </span>
-                </span>
+                </div>
               </div>
             </div>
           </div>

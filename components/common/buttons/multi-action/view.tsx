@@ -25,7 +25,7 @@ export default function MultiActionButton({
 }: MultiActionButtonProps & ButtonProps) {
   const { t } = useTranslation("common");
 
-  const { isDesktopView } = useBreakPoint();
+  const { isMobileView, isTabletView } = useBreakPoint(true);
 
   const defaultOption = {
     value: label,
@@ -56,7 +56,7 @@ export default function MultiActionButton({
   return(
     <div className="multi-action-button">
       <If 
-        condition={!isDesktopView}
+        condition={isMobileView || isTabletView}
         otherwise={
           <ReactSelect
             options={actionsToOptions(actions)}

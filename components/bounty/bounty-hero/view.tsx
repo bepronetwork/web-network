@@ -6,6 +6,7 @@ import Avatar from "components/avatar";
 import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
 import PriceConversor from "components/bounty/bounty-hero/price-conversor/controller";
+import CustomContainer from "components/custom-container";
 import If from "components/If";
 
 import { truncateAddress } from "helpers/truncate-address";
@@ -47,7 +48,7 @@ export default function BountyHeroView({
 
   return (
     <div className="mt-2 border-bottom border-gray-850 pb">
-      <div className="container">
+      <CustomContainer>
         <div className="row d-flex flex-row justify-content-center">
           <div className="col-md-12 min-w-bounty-hero justify-content-center">
             <div className="d-flex justify-content-between">
@@ -115,7 +116,9 @@ export default function BountyHeroView({
                 <BountyTagsView tags={bounty?.tags} />
               </div>
             </If>
-            <div className="my-3 pt-1 flex-wrap d-inline-flex align-items-center justify-content-md-start gap-20">
+            <div 
+              className="py-3 d-flex flex-wrap align-items-center border-top border-gray-850 justify-content-md-start"
+            >
               <If condition={!!bounty?.repository}>
                 <BountyItemLabel label={t("common:misc.repository")}>
                   <span className={`text-gray me-2 text-truncate`}>
@@ -168,7 +171,7 @@ export default function BountyHeroView({
             </div>
           </div>
         </div>
-      </div>
+      </CustomContainer>
     </div>
   );
 }
