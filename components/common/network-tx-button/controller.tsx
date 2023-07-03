@@ -1,12 +1,8 @@
-import {forwardRef, ReactChild, useEffect, useState} from "react";
+import {MutableRefObject, ReactChild, useEffect, useState} from "react";
 
 import {useTranslation} from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import Button from "components/button";
-import Icon from "components/icon";
-import Modal from "components/modal";
 
 import {useAppState} from "contexts/app-state";
 import {addToast} from "contexts/reducers/change-toaster";
@@ -19,9 +15,10 @@ import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
-import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
-import {MetamaskErrors} from "../interfaces/enums/Errors";
-import {SimpleBlockTransactionPayload} from "../interfaces/transaction";
+import {addTx, updateTx} from "../../../contexts/reducers/change-tx-list";
+import {MetamaskErrors} from "../../../interfaces/enums/Errors";
+import {SimpleBlockTransactionPayload} from "../../../interfaces/transaction";
+import NetworkTxButtonView from "./view";
 
 
 interface NetworkTxButtonParams {
@@ -37,6 +34,7 @@ interface NetworkTxButtonParams {
   modalDescription: string;
   buttonLabel?: string;
   handleEvent?: (blockNumber) => void;
+  buttonConfirmRef?: MutableRefObject<HTMLButtonElement>
   children?: ReactChild | ReactChild[];
   disabled?: boolean;
   txType: TransactionTypes;
@@ -45,7 +43,7 @@ interface NetworkTxButtonParams {
   className?: string;
 }
 
-function networkTxButton({
+export default function NetworkTxButton({
     txMethod,
     txParams,
     onSuccess,
@@ -59,8 +57,9 @@ function networkTxButton({
     disabled = false,
     txType = TransactionTypes.unknown,
     txCurrency,
-    handleEvent
-  }: NetworkTxButtonParams, elementRef) {
+    handleEvent,
+    buttonConfirmRef
+  }: NetworkTxButtonParams) {
   const { t } = useTranslation(["common"]);
 
   const [showModal, setShowModal] = useState(false);
@@ -154,44 +153,18 @@ function networkTxButton({
   useEffect(checkForTxMethod, [state.Service?.active, state.currentUser]);
 
   return (
-    <>
-      <button
-        className="d-none"
-        ref={elementRef}
-        onClick={makeTx}
-        disabled={disabled}
+      <NetworkTxButtonView 
+        modalTitle={modalTitle} 
+        modalDescription={modalDescription} 
+        buttonLabel={buttonLabel} 
+        disabled={disabled} 
+        makeTx={makeTx} 
+        buttonClass={getButtonClass()} 
+        showModal={showModal}
+        modalFooter={modalFooter} 
+        divClassName={getDivClass()} 
+        txSuccess={txSuccess}   
+        ref={buttonConfirmRef}
       />
-
-      <Button
-        color="purple"
-        className={getButtonClass()}
-        onClick={makeTx}
-        disabled={disabled}
-      >
-        {disabled && <LockedIcon width={12} height={12} className="mr-1" />}{" "}
-        <span>{buttonLabel}</span>
-      </Button>
-
-      <Modal
-        show={showModal}
-        title={modalTitle}
-        footer={modalFooter}
-        titlePosition="center">
-        <p className="p-small text-white-50 text-center">{modalDescription}</p>
-        <div className={getDivClass()}>
-          <Icon className="md-larger">
-            {txSuccess ? "check_circle" : "error"}
-          </Icon>
-          <p className="text-center fs-4 mb-0 mt-2">
-            {t("transactions.title")}{" "}
-            {txSuccess ? t("actions.completed") : t("actions.failed")}
-          </p>
-        </div>
-      </Modal>
-    </>
   );
 }
-
-const NetworkTxButton = forwardRef(networkTxButton);
-
-export default NetworkTxButton;

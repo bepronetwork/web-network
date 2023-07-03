@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {useState} from "react";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
@@ -8,7 +8,6 @@ import ArrowRightLine from "assets/icons/arrow-right-line";
 import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
-import NetworkTxButton from "components/network-tx-button";
 
 
 import {useAppState} from "contexts/app-state";
@@ -21,6 +20,8 @@ import {TransactionTypes} from "interfaces/enums/transaction-types";
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 
+import NetworkTxButton from "./common/network-tx-button/controller";
+
 export default function UnlockBeproModal({
   show = false,
   onCloseClick,
@@ -30,8 +31,6 @@ export default function UnlockBeproModal({
 
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [amountToUnlock, setAmountToUnlock] = useState<BigNumber>();
-
-  const networkTxRef = useRef<HTMLButtonElement>(null);
 
   const {state} = useAppState();
 
@@ -78,7 +77,6 @@ export default function UnlockBeproModal({
 
   function handleUnlock() {
     setIsUnlocking(true);
-    networkTxRef.current.click();
   }
 
   return (
@@ -209,7 +207,6 @@ export default function UnlockBeproModal({
         modalDescription={t("my-oracles:actions.unlock.description", { token: networkTokenSymbol })}
         onSuccess={setDefaults}
         onFail={handleError}
-        ref={networkTxRef}
       />
     </Modal>
   );

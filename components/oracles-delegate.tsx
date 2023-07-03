@@ -5,7 +5,6 @@ import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
 import InputNumber from "components/input-number";
-import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
@@ -19,6 +18,8 @@ import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useApi from "x-hooks/use-api";
+
+import NetworkTxButton from "./common/network-tx-button/controller";
 
 interface OraclesDelegateProps {
   wallet: Wallet;

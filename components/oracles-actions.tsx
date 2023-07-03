@@ -8,10 +8,10 @@ import {useTranslation} from "next-i18next";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
+import NetworkTxButton from "components/common/network-tx-button/controller";
 import ContractButton from "components/contract-button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
-import NetworkTxButton from "components/network-tx-button";
 import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
@@ -49,8 +49,6 @@ function OraclesActions({
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<string>();
 
-  const networkTxRef = useRef<HTMLButtonElement>(null);
-
   const networkTokenERC20 = useERC20();
 
   const { state: { transactions, Service }} = useAppState();
@@ -65,6 +63,8 @@ function OraclesActions({
     BigNumber(tokenAmount || 0).dividedBy(oracleExchangeRate).toFixed();
 
   const exceedsAvailable = value => BigNumber(value).gt(getMaxAmount());
+
+  const networkTxRef = useRef<HTMLButtonElement>(null);
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
     !!transactions.find((transactions) =>
@@ -351,7 +351,7 @@ function OraclesActions({
             modalDescription={renderInfo?.description}
             onSuccess={onSuccess}
             onFail={setError}
-            ref={networkTxRef}
+            buttonConfirmRef={networkTxRef}
           />
         </div>
       </div>
