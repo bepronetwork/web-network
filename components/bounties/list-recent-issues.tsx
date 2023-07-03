@@ -82,7 +82,7 @@ export default function ListRecentIssues({
   return (
     <CustomContainer className="px-xl-0">
       <div className="d-flex mt-2 p-1">
-        <h4 className="mt-1">
+        <h4 className="mt-1 font-weight-medium">
           {LABELS[type].title}
         </h4>
       </div>

@@ -61,7 +61,7 @@ export default function ExplorePageView({
         recentBounties={recentFunding}
       />
 
-      <CustomContainer>
+      <CustomContainer className="mt-3 px-xl-0">
         <BountiesList 
           bounties={bounties}
           variant="bounty-hall"

@@ -111,7 +111,7 @@ export default function BountiesListView({
     <div className="px-0 mx-0">
       <If condition={isBountyHall || isProfile}>
         <div className="d-flex flex-row align-items-center">
-          <h3 className="text-capitalize font-weight-medium">{listTitleByType[type]}</h3>
+          <h4 className="text-capitalize font-weight-medium">{listTitleByType[type]}</h4>
           <div className="ms-2">
             <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
               {bounties?.count || 0}

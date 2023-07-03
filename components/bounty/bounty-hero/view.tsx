@@ -70,8 +70,8 @@ export default function BountyHeroView({
               </div>
             </div>
 
-            <div className="d-flex flex-wrap justify-content-between border-top border-gray-850 mt-3">
-              <div className="d-flex d-inline-flex align-items-center mt-3">
+            <div className="d-flex flex-wrap justify-content-between border-top border-gray-850 mt-3 pt-3">
+              <div className="d-flex d-inline-flex align-items-center align-items-center">
                 <div
                   className={`d-flex py-1 px-2 bg-transparent border border-gray-700 text-gray-300 border-radius-4`}
                 >
@@ -106,7 +106,7 @@ export default function BountyHeroView({
                   </OverlayTrigger>
                 ) : null}
               </div>
-              <div className="mt-3">{renderPriceConversor()}</div>
+              <div>{renderPriceConversor()}</div>
             </div>
             <h5 className="mt-3 break-title">
               {bounty?.title}
@@ -120,33 +120,32 @@ export default function BountyHeroView({
               className="py-3 d-flex flex-wrap align-items-center border-top border-gray-850 justify-content-md-start"
             >
               <If condition={!!bounty?.repository}>
-                <BountyItemLabel label={t("common:misc.repository")}>
-                  <span className={`text-gray me-2 text-truncate`}>
+                <BountyItemLabel label={t("common:misc.repository")} className="col-12 col-sm-auto">
+                  <span className={`text-truncate`}>
                     {
                       bounty?.repository?.githubPath.split("/")?.[1]
                     }
                   </span>
                 </BountyItemLabel>
               </If>
-              <BountyItemLabel label={t("common:misc.branch")}>
-                <span className={`text-gray me-2 text-truncate`}>
+              <BountyItemLabel label={t("common:misc.branch")} className="col-12 col-sm-auto">
+                <span className={`text-truncate`}>
                   {bounty?.branch}
                 </span>
               </BountyItemLabel>
 
-              <BountyItemLabel label={t("info.working")}>
-                <span className={`text-gray me-2 text-truncate`}>
+              <BountyItemLabel label={t("info.working")} className="col-12 col-sm-auto">
+                <span className={`text-truncate`}>
                   {bounty?.working?.length}
                 </span>
               </BountyItemLabel>
 
               <div className="d-flex align-items-center">
-                <BountyItemLabel label={t("common:misc.owner")}>
+                <BountyItemLabel label={t("common:misc.owner")} className="col-12 col-sm-auto">
                   <>
                     <div className="d-flex flex-column justify-content-center">
                       <Avatar
                         size="xsm"
-                        className="me-2"
                         userLogin={bounty?.creatorGithub}
                       />{" "}
                     </div>
@@ -161,9 +160,9 @@ export default function BountyHeroView({
               <If condition={!!bounty?.createdAt}>
                 <BountyItemLabel
                   label={t("common:misc.opened-on")}
-                  className=".d-md-none .d-lg-block"
+                  className="col-12 col-sm-auto"
                 >
-                  <span className="text-gray text-truncate">
+                  <span className="text-truncate">
                     {bounty?.createdAt?.toLocaleDateString("PT")}
                   </span>
                 </BountyItemLabel>

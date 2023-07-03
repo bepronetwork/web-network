@@ -233,7 +233,6 @@ li {
       background-color: $gray-900;
       z-index: 4;
       padding: 6px;
-      margin-bottom: 50px;
       &-list {
         padding-top: 0;
         padding-bottom: 0;
@@ -1461,6 +1460,12 @@ textarea.form-control {
   hyphens: auto;
 }
 
+.overflow-wrap {
+  &-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
+
 .bounty-settings {
   width: 180px;
 }
@@ -1492,7 +1497,7 @@ textarea.form-control {
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.4em;
+    top: 4.43em;
   }
 
   .input-group {

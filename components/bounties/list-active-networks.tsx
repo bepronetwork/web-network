@@ -40,8 +40,8 @@ export default function ListActiveNetworks() {
 
   return (
     <CustomContainer className="mb-3 px-xl-0">
-      <div className="d-flex mt-2 p-1 justify-content-between">
-        <h4 className="mt-1">{t("most-active-networks")}</h4>
+      <div className="d-flex mt-2 px-1 justify-content-between">
+        <h4 className="mt-1 font-weight-medium">{t("most-active-networks")}</h4>
         <Link href={"/networks"}>
           <a
             className="text-decoration-none text-primary mt-2"
@@ -54,7 +54,7 @@ export default function ListActiveNetworks() {
       
       <LoadingList loading={loading} />
 
-      <div className="row mt-3">
+      <div className="row mt-1">
         <If
           condition={!!networks.length}
           otherwise={<NothingFound description={t("most-active-network-empty")} />}

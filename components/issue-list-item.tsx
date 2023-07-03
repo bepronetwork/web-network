@@ -444,11 +444,11 @@ export default function IssueListItem({
             <ResponsiveWrapper xs={true} xl={false}>
               <div className="col">
                 <div className="row justify-content-between">
-                  <div className="col-6 col-xs">
+                  <div className="mw-50-auto">
                     <BountyTagsView tags={[issue?.network?.name]} />
                   </div>
                   
-                  <div className="col-auto">
+                  <div className="mw-50-auto">
                     <BountyAmount bounty={issue} size={size} />
                   </div>
                 </div>

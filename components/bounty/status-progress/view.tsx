@@ -179,9 +179,9 @@ export default function BountyStatusProgressView({
   }
 
   return (
-    <div className="container sticky-bounty">
+    <div className="sticky-bounty">
       <div className="row justify-content-center">
-        <div className="px-0 col-12">
+        <div className="col-12">
           <div
             className={`content-wrapper bg-gray-850 mb-4 ${
               isFundingRequest ? "pb-5" : "pb-0"

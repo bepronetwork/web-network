@@ -3,6 +3,7 @@ import React, {ReactNode, useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 
 import ChainIcon from "components/chain-icon";
+import NativeSelectWrapper from "components/common/native-select-wrapper/view";
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import ReactSelect from "components/react-select";
@@ -12,6 +13,8 @@ import {useAppState} from "contexts/app-state";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import {getChainIcon, getChainIconsList} from "services/chain-id";
+
+import useBreakPoint from "x-hooks/use-breakpoint";
 
 interface SelectChainDropdownProps {
   onSelect: (chain: SupportedChainData) => void;
@@ -44,6 +47,7 @@ export default function SelectChainDropdown({
   const [selected, setSelectedChain] = useState<ChainOption>(null);
   const [loadingInfo, setLoadingInfo] = useState<boolean>(false);
 
+  const { isDesktopView } = useBreakPoint();
   const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
 
   function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption {
@@ -117,6 +121,17 @@ export default function SelectChainDropdown({
     setLoadingInfo(false);
   }
 
+  function getNativeOptions() {
+    return options.map((opt, index) => ({
+      label: opt?.label,
+      value: index,
+    }));
+  }
+
+  function onNativeChange(selectedOption) {
+    selectSupportedChain(options[selectedOption?.value]);
+  }
+
   useEffect(() => {
     updateOptions();
   }, [
@@ -134,20 +149,26 @@ export default function SelectChainDropdown({
   ]);
 
   return(
-    <div className={className}>
-      <ReactSelect
-        options={options}
-        value={selected}
-        onChange={selectSupportedChain}
-        placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
-        isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
-        isSearchable={false}
-        readOnly={true}
-        components={{
-          Option: IconOption,
-          SingleValue: IconSingleValue
-        }}
-      />
-    </div>
+    <NativeSelectWrapper
+      options={getNativeOptions()}
+      onChange={onNativeChange}
+    >
+      <div className={className}>
+        <ReactSelect
+          menuPlacement={isDesktopView ? "auto" : "top"}
+          options={options}
+          value={selected}
+          onChange={selectSupportedChain}
+          placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
+          isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
+          isSearchable={false}
+          readOnly={true}
+          components={{
+            Option: IconOption,
+            SingleValue: IconSingleValue
+          }}
+        />
+      </div>
+    </NativeSelectWrapper>
   );
 }

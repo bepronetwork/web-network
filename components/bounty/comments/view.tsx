@@ -11,7 +11,7 @@ export default function BountyCommentsView({ comments = [], replyRef }) {
   return (
     <div className="mb-5">
       <div className="row justify-content-center">
-        <div className="col-md-12">
+        <div className="col">
           <div className="content-wrapper bg-gray-850">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="caption-small mb-0">
@@ -23,9 +23,13 @@ export default function BountyCommentsView({ comments = [], replyRef }) {
                 target="_blank"
                 rel="noreferrer"
               >
-                <Button transparent textClass="text-primary">
-                  {t("actions.reply-on-github")}{" "}
-                  <ExternalLinkIcon className="ml-1" color="primary" />
+                <Button 
+                  transparent 
+                  textClass="text-primary"
+                  className="p-0 lh-1"
+                >
+                  <span>{t("actions.reply-on-github")}{" "}</span>
+                  <ExternalLinkIcon color="primary" />
                 </Button>
               </a>
             </div>

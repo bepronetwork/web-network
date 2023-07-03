@@ -65,9 +65,9 @@ export default function ListView(props: ListViewProps) {
   } = props;
 
   return (
-    <div className="px-0">
+    <div>
       <If condition={withSearchAndFilters}>
-        <div className="row w-100 align-items-center list-actions sticky-top bg-dark">
+        <div className="row align-items-center justify-content-between list-actions sticky-top bg-dark">
           <div className="col">
             <ListSearchBar
               searchString={searchString}
@@ -81,7 +81,7 @@ export default function ListView(props: ListViewProps) {
           </div>
 
           <If condition={!!sortOptions}>
-            <div className="col-auto px-0">
+            <div className="col-auto">
               <ListSort options={sortOptions} />
             </div>
           </If>

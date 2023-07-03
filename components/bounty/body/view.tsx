@@ -113,7 +113,7 @@ export default function BountyBodyView({
               )}
             </div>
           </div>
-          <div className="col-md-4 px-0">
+          <div className="col-12 col-md-4">
               <BountyStatusProgress currentBounty={bounty}/>
           </div>
         </div>
