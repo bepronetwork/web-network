@@ -28,7 +28,7 @@ export default function ListSortView({
   asSelect,
 }: ListSortProps) {
   const { t } = useTranslation("common");
-  
+
   const { isDesktopView } = useBreakPoint();
 
   const labelClass = asSelect ? 

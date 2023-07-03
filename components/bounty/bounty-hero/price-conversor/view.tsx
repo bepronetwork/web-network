@@ -36,7 +36,7 @@ export default function PriceConversorView({
       <span className="text-white caption-large">
         {formatStringToCurrency(currentValue?.toFixed() || "0")}
       </span>
-      <span className="text-white-30 ms-2">{currency}</span>
+      <span className="token-symbol text-truncate text-white-30 ms-2">{currency}</span>
     </div>
     <PriceConversorModal
         value={currentValue}

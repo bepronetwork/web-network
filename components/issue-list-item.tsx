@@ -401,8 +401,8 @@ export default function IssueListItem({
           </ResponsiveWrapper>
 
           <div className="row align-items-center border-xl-top border-gray-850 pt-3">
-            <ResponsiveWrapper xs={false} xl={true}>
-              <div className="row w-100 align-items-center justify-content-md-start gx-0">
+            <ResponsiveWrapper xs={false} xl={true} lg={true}>
+              <div className="row w-100 align-items-center justify-content-md-start">
                 <BountyItemLabel label="ID" className="col-auto">
                   <IssueTag />
                 </BountyItemLabel>
@@ -417,7 +417,7 @@ export default function IssueListItem({
                       </Tooltip>
                     }
                   >
-                    <span className={`text-gray me-2 text-truncate`}>
+                    <span className={`mw-repo text-gray me-2 text-truncate`}>
                       {issue?.repository?.githubPath.split("/")?.[1]}
                     </span>
                   </OverlayTrigger>
