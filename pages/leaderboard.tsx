@@ -1,28 +1,22 @@
 import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-import LeaderBoardList  from "components/leaderboard/leaderboard-list";
-import PageHero from "components/page-hero";
+import LeaderBoardPage from "components/pages/leaderboard/view";
 
-export default function LeaderBoardPage() {
-  const { t } = useTranslation(["common", "leaderboard"]);
+import { emptyPaginatedData } from "helpers/api";
 
-  return (
-    <>
-      <PageHero
-        title={t("leaderboard:title")}
-        subtitle={t("leaderboard:sub-title")}
-        infos={[]}
-      />
-      <LeaderBoardList />
-    </>
-  );
-}
+import getLeaderboardData from "x-hooks/api/get-leaderboard-data";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export default LeaderBoardPage;
+
+export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
+  const leaderboard = await getLeaderboardData(query)
+    .then(({ data }) => data)
+    .catch(() => emptyPaginatedData);
+  
   return {
     props: {
+      leaderboard,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

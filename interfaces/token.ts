@@ -21,6 +21,7 @@ export interface Token {
   network_tokens?: NetworkToken;
   isAllowed?: boolean;
   isReward?: boolean;
+  minimum?: string;
 }
 
 export interface NetworkToken {

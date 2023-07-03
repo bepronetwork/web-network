@@ -3,7 +3,7 @@ import {useTranslation} from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 
-import {CaptionMedium} from "components/bounty/funding-section/minimals";
+import {CaptionMedium} from "components/bounty/funding-section/minimals.view";
 
 import {useAppState} from "contexts/app-state";
 

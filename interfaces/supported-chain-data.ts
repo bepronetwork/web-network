@@ -12,4 +12,5 @@ export interface SupportedChainData {
   eventsApi: string
   isDefault: boolean;
   color?: string;
+  icon?: string;
 }

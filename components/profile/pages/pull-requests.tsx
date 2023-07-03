@@ -1,27 +1,32 @@
 import {useTranslation} from "next-i18next";
 
-import ListIssues from "components/list-issues";
+import BountiesList from "components/bounty/bounties-list/controller";
 import ProfileLayout from "components/profile/profile-layout";
 
-import {useAppState} from "contexts/app-state";
+import { SearchBountiesPaginated } from "types/api";
 
 import {useNetwork} from "x-hooks/use-network";
 
-export default function PullRequestsPage() {
+interface PullRequestsPageProps {
+  bounties: SearchBountiesPaginated;
+}
+
+export default function PullRequestsPage({
+  bounties
+}: PullRequestsPageProps) {
   const {t} = useTranslation(["pull-request", "bounty"]);
 
-  const {state} = useAppState();
   const { getURLWithNetwork } = useNetwork();
 
   return(
     <ProfileLayout>
-      <ListIssues
+      <BountiesList
+        bounties={bounties}
         redirect={getURLWithNetwork("/bounties")}
         buttonMessage={t('bounty:label_other')}
-        pullRequesterAddress={state.currentUser?.walletAddress || null}
-        pullRequesterLogin={state.currentUser?.login || null}
         emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
         variant="profile"
+        type="pull-requests"
       />
     </ProfileLayout>
   );

@@ -7,6 +7,7 @@
   "addresses_one": "{{count}} Address",
   "addresses_other": "{{count}} Addresses",
   "addresses_for_the_distribution": "addresses for the distribution",
+  "important": "Important",
   "actions": {
     "new": "New Proposal",
     "create": "Create Proposal",

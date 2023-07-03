@@ -8,7 +8,6 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   outline?: boolean;
   transparent?: boolean;
   rounded?: boolean;
-  upperCase?: boolean;
   asAnchor?: boolean;
   applyTextColor?: boolean;
   className?: string;

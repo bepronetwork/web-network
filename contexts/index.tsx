@@ -5,7 +5,7 @@ import NetworkThemeInjector from "components/custom-network/network-theme-inject
 import {AppStateContextProvider} from "./app-state";
 import {GlobalEffectsProvider} from "./global-effects";
 
-const RootProviders: React.FC = ({children}) => {
+const RootProviders = ({children}) => {
   return (
 
     <AppStateContextProvider>

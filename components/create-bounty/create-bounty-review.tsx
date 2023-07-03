@@ -33,7 +33,7 @@ export default function CreateBountyReview({
                 <div className="d-flex">
                   {value.map((item, key) => (
                     <div className="d-flex" key={key}>
-                      <div className="tag-ball mt-2 mx-2" key={key}/>
+                      <div className="ball tag mt-2 mx-2" key={key}/>
                       {item}
                     </div>
                   ))}

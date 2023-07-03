@@ -56,7 +56,7 @@ async function main(option = 0) {
     return;
   }
 
-  const web3Host = chainData.rpc[0];
+  const web3Host = chainData.rpc.length > 1 ? chainData.rpc[1] : chainData.rpc[0];
   const env = require('dotenv').config({path: options.envFile[option]}).parsed;
   const privateKey = options.privateKey;
 
@@ -83,7 +83,9 @@ async function main(option = 0) {
   const hasGovernance = options.governanceToken ? !!options.governanceToken[option] : false;
   const hasBountyNFT = options.bountyNFT ? !!options.bountyNFT[option] : false;
 
-  async function getContractAddress({contractAddress}) {
+  const startBlock = await connection.eth.getBlockNumber();
+
+  function getContractAddress({contractAddress}) {
     return contractAddress;
   }
 
@@ -91,7 +93,9 @@ async function main(option = 0) {
     const deployer = new _class(connection);
     deployer.loadAbi();
     console.debug(`Deploying ${deployer.constructor?.name} with args:`, ...(args || []));
-    return getContractAddress(await deployer.deployJsonAbi(...(args || [])));
+    const address = getContractAddress(await deployer.deployJsonAbi(...(args || [])));
+    console.debug(`Deployed address`, address);
+    return address;
   }
 
   async function deployNetwork(governanceToken, registryAddress) {
@@ -142,6 +146,7 @@ async function main(option = 0) {
 
     for (const [fn, value] of changeFunctions) {
       await network[fn](value);
+      console.debug(`Changed ${fn} to ${value}`);
     }
 
     const transactionTokensAllowed = [tokens[1], tokens[0]];
@@ -186,7 +191,7 @@ async function main(option = 0) {
   async function saveSettingsToDb({network, registry, payment, governance, reward, bounty}) {
     console.debug("Saving settings to DB");
 
-    const {chainTokenName, chainId, chainName, explorers, eventsUrl,} = chainData;
+    const {chainTokenName, chainId, chainName, explorers, eventsUrl, chainScan} = chainData;
     const {NEXT_PUBLIC_DEFAULT_NETWORK_NAME, NEXT_GH_OWNER, NEXT_GH_REPO} = env;
 
     try {
@@ -198,7 +203,8 @@ async function main(option = 0) {
       TokensModel.init(sequelize);
       NetworkTokensModel.init(sequelize);
 
-      const chainScan = explorers?.length ? explorers[0].url : undefined;
+      const linkScan = explorers?.length ? explorers[0].url : chainScan;
+      const blockScanner = linkScan.indexOf("https://") == 0 ? linkScan : `https://bepro.network/`
       const eventsApi = isXNetwork ? eventsUrl : `${NEXT_PUBLIC_HOME_URL}:2096`
 
       await ChainModel.findOrCreate({
@@ -215,7 +221,7 @@ async function main(option = 0) {
           chainCurrencyDecimals: chainData?.nativeCurrency?.decimals || 18,
           registryAddress: registry,
           eventsApi: eventsApi,
-          blockScanner: chainScan,
+          blockScanner: blockScanner,
           isDefault: false,
           color: "#29b6af"
         }
@@ -278,6 +284,14 @@ async function main(option = 0) {
           network_id: networkDb.id
         }
       });
+
+      await ChainEvents.findOrCreate({
+        where: {
+          chain_id: chainId,
+          name: "global",
+          lastBlock: startBlock,
+        }
+      })
 
 
       const saveNetworkTokensRelation = async (token, isTransactional, isReward) => {
@@ -352,7 +366,12 @@ async function main(option = 0) {
 
 (async () => {
   for (let index = 0; index < options.network.length; index++)
+    try  {
     await main(index);
+    } catch (e) {
+      console.error(e);
+      process.exit(1);
+    }
 
   process.exit(0);
 })();

@@ -157,3 +157,13 @@ button,
   letter-spacing: 0.1em;
   font-feature-settings: 'tnum' on, 'lnum' on, 'ss04' on;
 }
+
+/* Normal Case/2 XL/Semibold */
+.xl-semibold {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss04' on;
+}

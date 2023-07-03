@@ -12,6 +12,8 @@ import ReactSelect from "components/react-select";
 
 import {useAppState} from "contexts/app-state";
 
+import { IssueBigNumberData } from "interfaces/issue-data";
+
 import useOctokit from "x-hooks/use-octokit";
 
 interface props {
@@ -21,6 +23,7 @@ interface props {
   repo: string;
   title: string;
   description: string;
+  currentBounty: IssueBigNumberData;
 }
 
 export default function CreatePullRequestModal({
@@ -29,7 +32,8 @@ export default function CreatePullRequestModal({
   onCloseClick,
   repo = "",
   title: prTitle = "",
-  description: prDescription = ""
+  description: prDescription = "",
+  currentBounty
 }: props) {
 
   if(!show)
@@ -94,12 +98,12 @@ export default function CreatePullRequestModal({
           pullRequests.some(b=>`${b.headRepositoryOwner.login}:${b.headRefName}` === `${repository.owner}:${branch}`);
 
         const prExistsInActiveIssue =
-          state.currentBounty?.data.pullRequests
+          currentBounty.pullRequests
             .some(({userBranch: b}) => b === `${repository.owner}:${branch}`);
 
         const isBaseBranch =
-          (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
-            state.currentBounty?.data.branch === branch);
+          (currentBounty.repository.githubPath === repository.nameWithOwner &&
+            currentBounty.branch === branch);
 
         let postIcon = <></>;
 
@@ -129,7 +133,7 @@ export default function CreatePullRequestModal({
           disabledIcon,
           postIcon,
           isSelected: !!selectedBranch && branch === selectedBranch,
-          spaceBetween: true
+          justify: "between"
         };
       }))
       .then(setOptions)

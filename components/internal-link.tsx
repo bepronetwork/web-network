@@ -19,6 +19,7 @@ interface InternalLinkProps {
   style?: CSSProperties;
   outline?: boolean;
   title?: string;
+  onClick?: () => void;
 }
 
 export default function InternalLink({
@@ -33,6 +34,7 @@ export default function InternalLink({
   activeClass,
   style,
   outline,
+  onClick,
   ...props
 }: InternalLinkProps) {
   const { asPath, pathname } = useRouter();
@@ -45,7 +47,7 @@ export default function InternalLink({
 
     let classes = `${className}`;
 
-    if (!isActive && nav) classes += " opacity-75 opacity-100-hover ";
+    if (!isActive && nav) classes += " text-gray-500 text-gray-50-hover ";
 
     if (isActive && nav && activeClass) classes += " " + activeClass;
 
@@ -56,7 +58,7 @@ export default function InternalLink({
     if (props.icon) classes += " d-flex align-items-center justify-content-center ";
 
     return `${(!nav && `btn btn-${outline && "outline-" || ""}primary`) || " main-nav-link "} ${
-      brand ? "" : " text-white "
+      brand ? "" : " text-gray-50 "
     } bg-opacity-100 text-decoration-none shadow-none ${classes}`;
   }
 
@@ -67,6 +69,7 @@ export default function InternalLink({
         target={`${blank ? "_blank" : ""}`}
         style={{ ...style }}
         title={props?.title}
+        onClick={onClick}
       >
         {(iconBefore && props.icon) || ""}
         {(props.label && <span>{props.label}</span>) || ""}

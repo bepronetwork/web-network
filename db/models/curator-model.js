@@ -67,6 +67,11 @@ class Curators extends Model {
       sourceKey: "id",
       as: "delegations"
     });
+
+    this.hasMany(models.dispute, {
+      foreignKey: "address",
+      targetKey: "address"
+    });
   }
 }
 

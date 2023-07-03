@@ -65,3 +65,5 @@ export const highlightText = (str: string, className?: string) => {
 export const trimString = (string: string, at = 15) => string.length > at ? string.substring(0, at) + '...' : string;
 
 export const toLower = (str: string) => str?.toLowerCase();
+
+export const isTrue = (str: string) => str === "true";

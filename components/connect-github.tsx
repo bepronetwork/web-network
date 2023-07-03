@@ -8,7 +8,7 @@ import {useAppState} from "../contexts/app-state";
 import Button from "./button";
 
 interface IProps{
-  size?: 'md' | 'sm';
+  size?: 'md' | 'sm' | 'lg';
 }
 
 export default function ConnectGithub({size = 'md'}:IProps) {
@@ -17,12 +17,18 @@ export default function ConnectGithub({size = 'md'}:IProps) {
   const {state} = useAppState()
 
 
-  if(size === 'sm'){
+  if (['lg', 'sm'].includes(size)) {
     return (
-    <Button onClick={connectGithub} disabled={state.spinners?.connectingGH} isLoading={state.spinners?.connectingGH}>
-      <GithubImage  opacity={1} />
-      <span>{t("actions.connect")}</span>
-    </Button>)
+      <Button
+        className={size === "lg" && "col-12"}
+        onClick={connectGithub}
+        disabled={state.spinners?.connectingGH}
+        isLoading={state.spinners?.connectingGH}
+      >
+        <GithubImage opacity={1} />
+        <span>{t("actions.connect")}</span>
+      </Button>
+    );
   }
 
   return (

@@ -1,11 +1,45 @@
-import { memo } from "react";
+import { SVGProps, memo } from "react";
 
-function FilterIcon() {
+function FilterIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="2" width="12" height="2" rx="1" fill="white" />
-      <rect x="2" y="6" width="10" height="2" rx="1" fill="white" />
-      <rect x="3" y="10" width="8" height="2" rx="1" fill="white" />
+    <svg
+      width="16"
+      height="17"
+      viewBox="0 0 16 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g clipPath="url(#clip0_549_15573)">
+        <path
+          d="M4 8.33838H12"
+          stroke="#D5D6DD"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M1.5 5.33838H14.5"
+          stroke="#D5D6DD"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M6.5 11.3384H9.5"
+          stroke="#D5D6DD"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_549_15573">
+          <rect
+            width="16"
+            height="16"
+            fill="white"
+            transform="translate(0 0.338379)"
+          />
+        </clipPath>
+      </defs>
     </svg>
   );
 }

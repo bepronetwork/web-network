@@ -58,6 +58,9 @@ class Chain extends Model {
         type: DataTypes.STRING,
         allowNull: true
       },
+      icon: {
+        type: DataTypes.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

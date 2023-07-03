@@ -22,12 +22,15 @@ $gray-150: #D5D6DC;
 $gray-300: #ABACBA;
 $gray-400: #8F91A3;
 $gray-500: #73758C;
+$gray-600: #5C5E70;
 $gray-700: #454654;
 $gray-800: #2E2F38;
 $gray-850: #23232A;
 $gray-900: #17171C;
 $gray-950: #0B0C0E;
 $blue-200: #B3B9F4;
+$blue-400: #6873E9;
+$yellow-500: #FFD646;
 $light-gray: #434758;
 $blue: #4250e4;
 $blue-dark: #283089;
@@ -93,18 +96,21 @@ $more-bg: (
   "gray-300": $gray-300,
   "gray-400": $gray-400,
   "gray-500": $gray-500,
+  "gray-600": $gray-600,
   "gray-700": $gray-700,
   "gray-800": $gray-800,
   "gray-850": $gray-850,
   "gray-900": $gray-900,
   "gray-950": $gray-950,
   "blue-200": $blue-200,
+  "blue-400": $blue-400,
   "orange-500": $orange-500,
   "orange-800": rgba($orange-500, 0.8),
   "light-warning-30": rgba($light-warning, 0.3),
   "light-warning": $light-warning,
   "blue-dark": $blue-dark,
   "blue-shadow": $bg-blue-shadow,
+  "yellow-500": $yellow-500,
 );
 
 $more-colors: (
@@ -119,16 +125,19 @@ $more-colors: (
   "gray-300": $gray-300,
   "gray-400": $gray-400,
   "gray-500": $gray-500,
+  "gray-600": $gray-600,
   "gray-700": $gray-700,
   "gray-800": $gray-800,
   "gray-850": $gray-850,
   "gray-900": $gray-900,
   "gray-950": $gray-950,
   "blue-200": $blue-200,
+  "blue-400": $blue-400,
   "dark-gray": $dark-gray,
   "light-gray": $light-gray,
   "black": $black,
-  "white": #fff
+  "white": #fff,
+  "yellow-500": $yellow-500,
 );
 
 $more-roundend: (
@@ -194,8 +203,57 @@ $tooltip-bg: $white;
 $tooltip-color: $light-gray;
 $tooltip-arrow-color: $white;
 
+// Breakpoints
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1238px,
+  xxl: 1400px
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 1024px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/mixins";
+
+$sides: top, right, left, bottom;
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .border#{$infix} {
+      @each $side in $sides {
+        &-#{$side} {
+          border-#{$side}: $border-width solid $border-color;
+  
+          &-0 {
+            border-#{$side}: 0 !important;
+          }
+        }
+      }
+    }
+
+    .border#{$infix}-x {
+      border-left: $border-width solid $border-color ;
+      border-right: $border-width solid $border-color ;
+    }
+
+    .border#{$infix}-y {
+      border-top: $border-width solid $border-color ;
+      border-bottom: $border-width solid $border-color ;
+    }
+  }
+}
 
 $theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
@@ -213,21 +271,24 @@ $utilities: map-merge(
       map-merge(
         map-get($utilities, "border"),
         (
-          state: hover
+          state: hover,
+          responsive: true
         )
       ),
     "border-bottom":
       map-merge(
         map-get($utilities, "border-bottom"),
         (
-          state: hover
+          state: hover,
+          responsive: true
         )
       ),
     "border-top":
       map-merge(
         map-get($utilities, "border-top"),
         (
-          state: hover
+          state: hover,
+          responsive: true
         )
       ),
     "border-color":

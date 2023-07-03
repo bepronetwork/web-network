@@ -24,6 +24,10 @@
 @import "components/mini-tabs";
 @import "components/nav-avatar";
 @import "components/cookie-consent";
+@import "components/multi-action-button";
+@import "components/horizontal-scroll";
+@import "components/custom-dropdown";
+@import "components/native-select-wrapper";
 
 @import "components/swagger-ui";
 
@@ -143,7 +147,7 @@ li {
     padding-bottom: 0;
   }
   &-content {
-    background-color: $bg-shadow;
+    background-color: $gray-900;
   }
   &-header,
   &-footer {
@@ -151,8 +155,9 @@ li {
     border: 0;
   }
   .close-button {
-    width: 20px;
-    top: 1.5%;
+    width: 24px;
+    top: 16px;
+    right: 16px;
   }
 
   .close-icon-search {
@@ -214,8 +219,9 @@ li {
       color: $gray-500;
     }
     &__single-value {
-      @extend .p-small;
-      color: $white;
+      @extend .caption-small;
+      @extend .font-weight-medium;
+      color: $gray-300;
     }
     &__control--is-focused &__single-value {
       color: transparentize($white, 0.4);
@@ -227,7 +233,6 @@ li {
       background-color: $gray-900;
       z-index: 4;
       padding: 6px;
-      margin-bottom: 50px;
       &-list {
         padding-top: 0;
         padding-bottom: 0;
@@ -248,7 +253,8 @@ li {
       }
     }
     &__option {
-      @extend .p;
+      @extend .caption-small;
+      @extend .font-weight-medium;
       background-color: transparent;
       color: $gray-500;
 
@@ -303,6 +309,11 @@ li {
 
 .max-width-content {
   width: max-content;
+}
+
+.mw-50-auto {
+  width: auto;
+  max-width: 50%;
 }
 
 .github-info {
@@ -387,9 +398,17 @@ li {
 }
 
 .main-nav {
+  @extend .border-xl-bottom;
+  @extend .border-dark-gray;
+  
   width: 100%;
   min-height: $navbar-height;
   background-color: var(--bs-dark);
+
+  .btn:not(.brand, .not-svg) svg:only-child {
+    width: 16px;
+    height: 16px;
+  }
 
   .brand {
     padding: 0;
@@ -405,16 +424,15 @@ li {
     margin: 0px;
     padding: 0px;
     list-style: none;
-    li {
-      margin-left: $m * 2;
-    }
+    gap: 44px;
+
     a:not(.brand) {
-      color: rgba($white, 0.7);
+      color: $gray-500;
       padding: math.div($m, 4) 0px;
       transition: 0.2s ease-in-out;
       &:hover,
       &.active {
-        color: $white;
+        color: $gray-50;
         text-decoration: none;
       }
     }
@@ -450,6 +468,10 @@ li {
   border-bottom: 1px solid $dark-gray;
 }
 
+.min-w-bounty-hero {
+  min-height: 164px;
+}
+
 // Todo: check if can move to boostrap
 .price-conversor {
   &:hover {
@@ -468,7 +490,7 @@ li {
     margin-bottom: 0;
   }
   &:hover {
-    background-color: lighten($bg-shadow, 5);
+    background-color: $gray-950 !important;
     .h4 {
       color: $white;
     }
@@ -661,7 +683,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 155px
 }
 
 .white-space {
@@ -669,6 +690,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
   @media (max-width: 1399px) {
     white-space: normal;
+  }
+}
+
+.hide-bounty-item-lg {
+  @media (max-width: 1199px) {
+    display: none;
+  }
+}
+
+.hide-bounty-item-md {
+  @media (max-width: 991px) {
+    display: none;
   }
 }
 
@@ -763,11 +796,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-size: 20px;
 }
 
-.tag-ball {
+.ball {
   width: 8px;
   height: 8px;
-  background-color:#B3B9F4;
   border-radius: 50%;
+  &.tag {
+    background-color:#B3B9F4;
+  }
+  &-sm {
+    width: 4px !important;
+    height: 4px !important;
+    border-radius: 50% !important;
+  }
 }
 
 .active-description-button {
@@ -873,6 +913,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .font-weight-500 {
   font-weight: 500 !important;
+}
+
+.font-weight-400 {
+  font-weight: 400 !important;
 }
 
 .font-weight-medium {
@@ -1284,15 +1328,6 @@ $c_props: (
   width: 65%;
 }
 
-.main-nav {
-  border-bottom: 1px solid $dark-gray;
-
-  .btn:not(.brand) svg:only-child {
-    width: 16px;
-    height: 16px;
-  }
-}
-
 svg {
   &:not([height]) {
     width: 14px;
@@ -1304,7 +1339,7 @@ a.row-button svg {
   height: 24px;
 }
 
-.text-white:hover, .text-gray-150:hover {
+.text-white:hover:not(.btn), .text-gray-150:hover {
   svg path {
     fill: white;
   }
@@ -1327,7 +1362,7 @@ a.row-button svg {
   border: 0;
   border-radius: math.div($m, 2) math.div($m, 2) 0 0;
 
-  background-color: $bg-shadow;
+  background-color: $gray-900;
 
   .nav-item {
     .nav-link {
@@ -1343,11 +1378,11 @@ a.row-button svg {
       padding: 20px;
 
       color: rgba($white, 0.4);
-      background-color: $bg-shadow;
+      background-color: $gray-900;
 
       &.active {
         color: $white;
-        background-color: $dark-gray;
+        background-color: $gray-850;
       }
     }
   }
@@ -1419,6 +1454,22 @@ textarea.form-control {
   }
 }
 
+.break-title {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.overflow-wrap {
+  &-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
+
+.bounty-settings {
+  width: 180px;
+}
+
 .comment {
   a {
     color: var(--bs-primary);
@@ -1446,7 +1497,7 @@ textarea.form-control {
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.30em;
+    top: 4.43em;
   }
 
   .input-group {
@@ -1969,6 +2020,10 @@ input[type="color"] {
   max-width: none !important;
 }
 
+.token-symbol {
+  max-width: 120px;
+}
+
 .kyc-modal-body{
   min-height: 630px !important;
 }
@@ -1985,4 +2040,15 @@ input[type="color"] {
 
 .modal-md {
   max-width: 500px;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.overflow-noscrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

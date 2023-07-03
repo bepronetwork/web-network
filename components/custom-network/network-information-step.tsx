@@ -1,7 +1,8 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {useTranslation} from "next-i18next";
 import getConfig from "next/config";
+import {useDebounce} from "use-debounce";
 
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
@@ -11,15 +12,11 @@ import {useNetworkSettings} from "contexts/network-settings";
 import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
 import {StepWrapperProps} from "interfaces/stepper";
-import {useDebounce} from "use-debounce";
-
 
 const { publicRuntimeConfig } = getConfig();
 
 export default function NetworkInformationStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
-
-  const debounce = useRef(null)
 
   const { details, fields } = useNetworkSettings();
   const [nameInput, setNameInput] = useState("")

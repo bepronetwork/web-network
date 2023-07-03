@@ -11,13 +11,12 @@ import {GoogleAnalytics} from "nextjs-google-analytics";
 import ConsentCookie from "components/consent-cokie";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 import Loading from "components/loading";
-import MainNav from "components/main-nav";
+import NavBar from "components/navigation/navbar/controller";
+import NoMetamaskModal from "components/no-metamask-modal/controller";
 import ReadOnlyContainer from "components/read-only-container";
 import ReAuthorizeGithubModal from "components/reauthorize-github-modal";
 import Seo from "components/seo";
-import StatusBar from "components/status-bar";
 import Toaster from "components/toaster";
-import WebThreeDialog from "components/web3-dialog";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import RootProviders from "contexts";
@@ -25,7 +24,7 @@ import RootProviders from "contexts";
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
 
-function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: AppProps) {
+function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppProps) {
 
   const {asPath} = useRouter();
   const {publicRuntimeConfig} = getConfig();
@@ -38,17 +37,16 @@ function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: 
       <GoogleAnalytics gaMeasurementId={publicRuntimeConfig.gaMeasureID} trackPageViews />
       <SessionProvider session={session}>
         <RootProviders>
-          <Seo  issueMeta={currentIssue} />
+          <Seo issueMeta={seoData} />
           <ReadOnlyContainer>
-            <WebThreeDialog />
+            <NoMetamaskModal />
             <InvalidAccountWalletModal/>
             <ReAuthorizeGithubModal />
-            <MainNav />
+            <NavBar />
             <div id="root-container">
               <Component {...pageProps} />
             </div>
             <WrongNetworkModal />
-            <StatusBar />
             <Toaster />
             <Loading />
           </ReadOnlyContainer>

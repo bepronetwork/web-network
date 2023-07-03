@@ -1,0 +1,66 @@
+.multi-action-button {
+  position: relative;
+
+  .select-container {
+    position: relative;
+  }
+
+  .native-select {
+    @extend .bg-gray-900;
+    @extend .border-gray-800;
+    @extend .text-gray-300;
+
+    border-radius: 20px;
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+
+    option {
+      @extend .family-Regular;
+      
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.1rem;
+      line-height: 71%;
+      font-size: 12px;
+    }
+  }
+
+  .react-select-container {
+    .react-select__control {
+      @extend .btn;
+      @extend .btn-primary;
+
+      @extend .d-flex;
+      @extend .align-items-center;
+      @extend .justify-content-center;
+
+      padding: 6px 20px;
+      height: 34px;
+
+      .react-select__value-container {
+        @extend .p-0;
+      }
+
+      .react-select__indicators {
+        display: none;
+        position: absolute;
+      }
+  
+      .react-select__single-value {
+        @extend .text-white;
+
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 71%;
+  
+        svg {
+          width: 14px !important;
+          height: 14px !important;
+        }
+      }
+    }
+  }
+}

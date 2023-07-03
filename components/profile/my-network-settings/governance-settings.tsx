@@ -12,7 +12,7 @@ import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
-import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
+import { IM_AM_CREATOR_NETWORK, LARGE_TOKEN_SYMBOL_LENGTH } from "helpers/constants";
 
 import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
@@ -54,7 +54,11 @@ export default function GovernanceSettings({
     forcedNetwork,
   } = useNetworkSettings();
 
-  const networkTokenSymbol = forcedNetwork?.networkToken?.symbol;
+  const symbol = forcedNetwork?.networkToken?.symbol
+  const networkTokenSymbol =
+    symbol?.length > LARGE_TOKEN_SYMBOL_LENGTH
+      ? `${symbol.slice(0, LARGE_TOKEN_SYMBOL_LENGTH)}...`
+      : symbol;
 
   const NetworkAmount = (title, description, amount, fixed = undefined) => ({
     title,

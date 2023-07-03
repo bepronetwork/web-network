@@ -4,10 +4,10 @@ import {useRouter} from "next/router";
 import ArrowLeft from "assets/icons/arrow-left";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
+import PriceConversor from "components/bounty/bounty-hero/price-conversor/controller";
 import CustomContainer from "components/custom-container";
 import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
-import PriceConversor from "components/price-conversor";
 
 import {useAppState} from "contexts/app-state";
 
@@ -82,7 +82,7 @@ export default function ProposalHero({
 
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
-              currentValue={state.currentBounty?.data?.amount?.toFixed() || "0"}
+              currentValue={state.currentBounty?.data?.amount}
               currency={state.currentBounty?.data?.transactionalToken?.symbol || t('common:misc.token')}
             />
           </div>

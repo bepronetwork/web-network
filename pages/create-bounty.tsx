@@ -31,7 +31,7 @@ import {useAppState} from "contexts/app-state";
 import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
-import {BODY_CHARACTERES_LIMIT} from "helpers/constants";
+import {BODY_CHARACTERES_LIMIT, UNSUPPORTED_CHAIN} from "helpers/constants";
 import {parseTransaction} from "helpers/transactions";
 
 import {BountyPayload} from "interfaces/create-bounty";
@@ -45,7 +45,7 @@ import {SupportedChainData} from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
 import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
-import {getCoinInfoByContract} from "services/coingecko";
+import {getCoinInfoByContract, getCoinList} from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -127,6 +127,9 @@ export default function CreateBountyPage() {
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) =>
     !tokenAllowance.lt(amount);
 
+  const handleIsLessThan = (v: number, min: string) =>
+    BigNumber(v).isLessThan(BigNumber(min));
+
   async function addToken(newToken: Token) {
     await getCoinInfoByContract(newToken?.symbol)
       .then((tokenInfo) => {
@@ -139,6 +142,8 @@ export default function CreateBountyPage() {
   }
 
   async function handleCustomTokens(tokens: Token[]) {
+    await getCoinList() // ask for list so it we don't do that on the loop;
+
     Promise.all(tokens?.map(async (token) => {
       const newTokens = await getCoinInfoByContract(token?.symbol)
         .then((tokenInfo) => ({ ...token, tokenInfo }))
@@ -164,9 +169,13 @@ export default function CreateBountyPage() {
     if (isLoadingCreateBounty) return true;
 
     const isIssueAmount =
-      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
+      issueAmount.floatValue <= 0 ||
+      issueAmount.floatValue === undefined ||
+      handleIsLessThan(issueAmount.floatValue, transactionalToken?.minimum);
     const isRewardAmount =
-      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
+      rewardAmount.floatValue <= 0 ||
+      rewardAmount.floatValue === undefined ||
+      handleIsLessThan(rewardAmount.floatValue, rewardToken?.minimum);
 
     if (section === 0 && !currentNetwork) return true;
 
@@ -399,24 +408,44 @@ export default function CreateBountyPage() {
     transactionalERC20.setAddress(undefined);
   }
 
-  useEffect(() => {
-    if(!connectedChain) return;
+  function handleMinAmount(type: "reward" | "transactional") {
+    if(currentSection === 3){
+      const amount = type === "reward" ? rewardAmount : issueAmount 
+      const isAmount =
+      amount.floatValue <= 0 ||
+      amount.floatValue === undefined ||
+      handleIsLessThan(amount.floatValue, transactionalToken?.minimum);
 
-    searchNetworks({
-      isRegistered: true,
-      isClosed: false,
-      chainId: connectedChain?.id,
-      sortBy: "name",
-      order: "asc",
-      isNeedCountsAndTokensLocked: true,
-    })
-      .then(async ({ count, rows }) => {
-        setNetworks(rows);
-        setNotFoundNetwork(count > 0 ? false : true);
+      if(isAmount) setCurrentSection(2)
+    }
+  }
+
+  const [searchForNetwork, setSearchingForNetwork] = useState<string|null>(null);
+
+  useEffect(() => {
+    if(!connectedChain || searchForNetwork === connectedChain?.id) return;
+
+    setSearchingForNetwork(connectedChain?.id);
+
+    if (connectedChain.name === UNSUPPORTED_CHAIN)
+      setCurrentNetwork(undefined);
+    else
+      searchNetworks({
+        isRegistered: true,
+        isClosed: false,
+        chainId: connectedChain?.id,
+        sortBy: "name",
+        order: "asc",
+        isNeedCountsAndTokensLocked: true,
       })
-      .catch((error) => {
-        console.log("Failed to retrieve networks list", error);
-      });
+        .then(async ({ count, rows }) => {
+          setNetworks(rows);
+          setNotFoundNetwork(!count);
+        })
+        .catch((error) => {
+          console.log("Failed to retrieve networks list", error);
+        })
+        .finally(() => setSearchingForNetwork(null));
   }, [connectedChain]);
 
   useEffect(() => {
@@ -482,6 +511,9 @@ export default function CreateBountyPage() {
     }
   }, [currentNetwork?.tokens]);
 
+  useEffect(() => handleMinAmount('transactional'), [issueAmount])
+  useEffect(() => handleMinAmount('reward'), [rewardAmount])
+
   useEffect(() => {
     cleanFields();
     transactionalERC20.updateAllowanceAndBalance();
@@ -499,9 +531,15 @@ export default function CreateBountyPage() {
   }
 
   async function onNetworkSelected(opt) {
-    changeNetwork(connectedChain?.id, opt?.networkAddress)
+    changeNetwork(opt.chainId, opt?.networkAddress)
       .then(_ => setCurrentNetwork(opt));
   }
+
+  useEffect(() => {
+    if (!currentNetwork)
+      return;
+    changeNetwork(currentNetwork.chain_id, currentNetwork?.networkAddress)
+  }, [currentNetwork, Service?.active])
 
   function section() {
     if (currentSection === 0)
@@ -564,8 +602,9 @@ export default function CreateBountyPage() {
               setIsFundingType(e);
             }}
           >
-            {renderBountyToken("bounty")}
-            {isFundingType && (
+            {isFundingType ? (
+              <>
+              {renderBountyToken("bounty")}
               <div className="col-md-12 my-4">
                 <FormCheck
                   className="form-control-md pb-0"
@@ -578,7 +617,8 @@ export default function CreateBountyPage() {
                 {t("bounty:reward-funders-description")}
                 </p>
               </div>
-            )}
+              </>
+            ): renderBountyToken("bounty")}
             {rewardChecked && isFundingType && renderBountyToken("reward")}
           </CreateBountyRewardInfo>
         </>
@@ -699,7 +739,6 @@ export default function CreateBountyPage() {
             <div className="d-flex justify-content-between my-4 me-4">
               <Button
                 className="col-6 bounty-outline-button me-3"
-                upperCase={false}
                 onClick={() => {
                   currentSection !== 0 &&
                     setCurrentSection((prevState) => prevState - 1);

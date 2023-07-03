@@ -3,11 +3,12 @@ import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
+import {changeChain as changeChainReducer} from "contexts/reducers/change-chain";
 import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 
-import {UNSUPPORTED_CHAIN} from "helpers/constants";
+import {SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
@@ -19,8 +20,8 @@ import useNetworkChange from "x-hooks/use-network-change";
 export function useDao() {
   const { replace, asPath, pathname } = useRouter();
 
-  const { chain } = useChain();
   const {state, dispatch} = useAppState();
+  const { findSupportedChain } = useChain();
   const { handleAddNetwork } = useNetworkChange();
 
   function isChainConfigured(chain: SupportedChainData) {
@@ -70,7 +71,7 @@ export function useDao() {
    */
   async function changeNetwork(chainId = '', address = '') {
     const networkAddress = address || state.Service?.network?.active?.networkAddress;
-    const chain_id = chainId || state.Service?.network?.active?.chain_id;
+    const chain_id = +(chainId || state.Service?.network?.active?.chain_id);
 
     if (!state.Service?.active ||
         !networkAddress ||
@@ -82,16 +83,15 @@ export function useDao() {
     if (state.Service?.active?.network?.contractAddress === networkAddress)
       return;
 
-    const service = state.Service.active;
+    const networkChain = findSupportedChain({ chainId: chain_id });
 
-    if(chain) {
-      const withWeb3Host = !!state.Service?.active?.web3Host;
+    if (!networkChain) return;
 
-      if (+chain_id !== +chain?.chainId ||
-          !withWeb3Host && +chain_id !== +state.Service?.web3Connection?.web3?.currentProvider.chainId ||
-          withWeb3Host && chain?.chainRpc !== state.Service?.active?.web3Host)
-        return;
-    }
+    const withWeb3Host = !!state.Service?.active?.web3Host;
+
+    if (!withWeb3Host && chain_id !== +state.Service?.web3Connection?.web3?.currentProvider?.chainId ||
+        withWeb3Host && networkChain.chainRpc !== state.Service?.active?.web3Host)
+      return;
 
     console.debug("Starting network");
 
@@ -104,7 +104,7 @@ export function useDao() {
             console.error("Failed to load network", networkAddress);
             return;
           }
-          dispatch(changeActiveDAO(service));
+          // dispatch(changeActiveDAO(service));
           console.debug("Network started");
         })
         .catch(error => {
@@ -217,11 +217,45 @@ export function useDao() {
         .finally(() => dispatch(changeChangingChain(false)));
   }
 
+  function dispatchChainUpdate(chainId: number) {
+    const chain = findSupportedChain({ chainId });
+
+    sessionStorage.setItem("currentChainId", chainId.toString());
+
+    return dispatch(changeChainReducer.update({
+      id: (chain?.chainId || chainId)?.toString(),
+      name: chain?.chainName || UNSUPPORTED_CHAIN,
+      shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
+      explorer: chain?.blockScanner || SUPPORT_LINK,
+      events: chain?.eventsApi,
+      registry: chain?.registryAddress
+    }));
+  }
+
+  function listenChainChanged() {
+    if (!window.ethereum || !state.supportedChains?.length)
+      return;
+
+    window.ethereum.removeAllListeners(`chainChanged`);
+
+    if (window.ethereum.isConnected())
+      dispatchChainUpdate(+window.ethereum.chainId);
+
+    window.ethereum.on(`connected`, evt => {
+      console.debug(`Metamask connected`, evt);
+    });
+
+    window.ethereum.on(`chainChanged`, evt => {
+      dispatchChainUpdate(+evt);
+    });
+  }
+
   return {
     changeNetwork,
     changeChain,
     connect,
     start,
-    isServiceReady
+    isServiceReady,
+    listenChainChanged
   };
 }

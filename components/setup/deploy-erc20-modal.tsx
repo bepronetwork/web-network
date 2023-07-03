@@ -7,12 +7,14 @@ interface DeployERC20ModalProps {
   show?: boolean;
   handleHide: () => void;
   onChange: (value: string, validated?: boolean) =>  void;
+  onChangeMinAmount: (value: string) => void;
 }
 
 export function DeployERC20Modal({
   show = false,
   handleHide,
-  onChange
+  onChange,
+  onChangeMinAmount
 }: DeployERC20ModalProps) {
   const { t } = useTranslation("setup");
 
@@ -33,6 +35,8 @@ export function DeployERC20Modal({
       <ERC20Details
         deployer
         onChange={handleChange}
+        onChangeMinAmount={onChangeMinAmount}
+        minimum
       />
     </Modal>
   );

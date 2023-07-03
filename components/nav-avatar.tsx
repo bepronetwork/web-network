@@ -3,11 +3,11 @@ import {OverlayTrigger, Popover} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
+import DisconnectWalletButton from "components/common/buttons/disconnect-wallet/view";
 
 import {useAppState} from "contexts/app-state";
 
@@ -67,16 +67,6 @@ export default function NavAvatar() {
     </div>
   );
 
-  const DisconnectWallet = ({ onClick }) => (
-    <div
-      className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger"
-      onClick={onClick}
-    >
-      <span className="p family-Regular">{t("main-nav.nav-avatar.disconnect-wallet")}</span>
-      <CloseIcon width={10} height={10} color="" />
-    </div>
-  );
-
   const LinksSession = ({ children }) => (
     <div className="row align-items-center border-bottom border-light-gray">
       <div className="d-flex flex-column gap-3 pt-3 pb-3 px-0">
@@ -126,7 +116,7 @@ export default function NavAvatar() {
               <div className="d-flex flex-row justify-content-left">
                 <ProfileInternalLink
                   href="profile"
-                  label={t("main-nav.nav-avatar.view-profile")}
+                  label={t("main-nav.nav-avatar.my-profile")}
                   className="text-gray p family-Regular"
                 />
               </div>
@@ -150,7 +140,7 @@ export default function NavAvatar() {
         </LinksSession>
 
         <div className="row align-items-center">
-          <DisconnectWallet onClick={handleDisconnectWallet} />
+          <DisconnectWalletButton onClick={handleDisconnectWallet} />
         </div>
       </Popover.Body>
     </Popover>

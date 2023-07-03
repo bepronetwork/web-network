@@ -14,4 +14,5 @@ export interface MiniChainInfo {
   explorer?: string;
   eventsApi?: string;
   color?: string;
+  icon?: string;
 }

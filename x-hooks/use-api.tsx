@@ -148,7 +148,7 @@ export default function useApi() {
       }>(`/search/issues?${params}`)
       .then(({ data }) => ({
         ...data,
-        rows: data.rows.map(issueParser)
+        rows: data.rows.map(issue => issueParser(issue))
       }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
@@ -175,7 +175,7 @@ export default function useApi() {
     }).toString();
     return api
       .get<IssueData[]>(`/search/issues/recent/?${params}`)
-      .then(({ data }): IssueBigNumberData[] => data.map(issueParser))
+      .then(({ data }): IssueBigNumberData[] => data.map(issue => issueParser(issue)))
       .catch((): IssueBigNumberData[] => ([]));
   }
 
@@ -235,6 +235,13 @@ export default function useApi() {
   async function createIssue(payload: NewIssueParams, networkName = DEFAULT_NETWORK_NAME) {
     return api
       .post<number>("/issue", { ...payload, networkName })
+      .then(({ data }) => data)
+      .catch(() => null);
+  }
+
+  async function createToken(payload: {address: string; minAmount: string; chainId: number }) {
+    return api
+      .post("/token", { ...payload })
       .then(({ data }) => data)
       .catch(() => null);
   }
@@ -969,6 +976,7 @@ export default function useApi() {
   return {
     getSupportedChains,
     createIssue,
+    createToken,
     updateIssue,
     createNetwork,
     createPrePullRequest,

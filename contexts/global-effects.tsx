@@ -32,7 +32,7 @@ export const GlobalEffectsProvider = ({children}) => {
   const transactions = useTransactions();
   const { state, dispatch } = useAppState();
 
-  const { connectedChain, currentUser, Service } = state;
+  const { connectedChain, currentUser, Service, supportedChains } = state;
 
   useEffect(() => {
     const web3Connection = new Web3Connection({
@@ -41,6 +41,10 @@ export const GlobalEffectsProvider = ({children}) => {
 
     dispatch(changeWeb3Connection(web3Connection));
   }, []);
+
+  useEffect(dao.listenChainChanged, [
+    supportedChains
+  ]);
 
   useEffect(() => {
     dao.start();
@@ -67,7 +71,7 @@ export const GlobalEffectsProvider = ({children}) => {
   useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
 
   useEffect(auth.validateGhAndWallet, [session?.data, currentUser?.walletAddress]);
-  useEffect(auth.updateWalletAddress, [currentUser]);
+  useEffect(auth.updateWalletAddress, [currentUser?.connected]);
   useEffect(auth.listenToAccountsChanged, [Service]);
   useEffect(auth.updateWalletBalance, [currentUser?.walletAddress, Service?.active?.network]);
   useEffect(auth.updateKycSession, [state?.currentUser?.login,

@@ -74,7 +74,7 @@ export function FormGroup({
           className={`caption-medium text-gray-50 text-capitalize 
             font-weight-500 d-flex flex-row align-items-center mb-2`}
         >
-          <span className="mr-1">{label}</span>
+          <span className="mr-1 text-truncate">{label}</span>
           {renderDescription(rest?.description)}
         </Form.Label>
         { !isNumberFormat &&

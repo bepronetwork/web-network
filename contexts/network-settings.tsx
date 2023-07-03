@@ -281,6 +281,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     permission: {
       setter: value => setFields(`github.botPermission`, !!value)
     },
+    settlerTokenMinAmount: {
+      setter: value => setFields(`tokens.settlerTokenMinAmount`, value)
+    },
     settlerToken: {
       setter: value => setFields(`tokens.settler`, value)
     },

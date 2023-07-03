@@ -28,6 +28,7 @@ import { RegistryParameters } from "types/dappkit";
 import useApi from "x-hooks/use-api";
 import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
+import useChain from "x-hooks/use-chain";
 import {useSettings} from "x-hooks/use-settings";
 
 interface RegistrySetupProps { 
@@ -58,6 +59,7 @@ export function RegistrySetup({
 
   const [treasury, setTreasury] = useState("");
   const [erc20, setErc20] = useState(defaultContractField);
+  const [erc20MinAmount, setErc20MinAmount] = useState<string>();
   const [visibleModal, setVisibleModal] = useState<string>();
   const [isAllowingToken, setIsAllowingToken] = useState<string>();
   const [registry, setRegistry] = useState(defaultContractField);
@@ -73,9 +75,10 @@ export function RegistrySetup({
   const [registrySaveCTA, setRegistrySaveCTA] = useState(false);
 
   const { loadSettings } = useSettings();
+  const { findSupportedChain } = useChain();
   const { signMessage } = useAuthentication();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
-  const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains } = useApi();
+  const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains, createToken } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
 
   function isEmpty(value: string) {
@@ -152,6 +155,9 @@ export function RegistrySetup({
         return setChainRegistry(contractAddress);
       })
       .then(() => {
+        const chain = findSupportedChain({ chainId: +connectedChain?.id, chainShortName: connectedChain?.shortName});
+        if (chain) createToken({address: erc20.value, minAmount: erc20MinAmount, chainId: chain?.chainId}) 
+
         loadSettings(true);
       })
       .then(() => dispatch(toastSuccess(t("registry.success.deploy.content"), t("registry.success.deploy.title"))))
@@ -507,6 +513,7 @@ export function RegistrySetup({
         show={visibleModal === ModalKeys.ERC20}
         handleHide={handleHideModal}
         onChange={handleErc20Change}
+        onChangeMinAmount={setErc20MinAmount}
       />
 
       <DeployBountyTokenModal

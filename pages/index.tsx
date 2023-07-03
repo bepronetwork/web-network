@@ -1,38 +1,18 @@
-import {useEffect} from "react";
-
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import getConfig from "next/config";
-import {useRouter} from "next/router";
 import {GetServerSideProps} from "next/types";
 
-import {useAppState} from "contexts/app-state";
+import ExplorePage from "components/pages/explore/controller";
 
-import ExplorePage from "pages/explore";
+import getExplorePageData from "x-hooks/api/get-explore-page-data";
 
-const { publicRuntimeConfig } = getConfig();
+export default ExplorePage;
 
-export default function Index() {
-  const { replace } = useRouter();
+export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
+  const data = await getExplorePageData(query);
 
-  const { state } = useAppState();
-
-  useEffect(() => {
-    const isAdmin = state.currentUser?.walletAddress?.toLowerCase() === publicRuntimeConfig.adminWallet.toLowerCase();
-    const hasSupportedChains = !!state?.supportedChains?.length;
-
-    if (isAdmin && !hasSupportedChains)
-      replace("/setup");
-
-  }, [state?.supportedChains, state.currentUser?.walletAddress]);
-
-  return(
-    <ExplorePage />
-  );
-}
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
+      ...data,
       ...(await serverSideTranslations(locale, ["common", "custom-network", "bounty", "connect-wallet-button"]))
     }
   };

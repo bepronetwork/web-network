@@ -84,11 +84,14 @@ function ConnectionButton({
       { variant === "profile" && <label className="caption-medium mb-2">{LABELS[type]}</label> }
 
       <div className={CLASSES_BUTTON.join(" ")} onClick={handleConnect}>
-          
-            {ICONS[type]}
-            <span className="ml-2 caption-large text-white font-weight-medium flex-grow-1">{CREDENTIALS[type]}</span>
-            {isLoading  && (<span className="spinner-border spinner-border-xs ml-1" />)}
-          {STATE_ICON[state]}
+      {ICONS[type]}
+        <span className="text-truncate ml-2 caption-large text-white font-weight-medium flex-grow-1">
+          {CREDENTIALS[type]}
+        </span>
+        {isLoading && (
+          <span className="spinner-border spinner-border-xs ml-1" />
+        )}
+        {STATE_ICON[state]}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
-import {isMobile} from "react-device-detect";
 
+import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -10,19 +10,22 @@ import EyeIcon from "assets/icons/eye-icon";
 import EyeSlashIcon from "assets/icons/eye-slash-icon";
 import TrashIcon from "assets/icons/trash-icon";
 
-import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
+import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
-import BountyTags from "components/bounty/bounty-tags";
+import BountyAmount from "components/bounty/amount-info/controller";
 import CardItem from "components/card-item";
-import ChainBadge from "components/chain-badge";
-import IssueAmountInfo from "components/issue-amount-info";
+import If from "components/If";
+import Modal from "components/modal";
+import { FlexColumn } from "components/profile/wallet-balance";
+import ResponsiveWrapper from "components/responsive-wrapper";
 import Translation from "components/translation";
 
 import {useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
+import { formatNumberToCurrency } from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
@@ -32,8 +35,8 @@ import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 
-import Modal from "./modal";
-import { FlexColumn } from "./profile/wallet-balance";
+import BountyTagsView from "./bounty/bounty-tags/view";
+import NetworkBadge from "./network/badge/view";
 
 interface IssueListItemProps {
   issue?: IssueBigNumberData;
@@ -50,29 +53,34 @@ export default function IssueListItem({
 }: IssueListItemProps) {
   const router = useRouter();
   const { t } = useTranslation(["bounty", "common", "custom-network"]);
-  const [visible, setVisible] = useState<boolean>();
+  
   const {state,dispatch} = useAppState();
-  const { signMessage } = useAuthentication();
+  const [visible, setVisible] = useState<boolean>();
   const [isCancelable, setIsCancelable] = useState(false);
   const [hideTrashIcon, setHideTrashIcon] = useState<boolean>();
   const [showHardCancelModal, setShowHardCancelModal] = useState(false);
   const [isLoadingHardCancel, setIsLoadingHardCancel] = useState(false);
-  const {updateVisibleBounty} = useApi();
+  
+  const { updateVisibleBounty } = useApi();
   const { getURLWithNetwork } = useNetwork();
+  const { signMessage } = useAuthentication();
   const { handleHardCancelBounty } = useBepro();
 
-  const isVisible = visible !== undefined ? visible : issue?.visible
+  const isVisible = visible !== undefined ? visible : issue?.visible;
 
   const issueState = getIssueState({
     state: issue?.state,
     amount: issue?.amount,
     fundingAmount: issue?.fundingAmount,
-  })
+  });
+  
+  const fundedAmount = issue?.fundedAmount?.isNaN() ? BigNumber(0) : issue?.fundedAmount;
+  const fundingAmount = issue?.fundingAmount?.isNaN() ? BigNumber(0) : issue?.fundingAmount;
 
-  const badgeStyle = {
-    backgroundColor: `${issue?.network?.colors?.primary}90`,
-    border: `1px solid ${issue?.network?.colors?.primary}`
-  };
+  const percentage =
+  BigNumber(fundedAmount.multipliedBy(100).toFixed(2, 1))
+    .dividedBy(issue?.fundingAmount)
+    .toFixed(0, 1) || 0;
 
   function handleClickCard() {
     if (xClick) return xClick();
@@ -148,7 +156,7 @@ export default function IssueListItem({
     const id = issue?.githubId;
 
     return (
-      <span className={`${(tag && uppercase) && 'text-uppercase'} h6 text-white-40 me-2`}>
+      <span className={`${(tag && uppercase) && 'text-uppercase' || ""} text-gray me-2`}>
         {tag ? `${tag}-${id}` : `#${id}`}
       </span>
     );
@@ -156,6 +164,10 @@ export default function IssueListItem({
 
   function RenderIssueData({ state }: {state: IssueState}) {
     const types = {
+      funding: {
+        value: percentage,
+        translation: t("info.funded")
+      },
       open: {
         value: issue?.working?.length,
         translation: t("info.working"),
@@ -174,52 +186,91 @@ export default function IssueListItem({
       },
     };
 
-    if (["open", "ready", "proposal"].includes(state?.toLowerCase())) {
-      const { value, translation } = types[state?.toLowerCase()];
+    const lowerState = state?.toLowerCase();
+
+    if (["open", "ready", "proposal", "funding"].includes(lowerState)) {
+      const isFunding = lowerState === 'funding';
+      const { value, translation } = types[lowerState];
+
       return (
-        <div className="d-flex align-items-center" key={issue.githubId}>
-          <span className="caption-medium mr-1 text-white">
-            {value || 0}
+        <BountyItemLabel label={translation} key={issue.githubId} className="col-auto">
+          <span className={`${ isFunding ? 'text-light-warning': "text-gray"}`}>
+            {value || 0}{isFunding && '%'}
           </span>
-          <span className="caption-medium text-white-40 text-uppercase">
-            {translation}
-          </span>
-        </div>
+        </BountyItemLabel>
       );
     } else return <></>;
   }
 
   if (size === "sm") {
+    const isSeekingFund = ["funding", "partial-funded"].includes(issueState);
+
     return (
       <CardItem onClick={handleClickCard} key="sm-card">
         <>
-          <div className="d-flex flex-row align-items-center justify-content-between">
-            <div className="d-flex flex-row align-items-center gap-3">
-              <div className="network-name bg-dark-gray p-1 border-radius-8">
-                {issue?.network?.logoIcon && (
-                  <img
-                    src={`${state.Settings?.urls?.ipfs}/${issue?.network?.logoIcon}`}
-                    width={14}
-                    height={14}
-                    className="ms-1 me-2"
-                  />
-                )}
-                <span className="caption-small me-1 text-uppercase">
-                  {issue?.network?.name}
-                </span>
-              </div>
-
-              <ChainBadge chain={issue?.network?.chain} />
+          <ResponsiveWrapper xs={false} md={true} className="d-flex gap-2 align-items-center justify-content-between">
+            <div className="mw-50-auto network-name">
+              <NetworkBadge
+                logoUrl={issue?.network?.logoIcon && `${state.Settings?.urls?.ipfs}/${issue?.network?.logoIcon}`}
+                name={issue?.network?.name}
+              />
             </div>
 
-            <BountyStatusInfo issueState={issueState} className="mt-1 px-2 " />
-          </div>
-          <div className="text-truncate mb-2 mt-4">{issue?.title}</div>
-          <div className="issue-body text-white-40 text-break text-truncate mb-3" >
-            {issue?.body}
-          </div>
-          <div className={!issue?.isFundingRequest && 'mt-4'}>
-            <IssueAmountInfo issue={issue} size={size} />
+            <div className="max-width-content">
+              <Badge
+                color="transparent"
+                className={`d-flex align-items-center gap-1 border border-gray-800 caption-medium 
+                  font-weight-normal text-capitalize border-radius-8`}
+              >
+                <>
+                  <BountyStatusInfo issueState={issueState} />
+                  <span>{isSeekingFund ? t("seeking-funding") : issueState}</span>
+                </>
+              </Badge>
+            </div>
+          </ResponsiveWrapper>
+
+          <ResponsiveWrapper xs={true} md={false} className="align-items-center gap-2 mb-3">
+            <BountyStatusInfo issueState={issueState} />
+            <span className="text-truncate text-capitalize">{issue?.title}</span>
+          </ResponsiveWrapper>
+
+
+          <ResponsiveWrapper xs={false} md={true} className="mt-3 flex-column">
+            <span className="text-white text-truncate text-capitalize">
+              {issue?.title}
+            </span>
+
+            <span className="text-gray-600 text-truncate text-capitalize">
+              {issue?.body}
+            </span>
+          </ResponsiveWrapper>
+
+          <div className="row align-items-center justify-content-md-end justify-content-between mt-2">
+            <If condition={isSeekingFund}>
+              <ResponsiveWrapper 
+                xs={false} 
+                md={true} 
+                className="col-6 caption-medium font-weight-normal text-capitalize"
+              >
+                <span className="mr-1">{t("info.funded")}</span>
+                <span className="text-yellow-500">{formatNumberToCurrency(issue?.fundedPercent)}%</span>
+              </ResponsiveWrapper>
+            </If>
+
+            <ResponsiveWrapper 
+              md={false}
+              className="mw-50-auto network-name caption-medium font-weight-normal text-capitalize"
+            >
+              <NetworkBadge
+                logoUrl={issue?.network?.logoIcon && `${state.Settings?.urls?.ipfs}/${issue?.network?.logoIcon}`}
+                name={issue?.network?.name}
+              />
+            </ResponsiveWrapper>
+
+            <div className="col-6">
+              <BountyAmount bounty={issue} size={size} />
+            </div>
           </div>
         </>
       </CardItem>
@@ -293,74 +344,119 @@ export default function IssueListItem({
 
 
   return (
-    <CardItem onClick={handleClickCard} key='default-card'>
-      <div className="row align-center">
-        <div className="col-md-10 mb-3 mb-md-0">
-          <h4 className="h4 text-truncate mb-3">
-            <IssueTag/>
-            {(issue?.title !== null && issue?.title) || (
-              <Translation ns="bounty" label={"errors.fetching"} />
-            )}
-          </h4>
-          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            {!isMobile && (
-              <>
-                <BountyStatusInfo issueState={issueState} />
-                {issue?.isKyc ? <Badge
-                  className={
-                    `d-flex status caption-medium py-1 px-3 bg-transparent border border-gray-700 text-gray-300`}
-                  label={t("bounty:kyc.label")}
-                /> : null}
-                <div className="d-flex align-items-center gap-20">
-                  <AvatarOrIdenticon
-                    address={issue?.creatorAddress}
-                    user={issue?.creatorGithub}
-                    size="sm"
-                  />
-
-                  {(variant === "network" && issue?.repository) && (
-                    <OverlayTrigger
-                      key="bottom-githubPath"
-                      placement="bottom"
-                      overlay={
-                        <Tooltip id={"tooltip-bottom"}>
-                          {issue?.repository?.githubPath}
-                        </Tooltip>
-                      }
+    <CardItem onClick={handleClickCard} key="default-card">
+      <div className="row align-items-center">
+        <div className="col-12">
+          <div className="row">
+            <div className="d-flex col-10 text-truncate">
+              <div className="me-2">
+                <BountyStatusInfo
+                  issueState={issueState}
+                  fundedAmount={fundedAmount}
+                  fundingAmount={fundingAmount}
+                />
+              </div>
+              <span className="span text-truncate mb-3">
+                {(issue?.title !== null && issue?.title) || (
+                  <Translation ns="bounty" label={"errors.fetching"} />
+                )}
+              </span>
+            </div>
+            <div className="d-flex d-none d-lg-block justify-content-end col-md-2">
+              <div className="d-flex justify-content-end">
+                <If condition={variant === "multi-network"}>
+                  <ResponsiveWrapper xs={false} xl={true}>
+                    <div
+                      className={`d-flex py-1 pe-2 justify-content-center text-truncate border border-gray-800
+                        border-radius-4 text-white-40 bg-gray-850 text-uppercase`}
                     >
-                      <div className={`${!issue?.network?.colors?.primary && "bg-primary"} rounded-4 px-2 py-1`}
-                        style={badgeStyle}>
-                        <span className="caption-medium text-uppercase mw-github-info">
-                          {issue?.repository?.githubPath.split("/")?.[1]}
-                        </span>
+                      <div className="d-flex flex-column justify-content-center">
+                        <div
+                          className="d-flex ball mx-2"
+                          style={{
+                            backgroundColor: issue?.network?.chain?.color,
+                          }}
+                        />
                       </div>
-                    </OverlayTrigger>
-                  )}
-
-                  { variant === "multi-network" &&
-                    <Badge
-                      label={issue?.network?.name}
-                      style={badgeStyle}
-                    />
-                  }
-                </div>
-              </>
-            )}
-
-            <RenderIssueData state={issueState} />
-
-            <span className="text-gray-500 font-weight-medium">
-              {issue?.createdAt?.toLocaleDateString("PT")}
-            </span>
-
-            <BountyTags tags={issue?.tags} color={issue?.network?.colors?.primary}/>
+                      {issue?.network?.chain?.chainShortName}
+                    </div>
+                  </ResponsiveWrapper>
+                </If>
+              </div>
+            </div>
           </div>
-        </div>
+          
+          <ResponsiveWrapper xs={false} xl={true}>
+            <div className="d-flex justify-content-md-start mb-3">
+              <BountyTagsView tags={issue?.tags} />
 
-        <div className="col-md-2 my-auto text-center">
-          <IssueAmountInfo issue={issue} size={size} />
+              <If condition={issue?.isKyc}>
+                <Badge
+                  className={`d-flex status caption-medium py-1 px-3 
+                  ms-2 bg-transparent border border-gray-700 text-gray-300`}
+                  label={t("bounty:kyc.label")}
+                />
+              </If>
+            </div>
+          </ResponsiveWrapper>
+
+          <div className="row align-items-center border-xl-top border-gray-850 pt-3">
+            <ResponsiveWrapper xs={false} xl={true}>
+              <div className="row w-100 align-items-center justify-content-md-start gx-0">
+                <BountyItemLabel label="ID" className="col-auto">
+                  <IssueTag />
+                </BountyItemLabel>
+
+                <BountyItemLabel label="Repository" className="col-auto">
+                  <OverlayTrigger
+                    key="bottom-githubPath"
+                    placement="bottom"
+                    overlay={
+                      <Tooltip id={"tooltip-bottom"}>
+                        {issue?.repository?.githubPath}
+                      </Tooltip>
+                    }
+                  >
+                    <span className={`text-gray me-2 text-truncate`}>
+                      {issue?.repository?.githubPath.split("/")?.[1]}
+                    </span>
+                  </OverlayTrigger>
+                </BountyItemLabel>
+
+                <ResponsiveWrapper xs={false} xxl={true} className="col-auto">
+                  <RenderIssueData state={issueState} />
+                </ResponsiveWrapper>
+
+                <BountyItemLabel
+                  label={t("info.opened-on")}
+                  className="col-auto"
+                >
+                  <span className="text-gray text-truncate">
+                    {issue?.createdAt?.toLocaleDateString("PT")}
+                  </span>
+                </BountyItemLabel>
+
+                <div className="col d-flex justify-content-end px-0">
+                  <BountyAmount bounty={issue} size={size} />
+                </div>
+              </div>
+            </ResponsiveWrapper>
+            <ResponsiveWrapper xs={true} xl={false}>
+              <div className="col">
+                <div className="row justify-content-between">
+                  <div className="mw-50-auto">
+                    <BountyTagsView tags={[issue?.network?.name]} />
+                  </div>
+                  
+                  <div className="mw-50-auto">
+                    <BountyAmount bounty={issue} size={size} />
+                  </div>
+                </div>
+              </div>
+            </ResponsiveWrapper>
+          </div>
         </div>
       </div>
     </CardItem>
-  )
+  );
 }

@@ -19,6 +19,10 @@
   "percentage-for-dispute": "Percentage for dispute",
   "redeem-time": "Draft time",
   "council-amount": "Curator Amount",
+  "network-bounty-hall": {
+    "title": "{{network}} Bounty hall",
+    "description": "A collection of the most recent bounties of {{network}} networks"
+  },
   "cancelable-time": {
     "label": "Cancelable Time",
     "description": "After this time the network governor can cancel a stuck bounty. Min. {{min}}."

@@ -1,3 +1,4 @@
+import { Disputes } from "interfaces/issue-data";
 import { Network } from "interfaces/network";
 import { SupportedChainData } from "interfaces/supported-chain-data";
 
@@ -8,7 +9,7 @@ export interface Curator {
   tokensLocked?: string;
   delegatedToMe?: string;
   networkId?: number;
-  disputes?: number;
+  disputes?: Disputes[];
   isCurrentlyCurator?: boolean;
   delegations?: Delegation[];
 }

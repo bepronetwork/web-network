@@ -1,5 +1,5 @@
-import ListIssues from "components/list-issues";
+import BountiesList from "components/bounty/bounties-list/controller";
 
 export default function Management() {
-  return <ListIssues variant="management" />;
+  return <BountiesList variant="management" />;
 }

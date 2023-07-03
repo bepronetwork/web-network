@@ -4,6 +4,8 @@ import BigNumber from "bignumber.js";
 import {addSeconds, formatDistance} from "date-fns";
 import {useTranslation} from "next-i18next";
 
+import WarningIcon from "assets/icons/warning-icon";
+
 import {ContextualSpan} from "components/contextual-span";
 import ContractButton from "components/contract-button";
 import ProposalMerge from "components/proposal-merge";
@@ -104,6 +106,14 @@ export default function ProposalActionCard({
     // state.Service?.network?.active?.allowMerge === true
   ].every(v => v);
 
+  const canShowImportant = () => [
+    chainDisputable,
+    (isPrOwner && !chainDisputable && !proposalCanBeDisputed()),
+    (isProposalOwner && !chainDisputable && !proposalCanBeDisputed()),
+    allowMergeCommit === false,
+    prsNeedsApproval
+  ].includes(true);
+
   function handleRefuse() {
     setIsRefusing(true);
     onRefuse().finally(() => setIsRefusing(false));
@@ -169,7 +179,7 @@ export default function ProposalActionCard({
             refused={proposal?.refusedByBountyOwner}
           />
         </div>
-        <div className="mt-2 py-2 text-center">
+        <div className="mt-2 py-2 ">
           {!currentPullRequest?.isMergeable && !proposal?.isMerged && (
             <span className="text-uppercase text-danger caption-small">
               {t("pull-request:errors.merge-conflicts")}
@@ -217,41 +227,56 @@ export default function ProposalActionCard({
             )}
           </div>
 
+          {canShowImportant() && (
+            <div className="row mt-3">
+              <div className="d-flex justify-conten-start ms-2">
+                <div>
+                <span className="svg-warning">
+                  <WarningIcon width={14} height={14} className="mb-1" />
+                </span>
+                <span className="text-warning font-weight-500 mt-3 ms-1">
+                  {t("proposal:important")}
+                </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           { chainDisputable &&
-            <div className="row mt-2">
-              <ContextualSpan context="warning" classNameIcon="mr-3">
+            <div className="row mt-2 ms-1">
+              <ContextualSpan context="warning" icon={false}>
                 {t('proposal:messages.in-disputable-time', {time: missingDisputableTime})}
               </ContextualSpan>
             </div> || ""
           }
 
           {(isPrOwner && !chainDisputable && !proposalCanBeDisputed()) && (
-            <div className="row mt-2">
-              <ContextualSpan context="warning" classNameIcon="mb-4">
+            <div className="row mt-2 ms-1">
+              <ContextualSpan context="warning" icon={false}>
                 {t("proposal:messages.owner-pull-request")}
               </ContextualSpan>
             </div>
           )}
 
           {(isProposalOwner && !chainDisputable && !proposalCanBeDisputed()) && (
-            <div className="row mt-2">
-              <ContextualSpan context="warning">
+            <div className="row mt-2 ms-1">
+              <ContextualSpan context="warning" icon={false}>
                 {t("proposal:messages.owner-proposal")}
               </ContextualSpan>
             </div>
           )}
 
           { allowMergeCommit === false &&
-            <div className="row mt-2">
-              <ContextualSpan context="warning" classNameIcon="mb-4">
+            <div className="row mt-2 ms-1">
+              <ContextualSpan context="warning" icon={false}>
                 {t("pull-request:errors.merge-commit")}
               </ContextualSpan>
             </div>
           }
 
           { prsNeedsApproval &&
-            <div className="row mt-2">
-              <ContextualSpan context="warning" classNameIcon="mb-4">
+            <div className="row mt-2 ms-1">
+              <ContextualSpan context="warning" icon={false}>
                 {t("pull-request:errors.approval")}
               </ContextualSpan>
             </div>

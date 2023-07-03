@@ -11,13 +11,15 @@
   "description_proposal": "Reviewed implementations by the network curators ready to be approved by the network curators.",
   "description_pull-request": "Raw implementations from the network developers ready to be reviewed by anyone and approved into proposals by the network curators",
   "info": {
-    "working": "Working",
-    "pull-requests_one": "pull request",
-    "pull-requests_other": "pull requests",
+    "funded": "Funded",
+    "working": "Users working",
+    "pull-requests_one": "Pull request",
+    "pull-requests_other": "Pull requests",
     "proposals_one": "proposal",
     "proposals_other": "proposals",
     "reviews_one": "review",
-    "reviews_other": "reviews"
+    "reviews_other": "reviews",
+    "opened-on": "Opened on"
   },
   "steps": {
     "title": "Bounty State",
@@ -63,6 +65,7 @@
     "redeem": "Redeem",
     "update-amount": "Update Amount",
     "edit-bounty": "Edit Bounty",
+    "owner-cancel": "Owner cancel",
     "update-bounty": "Bounty updated successfully",
     "canceled-bounty": "Bounty canceled successfully",
     "recognize-finished": {
@@ -159,6 +162,7 @@
   "write": "write", 
   "self-fund": "Self-fund",
   "seek-funding": "Seek Funding",
+  "seeking-funding": "Seeking Funding",
   "balance": "balance:",
   "edit": "edit",
   "most-active-network-empty": "Not found active networks",
@@ -166,6 +170,7 @@
     "is-required": "Required KYC validation",
     "refresh": "Refresh Session",
     "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
+    "bounty-tool-tip": "This bounty requires KYC , you can activate it in your profile",
     "identify-to-start": "Start KYC",
     "identify-kyc": "Start KYC",
     "identified": "Successfully identified, you can close this modal",

@@ -1,15 +1,20 @@
-import React, {useEffect, useState, ReactNode} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 
 import {useTranslation} from "next-i18next";
 
+import ChainIcon from "components/chain-icon";
+import NativeSelectWrapper from "components/common/native-select-wrapper/view";
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
-import Indicator from "components/indicator";
 import ReactSelect from "components/react-select";
 
 import {useAppState} from "contexts/app-state";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
+
+import {getChainIcon, getChainIconsList} from "services/chain-id";
+
+import useBreakPoint from "x-hooks/use-breakpoint";
 
 interface SelectChainDropdownProps {
   onSelect: (chain: SupportedChainData) => void;
@@ -40,17 +45,19 @@ export default function SelectChainDropdown({
 
   const [options, setOptions] = useState<ChainOption[]>([]);
   const [selected, setSelectedChain] = useState<ChainOption>(null);
+  const [loadingInfo, setLoadingInfo] = useState<boolean>(false);
 
+  const { isDesktopView } = useBreakPoint();
   const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
 
   function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption {
     return {
       value: chain,
       label: chain.chainShortName,
-      preIcon: (<Indicator bg={isDisabled ? "gray" : chain.color} />),
+      preIcon: (<ChainIcon src={chain.icon} />),
       isDisabled,
       tooltip: isDisabled
-      ? "Not available on this chain"
+      ? t("errors.not-available-chain")
       : chain?.chainShortName?.length > 12
       ? chain.chainShortName
       : undefined,
@@ -75,12 +82,14 @@ export default function SelectChainDropdown({
     let chain = undefined;
 
     if (isOnNetwork && Service?.network?.active?.chain)
-      chain = Service?.network?.active?.chain;
+      chain = 
+        options?.find(({ value: { chainId } }) => chainId === +(Service?.network?.active?.chain?.chainId))?.value;
     else
       chain =
         options?.find(({ value: { chainId } }) => chainId === +(defaultChain?.chainId || connectedChain.id))?.value;
 
     if (!chain) {
+      setSelectedChain(null);
       return;
     }
 
@@ -89,19 +98,43 @@ export default function SelectChainDropdown({
     setSelectedChain(chainToOption(chain));
   }
 
-  function updateOptions() {
-    if (!supportedChains || (isOnNetwork && !Service?.network?.availableChains)) return;
+  async function updateOptions() {
+    if (!supportedChains || (isOnNetwork && !Service?.network?.availableChains) || loadingInfo) return;
 
-    const configuredChains = supportedChains.filter(isChainConfigured);
+    setLoadingInfo(true);
+
+    await getChainIconsList(); // request the chainsIconsList so we don't do it on the loop
+
+    const chainsWithIcon = await Promise.all(supportedChains
+      .filter(isChainConfigured)
+      .map(async (chain) => ({
+        ...chain,
+        icon: await getChainIcon(chain.icon)
+      })));
 
     if (isOnNetwork)
-      setOptions(configuredChains.map(chain =>
+      setOptions(chainsWithIcon.map(chain =>
         chainToOption(chain, !Service?.network?.availableChains?.find(({ chainId }) => chainId === chain.chainId))));
     else
-      setOptions(configuredChains.map(chain => chainToOption(chain)));
+      setOptions(chainsWithIcon.map(chain => chainToOption(chain)));
+
+    setLoadingInfo(false);
   }
 
-  useEffect(updateOptions, [
+  function getNativeOptions() {
+    return options.map((opt, index) => ({
+      label: opt?.label,
+      value: index,
+    }));
+  }
+
+  function onNativeChange(selectedOption) {
+    selectSupportedChain(options[selectedOption?.value]);
+  }
+
+  useEffect(() => {
+    updateOptions();
+  }, [
     isOnNetwork,
     Service?.network?.availableChains,
     supportedChains,
@@ -116,19 +149,26 @@ export default function SelectChainDropdown({
   ]);
 
   return(
-    <div className={className}>
-      <ReactSelect
-        options={options}
-        value={selected}
-        onChange={selectSupportedChain}
-        placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
-        isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
-        readOnly={true}
-        components={{
-          Option: IconOption,
-          SingleValue: IconSingleValue
-        }}
-      />
-    </div>
+    <NativeSelectWrapper
+      options={getNativeOptions()}
+      onChange={onNativeChange}
+    >
+      <div className={className}>
+        <ReactSelect
+          menuPlacement={isDesktopView ? "auto" : "top"}
+          options={options}
+          value={selected}
+          onChange={selectSupportedChain}
+          placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
+          isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
+          isSearchable={false}
+          readOnly={true}
+          components={{
+            Option: IconOption,
+            SingleValue: IconSingleValue
+          }}
+        />
+      </div>
+    </NativeSelectWrapper>
   );
 }

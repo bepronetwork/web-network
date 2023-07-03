@@ -5,14 +5,26 @@ import { useRouter } from "next/router";
 import BountiesPage from "components/profile/pages/bounties";
 import MyNetworkPage from "components/profile/pages/my-network";
 import PaymentsPage from "components/profile/pages/payments";
-import ProfilePage from "components/profile/pages/profile";
+import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
 import PullRequestsPage from "components/profile/pages/pull-requests";
 import VotingPowerPage from "components/profile/pages/voting-power";
 import WalletPage from "components/profile/pages/wallet";
 
-export default function ProfileRouter() {
-  const { asPath, push } = useRouter();
+import { useAppState } from "contexts/app-state";
+
+import { SearchBountiesPaginated } from "types/api";
+
+interface ProfileRouterProps {
+  bounties: SearchBountiesPaginated;
+}
+
+export default function ProfileRouter({
+  bounties
+}: ProfileRouterProps) {
+  const { pathname, asPath, query, push } = useRouter();
+
+  const { state: { currentUser } } = useAppState();
 
   const Route = (path, page) => ({ path, page });
 
@@ -27,15 +39,38 @@ export default function ProfileRouter() {
     Route("/profile/my-network", MyNetworkPage),
   ];
 
-  const currentRoute = routes.find(({ path }) => asPath.endsWith(path));
+  const currentRoute = routes.find(({ path }) => asPath.split("?")[0].endsWith(path));
 
   useEffect(() => {
     if (!currentRoute)
       push("/404");
   }, [currentRoute]);
 
+  useEffect(() => {
+    if (!currentUser?.walletAddress || !query) return;
+
+    const type = {
+      "/profile/bounties": "creator",
+      "/profile/pull-requests": "pullRequester",
+      "/profile/proposals": "proposer"
+    }[currentRoute.path];
+
+    if (type && query[type] !== currentUser?.walletAddress)
+      push({
+        pathname,
+        query: {
+          ...query,
+          [type]: currentUser?.walletAddress,
+        }
+      }, asPath, {
+        shallow: false,
+        scroll: false,
+      });
+
+  }, [currentUser?.walletAddress, asPath]);
+
   if (currentRoute)
-    return <currentRoute.page />;
+    return <currentRoute.page bounties={bounties} />;
 
   return <></>;
 }

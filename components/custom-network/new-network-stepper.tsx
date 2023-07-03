@@ -18,7 +18,6 @@ import Stepper from "components/stepper";
 import {useAppState} from "contexts/app-state";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import {changeLoadState} from "contexts/reducers/change-load";
-import {changeNeedsToChangeChain} from "contexts/reducers/change-spinners";
 import {addToast} from "contexts/reducers/change-toaster";
 
 import {
@@ -111,7 +110,7 @@ function NewNetwork() {
       creator: state.currentUser.walletAddress,
       accessToken: state.currentUser.accessToken,
       githubLogin: state.currentUser.login,
-      allowedTokens: tokens,
+      tokens,
       networkAddress: deployedNetworkAddress,
       isDefault: isSetupPage,
       signedMessage,

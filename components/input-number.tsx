@@ -9,6 +9,8 @@ import InfoTooltip from "components/info-tooltip";
 
 import { InputNumber as InputNumberProps } from "types/input-number";
 
+import TokenSymbolView from "./common/token-symbol/view";
+
 
 export default function InputNumber({
   label = "",
@@ -92,7 +94,7 @@ export default function InputNumber({
           value={inputValue}
         />
         {symbol && (
-          <span
+          <div
             className={clsx("input-group-text caption-small border-radius-4",
                             classSymbol,
                             {
@@ -100,8 +102,8 @@ export default function InputNumber({
                 ...errorStyle
                             })}
           >
-            {symbol}
-          </span>
+            <TokenSymbolView name={symbol} />
+          </div>
         )}
         {setMaxValue && (
           <span

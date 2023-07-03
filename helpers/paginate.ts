@@ -1,18 +1,18 @@
-const LIMIT = 10;
+export const DEFAULT_ITEMS_PER_PAGE = 10;
 
-export function calculateTotalPages(count) {
-  return Math.ceil(count / LIMIT);
+export function calculateTotalPages(count, limit = DEFAULT_ITEMS_PER_PAGE) {
+  return Math.ceil(count / limit);
 }
 
-function paginate(query = {}, { page = 1 } = { page: 1 }, order = []) {
+function paginate(query = {}, { page = 1 } = { page: 1 }, order = [], limit = DEFAULT_ITEMS_PER_PAGE) {
   page = Math.ceil(page);
   if (page < 1) page = 1;
-  const offset = (page - 1) * LIMIT;
+  const offset = (page - 1) * limit;
   return {
     ...query,
     distinct: true,
     offset,
-    limit: LIMIT,
+    limit,
     order
   };
 }

@@ -1,17 +1,21 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 interface InfiniteScrollProps {
   handleNewPage: () => void;
-  isLoading: boolean;
+  isLoading?: boolean;
   hasMore: boolean;
   children: ReactNode | ReactNode[];
+  className?: string;
 }
 
 export default function InfiniteScroll({
   handleNewPage,
   hasMore,
   isLoading,
-  children
+  children,
+  className
 }: InfiniteScrollProps) {
+  const divRef = useRef(null);
+
   function handleScrolling(entries, observer) {
     if (!hasMore || isLoading) return;
 
@@ -24,22 +28,21 @@ export default function InfiniteScroll({
     });
   }
 
-  const observer = new IntersectionObserver(handleScrolling, {
-    root: null,
-    rootMargin: "0px",
-    threshold: 1.0
-  });
-
   useEffect(() => {
-    const childs = document.getElementById("infinite-scroll").children;
+    const observer = new IntersectionObserver(handleScrolling, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0
+    });
 
-    if (childs.length) observer.observe(childs[childs.length - 1]);
+    const lastChild = divRef.current?.lastChild
+
+    if (lastChild) observer.observe(lastChild);
 
     return () => {
-      if (childs.length)
-        observer.unobserve(childs[childs.length - 1]);
+      if (lastChild) observer.unobserve(lastChild);
     };
-  }, [hasMore, isLoading]);
+  }, [hasMore, isLoading, children]);
 
-  return <div id="infinite-scroll">{children}</div>;
+  return <div id="infinite-scroll" className={className}>{children}</div>;
 }
