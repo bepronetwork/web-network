@@ -131,8 +131,8 @@ export default function ItemRowView({
           </div>
         )}
 
-        <div className="col-md d-none d-sm-block">
-          <div className=" d-flex flex-row gap-3 justify-content-end align-items-center">
+        <div className="col-lg-4 col-md d-none d-sm-block">
+          <div className="d-flex flex-row gap-3 justify-content-end align-items-center">
             <RenderProposalOrPullRequest />
             <ItemRowIdView
               id={id}

@@ -62,19 +62,16 @@ export default function ProposalOrPullRequestView({
 
       <ReadOnlyButtonWrapper>
         <div className="row align-items-center d-none d-xl-block">
-          <div className="col">
+          <div className="d-flex">
             <Button
-              className="read-only-button text-truncate"
+              className="read-only-button text-truncate ms-1"
               onClick={handleBtn}
             >
               <span className="label-m text-white">
                 <Translation label={btnLabel} />
               </span>
             </Button>
-          </div>
-
-          {shouldRenderApproveButton && (
-            <div className="col">
+            {shouldRenderApproveButton && (
               <GithubLink
                 forcePath={githubPath}
                 hrefPath={`pull/${(item as pullRequest)?.githubId || ""}/files`}
@@ -83,8 +80,8 @@ export default function ProposalOrPullRequestView({
               >
                 {t("common:actions.approve")}
               </GithubLink>
-            </div>
           )}
+          </div>
         </div>
       </ReadOnlyButtonWrapper>
     </>

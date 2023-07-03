@@ -17,6 +17,7 @@ interface ListSortProps {
   asSelect?: boolean;
   selectedIndex?: number;
   onChange: (newValue: SortOption) => void;
+  labelLineBreak?: boolean;
 }
 
 export default function ListSortView({
@@ -25,18 +26,19 @@ export default function ListSortView({
   dropdownItems,
   selectedIndex,
   onChange,
-  asSelect,
+  labelLineBreak = false,
+  asSelect
 }: ListSortProps) {
   const { t } = useTranslation("common");
 
   const { isDesktopView } = useBreakPoint();
 
-  const labelClass = asSelect ? 
+  const labelClass = (asSelect || labelLineBreak) ? 
     "caption-small font-weight-medium text-gray-100 text-capitalize" : 
     "caption-small text-white-50 text-nowrap mr-1";
-  const containerClass = asSelect ? "d-flex flex-column gap-1" : "d-flex align-items-center";
+  const containerClass = (asSelect || labelLineBreak) ? "d-flex flex-column gap-1" : "d-flex align-items-center";
 
-  if (isDesktopView || asSelect)
+  if (isDesktopView || asSelect || labelLineBreak)
     return (
       <div className={containerClass}>
         <span className={labelClass}>

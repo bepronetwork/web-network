@@ -19,10 +19,12 @@ import useChain from "x-hooks/use-chain";
 
 interface SelectNetworkProps {
   isCurrentDefault?: boolean;
+  onlyProfileFilters?: boolean;
 }
 
 export default function SelectNetwork({
-  isCurrentDefault = false
+  isCurrentDefault = false,
+  onlyProfileFilters = false
 } : SelectNetworkProps) {
   const { t } = useTranslation("common");
   const { query, pathname, asPath, push } = useRouter();
@@ -57,11 +59,16 @@ export default function SelectNetwork({
       const newQuery = {
         ...query,
         page: "1",
-        networkName: newValue?.value?.name || "all"
+        networkName: newValue?.value?.name || null
       };
 
       push({ pathname: pathname, query: newQuery }, asPath);
     }
+  }
+
+  function handleSelectedWithNetworkName(options) {
+    const opt = options.find(({ value }) => value?.name === query?.networkName)
+    if(opt) setSelected(opt)
   }
 
   useEffect(() => {
@@ -69,13 +76,19 @@ export default function SelectNetwork({
 
     const cache = new WinStorage(`networks:${chain?.chainId}`, 60000, "sessionStorage");
 
-    if (cache.value)
-      setOptions(cache.value.map(networkToOption));
-    else
+    if (cache.value){
+      const options = cache.value.map(networkToOption)
+      setOptions(options);
+      handleSelectedWithNetworkName(options);
+    } else
       searchNetworks({
         chainId: chain?.chainId?.toString()
       })
-        .then(({ rows }) => setOptions(rows.map(networkToOption)));
+        .then(({ rows }) => {
+          const options = rows.map(networkToOption)
+          setOptions(options)
+          handleSelectedWithNetworkName(options);
+        });
   }, [chain, isCurrentDefault]);
 
   useEffect(() => {
@@ -84,8 +97,8 @@ export default function SelectNetwork({
   }, [isCurrentDefault, state.Service?.network?.active]);
 
   return(
-    <div className="d-flex align-items-center">
-      <span className="caption text-gray-500 text-nowrap mr-1 font-weight-normal">
+    <div className={`${onlyProfileFilters ? 'mb-3' : 'd-flex align-items-center'}`}>
+      <span className='caption-small font-weight-medium text-gray-100 text-nowrap mr-1'>
         {t("misc.network")}
       </span>
 

@@ -33,6 +33,7 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
+import useBreakPoint from "x-hooks/use-breakpoint";
 import { useNetwork } from "x-hooks/use-network";
 
 import BountyTagsView from "./bounty/bounty-tags/view";
@@ -65,6 +66,7 @@ export default function IssueListItem({
   const { getURLWithNetwork } = useNetwork();
   const { signMessage } = useAuthentication();
   const { handleHardCancelBounty } = useBepro();
+  const { isMobileView } = useBreakPoint();
 
   const isVisible = visible !== undefined ? visible : issue?.visible;
 
@@ -442,15 +444,14 @@ export default function IssueListItem({
               </div>
             </ResponsiveWrapper>
             <ResponsiveWrapper xs={true} xl={false}>
-              <div className="col">
-                <div className="row justify-content-between">
-                  <div className="mw-50-auto">
+              <div className={`col d-flex flex-wrap justify-content-between text-truncate`} >
+              {isMobileView && (
+                  <div className="text-truncate mb-2">
                     <BountyTagsView tags={[issue?.network?.name]} />
                   </div>
-                  
-                  <div className="mw-50-auto">
-                    <BountyAmount bounty={issue} size={size} />
-                  </div>
+                )}
+                <div className="mb-2">
+                  <BountyAmount bounty={issue} size={size} />
                 </div>
               </div>
             </ResponsiveWrapper>
