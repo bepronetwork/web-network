@@ -22,7 +22,7 @@ import useApi from "x-hooks/use-api";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 
-import NetworkItem from "./network-item";
+import NetworkItem from "./network-item/controller";
 
 interface TokensOracles {
   symbol: string;

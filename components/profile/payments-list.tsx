@@ -9,7 +9,7 @@ import { Payment } from "interfaces/payments";
 import { useNetwork } from "x-hooks/use-network";
 
 import NetworkColumns from "./network-columns";
-import NetworkItem from "./network-item";
+import NetworkItem from "./network-item/controller";
 import { TotalFiatNetworks } from "./pages/payments";
 import { FlexColumn } from "./wallet-balance";
 

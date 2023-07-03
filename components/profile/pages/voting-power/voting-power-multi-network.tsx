@@ -9,7 +9,7 @@ import Delegations from "components/delegations";
 import If from "components/If";
 import Indicator from "components/indicator";
 import NetworkColumns from "components/profile/network-columns";
-import NetworkItem from "components/profile/network-item";
+import NetworkItem from "components/profile/network-item/controller";
 import TotalVotes from "components/profile/pages/voting-power/total-votes";
 
 import { useAppState } from "contexts/app-state";
@@ -63,7 +63,8 @@ export default function VotingPowerMultiNetwork() {
             columns={[
               t("profile:network-columns.network-name"),
               t("profile:network-columns.total-votes"),
-              t("profile:network-columns.network-link")
+              t("profile:network-columns.network-link"),
+              ""
             ]}
           />
 
