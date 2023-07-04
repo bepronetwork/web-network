@@ -4,6 +4,7 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import ContractButton from "components/contract-button";
+import ScrollableTabs from "components/navigation/scrollable-tabs/view";
 import { ContainerTab } from "components/profile/my-network-settings/container-tab";
 import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
 import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
@@ -11,7 +12,6 @@ import RegistrySettings from "components/profile/my-network-settings/registry-se
 import RepositoriesListSettings from "components/profile/my-network-settings/repositories-list-settings";
 import WarningGithub from "components/profile/my-network-settings/warning-github";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
-import TabbedNavigation from "components/tabbed-navigation";
 
 import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
@@ -327,12 +327,15 @@ export default function MyNetworkSettings({
 
       {!state.currentUser?.login && <WarningGithub />}
 
-      <TabbedNavigation
-        className="my-network-tabs"
-        defaultActiveKey="logo-and-colours"
-        tabs={tabs}
-        onTransition={setActiveTab}
+      <ScrollableTabs
+        tabs={tabs.map(tab => ({
+          label: tab?.title,
+          active: tab?.eventKey === activeTab,
+          onClick: () => setActiveTab(tab?.eventKey)
+        }))}
       />
+
+      {tabs.find(({ eventKey }) => activeTab === eventKey)?.component}
 
       {
         (

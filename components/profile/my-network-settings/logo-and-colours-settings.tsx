@@ -134,7 +134,7 @@ export default function LogoAndColoursSettings({
         </Row>
       )}
       <Row className="mb-3">
-        <h3 className="text-capitalize family-Regular text-white">
+        <h3 className="text-capitalize family-Regular text-white overflow-wrap-anywhere">
           {network?.name}
         </h3>
       </Row>
@@ -148,7 +148,7 @@ export default function LogoAndColoursSettings({
           </Row>
 
           <Row className="mb-2">
-            <span className="caption-large">
+            <span className="caption-large overflow-wrap-anywhere">
               <span className="text-white">
                 {urlWithoutProtocol(publicRuntimeConfig?.urls?.api)}/
               </span>

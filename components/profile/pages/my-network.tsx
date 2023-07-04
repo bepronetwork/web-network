@@ -77,7 +77,7 @@ export function MyNetwork() {
           </NothingFound>
         </Col>
       ||
-        <Col xs={10}>
+        <Col xs={12} xl={10}>
           <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
         </Col>
       }

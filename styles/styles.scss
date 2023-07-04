@@ -2052,3 +2052,9 @@ input[type="color"] {
     display: none;
   }
 }
+
+.overflow-wrap {
+  &-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
