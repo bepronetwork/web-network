@@ -106,7 +106,7 @@ export default function CreateBountyPage() {
   const { getURLWithNetwork } = useNetwork();
 
   const { handleApproveToken } = useBepro();
-  const { changeNetwork } = useDao();
+  const { changeNetwork, start } = useDao();
 
   const { getRepositoryBranches } = useOctokit();
 
@@ -535,6 +535,10 @@ export default function CreateBountyPage() {
     changeNetwork(opt.chain_id, opt?.networkAddress)
       .then(_ => setCurrentNetwork(opt));
   }
+
+  useEffect(() => {
+    start();
+  }, []);
 
   useEffect(() => {
     if (!currentNetwork)
