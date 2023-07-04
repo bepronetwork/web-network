@@ -40,7 +40,7 @@ export default function NavBarView({
           ])}
         >
           <div className="d-flex align-items-center gap-44">
-            <div className="d-flex gap-3">
+            <div className="d-flex gap-32">
               <BrandLogo
                 href={brandHref}
                 logoUrl={logoUrl}
