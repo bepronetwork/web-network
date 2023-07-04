@@ -162,10 +162,14 @@ export function useDao() {
       }
     }
 
-    const isSameWeb3Host = chainToConnect.chainRpc === state.Service?.active?.web3Host;
-    const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
     const web3Connection = state.Service?.web3Connection;
-    const isConnected = web3Connection?.web3?.currentProvider?._state?.isConnected;
+    const isConnected = !!web3Connection?.web3?.currentProvider?._state?.isConnected;
+    const shouldUseWeb3Connection = +chainIdToConnect === +connectedChain.id && isConnected;
+
+    const isSameWeb3Host = 
+      chainToConnect.chainRpc === state.Service?.active?.web3Host && !shouldUseWeb3Connection || 
+      shouldUseWeb3Connection && !state.Service?.active?.web3Host;
+    const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
 
     if (isSameWeb3Host && isSameRegistry && !isConnected || state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
@@ -179,7 +183,6 @@ export function useDao() {
     const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
     const registryAddress = isConfigured ? _registry : undefined;
-    const shouldUseWeb3Connection = +chainIdToConnect === +connectedChain.id && isConnected;
 
     const daoProps = shouldUseWeb3Connection ? { web3Connection, registryAddress } : { web3Host, registryAddress };
 
