@@ -449,13 +449,14 @@ export default function CreateBountyPage() {
   }, [connectedChain]);
 
   useEffect(() => {
-    if (transactionalToken?.address)
+    if (transactionalToken?.address && currentSection === 2)
       transactionalERC20.setAddress(transactionalToken.address);
-  }, [transactionalToken?.address, currentUser, Service?.active]);
+  }, [transactionalToken?.address, currentUser, Service?.active, currentSection]);
 
   useEffect(() => {
-    if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
-  }, [rewardToken?.address, currentUser, Service?.active]);
+    if (rewardToken?.address && currentSection === 2)
+      rewardERC20.setAddress(rewardToken.address);
+  }, [rewardToken?.address, currentUser, Service?.active, currentSection]);
 
 
   useEffect(() => {
