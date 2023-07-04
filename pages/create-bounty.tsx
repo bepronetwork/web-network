@@ -531,13 +531,14 @@ export default function CreateBountyPage() {
   }
 
   async function onNetworkSelected(opt) {
-    changeNetwork(opt.chainId, opt?.networkAddress)
+    changeNetwork(opt.chain_id, opt?.networkAddress)
       .then(_ => setCurrentNetwork(opt));
   }
 
   useEffect(() => {
     if (!currentNetwork)
       return;
+
     changeNetwork(currentNetwork.chain_id, currentNetwork?.networkAddress)
   }, [currentNetwork, Service?.active])
 
