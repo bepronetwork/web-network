@@ -424,7 +424,7 @@ li {
     margin: 0px;
     padding: 0px;
     list-style: none;
-    gap: 22px;
+    gap: 44px;
 
     a:not(.brand) {
       color: $gray-500;
@@ -1606,6 +1606,9 @@ textarea.form-control {
   .btn + .btn {
     margin: 0;
   }
+}
+.gap-44 {
+  gap: 44px;
 }
 
 .sticky-bounty {

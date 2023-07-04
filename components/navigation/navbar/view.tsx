@@ -39,7 +39,7 @@ export default function NavBarView({
             paddingY
           ])}
         >
-          <div className="d-flex align-items-center gap-4">
+          <div className="d-flex align-items-center gap-44">
             <div className="d-flex gap-3">
               <BrandLogo
                 href={brandHref}
