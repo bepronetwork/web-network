@@ -109,7 +109,7 @@ export default function SelectChainDropdown({
       .filter(isChainConfigured)
       .map(async (chain) => ({
         ...chain,
-        icon: await getChainIcon(chain?.chainName)
+        icon: await getChainIcon(chain.icon)
       })));
 
     if (isOnNetwork)
