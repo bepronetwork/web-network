@@ -11,6 +11,7 @@ const PullRequestModel = require("../models/pullRequest.model");
 const MergeProposalModel = require("../models/mergeproposal");
 const TokenModel = require("../models/tokens.model");
 const DelegationModel = require("../models/delegation.model");
+const DisputeModel = require("../models/dispute-model");
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -80,7 +81,8 @@ module.exports = {
       PullRequestModel,
       MergeProposalModel,
       TokenModel,
-      DelegationModel
+      DelegationModel,
+      DisputeModel
     ].forEach(model => model.init(queryInterface.sequelize));
 
     [
