@@ -137,8 +137,9 @@ export function useDao() {
 
     const { connectedChain } = state;
 
-    const chainIdToConnect =
-      state.Service?.network?.active?.chain_id || 
+    const activeNetworkChainId = state.Service?.network?.active?.chain_id;
+
+    const chainIdToConnect = isOnNetwork && activeNetworkChainId ? activeNetworkChainId : 
       (connectedChain?.name === UNSUPPORTED_CHAIN ? undefined : connectedChain?.id);
 
     const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
