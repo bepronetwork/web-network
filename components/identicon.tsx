@@ -31,14 +31,12 @@ export default function Identicon({
       const icon = jazzicon(SIZES[size], parseInt(address.slice(2, 10), 16));
 
       if (size === "lg") icon.style.height = `${SIZES[size]-6}px`;
-
+      icon.style.borderRadius = '50%'
       ref.current.appendChild(icon);
     }
   }, [address]);
 
   return(
-    <div ref={ref} className={`d-flex identicon ${size} ${className}`}>
-
-    </div>
+    <div ref={ref} className={`d-flex identicon ${size} ${className ? className : ''}`} />
   );
 }

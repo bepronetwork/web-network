@@ -13,11 +13,24 @@ export default function ItemAmount({
   label,
   currency
 } : ItemAmountProps) {
+  
+  function renderAmount (texto = "") {
+    const formattedText = texto.slice(0, -1); 
+    const lastLetter = texto.slice(-1); 
+  
+    return (
+      <>
+        {formattedText}
+        <span className="ls-0">{lastLetter}</span>
+      </>
+    );
+  }
+
   return(
     <div className="d-flex gap-1 bg-gray-950 text-nowrap py-1 px-2 border-radius-4 border border-gray-800">
       <If condition={typeof amount !== "undefined"}>
         <span className="caption-small font-weight-medium text-white">
-          {amount}
+          {typeof amount === 'string' ? renderAmount(amount) : amount}
         </span>
       </If>
 
