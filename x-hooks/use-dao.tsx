@@ -137,8 +137,9 @@ export function useDao() {
 
     const { connectedChain } = state;
 
-    const chainIdToConnect =
-      state.Service?.network?.active?.chain_id || 
+    const activeNetworkChainId = state.Service?.network?.active?.chain_id;
+
+    const chainIdToConnect = isOnNetwork && activeNetworkChainId ? activeNetworkChainId : 
       (connectedChain?.name === UNSUPPORTED_CHAIN ? undefined : connectedChain?.id);
 
     const chainToConnect = supportedChains.find(({ isDefault, chainId }) => 
@@ -161,10 +162,14 @@ export function useDao() {
       }
     }
 
-    const isSameWeb3Host = chainToConnect.chainRpc === state.Service?.active?.web3Host;
-    const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
     const web3Connection = state.Service?.web3Connection;
-    const isConnected = web3Connection?.web3?.currentProvider?._state?.isConnected;
+    const isConnected = !!web3Connection?.web3?.currentProvider?._state?.isConnected;
+    const shouldUseWeb3Connection = +chainIdToConnect === +connectedChain.id && isConnected;
+
+    const isSameWeb3Host = 
+      chainToConnect.chainRpc === state.Service?.active?.web3Host && !shouldUseWeb3Connection || 
+      shouldUseWeb3Connection && !state.Service?.active?.web3Host;
+    const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
 
     if (isSameWeb3Host && isSameRegistry && !isConnected || state.Service?.starting) {
       console.debug("Already connected to this web3Host or the service is still starting");
@@ -178,7 +183,6 @@ export function useDao() {
     const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
     const registryAddress = isConfigured ? _registry : undefined;
-    const shouldUseWeb3Connection = +chainIdToConnect === +connectedChain.id && isConnected;
 
     const daoProps = shouldUseWeb3Connection ? { web3Connection, registryAddress } : { web3Host, registryAddress };
 

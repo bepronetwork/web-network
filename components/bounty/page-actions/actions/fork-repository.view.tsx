@@ -6,6 +6,7 @@ export default function ForkRepositoryLink({ path }:{path: string}) {
   return (
       <PageActionsButton
         forcePath={path}
+        buttonType="github"
         className="btn btn-primary bounty-outline-button"
       >
         <Translation label="actions.fork-repository" />
