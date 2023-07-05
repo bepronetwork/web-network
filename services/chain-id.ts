@@ -26,7 +26,7 @@ async function getChainIconsList() {
 async function getChainIcon(iconName: string) {
   const icons = await getChainIconsList();
 
-  const found = icons.find(({ name }) => name === iconName);
+  const found = icons.find(({ name }) => name?.toLowerCase() === iconName?.toLowerCase() );
 
   const ipfsUrl = publicRuntimeConfig?.urls?.ipfs;
 

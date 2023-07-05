@@ -8,7 +8,7 @@ export default function ProfileSide() {
       xs={false}
       className="col-2 bg-gray-950"
     >
-      <div className="ml-2 pt-4">
+      <div className="ml-2 pt-4 w-100">
         <ProfileLinks />
       </div>
     </ResponsiveWrapper>

@@ -1,4 +1,4 @@
-import EthereumIcon from "assets/icons/ethereum-icon";
+import QuestionMarkIcon from "assets/icons/question-mark-icon";
 
 interface ChainIconProps {
   src?: string;
@@ -12,5 +12,5 @@ export default function ChainIcon({
   if (src)
     return <img className="rounded-circle bg-white p-1" src={src} height={size} width={size} />
 
-  return <EthereumIcon height={size} width={size} />;
+  return <QuestionMarkIcon height={size} width={size} />;
 }
