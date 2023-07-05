@@ -16,7 +16,7 @@ export default function ItemAmount({
   return(
     <div className="d-flex gap-1 bg-gray-950 text-nowrap py-1 px-2 border-radius-4 border border-gray-800">
       <If condition={typeof amount !== "undefined"}>
-        <span className="caption-small font-weight-medium text-white">
+        <span className="caption-small ls-0 font-weight-medium text-white">
           {amount}
         </span>
       </If>
