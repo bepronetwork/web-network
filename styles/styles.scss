@@ -397,6 +397,10 @@ li {
   width: 100%;
 }
 
+.profile-content {
+  padding-left: 30px;
+}
+
 .main-nav {
   @extend .border-xl-bottom;
   @extend .border-dark-gray;
