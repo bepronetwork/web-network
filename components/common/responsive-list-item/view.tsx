@@ -97,7 +97,9 @@ export default function ResponsiveListItem({
           xs={false}
           md={true}
         >
-          {action}
+          <div className="d-flex ms-3">
+            {action}
+          </div>
         </ResponsiveWrapper>
       </If>
     </div>
