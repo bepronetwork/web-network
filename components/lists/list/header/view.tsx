@@ -10,16 +10,16 @@ export default function ListHeader({
     return (
       <div
         key={`${key}-${label}`}
-        className={`col d-flex flex-row justify-content-center align-items-center 
+        className={`d-flex flex-row col justify-content-center  align-items-center 
         text-gray`}
       >
-        <span className="caption-medium mr-1">{label}</span>
+        <span className="caption-medium text-center">{label}</span>
       </div>
     );
   }
 
   return (
-    <div className="row pb-0 pt-2 mx-0 mb-2 svg-with-text-color">
+    <div className="row pb-0 pt-2 mb-2 svg-with-text-color">
       {columns.map(renderListBarColumn)}
     </div>
   );

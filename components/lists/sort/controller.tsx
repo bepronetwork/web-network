@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
 import ListSortView from "components/lists/sort/view";
 
 import { CustomDropdownItem, SortOption } from "types/components";
+
+import useBreakPoint from "x-hooks/use-breakpoint";
 
 interface ListSortProps {
   defaultOptionIndex?: number;
@@ -22,6 +24,9 @@ export default function ListSort({
   const router = useRouter();
 
   const [selectedIndex, setSelectedIndex] = useState<number>();
+  const [componentVersion, setComponentVersion] = useState<string>();
+
+  const { isDesktopView } = useBreakPoint();
 
   const { sortBy, order } = router.query;
 
@@ -56,6 +61,9 @@ export default function ListSort({
     }));
   }
 
+  useEffect(() => {
+    setComponentVersion(isDesktopView ? "desktop" : "mobile");
+  }, [isDesktopView]);
 
   return (
     <ListSortView
@@ -66,6 +74,7 @@ export default function ListSort({
       labelLineBreak={labelLineBreak}
       asSelect={asSelect}
       selectedIndex={selectedIndex}
+      componentVersion={componentVersion}
     />
   );
 }
