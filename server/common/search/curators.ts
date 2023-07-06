@@ -54,6 +54,14 @@ export default async function get(query: ParsedUrlQuery) {
         }
       }] : []
     });
+  } else {
+    include.push({
+      association: "network",
+      include: [
+        { association: "networkToken" },
+        { association: "chain", attributes: ["chainShortName"] },
+      ],
+    });
   }
 
   const PAGE = +(page || 1);

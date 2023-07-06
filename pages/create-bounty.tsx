@@ -106,7 +106,7 @@ export default function CreateBountyPage() {
   const { getURLWithNetwork } = useNetwork();
 
   const { handleApproveToken } = useBepro();
-  const { changeNetwork } = useDao();
+  const { changeNetwork, start } = useDao();
 
   const { getRepositoryBranches } = useOctokit();
 
@@ -449,13 +449,14 @@ export default function CreateBountyPage() {
   }, [connectedChain]);
 
   useEffect(() => {
-    if (transactionalToken?.address)
+    if (transactionalToken?.address && currentSection === 2)
       transactionalERC20.setAddress(transactionalToken.address);
-  }, [transactionalToken?.address, currentUser, Service?.active]);
+  }, [transactionalToken?.address, currentUser, Service?.active, currentSection]);
 
   useEffect(() => {
-    if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
-  }, [rewardToken?.address, currentUser, Service?.active]);
+    if (rewardToken?.address && currentSection === 2)
+      rewardERC20.setAddress(rewardToken.address);
+  }, [rewardToken?.address, currentUser, Service?.active, currentSection]);
 
 
   useEffect(() => {
@@ -531,13 +532,18 @@ export default function CreateBountyPage() {
   }
 
   async function onNetworkSelected(opt) {
-    changeNetwork(opt.chainId, opt?.networkAddress)
+    changeNetwork(opt.chain_id, opt?.networkAddress)
       .then(_ => setCurrentNetwork(opt));
   }
 
   useEffect(() => {
+    start();
+  }, []);
+
+  useEffect(() => {
     if (!currentNetwork)
       return;
+
     changeNetwork(currentNetwork.chain_id, currentNetwork?.networkAddress)
   }, [currentNetwork, Service?.active])
 

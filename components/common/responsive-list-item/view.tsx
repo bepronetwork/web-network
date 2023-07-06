@@ -47,7 +47,7 @@ export default function ResponsiveListItem({
 
           <div className="col px-0">
             <div className="row align-items-center">
-              <div className="col-auto">
+              <div className="col-auto mt-2">
                 <span className="caption-small overflow-wrap-anywhere font-weight-medium text-white">
                   {label}
                 </span>
@@ -97,7 +97,9 @@ export default function ResponsiveListItem({
           xs={false}
           md={true}
         >
-          {action}
+          <div className="d-flex ms-3">
+            {action}
+          </div>
         </ResponsiveWrapper>
       </If>
     </div>

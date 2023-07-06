@@ -397,6 +397,10 @@ li {
   width: 100%;
 }
 
+.profile-content {
+  padding-left: 30px;
+}
+
 .main-nav {
   @extend .border-xl-bottom;
   @extend .border-dark-gray;
@@ -1492,6 +1496,10 @@ textarea.form-control {
   letter-spacing: 0.1em;
 }
 
+.ls-0 {
+  letter-spacing: 0 !important;
+}
+
 .list-actions {
   border-radius: 0;
 
@@ -1606,6 +1614,12 @@ textarea.form-control {
   .btn + .btn {
     margin: 0;
   }
+}
+.gap-44 {
+  gap: 44px;
+}
+.gap-32 {
+  gap: 32px;
 }
 
 .sticky-bounty {
