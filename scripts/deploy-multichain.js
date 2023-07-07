@@ -292,6 +292,8 @@ async function main(option = 0) {
           chain_id: chainId,
           name: "global",
           lastBlock: startBlock,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       })
 
