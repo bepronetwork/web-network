@@ -201,6 +201,7 @@ async function main(option = 0) {
       NetworkModel.init(sequelize);
       RepositoryModel.init(sequelize);
       ChainModel.init(sequelize);
+      ChainEvents.init(sequelize);
       TokensModel.init(sequelize);
       NetworkTokensModel.init(sequelize);
 
