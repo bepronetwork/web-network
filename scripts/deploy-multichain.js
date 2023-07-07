@@ -7,6 +7,7 @@ const {nativeZeroAddress} = require("@taikai/dappkit/dist/src/utils/constants");
 
 const DBConfig = require("../db/config");
 const ChainModel = require("../db/models/chain.model");
+const ChainEvents = require("../db/models/chain-events.model");
 const TokensModel = require("../db/models/tokens.model");
 const NetworkModel = require("../db/models/network.model");
 const NetworkTokensModel = require("../db/models/network-tokens.model");
