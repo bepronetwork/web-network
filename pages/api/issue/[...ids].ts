@@ -21,6 +21,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const issueId = [repoId, ghId].join("/");
 
+  let network_id: number
+
   const include = [
     { association: "developers" },
     { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
@@ -29,7 +31,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "transactionalToken" },
     { association: "rewardToken" },
     { association: "benefactors" },
-    { association: "disputes" }
+    { association: "disputes" },
+    { association: "network", include: [{ association: "chain", attributes: [ "chainShortName" ] }] },
   ];
 
   const chainHeader = await chainFromHeader(req);
@@ -41,21 +44,26 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const network = await models.network.findOne({
-    where: {
-      name: {
-        [Op.iLike]: String(networkName).replaceAll(" ", "-")
-      },
-      chain_id: { [Op.eq]: chainId || chain?.chainId }
-    }
-  });
+  if(networkName && (chainId || chain)) {
 
-  if (!network) return res.status(404).json("Invalid network");
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName).replaceAll(" ", "-")
+        },
+        chain_id: { [Op.eq]: chainId || chain?.chainId }
+      }
+    });
+    
+    if (!network) return res.status(404).json("Invalid network");
+
+    network_id = network?.id;
+  }
 
   const issue = await models.issue.findOne({
     where: {
       issueId,
-      network_id: network?.id
+      ... network_id ? { network_id } : {}
     },
     include
   });

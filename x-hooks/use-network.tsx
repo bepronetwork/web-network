@@ -106,6 +106,7 @@ export function useNetwork() {
       })
       .catch(e => {
         console.log(`Failed to get network ${queryNetworkName}`, e);
+        if(query?.id && query?.repoId) return;
         return replace(`/networks`);
       });
   }
