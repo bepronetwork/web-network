@@ -6,7 +6,7 @@ export default function NetworkColumns({ columns }: { columns: string[] }) {
       {columns?.map((item, key) => (
         <NetworkListBarColumn
           key={key}
-          className={`d-flex justify-content-${key === 0 ? 'start ms-2': 'center ms-1 '}`}
+          className={`col-3 d-flex justify-content-${key === 0 ? 'start ms-2': 'center'}`}
           label={item}
           hideOrder={true}
           columnOrder={item}

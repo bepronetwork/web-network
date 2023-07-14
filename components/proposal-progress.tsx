@@ -30,7 +30,7 @@ function ProgressItem({
       {githubLogin ? (
         <Avatar key={githubLogin} userLogin={githubLogin} tooltip />
       ) : (
-        <span className="text-gray-500 text-uppercase xs-medium mt-1">
+        <span className="text-gray-500 text-uppercase xs-small mt-1">
           {label}
         </span>
       )}

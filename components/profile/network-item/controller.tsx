@@ -1,9 +1,12 @@
 import { ReactNode, useState } from "react";
 
+import { useRouter } from "next/router";
+
 import { useAppState } from "contexts/app-state";
 
-import NetworkItemView from "./view";
+import useBreakPoint from "x-hooks/use-breakpoint";
 
+import NetworkItemView from "./view";
 interface NetworkItemProps {
   children?: ReactNode;
   key?: number | string;
@@ -16,6 +19,7 @@ interface NetworkItemProps {
   symbol: string;
   handleNetworkLink?: () => void;
   variant?: "network" | "multi-network";
+  handleToggleTabletAndMobile?: () => void;
 }
 
 export default function NetworkItem({
@@ -30,18 +34,23 @@ export default function NetworkItem({
   subNetworkText,
   primaryColor,
   variant = "network",
+  handleToggleTabletAndMobile
 }: NetworkItemProps) {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   const {
     state: { Settings: settings },
   } = useAppState();
+  const { query } = useRouter();
+  const { isDesktopView } = useBreakPoint();
 
   const isNetworkVariant = variant === "network";
   const isNetworkType = type === "network";
 
   function toggleCollapse() {
-    setIsCollapsed((previous) => !previous);
+    if(handleToggleTabletAndMobile && query?.profilePage[0] === 'voting-power' && !isDesktopView){
+      handleToggleTabletAndMobile()
+    } else setIsCollapsed((previous) => !previous);
   }
 
   return (

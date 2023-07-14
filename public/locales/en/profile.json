@@ -3,6 +3,9 @@
   "wallet": "Wallet",
   "tokens": "Tokens",
   "received-in-total": "Received in total",
+  "not-found": {
+    "any-voting-power": "you do not have any voting power on any network"
+  },
   "oracle-name-placeholder": "Locked Network Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",

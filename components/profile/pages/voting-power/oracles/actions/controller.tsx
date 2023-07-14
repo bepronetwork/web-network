@@ -1,38 +1,24 @@
-import React, {Fragment, useEffect, useRef, useState} from "react";
-import {Spinner} from "react-bootstrap";
+import React, {useEffect, useRef, useState} from "react";
 import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
-import Button from "components/button";
-import NetworkTxButton from "components/common/network-tx-button/controller";
-import ContractButton from "components/contract-button";
-import InputNumber from "components/input-number";
-import Modal from "components/modal";
-import OraclesBoxHeader from "components/oracles-box-header";
-import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
-
 import {useAppState} from "contexts/app-state";
 
-import {formatNumberToNScale, formatStringToCurrency} from "helpers/formatNumber";
+import {formatNumberToNScale} from "helpers/formatNumber";
 
-import {Wallet} from "interfaces/authentication";
 import { NetworkEvents } from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
+import { OraclesActionsProps } from "interfaces/oracles-state";
 
 import useApi from "x-hooks/use-api";
 import useERC20 from "x-hooks/use-erc20";
 
-interface OraclesActionsProps {
-  wallet: Wallet;
-  updateWalletBalance: () => void;
-}
+import OraclesActionsView from "./view";
 
-function OraclesActions({
+export default function OraclesActions({
   wallet,
   updateWalletBalance
 } : OraclesActionsProps) {
@@ -241,166 +227,34 @@ function OraclesActions({
   }, [Service?.active?.network?.networkToken?.contractAddress]);
 
   return (
-    <>
-      <div className="col-md-6">
-        <div className="bg-gray-950 border border-gray-800 border-radius-4 p-4 h-100">
-          <OraclesBoxHeader
-            actions={actions}
-            onChange={setAction}
-            currentAction={action}
-          />
-
-          <p className="caption-small text-gray-500 font-weight-500 text-uppercase mt-2 mb-3">
-            {renderInfo?.description}
-          </p>
-
-          <InputNumber
-            disabled={!wallet?.address}
-            className="bg-gray-900"
-            label={t("my-oracles:fields.amount.label", {
-              currency: getCurrentLabel()
-            })}
-            symbol={`${getCurrentLabel()}`}
-            classSymbol={`${
-              getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })
-                ? "text-purple bg-gray-900"
-                : "text-primary bg-gray-900"
-            }`}
-            max={wallet?.balance?.bepro?.toFixed()}
-            error={!!error}
-            value={tokenAmount}
-            min={0}
-            placeholder={t("my-oracles:fields.amount.placeholder", {
-              currency: getCurrentLabel()
-            })}
-            onValueChange={handleChangeToken}
-            thousandSeparator
-            decimalSeparator="."
-            allowNegative={false}
-            decimalScale={networkTokenDecimals}
-            helperText={
-              <>
-                {formatStringToCurrency(getMaxAmount())}{" "}
-                {getCurrentLabel()} {t("misc.available")}
-                <span onClick={setMaxAmount}
-                      className={`caption-small ml-1 cursor-pointer text-uppercase ${(
-                        getCurrentLabel() === t("$oracles", { token: Service?.network?.active?.networkToken?.symbol })
-                          ? "text-purple"
-                          : "text-primary"
-                      )}`}>
-                  {t("misc.max")}
-                </span>
-                {error && <p className="p-small my-2">{error}</p>}
-              </>
-            }
-          />
-
-          <ReadOnlyButtonWrapper>
-            <div className="mt-5 d-grid gap-3">
-              {action === t("my-oracles:actions.lock.label") && (
-                <ContractButton
-                  disabled={!needsApproval() || isApproving}
-                  className="ms-0 read-only-button"
-                  onClick={approveSettlerToken}
-                >
-                  {!needsApproval() && (
-                    <LockedIcon width={12} height={12} className="mr-1" />
-                  )}
-                  <span>
-                    {t("actions.approve")}{" "}
-                    {wallet?.address &&
-                    verifyTransactionState(TransactionTypes.approveSettlerToken) ? (
-                      <Spinner
-                        size={"xs" as unknown as "sm"}
-                        className="align-self-center ml-1"
-                        animation="border"
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </span>
-                </ContractButton>
-              )}
-
-              <ContractButton
-                color={
-                  action === t("my-oracles:actions.lock.label")
-                    ? "purple"
-                    : "primary"
-                }
-                className="ms-0 read-only-button"
-                disabled={isButtonDisabled()}
-                onClick={handleCheck}
-              >
-                {isButtonDisabled() && (
-                  <LockedIcon width={12} height={12} className="mr-1" />
-                )}
-                <span>{renderInfo?.label}</span>
-              </ContractButton>
-            </div>
-          </ReadOnlyButtonWrapper>
-
-          <NetworkTxButton
-            txMethod={action.toLowerCase()}
-            txType={getTxType()}
-            txCurrency={getCurrentLabel()}
-            handleEvent={handleProcessEvent}
-            txParams={renderInfo?.params(wallet?.address)}
-            buttonLabel=""
-            modalTitle={renderInfo?.title}
-            modalDescription={renderInfo?.description}
-            onSuccess={onSuccess}
-            onFail={setError}
-            buttonConfirmRef={networkTxRef}
-          />
-        </div>
-      </div>
-
-      <Modal
-        title={renderInfo?.title}
-        show={show}
-        titlePosition="center"
-        onCloseClick={handleCancel}
-        footer={
-          <div className="d-flex justify-content-between">
-            <Button color="dark-gray" onClick={handleCancel}>
-              {t("actions.cancel")}
-            </Button>
-            <Button onClick={handleConfirm}>{t("actions.confirm")}</Button>
-          </div>
-        }
-      >
-        <p className="text-truncate caption-small text-uppercase text-center mb-2">
-          {renderInfo?.caption}
-        </p>
-        <p className="text-truncate text-center h4">
-          {renderInfo?.body?.split("/").map((sentence: string) => {
-            const Component =
-              ((sentence.startsWith("oracles") ||
-                sentence.startsWith("bepro")) &&
-                "span") ||
-              Fragment;
-
-            return (
-              <Fragment key={sentence}>
-                <Component
-                  {...(sentence.startsWith("oracles") && {
-                    className: "text-purple"
-                  })}
-                  {...(sentence.startsWith("bepro") && {
-                    className: "text-primary"
-                  })}
-                >
-                  {sentence.replace(/bepro|oracles|br/, "")}
-                </Component>
-                {sentence.startsWith("br") && <br />}
-              </Fragment>
-            );
-          })}
-        </p>
-      </Modal>
-    </>
+      <OraclesActionsView 
+        wallet={wallet} 
+        actions={actions} 
+        action={action} 
+        handleAction={setAction} 
+        renderInfo={renderInfo} 
+        currentLabel={getCurrentLabel()} 
+        networkTokenSymbol={Service?.network?.active?.networkToken?.symbol} 
+        error={error} 
+        tokenAmount={tokenAmount} 
+        handleChangeToken={handleChangeToken} 
+        networkTokenDecimals={networkTokenDecimals} 
+        getMaxAmount={getMaxAmount} 
+        handleMaxAmount={setMaxAmount}
+        needsApproval={needsApproval()} 
+        isApproving={isApproving} 
+        approveSettlerToken={approveSettlerToken} 
+        verifyTransactionState={verifyTransactionState} 
+        isButtonDisabled={isButtonDisabled()} 
+        handleCheck={handleCheck} 
+        txType={getTxType()} 
+        handleProcessEvent={handleProcessEvent} 
+        onSuccess={onSuccess} 
+        handleError={setError} 
+        networkTxRef={networkTxRef} 
+        show={show} 
+        handleCancel={handleCancel} 
+        handleConfirm={handleConfirm}      
+      />
   );
 }
-
-export default OraclesActions;

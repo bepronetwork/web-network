@@ -12,6 +12,7 @@ export interface Curator {
   disputes?: Disputes[];
   isCurrentlyCurator?: boolean;
   delegations?: Delegation[];
+  network?: Network;
 }
 
 export interface Delegation {

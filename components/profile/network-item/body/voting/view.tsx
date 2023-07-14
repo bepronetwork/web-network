@@ -6,7 +6,7 @@ import Button from "components/button";
 import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
-import NetworkItemAmountView from "../amount.view";
+import NetworkItemAmountView from "../../amount/view";
 
 
 interface BodyVotingViewProps {

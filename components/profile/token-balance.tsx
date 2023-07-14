@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 
 import ContractButton from "components/contract-button";
 import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
+import ResponsiveWrapper from "components/responsive-wrapper";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -35,7 +36,7 @@ export default function TokenBalance({
   const { t } = useTranslation(["common"]);
 
   const CONTAINER_CLASSES = [
-    "justify-content-between align-items-center bg-transparent",
+    "justify-content-between align-items-center bg-transparent flex-wrap",
     "border border-gray-800 border-radius-4 mb-2 py-3 px-4",
     variant === "network" ? "bg-gray-900" : "bg-gray-950"
   ];
@@ -66,12 +67,26 @@ export default function TokenBalance({
 
         <FlexColumn>
           <span className="caption text-white font-weight-500">
-            {overSymbol ? overSymbol : (delegationSymbol || symbol)}
+          {overSymbol ? overSymbol : delegationSymbol || symbol}
           </span>
-          <span className="caption text-gray-500 text-capitalize font-weight-500">{delegation?.to || name}</span>
+          <ResponsiveWrapper xs={false} sm={false} md={true} xxl={true}>
+            <span className="caption text-gray-500 text-capitalize font-weight-500">
+              {delegation?.to || name}
+            </span>
+          </ResponsiveWrapper>
         </FlexColumn>
       </FlexRow>
-
+      <ResponsiveWrapper
+        xs={true}
+        md={false}
+        sm={true}
+        xxl={false}
+        className="text-truncate"
+      >
+        <span className="my-3 fs-smallest text-gray-500 text-capitalize font-weight-500 text-truncate">
+          {delegation?.to || name}
+        </span>
+      </ResponsiveWrapper>
       <FlexRow>
         {(type === "delegation" && onTakeBackClick) &&
           <ContractButton

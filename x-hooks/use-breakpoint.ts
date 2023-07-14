@@ -37,9 +37,9 @@ export default function useBreakPoint(validateAgent = false) {
   const updateCurrentBreakpoint = () => setCurrentBreakpoint(getCurrentBreakPoint());
   const debouncedHandler = useDebouncedCallback(updateCurrentBreakpoint, 300);
 
-  const isMobileView = ["xs", "sm", "md"].includes(currentBreakPoint) && userAgentCheck && !isWindowUndefined();
-  const isTabletView = currentBreakPoint === "lg" && userAgentCheck&& !isWindowUndefined();
-  const isDesktopView = ["xl", "xxl"].includes(currentBreakPoint) && userAgentCheck&& !isWindowUndefined();
+  const isMobileView = ["xs", "sm"].includes(currentBreakPoint) && userAgentCheck;
+  const isTabletView = ["lg", "md"].includes(currentBreakPoint)  && userAgentCheck;
+  const isDesktopView = ["xl", "xxl"].includes(currentBreakPoint) && userAgentCheck;
 
   useEffect(() => {
     const observer = new ResizeObserver(debouncedHandler);

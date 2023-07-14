@@ -1,15 +1,14 @@
 import { useTranslation } from "next-i18next";
 
 import ArrowDown from "assets/icons/arrow-down";
+import ArrowRightSmall from "assets/icons/arrow-right-small";
 import ArrowUp from "assets/icons/arrow-up";
 import ArrowUpRight from "assets/icons/arrow-up-right";
 
 import { FlexColumn } from "components/profile/wallet-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
-import NetworkItemAmountView from "../amount.view";
-
-
+import NetworkItemAmountView from "../../amount/view";
 interface BodyNetworkViewProps {
   isCollapsed: boolean;
   handleNetworkLink: () => void;
@@ -19,10 +18,12 @@ interface BodyNetworkViewProps {
   isNetworkVariant: boolean;
   primaryColor: string;
   handleToggleCollapse: () => void;
+  isArrowRight?: boolean;
 }
 
 export default function BodyNetworkView({
   isCollapsed,
+  isArrowRight,
   type,
   amount,
   symbol,
@@ -34,7 +35,12 @@ export default function BodyNetworkView({
   const { t } = useTranslation(["profile"]);
 
   function ArrowComponent() {
-    if (isCollapsed) return <ArrowDown width={10} height={8} />;
+    if (isCollapsed)
+      return isArrowRight ? (
+        <ArrowRightSmall width={10} height={10} />
+      ) : (
+        <ArrowDown width={10} height={8} />
+      );
 
     return <ArrowUp width={10} height={8} />;
   }
@@ -74,11 +80,9 @@ export default function BodyNetworkView({
       <ResponsiveWrapper
         lg={true}
         xs={false}
-        className="d-flex justify-content-center col-lg-3 "
+        className="d-flex justify-content-center align-items-center col-lg-3"
       >
-        <FlexColumn className="justify-content-center">
-          <NetworkLinkIconButton className="px-1" />
-        </FlexColumn>
+          <NetworkLinkIconButton className="px-1 ms-3" />
       </ResponsiveWrapper>
       <div
         className="col-lg-3 col-6 d-flex justify-content-end cursor-pointer"

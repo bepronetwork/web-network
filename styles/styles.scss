@@ -397,8 +397,10 @@ li {
   width: 100%;
 }
 
-.profile-content {
-  padding-left: 30px;
+@include media-breakpoint-up(xl) {
+  .profile-content {
+    padding-left: 30px;
+  }
 }
 
 .main-nav {

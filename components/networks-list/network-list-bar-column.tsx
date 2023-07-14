@@ -30,7 +30,7 @@ export default function NetworkListBarColumn({
 
   return (
     <div
-      className={`col d-flex flex-row cursor-pointer justify-content-center align-items-center ${
+      className={`d-flex flex-row cursor-pointer align-items-center ${
         isColumnActive ? "text-primary" : textClass
       } ${className && className}`}
       onClick={onClick}

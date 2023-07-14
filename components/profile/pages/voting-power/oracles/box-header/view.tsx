@@ -3,18 +3,19 @@ import { useTranslation } from "next-i18next";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import Button from "./button";
+import Button from "../../../../../button";
 // This has to be generic.
 // todo: create something like <Tabs /> <TabContainer />
 
-interface IOraclesBoxProps{
+interface IOraclesBoxProps {
     actions: string | string[];
     available?: number | undefined;
     onChange?(action: string): void;
     currentAction?: string;
     delegatedBox?: boolean;
 }
-function OraclesBoxHeader({
+
+export default function OraclesBoxHeader({
   actions = null,
   available,
   onChange,
@@ -52,5 +53,3 @@ function OraclesBoxHeader({
     </div>
   );
 }
-
-export default OraclesBoxHeader;
