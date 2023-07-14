@@ -10,14 +10,14 @@ import Modal from "components/modal";
 import {useAppState} from "contexts/app-state";
 import {addToast} from "contexts/reducers/change-toaster";
 
-import {pullRequest} from "interfaces/issue-data";
+import {PullRequest} from "interfaces/issue-data";
 import {Proposal} from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
 
 interface MergeableModalProps {
   proposal: Proposal;
-  pullRequest: pullRequest;
+  pullRequest: PullRequest;
 }
 
 export default function NotMergeableModal({

@@ -14,6 +14,7 @@ export default async function get(query: ParsedUrlQuery) {
     state,
     issueId,
     chainId,
+    proposalId,
     chain,
     visible,
     creator,
@@ -60,9 +61,11 @@ export default async function get(query: ParsedUrlQuery) {
 
   if (chainId) 
     whereCondition.chain_id = +chainId;
-  
-  if (typeof visible !== "undefined") 
+
+  if (typeof visible !== "undefined" && visible !== "both") 
     whereCondition.visible = isTrue(visible.toString());
+  else if (visible !== "both")
+    whereCondition.visible = true;
 
   if (creator) 
     whereCondition.creatorAddress = {
@@ -102,9 +105,10 @@ export default async function get(query: ParsedUrlQuery) {
   const proposalAssociation = 
     getAssociation( "mergeProposals", 
                     undefined, 
-                    !!proposer || isMergeableState || isDisputableState, 
+                    !!proposer || !!proposalId || isMergeableState || isDisputableState, 
                     {
                       ... proposer ? { creator: { [Op.iLike]: proposer.toString() } } : {},
+                      ... proposalId ? { id: proposalId } : {},
                       ... isMergeableState || isDisputableState ? {
                         [Op.and]: [
                           { isDisputed: false },
@@ -114,7 +118,12 @@ export default async function get(query: ParsedUrlQuery) {
                                           Sequelize.literal(disputableTimeCalc))
                         ]
                       } : {}
-                    });
+                    },
+                    proposalId ? [
+                        {
+                          association: "disputes"
+                        }
+                    ] : []);
 
   const pullRequestAssociation = 
     getAssociation( "pullRequests", 

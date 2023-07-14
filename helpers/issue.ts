@@ -2,38 +2,38 @@ import BigNumber from "bignumber.js";
 
 import { bountyReadyPRsHasNoInvalidProposals } from "helpers/proposal";
 
-import { IssueBigNumberData, IssueData } from "interfaces/issue-data";
+import { IssueBigNumberData, IssueData, PullRequest } from "interfaces/issue-data";
+import { Proposal } from "interfaces/proposal";
 
 export const OPEN_STATES = ["draft", "open", "ready", "proposal"];
 
-export const pullRequestParser = (issue: IssueData) => 
-  issue.pullRequests.map(pullRequest => ({
-    ...pullRequest,
-    createdAt: new Date(pullRequest.createdAt),
-    updatedAt: new Date(pullRequest.updatedAt),
-    isCancelable: !issue.mergeProposals?.some(proposal => proposal.pullRequestId === pullRequest.id)
-  }));
+export const pullRequestParser = (pr: PullRequest, proposals?: Proposal[]) => ({
+  ...pr,
+  createdAt: new Date(pr.createdAt),
+  updatedAt: new Date(pr.updatedAt),
+  isCancelable: !proposals?.some(proposal => proposal.pullRequestId === pr.id)
+});
 
-export const mergeProposalParser = (issue: IssueData) => 
-  issue.mergeProposals?.map(proposal => ({
-    ...proposal,
-    disputeWeight: BigNumber(proposal.disputeWeight),
-    isMerged: issue.merged !== null && +proposal?.contractId === +issue.merged,
-    createdAt: new Date(proposal.createdAt),
-    updatedAt: new Date(proposal.updatedAt),
-    contractCreationDate: new Date(+proposal.contractCreationDate),
-    distributions: proposal.distributions?.map(distribution => ({
-      ...distribution,
-      createdAt: new Date(distribution.createdAt),
-      updatedAt: new Date(distribution.updatedAt)
-    })),
-    disputes: proposal.disputes?.map(dispute => ({
-      ...dispute,
-      createdAt: new Date(dispute.createdAt),
-      updatedAt: new Date(dispute.updatedAt),
-      weight: BigNumber(dispute.weight)
-    }))
-  }));
+export const mergeProposalParser = (proposal: Proposal, mergedProposal?: string) => ({
+  ...proposal,
+  disputeWeight: BigNumber(proposal.disputeWeight),
+  isMerged: mergedProposal !== null && +proposal?.contractId === +mergedProposal,
+  createdAt: new Date(proposal.createdAt),
+  updatedAt: new Date(proposal.updatedAt),
+  contractCreationDate: new Date(+proposal.contractCreationDate),
+  distributions: proposal.distributions?.map(distribution => ({
+    ...distribution,
+    createdAt: new Date(distribution.createdAt),
+    updatedAt: new Date(distribution.updatedAt)
+  })),
+  disputes: proposal.disputes?.map(dispute => ({
+    ...dispute,
+    createdAt: new Date(dispute.createdAt),
+    updatedAt: new Date(dispute.updatedAt),
+    weight: BigNumber(dispute.weight)
+  })),
+  pullRequest: proposal?.pullRequest ? pullRequestParser(proposal?.pullRequest, [proposal]) : undefined
+});
 
 export const benefactorsParser = (issue: IssueData) =>
   issue.benefactors?.map(benefactor => ({
@@ -51,7 +51,7 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   fundingAmount: BigNumber(issue.fundingAmount),
   fundedAmount: BigNumber(issue.fundedAmount),
   rewardAmount: BigNumber(issue.rewardAmount),
-  pullRequests: issue?.pullRequests && pullRequestParser(issue),
-  mergeProposals: issue?.mergeProposals && mergeProposalParser(issue),
+  pullRequests: issue?.pullRequests && issue?.pullRequests?.map(p => pullRequestParser(p, issue?.mergeProposals)),
+  mergeProposals: issue?.mergeProposals && issue?.mergeProposals?.map(p => mergeProposalParser(p, issue?.merged)),
   benefactors: issue?.benefactors && benefactorsParser(issue)
 });

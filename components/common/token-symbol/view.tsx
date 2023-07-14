@@ -18,9 +18,16 @@ export default function TokenSymbolView({
     <OverlayTrigger
       key="bottom-githubPath"
       placement="bottom"
-      overlay={<Tooltip id={"tooltip-bottom"}>{name}</Tooltip>}
+      overlay={
+        <Tooltip 
+          id={"tooltip-bottom"}
+          className="text-uppercase"
+        >
+          {name}
+        </Tooltip>
+      }
     >
-      <span className={`${className} token-symbol text-truncate`} style={style}>
+      <span className={`${className} token-symbol text-truncate text-uppercase`} style={style}>
         <>{name || t("common:misc.token")}</>
       </span>
     </OverlayTrigger>

@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 
-import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
 
 import CreateReviewModalView from "./view";
 
@@ -9,7 +9,7 @@ interface CreateReviewModalModalProps {
   isExecuting: boolean;
   onConfirm: (body: string) => void;
   onCloseClick: () => void;
-  pullRequest: pullRequest;
+  pullRequest: PullRequest;
   currentBounty: IssueBigNumberData;
 }
 

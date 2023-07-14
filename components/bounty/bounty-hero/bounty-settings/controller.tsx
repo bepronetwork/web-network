@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useAppState } from "contexts/app-state";
 
-import { getIssueState } from "helpers/handleTypeIssue";
-
 import { IssueBigNumberData } from "interfaces/issue-data";
 
 import { useAuthentication } from "x-hooks/use-authentication";
@@ -48,21 +46,23 @@ export default function BountySettings({
   };
 
   async function handleHardCancel() {
-    handleHardCancelBounty().then(() => {
-      updateWalletBalance();
-      updateBountyData();
-    });
+    handleHardCancelBounty(currentBounty.contractId, currentBounty.issueId)
+      .then(() => {
+        updateWalletBalance();
+        updateBountyData();
+      });
   }
 
   async function handleRedeem() {
-    handleReedemIssue(getIssueState({
-        state: currentBounty?.state,
-        amount: currentBounty?.amount,
-        fundingAmount: currentBounty?.fundingAmount,
-    }) === "funding").then(() => {
-      updateWalletBalance(true);
-      updateBountyData();
-    });
+    if (!currentBounty) return;
+    
+    const isFundingRequest = currentBounty.fundingAmount.gt(0);
+
+    handleReedemIssue(currentBounty.contractId, currentBounty.issueId, isFundingRequest)
+      .then(() => {
+        updateWalletBalance(true);
+        updateBountyData();
+      });
   }
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { IssueData } from "interfaces/issue-data";
+import { Proposal } from "interfaces/proposal";
 
 import { SearchBountiesPaginated, LeaderBoardPaginated, CuratorsListPaginated } from "types/api";
 
@@ -19,4 +20,12 @@ export interface NetworkCuratorsPageProps {
 
 export interface LeaderBoardPageProps {
   leaderboard: LeaderBoardPaginated;
+}
+
+export interface ProposalPageProps {
+  proposal: Proposal;
+}
+
+interface MyNetworkPageProps {
+  bounties: SearchBountiesPaginated;
 }

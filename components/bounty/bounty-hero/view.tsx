@@ -117,7 +117,8 @@ export default function BountyHeroView({
               </div>
             </If>
             <div 
-              className="py-3 d-flex flex-wrap align-items-center border-top border-gray-850 justify-content-md-start"
+              className={`py-3 gap-3 d-flex flex-wrap align-items-center border-top 
+                border-gray-850 justify-content-md-start`}
             >
               <If condition={!!bounty?.repository}>
                 <BountyItemLabel label={t("common:misc.repository")} className="col-12 col-sm-auto">

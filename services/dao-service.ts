@@ -714,7 +714,7 @@ export default class DAO {
   }
 
   async getTimeChain(): Promise<number> { 
-    return this.web3Connection.Web3.eth.getBlock(`latest`).then(block => block.timestamp*1000);
+    return this.web3Connection.Web3.eth.getBlock(`latest`).then(block => (block?.timestamp || 0) * 1000);
   }
 
   async isBountyInDraftChain(creationDateIssue: number): Promise<boolean> { 

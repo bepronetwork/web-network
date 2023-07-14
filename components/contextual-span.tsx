@@ -72,7 +72,7 @@ export function ContextualSpan({
                 <Icon width={12} height={12} />
               </span>
             ) : (
-              <div className="ball-sm bg-warning me-2 mt-2" />
+              <div className={`ball-sm bg-${context} me-2 mt-2`} />
             )}
           </div>
           <div className={`col-12 ${classNameChildren}`}>

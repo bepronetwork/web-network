@@ -7,7 +7,7 @@ import CustomContainer from "components/custom-container";
 import GithubLink from "components/github-link";
 import NothingFound from "components/nothing-found";
 
-import { pullRequest } from "interfaces/issue-data";
+import { PullRequest } from "interfaces/issue-data";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
 
@@ -15,7 +15,7 @@ import ApproveLink from "./actions/approve-link.view";
 import PullRequestButton from "./actions/pull-request-button";
 
 interface PullRequestBodyViewProps {
-  currentPullRequest: pullRequest;
+  currentPullRequest: PullRequest;
   isCreatingReview: boolean;
   handleShowModal: () => void;
   handleCancel: () => void;

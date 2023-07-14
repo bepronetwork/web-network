@@ -12,3 +12,7 @@ export const orderByProperty = (elements, property, order) => {
     return 0;
   });
 };
+
+export function isLastItem(target, currentIndex) {
+  return target?.length - 1 === currentIndex;
+}

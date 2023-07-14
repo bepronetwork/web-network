@@ -44,6 +44,11 @@ class ProposalDistributions extends Model {
       sourceKey: "id",
       as: "mergeProposal"
     });
+
+    this.belongsTo(models.user, {
+      foreignKey: "recipient",
+      sourceKey: "address"
+    });
   }
 }
 

@@ -19,7 +19,7 @@ import { issueParser } from "helpers/issue";
 import {
   IssueBigNumberData,
   IssueData,
-  pullRequest,
+  PullRequest,
 } from "interfaces/issue-data";
 
 import {
@@ -32,7 +32,7 @@ import useApi from "x-hooks/use-api";
 
 interface PagePullRequestProps {
   bounty: IssueData;
-  pullRequest: pullRequest;
+  pullRequest: PullRequest;
   _nextI18Next?: SSRConfig;
 }
 
@@ -44,7 +44,7 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
 
   const [showModal, setShowModal] = useState(!!review);
   const [currentBounty, setCurrentBounty] = useState<IssueBigNumberData>(issueParser(bounty));
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({
+  const [currentPullRequest, setCurrentPullRequest] = useState<PullRequest>({
     ...pullRequest,
     createdAt: new Date(pullRequest.createdAt),
   });
@@ -182,7 +182,7 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
   const pullRequestReviews = await getPullRequestReviews(bountyDatabase?.repository?.githubPath, 
                                                          +prId);
 
-  const pullRequest: pullRequest = {
+  const pullRequest: PullRequest = {
     ...pullRequestDatabase,
     isMergeable: pullRequestDetail[0]?.isMergeable,
     merged: pullRequestDetail[0]?.merged,

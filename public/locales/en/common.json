@@ -364,7 +364,8 @@
     "failed-update-bounty": "Failed to update bounty!",
     "read-only-network": "This network is closed. It is set to read-only mode.",
     "results-truncated": "Results Truncated",
-    "not-available-chain": "Not available on this chain"
+    "not-available-chain": "Not available on this chain",
+    "something-went-wrong": "Something went wrong"
   },
   "404": {
     "the-page": "The page you looking for was",

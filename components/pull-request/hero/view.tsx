@@ -8,12 +8,12 @@ import CustomContainer from "components/custom-container";
 import DateLabel from "components/date-label";
 import GithubInfo from "components/github-info";
 
-import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
 
 import PullRequestLabels from "../labels/controller";
 
 interface PullRequestHeroViewProps {
-  currentPullRequest: pullRequest;
+  currentPullRequest: PullRequest;
   currentBounty: IssueBigNumberData;
   handleBack: () => void;
 }

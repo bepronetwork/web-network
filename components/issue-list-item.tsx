@@ -33,7 +33,6 @@ import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
-import useBreakPoint from "x-hooks/use-breakpoint";
 import { useNetwork } from "x-hooks/use-network";
 
 import BountyTagsView from "./bounty/bounty-tags/view";
@@ -66,7 +65,6 @@ export default function IssueListItem({
   const { getURLWithNetwork } = useNetwork();
   const { signMessage } = useAuthentication();
   const { handleHardCancelBounty } = useBepro();
-  const { isMobileView } = useBreakPoint();
 
   const isVisible = visible !== undefined ? visible : issue?.visible;
 
@@ -403,13 +401,13 @@ export default function IssueListItem({
           </ResponsiveWrapper>
 
           <div className="row align-items-center border-xl-top border-gray-850 pt-3">
-            <ResponsiveWrapper xs={false} xl={true} lg={true}>
+            <ResponsiveWrapper xs={false} xl={true}>
               <div className="row w-100 align-items-center justify-content-md-start">
                 <BountyItemLabel label="ID" className="col-auto">
                   <IssueTag />
                 </BountyItemLabel>
 
-                <BountyItemLabel label="Repository" className="col-auto">
+                <BountyItemLabel label="Repository" className="col-auto px-0">
                   <OverlayTrigger
                     key="bottom-githubPath"
                     placement="bottom"
@@ -438,21 +436,22 @@ export default function IssueListItem({
                   </span>
                 </BountyItemLabel>
 
-                <div className="col d-flex justify-content-end px-0">
+                <div className="col d-flex justify-content-end">
                   <BountyAmount bounty={issue} size={size} />
                 </div>
               </div>
             </ResponsiveWrapper>
-            <ResponsiveWrapper xs={true} xl={false}>
-              <div className={`col d-flex flex-wrap justify-content-between text-truncate`} >
-              {isMobileView && (
-                  <div className="text-truncate mb-2">
-                    <BountyTagsView tags={[issue?.network?.name]} />
-                  </div>
-                )}
-                <div className="mb-2">
-                  <BountyAmount bounty={issue} size={size} />
-                </div>
+            <ResponsiveWrapper
+              xs={true}
+              xl={false}
+              className="row align-items-center justify-content-between"
+            >
+              <div className="col mw-50-auto network-name">
+                <BountyTagsView tags={[issue?.network?.name]} />
+              </div>
+
+              <div className="col-auto px-0">
+                <BountyAmount bounty={issue} size={size} />
               </div>
             </ResponsiveWrapper>
           </div>

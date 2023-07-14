@@ -23,7 +23,7 @@ import {
 import { Curator, SearchCuratorParams } from "interfaces/curators";
 import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
 import { HeaderNetworksProps } from "interfaces/header-information";
-import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, IssueData, PullRequest } from "interfaces/issue-data";
 import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -298,7 +298,7 @@ export default function useApi() {
   async function getPullRequestIssue(issueId: string, page = "1") {
     const search = new URLSearchParams({ issueId, page }).toString();
     return api
-      .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
+      .get<PaginatedData<PullRequest>>(`/pull-request?${search}`)
       .then(({ data: { rows } }) => head(rows))
       .catch((e) => {
         console.log("Failed to fetch PR information", e);
@@ -450,7 +450,7 @@ export default function useApi() {
       networkName
     }).toString();
     return api
-      .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
+      .get<PaginatedData<PullRequest>>(`/pull-request?${search}`)
       .then(({ data: { count } }) => count > 0)
       .catch((e) => {
         console.log("Failed to fetch PR information", e);
@@ -462,7 +462,7 @@ export default function useApi() {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
     return api
-      .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
+      .get<PaginatedData<PullRequest>>(`/pull-request?${search}`)
       .then(({ data }) => data)
       .catch((e) => {
         console.log("Failed to fetch PR information", e);

@@ -49,7 +49,6 @@ export default function BountyBodyView({
 }: BountyBodyProps) {
   const { t } = useTranslation(["common", "bounty"]);
 
-
   if (walletAddress)
     return (
       <div className="mb-1">

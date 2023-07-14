@@ -5,13 +5,13 @@ import { useTranslation } from "next-i18next";
 
 import NothingFound from "components/nothing-found";
 
-import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import ItemRow from "../item-row/controller";
 
 interface ItemViewProps {
-  data: Proposal[] | pullRequest[],
+  data: Proposal[] | PullRequest[],
   isProposal: boolean,
   currentBounty: IssueBigNumberData;
   approvalsRequired: number;
@@ -25,7 +25,7 @@ function ItemSectionsView({ data, isProposal, currentBounty, approvalsRequired, 
     <section className="content-wrapper border-top-0 p-20 d-flex flex-column gap-2 bg-gray-850">
       {
         data?.length ?
-          React.Children.toArray(data?.map((item: Proposal | pullRequest) => {
+          React.Children.toArray(data?.map((item: Proposal | PullRequest) => {
             return (
               <ItemRow 
                 item={item} 

@@ -26,6 +26,8 @@ import { psReadAsText } from "helpers/file-reader";
 import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 
+import { SearchBountiesPaginated } from "types/api";
+
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
@@ -36,6 +38,7 @@ import Management from "./management";
 
 interface MyNetworkSettingsProps {
   network: Network;
+  bounties: SearchBountiesPaginated;
   updateEditingNetwork: () => void;
 }
 
@@ -47,6 +50,7 @@ interface TabsProps {
 
 export default function MyNetworkSettings({
   network,
+  bounties,
   updateEditingNetwork,
 }: MyNetworkSettingsProps) {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
@@ -307,7 +311,7 @@ export default function MyNetworkSettings({
         title: t("bounty:management.label"),
         component: (
           <NetworkContainer>
-            <Management />
+            <Management bounties={bounties} />
           </NetworkContainer>
         )
       }
