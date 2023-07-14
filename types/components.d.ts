@@ -2,9 +2,10 @@ import { ReactNode } from "react";
 
 import { Currency } from "interfaces/currency";
 import { IssueBigNumberData } from "interfaces/issue-data";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import { SearchBountiesPaginated } from "types/api";
-import { BreakpointOptions, SelectOption } from "types/utils";
+import { BreakpointOptions, Direction, SelectOption } from "types/utils";
 
 export interface SearchBountiesPaginatedBigNumber extends Omit<SearchBountiesPaginated, "rows"> {
   rows: IssueBigNumberData[];
@@ -42,8 +43,23 @@ export interface HeroInfo {
   setListedModalVisibility?: (visible: boolean) => void;
 }
 
-interface MiniTabsItem {
+export interface MiniTabsItem {
   onClick: () => void;
   label: string;
   active: boolean;
+}
+
+export interface IntervalFiltersProps {
+  defaultInterval?: number;
+  intervals: number[];
+  intervalIn?: "days" | "months" | "years";
+  direction?: Direction;
+  onStartDateChange?: (value: string) => void;
+  onEndDateChange?: (value: string) => void;
+}
+
+export interface ChainFilterProps {
+  chains: SupportedChainData[];
+  direction?: Direction;
+  onChange?: (value: string | number) => void;
 }

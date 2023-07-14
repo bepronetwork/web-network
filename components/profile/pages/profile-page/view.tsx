@@ -41,7 +41,7 @@ export default function ProfilePageView({
 
   return (
     <>
-      <div className="border-bottom border-gray-850">
+      <div className="border-bottom border-gray-850 border-xl-0">
         <CustomContainer>
           <ResponsiveWrapper xl={false} xs={true} className="mb-4">
             <h4>{t(`common:main-nav.nav-avatar.profile`)}</h4>

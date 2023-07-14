@@ -5,12 +5,14 @@ import { useRouter } from "next/router";
 import { useAppState } from "contexts/app-state";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
+import { useNetwork } from "x-hooks/use-network";
 
 import NetworkItemView from "./view";
 interface NetworkItemProps {
   children?: ReactNode;
   key?: number | string;
-  type?: "network" | "voting";
+  type?: "network" | "voting" | "payments";
+  networkChain?: string;
   networkName: string;
   subNetworkText?: string;
   primaryColor?: string;
@@ -31,6 +33,7 @@ export default function NetworkItem({
   handleNetworkLink,
   iconNetwork,
   networkName,
+  networkChain,
   subNetworkText,
   primaryColor,
   variant = "network",
@@ -39,17 +42,24 @@ export default function NetworkItem({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   const {
-    state: { Settings: settings },
+    state: { Settings: settings, currentUser },
   } = useAppState();
   const { query } = useRouter();
+  const { goToProfilePage } = useNetwork();
   const { isDesktopView } = useBreakPoint();
 
   const isNetworkVariant = variant === "network";
-  const isNetworkType = type === "network";
+  const isNetworkType = ["network", "payments"].includes(type);
 
   function toggleCollapse() {
     if(handleToggleTabletAndMobile && query?.profilePage[0] === 'voting-power' && !isDesktopView){
       handleToggleTabletAndMobile()
+    } else if (isNetworkType && !isDesktopView) {
+      goToProfilePage("payments", {
+        networkName,
+        networkChain,
+        wallet: currentUser?.walletAddress
+      });
     } else setIsCollapsed((previous) => !previous);
   }
 

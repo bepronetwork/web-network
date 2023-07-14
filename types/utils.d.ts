@@ -1,4 +1,7 @@
+import BigNumber from "bignumber.js";
 import { UrlObject } from "url";
+
+import { Token } from "interfaces/token";
 
 export interface BreakpointOptions {
   xs?: boolean;
@@ -30,4 +33,29 @@ export interface Link {
 export interface Action {
   onClick: () => void;
   label: string;
+}
+
+export interface QueryParams {
+  [key: string]: string | undefined;
+}
+
+export type Direction = "vertical" | "horizontal";
+
+export interface ConvertableItem {
+  [key: string]: unknown;
+  token: Token;
+  value: BigNumber;
+}
+
+export interface ConvertedItem extends ConvertableItem {
+  [key: string]: unknown;
+  price: number;
+  convertedValue: BigNumber;
+}
+
+export interface TotalFiatNetworks {
+  tokenAddress: string;
+  value: number;
+  price: number;
+  networkId: number;
 }

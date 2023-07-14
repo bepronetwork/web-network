@@ -11,7 +11,7 @@ import NetworkItemAmountView from "../../amount/view";
 
 interface BodyVotingViewProps {
   handleNetworkLink: () => void;
-  type: "network" | "voting";
+  type: "network" | "voting" | "payments";
   amount: string | number;
   symbol: string;
   isNetworkVariant: boolean;
@@ -19,7 +19,6 @@ interface BodyVotingViewProps {
 }
 
 export default function BodyVotingView({
-  type,
   amount,
   symbol,
   isNetworkVariant,
@@ -45,7 +44,6 @@ export default function BodyVotingView({
         amount={amount}
         symbol={symbol}
         isNetworkVariant={isNetworkVariant}
-        type={type}
         primaryColor={primaryColor}
       />
     );

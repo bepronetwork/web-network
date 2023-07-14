@@ -1,4 +1,4 @@
-import { formatDistanceStrict } from "date-fns";
+import { differenceInDays, differenceInMonths, differenceInYears, formatDistanceStrict, parseISO } from "date-fns";
 
 export const formatDate = (date: number | string | Date, joiner = "/") => {
   try {
@@ -22,3 +22,17 @@ export const getTimeDifferenceInWords = (date: Date, dateToCompare: Date) => {
     return `0`;
   }
 };
+
+export function getDifferenceBetweenDates(startDate: string | Date, 
+                                          endDate: string | Date, 
+                                          diffIn: "days" | "months" | "years") {
+  if (!startDate || !endDate) return null;
+
+  const diffFn = {
+    days: differenceInDays,
+    months: differenceInMonths,
+    years: differenceInYears,
+  }[diffIn];
+
+  return diffFn(parseISO(endDate.toString()), parseISO(startDate.toString()));
+}

@@ -6,7 +6,7 @@ import WalletBalance from "components/profile/wallet-balance";
 export default function WalletPage() {
   return (
     <ProfileLayout>
-      <Col xs={10}>
+      <Col xs={12}>
         <Row className="mb-3">
           <WalletBalance/>
         </Row>

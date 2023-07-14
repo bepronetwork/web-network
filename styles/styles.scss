@@ -139,7 +139,6 @@ li {
 
 #root-container{
   padding-top: $navbar-height;
-  padding-bottom: $statusbar-height;
 }
 
 .modal {
@@ -573,6 +572,7 @@ label {
 
   background-color: $gray-900;
   border: 1px solid $gray-800;
+  border-radius: 4px;
   color: #fff;
 
   &:disabled,
@@ -1906,7 +1906,7 @@ input[type="color"] {
 
 .profile {
   &-content {
-    min-height: 90vh;
+    min-height: calc(100vh - $navbar-height);
     height: max-content;
     border-left: 1px solid $dark-gray;
   }

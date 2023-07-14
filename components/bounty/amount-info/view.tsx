@@ -41,7 +41,7 @@ export default function BountyAmountView({
       >
         <div className={`d-flex gap-1 px-0 justify-content-center text-truncate ${size === "sm" && "text-center"}`}>
           <span
-            className={`text-opacity-1 text-white${isActive && "-40"}`}
+            className={`text-opacity-1 mr-1 text-white${isActive && "-40"}`}
           >
             {(+bountyAmount >= 1e-6 &&
               formatNumberToNScale(bountyAmount?.toFixed())) ||

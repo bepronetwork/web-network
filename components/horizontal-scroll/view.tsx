@@ -1,5 +1,6 @@
 import { MutableRefObject, ReactNode } from "react";
 
+import ChevronRightMediumIcon from "assets/icons/chevron-right-medium-icon";
 import ChevronLeftIcon from "assets/icons/chevronleft-icon";
 import ChevronRightIcon from "assets/icons/chevronright-icon";
 
@@ -47,7 +48,7 @@ export default function HorizontalScrollView({
           className="rightButton p-0 rounded-0 h-100 border-0 d-xl-none"
           {...mouseEventsRight}
         >
-          <ChevronRightIcon />
+          <ChevronRightMediumIcon />
         </Button>
       </If>
     </div>

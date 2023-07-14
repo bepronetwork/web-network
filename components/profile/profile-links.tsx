@@ -28,8 +28,9 @@ export default function ProfileLinks({
 
   const getHref = (href = "") =>
     query?.network ? `/${query?.network}/${query?.chain}/profile/${href}` : `/profile/${href}`;
-  const getUrl = () =>
-    query?.network ? getURLWithNetwork("/profile/[[...profilePage]]") : "/profile/[[...profilePage]]";
+  const getUrl = () => query?.network ?
+    getURLWithNetwork("/profile/[[...profilePage]]") :
+    { pathname: "/profile/[[...profilePage]]", query };
   const getTranslation = page => t(`main-nav.nav-avatar.${page}`);
   const isActive = href => asPath.endsWith(`/profile${href ? `/${href}` : ""}`);
 

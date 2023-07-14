@@ -12,6 +12,7 @@ interface NativeSelectWrapperProps {
   children: ReactNode;
   options: SelectOption[];
   selectedIndex?: number;
+  isClearable?: boolean;
   onChange: (value) => void;
 }
 
@@ -20,6 +21,7 @@ export default function NativeSelectWrapper({
   options,
   selectedIndex,
   onChange,
+  isClearable,
 }: NativeSelectWrapperProps) {
   const { t } = useTranslation("common");
 
@@ -39,9 +41,12 @@ export default function NativeSelectWrapper({
         <select
           className="native-select"
           onChange={handleChange}
-          value={selectedIndex >= 0 ? selectedIndex : "choose"}
+          value={selectedIndex >= 0 ? selectedIndex : ""}
         >
-          <option value="choose" disabled hidden>{t("misc.choose-one")}</option>
+          <option value="" disabled={!isClearable}>
+            { isClearable && t("actions.clear") || t("misc.choose-one") }
+          </option>
+          
           {options.map(({ label }, i) => <option value={i} key={label}>{label}</option>)}
         </select>
       </If>

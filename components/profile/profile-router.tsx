@@ -2,9 +2,9 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/router";
 
+import PaymentsPage from "components/pages/profile/payments/controller";
 import BountiesPage from "components/profile/pages/bounties";
 import MyNetworkPage from "components/profile/pages/my-network";
-import PaymentsPage from "components/profile/pages/payments";
 import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
 import PullRequestsPage from "components/profile/pages/pull-requests";
@@ -13,15 +13,9 @@ import WalletPage from "components/profile/pages/wallet";
 
 import { useAppState } from "contexts/app-state";
 
-import { SearchBountiesPaginated } from "types/api";
+import { ProfilePageProps } from "types/pages";
 
-interface ProfileRouterProps {
-  bounties: SearchBountiesPaginated;
-}
-
-export default function ProfileRouter({
-  bounties
-}: ProfileRouterProps) {
+export default function ProfileRouter(props: ProfilePageProps) {
   const { pathname, asPath, query, push } = useRouter();
 
   const { state: { currentUser } } = useAppState();
@@ -49,28 +43,21 @@ export default function ProfileRouter({
   useEffect(() => {
     if (!currentUser?.walletAddress || !query) return;
 
-    const type = {
-      "/profile/bounties": "creator",
-      "/profile/pull-requests": "pullRequester",
-      "/profile/proposals": "proposer"
-    }[currentRoute.path];
-
-    if (type && query[type] !== currentUser?.walletAddress)
-      push({
-        pathname,
-        query: {
-          ...query,
-          [type]: currentUser?.walletAddress,
-        }
-      }, asPath, {
-        shallow: false,
-        scroll: false,
-      });
+    push({
+      pathname,
+      query: {
+        ...query,
+        wallet: currentUser?.walletAddress,
+      }
+    }, asPath, {
+      shallow: false,
+      scroll: false,
+    });
 
   }, [currentUser?.walletAddress, asPath]);
 
   if (currentRoute)
-    return <currentRoute.page bounties={bounties} />;
+    return <currentRoute.page {...props} />;
 
   return <></>;
 }

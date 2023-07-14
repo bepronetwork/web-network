@@ -134,7 +134,10 @@ export function useNetwork() {
     const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
 
     if (queryNetwork !== "")
-      return push(getURLWithNetwork(`/profile/[[...profilePage]]`, params), `/${queryNetwork}/${queryChain}/${path}`);
+      return push(getURLWithNetwork(`/profile/[[...profilePage]]`, {
+        ...query,
+        ...params
+      }), `/${queryNetwork}/${queryChain}/${path}`);
 
     return push({
       pathname: "/profile/[[...profilePage]]",

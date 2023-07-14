@@ -15,12 +15,14 @@
   "council": "Curator",
   "connect-github": "Connect Github",
   "go-to-network": "Go to Network",
+  "total-received": "Total received",
   "connections": "Connections",
   "voting-power": "Voting Power",
   "need-network-to-manage": "To manage your voting power you need to be in a especific network",
   "network-columns": {
     "network-name": "Network name",
     "total-votes": "Total votes",
+    "total-received": "Total received",
     "network-link": "Network link"
   },
   "payments": {

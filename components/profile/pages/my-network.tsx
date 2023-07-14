@@ -87,7 +87,11 @@ export function MyNetwork({
         </Col>
       ||
         <Col xs={12} xl={10}>
-          <MyNetworkSettings bounties={bounties} network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
+          <MyNetworkSettings
+            bounties={bounties}
+            network={myNetwork}
+            updateEditingNetwork={updateEditingNetwork}
+          />
         </Col>
       }
     </ProfileLayout>

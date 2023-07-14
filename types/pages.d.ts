@@ -1,7 +1,8 @@
 import { IssueData } from "interfaces/issue-data";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 import { Proposal } from "interfaces/proposal";
 
-import { SearchBountiesPaginated, LeaderBoardPaginated, CuratorsListPaginated } from "types/api";
+import { SearchBountiesPaginated, LeaderBoardPaginated, CuratorsListPaginated, NetworkPaymentsData } from "types/api";
 
 export interface ExplorePageProps {
   numberOfNetworks: number;
@@ -28,4 +29,19 @@ export interface ProposalPageProps {
 
 interface MyNetworkPageProps {
   bounties: SearchBountiesPaginated;
+}
+
+interface ProfilePageProps {
+  bounties?: SearchBountiesPaginated;
+  payments?: NetworkPaymentsData[];
+  chains?: SupportedChainData[];
+}
+
+export interface MyNetworkPageProps {
+  bounties: SearchBountiesPaginated;
+}
+
+export interface PaymentsPageProps {
+  payments: NetworkPaymentsData[];
+  chains: SupportedChainData[];
 }

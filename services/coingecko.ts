@@ -92,7 +92,7 @@ async function getCoinPrice(search: string, fiat = settings?.currency.defaultFia
   if (!publicRuntimeConfig.enableCoinGecko)
     return 0;
 
-  const storage = new WinStorage(`coingecko:${search?.toLowerCase()}`);
+  const storage = new WinStorage(`coingecko:${search?.toLowerCase()}`, 60000);
   if (storage.value?.prices[fiat || 'eur'])
     return storage.value.prices[fiat || 'eur'];
 

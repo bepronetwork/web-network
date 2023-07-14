@@ -5,3 +5,9 @@ export class HttpNotFoundError extends BaseAPIError {
     super(message, 404);
   }
 }
+
+export class BadRequestError extends BaseAPIError {
+  constructor(message: string) {
+    super(message, 400);
+  }
+}

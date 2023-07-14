@@ -1,5 +1,5 @@
-import ArrowDown from "assets/icons/arrow-down";
-import ArrowUp from "assets/icons/arrow-up";
+import ChevronDownIcon from "assets/icons/chevrondown-icon";
+import ChevronUpIcon from "assets/icons/chevronup-icon";
 
 export default function NetworkListBarColumn({
   hideOrder = false,
@@ -23,20 +23,22 @@ export default function NetworkListBarColumn({
     : "text-light-gray text-gray-hover";
   const ArrowComponent =
     columnOrder === "desc" || !isColumnActive ? (
-      <ArrowDown width={9.33} height={6.22} />
+      <ChevronDownIcon width={9.33} height={6.22} />
     ) : (
-      <ArrowUp width={9.33} height={6.22} />
+      <ChevronUpIcon width={9.33} height={6.22} />
     );
 
   return (
     <div
-      className={`d-flex flex-row cursor-pointer align-items-center ${
+      className={`col cursor-pointer ${
         isColumnActive ? "text-primary" : textClass
       } ${className && className}`}
       onClick={onClick}
     >
-      <span className={`${labelWhite ? 'text-white-30' : 'caption-medium'} mr-1`}>{label}</span>
-      {(!hideOrder && ArrowComponent) || <></>}
+      <div className="d-flex justify-content-center align-items-center">
+        <span className={`${labelWhite ? 'text-white-30' : 'caption-medium'} mr-1`}>{label}</span>
+        {(!hideOrder && ArrowComponent) || <></>}
+      </div>
     </div>
   );
 }

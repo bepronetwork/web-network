@@ -1,6 +1,8 @@
 import { Curator } from "interfaces/curators";
 import { IssueData } from "interfaces/issue-data";
 import { LeaderBoard } from "interfaces/leaderboard";
+import { Network } from "interfaces/network";
+import { Payment } from "interfaces/payments";
 
 export interface PaginatedData<T> {
   count: number;
@@ -36,4 +38,10 @@ export interface NetworkOverviewData {
   };
   networkTokenOnClosedBounties: number;
   members: number;
+}
+
+export type PaymentsData = Payment[];
+
+export interface NetworkPaymentsData extends Partial<Network> {
+  payments?: PaymentsData;
 }

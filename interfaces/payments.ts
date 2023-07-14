@@ -9,5 +9,5 @@ export interface Payment {
   transactionHash: string;
   labelBounty?: string;
   labelToken?: string;
-  handleItemClick: (issueId: string, chainName: string, networkName: string) => void
+  handleItemClick?: () => void;
 }
