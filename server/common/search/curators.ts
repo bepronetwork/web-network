@@ -10,7 +10,7 @@ import { isTrue } from "helpers/string";
 export default async function get(query: ParsedUrlQuery) {
   const {
     address,
-    isCurrentlyCurator = true,
+    isCurrentlyCurator,
     network,
     chain,
     page,
@@ -23,8 +23,8 @@ export default async function get(query: ParsedUrlQuery) {
   if (address)
     whereCondition.address = Sequelize.where( Sequelize.fn("lower", Sequelize.col("curator.address")),
                                               address.toString().toLowerCase());
-
-  whereCondition.isCurrentlyCurator = isTrue(isCurrentlyCurator.toString());
+  if(isCurrentlyCurator)
+    whereCondition.isCurrentlyCurator = isTrue(isCurrentlyCurator.toString());
 
   const include: IncludeOptions[] = [
     { association: "delegations" },
