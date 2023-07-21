@@ -3,8 +3,8 @@ import { ReactNode } from "react";
 import { BigNumber } from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
+import { FlexRow } from "components/common/flex-box/view";
 import NetworkItem from "components/profile/network-item/controller";
-import { FlexRow } from "components/profile/wallet-balance";
 
 import VotingPowerSubTitle from "../sub-title/controller";
 interface TotalVotesProps {

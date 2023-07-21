@@ -10,7 +10,11 @@ import { useDao } from "x-hooks/use-dao";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
 
-export default function ChainSelector() {
+export default function ChainSelector({
+  isFilter = false
+}: {
+  isFilter?: boolean;
+}) {
   const { query, pathname, asPath, push } = useRouter();
 
   const { connect } = useDao();
@@ -46,6 +50,7 @@ export default function ChainSelector() {
 
   return(
     <ChainSelectorView
+      isFilter={isFilter}
       onSelect={handleNetworkSelected}
       isOnNetwork={isOnNetwork}
     />

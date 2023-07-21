@@ -2,7 +2,7 @@ import TokenSymbolView from "components/common/token-symbol/view";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import { FlexRow } from "../../wallet-balance";
+import { FlexRow } from "../../../../components/common/flex-box/view";
 
 export default function NetworkItemAmountView({
   amount,

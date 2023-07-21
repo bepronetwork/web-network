@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 
-import { FlexRow } from "../wallet-balance";
+import ResponsiveWrapper from "components/responsive-wrapper";
+
+import { FlexRow } from "../../common/flex-box/view";
 import NetworkItemBody from "./body/controller";
 import NetworkItemTitleView from "./title/view";
 
@@ -56,9 +58,11 @@ export default function NetworkItemView({
           networkName={networkName}
           subNetworkText={subNetworkText}
         />
-        <FlexRow className="d-sm-none justify-content-end">
-          <span className="text-gray">{subNetworkText}</span>
-        </FlexRow>
+        <ResponsiveWrapper xs={true} md={false} className="ms-2">
+          <div className="mw-repo text-truncate">
+            <span className="text-gray">{subNetworkText}</span>
+          </div>
+        </ResponsiveWrapper>
         <NetworkItemBody
           isCollapsed={isCollapsed}
           handleNetworkLink={handleNetworkLink}

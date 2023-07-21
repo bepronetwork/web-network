@@ -5,7 +5,7 @@ import ChevronRightIcon from "assets/icons/chevronright-icon";
 
 import Button from "components/button";
 import CollapseArrows from "components/common/collapse-arrows/view";
-import { FlexColumn } from "components/profile/wallet-balance";
+import { FlexColumn } from "components/common/flex-box/view";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 import NetworkItemAmountView from "../../amount/view";

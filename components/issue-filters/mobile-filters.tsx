@@ -5,7 +5,23 @@ import FilterIcon from "assets/icons/filter-icon";
 import Button from "components/button";
 import MobileFiltersModal from "components/issue-filters/mobile-filters-modal";
 
-export default function IssueMobileFilters({ onlyTimeFrame = false, onlyProfileFilters = false, sortOptions }) {
+import { SortOption } from "types/components";
+
+interface IssueMobileFiltersProps {
+  onlyTimeFrame?: boolean;
+  onlyProfileFilters?: boolean;
+  sortOptions?: SortOption[];
+  hideSort?: boolean;
+  showChainSelector?: boolean;
+}
+
+export default function IssueMobileFilters({
+  onlyTimeFrame = false,
+  onlyProfileFilters = false,
+  sortOptions,
+  hideSort,
+  showChainSelector = false
+}: IssueMobileFiltersProps) {
   const [showModal, setShowModal] = useState(false);
 
   function handleShowModal() {
@@ -22,7 +38,7 @@ export default function IssueMobileFilters({ onlyTimeFrame = false, onlyProfileF
         color="gray-900"
         className={`border border-gray-800 rounded-2 not-svg`}
         onClick={handleShowModal}
-        >
+      >
         <FilterIcon />
       </Button>
 
@@ -32,6 +48,8 @@ export default function IssueMobileFilters({ onlyTimeFrame = false, onlyProfileF
         onlyTimeFrame={onlyTimeFrame}
         onlyProfileFilters={onlyProfileFilters}
         sortOptions={sortOptions}
+        hideSort={hideSort}
+        showChainSelector={showChainSelector}
       />
     </>
   );

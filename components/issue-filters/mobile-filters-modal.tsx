@@ -5,11 +5,14 @@ import SelectNetwork from "components/bounties/select-network";
 import If from "components/If";
 import ListSort from "components/lists/sort/controller";
 import Modal from "components/modal";
-import ReactSelect from "components/react-select";
+import ChainSelector from "components/navigation/chain-selector/controller";
 
 import { SortOption } from "types/components";
 
 import useFilters from "x-hooks/use-filters";
+
+import { ContainerFilterView } from "./container-filter/view";
+import FilterComponent from "./filter-component/controller";
 
 interface MobileFiltersModalProps {
   show: boolean;
@@ -17,6 +20,8 @@ interface MobileFiltersModalProps {
   onlyTimeFrame?: boolean;
   onlyProfileFilters?: boolean;
   sortOptions?: SortOption[];
+  hideSort?: boolean;
+  showChainSelector?: boolean;
 }
 
 export default function MobileFiltersModal({
@@ -24,13 +29,15 @@ export default function MobileFiltersModal({
   hide,
   onlyTimeFrame,
   onlyProfileFilters,
-  sortOptions
+  sortOptions,
+  showChainSelector,
+  hideSort = false
 }: MobileFiltersModalProps) {
   const { t } = useTranslation(["common"]);
   const router = useRouter();
   const isOnNetwork = !!router?.query?.network;
 
-  const [ [repoOptions, stateOptions, timeOptions], , , checkOption, applyFilters ] = useFilters();
+  const [ [repoOptions, stateOptions, timeOptions], , , , applyFilters ] = useFilters();
 
   
   const defaultSortOptions = sortOptions ? sortOptions : [
@@ -60,32 +67,9 @@ export default function MobileFiltersModal({
     }
   ];
 
-  function getCurrentFilter(options) {
-    return options?.find(({ checked }) => checked);
-  }
-
-  function handleChange(type) {
-    return (value) => {
-      checkOption(value, type);
-    };
-  }
-
   function handleApply() {
     hide();
     applyFilters();
-  }
-
-  function FilterComponent(label, options, type) {
-    return(
-      <div className="mb-3">
-        <span className="caption-small font-weight-medium text-gray-100 text-capitalize">{label}</span>
-        <ReactSelect
-          value={getCurrentFilter(options)}
-          options={options}
-          onChange={handleChange(type)}
-        />
-      </div>
-    );
   }
 
   return(
@@ -97,21 +81,42 @@ export default function MobileFiltersModal({
       okLabel={t("actions.apply")}
       onOkClick={handleApply}
     >
+      <If condition={showChainSelector && !isOnNetwork}>
+        <ContainerFilterView label={t("misc.chain")}>
+          <ChainSelector isFilter />
+        </ContainerFilterView>
+      </If>
       <If condition={onlyProfileFilters}>
-        <ListSort options={defaultSortOptions} labelLineBreak={onlyProfileFilters} />
+        <If condition={!hideSort}>
+          <ListSort options={defaultSortOptions} labelLineBreak={onlyProfileFilters} />
+        </If>
+
         <SelectNetwork
           isCurrentDefault={isOnNetwork}
           onlyProfileFilters={onlyProfileFilters}
+          filterByConnectedChain
         />
       </If>
 
       <If condition={!onlyTimeFrame && !onlyProfileFilters}>
-        {FilterComponent("Repository", repoOptions, "repo")}
-        {FilterComponent("Bounty State", stateOptions, "state")}
+        <FilterComponent 
+          label={t('filters.repository')}
+          options={repoOptions}
+          type="repo"
+        />
+        <FilterComponent 
+          label={t('filters.bounties.title')}
+          options={stateOptions}
+          type="state"
+        />
       </If>
 
       <If condition={onlyTimeFrame || !onlyProfileFilters}>
-        {FilterComponent("Timeframe", timeOptions, "time")}
+        <FilterComponent 
+          label={t('filters.timeframe.title')}
+          options={timeOptions}
+          type="time"
+        />
 
         <ListSort options={defaultSortOptions} asSelect />
       </If>

@@ -1,7 +1,8 @@
 import {Col, Row} from "react-bootstrap";
 
 import ProfileLayout from "components/profile/profile-layout";
-import WalletBalance from "components/profile/wallet-balance";
+
+import WalletBalance from "./wallet-balance/controller";
 
 export default function WalletPage() {
   return (

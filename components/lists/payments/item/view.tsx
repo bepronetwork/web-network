@@ -1,5 +1,5 @@
 import Button from "components/button";
-import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
+import { FlexColumn, FlexRow } from "components/common/flex-box/view";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 

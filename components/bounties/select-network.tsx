@@ -20,11 +20,13 @@ import useChain from "x-hooks/use-chain";
 interface SelectNetworkProps {
   isCurrentDefault?: boolean;
   onlyProfileFilters?: boolean;
+  filterByConnectedChain?: boolean;
 }
 
 export default function SelectNetwork({
   isCurrentDefault = false,
-  onlyProfileFilters = false
+  onlyProfileFilters = false,
+  filterByConnectedChain = false
 } : SelectNetworkProps) {
   const { t } = useTranslation("common");
   const { query, pathname, asPath, push } = useRouter();
@@ -71,9 +73,7 @@ export default function SelectNetwork({
     if(opt) setSelected(opt)
   }
 
-  useEffect(() => {
-    if (!chain && isCurrentDefault) return;
-
+  function getNetworksByChainId(id: string) {
     const cache = new WinStorage(`networks:${chain?.chainId}`, 60000, "sessionStorage");
 
     if (cache.value){
@@ -82,14 +82,26 @@ export default function SelectNetwork({
       handleSelectedWithNetworkName(options);
     } else
       searchNetworks({
-        chainId: chain?.chainId?.toString()
+        chainId: id
       })
         .then(({ rows }) => {
           const options = rows.map(networkToOption)
           setOptions(options)
           handleSelectedWithNetworkName(options);
         });
+  }
+
+  useEffect(() => {
+    if (!chain && isCurrentDefault) return;
+    
+    getNetworksByChainId(chain?.chainId?.toString())
   }, [chain, isCurrentDefault]);
+
+  useEffect(() => {
+    if(filterByConnectedChain && state.connectedChain?.id){
+      getNetworksByChainId(state.connectedChain?.id)
+    }
+  }, [state.connectedChain])
 
   useEffect(() => {
     if (state.Service?.network?.active && !selected && isCurrentDefault)

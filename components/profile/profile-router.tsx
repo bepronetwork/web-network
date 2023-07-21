@@ -9,11 +9,11 @@ import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
 import PullRequestsPage from "components/profile/pages/pull-requests";
 import VotingPowerPage from "components/profile/pages/voting-power/controller";
-import WalletPage from "components/profile/pages/wallet";
 
 import { useAppState } from "contexts/app-state";
 
 import { ProfilePageProps } from "types/pages";
+import WalletPage from "./pages/wallet/view";
 
 export default function ProfileRouter(props: ProfilePageProps) {
   const { pathname, asPath, query, push } = useRouter();

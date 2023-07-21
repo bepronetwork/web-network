@@ -2,12 +2,13 @@ import { useTranslation } from "next-i18next";
 
 import PaymentItem from "components/lists/payments/item/view";
 import NetworkItem from "components/profile/network-item/controller";
-import { FlexColumn } from "components/profile/wallet-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 import { Payment } from "interfaces/payments";
 
 import { NetworkPaymentsData } from "types/api";
+
+import { FlexColumn } from "../../../components/common/flex-box/view";
 
 interface HeaderItem {
   label: string;

@@ -3,8 +3,8 @@ import { Col } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
+import { FlexRow } from "components/common/flex-box/view";
 import ProfileLayout from "components/profile/profile-layout";
-import { FlexRow } from "components/profile/wallet-balance";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 export default function VotingPowerPageView({

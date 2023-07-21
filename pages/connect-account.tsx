@@ -8,8 +8,8 @@ import InfoIconEmpty from "assets/icons/info-icon-empty";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
+import {FlexRow} from "components/common/flex-box/view";
 import {ConnectionButton} from "components/profile/connect-button";
-import {FlexRow} from "components/profile/wallet-balance";
 
 import {useAppState} from "contexts/app-state";
 import {changeLoadState} from "contexts/reducers/change-load";

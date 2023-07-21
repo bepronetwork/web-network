@@ -1,6 +1,11 @@
 {
   "balance": "Balance",
   "wallet": "Wallet",
+  "search-wallet": "Search for Token",
+  "not-found": {
+    "voting-power": "Voting power not found",
+    "tokens": "Tokens not found"
+  },
   "tokens": "Tokens",
   "received-in-total": "Received in total",
   "not-found": {

@@ -37,6 +37,14 @@ export interface OracleToken {
   icon: ReactElement;
 }
 
+export interface TokensOracles {
+  symbol: string;
+  name: string;
+  networkName: string;
+  icon: string | ReactElement;
+  oraclesLocked: BigNumber;
+  address: string;
+}
 
 interface Info {
   title: string;

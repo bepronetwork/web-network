@@ -9,7 +9,8 @@ import WarningIcon from "assets/icons/warning-icon";
 
 import Button from "components/button";
 import If from "components/If";
-import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
+
+import { FlexColumn, FlexRow } from "./common/flex-box/view";
 
 interface ContextualSpanProps {
   children: ReactNode;

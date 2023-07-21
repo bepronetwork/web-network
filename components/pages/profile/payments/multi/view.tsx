@@ -1,5 +1,6 @@
 import { useTranslation } from "next-i18next";
 
+import { FlexColumn, FlexRow } from "components/common/flex-box/view";
 import If from "components/If";
 import ChainFilter from "components/lists/filters/chain/controller";
 import IntervalFilters from "components/lists/filters/interval/controller";
@@ -7,7 +8,6 @@ import PaymentsList from "components/lists/payments/controller";
 import PaymentsListMobileFilters from "components/lists/payments/mobile-filters/controller";
 import NothingFound from "components/nothing-found";
 import ProfileLayout from "components/profile/profile-layout";
-import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";

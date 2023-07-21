@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { UrlObject } from "url";
 
-import { Token } from "interfaces/token";
+import { Token, TokenInfo } from "interfaces/token";
 
 export interface BreakpointOptions {
   xs?: boolean;
@@ -40,10 +40,9 @@ export interface QueryParams {
 }
 
 export type Direction = "vertical" | "horizontal";
-
 export interface ConvertableItem {
   [key: string]: unknown;
-  token: Token;
+  token: Token | Partial<TokenInfo>;
   value: BigNumber;
 }
 
