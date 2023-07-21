@@ -21,7 +21,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const issueId = [repoId, ghId].join("/");
 
-  let network_id: number
+  let network_id: number;
 
   const include = [
     { association: "developers" },
@@ -54,7 +54,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         chain_id: { [Op.eq]: chainId || chain?.chainId }
       }
     });
-    
+
     if (!network) return res.status(404).json("Invalid network");
 
     network_id = network?.id;
