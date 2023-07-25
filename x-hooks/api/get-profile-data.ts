@@ -23,10 +23,11 @@ export default async function getProfilePageData(query: ParsedUrlQuery) {
     "bounties": walletFilter("creator"),
     "pull-requests": walletFilter("pullRequester"),
     "proposals": walletFilter("proposer"),
-    "my-network": { visible: "both" },
+    "my-network": { visible: "both", sortBy: query?.sortBy || "visible", order: query?.order || "ASC" },
   }[pageName];
 
-  const shouldFetchBounties = ["bounties", "pull-requests", "proposals", "my-network"].includes(pageName) && !!wallet;
+  const shouldFetchBounties = 
+    ["bounties", "pull-requests", "proposals"].includes(pageName) && !!wallet || pageName === "my-network";
   const shouldFetchPayments = pageName === "payments" && !!wallet && !!query?.startDate && !!query?.endDate;
   const shouldFetchChains = pageName === "payments";
 

@@ -34,9 +34,14 @@ export default async function get(query: ParsedUrlQuery) {
 
   const whereCondition: WhereOptions = {};
 
+  const defaultStatesToIgnore = ["pending", "canceled"];
+
+  if (["disputable", "mergeable", "proposable"].includes(state?.toString()))
+    defaultStatesToIgnore.push("closed", "draft");
+
   // Issue table columns
   whereCondition.state = {
-    [Op.notIn]: ["pending", "canceled"]
+    [Op.notIn]: defaultStatesToIgnore
   };
 
   if (state && !["disputable", "mergeable"].includes(state.toString())) {
@@ -182,7 +187,11 @@ export default async function get(query: ParsedUrlQuery) {
   } else
     sort.push("updatedAt");
 
+  const useSubQuery = isMergeableState || isDisputableState ? false : undefined;
+
   const issues = await models.issue.findAndCountAll(paginate({
+    subQuery: useSubQuery,
+    logging: console.log,
     where: whereCondition,
     include: [
       networkAssociation,

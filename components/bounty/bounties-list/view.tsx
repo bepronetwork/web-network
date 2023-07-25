@@ -112,7 +112,7 @@ export default function BountiesListView({
   ];
 
   return (
-    <div className="px-0 mx-0">
+    <div className="px-0 mx-0 mb-4">
       <If condition={isBountyHall || isProfile}>
         <div className="d-flex flex-wrap justify-content-between">
           <div className="d-flex flex-row flex-wrap align-items-center">

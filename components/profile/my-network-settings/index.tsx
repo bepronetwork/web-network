@@ -8,6 +8,7 @@ import ScrollableTabs from "components/navigation/scrollable-tabs/view";
 import { ContainerTab } from "components/profile/my-network-settings/container-tab";
 import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
 import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
+import Management from "components/profile/my-network-settings/management";
 import RegistrySettings from "components/profile/my-network-settings/registry-settings";
 import RepositoriesListSettings from "components/profile/my-network-settings/repositories-list-settings";
 import WarningGithub from "components/profile/my-network-settings/warning-github";
@@ -33,8 +34,8 @@ import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
+import usePaginatedList from "x-hooks/use-paginated-list";
 
-import Management from "./management";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -74,6 +75,7 @@ export default function MyNetworkSettings({
     tokens,
     forcedNetwork,
   } = useNetworkSettings();
+  const { list: bountiesList, update: updateBountiesList } = usePaginatedList();
 
   const isCurrentNetwork =
     !!network &&
@@ -311,17 +313,22 @@ export default function MyNetworkSettings({
         title: t("bounty:management.label"),
         component: (
           <NetworkContainer>
-            <Management bounties={bounties} />
+            <Management bounties={bountiesList} />
           </NetworkContainer>
         )
       }
     ])
   },[
     network,
+    bounties,
     isGovernorRegistry,
     networkNeedRegistration,
     errorBigImages
   ]);
+
+  useEffect(() => {
+    updateBountiesList(bounties);
+  }, [bounties]);
 
   return (
     <>

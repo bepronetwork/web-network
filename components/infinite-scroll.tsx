@@ -35,7 +35,7 @@ export default function InfiniteScroll({
       threshold: 1.0
     });
 
-    const lastChild = divRef.current?.lastChild
+    const lastChild = divRef.current?.lastChild;
 
     if (lastChild) observer.observe(lastChild);
 
@@ -44,5 +44,5 @@ export default function InfiniteScroll({
     };
   }, [hasMore, isLoading, children]);
 
-  return <div id="infinite-scroll" className={className}>{children}</div>;
+  return <div id="infinite-scroll" className={className} ref={divRef}>{children}</div>;
 }

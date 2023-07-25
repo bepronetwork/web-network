@@ -1,8 +1,5 @@
-import {useEffect, useState} from "react";
-
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/dist/client/router";
 import {GetServerSideProps} from "next/types";
 
 import BountiesList from "components/bounty/bounties-list/controller";
@@ -12,98 +9,53 @@ import CustomContainer from "components/custom-container";
 import {useAppState} from "contexts/app-state";
 import {BountyEffectsProvider} from "contexts/bounty-effects";
 
-import { IssueBigNumberData } from "interfaces/issue-data";
+import { emptyBountiesPaginated, emptyNetworkOverview } from "helpers/api";
 
 import { SearchBountiesPaginated } from "types/api";
-import { HeroInfo } from "types/components";
 
 import getBountiesListData from "x-hooks/api/bounty/get-bounties-list-data";
-import useApi from "x-hooks/use-api";
+import getNetworkOverviewData from "x-hooks/api/get-overview-data";
 import {useBounty} from "x-hooks/use-bounty";
-import useChain from "x-hooks/use-chain";
 
 interface BountiesPageProps {
   bounties: SearchBountiesPaginated;
+  bountiesInProgress: number;
+  bountiesClosed: number;
+  lockedOnNetwork: number;
+  protocolMembers: number;
 }
 
 export default function BountiesPage({
-  bounties
+  bounties,
+  bountiesInProgress,
+  bountiesClosed,
+  lockedOnNetwork,
+  protocolMembers,
 }: BountiesPageProps) {
   useBounty();
   const { t } = useTranslation(["common"]);
-  const { query } = useRouter();
-
-  const { chain } = useChain();
+  
   const {state} = useAppState();
-  const { getTotalUsers, getCuratorsResume, searchIssues } = useApi();
 
-  const zeroInfo = [
+  const infos = [
     {
-      value: 0,
+      value: bountiesInProgress,
       label: t("heroes.in-progress")
     },
     {
-      value: 0,
+      value: bountiesClosed,
       label: t("heroes.bounties-closed")
     },
     {
-      value: 0,
+      value: lockedOnNetwork,
       label: t("heroes.in-network"),
-      currency: t("misc.$token")
+      currency: t("$oracles", { token: state.Service?.network?.active?.networkToken?.symbol || t("misc.$token") })
     },
     {
-      value: 0,
+      value: protocolMembers,
       label: t("heroes.protocol-members")
     }
   ];
-
-  const [infos, setInfos] = useState<HeroInfo[]>(zeroInfo);
-
-  useEffect(() => {
-    if (!state.Service?.network?.active || !chain || !query?.network) return;
-
-    setInfos(zeroInfo);
-
-    Promise.all([
-      searchIssues({
-        networkName: query.network.toString(),
-        chainId: chain.chainId.toString()
-      }).then(({ rows } : { rows: IssueBigNumberData[] }) => rows),
-      getCuratorsResume({
-        networkName: query.network.toString(),
-        chainShortName: query.chain.toString()
-      }),
-      getTotalUsers(),
-      state.Service?.network?.active?.networkToken?.symbol,
-    ])
-      .then(([bounties, { totalValue }, totalUsers, symbol]) => {
-        const closedBounties = bounties.filter(({ state }) => state === "closed").length;
-        const inProgress = bounties.filter(({ state }) => !["pending", "canceled", "closed"].includes(state)).length;
-
-        return [closedBounties, inProgress, totalValue, totalUsers, symbol];
-      })
-      .then(([closed, inProgress, onNetwork, totalUsers, symbol]) => {
-        setInfos([
-          {
-            value: inProgress,
-            label: t("heroes.in-progress")
-          },
-          {
-            value: closed,
-            label: t("heroes.bounties-closed")
-          },
-          {
-            value: onNetwork,
-            label: t("heroes.in-network"),
-            currency: t("$oracles",{ token: symbol || t("misc.$token") })
-          },
-          {
-            value: totalUsers,
-            label: t("heroes.protocol-members")
-          }
-        ]);
-      });
-  }, [state.Service?.network?.active, query?.network, chain]);
 
   return (
     <BountyEffectsProvider>
@@ -124,13 +76,30 @@ export default function BountiesPage({
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
-  const bounties = await getBountiesListData(query)
-    .then(({ data }) => data)
-    .catch(() => ({ count: 0, rows: [], currentPage: 1, pages: 1 }));
+  const [bounties, overview] = await Promise.all([
+    getBountiesListData(query)
+      .then(({ data }) => data)
+      .catch(() => emptyBountiesPaginated),
+    getNetworkOverviewData(query)
+      .then(({ data }) => data)
+      .catch(() => emptyNetworkOverview)
+  ]);
+
+  const { 
+    open = 0, 
+    draft = 0, 
+    ready = 0, 
+    proposal = 0, 
+    closed = 0 
+  } = overview.bounties;
 
   return {
     props: {
       bounties,
+      bountiesInProgress: open + draft + ready + proposal,
+      bountiesClosed: closed,
+      lockedOnNetwork: overview.curators.tokensLocked,
+      protocolMembers: overview.members,
       ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button"]))
     }
   };
