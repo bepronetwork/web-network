@@ -3,6 +3,8 @@ import { Fragment } from "react";
 import { add, addSeconds, compareAsc, intervalToDuration } from "date-fns";
 import { useTranslation } from "next-i18next";
 
+import ResponsiveWrapper from "components/responsive-wrapper";
+
 import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 
 interface BountyStatusProgressProps {
@@ -124,7 +126,7 @@ export default function BountyStatusProgressView({
 
     if (currentValue)
       return (
-        <div className="d-none d-lg-block">
+        <ResponsiveWrapper xs={false} lg={true}>
           <span
             className={`white-space text-${
               currentValue.color && currentValue.color
@@ -132,7 +134,7 @@ export default function BountyStatusProgressView({
           >
             {currentValue.text}
           </span>
-        </div>
+        </ResponsiveWrapper>
       );
   }
 
