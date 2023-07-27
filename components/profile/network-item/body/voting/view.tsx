@@ -51,7 +51,7 @@ export default function BodyVotingView({
 
   return (
 <>
-      <FlexColumn className="justify-content-center ms-2">
+      <FlexColumn className="justify-content-center py-3 ms-2">
         <FlexRow>
           <RenderAmount />
           {handleNetworkLink && (

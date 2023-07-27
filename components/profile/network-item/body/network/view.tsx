@@ -94,9 +94,9 @@ export default function BodyNetworkView({
       <ResponsiveWrapper
         xl={false}
         xs={true}
-        className="d-flex flex-column justify-content-center mt-3"
+        className="d-flex flex-column col-12 justify-content-center mt-3 pb-3"
       >
-        <span className="font-weight-normal text-gray-500 text-capitalize">
+        <span className="font-weight-normal text-gray-500 text-capitalize mb-2">
           {type === "network" ? t("network-columns.total-votes") : t("network-columns.total-received")}
         </span>
         <RenderAmount />

@@ -20,7 +20,7 @@ export default function NetworkItemTitleView({
   subNetworkText,
 }: NetworkItemTitleViewProps) {
   return (
-    <FlexRow className={`${isNetworkType && "col-lg-3 col-6"} mb-3`}>
+    <FlexRow className={`${isNetworkType && "col-xl-3 col-6"} ${subNetworkText && 'col-6'} py-3`}>
       <FlexColumn className="justify-content-center me-2">
         {typeof iconNetwork === "string" ? (
           <NetworkLogo
@@ -35,7 +35,9 @@ export default function NetworkItemTitleView({
         )}
       </FlexColumn>
       <FlexColumn className="justify-content-center">
-        <FlexRow className="flex-wrap xs-medium text-capitalize">{networkName}</FlexRow>
+        <FlexRow className="flex-wrap xs-medium text-capitalize">
+          {networkName}
+        </FlexRow>
 
         {subNetworkText && (
           <FlexRow className="d-none d-sm-block">
