@@ -46,6 +46,7 @@ export interface IssueData {
   repository?: Repository;
   repository_id?: number;
   seoImage: string;
+  nftImage?: string;
   state: IssueState;
   title: string;
   updatedAt?: Date;
