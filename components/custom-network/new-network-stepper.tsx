@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 
+import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import {isZeroAddress} from "ethereumjs-util";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
@@ -142,50 +143,69 @@ function NewNetwork() {
     const mergerFee = settings.parameters.mergeCreatorFeeShare.value;
     const proposerFee = settings.parameters.proposerFeeShare.value;
 
+    const getTxBlock = (tx: TransactionReceipt) => tx.blockNumber;
+    const txBlocks = [];
+
     if (draftTime !== DEFAULT_DRAFT_TIME) {
       setCreatingNetwork(1);
-      await handleChangeNetworkParameter("draftTime", draftTime, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("draftTime", draftTime, deployedNetworkAddress)));
     }
 
     if (disputableTime !== DEFAULT_DISPUTE_TIME) {
       setCreatingNetwork(2);
-      await handleChangeNetworkParameter("disputableTime", disputableTime, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("disputableTime", 
+                                                                  disputableTime,
+                                                                  deployedNetworkAddress)));
     }
 
     if (councilAmount !== DEFAULT_COUNCIL_AMOUNT) {
       setCreatingNetwork(3);
-      await handleChangeNetworkParameter("councilAmount", councilAmount, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("councilAmount", 
+                                                                  councilAmount, 
+                                                                  deployedNetworkAddress)));
     }
 
     if (percentageForDispute !== DEFAULT_PERCENTAGE_FOR_DISPUTE) {
       setCreatingNetwork(4);
-      await handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("percentageNeededForDispute", 
+                                                                  percentageForDispute, 
+                                                                  deployedNetworkAddress)));
     }
 
     if (cancelableTime !== DEFAULT_CANCELABLE_TIME) {
       setCreatingNetwork(5);
-      await handleChangeNetworkParameter("cancelableTime", cancelableTime, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("cancelableTime", 
+                                                                  cancelableTime, 
+                                                                  deployedNetworkAddress)));
     }
 
     if (oracleExchangeRate !== DEFAULT_ORACLE_EXCHANGE_RATE) {
       setCreatingNetwork(6);
-      await handleChangeNetworkParameter("oracleExchangeRate", oracleExchangeRate, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("oracleExchangeRate", 
+                                                                  oracleExchangeRate, 
+                                                                  deployedNetworkAddress)));
     }
 
     if (mergerFee !== DEFAULT_MERGER_FEE) {
       setCreatingNetwork(7);
-      await handleChangeNetworkParameter("mergeCreatorFeeShare", mergerFee, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("mergeCreatorFeeShare", 
+                                                                  mergerFee, 
+                                                                  deployedNetworkAddress)));
     }
 
     if (proposerFee !== DEFAULT_PROPOSER_FEE) {
       setCreatingNetwork(8);
-      await handleChangeNetworkParameter("proposerFeeShare", proposerFee, deployedNetworkAddress);
+      txBlocks.push(getTxBlock(await handleChangeNetworkParameter("proposerFeeShare", 
+                                                                  proposerFee, 
+                                                                  deployedNetworkAddress)));
     }
 
-    await processEvent(StandAloneEvents.UpdateNetworkParams, deployedNetworkAddress, {
-      chainId: state.connectedChain?.id
-    })
-      .catch(error => console.debug("Failed to update network parameters", error));
+    if (txBlocks.length)
+      await processEvent(StandAloneEvents.UpdateNetworkParams, deployedNetworkAddress, {
+        chainId: state.connectedChain?.id,
+        fromBlock: Math.min(...txBlocks)
+      })
+        .catch(error => console.debug("Failed to update network parameters", error));
 
     setCreatingNetwork(9);
 
