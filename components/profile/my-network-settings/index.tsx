@@ -119,45 +119,52 @@ export default function MyNetworkSettings({
     const networkAddress = network?.networkAddress;
     const failed = [];
     const success = {};
+    const txBlocks = [];
 
     const promises = await Promise.allSettled([
       ...(draftTime !== forcedNetwork.draftTime
         ? [
-            handleChangeNetworkParameter("draftTime",
-                                         draftTime,
-                                         networkAddress)
-              .then(() => ({ param: "draftTime", value: draftTime })),
+            handleChangeNetworkParameter( "draftTime",
+                                          draftTime,
+                                          networkAddress)
+              .then(({ blockNumber }) => ({ param: "draftTime", value: draftTime, blockNumber })),
         ]
         : []),
       ...(disputableTime !== forcedNetwork.disputableTime
         ? [
-            handleChangeNetworkParameter("disputableTime",
-                                         disputableTime,
-                                         networkAddress)
-              .then(() => ({ param: "disputableTime", value: disputableTime })),
+            handleChangeNetworkParameter( "disputableTime",
+                                          disputableTime,
+                                          networkAddress)
+              .then(({ blockNumber }) => ({ param: "disputableTime", value: disputableTime, blockNumber })),
         ]
         : []),
       ...(councilAmount !== +forcedNetwork.councilAmount
         ? [
-            handleChangeNetworkParameter("councilAmount",
-                                         councilAmount,
-                                         networkAddress)
-              .then(() => ({ param: "councilAmount", value: councilAmount })),
+            handleChangeNetworkParameter( "councilAmount",
+                                          councilAmount,
+                                          networkAddress)
+              .then(({ blockNumber }) => ({ param: "councilAmount", value: councilAmount, blockNumber })),
         ]
         : []),
       ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
         ? [
-            handleChangeNetworkParameter("percentageNeededForDispute",
-                                         percentageForDispute,
-                                         networkAddress)
-              .then(() => ({ param: "percentageNeededForDispute", value: percentageForDispute })),
+            handleChangeNetworkParameter( "percentageNeededForDispute",
+                                          percentageForDispute,
+                                          networkAddress)
+              .then(({ blockNumber }) => ({
+                param: "percentageNeededForDispute",
+                value: percentageForDispute,
+                blockNumber
+              }))
         ]
         : []),
     ]);
 
     promises.forEach((promise) => {
-      if (promise.status === "fulfilled") success[promise.value.param] = promise.value.value;
-      else failed.push(promise.reason);
+      if (promise.status === "fulfilled") {
+        success[promise.value.param] = promise.value.value;
+        txBlocks.push(promise.value.blockNumber);
+      } else failed.push(promise.reason);
     });
 
     if (failed.length) {
@@ -171,13 +178,15 @@ export default function MyNetworkSettings({
     const successQuantity = Object.keys(success).length;
 
     if (successQuantity) {
+      const firstBlock = Math.min(...txBlocks);
+
       if(draftTime !== forcedNetwork.draftTime)
         Promise.all([
-          await processEvent(StandAloneEvents.UpdateBountiesToDraft),
-          await processEvent(StandAloneEvents.BountyMovedToOpen)
+          await processEvent(StandAloneEvents.UpdateBountiesToDraft, undefined, { fromBlock: firstBlock }),
+          await processEvent(StandAloneEvents.BountyMovedToOpen, undefined, { fromBlock: firstBlock })
         ]);
 
-      await processEvent(StandAloneEvents.UpdateNetworkParams)
+      await processEvent(StandAloneEvents.UpdateNetworkParams, undefined, { fromBlock: firstBlock })
         .catch(error => console.debug("Failed to update network parameters", error));
 
       dispatch(toastSuccess(t("custom-network:messages.updated-parameters", {
