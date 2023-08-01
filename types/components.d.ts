@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, ReactElement, SVGProps } from "react";
 
 import { Currency } from "interfaces/currency";
 import { IssueBigNumberData } from "interfaces/issue-data";
 import { SupportedChainData } from "interfaces/supported-chain-data";
+import { ProfilePages } from "interfaces/utils";
 
 import { SearchBountiesPaginated } from "types/api";
 import { BreakpointOptions, Direction, SelectOption } from "types/utils";
@@ -62,4 +63,9 @@ export interface ChainFilterProps {
   chains: SupportedChainData[];
   direction?: Direction;
   onChange?: (value: string | number) => void;
+}
+export interface LinkProps {
+  label: string;
+  href?: ProfilePages;
+  icon?: (props?: SVGProps<SVGSVGElement>) => ReactElement
 }

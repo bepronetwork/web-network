@@ -2,6 +2,7 @@ import {useState} from "react";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
+import { useRouter } from "next/router";
 
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
@@ -12,6 +13,7 @@ import DisconnectWalletButton from "components/common/buttons/disconnect-wallet/
 import {useAppState} from "contexts/app-state";
 
 import { DISCORD_LINK, DOCS_LINK, SUPPORT_LINK, TWITTER_LINK } from "helpers/constants";
+import { getProfileLinks } from "helpers/navigation-links";
 import {truncateAddress} from "helpers/truncate-address";
 
 import { ProfilePages } from "interfaces/utils";
@@ -25,7 +27,7 @@ export default function NavAvatar() {
   const [visible, setVisible] = useState(false);
 
   const {state} = useAppState();
-
+  const { query } = useRouter();
   const { goToProfilePage } = useNetwork();
   const { disconnectWallet } = useAuthentication();
 
@@ -43,8 +45,19 @@ export default function NavAvatar() {
     setVisible(false);
   }
 
-  const ProfileInternalLink = ({ label, href, className = "" }) =>
-    <Button
+  const ProfileInternalLink = ({
+    label,
+    href,
+    className = "",
+  }: {
+    label: string;
+    href?: ProfilePages;
+    className?: string;
+  }) => {
+    if(!href) return null;
+    
+    return (
+      <Button
       className={`mb-1 p family-Regular p-0 text-capitalize font-weight-normal mx-0 ${className}`}
       align="left"
       key={label}
@@ -52,7 +65,9 @@ export default function NavAvatar() {
       transparent
     >
       {label}
-    </Button>;
+    </Button>
+    )
+  }
 
   const ProfileExternalLink = ({ label, href, className = "" }) => (
     <div className={`d-flex flex-row align-items-center justify-content-between ${className}`} key={label}>
@@ -76,16 +91,6 @@ export default function NavAvatar() {
   );
 
   const Link = (label, href) => ({ label, href });
-
-  const internalLinks = [
-    Link(t("main-nav.nav-avatar.wallet"), "wallet"),
-    Link(t("main-nav.nav-avatar.voting-power"), "voting-power"),
-    Link(t("main-nav.nav-avatar.payments"), "payments"),
-    Link(t("main-nav.nav-avatar.bounties"), "bounties"),
-    Link(t("main-nav.nav-avatar.pull-requests"), "pull-requests"),
-    Link(t("main-nav.nav-avatar.proposals"), "proposals"),
-    Link(t("main-nav.nav-avatar.my-network"), "my-network"),
-  ];
 
   const externalLinks = [
     Link(t("main-nav.nav-avatar.support-center"), SUPPORT_LINK),
@@ -124,7 +129,7 @@ export default function NavAvatar() {
         </div>
 
         <LinksSession>
-          {internalLinks.map(ProfileInternalLink)}
+          {getProfileLinks(t, !!query?.network).map(ProfileInternalLink)}
         </LinksSession>
 
         <LinksSession>
