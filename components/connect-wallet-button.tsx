@@ -13,6 +13,7 @@ import {changeShowWeb3} from "contexts/reducers/update-show-prop";
 
 import {useAuthentication} from "x-hooks/use-authentication";
 
+import { ContextualSpan } from "./contextual-span";
 import ResponsiveWrapper from "./responsive-wrapper";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
@@ -63,7 +64,8 @@ export default function ConnectWalletButton({children = null, asModal = false, f
             {t("connect-wallet-button:this-page-needs-access-to-your-wallet-address")}
           </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
-            <div
+            {state.Service?.web3Connection ? (
+              <div
               className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center
                         justify-content-center align-items-center w-75 cursor-pointer"
               onClick={() => handleLogin()}
@@ -73,6 +75,17 @@ export default function ConnectWalletButton({children = null, asModal = false, f
                 {t("misc.metamask")}
               </span>
             </div>
+            ) : (
+              <div className="my-3">
+                <ContextualSpan context="danger">
+                  {t("connect-wallet-button:web3Connection-error")}
+                </ContextualSpan>
+
+                <span className="p text-danger ms-3">
+                  {t("connect-wallet-button:refresh-page")}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="small-info text-center text-uppercase mt-1 pt-1">
