@@ -98,8 +98,8 @@
           "placeholder": "Type a description..."
         },
         "colors": {
-          "label": "Colours",
-          "similar-colors": "These colours are very similar. Please pick a different colour."
+          "label": "Colors",
+          "similar-colors": "These colors are very similar. Please pick a different color."
         }
       },
       "logo-helper": "The logos must be in .svg format"
@@ -108,14 +108,14 @@
       "title": "Network Settings",
       "fields": {
         "colors": {
-          "label": "Network Colours",
-          "similar-colors": "These colours are very similar. Please pick a different colour.",
-          "more-colors": "More colours",
+          "label": "Network Colors",
+          "similar-colors": "These colors are very similar. Please pick a different color.",
+          "more-colors": "More colors",
           "types": {
             "primary": "Primary",
             "secondary": "Secondary",
             "oracle": "Oracle",
-            "text-colour": "Text Colour",
+            "text-colour": "Text Color",
             "background": "Background",
             "background-shadow": "Background Shadow",
             "gray": "Gray",
@@ -268,10 +268,12 @@
   "messages": {
     "refresh-the-page": "Refresh the page for the changes to take effect.",
     "network-closed": "Network closed.",
-    "updated-parameters": "Updated {{updated}} of {{total}} params"
+    "updated-parameters": "Updated {{updated}} of {{total}} params",
+    "network-registered": "Network Registered"
   },
   "errors": {
     "failed-to-create-network": "Failed to create network {{error}}",
+    "failed-to-register-network": "Failed to register network {{error}}",
     "failed-to-update-network": "Failed to update network {{error}}",
     "failed-to-close-network": "Failed to close network {{error}}",
     "invalid-format": "Invalid format",
@@ -284,10 +286,11 @@
     "updating-values": "Error updating network values",
     "updated-parameters": "Failed to update {{failed}} params",
     "network-not-registered": "This network has yet to be registered to be usable, please do so.",
-    "failed-to-update-network-id": "Failed to update network chain id"
+    "failed-to-update-network-id": "Failed to update network chain id",
+    "you-dont-have-a-custom-network": "You don't have a custom network created"
   },
   "tabs": {
-    "logo-and-colours": "Logo & Colours",
+    "logo-and-colours": "Logo & Colors",
     "repositories": "Repositories",
     "governance": "Governance",
     "registry": "Registry"

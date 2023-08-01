@@ -1,16 +1,10 @@
-import {useEffect, useState} from "react";
-import {Col} from "react-bootstrap";
+import { useEffect, useState } from "react";
 
-import {useTranslation} from "next-i18next";
+import MyNetworkPageView from "components/pages/profile/my-network/view";
 
-import InternalLink from "components/internal-link";
-import NothingFound from "components/nothing-found";
-import MyNetworkSettings from "components/profile/my-network-settings";
-import ProfileLayout from "components/profile/profile-layout";
-
-import {useAppState} from "contexts/app-state";
-import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
-import {changeLoadState} from "contexts/reducers/change-load";
+import { useAppState} from "contexts/app-state";
+import { NetworkSettingsProvider, useNetworkSettings } from "contexts/network-settings";
+import { changeLoadState } from "contexts/reducers/change-load";
 
 import {Network} from "interfaces/network";
 
@@ -27,17 +21,12 @@ interface MyNetworkProps {
 export function MyNetwork({
   bounties
 }: MyNetworkProps) {
-  const { t } = useTranslation(["common", "custom-network"]);
-
   const [myNetwork, setMyNetwork] = useState<Network>();
-
-  const { state, dispatch } = useAppState();
 
   const { chain } = useChain();
   const { searchNetworks } = useApi();
+  const { state, dispatch } = useAppState();
   const { setForcedNetwork } = useNetworkSettings();
-
-  const defaultNetworkName = state?.Service?.network?.active?.name?.toLowerCase();
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
@@ -70,31 +59,11 @@ export function MyNetwork({
   }, [state.currentUser?.walletAddress, chain]);
 
   return(
-    <ProfileLayout>
-      { !myNetwork &&
-        <Col className="pt-5">
-          <NothingFound description={t("custom-network:errors.not-found")}>
-            <InternalLink
-              href={
-                state.Service?.network?.active?.name?.toLowerCase() === defaultNetworkName
-                  ? "/new-network"
-                  : "/networks"
-              }
-              label={String(t("actions.create-one"))}
-              uppercase
-            />
-          </NothingFound>
-        </Col>
-      ||
-        <Col xs={12} xl={10}>
-          <MyNetworkSettings
-            bounties={bounties}
-            network={myNetwork}
-            updateEditingNetwork={updateEditingNetwork}
-          />
-        </Col>
-      }
-    </ProfileLayout>
+    <MyNetworkPageView
+      myNetwork={myNetwork}
+      bounties={bounties}
+      updateEditingNetwork={updateEditingNetwork}
+    />
   );
 }
 

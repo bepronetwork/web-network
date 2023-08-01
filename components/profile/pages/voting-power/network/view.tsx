@@ -3,8 +3,8 @@ import { Row } from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
 
-import Delegations from "components/profile/pages/voting-power/delegations/controller";
 import { Divider } from "components/divider";
+import Delegations from "components/profile/pages/voting-power/delegations/controller";
 import OraclesActions from "components/profile/pages/voting-power/oracles/actions/controller";
 import OraclesDelegate from "components/profile/pages/voting-power/oracles/delegate/controller";
 import TotalVotes from "components/profile/pages/voting-power/total-votes/view";

@@ -183,7 +183,9 @@ export default function RepositoriesList({
         />
       ))}
 
-      {renderInfos.filter(({ visible }) => visible).map(renderInfo)}
+      <div className="d-flex flex-column gap-2 mt-3 px-0">
+        {renderInfos.filter(({ visible }) => visible).map(renderInfo)}
+      </div>
     </div>
   );
 }

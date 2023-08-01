@@ -113,16 +113,18 @@ export default function BountiesListView({
 
   return (
     <div className="px-0 mx-0 mb-4">
-      <If condition={isBountyHall || isProfile}>
+      <If condition={isBountyHall || isProfile || isManagement}>
         <div className="d-flex flex-wrap justify-content-between">
-          <div className="d-flex flex-row flex-wrap align-items-center">
-            <h4 className="text-capitalize font-weight-medium pb-2">{listTitleByType[type]}
-            <span className="ms-2 p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
-                {bounties?.count || 0}
-              </span>
+          <div className="d-flex flex-row flex-wrap align-items-center gap-3">
+            <h4 className="text-capitalize font-weight-medium">
+              {listTitleByType[type]}
             </h4>
 
+            <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
+              {bounties?.count || 0}
+            </span>
           </div>
+
           <If condition={isProfile && isOnNetwork}>
             <ResponsiveWrapper md={false} xs={true} sm={true}>
             <div className="d-flex align-items-center">
@@ -175,11 +177,11 @@ export default function BountiesListView({
             </InputGroup>
           </div>
 
-          <ResponsiveWrapper xs={false} xl={true} className="col-auto d-flex align-items-center">
+          <ResponsiveWrapper xs={isManagement} xl={true} className="col-auto">
             <ListSort options={sortOptions} />
           </ResponsiveWrapper>
 
-          <If condition={!hideFilter}>
+          <If condition={!hideFilter && (!isManagement || isProfile)}>
             <div className="col-auto">
               <If condition={!isManagement}>
                 <IssueFilters sortOptions={sortOptions} onlyProfileFilters={isProfile}/>
@@ -196,7 +198,11 @@ export default function BountiesListView({
       </If>
 
       <If condition={isManagement && hasIssues}>
-        <div className="row row align-center mb-2 px-3">
+        <ResponsiveWrapper
+          xs={false}
+          md={true}
+          className="row align-items-center mb-2 pb-1 px-3"
+        >
           {columns?.map((item) => (
             <div
               className={`d-flex col-${
@@ -204,10 +210,10 @@ export default function BountiesListView({
               }`}
               key={item}
             >
-              <span>{item}</span>
+              <span className="caption-medium font-weight-normal text-capitalize text-gray-500">{item}</span>
             </div>
           ))}
-        </div>
+        </ResponsiveWrapper>
       </If>
 
       <If 

@@ -117,7 +117,7 @@ export default function NetworkContractSettings() {
   ];
   
   return (
-    <div className="row border-radius-8 mt-2 gy-3">
+    <div className="row mt-2 gy-3">
       { parameterInputs.map(input => <NetworkParameterInput  key={input.label} {...input} />) }
     </div>
   );

@@ -47,7 +47,7 @@ export default function useContractTransaction( event: RegistryEvents | NetworkE
         });
       } catch (error) {
         if (errorMessage && error?.code !== MetamaskErrors.UserRejected)
-          dispatch(toastError(successMessage, t("actions.failed")));
+          dispatch(toastError(errorMessage, t("actions.failed")));
 
         reject(error);
       } finally {

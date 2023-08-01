@@ -6,9 +6,7 @@ import BigNumber from "bignumber.js";
 import { Currency } from "interfaces/currency";
 import { IssueBigNumberData } from "interfaces/issue-data";
 import { SupportedChainData } from "interfaces/supported-chain-data";
-
 import { Token } from "interfaces/token";
-
 import { ProfilePages } from "interfaces/utils";
 
 import { SearchBountiesPaginated } from "types/api";
@@ -71,6 +69,12 @@ export interface ChainFilterProps {
   onChange?: (value: string | number) => void;
 }
 
+export interface AmountCardProps {
+  title: string;
+  amount?: number;
+  description: string;
+  fixed?: number;
+}
 export interface RewardInformationViewProps {
   isFundingType: boolean;
   defaultValue: {
