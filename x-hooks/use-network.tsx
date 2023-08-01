@@ -11,9 +11,11 @@ import {
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
   changeAllowedTokens,
-  changeNetworkLastVisited
+  changeNetworkLastVisited,
+  changeNetworkReposList
 } from "contexts/reducers/change-service";
 
+import { Network } from "interfaces/network";
 import {ProfilePages} from "interfaces/utils";
 
 import {WinStorage} from "services/win-storage";
@@ -45,6 +47,11 @@ export function useNetwork() {
       new WinStorage(getStorageKey(networkName, chainId), 0, `sessionStorage`).delete();
   }
 
+  function dispatchNetworkContextUpdates(network: Network) {
+    dispatch(changeActiveNetwork(network));
+    dispatch(changeNetworkReposList(network.repositories));
+  }
+
   async function updateActiveNetwork(forceUpdate = false) {
     const queryNetworkName = query?.network?.toString();
     const queryChainName = query?.chain?.toString();
@@ -62,7 +69,7 @@ export function useNetwork() {
 
         const cachedNetworkData = new WinStorage(storageKey, 3000, `sessionStorage`);
         if (forceUpdate === false && cachedNetworkData.value) {
-          dispatch(changeActiveNetwork(cachedNetworkData.value));
+          dispatchNetworkContextUpdates(cachedNetworkData.value);
           return;
         }
       }
@@ -96,7 +103,7 @@ export function useNetwork() {
           newCachedData.value = data;
 
           dispatch(changeNetworkLastVisited(queryNetworkName));
-          dispatch(changeActiveNetwork(newCachedData.value));
+          dispatchNetworkContextUpdates(newCachedData.value);
         }
 
         const available = rows

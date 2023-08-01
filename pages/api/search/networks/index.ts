@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op, Sequelize, WhereOptions} from "sequelize";
-import {Fn, Literal, Where} from "sequelize/types/utils";
+import {Op, Sequelize, WhereOptions, IncludeOptions} from "sequelize";
+import {Fn, Literal} from "sequelize/types/utils";
 
 import models from "db/models";
 
@@ -10,17 +10,6 @@ import {LogAccess} from "middleware/log-access";
 import WithCors from "middleware/withCors";
 
 import { Logger } from "services/logging";
-
-type StrOrNmb = string | string[] | number;
-
-interface includeProps {
-  association: string;
-  required?: boolean;
-  attributes?: string[];
-  where?: {
-    [col: string]: StrOrNmb | { [key: symbol]: StrOrNmb | Where } | Where | boolean
-  };
-}
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -62,7 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (chainId)
     whereCondition.chain_id = chainId;
 
-  const include: includeProps[] = [
+  const include: IncludeOptions[] = [
     { association: "tokens" },
     { 
       association: "chain",
@@ -74,7 +63,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         } : {}
       }
     },
-    { association: "networkToken"}
+    { association: "networkToken" },
+    {
+      association: "repositories",
+      attributes: {
+        exclude: ["network_id"]
+      }
+    }
   ];
 
   let group: string[] = []
@@ -115,7 +110,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       [Sequelize.literal('COUNT(DISTINCT("issues".id))'), 'totalIssues'],
       [Sequelize.literal('COUNT(DISTINCT("openIssues".id))'), 'totalOpenIssues']
     ]
-    group = ['network.id', "network.name", "tokens.id", "tokens->network_tokens.id", "chain.id", "networkToken.id"]
+    group = [
+      "network.id",
+      "network.name",
+      "tokens.id",
+      "tokens->network_tokens.id",
+      "chain.id",
+      "networkToken.id",
+      "repositories.id"
+    ]
   }
  
   const networks = await models.network.findAll({

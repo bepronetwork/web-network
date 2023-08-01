@@ -30,15 +30,25 @@ export function useRepos() {
   const {getReposList} = useApi();
   const { getRepository, getRepositoryForks, getRepositoryBranches, getRepositoryViewerPermission } = useOctokit();
 
+  function getStorageFor(storageFor: "repos" | "active-repo", repo?: string) {
+    const isActiveRepo = storageFor === "active-repo";
+    const keyComplement = isActiveRepo ? `:${repo}:${state.currentUser?.login}` : "";
+    
+    const key = `bepro.network:${storageFor}:${query?.network}:${query?.chain}${keyComplement}`;
+
+    const storage = new WinStorage(key, 60000, "sessionStorage");
+
+    return storage;
+  }
+
   function loadRepos(force = false) {
     const name = query?.network;
 
     if (!name || !chain || state.spinners?.repos || !state.Service?.network?.active)
       return;
 
-    const key = `bepro.network:repos:${name}:${chain.chainId}`;
-    const storage = new WinStorage(key, 3600, `sessionStorage`);
-    
+    const storage = getStorageFor("repos");
+
     if (storage.value && !force) {
       if (!state.Service?.network?.repos?.list) {
         dispatch(changeNetworkReposList(storage.value));
@@ -67,6 +77,11 @@ export function useRepos() {
       });
   }
 
+  function dispatchRepoUpdates(active, viewerPermission) {
+    dispatch(changeNetworkReposActive(active));
+    dispatch(changeNetworkReposActiveViewerPerm(viewerPermission));
+  }
+
   function updateActiveRepo(id = null) {
     if (!(id ||
           query?.repoId) ||
@@ -87,6 +102,14 @@ export function useRepos() {
       return;
     }
 
+    const storage = getStorageFor("active-repo", activeRepo?.githubPath);
+
+    if (storage.value) {
+      dispatchRepoUpdates(storage.value.active, storage.value.permission);
+
+      return;
+    }
+
     getRepository(activeRepo?.githubPath, true)
       .then(info => {
         if (!info)
@@ -100,14 +123,20 @@ export function useRepos() {
         ])
       })
       .then(([info = undefined, branches = [], forks = [], permission]) => {
-        dispatch(changeNetworkReposActive({
+        const repoActive = {
           ghVisibility: !!info, 
           ...activeRepo, 
           ...info, 
           branches: branches.branches, 
           forks
-        }));
-        dispatch(changeNetworkReposActiveViewerPerm(permission));
+        };
+
+        storage.value = {
+          active: repoActive,
+          permission
+        }
+
+        dispatchRepoUpdates(repoActive, permission);
       })
       .catch(error => {
         console.error(`Failed to load repository`, error);
