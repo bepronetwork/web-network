@@ -768,40 +768,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
-.input-funded {
-  border: none;
-  background-color: $gray-900;
-  font-size: 24px;
-  &:focus {
-    border: none;
-    background-color: $gray-900;
-  }
-  &:hover {
-    border: none;
-  }
-}
-
-.input-fund {
-  border: 1px solid $gray-700;
-  background-color: $gray-900;
-  font-size: 24px;
-  &:focus {
-    border: 1px solid $gray-700;
-    background-color: $gray-900;
-  }
-}
-
-.symbol-fund {
-  background-color: $gray-900 !important;
-  font-size: 24px;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.convert-value {
-  font-size: 20px;
-}
-
 .ball {
   width: 8px;
   height: 8px;
@@ -827,6 +793,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: $gray-300;
     background-color: $gray-800;
   }
+}
+
+.form-switch
+.form-check-input {
+  width: 40px;
+  height: 20px;
+}
+
+.form-check-input {
+  background-color: $gray-200;
 }
 
 .badge-opaque {
@@ -1884,6 +1860,10 @@ input[type="color"] {
       }
     }
   }
+}
+
+.min-vh-90 {
+  min-height: 90vh;
 }
 
 .nav-link-gradient {

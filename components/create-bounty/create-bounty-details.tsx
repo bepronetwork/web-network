@@ -22,6 +22,8 @@ import {
 
 import { DetailsProps } from "interfaces/create-bounty";
 
+import useOctokit from "x-hooks/use-octokit";
+
 import CreateBountyDescription from "./create-bounty-description";
 import BountyLabel from "./create-bounty-label";
 
@@ -43,6 +45,7 @@ export default function CreateBountyDetails({
   updateBranch,
   repositories,
   branches,
+  updateBranches,
   updateUploading,
 }: DetailsProps) {
   const { t } = useTranslation("bounty");
@@ -53,6 +56,8 @@ export default function CreateBountyDetails({
   const {
     state: { Settings },
   } = useAppState();
+
+  const { getRepositoryBranches } = useOctokit();
 
   const TAGS_OPTIONS = PROGRAMMING_LANGUAGES.map(({ tag }) => ({
     label: tag,
@@ -73,6 +78,18 @@ export default function CreateBountyDetails({
 
   function handleIsKYCChecked(e: React.ChangeEvent<HTMLInputElement>) {
     updateIsKyc(e.target.checked);
+  }
+
+  function handleSelectedRepo(opt: {
+    value: {
+      id: string;
+      path: string;
+    };
+  }) {
+    updateRepository(opt.value);
+    getRepositoryBranches(opt.value.path, true).then((b) =>
+      updateBranches(b.branches));
+    updateBranch(null);
   }
 
   useEffect(() => {
@@ -198,24 +215,21 @@ export default function CreateBountyDetails({
       <div className="mt-4">
         <h5>{t("steps.github")}</h5>
         <p className="text-gray">{t("descriptions.github")}</p>
-        <div className="row mt-2">
-              <div className="col-6">   
+        <div className="row">
+              <div className="col-md-6 mt-2">   
               <ReposDropdown
                 repositories={repositories}
-                onSelected={(opt) => {
-                  updateRepository(opt.value)
-                  updateBranch(null)
-                }}
+                onSelected={handleSelectedRepo}
                 value={{
                   label: repository?.path,
                   value: repository,
                 }}
               />
               </div>
-              <div className="col-6">
+              <div className="col-md-6 mt-2">
               <BranchsDropdown
                 branches={branches}
-                onSelected={(opt) => updateBranch(opt)}
+                onSelected={updateBranch}
                 value={branch}
               />
               </div>

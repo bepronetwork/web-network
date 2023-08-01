@@ -31,6 +31,7 @@ export interface DetailsProps {
   updateUploading: (e: boolean) => void;
   repositories?: ReposList;
   branches?: string[];
+  updateBranches?: (e: string[]) => void;
 }
 export interface BountyPayload {
   title: string;
