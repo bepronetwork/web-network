@@ -35,6 +35,7 @@ class Issue extends Model {
       working: DataTypes.ARRAY(DataTypes.STRING),
       merged: DataTypes.STRING,
       seoImage: DataTypes.STRING,
+      nftImage: DataTypes.STRING,
       network_id: DataTypes.INTEGER,
       contractId: DataTypes.INTEGER,
       transactionalTokenId: DataTypes.INTEGER,

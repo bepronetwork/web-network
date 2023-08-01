@@ -150,7 +150,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const nft = {
       title: `${networkBounty.title}`,
       description: `NFT for bounty ${issue.githubId} created on network ${customNetwork.name}`,
-      image: issue.seoImage? `${defaultConfig.urls.ipfs}/${issue.seoImage}`: "",
+      image: issue.nftImage ? `${defaultConfig.urls.ipfs}/${issue.nftImage}`: "",
       properties: {
         price: formatNumberToNScale(networkBounty.tokenAmount),
         merger,
