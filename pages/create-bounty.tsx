@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {FormCheck} from "react-bootstrap";
 import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
@@ -15,16 +14,17 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import {ContextualSpan} from "components/contextual-span";
 import ContractButton from "components/contract-button";
 import CreateBountyCard from "components/create-bounty/create-bounty-card";
+import CreateBountyContainer from "components/create-bounty/create-bounty-container";
 import CreateBountyDetails from "components/create-bounty/create-bounty-details";
 import CreateBountyNetworkDropdown from "components/create-bounty/create-bounty-network-dropdown";
-import CreateBountyReview from "components/create-bounty/create-bounty-review";
-import CreateBountyRewardInfo from "components/create-bounty/create-bounty-reward-info";
+import CreateBountyReview from "components/create-bounty/create-bounty-review/view";
 import CreateBountySteps from "components/create-bounty/create-bounty-steps";
-import CreateBountyTokenAmount from "components/create-bounty/create-bounty-token-amount";
+import RewardInformation from "components/create-bounty/reward-information/controller";
 import SelectNetwork from "components/create-bounty/select-network";
 import CustomContainer from "components/custom-container";
 import {IFilesProps} from "components/drag-and-drop";
 import Modal from "components/modal";
+import ResponsiveWrapper from "components/responsive-wrapper";
 import SelectChainDropdown from "components/select-chain-dropdown";
 
 import {useAppState} from "contexts/app-state";
@@ -53,7 +53,6 @@ import {useDao} from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
-import useOctokit from "x-hooks/use-octokit";
 
 const ZeroNumberFormatValues = {
   value: "",
@@ -107,8 +106,6 @@ export default function CreateBountyPage() {
 
   const { handleApproveToken } = useBepro();
   const { changeNetwork, start } = useDao();
-
-  const { getRepositoryBranches } = useOctokit();
 
   const {
     dispatch,
@@ -171,11 +168,14 @@ export default function CreateBountyPage() {
     const isIssueAmount =
       issueAmount.floatValue <= 0 ||
       issueAmount.floatValue === undefined ||
-      handleIsLessThan(issueAmount.floatValue, transactionalToken?.minimum);
+      handleIsLessThan(issueAmount.floatValue, transactionalToken?.minimum) ||
+      (!isFundingType && BigNumber(issueAmount.floatValue).gt(transactionalERC20?.balance)) 
+
     const isRewardAmount =
       rewardAmount.floatValue <= 0 ||
       rewardAmount.floatValue === undefined ||
-      handleIsLessThan(rewardAmount.floatValue, rewardToken?.minimum);
+      handleIsLessThan(rewardAmount.floatValue, rewardToken?.minimum) ||
+      BigNumber(issueAmount.floatValue).gt(rewardERC20?.balance)
 
     if (section === 0 && !currentNetwork) return true;
 
@@ -420,6 +420,26 @@ export default function CreateBountyPage() {
     }
   }
 
+  
+  function handleUpdateToken(e: Token, type: 'transactional' | 'reward') {
+    const ERC20 = type === 'transactional' ? transactionalERC20 : rewardERC20
+    const setToken = type === 'transactional' ? setTransactionalToken : setRewardToken
+    setToken(e)
+    ERC20.setAddress(e.address) 
+  }
+
+  function handleNextStep() {
+    if (currentSection + 1 < steps.length){
+      if(currentSection + 1 === 1){
+        getReposList(true, currentNetwork.name, connectedChain?.id).then(setRepositories)
+      }
+      setCurrentSection((prevState) => prevState + 1);
+    }
+      
+    if (currentSection === 3) {
+      createBounty();
+    }
+  }
   const [searchForNetwork, setSearchingForNetwork] = useState<string|null>(null);
 
   useEffect(() => {
@@ -449,17 +469,6 @@ export default function CreateBountyPage() {
   }, [connectedChain]);
 
   useEffect(() => {
-    if (transactionalToken?.address && currentSection === 2)
-      transactionalERC20.setAddress(transactionalToken.address);
-  }, [transactionalToken?.address, currentUser, Service?.active, currentSection]);
-
-  useEffect(() => {
-    if (rewardToken?.address && currentSection === 2)
-      rewardERC20.setAddress(rewardToken.address);
-  }, [rewardToken?.address, currentUser, Service?.active, currentSection]);
-
-
-  useEffect(() => {
     let approved = true;
 
     if (!isFundingType)
@@ -479,19 +488,6 @@ export default function CreateBountyPage() {
   ]);
 
   useEffect(() => {
-    if (currentNetwork && currentSection === 1 && connectedChain?.id) {
-      getReposList(true, currentNetwork.name, connectedChain?.id).then(setRepositories)
-    }
-  }, [currentNetwork, currentSection, connectedChain]);
-
-  useEffect(() => {
-    if (repository) {
-      getRepositoryBranches(repository.path, true).then((b) =>
-        setBranches(b.branches));
-    }
-  }, [repository]);
-
-  useEffect(() => {
     if (!currentNetwork?.tokens) {
       setTransactionalToken(undefined);
       setRewardToken(undefined);
@@ -503,8 +499,8 @@ export default function CreateBountyPage() {
       const tokens = currentNetwork?.tokens
 
       if (tokens.length === 1) {
-        setTransactionalToken(tokens[0]);
-        setRewardToken(tokens[0]);
+        handleUpdateToken(tokens[0], 'transactional');
+        handleUpdateToken(tokens[0], 'reward');
       }
 
       if (tokens.length !== customTokens.length)
@@ -512,14 +508,13 @@ export default function CreateBountyPage() {
     }
   }, [currentNetwork?.tokens]);
 
+  useEffect(() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }), [currentSection])
   useEffect(() => handleMinAmount('transactional'), [issueAmount])
   useEffect(() => handleMinAmount('reward'), [rewardAmount])
 
   useEffect(() => {
     cleanFields();
-    transactionalERC20.updateAllowanceAndBalance();
-    rewardERC20.updateAllowanceAndBalance();
-
+    
     if (query?.type === "funding")
       setIsFundingType(true);
   }, []);
@@ -529,6 +524,11 @@ export default function CreateBountyPage() {
     handleAddNetwork(chain)
       .then(_ => setCurrentNetwork(networks[0]))
       .catch((err) => console.log('handle Add Network error', err));
+  }
+
+  function handleBackButton() {
+    if(currentSection !== 0)
+      setCurrentSection((prevState) => prevState - 1);
   }
 
   async function onNetworkSelected(opt) {
@@ -551,14 +551,17 @@ export default function CreateBountyPage() {
     if (currentSection === 0)
       return (
         <SelectNetwork>
+          <label className="p mb-2 text-gray-300">{t("common:placeholders.select-chain")}</label>
           <SelectChainDropdown 
               onSelect={handleNetworkSelected}
               isOnNetwork={false}
               className="select-network-dropdown w-max-none mb-4"
             />
+          <label className="p mb-2 text-gray-300">{t("bounty:steps.select-network")}</label>
           <CreateBountyNetworkDropdown
             value={currentNetwork}
             networks={networks}
+            className="select-network-dropdown w-max-none"
             onSelect={onNetworkSelected}
           />
           {notFoundNetworks && (
@@ -589,45 +592,34 @@ export default function CreateBountyPage() {
           updateBranch={setBranch}
           repositories={repositories}
           branches={branches}
+          updateBranches={setBranches}
           updateUploading={setIsUploading}
         />
       );
 
     if (currentSection === 2)
       return (
-        <>
-          <CreateBountyRewardInfo
-            isFunding={isFundingType}
-            updateIsFunding={(e: boolean) => {
-              if (e === true) setIssueAmount(ZeroNumberFormatValues);
-              else {
-                setIssueAmount(ZeroNumberFormatValues);
-                setRewardAmount(ZeroNumberFormatValues);
-              }
-
-              setIsFundingType(e);
-            }}
-          >
-            {isFundingType ? (
-              <>
-              {renderBountyToken("bounty")}
-              <div className="col-md-12 my-4">
-                <FormCheck
-                  className="form-control-md pb-0"
-                  type="checkbox"
-                  label={t("bounty:reward-funders")}
-                  onChange={handleRewardChecked}
-                  checked={rewardChecked}
-                />
-                <p className="ms-4 text-gray">
-                {t("bounty:reward-funders-description")}
-                </p>
-              </div>
-              </>
-            ): renderBountyToken("bounty")}
-            {rewardChecked && isFundingType && renderBountyToken("reward")}
-          </CreateBountyRewardInfo>
-        </>
+          <RewardInformation 
+            isFundingType={isFundingType} 
+            rewardChecked={rewardChecked} 
+            transactionalToken={transactionalToken} 
+            rewardToken={rewardToken} 
+            bountyDecimals={transactionalERC20?.decimals} 
+            rewardDecimals={transactionalERC20?.decimals} 
+            issueAmount={issueAmount} 
+            rewardAmount={rewardAmount} 
+            bountyTokens={customTokens.filter((token) => !!token?.network_tokens?.isTransactional)} 
+            rewardTokens={customTokens.filter((token) => !!token?.network_tokens?.isReward)} 
+            rewardBalance={rewardERC20.balance} 
+            bountyBalance={transactionalERC20.balance} 
+            updateRewardToken={(v) => handleUpdateToken(v, 'reward')} 
+            updateTransactionalToken={(v) => handleUpdateToken(v, 'transactional')} 
+            addToken={addToken} 
+            handleRewardChecked={handleRewardChecked} 
+            updateIssueAmount={setIssueAmount} 
+            updateRewardAmount={setRewardAmount} 
+            updateIsFundingType={setIsFundingType}          
+          />
       );
 
     if (currentSection === 3)
@@ -649,57 +641,51 @@ export default function CreateBountyPage() {
       );
   }
 
-  function renderBountyToken(type: "bounty" | "reward") {
-    const fieldParams = {
-      bounty: {
-        token: transactionalToken,
-        setToken: setTransactionalToken,
-        default: transactionalToken,
-        decimals: transactionalERC20?.decimals,
-        amount: issueAmount,
-        setAmount: setIssueAmount,
-        tokens: customTokens.filter((token) => !!token?.network_tokens?.isTransactional),
-        balance: transactionalERC20.balance,
-        isFunding: isFundingType,
-        label: t("bounty:fields.select-token.bounty", {
-          set: t("bounty:fields.set"),
-        }),
-      },
-      reward: {
-        token: rewardToken,
-        setToken: setRewardToken,
-        default: rewardToken,
-        decimals: transactionalERC20?.decimals,
-        amount: rewardAmount,
-        setAmount: setRewardAmount,
-        tokens: customTokens.filter((token) => !!token?.network_tokens?.isReward),
-        balance: rewardERC20.balance,
-        isFunding: isFundingType,
-        label: t("bounty:fields.select-token.reward", {
-          set: t("bounty:fields.set"),
-        }),
-      },
-    };
-
+  function renderButtons() {
     return (
       <>
-        <CreateBountyTokenAmount
-          currentToken={fieldParams[type].token}
-          setCurrentToken={fieldParams[type].setToken}
-          customTokens={fieldParams[type].tokens}
-          userAddress={currentUser?.walletAddress}
-          defaultToken={fieldParams[type].default}
-          canAddCustomToken={false}
-          addToken={addToken}
-          decimals={fieldParams[type].decimals}
-          issueAmount={fieldParams[type].amount}
-          setIssueAmount={fieldParams[type].setAmount}
-          tokenBalance={fieldParams[type].balance}
-          isFunders={type === "reward" ? false : true}
-          needValueValidation={!isFundingType || type === "reward"}
-          isFunding={isFundingType}
-          labelSelect={fieldParams[type].label}
-        />
+        <div className="col-6 ps-2">
+          <Button
+            className="col-12 bounty-outline-button"
+            onClick={handleBackButton}
+            disabled={!!(currentSection === 0)}
+          >
+            {t("actions.back")}
+          </Button>
+        </div>
+
+        <div className="col-6 pe-2">
+          {!isTokenApproved && currentSection === 3 ? (
+            <ContractButton
+              className="col-12 bounty-button"
+              disabled={isApproveButtonDisabled()}
+              onClick={allowCreateIssue}
+              isLoading={isLoadingApprove}
+            >
+              {t("actions.approve")}
+            </ContractButton>
+          ) : (
+            <ContractButton
+              className="col-12 bounty-button"
+              disabled={verifyNextStepAndCreate()}
+              isLoading={isLoadingCreateBounty}
+              onClick={handleNextStep}
+            >
+              {currentSection === 3 ? (
+                <>
+                  <ResponsiveWrapper xs={true} md={false}>
+                    {t("common:misc.create")}
+                  </ResponsiveWrapper>
+                  <ResponsiveWrapper xs={false} md={true}>
+                    {t("bounty:create-bounty")}
+                  </ResponsiveWrapper>
+                </>
+              ) : (
+                t("bounty:next-step")
+              )}
+            </ContractButton>
+          )}
+        </div>
       </>
     );
   }
@@ -710,9 +696,8 @@ export default function CreateBountyPage() {
   return (
     <>
       {!(query?.created?.toString() === "true") && (
-        <>
-          <CustomContainer>
-
+        <CreateBountyContainer>
+          <CustomContainer col="col-xs-12 col-xl-10 px-0">
           <CreateBountySteps
               steps={steps}
               currentSection={currentSection}
@@ -722,8 +707,6 @@ export default function CreateBountyPage() {
                 }
               }}
             />
-          </CustomContainer>
-          <CustomContainer>
             <CreateBountyCard
               maxSteps={steps?.length}
               currentStep={currentSection + 1}
@@ -732,56 +715,26 @@ export default function CreateBountyPage() {
             </CreateBountyCard>
           </CustomContainer>
           {currentSection === 3 && (
+            <div className="mx-5">
             <div className="d-flex justify-content-center col-12 mt-4">
-              <p>
+              <p className="">
                 {t("bounty:creating-this-bounty")}{" "}
                 <a href="https://www.bepro.network/terms" target="_blank">
                   {t("bounty:terms-and-conditions")}
                 </a>
               </p>
             </div>
+          </div>
           )}
-          <CustomContainer className='mb-5'>
-            <div className="d-flex justify-content-between my-4 me-4">
-              <Button
-                className="col-6 bounty-outline-button me-3"
-                onClick={() => {
-                  currentSection !== 0 &&
-                    setCurrentSection((prevState) => prevState - 1);
-                }}
-                disabled={!!(currentSection === 0)}
-              >
-                {t("actions.back")}
-              </Button>
-
-              {!isTokenApproved && currentSection === 3 ? (
-                <ContractButton
-                  className="col-6 bounty-button"
-                  disabled={isApproveButtonDisabled()}
-                  onClick={allowCreateIssue}
-                  isLoading={isLoadingApprove}
-                >
-                  {t("actions.approve")}
-                </ContractButton>
-              ) : (
-                <ContractButton
-                  className="col-6 bounty-button"
-                  disabled={verifyNextStepAndCreate()}
-                  isLoading={isLoadingCreateBounty}
-                  onClick={() => {
-                    if (currentSection + 1 < steps.length)
-                      setCurrentSection((prevState) => prevState + 1);
-                    if (currentSection === 3) {
-                      createBounty();
-                    }
-                  }}
-                >
-                  {currentSection === 3 ? t("bounty:create-bounty") : t("bounty:next-step")}
-                </ContractButton>
-              )}
-            </div>
+          <CustomContainer className='d-flex flex-column justify-content-end'>
+            <ResponsiveWrapper className="row my-4" xs={false} md={true}>
+              {renderButtons()}
+            </ResponsiveWrapper>
+            <ResponsiveWrapper className="row my-4 mx-1" xs={true} md={false}>
+              {renderButtons()}
+            </ResponsiveWrapper>
           </CustomContainer>
-        </>
+        </CreateBountyContainer>
       )}
       <Modal
         show={showModalSuccess}

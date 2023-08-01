@@ -15,13 +15,19 @@ export default function CreateBountyRewardInfo({
 }) {
   const { t } = useTranslation(["bounty"]);
 
+  const descriptions = [
+    t("descriptions.reward-1"),
+    t("descriptions.reward-2")
+  ]
+
   return (
     <div className="mt-2">
       <h5>{t("steps.reward")}</h5>
       <div className="text-gray">
         {t("descriptions.reward")}
-        <p className="mt-2 ms-1">{t("descriptions.reward-1")}</p>
-        <p className="ms-1">{t("descriptions.reward-2")}</p>
+        {descriptions?.map((value, key) => (
+          <p key={key} className={`d-flex ${key === 0 ? 'mt-2': ''} ms-1`}>{key+1}.&nbsp;<p>{value}</p></p>
+        ))}
       </div>
 
       <>

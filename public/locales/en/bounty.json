@@ -40,8 +40,8 @@
     "details": "Enter the necessary information to understand your bounty",
     "github": "Inform the repository and the branch where the solution will be made",
     "reward": "When creating a new bounty, you have two options regarding the reward:",
-    "reward-1": "1. Self-fund: You use your own money to create the bounty. This means you will be responsible for providing the reward money that will be given to the person who successfully completes the task.",
-    "reward-2": "2. Seek funding: You can seek funding for the bounty. This means you can look for other individuals who are willing to contribute to the reward money.",
+    "reward-1": "Self-fund: You use your own money to create the bounty. This means you will be responsible for providing the reward money that will be given to the person who successfully completes the task.",
+    "reward-2": "Seek funding: You can seek funding for the bounty. This means you can look for other individuals who are willing to contribute to the reward money.",
     "review": "In this step you will view the main information and get a sense of how your bounty is doing"
   },
   "status": {
@@ -118,6 +118,7 @@
     "tags-info": "Up to 3 tags",
     "reward-type": "Reward Type",
     "select-token": {
+      "label": "Select Token",
       "bounty": "Set Reward",
       "reward": "Set Funded Reward",
       "funding": "Set Funding Amount"
@@ -129,11 +130,10 @@
       "max": "Use max"
     },
     "conversion-token": {
-      "invalid": "Could not convert this token",
       "not-found": "Can't convert because not found"
     }
   },
-  "reward-funders": "Reward Funders",
+  "reward-funders": "Set Funders Reward",
   "reward-funders-description": "Reward anyone who funds this bounty.",
   "review": {
     "repository": "Repository",
@@ -163,7 +163,7 @@
   "self-fund": "Self-fund",
   "seek-funding": "Seek Funding",
   "seeking-funding": "Seeking Funding",
-  "balance": "balance:",
+  "balance": "Total Balance:",
   "edit": "edit",
   "most-active-network-empty": "Not found active networks",
   "kyc": {
@@ -178,10 +178,28 @@
     "label": "KYC",
     "steps": "{{current}} of {{total}} steps"
   },
+  "proposal-creator": "Proposal Creator",
+  "proposal-merger": "Merger",
+  "network-fee": "Network Fee",
   "bounty-examples": "See bounty examples",
   "finding-yourself-lost": "Finding yourself lost?",
   "terms-and-conditions": "terms and conditions.",
   "creating-this-bounty": "By creating this bounty you agree to our",
   "see-bounty": "See Bounty",
-  "created-success": "Bounty created successfully!"
+  "created-success": "Bounty created successfully!",
+  "service-fee": {
+    "title": "Service Fees",
+    "description": "You Can find more information in our",
+    "doc": "Documentation",
+    "support-message": "Amount paid to incentivize the community to participate on the network"
+  },
+  "step-of": "Step {{currentStep}} of {{maxSteps}}",
+  "step": "Step {{currentStep}}",
+  "set-reward-description": "Amount distributed to the person who solution was accepted",
+  "set-funded-reward-description": "Amount you want to rise to be distributed to the person who solution was accepted",
+  "set-funders-reward-description": "Amount you want to pay for the funders as recompense for their participation",
+  "total-amount": {
+    "title": "Total Amount",
+    "description": "Amount you will pay for this bounty (reward + services fees)"
+  }
 }

@@ -3,6 +3,8 @@ import { useTranslation } from "next-i18next";
 
 import MarkedRender from "components/MarkedRender";
 
+import { ContainerTypeFlex } from "./container-type/view";
+
 interface ReviewProps {
   [name: string]: string | string[];
 }
@@ -15,6 +17,7 @@ export default function CreateBountyReview({
   payload: ReviewProps;
 }) {
   const { t } = useTranslation(["bounty"]);
+
   return (
     <div className="mt-2">
       <h5>{t("bounty:steps.review")}</h5>
@@ -24,13 +27,13 @@ export default function CreateBountyReview({
       {Object.entries(payload).map(([name, value]: [string, Value], key) => {
         if(!value || value?.length === 0) return null;
         return (
-          <div className="d-flex border-top border-gray-700 py-3 px-2" key={key}>
-            <div className="col-3 text-gray">
+          <ContainerTypeFlex key={key}>
+            <div className="col-md-3 text-gray">
               {name.charAt(0).toUpperCase() + name.slice(1).replace("_", " ")}
             </div>
-            <div className="col-9 text-truncate">
+            <div className="col-md-9 text-truncate">
               {isArray(value) ? (
-                <div className="d-flex">
+                <div className="d-flex flex-wrap">
                   {value.map((item, key) => (
                     <div className="d-flex" key={key}>
                       <div className="ball tag mt-2 mx-2" key={key}/>
@@ -42,7 +45,7 @@ export default function CreateBountyReview({
               name === 'description' ? <MarkedRender source={value}/> : value 
               }
             </div>
-          </div>
+          </ContainerTypeFlex>
         )
       })}
     </div>
