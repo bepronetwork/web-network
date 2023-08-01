@@ -7,7 +7,6 @@ import PageHero from "components/common/page-hero/view";
 import CustomContainer from "components/custom-container";
 
 import {useAppState} from "contexts/app-state";
-import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import { emptyBountiesPaginated, emptyNetworkOverview } from "helpers/api";
 
@@ -58,7 +57,7 @@ export default function BountiesPage({
   ];
 
   return (
-    <BountyEffectsProvider>
+    <>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
@@ -71,7 +70,7 @@ export default function BountiesPage({
           variant="network"
         />
       </CustomContainer>
-    </BountyEffectsProvider>
+    </>
   );
 }
 

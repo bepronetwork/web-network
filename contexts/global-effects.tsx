@@ -11,7 +11,6 @@ import {useAuthentication} from "x-hooks/use-authentication";
 import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
-import {useRepos} from "x-hooks/use-repos";
 import {useSettings} from "x-hooks/use-settings";
 import {useTransactions} from "x-hooks/use-transactions";
 
@@ -24,7 +23,6 @@ export const GlobalEffectsProvider = ({children}) => {
   const session = useSession();
   
   const dao = useDao();
-  const repos = useRepos();
   const network = useNetwork();
   const { chain } = useChain();
   const settings = useSettings();
@@ -62,13 +60,6 @@ export const GlobalEffectsProvider = ({children}) => {
     Service?.network?.active?.networkAddress,
     Service?.network?.active?.chain_id,
   ]);
-
-  useEffect(repos.loadRepos, [
-    query?.network,
-    chain,
-    state.Service?.network?.active
-  ]);
-  useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
 
   useEffect(auth.validateGhAndWallet, [session?.data, currentUser?.walletAddress]);
   useEffect(auth.updateWalletAddress, [currentUser?.connected]);

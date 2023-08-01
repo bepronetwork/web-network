@@ -6,6 +6,8 @@ import {IssueData} from "interfaces/issue-data";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
 
+import { RepoInfo } from "./repos-list";
+
 export interface Network {
   id: number;
   name: string;
@@ -51,6 +53,7 @@ export interface Network {
   chain?: SupportedChainData;
   issues?: IssueData[];
   allowMerge: boolean;
+  repositories?: RepoInfo[];
 }
 
 export interface ThemeColors {

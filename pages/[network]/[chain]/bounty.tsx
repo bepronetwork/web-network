@@ -15,6 +15,7 @@ import CustomContainer from "components/custom-container";
 import If from "components/If";
 
 import {useAppState} from "contexts/app-state";
+import { BountyEffectsProvider } from "contexts/bounty-effects";
 
 import {IM_AM_CREATOR_ISSUE} from "helpers/constants";
 import { issueParser } from "helpers/issue";
@@ -128,7 +129,7 @@ export default function PageIssue({ bounty }: PageBountyProps) {
   ]);
 
   return (
-    <>
+    <BountyEffectsProvider currentBounty={bounty}>
       <BountyHero 
         currentBounty={currentBounty?.data}
         updateBountyData={updateBountyData}
@@ -170,7 +171,7 @@ export default function PageIssue({ bounty }: PageBountyProps) {
           issueId={id}
         />
       </CustomContainer>
-    </>
+    </BountyEffectsProvider>
   );
 }
 
