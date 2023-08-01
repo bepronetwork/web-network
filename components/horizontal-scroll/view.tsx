@@ -2,7 +2,6 @@ import { MutableRefObject, ReactNode } from "react";
 
 import ChevronRightMediumIcon from "assets/icons/chevron-right-medium-icon";
 import ChevronLeftIcon from "assets/icons/chevronleft-icon";
-import ChevronRightIcon from "assets/icons/chevronright-icon";
 
 import Button from "components/button";
 import If from "components/If";

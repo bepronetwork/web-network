@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import {Col, Form, OverlayTrigger, Popover} from "react-bootstrap";
+import {Col, ColProps, Form, OverlayTrigger, Popover} from "react-bootstrap";
 
 import InfoIcon from "assets/icons/info-icon";
 
@@ -20,6 +20,7 @@ interface FormGroupProps {
   onBlur?: () => void;
   onChange?: (newValue: string) => void;
   decimalScale?: number;
+  colProps?: ColProps;
 }
 
 export function FormGroup({
@@ -30,6 +31,7 @@ export function FormGroup({
                             variant = "input",
                             symbol,
                             decimalScale,
+                            colProps,
                             ...rest
                           }: FormGroupProps) {
   const isNumberFormat = variant === "numberFormat";
@@ -68,7 +70,7 @@ export function FormGroup({
   }
 
   return(
-    <Col>
+    <Col {...colProps}>
       <Form.Group className="form-group my-0">
         <Form.Label 
           className={`caption-medium text-gray-50 text-capitalize 
@@ -85,7 +87,7 @@ export function FormGroup({
             {...rest}
           /> ||
           <InputNumber
-            classSymbol={"blue-200"}
+            classSymbol={"text-primary"}
             onValueChange={handleNumberFormatChange}
             allowNegative={false}
             decimalScale={decimalScale}

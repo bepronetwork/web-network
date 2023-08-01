@@ -494,33 +494,35 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    const network_tokens = await Database.networkTokens.findAll({
-      where: {
-        networkId: network.id
+    if (allowedTokens) {
+      const network_tokens = await Database.networkTokens.findAll({
+        where: {
+          networkId: network.id
+        }
+      });
+  
+      if (allowedTokens?.transactional?.length) { 
+        for (const id of allowedTokens.transactional) {
+          await handlefindOrCreateTokens(id, network.id, 'transactional');
+        }
       }
-    });
-
-    if (allowedTokens?.transactional?.length) { 
-      for (const id of allowedTokens.transactional) {
-        await handlefindOrCreateTokens(id, network.id, 'transactional');
+  
+      const transactionalTokens = network_tokens.filter(e => e.isTransactional);
+  
+      for (const token of transactionalTokens) {
+        await handleRemoveTokens(allowedTokens.transactional, token, 'transactional');
       }
-    }
-
-    const transactionalTokens = network_tokens.filter(e => e.isTransactional);
-
-    for (const token of transactionalTokens) {
-      await handleRemoveTokens(allowedTokens.transactional, token, 'transactional');
-    }
-
-    if (allowedTokens?.reward?.length) {
-      for (const id of allowedTokens.reward) {
-        await handlefindOrCreateTokens(id, network.id, 'reward');
+  
+      if (allowedTokens?.reward?.length) {
+        for (const id of allowedTokens.reward) {
+          await handlefindOrCreateTokens(id, network.id, 'reward');
+        }
+      } 
+      const rewardTokens = network_tokens.filter(e => e.isReward);
+  
+      for (const token of rewardTokens) {
+        await handleRemoveTokens(allowedTokens.reward, token, 'reward');
       }
-    } 
-    const rewardTokens = network_tokens.filter(e => e.isReward);
-
-    for (const token of rewardTokens) {
-      await handleRemoveTokens(allowedTokens.reward, token, 'reward');
     }
 
     if (removingRepos.length && !isAdminOverriding)

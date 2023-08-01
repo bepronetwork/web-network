@@ -1,13 +1,8 @@
 import InfoTooltip from "components/info-tooltip";
 
-import {formatNumberToNScale} from "helpers/formatNumber";
+import { formatNumberToNScale } from "helpers/formatNumber";
 
-interface AmountCardProps {
-  title: string;
-  amount?: number;
-  description: string;
-  fixed?: number;
-}
+import { AmountCardProps } from "types/components";
 
 export default function AmountCard({
   title,

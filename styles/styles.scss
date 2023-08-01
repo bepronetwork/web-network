@@ -1483,7 +1483,7 @@ textarea.form-control {
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.41em;
+    top: 4.416em;
   }
 
   .input-group {
@@ -1569,8 +1569,8 @@ textarea.form-control {
 
 .scroll-top-button {
   position: fixed;
-  bottom: 50px;
-  right: 20px;
+  bottom: 10px;
+  right: 10px;
   z-index: 99;
 
   background-color: transparent;
@@ -1887,7 +1887,6 @@ input[type="color"] {
 .profile {
   &-content {
     min-height: calc(100vh - $navbar-height);
-    height: max-content;
     border-left: 1px solid $dark-gray;
   }
 }
@@ -2053,4 +2052,10 @@ input[type="color"] {
   &-anywhere {
     overflow-wrap: anywhere;
   }
+}
+
+.text-overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

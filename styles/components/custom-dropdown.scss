@@ -9,6 +9,18 @@
     }
   }
 
+  &.light {
+    .dropdown-toggle {
+      @extend .bg-gray-800;
+    }
+
+    &.show {
+      .dropdown-toggle {
+        @extend .bg-gray-950;
+      }
+    }
+  }
+
   .dropdown-toggle {
     @extend .bg-gray-900;
     @extend .border-radius-4;
@@ -29,14 +41,15 @@
   }
 
   .dropdown-menu {
-    @extend .bg-gray-900;
+    @extend .bg-gray-950;
     @extend .border-radius-4;
     @extend .border-gray-800;
     
     .dropdown-item {
-      @extend .caption-small;
-      @extend .font-weight-medium;
+      @extend .caption-medium;
+      @extend .font-weight-normal;
       @extend .text-gray-200;
+      @extend .text-capitalize;
 
       &:hover {
         @extend .text-white;

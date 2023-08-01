@@ -2,9 +2,9 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/router";
 
+import MyNetworkPage from "components/pages/profile/my-network/controller";
 import PaymentsPage from "components/pages/profile/payments/controller";
 import BountiesPage from "components/profile/pages/bounties";
-import MyNetworkPage from "components/profile/pages/my-network";
 import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
 import PullRequestsPage from "components/profile/pages/pull-requests";

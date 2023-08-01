@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
-import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import ContractButton from "components/contract-button";
-import AmountCard from "components/custom-network/amount-card";
-import NetworkContractSettings from "components/custom-network/network-contract-settings";
-import TokensSettings from "components/profile/my-network-settings/tokens-settings";
+import NetworkGovernanceSettingsView from "components/network/settings/governance/view";
 
 import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
@@ -30,7 +26,7 @@ interface GovernanceProps {
   updateEditingNetwork: () => void;
 }
 
-export default function GovernanceSettings({
+export default function NetworkGovernanceSettings({
   network,
   tokens,
   address,
@@ -42,7 +38,7 @@ export default function GovernanceSettings({
   const [isUpdating, setIsUpdating] = useState(false);
   const [networkToken, setNetworkToken] = useState<Token[]>();
   
-  const {state, dispatch} = useAppState();
+  const { state, dispatch } = useAppState();
   const { updateActiveNetwork } = useNetwork();
   const { updateNetwork, processEvent } = useApi();
   const { updateWalletBalance, signMessage } = useAuthentication();
@@ -125,6 +121,57 @@ export default function GovernanceSettings({
       });
   }
 
+  function getChangedParameters() {
+    const changedParameters = [];
+
+    if (!forcedNetwork) return changedParameters;
+
+    const { parameters } = settings;
+
+    const parametersKeys = [
+      "draftTime",
+      "disputableTime",
+      "councilAmount",
+      "percentageNeededForDispute",
+      "cancelableTime",
+      "oracleExchangeRate",
+      "mergeCreatorFeeShare",
+      "proposerFeeShare",
+    ];
+
+    changedParameters.push(...parametersKeys.filter(param => parameters[param].value !== +forcedNetwork[param]));
+
+    return changedParameters;
+  }
+
+  function getChangedTokens() {
+    const changedTokens = [];
+
+    if (!settingsTokens.allowedRewards || !settingsTokens.allowedTransactions || !network) return changedTokens;
+
+    const getAddress = ({ address }) => address;
+    const hasEqualLength = (arr1, arr2) => arr1.length === arr2.length;
+    const hasSameElements = (arr1, arr2) => arr1.every(el => arr2.find(el2 => el === el2));
+
+    const allowedRewards = settingsTokens.allowedRewards.map(getAddress);
+    const allowedTransactions = settingsTokens.allowedTransactions.map(getAddress);
+
+    const networkRewards = network.tokens.filter(({ isReward }) => isReward).map(getAddress);
+    const networkTransactions = network.tokens.filter(({ isTransactional }) => isTransactional).map(getAddress);
+
+    if (!hasEqualLength(allowedRewards, networkRewards))
+      changedTokens.push("reward");
+    else if (!hasSameElements(allowedRewards, networkRewards))
+      changedTokens.push("reward");
+
+    if (!hasEqualLength(allowedTransactions, networkTransactions))
+      changedTokens.push("transactional");
+    else if (!hasSameElements(allowedTransactions, networkTransactions))
+      changedTokens.push("transactional");
+
+    return changedTokens;
+  }
+
   async function handleSubmit() {
     if (
       !state.currentUser?.walletAddress ||
@@ -137,53 +184,19 @@ export default function GovernanceSettings({
 
     setIsUpdating(true);
 
-    const {
-      parameters: {
-        draftTime: { value: draftTime },
-        disputableTime: { value: disputableTime },
-        councilAmount: { value: councilAmount },
-        percentageNeededForDispute: { value: percentageForDispute },
-      },
-    } = settings;
+    const changedParameters = getChangedParameters().map(param => ({
+      param,
+      value: settings?.parameters[param]?.value
+    }));
 
     const networkAddress = network?.networkAddress;
     const failed = [];
     const success = {};
 
-    const promises = await Promise.allSettled([
-      ...(draftTime !== forcedNetwork.draftTime
-        ? [
-            handleChangeNetworkParameter("draftTime",
-                                         draftTime,
-                                         networkAddress)
-              .then(() => ({ param: "draftTime", value: draftTime })),
-        ]
-        : []),
-      ...(disputableTime !== forcedNetwork.disputableTime
-        ? [
-            handleChangeNetworkParameter("disputableTime",
-                                         disputableTime,
-                                         networkAddress)
-              .then(() => ({ param: "disputableTime", value: disputableTime })),
-        ]
-        : []),
-      ...(councilAmount !== +forcedNetwork.councilAmount
-        ? [
-            handleChangeNetworkParameter("councilAmount",
-                                         councilAmount,
-                                         networkAddress)
-              .then(() => ({ param: "councilAmount", value: councilAmount })),
-        ]
-        : []),
-      ...(percentageForDispute !== forcedNetwork.percentageNeededForDispute
-        ? [
-            handleChangeNetworkParameter("percentageNeededForDispute",
-                                         percentageForDispute,
-                                         networkAddress)
-              .then(() => ({ param: "percentageNeededForDispute", value: percentageForDispute })),
-        ]
-        : []),
-    ]);
+    const promises = await Promise.allSettled(changedParameters
+      .map(async ({ param, value }) => 
+        handleChangeNetworkParameter(param, value, networkAddress)
+          .then(() => ({ param, value }))));
 
     promises.forEach((promise) => {
       if (promise.status === "fulfilled") success[promise.value.param] = promise.value.value;
@@ -201,10 +214,10 @@ export default function GovernanceSettings({
     const successQuantity = Object.keys(success).length;
 
     if (successQuantity) {
-      if(draftTime !== forcedNetwork.draftTime)
-        Promise.all([
-          await processEvent(StandAloneEvents.UpdateBountiesToDraft),
-          await processEvent(StandAloneEvents.BountyMovedToOpen)
+      if(changedParameters.find(({ param }) => param === "draftTime"))
+        await Promise.all([
+          processEvent(StandAloneEvents.UpdateBountiesToDraft),
+          processEvent(StandAloneEvents.BountyMovedToOpen)
         ]);
 
       await processEvent(StandAloneEvents.UpdateNetworkParams)
@@ -215,6 +228,10 @@ export default function GovernanceSettings({
           total: promises.length,
       })));
     }
+
+    const hasChangedTokens = !!getChangedTokens().length;
+
+    if (!hasChangedTokens) return;
 
     const json = {
       creator: state.currentUser.walletAddress,
@@ -252,85 +269,32 @@ export default function GovernanceSettings({
   }
 
   useEffect(() => {
-    if(tokens.length > 0) setNetworkToken(tokens.map((token) => ({
-      ...token,
-      isReward: !!token.network_tokens.isReward,
-      isTransactional: !!token.network_tokens.isTransactional
-    })));
+    if(tokens.length > 0) 
+      setNetworkToken(tokens.map((token) => ({
+        ...token,
+        isReward: !!token.network_tokens.isReward,
+        isTransactional: !!token.network_tokens.isTransactional
+      })));
   }, [tokens]);
 
   useEffect(() => {
     updateActiveNetwork(true);
   }, []);
 
-  return (
-    <>
-      <Row className="mt-4 mb-3">
-        <span className="caption-medium text-white mb-3">
-          {t("custom-network:network-info")}
-        </span>
-
-        {networkAmounts.map((amount) => (
-          <Col key={amount.title}>
-            <AmountCard {...amount} />
-          </Col>
-        ))}
-      </Row>
-
-      <Row>
-        <Col>
-          <span className="caption-large text-white text-capitalize font-weight-medium mb-3">
-            {t("custom-network:network-info")}
-          </span>
-        </Col>
-
-        <Col xs="auto">
-          <ContractButton
-            className="border-radius-4"
-            disabled={!settings?.validated || isUpdating || forcedNetwork?.isClosed || isClosing}
-            onClick={handleSubmit}
-          >
-            {t("misc.save-changes")}
-          </ContractButton>
-        </Col>
-      </Row>
-
-      <Row className="mt-1">
-        <Col>
-          <label className="caption-small mb-2">
-            {t("custom-network:network-address")}
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            value={address}
-            disabled={true}
-          />
-        </Col>
-        <Col className="d-flex align-items-center justify-content-end">
-          <ContractButton
-            color="dark-gray"
-            disabled={!isAbleToClosed || isClosing || !state.currentUser?.login}
-            className="ml-2 border-radius-4"
-            onClick={handleCloseMyNetwork}
-            isLoading={isClosing}
-          >
-            <span>{t("custom-network:close-network")}</span>
-          </ContractButton>
-        </Col>
-      </Row>
-      
-      <Row className="mt-4">
-       <TokensSettings defaultSelectedTokens={networkToken} />
-      </Row>
-
-      <Row className="mt-4">
-        <span className="caption-medium text-white mb-3">
-          {t("custom-network:steps.network-settings.fields.other-settings.title")}
-        </span>
-
-        <NetworkContractSettings />
-      </Row>
-    </>
+  return(
+    <NetworkGovernanceSettingsView
+      networkAmounts={networkAmounts}
+      networkAddress={address}
+      isGithubConnected={!!state.currentUser?.login}
+      isAbleToClosed={isAbleToClosed}
+      isClosing={isClosing}
+      networkTokens={networkToken}
+      isSubmitButtonVisible={
+        !!settings?.validated && (!!getChangedParameters()?.length || !!getChangedTokens()?.length)
+      }
+      isSubmitButtonDisabled={!settings?.validated || isUpdating || forcedNetwork?.isClosed || isClosing}
+      onCloseNetworkClick={handleCloseMyNetwork}
+      onSaveChangesClick={handleSubmit}
+    />
   );
 }

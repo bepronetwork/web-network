@@ -14,9 +14,9 @@ export default function CardItem({
   return (
     <div
       className={`${
-        !hide && "bg-gray-900" || ""
+        !hide && "bg-gray-900" || "bg-gray-950"
       } list-item border border-gray-800 ${
-        variant ? "px-3 py-2 border-radius-4" : `p-3 p-list-item border-radius-8`
+        variant ? "p-3 border-radius-4" : `p-3 p-list-item border-radius-8`
       } ${onClick && 'cursor-pointer' || ""}`}
       onClick={onClick}
     >

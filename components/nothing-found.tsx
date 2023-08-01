@@ -18,8 +18,8 @@ export default function NothingFound({
       ? "align-items-center gap-4 mt-3"
       : "justify-content-center p-3 border-dashed bg-gray-900 border-radius-8 h-100"
   }`;
-  const descriptionClass = `mb-0 text-center ${
-    type === "default" ? "caption-small text-gray" : "text-white-50"
+  const descriptionClass = `mb-0 text-center font-weight-medium ${
+    type === "default" ? "caption-small text-white" : "text-white-50"
   } `;
   
   return (
