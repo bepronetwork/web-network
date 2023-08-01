@@ -5,7 +5,7 @@ export default function ChevronLeftIcon(props: SVGProps<SVGSVGElement>) {
     <svg
       viewBox="0 0 18 26"
       fill="none"
-      color="white"
+      color="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

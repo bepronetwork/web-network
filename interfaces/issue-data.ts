@@ -41,7 +41,7 @@ export interface IssueData {
   numberOfComments: number;
   owner?: string;
   network_id?: number;
-  pullRequests: pullRequest[];
+  pullRequests: PullRequest[];
   repo?: string;
   repository?: Repository;
   repository_id?: number;
@@ -105,9 +105,10 @@ export interface Repository {
   id: number;
   githubPath: string;
   network?: Network;
+  mergeCommitAllowed?: boolean;
 }
 
-export interface pullRequest {
+export interface PullRequest {
   createdAt: Date;
   githubId: string;
   githubLogin: string;

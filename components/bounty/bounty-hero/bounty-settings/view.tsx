@@ -109,7 +109,7 @@ export default function BountySettingsView({
         hasOpenPullRequest
       )
       return (
-          <span className="d-flex py-2 cursor-pointer">
+          <span className="d-flex cursor-pointer">
             <GithubLink
               forcePath={bounty?.repository?.githubPath}
               hrefPath={`pull?q=base:${bounty?.branch}`}
@@ -123,7 +123,7 @@ export default function BountySettingsView({
   function renderEditButton() {
     if (isWalletConnected && isBountyInDraft && isBountyOwner)
       return (
-          <span className="py-2 cursor-pointer" onClick={handleEditIssue}>
+          <span className="cursor-pointer" onClick={handleEditIssue}>
             <Translation ns="bounty" label="actions.edit-bounty" />
           </span>
       );
@@ -132,7 +132,7 @@ export default function BountySettingsView({
   function renderCancel() {
     const Cancel = (isHard: boolean) => (
         <span
-          className="py-2 cursor-pointer"
+          className="cursor-pointer"
           onClick={() => (isHard ? setShowHardCancelModal(true) : handleRedeem())}
         >
           <Translation
@@ -162,7 +162,7 @@ export default function BountySettingsView({
   function renderActions() {
     return (
         <>
-          <span className="d-flex pb-2 cursor-pointer">
+          <span className="d-flex cursor-pointer">
             <GithubLink
               forcePath={bounty?.repository?.githubPath}
               hrefPath={`${
@@ -202,11 +202,11 @@ export default function BountySettingsView({
           </div>
   
           <div
-            className={`border border-gray-800 rounded rounded-3 filter-wrapper d-${
+            className={`border border-gray-800 border-radius-4 filter-wrapper d-${
               show ? "flex" : "none"
             } justify-content-start align-items-stretch position-absolute`}
           >
-            <div className="d-flex flex-column bounty-settings px-2 pt-2 bg-gray-950">
+            <div className="d-flex gap-2 flex-column bounty-settings p-2 bg-gray-950">
               {renderActions()}
             </div>
           </div>

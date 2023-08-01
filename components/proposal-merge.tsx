@@ -6,7 +6,6 @@ import {useTranslation} from "next-i18next";
 import Button from "components/button";
 import ContractButton from "components/contract-button";
 import Modal from "components/modal";
-import ProposalListDistribution from "components/proposal-list-distribution";
 
 import {useAppState} from "contexts/app-state";
 
@@ -16,6 +15,8 @@ import { DistributedAmounts, Proposal } from "interfaces/proposal";
 import {TokenInfo} from "interfaces/token";
 
 import {getCoinInfoByContract} from "services/coingecko";
+
+import ProposalDistributionList from "./proposal/distribution/list/view";
 
 interface props {
   amountTotal: BigNumber;
@@ -73,7 +74,6 @@ export default function ProposalMerge({
   return (
     <>
       <ContractButton
-        className="flex-grow-1"
         textClass="text-uppercase text-white"
         onClick={() => setShow(true)}
         disabled={!canMerge || isMerging}
@@ -115,19 +115,20 @@ export default function ProposalMerge({
           </div>
         }
       >
-       <ProposalListDistribution distributedAmounts={distributedAmounts}/>
+       <ProposalDistributionList
+        distributedAmounts={distributedAmounts}
+        transactionalTokenSymbol={currentTokenSymbol}
+        convertValue={handleConversion}
+      />
 
         <div className="mt-4 border-dashed"></div>
 
-        <div className="d-flex justify-content-between rounded-5 mt-4 py-2 px-3 bg-black">
-          <span className="text-white caption-medium pt-3">
+        <div className="d-flex align-items-center justify-content-between rounded-5 mt-4 py-2 px-3 bg-black">
+          <span className="text-white caption-medium">
             {t("proposal:merge-modal.total")}
           </span>
 
-          <div
-            className={`d-flex flex-column cursor-pointer 
-          ${amountTotalConverted?.gt(0) ? "mt-1" : "mt-3"}`}
-          >
+          <div className={`d-flex flex-column`}>
             <div className="d-flex justify-content-end mb-1">
               <span className="text-white caption-medium">
                 {formatStringToCurrency(amountTotal?.toFixed())}

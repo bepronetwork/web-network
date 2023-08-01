@@ -17,19 +17,20 @@ export function CallToAction({
     <ContextualSpan
       context={color}
       className="mb-3"
+      classNameChildren="d-flex align-items-center"
       isAlert
     >
-      <span className="mr-3">{call}</span>
+        <span className="mr-3">{call}</span>
 
-      <BtnComponent
-        color={color}
-        disabled={executing || disabled}
-        withLockIcon={disabled && !executing}
-        isLoading={executing}
-        onClick={onClick}
-      >
-        <span>{action}</span>
-      </BtnComponent>
+        <BtnComponent
+          color={color}
+          disabled={executing || disabled}
+          withLockIcon={disabled && !executing}
+          isLoading={executing}
+          onClick={onClick}
+        >
+          <span>{action}</span>
+        </BtnComponent>
     </ContextualSpan>
   );
 }

@@ -9,14 +9,14 @@ import ProposalProgressSmall from "components/proposal-progress-small";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 
-import { pullRequest } from "interfaces/issue-data";
+import { PullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import ReviewsNumberView from "../reviews-number.view";
 
 interface ItemRowProps {
   isProposal: boolean;
-  item: Proposal | pullRequest;
+  item: Proposal | PullRequest;
   handleBtn: (ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   btnLabel: string;
   shouldRenderApproveButton: boolean;
@@ -56,35 +56,32 @@ export default function ProposalOrPullRequestView({
       ) : (
         <ReviewsNumberView
           className="d-none d-xl-block"
-          reviewers={(item as pullRequest)?.reviewers?.length || 0}
+          reviewers={(item as PullRequest)?.reviewers?.length || 0}
         />
       )}
 
       <ReadOnlyButtonWrapper>
         <div className="row align-items-center d-none d-xl-block">
-          <div className="col">
+          <div className="d-flex">
             <Button
-              className="read-only-button text-truncate"
+              className="read-only-button text-truncate ms-1"
               onClick={handleBtn}
             >
               <span className="label-m text-white">
                 <Translation label={btnLabel} />
               </span>
             </Button>
-          </div>
-
-          {shouldRenderApproveButton && (
-            <div className="col">
+            {shouldRenderApproveButton && (
               <GithubLink
                 forcePath={githubPath}
-                hrefPath={`pull/${(item as pullRequest)?.githubId || ""}/files`}
+                hrefPath={`pull/${(item as PullRequest)?.githubId || ""}/files`}
                 color="primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 {t("common:actions.approve")}
               </GithubLink>
-            </div>
           )}
+          </div>
         </div>
       </ReadOnlyButtonWrapper>
     </>

@@ -8,7 +8,7 @@ import { addToast } from "contexts/reducers/change-toaster";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
 import { NetworkEvents } from "interfaces/enums/events";
-import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -17,7 +17,7 @@ import { useNetwork } from "x-hooks/use-network";
 import PullRequestBodyView from "./view";
 
 interface PullRequestBodyControllerProps {
-  currentPullRequest: pullRequest;
+  currentPullRequest: PullRequest;
   currentBounty: IssueBigNumberData;
   isCreatingReview: boolean;
   updateBountyData: () => void;

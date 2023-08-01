@@ -15,6 +15,7 @@ export default function ProposalProgressBar({
   isMerged = false,
   refused = false,
   disputeMaxAmount = 0,
+  isAbleToDispute = false,
 }) {
   const { t } = useTranslation("proposal");
 
@@ -54,7 +55,7 @@ export default function ProposalProgressBar({
     if (isDisputed === true || (!isMerged && isFinished === true))
       return t("status.failed");
 
-    if (isDisputed === false && isFinished === false) return t("status.open-for-dispute");
+    if (isDisputed === false && isFinished === false && isAbleToDispute) return t("status.open-for-dispute");
 
     if (isDisputed === false && isFinished === true && isMerged)
       return t("status.accepted");
@@ -77,7 +78,7 @@ export default function ProposalProgressBar({
     ].join(` `);
 
     const captionClass = [
-      `caption mt-4 ms-1`,
+      `caption mt-4 ms-1 font-weight-medium`,
       isLastColumn ? `text-${issueColor}` : "text-white"
     ].join(` `)
 
@@ -120,14 +121,15 @@ export default function ProposalProgressBar({
 
   return (
     <>
-      <div className="row mb-2 proposal-progress-bar">
-        <div className="col d-flex justify-content-between">
-          <h4
-            className={`caption-large text-uppercase text-${issueColor} mb-4`}
-          >
+      <div className="row mb-2 proposal-progress-bar align-items-center">
+        <div className="col-12 col-xl-6 mb-3">
+          <h4 className={`caption-large text-uppercase text-${issueColor}`}>
             {issueState}
           </h4>
-          <div className="caption-small d-flex align-items-center mb-4 text-truncate">
+        </div>
+
+        <div className="col-12 col-xl-6 mb-3">
+          <div className="d-flex justify-content-xl-end caption-small align-items-center text-truncate">
             <span className={`text-${issueColor} text-uppercase`}>
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
@@ -140,21 +142,19 @@ export default function ProposalProgressBar({
           </div>
         </div>
       </div>
-      {!_columns.length
-        ? ''
-        : <div className="row">
-          <div className="ms-2 col-12 position-relative">
-            <div className={`progress bg-${issueColor}`}>
-              <div
-                className={`progress-bar bg-${issueColor}`}
-                role="progressbar"
-                style={{ width: `${toRepresentationPercent(percentage)}%` }}>
-                {_columns.map(renderColumn)}
-              </div>
+
+      <div className="row">
+        <div className="ms-1 col-12 position-relative">
+          <div className={`progress bg-${issueColor}`}>
+            <div
+              className={`progress-bar bg-${issueColor}`}
+              role="progressbar"
+              style={{ width: `${toRepresentationPercent(percentage)}%` }}>
+              {_columns.map(renderColumn)}
             </div>
           </div>
         </div>
-      }
+      </div>
     </>
   );
 }

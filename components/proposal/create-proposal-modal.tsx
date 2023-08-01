@@ -21,7 +21,7 @@ import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import sumObj from "helpers/sumObj";
 
 import {NetworkEvents} from "interfaces/enums/events";
-import {IssueBigNumberData, pullRequest} from "interfaces/issue-data";
+import {IssueBigNumberData, PullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -87,7 +87,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 
 interface ProposalModalProps {
   amountTotal: BigNumber | string | number;
-  pullRequests: pullRequest[];
+  pullRequests: PullRequest[];
   show: boolean;
   onCloseClick: () => void;
   currentBounty: IssueBigNumberData;
@@ -119,7 +119,7 @@ export default function ProposalModal({
   const [isLoadingParticipants, setIsLoadingParticipants] = useState<boolean>(false);
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>();
+  const [currentPullRequest, setCurrentPullRequest] = useState<PullRequest>();
   const [showDecimalsError, setShowDecimalsError] = useState(false)
 
   const {state} = useAppState();

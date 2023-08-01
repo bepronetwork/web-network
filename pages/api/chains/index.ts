@@ -146,12 +146,12 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
   const query = req.query;
   const where = {
      ... query.chainId ? {chainId: {[Op.eq]: query.chainId}} : {},
-     ... query.name ? {name: {[Op.iLike]: query.name}} : {},
-     ... query.shortName ? {shortName: {[Op.iLike]: query.shortName}} : {},
+     ... query.name ? {chainName: {[Op.iLike]: query.name}} : {},
+     ... query.shortName ? {chainShortName: {[Op.iLike]: query.shortName}} : {},
      ... query.chainRpc ? {chainRpc: {[Op.iLike]: query.chainRpc}} : {},
-     ... query.nativeCurrencyName ? {nativeCurrencyName: {[Op.iLike]: query.nativeCurrencyName}} : {},
-     ... query.nativeCurrencySymbol ? {nativeCurrencySymbol: {[Op.iLike]: query.nativeCurrencySymbol}} : {},
-     ... query.nativeCurrencyDecimals ? {nativeCurrencyDecimals: {[Op.eq]: query.nativeCurrencyDecimals}} : {}
+     ... query.nativeCurrencyName ? {chainCurrencyName: {[Op.iLike]: query.nativeCurrencyName}} : {},
+     ... query.nativeCurrencySymbol ? {chainCurrencySymbol: {[Op.iLike]: query.nativeCurrencySymbol}} : {},
+     ... query.nativeCurrencyDecimals ? {chainCurrencyDecimals: {[Op.eq]: query.nativeCurrencyDecimals}} : {}
   }
 
   return models.chain.findAll({where})

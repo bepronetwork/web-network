@@ -14,6 +14,7 @@ export default async function get(query: ParsedUrlQuery) {
     state,
     issueId,
     chainId,
+    proposalId,
     chain,
     visible,
     creator,
@@ -33,9 +34,14 @@ export default async function get(query: ParsedUrlQuery) {
 
   const whereCondition: WhereOptions = {};
 
+  const defaultStatesToIgnore = ["pending", "canceled"];
+
+  if (["disputable", "mergeable", "proposable"].includes(state?.toString()))
+    defaultStatesToIgnore.push("closed", "draft");
+
   // Issue table columns
   whereCondition.state = {
-    [Op.notIn]: ["pending", "canceled"]
+    [Op.notIn]: defaultStatesToIgnore
   };
 
   if (state && !["disputable", "mergeable"].includes(state.toString())) {
@@ -61,8 +67,10 @@ export default async function get(query: ParsedUrlQuery) {
   if (chainId) 
     whereCondition.chain_id = +chainId;
   
-  if (typeof visible !== "undefined") 
+  if (typeof visible !== "undefined" && visible !== "both") 
     whereCondition.visible = isTrue(visible.toString());
+  else if (visible !== "both")
+    whereCondition.visible = true;
 
   if (creator) 
     whereCondition.creatorAddress = {
@@ -102,9 +110,10 @@ export default async function get(query: ParsedUrlQuery) {
   const proposalAssociation = 
     getAssociation( "mergeProposals", 
                     undefined, 
-                    !!proposer || isMergeableState || isDisputableState, 
+                    !!proposer || !!proposalId || isMergeableState || isDisputableState, 
                     {
                       ... proposer ? { creator: { [Op.iLike]: proposer.toString() } } : {},
+                      ... proposalId ? { id: proposalId } : {},
                       ... isMergeableState || isDisputableState ? {
                         [Op.and]: [
                           { isDisputed: false },
@@ -114,7 +123,12 @@ export default async function get(query: ParsedUrlQuery) {
                                           Sequelize.literal(disputableTimeCalc))
                         ]
                       } : {}
-                    });
+                    },
+                    proposalId ? [
+                        {
+                          association: "disputes"
+                        }
+                    ] : []);
 
   const pullRequestAssociation = 
     getAssociation( "pullRequests", 
@@ -173,7 +187,11 @@ export default async function get(query: ParsedUrlQuery) {
   } else
     sort.push("updatedAt");
 
+  const useSubQuery = isMergeableState || isDisputableState ? false : undefined;
+
   const issues = await models.issue.findAndCountAll(paginate({
+    subQuery: useSubQuery,
+    logging: console.log,
     where: whereCondition,
     include: [
       networkAssociation,

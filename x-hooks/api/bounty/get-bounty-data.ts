@@ -2,7 +2,7 @@ import { ParsedUrlQuery } from "querystring";
 
 import {
   IssueData,
-  pullRequest,
+  PullRequest,
 } from "interfaces/issue-data";
 
 import { api } from "services/api";
@@ -48,18 +48,18 @@ export async function getPullRequestReviews(repositoryPath: string, id: number) 
  * @returns list of pullRequests
  */
 export async function getPullRequestsDetails(repositoryPath: string,
-                                             pullRequests: pullRequest[]): Promise<pullRequest[]> {
+                                             pullRequests: PullRequest[]): Promise<PullRequest[]> {
 
   return Promise.all([
     ...pullRequests.map((pullRequest) => useOctokit()
         .getPullRequestDetails(repositoryPath, +pullRequest.githubId)
         .then((details) =>  ({
-                ...pullRequest,
-                isMergeable: details?.mergeable === "MERGEABLE",
-                merged: details?.merged,
-                state: details?.state,
-                approvals: details?.approvals,
-                hash: details?.hash,
+          ...pullRequest,
+          isMergeable: details?.mergeable === "MERGEABLE",
+          merged: details?.merged,
+          state: details?.state,
+          approvals: details?.approvals,
+          hash: details?.hash,
         }))),
   ])
 }

@@ -9,7 +9,8 @@ import WarningIcon from "assets/icons/warning-icon";
 
 import Button from "components/button";
 import If from "components/If";
-import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
+
+import { FlexColumn, FlexRow } from "./common/flex-box/view";
 
 interface ContextualSpanProps {
   children: ReactNode;
@@ -72,7 +73,7 @@ export function ContextualSpan({
                 <Icon width={12} height={12} />
               </span>
             ) : (
-              <div className="ball-sm bg-warning me-2 mt-2" />
+              <div className={`ball-sm bg-${context} me-2 mt-2`} />
             )}
           </div>
           <div className={`col-12 ${classNameChildren}`}>

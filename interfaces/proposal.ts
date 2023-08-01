@@ -1,11 +1,14 @@
 import BigNumber from "bignumber.js";
 
+import { User } from "interfaces/api";
 import { BaseModel } from "interfaces/db/base";
+import { IssueBigNumberData, IssueData, PullRequest } from "interfaces/issue-data";
 
 export interface ProposalDistribution extends BaseModel {
   recipient: string;
   percentage: number;
   proposalId: number;
+  user?: User;
 }
 
 export interface ProposalDisputes extends BaseModel {
@@ -29,6 +32,8 @@ export interface Proposal extends BaseModel {
   refusedByBountyOwner?: boolean;
   isDisputed?: boolean;
   disputes?: ProposalDisputes[];
+  issue?: IssueData | IssueBigNumberData;
+  pullRequest?: PullRequest;
 }
 
 export interface INetworkProposal {

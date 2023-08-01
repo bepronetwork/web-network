@@ -70,7 +70,6 @@ export function useNetwork() {
 
     await searchNetworks({
       name: queryNetworkName,
-      chainShortName: queryChainName,
       isNeedCountsAndTokensLocked: true
     })
       .then(({count, rows}) => {
@@ -79,7 +78,9 @@ export function useNetwork() {
         }
 
         if (queryChainName) {
-          const data = rows[0];
+          const data = rows.find((network) =>
+              network?.chain?.chainShortName?.toLowerCase() ===
+              queryChainName?.toLowerCase());
 
           if (!data.isRegistered) {
             if (state.currentUser?.walletAddress === data.creatorAddress)
@@ -134,7 +135,10 @@ export function useNetwork() {
     const path = profilePage === "profile" ? "profile" : `profile/${profilePage}`;
 
     if (queryNetwork !== "")
-      return push(getURLWithNetwork(`/profile/[[...profilePage]]`, params), `/${queryNetwork}/${queryChain}/${path}`);
+      return push(getURLWithNetwork(`/profile/[[...profilePage]]`, {
+        ...query,
+        ...params
+      }), `/${queryNetwork}/${queryChain}/${path}`);
 
     return push({
       pathname: "/profile/[[...profilePage]]",

@@ -61,7 +61,10 @@ export default function ListActiveNetworks() {
         >
           <HorizontalScroll>
             {networks.map((network) => 
-              <div className="col-12 col-sm-6 col-md-5 col-lg-4">
+              <div
+                className="col-12 col-sm-6 col-md-5 col-lg-4"
+                key={`active-${network?.networkAddress}`}
+              >
                 <ListActiveNetworksItem network={network} key={`${network.name}-${network.chain.chainShortName}`} />
               </div>)}
           </HorizontalScroll>

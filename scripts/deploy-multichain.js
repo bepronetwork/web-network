@@ -7,6 +7,7 @@ const {nativeZeroAddress} = require("@taikai/dappkit/dist/src/utils/constants");
 
 const DBConfig = require("../db/config");
 const ChainModel = require("../db/models/chain.model");
+const ChainEvents = require("../db/models/chain-events.model");
 const TokensModel = require("../db/models/tokens.model");
 const NetworkModel = require("../db/models/network.model");
 const NetworkTokensModel = require("../db/models/network-tokens.model");
@@ -200,6 +201,7 @@ async function main(option = 0) {
       NetworkModel.init(sequelize);
       RepositoryModel.init(sequelize);
       ChainModel.init(sequelize);
+      ChainEvents.init(sequelize);
       TokensModel.init(sequelize);
       NetworkTokensModel.init(sequelize);
 
@@ -290,6 +292,8 @@ async function main(option = 0) {
           chain_id: chainId,
           name: "global",
           lastBlock: startBlock,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       })
 

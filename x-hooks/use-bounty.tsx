@@ -13,7 +13,7 @@ import {changeSpinners} from "contexts/reducers/change-spinners";
 
 import { issueParser } from "helpers/issue";
 
-import {IssueData, pullRequest} from "interfaces/issue-data";
+import {IssueData, PullRequest} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
@@ -81,7 +81,7 @@ export function useBounty() {
             })))]);
       })
       .then(pullRequests => {
-        const extendedPrs = pullRequests.slice(1) as pullRequest[];
+        const extendedPrs = pullRequests.slice(1) as PullRequest[];
         dispatch(changeCurrentBountyData({ ...pullRequests[0], pullRequests: extendedPrs }));
       })
       .catch(error => {

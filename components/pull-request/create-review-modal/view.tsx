@@ -9,7 +9,7 @@ import Modal from "components/modal";
 
 import { formatDate } from "helpers/formatDate";
 
-import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
 
@@ -19,7 +19,7 @@ interface CreateReviewModalViewProps {
   show: boolean;
   isExecuting: boolean;
   onCloseClick: () => void;
-  pullRequest: pullRequest;
+  pullRequest: PullRequest;
   currentBounty: IssueBigNumberData;
   body: string;
   handleChangeBody: (e: ChangeEvent<HTMLTextAreaElement>) => void;

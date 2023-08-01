@@ -24,7 +24,7 @@ export default function NetworkLogo({
 
   return (
     <div className={
-      `${noBg ? "px-2 py-0" : "bg-dark p-2"} d-flex align-items-center justify-content-center rounded-circle`
+      `${noBg ? "p-0" : "bg-dark p-2"} d-flex align-items-center justify-content-center rounded-circle`
     }>
       {isBepro ? (
         <BeProBlue width={sizes[size]} height={sizes[size]} />

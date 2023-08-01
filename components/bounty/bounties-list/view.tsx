@@ -17,6 +17,8 @@ import NothingFound from "components/nothing-found";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
+import { SupportedChainData } from "interfaces/supported-chain-data";
+
 import { SearchBountiesPaginatedBigNumber } from "types/components";
 
 interface BountiesListViewProps {
@@ -30,6 +32,7 @@ interface BountiesListViewProps {
   isConnected?: boolean;
   hideFilter?: boolean;
   hasFilter?: boolean;
+  currentChain?: SupportedChainData;
   onClearSearch: () => void;
   onNotFoundClick: () => void;
   onNextPage: () => void;
@@ -55,6 +58,7 @@ export default function BountiesListView({
   onSearchInputChange,
   onSearchClick,
   onEnterPressed,
+  currentChain
 }: BountiesListViewProps) {
   const { t } = useTranslation(["common", "bounty", "pull-request", "proposal"]);
 
@@ -108,15 +112,37 @@ export default function BountiesListView({
   ];
 
   return (
-    <div className="px-0 mx-0">
+    <div className="px-0 mx-0 mb-4">
       <If condition={isBountyHall || isProfile}>
-        <div className="d-flex flex-row align-items-center">
-          <h4 className="text-capitalize font-weight-medium">{listTitleByType[type]}</h4>
-          <div className="ms-2">
-            <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
-              {bounties?.count || 0}
-            </span>
+        <div className="d-flex flex-wrap justify-content-between">
+          <div className="d-flex flex-row flex-wrap align-items-center">
+            <h4 className="text-capitalize font-weight-medium pb-2">{listTitleByType[type]}
+            <span className="ms-2 p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
+                {bounties?.count || 0}
+              </span>
+            </h4>
+
           </div>
+          <If condition={isProfile && isOnNetwork}>
+            <ResponsiveWrapper md={false} xs={true} sm={true}>
+            <div className="d-flex align-items-center">
+                <div
+                  className={`d-flex py-1 pe-2 justify-content-center text-truncate border border-gray-800
+                        border-radius-4 text-white-40 bg-gray-850 text-uppercase`}
+                >
+                  <div className="d-flex flex-column justify-content-center">
+                    <div
+                      className="d-flex ball mx-2"
+                      style={{
+                        backgroundColor: currentChain?.color,
+                      }}
+                    />
+                  </div>
+                  {currentChain?.chainShortName}
+                </div>
+              </div>
+            </ResponsiveWrapper>
+          </If>
         </div>
       </If>
 
@@ -155,8 +181,8 @@ export default function BountiesListView({
 
           <If condition={!hideFilter}>
             <div className="col-auto">
-              <If condition={!isProfile && !isManagement}>
-                <IssueFilters sortOptions={sortOptions} />
+              <If condition={!isManagement}>
+                <IssueFilters sortOptions={sortOptions} onlyProfileFilters={isProfile}/>
               </If>
 
               <div className="d-none d-xl-flex">

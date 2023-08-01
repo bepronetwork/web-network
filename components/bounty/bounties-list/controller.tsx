@@ -13,6 +13,7 @@ import { issueParser } from "helpers/issue";
 import { SearchBountiesPaginated } from "types/api";
 import { SearchBountiesPaginatedBigNumber } from "types/components";
 
+import useChain from "x-hooks/use-chain";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
@@ -45,10 +46,11 @@ export default function BountiesList({
   const { nextPage } = usePage();
   const { state: appState } = useAppState();
   const { search, setSearch, clearSearch } = useSearch();
+  const { getChainFromUrl } = useChain();
+  
+  const { state, time, repoId, networkName } = router.query;
 
-  const { state, time, repoId } = router.query;
-
-  const hasFilter = !!(state || time || repoId || search);
+  const hasFilter = !!(state || time || repoId || search || networkName);
   const isOnNetwork = !!router?.query?.network;
 
   function handleSearchChange(e) {
@@ -100,6 +102,7 @@ export default function BountiesList({
       emptyMessage={emptyMessage}
       buttonMessage={buttonMessage}
       variant={variant}
+      currentChain={getChainFromUrl()}
       bounties={bountiesList}
       type={type}
       searchString={searchState}

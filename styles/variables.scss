@@ -345,6 +345,28 @@ $utilities: map-merge(
               $more-roundend
             )
         )
-      )
+      ),
+    "rounded-top":
+      map-merge(
+        map-get($utilities, "rounded-top"),
+        (
+          values:
+            map-merge(
+              map-get(map-get($utilities, "rounded-top"), "values"),
+              $more-roundend
+            )
+        )
+      ),
+    "rounded-bottom":
+        map-merge(
+          map-get($utilities, "rounded-bottom"),
+          (
+            values:
+              map-merge(
+                map-get(map-get($utilities, "rounded-bottom"), "values"),
+                $more-roundend
+              )
+          )
+        )
   )
 );

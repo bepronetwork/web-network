@@ -10,7 +10,7 @@ import { IPRLabel } from "components/pull-request/labels/controller";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import { pullRequest } from "interfaces/issue-data";
+import { PullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import ReviewsNumberView from "../reviews-number.view";
@@ -23,7 +23,7 @@ interface ItemRowProps {
   status?: IPRLabel[];
   href?: UrlObject | string;
   isProposal?: boolean;
-  item: Proposal | pullRequest;
+  item: Proposal | PullRequest;
   handleBtn: (ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   btnLabel: string;
   shouldRenderApproveButton: boolean;
@@ -99,7 +99,7 @@ export default function ItemRowView({
           </div>
           {!isProposal && (
             <ReviewsNumberView
-              reviewers={(item as pullRequest)?.reviewers?.length || 0}
+              reviewers={(item as PullRequest)?.reviewers?.length || 0}
               className="col-xs-12 d-xl-none d-none d-sm-block"
             />
           )}
@@ -113,7 +113,7 @@ export default function ItemRowView({
 
         {!isProposal && (
           <ReviewsNumberView
-            reviewers={(item as pullRequest)?.reviewers?.length || 0}
+            reviewers={(item as PullRequest)?.reviewers?.length || 0}
             className="d-block d-sm-none mb-2 mt-4"
           />
         )}
@@ -131,8 +131,8 @@ export default function ItemRowView({
           </div>
         )}
 
-        <div className="col-md d-none d-sm-block">
-          <div className=" d-flex flex-row gap-3 justify-content-end align-items-center">
+        <div className="col-lg-4 col-md d-none d-sm-block">
+          <div className="d-flex flex-row gap-3 justify-content-end align-items-center">
             <RenderProposalOrPullRequest />
             <ItemRowIdView
               id={id}

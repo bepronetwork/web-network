@@ -11,13 +11,15 @@ import useBreakPoint from "x-hooks/use-breakpoint";
 interface ListSortProps {
   defaultOptionIndex?: number;
   options: SortOption[];
+  labelLineBreak?: boolean;
   asSelect?: boolean;
 }
 
 export default function ListSort({
   defaultOptionIndex = 0,
   options,
-  asSelect,
+  labelLineBreak,
+  asSelect
 }: ListSortProps) {
   const router = useRouter();
 
@@ -69,6 +71,7 @@ export default function ListSort({
       options={options}
       onChange={handleSelectChange}
       dropdownItems={optionsToDropdownItems()}
+      labelLineBreak={labelLineBreak}
       asSelect={asSelect}
       selectedIndex={selectedIndex}
       componentVersion={componentVersion}

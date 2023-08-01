@@ -1,57 +1,75 @@
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
+import SelectNetwork from "components/bounties/select-network";
 import If from "components/If";
 import ListSort from "components/lists/sort/controller";
 import Modal from "components/modal";
-import ReactSelect from "components/react-select";
+import ChainSelector from "components/navigation/chain-selector/controller";
 
 import { SortOption } from "types/components";
 
 import useFilters from "x-hooks/use-filters";
 
+import { ContainerFilterView } from "./container-filter/view";
+import FilterComponent from "./filter-component/controller";
+
 interface MobileFiltersModalProps {
   show: boolean;
   hide: () => void;
   onlyTimeFrame?: boolean;
+  onlyProfileFilters?: boolean;
   sortOptions?: SortOption[];
+  hideSort?: boolean;
+  showChainSelector?: boolean;
 }
 
 export default function MobileFiltersModal({
   show,
   hide,
   onlyTimeFrame,
-  sortOptions
+  onlyProfileFilters,
+  sortOptions,
+  showChainSelector,
+  hideSort = false
 }: MobileFiltersModalProps) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common"]);
+  const router = useRouter();
+  const isOnNetwork = !!router?.query?.network;
 
-  const [ [repoOptions, stateOptions, timeOptions], , , checkOption, applyFilters ] = useFilters();
+  const [ [repoOptions, stateOptions, timeOptions], , , , applyFilters ] = useFilters();
 
-  function getCurrentFilter(options) {
-    return options?.find(({ checked }) => checked);
-  }
-
-  function handleChange(type) {
-    return (value) => {
-      checkOption(value, type);
-    };
-  }
+  
+  const defaultSortOptions = sortOptions ? sortOptions : [
+    {
+      value: "newest",
+      sortBy: "createdAt",
+      order: "DESC",
+      label: t("sort.types.newest")
+    },
+    {
+      value: "oldest",
+      sortBy: "createdAt",
+      order: "ASC",
+      label: t("sort.types.oldest")
+    },
+    {
+      value: "highest-bounty",
+      sortBy: "amount,fundingAmount",
+      order: "DESC",
+      label: t("sort.types.highest-bounty")
+    },
+    {
+      value: "lowest-bounty",
+      sortBy: "amount,fundingAmount",
+      order: "ASC",
+      label: t("sort.types.lowest-bounty")
+    }
+  ];
 
   function handleApply() {
     hide();
     applyFilters();
-  }
-
-  function FilterComponent(label, options, type) {
-    return(
-      <div className="mb-3">
-        <span className="caption-small font-weight-medium text-gray-100 text-capitalize">{label}</span>
-        <ReactSelect
-          value={getCurrentFilter(options)}
-          options={options}
-          onChange={handleChange(type)}
-        />
-      </div>
-    );
   }
 
   return(
@@ -63,14 +81,45 @@ export default function MobileFiltersModal({
       okLabel={t("actions.apply")}
       onOkClick={handleApply}
     >
-      <If condition={!onlyTimeFrame}>
-        {FilterComponent(t("filters.repository"), repoOptions, "repo")}
-        {FilterComponent(t("filters.bounties.title"), stateOptions, "state")}
+      <If condition={showChainSelector && !isOnNetwork}>
+        <ContainerFilterView label={t("misc.chain")}>
+          <ChainSelector isFilter />
+        </ContainerFilterView>
       </If>
-      
-      {FilterComponent(t("filters.timeframe.title"), timeOptions, "time")}
+      <If condition={onlyProfileFilters}>
+        <If condition={!hideSort}>
+          <ListSort options={defaultSortOptions} labelLineBreak={onlyProfileFilters} />
+        </If>
 
-      <ListSort options={sortOptions} asSelect />
+        <SelectNetwork
+          isCurrentDefault={isOnNetwork}
+          onlyProfileFilters={onlyProfileFilters}
+          filterByConnectedChain
+        />
+      </If>
+
+      <If condition={!onlyTimeFrame && !onlyProfileFilters}>
+        <FilterComponent 
+          label={t('filters.repository')}
+          options={repoOptions}
+          type="repo"
+        />
+        <FilterComponent 
+          label={t('filters.bounties.title')}
+          options={stateOptions}
+          type="state"
+        />
+      </If>
+
+      <If condition={onlyTimeFrame || !onlyProfileFilters}>
+        <FilterComponent 
+          label={t('filters.timeframe.title')}
+          options={timeOptions}
+          type="time"
+        />
+
+        <ListSort options={defaultSortOptions} asSelect />
+      </If>
     </Modal>
   );
 }

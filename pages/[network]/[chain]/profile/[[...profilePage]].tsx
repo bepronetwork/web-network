@@ -3,31 +3,20 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import ProfileRouter from "components/profile/profile-router";
 
-import { SearchBountiesPaginated } from "types/api";
+import { ProfilePageProps } from "types/pages";
 
-import getBountiesListData from "x-hooks/api/bounty/get-bounties-list-data";
+import getProfilePageData from "x-hooks/api/get-profile-data";
 
-interface ProfilePageProps {
-  bounties: SearchBountiesPaginated;
-}
-
-export default function Profile({
-  bounties
-}: ProfilePageProps) {
-  return <ProfileRouter bounties={bounties} />;
+export default function Profile(props: ProfilePageProps) {
+  return <ProfileRouter {...props} />;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
-  const hasNotWalletFilter = !query?.creator && !query?.proposer && !query?.pullRequester;
-  const emptyData = { count: 0, rows: [], currentPage: 1, pages: 1 };
-
-  const bounties = hasNotWalletFilter ? emptyData : await getBountiesListData(query)
-    .then(({ data }) => data)
-    .catch(() => ({ count: 0, rows: [], currentPage: 1, pages: 1 }));
-
+  const pageData = await getProfilePageData(query);
+  
   return {
     props: {
-      bounties,
+      ...pageData,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

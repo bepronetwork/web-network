@@ -35,21 +35,23 @@ export default function BountyAmountView({
       }
     >
       <div
-        className={`m-0 text-truncate px-1 py-1 border-radius-4 border border-gray-800 ${
+        className={`m-0 text-truncate px-2 py-1 border-radius-4 border border-gray-800 ${
           !isActive ? "bg-gray-950" : "bg-dark-gray"
         } `}
       >
-        <div className={`px-0 text-truncate ${size === "sm" && "text-center"}`}>
+        <div className={`d-flex gap-1 px-0 justify-content-center text-truncate ${size === "sm" && "text-center"}`}>
           <span
-            className={`mx-2 text-opacity-1 text-white${isActive && "-40"}`}
+            className={`text-opacity-1 mr-1 text-white${isActive && "-40"}`}
           >
             {(+bountyAmount >= 1e-6 &&
               formatNumberToNScale(bountyAmount?.toFixed())) ||
-              bountyAmount?.toExponential()}{" "}
-            <span className={`text-uppercase text-gray-500`}>
+              bountyAmount?.toExponential()}
+          </span>
+          <div className="text-truncate token-symbol">
+            <span className={`text-uppercase text-white-40 `}>
               {symbol || t("common:misc.token")}
             </span>
-          </span>
+          </div>
         </div>
       </div>
     </OverlayTrigger>

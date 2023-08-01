@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { useAppState } from "contexts/app-state";
 
-import { IssueBigNumberData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import { useNetwork } from "x-hooks/use-network";
@@ -14,7 +14,7 @@ import { useNetwork } from "x-hooks/use-network";
 import ItemRowView from "./view";
 
 interface ItemRowProps {
-  item: Proposal | pullRequest;
+  item: Proposal | PullRequest;
   isProposal: boolean;
   currentBounty: IssueBigNumberData;
   approvalsRequired: number;
@@ -48,11 +48,11 @@ export default function ItemRow({
 
   if (!isProposal) {
     status.push({
-      merged: (item as pullRequest)?.merged,
-      isMergeable: (item as pullRequest)?.isMergeable,
-      isDraft: (item as pullRequest)?.status === "draft",
+      merged: (item as PullRequest)?.merged,
+      isMergeable: (item as PullRequest)?.isMergeable,
+      isDraft: (item as PullRequest)?.status === "draft",
     });
-    valueRedirect.prId = (item as pullRequest)?.githubId;
+    valueRedirect.prId = (item as PullRequest)?.githubId;
   } else if (proposal) {
     if (isDisputed || isMerged) {
       status.push({
@@ -64,18 +64,18 @@ export default function ItemRow({
     valueRedirect.proposalId = item?.id;
   }
 
-  const approvalsCurrentPr = (item as pullRequest)?.approvals?.total || 0;
+  const approvalsCurrentPr = (item as PullRequest)?.approvals?.total || 0;
   const shouldRenderApproveButton =
     approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
   const itemId = isProposal
     ? item?.contractId + 1
-    : (item as pullRequest)?.githubId;
+    : (item as PullRequest)?.githubId;
   const totalToBeDisputed = BigNumber(state.Service?.network?.amounts?.percentageNeededForDispute)
     .multipliedBy(state.Service?.network?.amounts?.totalNetworkToken)
     .dividedBy(100);
   const btnLabel = isProposal
     ? "actions.view-proposal"
-    : (item as pullRequest)?.status === "draft"
+    : (item as PullRequest)?.status === "draft"
     ? "actions.view-pull-request"
     : "actions.review";
 
@@ -83,7 +83,7 @@ export default function ItemRow({
     ev.preventDefault();
     router.push?.(getURLWithNetwork(pathRedirect, {
         ...valueRedirect,
-        review: (item as pullRequest)?.status === "ready",
+        review: (item as PullRequest)?.status === "ready",
     }));
   }
 

@@ -1,6 +1,6 @@
 import { SVGProps } from "react";
 
-const ArrowRightSmall: React.FC = (props: SVGProps<SVGSVGElement>) => {
+export default function ArrowRightSmall(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 8 12"
@@ -17,5 +17,3 @@ const ArrowRightSmall: React.FC = (props: SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default ArrowRightSmall;

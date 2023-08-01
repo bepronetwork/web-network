@@ -14,10 +14,19 @@ import {changeLoadState} from "contexts/reducers/change-load";
 
 import {Network} from "interfaces/network";
 
+import { SearchBountiesPaginated } from "types/api";
+import { MyNetworkPageProps } from "types/pages";
+
 import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 
-export function MyNetwork() {
+interface MyNetworkProps {
+  bounties: SearchBountiesPaginated;
+}
+
+export function MyNetwork({
+  bounties
+}: MyNetworkProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
@@ -77,18 +86,24 @@ export function MyNetwork() {
           </NothingFound>
         </Col>
       ||
-        <Col xs={10}>
-          <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
+        <Col xs={12} xl={10}>
+          <MyNetworkSettings
+            bounties={bounties}
+            network={myNetwork}
+            updateEditingNetwork={updateEditingNetwork}
+          />
         </Col>
       }
     </ProfileLayout>
   );
 }
 
-export default function MyNetworkPage() {
+export default function MyNetworkPage({
+  bounties
+}: MyNetworkPageProps) {
   return(
     <NetworkSettingsProvider>
-      <MyNetwork />
+      <MyNetwork bounties={bounties} />
     </NetworkSettingsProvider>
   );
 }

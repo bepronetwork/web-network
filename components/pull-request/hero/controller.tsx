@@ -1,13 +1,13 @@
 import {useRouter} from "next/router";
 
-import {IssueBigNumberData, pullRequest} from "interfaces/issue-data";
+import {IssueBigNumberData, PullRequest} from "interfaces/issue-data";
 
 import { useNetwork } from "x-hooks/use-network";
 
 import PullRequestHeroView from "./view";
 
 interface PullRequestHeroControllerProps {
-  currentPullRequest: pullRequest;
+  currentPullRequest: PullRequest;
   currentBounty: IssueBigNumberData;
 }
 

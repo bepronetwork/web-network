@@ -18,9 +18,10 @@
     "distribution-is-100": "Distribution is 100%",
     "distribution-must-be-100": "Distribution Must be 100%",
     "no-proposals-created": "There are no proposals created.",
-    "distribution-cant-done": "This distribution can't be done try another one.",
+    "distribution-cant-done": "This distribution can't be done try another one",
     "proposal-refused": "Proposal Refused",
-    "in-disputable-time": "{{time}} before proposal can be merged.",
+    "proposal-disputed": "Proposal Disputed",
+    "in-disputable-time": "{{time}} until dispute period ends",
     "owner-pull-request": "You cannot accept a proposal containing your own pull request",
     "owner-proposal": "You cannot accept a proposal created by you"
   },
@@ -35,14 +36,14 @@
     "failed": "Failed",
     "open-for-dispute": "Open for Dispute",
     "accepted": "Accepted",
-    "waiting": "Waiting"
+    "waiting": "Waiting for Merge"
   },
   "merge-modal": {
     "title": "Confirm Bounty Distribution",
     "sub-title": "You are about to distribute the",
     "bounty":"Bounty #{{id}}",
     "confirm-merge": "Confirm Distribution",
-    "proposal-creator": "Proposal Creator",
+    "proposal-creator": "Proposer",
     "proposal-creator-description": "Curator who proposed this distribution",
     "proposal-merger": "Merger",
     "proposal-merger-description": "User who accepted the Bounty’s solution",
@@ -50,7 +51,7 @@
     "contributor-description": "User who actively participated in the development of the Bounty’s solution",
     "total": "total",
     "network-fee": "Network Fee",
-    "network-fee-description": "We charge a {{percentage}}% convenience fee on every distribution. This makes sure we can keep improving the platform."
+    "network-fee-description": "We charge a {{percentage}}% convenience fee on every distribution. This makes sure we can keep improving the platform"
   },
   "disputes": {
     "title": "Addresses disputed"

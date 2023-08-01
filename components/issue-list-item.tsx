@@ -15,9 +15,9 @@ import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
 import BountyAmount from "components/bounty/amount-info/controller";
 import CardItem from "components/card-item";
+import { FlexColumn } from "components/common/flex-box/view";
 import If from "components/If";
 import Modal from "components/modal";
-import { FlexColumn } from "components/profile/wallet-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
 import Translation from "components/translation";
 
@@ -402,12 +402,12 @@ export default function IssueListItem({
 
           <div className="row align-items-center border-xl-top border-gray-850 pt-3">
             <ResponsiveWrapper xs={false} xl={true}>
-              <div className="row w-100 align-items-center justify-content-md-start gx-0">
+              <div className="row w-100 align-items-center justify-content-md-start">
                 <BountyItemLabel label="ID" className="col-auto">
                   <IssueTag />
                 </BountyItemLabel>
 
-                <BountyItemLabel label="Repository" className="col-auto">
+                <BountyItemLabel label="Repository" className="col-auto px-0">
                   <OverlayTrigger
                     key="bottom-githubPath"
                     placement="bottom"
@@ -417,7 +417,7 @@ export default function IssueListItem({
                       </Tooltip>
                     }
                   >
-                    <span className={`text-gray me-2 text-truncate`}>
+                    <span className={`mw-repo text-gray me-2 text-truncate`}>
                       {issue?.repository?.githubPath.split("/")?.[1]}
                     </span>
                   </OverlayTrigger>
@@ -436,22 +436,22 @@ export default function IssueListItem({
                   </span>
                 </BountyItemLabel>
 
-                <div className="col d-flex justify-content-end px-0">
+                <div className="col d-flex justify-content-end">
                   <BountyAmount bounty={issue} size={size} />
                 </div>
               </div>
             </ResponsiveWrapper>
-            <ResponsiveWrapper xs={true} xl={false}>
-              <div className="col">
-                <div className="row justify-content-between">
-                  <div className="mw-50-auto">
-                    <BountyTagsView tags={[issue?.network?.name]} />
-                  </div>
-                  
-                  <div className="mw-50-auto">
-                    <BountyAmount bounty={issue} size={size} />
-                  </div>
-                </div>
+            <ResponsiveWrapper
+              xs={true}
+              xl={false}
+              className="row align-items-center justify-content-between"
+            >
+              <div className="col mw-50-auto network-name">
+                <BountyTagsView tags={[issue?.network?.name]} />
+              </div>
+
+              <div className="col-auto px-0">
+                <BountyAmount bounty={issue} size={size} />
               </div>
             </ResponsiveWrapper>
           </div>

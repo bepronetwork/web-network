@@ -39,15 +39,16 @@ export default function useBepro() {
     console.error("Tx error", err);
   }
 
-  async function handlerDisputeProposal(proposalContractId: number): Promise<TransactionReceipt | Error> {
+  async function handlerDisputeProposal(issueContractId: number,
+                                        proposalContractId: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const disputeTxAction = addTx([{
         type: TransactionTypes.dispute,
         network: state.Service?.network?.active,
       }] as any);
       dispatch(disputeTxAction);
-      await state.Service?.active.disputeProposal(+state.currentBounty?.data?.contractId, +proposalContractId)
-        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+      await state.Service?.active.disputeProposal(+issueContractId, +proposalContractId)
+        .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, disputeTxAction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve?.(txInfo);
         })
@@ -119,7 +120,7 @@ export default function useBepro() {
 
   async function handleCloseIssue(bountyId: number,
                                   proposalContractId: number,
-                                  tokenUri: string): Promise<TransactionReceipt | Error> {
+                                  tokenUri: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTx([{
         type: TransactionTypes.closeIssue,
@@ -128,7 +129,7 @@ export default function useBepro() {
       dispatch(closeIssueTx);
 
       await state.Service?.active.closeBounty(+bountyId, +proposalContractId, tokenUri)
-        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+        .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, closeIssueTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })
@@ -162,7 +163,9 @@ export default function useBepro() {
     });
   }
 
-  async function handleReedemIssue(funding = false): Promise<{ blockNumber: number; } | Error> {
+  async function handleReedemIssue( contractId: number, 
+                                    issueId: string, 
+                                    funding = false): Promise<{ blockNumber: number; } | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTx([{
         type: TransactionTypes.redeemIssue,
@@ -172,15 +175,15 @@ export default function useBepro() {
 
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.cancelBounty(state.currentBounty?.data?.contractId, funding)
+      await state.Service?.active.cancelBounty(contractId, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent(NetworkEvents.BountyCanceled, undefined, {
-            fromBlock: txInfo.blockNumber, id: state.currentBounty?.data?.contractId
+            fromBlock: txInfo.blockNumber, id: contractId
           });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[state.currentBounty?.data?.issueId]) throw new Error('Failed');
+          if (!canceledBounties?.[issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(tx)
           // todo should force these two after action, but we can't have it here or it will fall outside of context
@@ -202,17 +205,17 @@ export default function useBepro() {
       dispatch(transaction);
       let tx: { blockNumber: number; }
 
-      await state.Service?.active.hardCancel(contractId || state.currentBounty?.data?.contractId)
+      await state.Service?.active.hardCancel(contractId)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
 
           return processEvent(NetworkEvents.BountyCanceled, undefined, {
             fromBlock: txInfo.blockNumber, 
-            id: contractId || state.currentBounty?.data?.contractId
+            id: contractId
           });
         })
         .then((canceledBounties) => {
-          if (!canceledBounties?.[issueId || state.currentBounty?.data?.issueId]) throw new Error('Failed');
+          if (!canceledBounties?.[issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(canceledBounties)
           // getChainBounty(true);
@@ -378,7 +381,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleRefuseByOwner(bountyId: number, proposalId: number) {
+  async function handleRefuseByOwner(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
         type: TransactionTypes.refuseProposal,
@@ -387,7 +390,7 @@ export default function useBepro() {
       dispatch(tx);
 
       await state.Service?.active.refuseProposal(bountyId, proposalId)
-      .then((txInfo: unknown) => {
+      .then((txInfo: TransactionReceipt) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })

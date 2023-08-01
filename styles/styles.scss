@@ -139,7 +139,6 @@ li {
 
 #root-container{
   padding-top: $navbar-height;
-  padding-bottom: $statusbar-height;
 }
 
 .modal {
@@ -303,8 +302,8 @@ li {
   font-weight: 600;
 }
 
-.mw-github-info {
-  max-width: 235px;
+.mw-repo {
+  max-width: 120px;
 }
 
 .max-width-content {
@@ -397,8 +396,10 @@ li {
   width: 100%;
 }
 
-.profile-content {
-  padding-left: 30px;
+@include media-breakpoint-up(xl) {
+  .profile-content {
+    padding-left: 30px;
+  }
 }
 
 .main-nav {
@@ -571,6 +572,7 @@ label {
 
   background-color: $gray-900;
   border: 1px solid $gray-800;
+  border-radius: 4px;
   color: #fff;
 
   &:disabled,
@@ -1904,7 +1906,7 @@ input[type="color"] {
 
 .profile {
   &-content {
-    min-height: 90vh;
+    min-height: calc(100vh - $navbar-height);
     height: max-content;
     border-left: 1px solid $dark-gray;
   }
@@ -2064,5 +2066,11 @@ input[type="color"] {
   /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+.overflow-wrap {
+  &-anywhere {
+    overflow-wrap: anywhere;
   }
 }

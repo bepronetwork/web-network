@@ -4,14 +4,15 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import ContractButton from "components/contract-button";
+import ScrollableTabs from "components/navigation/scrollable-tabs/view";
 import { ContainerTab } from "components/profile/my-network-settings/container-tab";
 import GovernanceSettings from "components/profile/my-network-settings/governance-settings";
 import LogoAndColoursSettings from "components/profile/my-network-settings/logo-and-colours-settings";
+import Management from "components/profile/my-network-settings/management";
 import RegistrySettings from "components/profile/my-network-settings/registry-settings";
 import RepositoriesListSettings from "components/profile/my-network-settings/repositories-list-settings";
 import WarningGithub from "components/profile/my-network-settings/warning-github";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
-import TabbedNavigation from "components/tabbed-navigation";
 
 import { useAppState } from "contexts/app-state";
 import { useNetworkSettings } from "contexts/network-settings";
@@ -26,16 +27,19 @@ import { psReadAsText } from "helpers/file-reader";
 import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 
+import { SearchBountiesPaginated } from "types/api";
+
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
+import usePaginatedList from "x-hooks/use-paginated-list";
 
-import Management from "./management";
 
 interface MyNetworkSettingsProps {
   network: Network;
+  bounties: SearchBountiesPaginated;
   updateEditingNetwork: () => void;
 }
 
@@ -47,6 +51,7 @@ interface TabsProps {
 
 export default function MyNetworkSettings({
   network,
+  bounties,
   updateEditingNetwork,
 }: MyNetworkSettingsProps) {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
@@ -70,6 +75,7 @@ export default function MyNetworkSettings({
     tokens,
     forcedNetwork,
   } = useNetworkSettings();
+  const { list: bountiesList, update: updateBountiesList } = usePaginatedList();
 
   const isCurrentNetwork =
     !!network &&
@@ -307,17 +313,22 @@ export default function MyNetworkSettings({
         title: t("bounty:management.label"),
         component: (
           <NetworkContainer>
-            <Management />
+            <Management bounties={bountiesList} />
           </NetworkContainer>
         )
       }
     ])
   },[
     network,
+    bounties,
     isGovernorRegistry,
     networkNeedRegistration,
     errorBigImages
   ]);
+
+  useEffect(() => {
+    updateBountiesList(bounties);
+  }, [bounties]);
 
   return (
     <>
@@ -327,12 +338,15 @@ export default function MyNetworkSettings({
 
       {!state.currentUser?.login && <WarningGithub />}
 
-      <TabbedNavigation
-        className="my-network-tabs"
-        defaultActiveKey="logo-and-colours"
-        tabs={tabs}
-        onTransition={setActiveTab}
+      <ScrollableTabs
+        tabs={tabs.map(tab => ({
+          label: tab?.title,
+          active: tab?.eventKey === activeTab,
+          onClick: () => setActiveTab(tab?.eventKey)
+        }))}
       />
+
+      {tabs.find(({ eventKey }) => activeTab === eventKey)?.component}
 
       {
         (
