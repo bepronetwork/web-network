@@ -62,12 +62,16 @@ export default function BountySettingsView({
     setShowHardCancelModal(false)
     handleHardCancel()
   }
+
+  function handleHide() {
+    setShow(false);
+  }
   
   function handleClick(e) {
       // @ts-ignore
     if (node.current.contains(e.target)) return;
   
-    setShow(false);
+    handleHide();
   }
   
   function loadOutsideClick() {
@@ -113,27 +117,43 @@ export default function BountySettingsView({
             <GithubLink
               forcePath={bounty?.repository?.githubPath}
               hrefPath={`pull?q=base:${bounty?.branch}`}
+              onClick={handleHide}
             >
               <Translation ns="pull-request" label="actions.view" />
             </GithubLink>
           </span>
       );
   }
+
+  function handleEditClick() {
+    handleHide();
+    handleEditIssue();
+  }
   
   function renderEditButton() {
     if (isWalletConnected && isBountyInDraft && isBountyOwner)
       return (
-          <span className="cursor-pointer" onClick={handleEditIssue}>
+          <span className="cursor-pointer" onClick={handleEditClick}>
             <Translation ns="bounty" label="actions.edit-bounty" />
           </span>
       );
+  }
+
+  function handleCancelClick(isHard) {
+    return () => {
+      if (isHard)
+        setShowHardCancelModal(true)
+      else
+        handleRedeem();
+      handleHide();
+    }
   }
   
   function renderCancel() {
     const Cancel = (isHard: boolean) => (
         <span
           className="cursor-pointer"
-          onClick={() => (isHard ? setShowHardCancelModal(true) : handleRedeem())}
+          onClick={handleCancelClick(isHard)}
         >
           <Translation
             ns={isHard ? "common" : "bounty"}
@@ -158,6 +178,12 @@ export default function BountySettingsView({
       )
       return Cancel(false);
   }
+
+  function handleGithubLinkClick() {
+    if (!network?.repos?.active?.ghVisibility) setShowGHModal(true);
+
+    handleHide();
+  }
   
   function renderActions() {
     return (
@@ -171,11 +197,7 @@ export default function BountySettingsView({
                   "pull") ||
                 "issues"
               }/${bounty?.githubId || ""}`}
-              onClick={
-                !network?.repos?.active?.ghVisibility
-                  ? () => setShowGHModal(true)
-                  : null
-              }
+              onClick={handleGithubLinkClick}
             >
               {t("actions.view-on-github")}
             </GithubLink>
