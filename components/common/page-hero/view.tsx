@@ -17,7 +17,7 @@ export interface PageHeroProps {
 export default function PageHero({ title, subtitle, infos }: PageHeroProps) {
   return (
     <div>
-      <div className="d-flex d-xl-none py-4 px-3 border-bottom border-gray-850">
+      <div className="d-flex d-xl-none pt-2 pb-3 px-3 border-bottom border-gray-850">
         <span className="xl-semibold text-white text-capitalize">{title}</span>
       </div>
 
