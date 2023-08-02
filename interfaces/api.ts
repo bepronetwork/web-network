@@ -15,7 +15,7 @@ export interface User {
 
 export interface PastEventsParams {
   id? :number;
-  fromBlock?: number;
+  fromBlock: number;
   toBlock?: number;
   chainId?: string;
   issueId?: string;

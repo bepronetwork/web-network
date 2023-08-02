@@ -403,7 +403,7 @@ export default function useApi() {
 
   async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
                               address?: string,
-                              params: PastEventsParams = {},
+                              params: PastEventsParams = { fromBlock: 0 },
                               currentNetworkName?: string) {
     const chainId = state.connectedChain?.id;
     const events = state.connectedChain?.events;
