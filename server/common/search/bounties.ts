@@ -39,10 +39,11 @@ export default async function get(query: ParsedUrlQuery) {
   if (["disputable", "mergeable", "proposable"].includes(state?.toString()))
     defaultStatesToIgnore.push("closed", "draft");
 
-  // Issue table columns
-  whereCondition.state = {
-    [Op.notIn]: defaultStatesToIgnore
-  };
+  if (!creator)
+    // Issue table columns
+    whereCondition.state = {
+      [Op.notIn]: defaultStatesToIgnore
+    };
 
   if (state && !["disputable", "mergeable"].includes(state.toString())) {
     if (state === "funding")
