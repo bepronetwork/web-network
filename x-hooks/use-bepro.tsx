@@ -566,7 +566,10 @@ export default function useBepro() {
     });
   }
 
-  async function handleRetractFundBounty(bountyId: number, fundingId: number, amount?: string, currency?: string) {
+  async function handleRetractFundBounty( bountyId: number, 
+                                          fundingId: number,
+                                          amount?: string,
+                                          currency?: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
         type: TransactionTypes.retractFundBounty,
@@ -591,7 +594,7 @@ export default function useBepro() {
   async function handleWithdrawFundRewardBounty(bountyId: number,
                                                 fundingId: number,
                                                 amount?: string,
-                                                currency?: string) {
+                                                currency?: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
         type: TransactionTypes.withdrawFundRewardBounty,

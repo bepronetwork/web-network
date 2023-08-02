@@ -57,12 +57,11 @@ export default function RetractOrWithdrawModal({
                                      funding.contractId,
                                      retractOrWithdrawAmount,
                                      rewardTokenSymbol)
-        .then(() => {
-          return processEvent(StandAloneEvents.BountyWithdrawReward,
-                              undefined,
-                              {
-              issueId: currentBounty?.issueId,
-                              });
+        .then(({ blockNumber }) => {
+          return processEvent(StandAloneEvents.BountyWithdrawReward, undefined, {
+            issueId: currentBounty?.issueId,
+            fromBlock: blockNumber
+          });
         })
         .then(() => {
           updateBountyData();
@@ -82,13 +81,11 @@ export default function RetractOrWithdrawModal({
     } else {
       handleRetractFundBounty(currentBounty?.contractId,
                               funding.contractId)
-        .then((txInfo) => {
-          const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-
+        .then(({ blockNumber }) => {
           updateBountyData();
 
           return processEvent(NetworkEvents.BountyFunded, undefined, {
-            fromBlock,
+            fromBlock: blockNumber,
           });
         })
         .then(async () => {
