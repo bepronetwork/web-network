@@ -1,25 +1,16 @@
 import { IssueFilterBoxOption } from "interfaces/filters";
 
-import useFilters from "x-hooks/use-filters";
-
 import FilterComponentView from "./view";
 
 export default function FilterComponent({
   label,
   options,
-  type,
+  onChange
 }: {
   label: string;
   options: IssueFilterBoxOption[];
-  type: string;
+  onChange: (e) => void;
 }) {
-  const [, , , checkOption] = useFilters();
-
-  function handleChange(type) {
-    return (value) => {
-      checkOption(value, type);
-    };
-  }
 
   function getCurrentFilter(options) {
     return options?.find(({ checked }) => checked);
@@ -29,9 +20,8 @@ export default function FilterComponent({
     <FilterComponentView
       label={label}
       options={options}
-      type={type}
       handleCurrentFilter={getCurrentFilter}
-      handleChange={handleChange}
+      handleChange={onChange}
     />
   );
 }

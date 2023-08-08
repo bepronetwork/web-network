@@ -7,13 +7,11 @@ import { ContainerFilterView } from "../container-filter/view";
 export default function FilterComponentView({
   label,
   options,
-  type,
   handleCurrentFilter,
   handleChange
 }: {
   label: string;
   options: IssueFilterBoxOption[];
-  type: string;
   handleCurrentFilter: (v: IssueFilterBoxOption[]) => void;
   handleChange: (type: string) => void
 }) {
@@ -22,7 +20,7 @@ export default function FilterComponentView({
       <ReactSelect
         value={handleCurrentFilter(options)}
         options={options}
-        onChange={handleChange(type)}
+        onChange={handleChange}
       />
     </ContainerFilterView>
   );
