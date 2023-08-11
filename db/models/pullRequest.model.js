@@ -77,6 +77,12 @@ class PullRequest extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
+
+    this.hasMany(models.comment, {
+      foreignKey: "deliverableId",
+      sourceKey: "id",
+      as: "comments"
+    });
   }
 }
 

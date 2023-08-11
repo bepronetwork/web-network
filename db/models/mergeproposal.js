@@ -76,6 +76,12 @@ class MergeProposal extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
+
+    this.hasMany(models.comment, {
+      foreignKey: "proposalId",
+      sourceKey: "id",
+      as: "comments"
+    });
   }
 }
 
