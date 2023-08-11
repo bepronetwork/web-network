@@ -164,6 +164,11 @@ class Issue extends Model {
       targetKey: "chainId",
       as: "chain"
     });
+    this.hasMany(models.comment, {
+      foreignKey: "issueId",
+      sourceKey: "id",
+      as: "comments"
+    });
   }
 }
 

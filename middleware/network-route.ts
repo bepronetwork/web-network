@@ -12,7 +12,7 @@ import decodeMessage from "helpers/decode-message";
 import { isAdmin } from "helpers/is-admin";
 import { resJsonMessage } from "helpers/res-json-message";
 
-export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT` ]) => {
+export const NetworkRoute = (handler: NextApiHandler, methods: string[] = [ `PUT`, `PATCH` ]) => {
 
   return async (req, res) => {
     if (!methods.includes(req.method.toUpperCase()))
