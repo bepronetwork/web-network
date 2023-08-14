@@ -37,7 +37,20 @@ class User extends Model {
     },
     {
       sequelize,
-      modelName: "user"
+      modelName: "user",
+      defaultScope: {
+        attributes: {
+          exclude: ["emailVerificationCode", "email", "isEmailConfirmed"]
+        }
+      },
+      scopes: {
+        ownerOrGovernor: {
+          attributes: {
+            exclude: ["emailVerificationCode"]
+          }
+        },
+        admin: {}
+      }
     });
   }
 
