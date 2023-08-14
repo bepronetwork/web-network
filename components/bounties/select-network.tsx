@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import NativeSelectWrapper from "components/common/native-select-wrapper/view";
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import NetworkLogo from "components/network-logo";
@@ -113,18 +114,24 @@ export default function SelectNetwork({
       <span className='caption-small font-weight-medium text-gray-100 text-nowrap mr-1'>
         {t("misc.network")}
       </span>
-
-      <ReactSelect
-        value={selected}
+      <NativeSelectWrapper
         options={options}
         onChange={onChange}
-        placeholder="Select a network"
-        components={{
-          Option: IconOption,
-          SingleValue: IconSingleValue
-        }}
-        isClearable
-      />
+        selectedIndex={options?.findIndex((opt) =>
+            opt?.value?.networkAddress === selected?.value?.networkAddress)}
+      >
+        <ReactSelect
+          value={selected}
+          options={options}
+          onChange={onChange}
+          placeholder="Select a network"
+          components={{
+            Option: IconOption,
+            SingleValue: IconSingleValue,
+          }}
+          isClearable
+        />
+      </NativeSelectWrapper>
     </div>
   );
 }
