@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -36,7 +38,7 @@ export default function MobileFiltersModal({
   const { t } = useTranslation(["common"]);
   const router = useRouter();
   const isOnNetwork = !!router?.query?.network;
-
+  const [selectedSortIndex, setSelectedSortIndex] = useState<number>();
   const [ [repoOptions, stateOptions, timeOptions], , , checkOption, applyFilters ] = useFilters();
 
   
@@ -67,9 +69,21 @@ export default function MobileFiltersModal({
     }
   ];
 
+  function handleSortBy() {
+
+    const query = {
+      ...router.query,
+      sortBy: defaultSortOptions[selectedSortIndex].sortBy,
+      order: defaultSortOptions[selectedSortIndex].order,
+      page: "1"
+    };
+
+    router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
+  }
+
   function handleApply() {
     hide();
-    applyFilters();
+    applyFilters()
   }
 
   return(
@@ -79,7 +93,10 @@ export default function MobileFiltersModal({
       onCloseClick={hide}
       cancelLabel={t("actions.cancel")}
       okLabel={t("actions.apply")}
-      onOkClick={handleApply}
+      onOkClick={() => {
+        handleApply()
+        handleSortBy();
+      }}
     >
       <If condition={showChainSelector && !isOnNetwork}>
         <ContainerFilterView label={t("misc.chain")}>
@@ -118,7 +135,12 @@ export default function MobileFiltersModal({
           onChange={(e) => checkOption(e, "time")}
         />
 
-        <ListSort options={defaultSortOptions} asSelect />
+       <ListSort
+          options={defaultSortOptions}
+          asSelect
+          index={selectedSortIndex}
+          updateIndex={setSelectedSortIndex}
+        />
       </If>
     </Modal>
   );

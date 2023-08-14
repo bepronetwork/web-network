@@ -13,13 +13,17 @@ interface ListSortProps {
   options: SortOption[];
   labelLineBreak?: boolean;
   asSelect?: boolean;
+  index?: number;
+  updateIndex?: (e: number) => void;
 }
 
 export default function ListSort({
   defaultOptionIndex = 0,
   options,
   labelLineBreak,
-  asSelect
+  asSelect,
+  index,
+  updateIndex
 }: ListSortProps) {
   const router = useRouter();
 
@@ -31,19 +35,24 @@ export default function ListSort({
   const { sortBy, order } = router.query;
 
   function handleSelectChange(newValue) {
-    setSelectedIndex(options?.findIndex(option => option.sortBy === newValue.sortBy && 
-                                        option.order === newValue.order));
 
-    const query = {
-      ...router.query,
-      sortBy: newValue.sortBy,
-      order: newValue.order,
-      page: "1"
-    };
+    const currentIndex = options?.findIndex(option => option.sortBy === newValue.sortBy && 
+      option.order === newValue.order)
 
-    router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
+    updateIndex ? updateIndex(currentIndex) : setSelectedIndex(currentIndex);
+
+    if(!updateIndex) {
+      const query = {
+        ...router.query,
+        sortBy: newValue.sortBy,
+        order: newValue.order,
+        page: "1"
+      };
+  
+      router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
+    }
   }
-
+  console.log('update', index, selectedIndex)
   function getDefaultValue(): SortOption {
     if (sortBy && order) {
       const optionExists = options.find((option) => option.sortBy === sortBy && option.order === order);
@@ -73,7 +82,7 @@ export default function ListSort({
       dropdownItems={optionsToDropdownItems()}
       labelLineBreak={labelLineBreak}
       asSelect={asSelect}
-      selectedIndex={selectedIndex}
+      selectedIndex={updateIndex ? index : selectedIndex}
       componentVersion={componentVersion}
     />
   );
