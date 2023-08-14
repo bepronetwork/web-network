@@ -11,10 +11,13 @@ export interface User {
   createdAt: string;
   id: number;
   updatedAt: string;
+  email?: string;
+  isEmailConfirmed?: string;
+  emailVerificationCode?: string;
 }
 
 export interface PastEventsParams {
-  id? :number;
+  id?: number;
   fromBlock: number;
   toBlock?: number;
   chainId?: string;
