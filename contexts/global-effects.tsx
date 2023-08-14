@@ -15,7 +15,7 @@ import {useSettings} from "x-hooks/use-settings";
 import {useTransactions} from "x-hooks/use-transactions";
 
 const _context = {};
-//context
+
 export const GlobalEffectsContext = createContext(_context);
 export const GlobalEffectsProvider = ({children}) => {
 
