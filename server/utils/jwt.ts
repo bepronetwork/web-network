@@ -8,10 +8,10 @@ export class UserRoleUtils {
   }
 
   static hasAdminRole(token: JwtToken) {
-    return token?.roles?.includes("admin");
+    return !!token?.roles?.includes("admin");
   }
 
   static hasGovernorRole(token: JwtToken) {
-    return token?.roles?.find(role => role?.includes("governor"));
+    return !!token?.roles?.find(role => role?.includes("governor"));
   }
 }
