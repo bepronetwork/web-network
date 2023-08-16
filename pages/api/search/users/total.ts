@@ -2,8 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withCORS } from "middleware";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const userCount = await models.user.count();
@@ -24,4 +23,4 @@ async function getAll(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(getAll));
+export default withCORS(getAll);

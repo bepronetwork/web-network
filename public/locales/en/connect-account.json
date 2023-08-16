@@ -4,7 +4,7 @@
   "connected-accounts": "Connected accounts!",
   "warnings": {
     "already-connected": "These accounts are already connected",
-    "already-in-use": "This github account or this wallet is already in use"
+    "already-in-use": "This github account or this wallet is already in use. Please sign out and try again with other accounts."
   },
   "errors": {
     "migrating-address-not-match": "When migrating, address must match {{address}}.",

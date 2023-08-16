@@ -7,8 +7,7 @@ import {NOT_AN_ADMIN} from "helpers/constants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withProtected } from "middleware";
 
 async function getAllRepos(req, res) {
   const { networkName, withBounties, chainId } = req.query;
@@ -132,4 +131,4 @@ async function RepoRoute(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(RepoRoute));
+export default withProtected(RepoRoute);

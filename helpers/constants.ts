@@ -38,8 +38,9 @@ export const SUPPORT_LINK = "https://support.bepro.network/en/";
 export const DOCS_LINK = "https://docs.bepro.network/";
 export const TWITTER_LINK = "https://twitter.com/bepronet";
 export const TERMS_AND_CONDITIONS_LINK = "https://www.bepro.network/terms";
-export const SMALL_TOKEN_SYMBOL_LENGTH = 6
-export const LARGE_TOKEN_SYMBOL_LENGTH = 12
+export const PRIVACY_POLICY_LINK = "https://taikai.network/privacy";
+export const SMALL_TOKEN_SYMBOL_LENGTH = 6;
+export const LARGE_TOKEN_SYMBOL_LENGTH = 12;
 export const BOOTSTRAP_BREAKPOINTS = {
   sm: 576,
   md: 768,
@@ -47,3 +48,4 @@ export const BOOTSTRAP_BREAKPOINTS = {
   xl: 1238,
   xxl: 1400
 };
+export const DAY_IN_SECONDS = 24 * 60 * 60;

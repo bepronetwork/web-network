@@ -25,14 +25,12 @@ import Translation from "components/translation";
 import {useAppState} from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
-import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import {getIssueState} from "helpers/handleTypeIssue";
 
 import {IssueBigNumberData, IssueState} from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 
@@ -65,7 +63,6 @@ export default function IssueListItem({
   
   const { updateVisibleBounty } = useApi();
   const { getURLWithNetwork } = useNetwork();
-  const { signMessage } = useAuthentication();
   const { handleHardCancelBounty } = useBepro();
 
   const isVisible = visible !== undefined ? visible : issue?.visible;
@@ -104,15 +101,14 @@ export default function IssueListItem({
   }
 
   async function handleHideBounty() {
-    await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
-      updateVisibleBounty({
+    updateVisibleBounty({
       issueId: issue?.issueId,
       creator: state?.currentUser?.walletAddress,
       networkAddress: issue?.network?.networkAddress,
       visible: !isVisible,
       accessToken: state.currentUser?.accessToken,
       override: true,
-      })
+    })
       .then(() => {
         dispatch(addToast({
           type: "success",
@@ -122,7 +118,6 @@ export default function IssueListItem({
         setVisible(!isVisible)
       })
       .catch(handleToastError);
-    })
   }
 
   function handleHardCancel() {

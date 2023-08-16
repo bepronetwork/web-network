@@ -10,9 +10,8 @@ import * as RepositoryQueries from "graphql/repository";
 
 import {chainFromHeader} from "helpers/chain-from-header";
 
-import { LogAccess } from "middleware/log-access";
+import { withProtected } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 import {GraphQlResponse} from "types/octokit";
 
@@ -125,7 +124,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(`${repository.id}/${githubId}`);
 }
 
-export default LogAccess(WithCors(WithValidChainId(async function Issue(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -136,4 +135,6 @@ export default LogAccess(WithCors(WithValidChainId(async function Issue(req: Nex
   }
 
   res.end();
-})))
+}
+
+export default withProtected(WithValidChainId(handler));

@@ -56,7 +56,8 @@ export default async function get(query: ParsedUrlQuery) {
       ],
       group: ["issue.state"],
       where: {
-        network_id: network.id
+        network_id: network.id,
+        visible: true
       }
     })
       .then(values => Object.fromEntries(values.map(({ state, total }) => [state, +total]))),

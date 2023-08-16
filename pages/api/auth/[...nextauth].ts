@@ -1,70 +1,99 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github";
+import { getToken } from "next-auth/jwt";
 import getConfig from "next/config";
 
-import models from "db/models";
+import { Logger } from "services/logging";
 
-const {serverRuntimeConfig} = getConfig();
+import { SESSION_TTL } from "server/auth/config";
+import { EthereumProvider, GHProvider } from "server/auth/providers";
+import { AccountValidator } from "server/auth/validators/account";
 
-export default NextAuth({
-  providers: [
-    GithubProvider({
-      clientId: serverRuntimeConfig?.github?.clientId,
-      clientSecret: serverRuntimeConfig?.github?.secret,
-      authorization:
-        "https://github.com/login/oauth/authorize?scope=read:user+user:email+repo",
-      profile(profile: { id; name; login; email; avatar_url }) {
+const {
+  serverRuntimeConfig: {
+    auth: {
+      secret
+    }
+  }
+} = getConfig();
+
+export default async function auth(req: NextApiRequest, res: NextApiResponse) {
+  const currentToken = await getToken({ req, secret: secret });
+
+  const ethereumProvider = EthereumProvider(currentToken, req);
+  const githubProvider = GHProvider(currentToken, req);
+
+  return NextAuth(req, res, {
+    providers: [
+      ethereumProvider.config,
+      githubProvider.config
+    ],
+    pages: {
+      signIn: "/auth/signin"
+    },
+    session:{
+      strategy: "jwt",
+      maxAge: SESSION_TTL
+    },
+    callbacks: {
+      async signIn(params) {
+        try {
+          const provider = params?.account?.provider;
+
+          switch (provider) {
+          case "github":
+            return githubProvider.callbacks.signIn(params);
+          
+          case "credentials":
+            return ethereumProvider.callbacks.signIn(params);
+          
+          default:
+            return false;
+          }
+        } catch(error) {
+          Logger.error(error, "SignIn callback: ");
+        }
+
+        return false;
+      },
+      async jwt(params) {
+        try {
+          const provider = params?.account?.provider;
+
+          switch (provider) {
+          case "github":
+            return githubProvider.callbacks.jwt(params);
+          
+          case "credentials":
+            return ethereumProvider.callbacks.jwt(params);
+          
+          default:
+            return params.token;
+          }
+        } catch(error) {
+          Logger.error(error, "JWT callback: ");
+        }
+
+        return params?.token;
+      },
+      async session({ session, token }) {
+        const { login, name, accessToken, roles, address, nonce } = token;
+
+        const accountsMatch = await AccountValidator.matchAddressAndGithub(address?.toString(), login?.toString());
+
         return {
-          id: profile.id,
-          name: profile.name,
-          login: profile.login,
-          email: profile.email,
-          image: profile.avatar_url,
+          expires: session.expires,
+          user: {
+            login,
+            name,
+            accessToken,
+            roles,
+            address,
+            accountsMatch,
+            nonce
+          },
         };
       },
-    }),
-  ],
-  pages: {
-    signIn: "/auth/signin"
-  },
-  session:{
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60 // 30 days
-  },
-  callbacks: {
-    async signIn({ profile }) {
-      try {
-        if (!profile?.login) return "/?authError=Profile not found";
-
-        return true;
-      } catch(e) {
-        console.log("SignIn Callback", e);
-        return false;
-      }
     },
-    async jwt({ token, account, profile }) {
-      const user = await models.user.findOne({
-        where: { 
-          githubLogin: profile?.login || token?.login
-        },
-        raw: true
-      })
-        .catch(error => {
-          console.log("JWT Callback", error)
-        });
-
-      return { ...token, ...profile, ...account, wallet: user?.address };
-    },
-    async session({ session, token }) {
-      // console.log(`Session`, session, user, token);
-      return {
-        expires: session.expires,
-        user: {
-          ...session.user,
-          login: token.login,
-          accessToken: token?.access_token,
-        },
-      };
-    },
-  },
-});
+  });
+}

@@ -5,8 +5,7 @@ import models from "db/models";
 
 import paginate from "helpers/paginate";
 
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withCORS } from "middleware";
 
 import {error as LogError} from "services/logging";
 
@@ -56,4 +55,4 @@ async function SearchUsers(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default  LogAccess(WithCors(SearchUsers));
+export default  withCORS(SearchUsers);

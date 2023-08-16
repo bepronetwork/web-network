@@ -1,5 +1,5 @@
 "use strict";
-const {Model, DataTypes} = require("sequelize");
+const {Model, DataTypes, Sequelize} = require("sequelize");
 const {getValueToLowerCase} = require("../../helpers/db/getters");
 
 class Network extends Model {
@@ -148,6 +148,14 @@ class Network extends Model {
     });
 
     this.belongsToMany(models.tokens, {through: 'network_tokens'});
+  }
+
+  static findAllOfCreatorAddress(creatorAddress) {
+    return this.findAll({
+      where: {
+        creatorAddress: Sequelize.where(Sequelize.fn("lower", Sequelize.col("creatorAddress")), creatorAddress?.toLowerCase())
+      }
+    });
   }
 }
 

@@ -15,7 +15,6 @@ import { RegistryParameters } from "types/dappkit";
 import { Field } from "types/utils";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import { useNetwork } from "x-hooks/use-network";
 
@@ -51,7 +50,6 @@ export default function NetworkRegistrySettings({ isGovernorRegistry = false }) 
     handleFeeNetworkCreation,
     handleChangeAllowedTokens
   } = useBepro();
-  const { signMessage } = useAuthentication();
 
   function isSameAdresses(adressesA: string[], adressesB: string[]) {
     return [...adressesA as string[]].sort().join() === [...adressesB as string[]].sort().join();
@@ -172,7 +170,6 @@ export default function NetworkRegistrySettings({ isGovernorRegistry = false }) 
       await Promise.all(toAdd.map(async (address) => {
         const currentToken = findMinAmount(isTransactional ? transactionalTokens : rewardTokens, address)
         if(currentToken?.minimum !== '0'){
-          await signMessage();
           return createToken({address, minAmount: currentToken?.minimum, chainId: +state.connectedChain.id})
         }
       }))

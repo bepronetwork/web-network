@@ -67,6 +67,7 @@
           ["/^middleware/"],
           ["/^pages/"],
           ["/^services/"],
+          ["/^server/"],
           ["/^styles/"],
           ["/^templates/"],
           ["/^types/"],

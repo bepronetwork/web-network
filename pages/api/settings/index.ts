@@ -4,7 +4,7 @@ import models from "db/models";
 
 import {Settings} from "helpers/settings";
 
-import {LogAccess} from "middleware/log-access";
+import { withCORS } from "middleware";
 
 import {Logger} from "services/logging";
 
@@ -21,7 +21,7 @@ async function get(_req: NextApiRequest, res: NextApiResponse) {
 
 Logger.changeActionName(`Settings`);
 
-export default LogAccess(async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
   case "GET":
     await get(req, res);
@@ -32,4 +32,6 @@ export default LogAccess(async function handler(req: NextApiRequest, res: NextAp
   }
 
   res.end();
-})
+}
+
+export default withCORS(handler);

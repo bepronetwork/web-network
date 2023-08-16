@@ -12,8 +12,12 @@ export default function ItemRowLabelsView({
   return (
       <div className={`${className} col-md-4 d-flex gap-2`}>
         {status?.length
-          ? status.map((st) => (
-              <PullRequestLabels {...st} className={classLabels} />
+          ? status.map((st, index) => (
+              <PullRequestLabels 
+                {...st}
+                key={`pr-label-${index}`}
+                className={classLabels} 
+              />
             ))
           : null}
       </div>

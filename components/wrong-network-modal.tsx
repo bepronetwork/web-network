@@ -5,6 +5,7 @@ import {useTranslation} from "next-i18next";
 import { useRouter } from "next/router";
 
 import Button from "components/button";
+import TermsAndConditions from "components/common/terms-and-conditions/view";
 import ConnectWalletButton from "components/connect-wallet-button";
 import Modal from "components/modal";
 import SelectChainDropdown from "components/select-chain-dropdown";
@@ -160,26 +161,8 @@ export default function WrongNetworkModal() {
         {error && (
           <p className="caption-small text-uppercase text-danger">{error}</p>
         )}
-        <div className="small-info text-light-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
-          {t("misc.by-connecting")}{" "}
-          <a
-            href="https://www.bepro.network/terms"
-            target="_blank"
-            className="text-decoration-none"
-            rel="noreferrer"
-          >
-            {t("misc.terms-and-conditions")}
-          </a>{" "}
-          <br /> {t("misc.and")}{" "}
-          <a
-            href="https://taikai.network/privacy"
-            target="_blank"
-            className="text-decoration-none"
-            rel="noreferrer"
-          >
-            {t("misc.privacy-policy")}
-          </a>
-        </div>
+
+        <TermsAndConditions />
       </div>
     </Modal>
   );

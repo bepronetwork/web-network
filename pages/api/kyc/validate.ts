@@ -4,6 +4,8 @@ import models from "db/models";
 
 import findUserBySession from 'helpers/query/findUserBySession';
 
+import { withCORS } from "middleware";
+
 import { kycApi } from "services/api";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -50,8 +52,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function KycValidate(req: NextApiRequest,
-                                          res: NextApiResponse) {
+async function KycValidate(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -63,3 +64,5 @@ export default async function KycValidate(req: NextApiRequest,
 
   res.end();
 }
+
+export default withCORS(KycValidate);

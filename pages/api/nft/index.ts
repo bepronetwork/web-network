@@ -11,9 +11,8 @@ import {formatNumberToNScale} from "helpers/formatNumber";
 import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
 
-import { LogAccess } from "middleware/log-access";
+import { withProtected } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
@@ -191,4 +190,4 @@ async function NftMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(WithValidChainId(NftMethods)));
+export default withProtected(WithValidChainId(NftMethods));

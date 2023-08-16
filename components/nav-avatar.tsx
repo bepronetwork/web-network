@@ -22,14 +22,14 @@ import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 
 export default function NavAvatar() {
+  const { query, asPath } = useRouter();
   const { t } = useTranslation("common");
 
   const [visible, setVisible] = useState(false);
 
-  const {state} = useAppState();
-  const { query } = useRouter();
+  const { state } = useAppState();
+  const { signOut } = useAuthentication();
   const { goToProfilePage } = useNetwork();
-  const { disconnectWallet } = useAuthentication();
 
   const username =
     state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
@@ -41,7 +41,9 @@ export default function NavAvatar() {
   }
 
   function handleDisconnectWallet() {
-    disconnectWallet();
+    const redirect = asPath?.includes("connect-account") ? "connect-account" : null;
+
+    signOut(redirect);
     setVisible(false);
   }
 

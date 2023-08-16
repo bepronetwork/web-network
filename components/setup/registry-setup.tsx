@@ -26,7 +26,6 @@ import {SupportedChainData} from "interfaces/supported-chain-data";
 import { RegistryParameters } from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
-import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import useChain from "x-hooks/use-chain";
 import {useSettings} from "x-hooks/use-settings";
@@ -76,7 +75,6 @@ export function RegistrySetup({
 
   const { loadSettings } = useSettings();
   const { findSupportedChain } = useChain();
-  const { signMessage } = useAuthentication();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
   const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains, createToken } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
@@ -149,8 +147,6 @@ export function RegistrySetup({
         setRegistry(previous => ({ ...previous, value: contractAddress}));
 
         Service?.active?.loadRegistry(false, contractAddress);
-
-        await signMessage();
 
         return setChainRegistry(contractAddress);
       })

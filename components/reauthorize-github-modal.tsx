@@ -17,7 +17,7 @@ export default function ReAuthorizeGithubModal() {
       }
     } 
   } = useAppState();
-  const { connectGithub } = useAuthentication();
+  const { signInGithub } = useAuthentication();
 
   return (
     <Modal
@@ -30,7 +30,7 @@ export default function ReAuthorizeGithubModal() {
       </p>
 
       <div className="d-flex flex-row justify-content-center">
-        <Button onClick={() => connectGithub()}>
+        <Button onClick={signInGithub}>
           {t("modals.reauthorize-github.button-label")}
         </Button>
       </div>

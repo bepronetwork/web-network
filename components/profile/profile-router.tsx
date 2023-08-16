@@ -13,6 +13,7 @@ import VotingPowerPage from "components/profile/pages/voting-power/controller";
 import { useAppState } from "contexts/app-state";
 
 import { ProfilePageProps } from "types/pages";
+
 import WalletPage from "./pages/wallet/view";
 
 export default function ProfileRouter(props: ProfilePageProps) {

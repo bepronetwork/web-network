@@ -6,9 +6,8 @@ import models from "db/models";
 import paginate, {calculateTotalPages} from "helpers/paginate";
 import {resJsonMessage} from "helpers/res-json-message";
 
-import {LogAccess} from "middleware/log-access";
+import { withCORS } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -69,4 +68,4 @@ async function SearchRepositories(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(WithValidChainId(SearchRepositories)));
+export default withCORS(WithValidChainId(SearchRepositories));
