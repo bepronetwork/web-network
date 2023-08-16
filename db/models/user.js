@@ -1,6 +1,6 @@
 "use strict";
 const { getValueToLowerCase } = require("../../helpers/db/getters");
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Sequelize } = require("sequelize");
 
 class User extends Model {
   /**
