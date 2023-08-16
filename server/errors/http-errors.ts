@@ -6,8 +6,14 @@ export class HttpNotFoundError extends BaseAPIError {
   }
 }
 
-export class BadRequestError extends BaseAPIError {
+export class HttpBadRequestError extends BaseAPIError {
   constructor(message: string) {
     super(message, 400);
+  }
+}
+
+export class HttpConflictError extends BaseAPIError {
+  constructor(message: string) {
+    super(message, 409);
   }
 }
