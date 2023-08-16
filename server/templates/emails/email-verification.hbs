@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Verification</title>
+
+  <style>
+    .container {
+      width: 100%;
+
+      background-color: #fff;
+    }
+
+    .container > div {
+      margin: 0 auto;
+      width: 80%;
+    }
+
+    .section {
+      padding: 20px;
+      width: 100%;
+    }
+
+    .logo {
+      background-color: #4250E4;
+      height: 50px;
+    }
+
+    .logo img {
+      display: block;
+      margin: auto;
+      width: max-content;
+    }
+
+    .content {
+      text-align: center;
+    }
+
+    .content h2 {
+      color: #4250E4;
+      margin-bottom: 30px;
+    }
+
+    .content p {
+      color: #797979;
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 40px;
+    }
+
+    .content a {
+      text-decoration: none;
+      background-color: #4250E4;
+      padding: 12px 18px;
+      border-radius: 4px;
+      
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .social {
+      background-color: #4250E4;
+
+      text-align: center;
+
+      padding-top: 35px;
+      padding-bottom: 35px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section logo">
+      <img src="{{host}}/images/logo-white.png" alt="Bepro Logo" height="50">
+    </div>
+
+    <div class="section content">
+      <h2>Email Verification</h2>
+      <p>Please verify your email by clicking on the link below</p>
+      <a href="{{verifyLink}}" target="_blank">Verify Email</a>
+    </div>
+
+    <div class="section social">
+      <a href="{{twitter}}" target="_blank">
+        <img src="{{host}}/images/social/twitter.png" alt="Twitter Logo" height="25">
+      </a>
+
+      <a href="{{instagram}}" target="_blank">
+        <img src="{{host}}/images/social/instagram.png" alt="Instagram Logo" height="25">
+      </a>
+
+      <a href="{{linkedin}}" target="_blank">
+        <img src="{{host}}/images/social/linkedin.png" alt="Linkedin Logo" height="25">
+      </a>
+
+      <a href="{{discord}}" target="_blank">
+        <img src="{{host}}/images/social/discord.png" alt="Discord Logo" height="25">
+      </a>
+    </div>
+  </div>
+</body>
+</html>
