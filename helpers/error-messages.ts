@@ -1,2 +1,3 @@
 export const UNAUTHORIZED = `Unauthorized`;
-export const INVALID_JWT_TOKEN = `Invalid JWT Token`;
+export const MISSING_JWT_TOKEN = `Missing JWT Token`;
+export const INVALID_SIGNATURE = `Invalid signature`;

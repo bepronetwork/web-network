@@ -6,8 +6,7 @@ import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withCORS } from "middleware";
 
 import { Logger } from "services/logging";
 
@@ -155,5 +154,5 @@ async function SearchNetworks(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`SearchNetworks`);
-export default LogAccess(WithCors(SearchNetworks));
+export default withCORS(SearchNetworks);
 

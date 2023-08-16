@@ -10,9 +10,8 @@ import * as PullRequestQueries from "graphql/pull-request";
 import {chainFromHeader} from "helpers/chain-from-header";
 import {resJsonMessage} from "helpers/res-json-message";
 
-import {LogAccess} from "middleware/log-access";
+import { withProtected } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
 
@@ -131,4 +130,4 @@ async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(WithValidChainId(PullRequest)));
+export default withProtected(WithValidChainId(PullRequest));

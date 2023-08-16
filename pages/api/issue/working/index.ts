@@ -11,9 +11,8 @@ import * as IssueQueries from "graphql/issue";
 import {chainFromHeader} from "helpers/chain-from-header";
 import {getPropertyRecursively} from "helpers/object";
 
-import {LogAccess} from "middleware/log-access";
+import { withProtected } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 import {Logger} from "services/logging";
 
@@ -102,4 +101,4 @@ async function Working(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`Issue/Working`);
-export default LogAccess(WithCors(WithValidChainId(Working)));
+export default withProtected(WithValidChainId(Working));

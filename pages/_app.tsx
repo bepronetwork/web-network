@@ -40,7 +40,7 @@ function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppPr
           <Seo issueMeta={seoData} />
           <ReadOnlyContainer>
             <NoMetamaskModal />
-            <InvalidAccountWalletModal/>
+            <InvalidAccountWalletModal />
             <ReAuthorizeGithubModal />
             <NavBar />
             <div id="root-container">

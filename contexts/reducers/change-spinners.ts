@@ -3,7 +3,7 @@ import {SimpleAction} from "contexts/reducers/reducer";
 import {State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 
-interface Spinners {
+export interface Spinners {
   proposals: boolean;
   pullRequests: boolean;
   bountyState: boolean;

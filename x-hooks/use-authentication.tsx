@@ -1,16 +1,15 @@
 import {useState} from "react";
 
 import BigNumber from "bignumber.js";
-import {signIn, signOut, useSession} from "next-auth/react";
+import {getCsrfToken, signIn as nextSignIn, signOut as nextSignOut, useSession} from "next-auth/react";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
-import {changeChain} from "contexts/reducers/change-chain";
 import {
-  changeCurrentUser,
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
+  changeCurrentUserConnected,
   changeCurrentUserHandle,
   changeCurrentUserKycSession,
   changeCurrentUserLogin,
@@ -20,18 +19,22 @@ import {
   changeCurrentUserisAdmin
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
-import {changeConnectingGH, changeSpinners, changeWalletSpinnerTo} from "contexts/reducers/change-spinners";
+import {changeSpinners} from "contexts/reducers/change-spinners";
 import { addToast } from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
-import {IM_AN_ADMIN, NOT_AN_ADMIN, SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
+import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
+import { AddressValidator } from "helpers/validators/address";
 
 import {EventName} from "interfaces/analytics";
 import {CustomSession} from "interfaces/custom-session";
+import { UserRole } from "interfaces/enums/roles";
 import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
+
+import { SESSION_TTL } from "server/auth/config";
 
 import useAnalyticEvents from "x-hooks/use-analytic-events";
 import useApi from "x-hooks/use-api";
@@ -47,164 +50,59 @@ const { publicRuntimeConfig } = getConfig();
 
 export function useAuthentication() {
   const session = useSession();
-  const {asPath, push} = useRouter();
+  const { asPath } = useRouter();
 
-  const {connect} = useDao();
+  const { connect } = useDao();
   const { chain } = useChain();
   const transactions = useTransactions();
-  const { signMessage: _signMessage } = useSignature();
-  const {state, dispatch} = useAppState();
+  const { signMessage: _signMessage, signInWithEthereum } = useSignature();
+  const { state, dispatch } = useAppState();
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
 
-  const {getUserOf, getUserAll, searchCurators, getKycSession, validateKycSession} = useApi();
+  const { searchCurators, getKycSession, validateKycSession } = useApi();
 
-  const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
-  const [balance,] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
+  const [balance] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
 
   const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
-  function disconnectGithub() {
-    dispatch(changeCurrentUserMatch(undefined));
-    dispatch(changeCurrentUserHandle(undefined));
-    dispatch(changeCurrentUserLogin(undefined));
-    dispatch(changeCurrentUserAccessToken((undefined)));
-    return signOut({redirect: false});
-  }
-
-  function disconnectWallet() {
-
-    if (!state.currentUser?.walletAddress)
-      return;
-
-    transactions.deleteFromStorage();
-
+  function signOut(redirect?: string) {
     const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
 
     expirationStorage.removeItem();
+    transactions.deleteFromStorage();
 
-    const lastNetwork = state.Service?.network?.active ? `/${state.Service?.network?.active?.name?.toLowerCase()}` : "";
-    const lastChain = 
-      state.Service?.network?.active ? `/${state.Service?.network?.active?.chain?.chainShortName?.toLowerCase()}` : "";
-
-    signOut({callbackUrl: `${URL_BASE}${lastNetwork}${lastChain}`})
-      .then(() => {
-        dispatch(changeCurrentUser.update({handle: state.currentUser?.handle, walletAddress: ''}));
-      });
+    nextSignOut({
+      callbackUrl: `${URL_BASE}/${redirect || ""}`
+    });
   }
 
-  function connectWallet() {
-    connect();
+  async function signInWallet() {
+    const address = await connect();
+
+    if (!address) return;
+
+    const csrfToken = await getCsrfToken();
+
+    const issuedAt = new Date();
+    const expiresAt = new Date(+issuedAt + SESSION_TTL);
+
+    const signature = await signInWithEthereum(csrfToken, address, issuedAt, expiresAt);
+
+    if (!signature) return;
+
+    nextSignIn("credentials", {
+      redirect: false,
+      signature,
+      issuedAt: +issuedAt,
+      expiresAt: +expiresAt,
+      callbackUrl: `${URL_BASE}${asPath}`
+    });
   }
 
-  function updateWalletAddress() {
-    if (state.spinners?.wallet || !state.currentUser?.connected)
-      return;
-
-    dispatch(changeWalletSpinnerTo(true));
-
-    (state.Service?.active ?
-      state.Service.active.getAddress() : window.ethereum.request({method: 'eth_requestAccounts'}))
-      .then(_address => {
-        if (Array.isArray(_address)) console.debug("eth_requestAccounts", _address);
-
-        const address = Array.isArray(_address) ? _address[0] : _address;
-
-        if (address !== state.currentUser?.walletAddress) {
-          dispatch(changeCurrentUserWallet(address?.toLowerCase()));
-          pushAnalytic(EventName.WALLET_ADDRESS_CHANGED, {newAddress: address?.toString()});
-        }
-
-        dispatch(changeCurrentUserisAdmin(publicRuntimeConfig.adminWallet.toLowerCase() === address?.toLowerCase()));
-
-        const windowChainId = +window.ethereum.chainId;
-        const chain = state.supportedChains?.find(({chainId}) => chainId === windowChainId);
-
-        dispatch(changeChain.update({
-          id: (chain?.chainId || windowChainId)?.toString(),
-          name: chain?.chainName || UNSUPPORTED_CHAIN,
-          shortName: chain?.chainShortName?.toLowerCase() || UNSUPPORTED_CHAIN,
-          explorer: chain?.blockScanner || SUPPORT_LINK,
-          events: chain?.eventsApi,
-          registry: chain?.registryAddress
-        }));
-
-        sessionStorage.setItem("currentChainId", chain ? chain?.chainId?.toString() : (+windowChainId)?.toString());
-        sessionStorage.setItem("currentWallet", address || '');
-      })
-      .catch(e => {
-        console.error("Error getting address", e);
-      })
-      .finally(() => {
-        dispatch(changeWalletSpinnerTo(false));
-      })
-
-  }
-
-  function connectGithub() {
-    if (!state.currentUser?.walletAddress)
-      return;
-
-    dispatch(changeConnectingGH(true));
-
-    getUserOf(state.currentUser?.walletAddress)
-      .then((user) => {
-        if (!user?.githubLogin && !asPath.includes(`connect-account`)) {
-          disconnectGithub()
-          push(`/connect-account`);
-          return false;
-        }
-        return true;
-      })
-      .then(signedIn => {
-        if (!signedIn)
-          return dispatch(changeConnectingGH(false))
-
-        lastUrl.value = asPath;
-
-        if(signedIn)
-          signIn('github', {callbackUrl: `${URL_BASE}${asPath}`})
-
-        return setTimeout(() => dispatch(changeConnectingGH(false)), 5 * 1000)
-      })
-  }
-
-  function validateGhAndWallet() {
-    const sessionUser = (session?.data as CustomSession)?.user;
-
-    if (!state.currentUser?.walletAddress || !sessionUser?.login || state.spinners?.matching)
-      return;
-
-    dispatch(changeSpinners.update({matching: true}));
-
-    const userLogin = sessionUser.login;
-    const walletAddress = state.currentUser.walletAddress.toLowerCase();
-
-    getUserAll(walletAddress,userLogin)
-      .then(async(user) => {
-        if (!user?.githubLogin){
-          dispatch(changeCurrentUserMatch(undefined));
-
-          if(session.status === 'authenticated' && state.currentUser.login && !asPath.includes(`connect-account`)){
-            await disconnectGithub()
-          }
-        }
-        else if (user.githubLogin && userLogin)
-          dispatch(changeCurrentUserMatch(userLogin === user.githubLogin &&
-            (walletAddress ? walletAddress === user.address : true)));
-
-      })
-      .finally(() => {
-        dispatch(changeSpinners.update({matching: false}));
-      })
-  }
-
-  function listenToAccountsChanged() {
-    if (!state.Service || !window.ethereum)
-      return;
-
-    window.ethereum.on(`accountsChanged`, () => {
-      connect();
+  function signInGithub() {
+    nextSignIn("github", {
+      callbackUrl: `${URL_BASE}${asPath}`
     });
   }
 
@@ -250,23 +148,56 @@ export function useAuthentication() {
     loadNetworkAmounts();
   }
 
-  function updateCurrentUserLogin() {
-    const sessionUser = (session?.data as CustomSession)?.user;
+  async function syncUserDataWithSession() {
+    if (session?.status === "loading") return;
 
-    if (!sessionUser || state.currentUser?.login === sessionUser?.login ||
-      sessionUser.accessToken === state.currentUser?.accessToken)
+    const isUnauthenticated = session?.status === "unauthenticated";
+
+    if (isUnauthenticated) {
+      dispatch(changeCurrentUserConnected(false));
+      dispatch(changeCurrentUserHandle(null));
+      dispatch(changeCurrentUserLogin(null));
+      dispatch(changeCurrentUserAccessToken(null));
+      dispatch(changeCurrentUserWallet(null));
+      dispatch(changeCurrentUserisAdmin(null));
+      dispatch(changeCurrentUserMatch(null));
+
+      sessionStorage.setItem("currentWallet", "");
+
+      return;
+    }
+
+    const user = session?.data?.user as CustomSession["user"];
+    const isSameGithubAccount = 
+      user.login === state.currentUser?.login && user.accessToken === state.currentUser?.accessToken;
+    const isSameWallet = AddressValidator.compare(user.address, state.currentUser?.walletAddress);
+
+    if (user.accountsMatch !== state.currentUser?.match)
+      dispatch(changeCurrentUserMatch(user.accountsMatch));
+
+    if (!user || isSameGithubAccount && isSameWallet)
       return;
 
-    const expirationStorage = new WinStorage(SESSION_EXPIRATION_KEY, 0);
+    if (!isSameGithubAccount) {
+      dispatch(changeCurrentUserHandle(user.name));
+      dispatch(changeCurrentUserLogin(user.login));
+      dispatch(changeCurrentUserAccessToken(user.accessToken));
+    }
 
-    expirationStorage.value =  session.data.expires;
+    if (!isSameWallet) {
+      const isAdmin = user.roles.includes(UserRole.ADMIN);
 
-    dispatch(changeCurrentUserHandle(session.data.user.name));
-    dispatch(changeCurrentUserLogin(sessionUser.login));
-    dispatch(changeCurrentUserAccessToken((sessionUser.accessToken)));
+      dispatch(changeCurrentUserWallet(user.address));
+      dispatch(changeCurrentUserisAdmin(isAdmin));
 
-    pushAnalytic(EventName.USER_LOGGED_IN, {username: session.data.user.name, login: sessionUser.login});
+      sessionStorage.setItem("currentWallet", user.address);
+    }
 
+    await connect();
+
+    dispatch(changeCurrentUserConnected(true));
+
+    pushAnalytic(EventName.USER_LOGGED_IN, { username: user.name, login: user.login });
   }
 
   function verifyReAuthorizationNeed() {
@@ -353,17 +284,13 @@ export function useAuthentication() {
   }
 
   return {
-    connectWallet,
-    disconnectWallet,
-    disconnectGithub,
-    connectGithub,
+    signOut,
+    signInWallet,
+    signInGithub,
     updateWalletBalance,
-    updateWalletAddress,
-    validateGhAndWallet,
-    listenToAccountsChanged,
-    updateCurrentUserLogin,
     verifyReAuthorizationNeed,
     signMessage,
     updateKycSession,
+    syncUserDataWithSession,
   }
 }

@@ -1,77 +1,62 @@
-import {GetServerSideProps} from "next";
-import {useSession} from "next-auth/react";
-import {useTranslation} from "next-i18next";
-import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import {useRouter} from "next/router";
+import { GetServerSideProps } from "next";
+import { useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
-import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
-import {FlexRow} from "components/common/flex-box/view";
-import {ConnectionButton} from "components/profile/connect-button";
+import { FlexRow } from "components/common/flex-box/view";
+import TermsAndConditions from "components/common/terms-and-conditions/view";
+import If from "components/If";
+import {ConnectionButton } from "components/profile/connect-button";
 
-import {useAppState} from "contexts/app-state";
-import {changeLoadState} from "contexts/reducers/change-load";
-import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
+import { useAppState } from "contexts/app-state";
+import { changeLoadState } from "contexts/reducers/change-load";
+import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
-import {CustomSession} from "interfaces/custom-session";
-
-import { WinStorage } from "services/win-storage";
+import { MatchAccountsStatus } from "interfaces/enums/api";
 
 import useApi from "x-hooks/use-api";
-import {useAuthentication} from "x-hooks/use-authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 export default function ConnectAccount() {
   const router = useRouter();
-  const {data: sessionData} = useSession();
-  const {t} = useTranslation(["common", "connect-account", "profile"]);
+  const { update: updateSession } = useSession();
+  const { t } = useTranslation(["common", "connect-account", "profile"]);
 
   const { joinAddressToUser } = useApi();
   const { state, dispatch } = useAppState();
-  const {connectWallet, connectGithub, disconnectGithub, validateGhAndWallet} = useAuthentication();
+  const { signInWallet, signInGithub, signOut } = useAuthentication();
 
-  const { user: sessionUser } = (sessionData || {}) as CustomSession;
+  const isMatch = state.currentUser?.match === MatchAccountsStatus.MATCH;
+  const isMismatch = state.currentUser?.match === MatchAccountsStatus.MISMATCH;
 
   const isButtonDisabled = [
-    state.currentUser?.match !== undefined,
-    !sessionUser?.login,
+    !!state.currentUser?.match,
+    !state.currentUser?.login,
     !state.currentUser?.walletAddress
   ].some(condition => condition);
 
-  const connectButtonState = {
-    "undefined": undefined,
-    "true": "success",
-    "false": "danger"
-  };
+  const connectButtonState = isMatch ? "success" : isMismatch ? "danger" : undefined;
 
   const Message = ({ text, type } : { text: string, type: "success"| "danger" }) => 
-  <FlexRow className={`p family-Regular align-items-center font-weight-medium svg-${type} text-${type} mt-3`}>
-    <InfoIconEmpty width={12} height={12} />
-    <span className="ml-1">
-      {text}
-    </span>
-  </FlexRow>;
-
-  function redirectToProfile() {
-    const lastNetworkVisited = new WinStorage(`lastNetworkVisited`, 0, 'localStorage');
-
-    const toNetworks = state.Service?.active?.network ? "/networks" : "/setup"
-
-    const redirectTo = 
-    lastNetworkVisited.value ? `${lastNetworkVisited.value}/profile` : toNetworks;
-
-    router.push(redirectTo);
-  }
+    <FlexRow className={`p family-Regular align-items-center font-weight-medium svg-${type} text-${type} mt-3`}>
+      <InfoIconEmpty width={12} height={12} />
+      <span className="ml-1">
+        {text}
+      </span>
+    </FlexRow>;
 
   function handleCancel() {
-    if (!state.currentUser?.match)
-      disconnectGithub();
+    if (isMismatch)
+      signOut();
 
-    const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
+    const previousRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
 
-    if(previusRouter)
-      return router.push(previusRouter)
+    if(previousRouter)
+      return router.push(previousRouter);
 
     router.back();
   }
@@ -80,14 +65,14 @@ export default function ConnectAccount() {
     dispatch(changeLoadState(true));
 
     joinAddressToUser({
-      githubLogin: sessionUser?.login?.toString(),
-      wallet: state.currentUser?.walletAddress.toLowerCase()
+      githubLogin: state.currentUser?.login?.toString(),
+      wallet: state.currentUser?.walletAddress.toLowerCase(),
     }).then(() => {
       dispatch(toastSuccess(t("connect-account:connected-accounts")));
 
-      return validateGhAndWallet();
+      return updateSession();
     })
-    .then(() => redirectToProfile())
+    .then(() => router.push("/profile"))
     .catch(error => {
       console.debug("Failed to patch user", error);
 
@@ -112,6 +97,7 @@ export default function ConnectAccount() {
           </div>
         </div>
       </div>
+
       <div className="container connect-account">
         <div className="row justify-content-center">
           <div className="col-md-8 d-flex justify-content-center">
@@ -119,76 +105,58 @@ export default function ConnectAccount() {
               <strong className="caption-large d-block text-uppercase mb-4">
                 {t("connect-account:connect-to-use")}
               </strong>
+
               <div className="row gx-3">
                 <div className="col-6">
                   <ConnectionButton
                     type="github"
                     variant="connect-account"
-                    state={connectButtonState[String(state.currentUser?.match)]}
-                    credential={sessionUser?.login} 
-                    connect={connectGithub}
+                    state={connectButtonState}
+                    credential={state.currentUser?.login} 
+                    connect={signInGithub}
                     isLoading={state.spinners?.connectingGH}
-                    isDisabled={!state.currentUser?.walletAddress || state.spinners?.connectingGH}
+                    isDisabled={state.spinners?.connectingGH}
                   />
                 </div>
+
                 <div className="col-6">
                   <ConnectionButton
                     type="wallet"
                     variant="connect-account"
-                    state={connectButtonState[String(state.currentUser?.match)]}
+                    state={connectButtonState}
                     credential={state.currentUser?.walletAddress}
-                    connect={connectWallet}
+                    connect={signInWallet}
                   />
                 </div>
               </div>
 
-              { state.currentUser?.match &&
+              <If condition={isMatch}>
                 <Message 
                   text={t("connect-account:warnings.already-connected")}
                   type="success"
                 />
-              }
+              </If>
 
-              { state.currentUser?.match === false &&
+              <If condition={isMismatch}>
                 <Message 
                   text={t("connect-account:warnings.already-in-use")}
                   type="danger"
                 />
-              }
+              </If>
 
-              <div className="caption-small text-light-gray text-center fs-smallest text-dark text-uppercase mt-4">
-                {t("misc.by-connecting")}{" "}
-                <a
-                  href="https://www.bepro.network/terms"
-                  target="_blank"
-                  className="text-decoration-none"
-                  rel="noreferrer"
-                >
-                  {t("misc.terms-and-conditions")}
-                </a>{" "}
-                &{" "}
-                <a
-                  href="https://taikai.network/privacy"
-                  target="_blank"
-                  className="text-decoration-none"
-                  rel="noreferrer"
-                >
-                  {t("misc.privacy-policy")}
-                </a>
-              </div>
-              <div className="d-flex justify-content-center mt-4">
+              <TermsAndConditions />
+
+              <div className="d-flex justify-content-center mt-4 gap-3">
                 <Button
-                  className="me-3"
                   disabled={isButtonDisabled}
                   onClick={joinAddressToGh}
+                  withLockIcon={isButtonDisabled}
                 >
-                  {isButtonDisabled && (
-                    <LockedIcon className="mr-1" width={14} height={14} />
-                  )}
-                  {t("actions.connect")}
+                  <span>{t("actions.connect")}</span>
                 </Button>
+
                 <Button color="dark-gray" onClick={handleCancel}>
-                  {t("actions.back")}
+                  <span>{t("actions.back")}</span>
                 </Button>
               </div>
             </div>

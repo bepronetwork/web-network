@@ -67,3 +67,5 @@ export const trimString = (string: string, at = 15) => string.length > at ? stri
 export const toLower = (str: string) => str?.toLowerCase();
 
 export const isTrue = (str: string) => str === "true";
+
+export const lowerCaseCompare = (str: string, strToCompare: string) => toLower(str) === toLower(strToCompare);

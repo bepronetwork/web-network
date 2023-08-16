@@ -1,8 +1,6 @@
 import {NextApiHandler} from "next";
-import {Op} from "sequelize";
 
-import models from "db/models";
-
+import { chainFromHeader } from "helpers/chain-from-header";
 import {CHAIN_ID_NOT_SUPPORTED, MISSING_CHAIN_ID} from "helpers/constants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
@@ -15,9 +13,20 @@ export const WithValidChainId = (handler: NextApiHandler, methods: string[] = [`
     if (!req.headers?.chain)
       return resJsonMessage(MISSING_CHAIN_ID, res, 400);
 
-    const foundChain = await models.chain.findOne({where: {chainId: {[Op.eq]: +req.headers.chain}}});
-    if (!foundChain && !isAdmin(req))
+    const chain = await chainFromHeader(req);
+
+    if (!chain && !isAdmin(req))
       return resJsonMessage(CHAIN_ID_NOT_SUPPORTED, res, 400);
+
+    const bodyWithContext = {
+      ...req.body,
+      context: {
+        ...req.body?.context,
+        chain: chain
+      }
+    };
+
+    req.body = bodyWithContext;
 
     return handler(req, res);
   }

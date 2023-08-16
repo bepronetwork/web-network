@@ -12,7 +12,7 @@ export default function ProfilePage() {
 
   const { state } = useAppState();
 
-  const { disconnectGithub } = useAuthentication();
+  const { signOut } = useAuthentication();
 
   const handleClickDisconnect = () => setShowRemoveModal(true);
   const hideRemoveModal = () => setShowRemoveModal(false);
@@ -25,7 +25,7 @@ export default function ProfilePage() {
       handleClickDisconnect={handleClickDisconnect}
       hideRemoveModal={hideRemoveModal}
       showRemoveModal={showRemoveModal}
-      disconnectGithub={disconnectGithub}
+      disconnectGithub={signOut}
     />
   );
 }

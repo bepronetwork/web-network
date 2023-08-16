@@ -12,8 +12,7 @@ import {handleCreateSettlerToken, handlefindOrCreateTokens, handleRemoveTokens} 
 import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
 
-import {withCors} from "middleware";
-import {LogAccess} from "middleware/log-access";
+import {withProtected} from "middleware";
 import { NetworkRoute } from "middleware/network-route";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
 
@@ -565,4 +564,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`Network`);
-export default LogAccess(withCors(WithValidChainId(NetworkRoute(handler))));
+export default withProtected(WithValidChainId(NetworkRoute(handler)));

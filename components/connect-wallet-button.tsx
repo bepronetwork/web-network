@@ -1,38 +1,36 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-import {useTranslation} from "next-i18next";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 
 import metamaskLogo from "assets/metamask.png";
 
 import Button from "components/button";
+import TermsAndConditions from "components/common/terms-and-conditions/view";
+import { ContextualSpan } from "components/contextual-span";
 import Modal from "components/modal";
+import ResponsiveWrapper from "components/responsive-wrapper";
 
-import {useAppState} from "contexts/app-state";
-import {changeShowWeb3} from "contexts/reducers/update-show-prop";
+import { useAppState } from "contexts/app-state";
+import { changeShowWeb3 } from "contexts/reducers/update-show-prop";
 
-import {useAuthentication} from "x-hooks/use-authentication";
-
-import { ContextualSpan } from "./contextual-span";
-import ResponsiveWrapper from "./responsive-wrapper";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
   const [showModal, setShowModal] = useState(false);
 
-  const {dispatch, state} = useAppState();
-
-  const { connectWallet } = useAuthentication();
+  const { dispatch, state } = useAppState();
+  const { signInWallet } = useAuthentication();
 
   async function handleLogin()  {
-
     if(!window?.ethereum) {
       dispatch(changeShowWeb3(true))
       return;
     }
 
-    connectWallet();
+    signInWallet();
   }
 
   function onWalletChange() {
@@ -43,8 +41,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
     if (!state.Service?.active) return;
 
     if (forceLogin)
-      connectWallet();
-
+      signInWallet();
   }, [state.Service?.active, forceLogin]);
 
   useEffect(onWalletChange, [state.currentUser?.walletAddress]);
@@ -88,27 +85,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
             )}
           </div>
 
-          <div className="small-info text-center text-uppercase mt-1 pt-1">
-            <span className="text-light-gray">{t("misc.by-connecting")} </span>
-            <a
-              href="https://www.bepro.network/terms"
-              target="_blank"
-              className="text-decoration-none text-primary"
-              rel="noreferrer"
-            >
-              {t("misc.terms-and-conditions")}
-            </a>{" "}
-            <br />
-            <span className="text-light-gray">{t("misc.and")} </span>
-            <a
-              href="https://taikai.network/privacy"
-              target="_blank"
-              className="text-decoration-none text-primary"
-              rel="noreferrer"
-            >
-              {t("misc.privacy-policy")}
-            </a>
-          </div>
+          <TermsAndConditions />
         </div>
       </Modal>
     );

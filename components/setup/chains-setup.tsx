@@ -21,7 +21,6 @@ import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import {MiniChainInfo} from "interfaces/mini-chain";
 
 import useApi from "x-hooks/use-api";
-import { useAuthentication } from "x-hooks/use-authentication";
 
 export default function ChainsSetup() {
   const { t } = useTranslation(["common"]);
@@ -35,7 +34,6 @@ export default function ChainsSetup() {
   
   const api = useApi();
   const {state, dispatch} = useAppState();
-  const { signMessage } = useAuthentication();
 
   function updateMiniChainInfo() {
     if (chains.length)
@@ -75,16 +73,13 @@ export default function ChainsSetup() {
       return;
     }
 
-    signMessage()
-      .then(() => {
-        api.addSupportedChain(chain)
-          .then(success => {
-            if (success) {
-              dispatch(toastSuccess(`added chain ${chain.name}`));
-              setShowChainModal(null);
-            } else 
-            dispatch(toastError(`Failed to add chain ${chain.name}`));
-          });
+    api.addSupportedChain(chain)
+      .then(success => {
+        if (success) {
+          dispatch(toastSuccess(`added chain ${chain.name}`));
+          setShowChainModal(null);
+        } else 
+        dispatch(toastError(`Failed to add chain ${chain.name}`));
       })
       .catch(() => {
         dispatch(toastError(`Failed to add chain ${chain.name}`));

@@ -4,30 +4,26 @@ import {Op, Sequelize} from "sequelize";
 
 import models from "db/models";
 
-import {UNAUTHORIZED} from "helpers/error-messages";
+import { withProtected } from "middleware";
 
-import {LogAccess} from "middleware/log-access";
-
-import {error as LogError} from "services/logging";
+import { Logger } from "services/logging";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {address, githubLogin} = req.body;
-
   try {
+    const token = await getToken({ req });
+
+    const githubLogin = token.login.toString();
+    const address = token.address.toString();
+
     const user = await models.user.findOne({
       where: {
       address: address.toLowerCase(),
       githubLogin: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("githubLogin")), "=", githubLogin.toLowerCase())
-      } });
+      }
+    });
 
     if (!user) 
       return res.status(404).json("User not found");
-
-    const headerWallet = (req.headers.wallet as string).toLowerCase();
-    const token = await getToken({req});
-
-    if ( headerWallet !== user.address || !token || token?.login !== githubLogin )
-      return res.status(401).json({message: UNAUTHORIZED});
 
     const issuesWithPullRequestsByAccount = await models.issue.findAndCountAll({
       where: {
@@ -35,19 +31,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           [Op.notIn]: ["canceled", "closed"]
         }
       },
-      include: [{
-        association: "pullRequests",
-        required: true,
-        where: {
-          status: {
-            [Op.not]: "canceled"
-          },
-          githubLogin
+      include: [
+        {
+          association: "pullRequests",
+          required: true,
+          where: {
+            status: {
+              [Op.not]: "canceled"
+            },
+            githubLogin
+          }
         }
-      }]
+      ]
     });
 
-    if (issuesWithPullRequestsByAccount.count > 0) return res.status(409).json("PULL_REQUESTS_OPEN");
+    if (issuesWithPullRequestsByAccount.count > 0)
+      return res.status(409).json("PULL_REQUESTS_OPEN");
 
     user.resetedAt = new Date();
     user.githubHandle = null;
@@ -56,13 +55,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await user.save();
 
     return res.status(200).json("User reseted sucessfully");
-  } catch(e) {
-    LogError("Reset Account", { req, address, githubLogin, error: e });
-    return res.status(500).json(e);
+  } catch(error) {
+    Logger.error(error, "Reset Account", { req, error });
+    return res.status(500).json(error);
   }
 }
 
-export default LogAccess(async function ResetUser(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -73,4 +72,6 @@ export default LogAccess(async function ResetUser(req: NextApiRequest, res: Next
   }
 
   res.end();
-})
+}
+
+export default withProtected(handler);

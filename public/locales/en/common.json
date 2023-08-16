@@ -120,6 +120,7 @@
     "completed": "Completed",
     "confirm": "Confirm",
     "connect": "Connect",
+    "disconnect": "Disconnect",
     "connect-github": "Please, connect your GitHub account",
     "connect-github-to-work": "To start working on this bounty, please connect your github account below.",
     "connect-wallet": "Connect Wallet",
@@ -336,6 +337,12 @@
       "title": "Reauthorize Github",
       "description": "Your github connection has expired. Please, reauthorize the session.",
       "button-label": "Reauthorize"
+    },
+    "wallet-mismatch": {
+      "title": "Wallet Mismatch",
+      "description-pre": "You are logged in with the wallet",
+      "description-pos": "but your Metamask is connected to another wallet.",
+      "recommendation": "Please, change the wallet on Metamask or sign in with the current wallet."
     }
   },
   "forms": {

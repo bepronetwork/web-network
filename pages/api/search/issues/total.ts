@@ -5,10 +5,8 @@ import models from "db/models";
 
 import { resJsonMessage } from "helpers/res-json-message";
 
-import { WithJwt } from "middleware";
-import {LogAccess} from "middleware/log-access";
+import { RouteMiddleware } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: { [Op.notIn]: ["pending", "canceled"] }, visible: true};
@@ -65,4 +63,4 @@ async function getAll(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(WithJwt(WithValidChainId(getAll))));
+export default RouteMiddleware(WithValidChainId(getAll));

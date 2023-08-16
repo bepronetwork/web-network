@@ -6,8 +6,7 @@ import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withCORS } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -92,4 +91,4 @@ async function SearchNetworks(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(SearchNetworks));
+export default withCORS(SearchNetworks);

@@ -2,8 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import models from "db/models";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withCORS } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const headerInformation = await models.headerInformation.findAll({});
@@ -27,4 +26,5 @@ async function SearchNetworks(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(SearchNetworks))
+
+export default withCORS(SearchNetworks);

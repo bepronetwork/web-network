@@ -7,8 +7,7 @@ import models from "db/models";
 import { chainFromHeader } from "helpers/chain-from-header";
 import { resJsonMessage } from "helpers/res-json-message";
 
-import { withCors } from "middleware";
-import { LogAccess } from "middleware/log-access";
+import { withGovernor, withProtected } from "middleware";
 import { NetworkRoute } from "middleware/network-route";
 import { WithValidChainId } from "middleware/with-valid-chain-id";
 
@@ -82,4 +81,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`network/Management`);
-export default LogAccess(withCors(WithValidChainId(NetworkRoute(handler))));
+export default withProtected(WithValidChainId(withGovernor(NetworkRoute(handler))));

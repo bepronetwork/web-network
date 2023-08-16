@@ -60,10 +60,10 @@ export default function ListActiveNetworks() {
           otherwise={<NothingFound description={t("most-active-network-empty")} />}
         >
           <HorizontalScroll>
-            {networks.map((network) => 
+            {networks.map((network, index) => 
               <div
                 className="col-12 col-sm-6 col-md-5 col-lg-4"
-                key={`active-${network?.networkAddress}`}
+                key={`active-${index}-${network?.name}`}
               >
                 <ListActiveNetworksItem network={network} key={`${network.name}-${network.chain.chainShortName}`} />
               </div>)}

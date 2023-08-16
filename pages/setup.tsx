@@ -4,7 +4,6 @@ import {Container, Row} from "react-bootstrap";
 import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import ConnectWalletButton from "components/connect-wallet-button";
@@ -21,8 +20,6 @@ import {Network} from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig: { adminWallet } } = getConfig();
-
 export default function SetupPage(){
   const { replace } = useRouter();
   const { t } = useTranslation(["setup", "common"])
@@ -34,12 +31,12 @@ export default function SetupPage(){
   const { state: { currentUser, supportedChains, connectedChain } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
-  const isAdmin = adminWallet?.toLowerCase() === currentUser?.walletAddress?.toLowerCase();
+  const isAdmin = !!currentUser?.isAdmin;
 
   useEffect(() => {
-    if (isConnected && adminWallet && !isAdmin)
+    if (isConnected && !isAdmin)
       replace("/networks");
-  }, [adminWallet, currentUser?.walletAddress]);
+  }, [currentUser?.isAdmin, currentUser?.walletAddress]);
 
   function searchForNetwork() {
     if (!isConnected || !isAdmin) return;

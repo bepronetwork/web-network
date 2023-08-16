@@ -1,14 +1,15 @@
 import {isZeroAddress} from "ethereumjs-util";
+import { useSession } from "next-auth/react";
 import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
 import {useAppState} from "contexts/app-state";
 import {changeChain as changeChainReducer} from "contexts/reducers/change-chain";
-import {changeCurrentUserConnected, changeCurrentUserWallet} from "contexts/reducers/change-current-user";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
 
 import {SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
+import { lowerCaseCompare } from "helpers/string";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
@@ -18,9 +19,10 @@ import useChain from "x-hooks/use-chain";
 import useNetworkChange from "x-hooks/use-network-change";
 
 export function useDao() {
+  const session = useSession();
   const { replace, asPath, pathname } = useRouter();
 
-  const {state, dispatch} = useAppState();
+  const { state, dispatch } = useAppState();
   const { findSupportedChain } = useChain();
   const { handleAddNetwork } = useNetworkChange();
 
@@ -35,7 +37,7 @@ export function useDao() {
   /**
    * Enables the user/dapp to connect to the active DAOService
    */
-  function connect() {
+  function connect(): Promise<string | null> {
     if (!state.Service?.web3Connection) return;
 
     dispatch(changeConnecting(true));
@@ -51,14 +53,13 @@ export function useDao() {
         return state.Service?.web3Connection?.getAddress();
       })
       .then(address => {
-        if (address === "0x00") return;
+        if (address === "0x00") return null;
 
-        dispatch(changeCurrentUserConnected(true));
-        dispatch(changeCurrentUserWallet(address));
+        return address;
       })
       .catch(error => {
         console.debug(`Failed to connect`, error);
-        return false;
+        return null;
       })
       .finally(() => {
         dispatch(changeConnecting(false));
@@ -120,6 +121,12 @@ export function useDao() {
    * dispatches changeNetwork() to active network
    */
   async function start() {
+    if (session.status === "loading" ||
+        session.status === "authenticated" && !state.currentUser?.connected) {
+      console.debug("Session not loaded yet");
+      return;
+    }
+
     const supportedChains = state.supportedChains;
 
     if (!supportedChains?.length) {
@@ -169,9 +176,9 @@ export function useDao() {
     const isSameWeb3Host = 
       chainToConnect.chainRpc === state.Service?.active?.web3Host && !shouldUseWeb3Connection || 
       shouldUseWeb3Connection && !state.Service?.active?.web3Host;
-    const isSameRegistry = chainToConnect?.registryAddress === state.Service?.active?.registryAddress?.toLowerCase();
+    const isSameRegistry = lowerCaseCompare(chainToConnect?.registryAddress, state.Service?.active?.registryAddress);
 
-    if (isSameWeb3Host && isSameRegistry && !isConnected || state.Service?.starting) {
+    if (isSameWeb3Host && isSameRegistry && !isConnected) {
       console.debug("Already connected to this web3Host or the service is still starting");
       return;
     }

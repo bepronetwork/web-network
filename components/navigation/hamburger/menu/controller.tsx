@@ -28,7 +28,7 @@ export default function HamburgerMenu({
   const [isProfileLinksVisible, setIsProfileLinksVisible] = useState(false);
   
   const { state } = useAppState();
-  const { disconnectWallet } = useAuthentication();
+  const { signOut } = useAuthentication();
   const { getURLWithNetwork } = useNetwork();
 
   const isOnNetwork = isOnNetworkPath(pathname);
@@ -43,7 +43,7 @@ export default function HamburgerMenu({
   function handleDisconnect() {
     setIsProfileLinksVisible(false);
     onHide();
-    disconnectWallet();
+    signOut();
   }
 
   function handleShowProfileLinks() {

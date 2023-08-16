@@ -10,7 +10,7 @@ import * as IssueQueries from "graphql/issue";
 import { chainFromHeader } from "helpers/chain-from-header";
 import { getPropertyRecursively } from "helpers/object";
 
-import { IssueRoute } from "middleware/issue-route";
+import { IssueRoute } from "middleware";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 

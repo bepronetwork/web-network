@@ -2,8 +2,7 @@ import formidable from "formidable";
 import fs from "fs";
 import {NextApiRequest, NextApiResponse} from "next";
 
-import { LogAccess } from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withProtected } from "middleware";
 
 import IpfsStorage from "services/ipfs-service";
 import {Logger} from "services/logging";
@@ -53,4 +52,4 @@ async function FilesMethods (req: NextApiRequest, res: NextApiResponse) {
 }
 
 Logger.changeActionName(`Files`);
-export default LogAccess(WithCors(FilesMethods));
+export default withProtected(FilesMethods);
