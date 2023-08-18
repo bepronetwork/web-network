@@ -7,7 +7,6 @@ import Database from "db/models";
 
 import {chainFromHeader} from "helpers/chain-from-header";
 import {WANT_TO_CREATE_NETWORK} from "helpers/constants";
-import decodeMessage from "helpers/decode-message";
 import {handleCreateSettlerToken, handlefindOrCreateTokens, handleRemoveTokens} from "helpers/handleNetworkTokens";
 import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
@@ -17,6 +16,7 @@ import { NetworkRoute } from "middleware/network-route";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
 
 import DAO from "services/dao-service";
+import { ethereumMessageService } from "services/ethereum/message";
 import IpfsStorage from "services/ipfs-service";
 import {Logger} from 'services/logging';
 
@@ -106,8 +106,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     
     const chain = await chainFromHeader(req);
 
-    const validateSignature = (assumedOwner: string) => 
-      decodeMessage(chain.chainId, WANT_TO_CREATE_NETWORK, signedMessage, assumedOwner);
+    const typedMessage = ethereumMessageService.getMessage({
+      chainId: chain.chainId,
+      message: WANT_TO_CREATE_NETWORK
+    });
+
+    const validateSignature = assumedOwner => 
+      ethereumMessageService.decodeMessage(typedMessage, signedMessage, assumedOwner);
 
     if (!validateSignature(creator))
       return resJsonMessage("Invalid signature", res, 403);
