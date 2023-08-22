@@ -12,6 +12,8 @@ export interface CustomSession extends Record<string, unknown> {
     address?: string | null;
     roles?: string[] | null;
     accountsMatch?: MatchAccountsStatus | null;
+    isEmailConfirmed?: boolean | null;
+    emailVerificationSentAt?: string | null;
   };
   expires: ISODateString;
 }

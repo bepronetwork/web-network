@@ -21,7 +21,7 @@ export default function Identicon({
     xsm: 16,
     sm: 24,
     md: 32,
-    lg: 108
+    lg: 72
   };
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function Identicon({
 
       const icon = jazzicon(SIZES[size], parseInt(address.slice(2, 10), 16));
 
-      if (size === "lg") icon.style.height = `${SIZES[size]-6}px`;
+      if (size === "lg") icon.style.height = `${SIZES[size]}px`;
       icon.style.borderRadius = '50%'
       ref.current.appendChild(icon);
     }

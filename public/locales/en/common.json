@@ -155,7 +155,8 @@
     "register": "Register",
     "clear-all": "Clear All",
     "apply": "Apply",
-    "clear": "Clear"
+    "clear": "Clear",
+    "save": "Save"
   },
   "misc": {
     "by": "by",

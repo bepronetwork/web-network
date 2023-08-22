@@ -1,5 +1,3 @@
-import { UserRole } from "interfaces/enums/roles";
-
 export const emptyPaginatedData = { count: 0, rows: [], currentPage: 1, pages: 1 };
 export const emptyBountiesPaginated = { ...emptyPaginatedData, totalBounties: 0 };
 export const emptyCuratorsPaginated = { ...emptyPaginatedData, totalCurators: 0 };
@@ -19,6 +17,3 @@ export const emptyNetworkOverview = {
   networkTokenOnClosedBounties: 0,
   members: 0,
 };
-
-export const governorRole = (chainId: string | number, networkAddress: string) => 
-  `${UserRole.GOVERNOR}:${chainId}_${networkAddress}`;

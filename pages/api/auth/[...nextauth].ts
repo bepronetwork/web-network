@@ -3,6 +3,8 @@ import NextAuth from "next-auth";
 import { getToken } from "next-auth/jwt";
 import getConfig from "next/config";
 
+import models from "db/models";
+
 import { Logger } from "services/logging";
 
 import { SESSION_TTL } from "server/auth/config";
@@ -80,6 +82,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
         const { login, name, accessToken, roles, address, nonce } = token;
 
         const accountsMatch = await AccountValidator.matchAddressAndGithub(address?.toString(), login?.toString());
+        const user = await models.user.scope("ownerOrGovernor").findByAddress(address);
 
         return {
           expires: session.expires,
@@ -90,7 +93,10 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
             roles,
             address,
             accountsMatch,
-            nonce
+            nonce,
+            email: user.email,
+            isEmailConfirmed: user.isEmailConfirmed,
+            emailVerificationSentAt: user.emailVerificationSentAt,
           },
         };
       },

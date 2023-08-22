@@ -55,5 +55,23 @@
         "check-requirements": "Check the requirements"
       }
     }
+   },
+   "notifications-form": {
+      "title": "Notifications",
+      "message": "Allow Bepro Network to send you updates via email. These can include updates to bounties, app updates, etc.",
+      "invalid-email": "Invalid email",
+      "re-send-email": "A confirmation email was sent, please check your inbox and spam box.",
+      "re-send": "Re-send",
+      "success-toast": {
+        "title": "Success",
+        "content": "Email confirmed"
+      }
+   },
+   "email-errors": {
+    "invalid-link": "Invalid confirmation link",
+    "already-confirmed": "Email already confirmed",
+    "expired-link": "This confirmation link is expired. Try re-sending another email.",
+    "failed-to-update": "Failed to update email",
+    "try-again-later": "Something went wrong, try again later"
    }
 }

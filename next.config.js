@@ -65,7 +65,12 @@ const serverRuntimeConfig = {
   e2eEnabled: process.env.NEXT_E2E_TESTNET || false,
   scheduleInterval: process.env.NEXT_E2E_TESTNET || 60,
   logLevel: process.env.LOG_LEVEL,
-  logStackTrace: process.env.ELASTIC_INDEX_STACK_TRACE === "true"
+  logStackTrace: process.env.ELASTIC_INDEX_STACK_TRACE === "true",
+  email: {
+    apiKey: process.env.NEXT_SENDGRID_MAIL_API_KEY,
+    from: process.env.NEXT_SENDGRID_MAIL_FROM,
+    verificationCodeExpiration: process.env.NEXT_MAIL_VERIFICATION_EXPIRATION || 24
+  }
 }
 
 module.exports = () => {
