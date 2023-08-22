@@ -11,10 +11,9 @@ import CreateReviewModal from "components/pull-request/create-review-modal/contr
 import PullRequestHero from "components/pull-request/hero/controller";
 
 import { useAppState } from "contexts/app-state";
-import { changeCurrentBountyComments } from "contexts/reducers/change-current-bounty";
 import { addToast } from "contexts/reducers/change-toaster";
 
-import { issueParser } from "helpers/issue";
+import { commentsParser, issueParser } from "helpers/issue";
 
 import {
   IssueBigNumberData,
@@ -24,11 +23,10 @@ import {
 
 import {
   getBountyData,
-  getBountyOrPullRequestComments,
-  getPullRequestReviews,
   getPullRequestsDetails,
 } from "x-hooks/api/bounty/get-bounty-data";
-import useApi from "x-hooks/use-api";
+import getCommentsData from "x-hooks/api/comments/get-comments-data";
+import CreateComment from "x-hooks/api/comments/post-comments";
 
 interface PagePullRequestProps {
   bounty: IssueData;
@@ -46,13 +44,12 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
   const [currentBounty, setCurrentBounty] = useState<IssueBigNumberData>(issueParser(bounty));
   const [currentPullRequest, setCurrentPullRequest] = useState<PullRequest>({
     ...pullRequest,
+    comments: commentsParser(pullRequest.comments),
     createdAt: new Date(pullRequest.createdAt),
   });
   const [isCreatingReview, setIsCreatingReview] = useState(false);
 
   const { state, dispatch } = useAppState();
-
-  const { createReviewForPR } = useApi();
 
   const isPullRequestReady = !!currentPullRequest?.isReady;
 
@@ -69,9 +66,16 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
           merged: currentPullRequest?.merged,
           state: currentPullRequest?.state,
           comments: currentPullRequest.comments,
-          reviews: currentPullRequest.reviews,
         });
       });
+  }
+
+  function updateCommentData() {
+    getCommentsData({ deliverableId: currentPullRequest?.id.toString() })
+     .then((comments) => setCurrentPullRequest({
+      ...currentPullRequest,
+      comments: commentsParser(comments)
+     }))
   }
 
   function updatePrDetails() {
@@ -82,7 +86,6 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
         setCurrentPullRequest({
           ...currentPullRequest,
           comments: currentPullRequest.comments,
-          reviews: currentPullRequest.reviews,
           isMergeable: details[0]?.isMergeable,
           merged: details[0]?.merged,
           state: details[0]?.state,
@@ -91,44 +94,33 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
   }
 
   function handleCreateReview(body: string) {
-    if (!state.currentUser?.login) return;
+    if (!state.currentUser?.walletAddress) return;
 
     setIsCreatingReview(true);
 
-    createReviewForPR({
-      issueId: String(currentBounty?.issueId),
-      pullRequestId: String(prId),
-      githubLogin: state.currentUser?.login,
-      body,
-      networkName: state.Service?.network?.active?.name,
-      wallet: state.currentUser.walletAddress
+    CreateComment({
+      type: 'review',
+      issueId: +currentBounty.id,
+      deliverableId: currentPullRequest.id,
+      comment: body
+    }).then(() => {
+      dispatch(addToast({
+        type: "success",
+        title: t("actions.success"),
+        content: t("pull-request:actions.review.success"),
+      }));
+      updateCommentData()
+      setShowModal(false)
+    }).catch(() => {
+      dispatch(addToast({
+        type: "danger",
+        title: t("actions.failed"),
+        content: t("pull-request:actions.review.error"),
+      }));
     })
-      .then((response) => {
-        dispatch(addToast({
-          type: "success",
-          title: t("actions.success"),
-          content: t("pull-request:actions.review.success"),
-        }));
-
-        setCurrentPullRequest({
-          ...currentPullRequest,
-          comments: [...currentPullRequest.comments, response.data],
-        });
-
-        dispatch(changeCurrentBountyComments([...state.currentBounty?.comments || [], response.data]))
-
-        setShowModal(false);
-      })
-      .catch(() => {
-        dispatch(addToast({
-          type: "danger",
-          title: t("actions.failed"),
-          content: t("pull-request:actions.review.error"),
-        }));
-      })
-      .finally(() => {
-        setIsCreatingReview(false);
-      });
+    .finally(() => {
+      setIsCreatingReview(false);
+    });
   }
 
   function handleShowModal() {
@@ -149,6 +141,7 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
         isCreatingReview={isCreatingReview} 
         updateBountyData={updateBountyData}
         updatePrDetails={updatePrDetails}
+        updateComments={updateCommentData}
         handleShowModal={handleShowModal}      
       />
 
@@ -176,19 +169,14 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
   const pullRequestDetail = await getPullRequestsDetails(bountyDatabase?.repository?.githubPath,
                                                          [pullRequestDatabase]);
 
-  const pullRequestComments = await getBountyOrPullRequestComments(bountyDatabase?.repository?.githubPath, 
-                                                                   +prId);
-  
-  const pullRequestReviews = await getPullRequestReviews(bountyDatabase?.repository?.githubPath, 
-                                                         +prId);
+  const pullRequestComments = await getCommentsData({ deliverableId: pullRequestDatabase?.id.toString() })
 
   const pullRequest: PullRequest = {
     ...pullRequestDatabase,
     isMergeable: pullRequestDetail[0]?.isMergeable,
     merged: pullRequestDetail[0]?.merged,
     state: pullRequestDetail[0]?.state,
-    comments: pullRequestComments,
-    reviews: pullRequestReviews
+    comments: pullRequestComments
   }
                                                            
   return {

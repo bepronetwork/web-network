@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 import { User } from "interfaces/api";
 import { BaseModel } from "interfaces/db/base";
-import { IssueBigNumberData, IssueData, PullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, IssueData, IssueDataComment, PullRequest } from "interfaces/issue-data";
 
 export interface ProposalDistribution extends BaseModel {
   recipient: string;
@@ -34,6 +34,7 @@ export interface Proposal extends BaseModel {
   disputes?: ProposalDisputes[];
   issue?: IssueData | IssueBigNumberData;
   pullRequest?: PullRequest;
+  comments?: IssueDataComment[];
 }
 
 export interface INetworkProposal {

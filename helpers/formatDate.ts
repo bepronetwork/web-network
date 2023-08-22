@@ -15,9 +15,11 @@ export const formatDate = (date: number | string | Date, joiner = "/") => {
   }
 };
 
-export const getTimeDifferenceInWords = (date: Date, dateToCompare: Date) => {
+export const getTimeDifferenceInWords = (date: Date, dateToCompare: Date, addSuffix = false) => {
   try {
-    return formatDistanceStrict(date, dateToCompare);
+    return formatDistanceStrict(date, dateToCompare, {
+      addSuffix
+    });
   } catch (e) {
     return `0`;
   }

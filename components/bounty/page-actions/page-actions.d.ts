@@ -28,7 +28,6 @@ export interface PageActionsViewProps {
 
 export interface PageActionsControllerProps {
   isRepoForked?: boolean;
-  addNewComment?: (comment: string) => void;
   handleEditIssue?: () => void;
   isEditIssue?: boolean;
   currentBounty: IssueBigNumberData;

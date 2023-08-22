@@ -6,6 +6,7 @@ import ProposalPage from "components/pages/bounty/proposal/controller";
 import { Logger } from "services/logging";
 
 import { getPullRequestsDetails } from "x-hooks/api/bounty/get-bounty-data";
+import getCommentsData from "x-hooks/api/comments/get-comments-data";
 import getProposalData from "x-hooks/api/get-proposal-data";
 import useOctokit from "x-hooks/use-octokit";
 
@@ -24,6 +25,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       Logger.error(error, "Failed to getProposalData");
       return undefined;
     });
+
+  const proposalComments = await getCommentsData({ proposalId: proposal?.id?.toString() })
 
   const [pullRequestDetails, repositoryDetails] = await Promise.all([
     getPullRequestsDetails( proposal?.issue?.repository?.githubPath,
@@ -56,6 +59,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           ...proposal?.pullRequest,
           ...pullRequestDetails,
         },
+        comments: proposalComments
       },
       ...(await serverSideTranslations(locale, [
         "common",

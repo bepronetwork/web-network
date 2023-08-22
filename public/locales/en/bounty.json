@@ -72,6 +72,10 @@
       "title": "Recognize as finished",
       "error": "Failed to mark bounty as finished"
     },
+    "comment": {
+      "success": "Comment successfully created",
+      "error": "Error creating comment" 
+    },
     "start-working": {
       "title": "Start Working",
       "success": "To start working on this bounty",

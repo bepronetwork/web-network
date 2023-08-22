@@ -5,6 +5,8 @@ import { Payment } from "interfaces/payments";
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
 
+import { User } from "./api";
+
 export type IssueState =
   | "pending"
   | "draft"
@@ -122,7 +124,6 @@ export interface PullRequest {
   updatedAt: Date;
   issue?: IssueData;
   comments?: IssueDataComment[];
-  reviews?: IssueDataComment[];
   status?: string;
   reviewers?: string[];
   contractId?: number;
@@ -145,12 +146,20 @@ export interface developer {
   url?: string;
   type?: string;
 }
-
 export interface IssueDataComment {
-  body: string;
-  created_at: string | number | Date;
-  updated_at: string | number | Date;
-  author: string;
+  id: number;
+  comment: string;
+  hidden: boolean;
+  type: string;
+  issueId: number;
+  proposalId?: number;
+  deliverableId?: number;
+  userId: number;
+  userAddress: string;
+  replyId?: number;
+  updatedAt: Date;
+  createdAt: Date;
+  user: User;
 }
 
 export interface GithubUser {
