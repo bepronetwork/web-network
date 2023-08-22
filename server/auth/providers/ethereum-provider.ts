@@ -5,7 +5,6 @@ import { getCsrfToken } from "next-auth/react";
 
 import models from "db/models";
 
-import { governorRole } from "helpers/api";
 import { caseInsensitiveEqual } from "helpers/db/conditionals";
 import { AddressValidator } from "helpers/validators/address";
 
@@ -14,6 +13,7 @@ import { UserRole } from "interfaces/enums/roles";
 import { siweMessageService } from "services/ethereum/siwe";
 
 import { AuthProvider } from "server/auth/providers";
+import { UserRoleUtils } from "server/utils/jwt";
 
 export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthProvider => ({
   config: CredentialsProvider({
@@ -87,7 +87,8 @@ export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthPr
         roles.push(UserRole.ADMIN);
 
       const governorOf = await models.network.findAllOfCreatorAddress(address)
-        .then(networks => networks.map(({ networkAddress, chain_id }) => governorRole(chain_id, networkAddress)))
+        .then(networks => 
+          networks.map(({ networkAddress, chain_id }) => UserRoleUtils.getGovernorRole(chain_id, networkAddress)))
         .catch(() => []);
 
       roles.push(...governorOf);

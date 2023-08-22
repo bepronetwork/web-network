@@ -177,3 +177,12 @@ button,
   line-height: 30px;
   font-feature-settings: 'tnum' on, 'lnum' on, 'ss04' on;
 }
+
+/* Normal Case/BASE/Medium */
+.base-medium {
+  font-family: Space Grotesk;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 125% */
+}

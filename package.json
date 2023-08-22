@@ -40,6 +40,7 @@
     "@metamask/eth-sig-util": "^5.0.2",
     "@metamask/jazzicon": "^2.0.0",
     "@primer/css": "^20.8.0",
+    "@sendgrid/mail": "^7.7.0",
     "@synaps-io/react-verify": "^1.0.3",
     "@taikai/dappkit": "2.1.11",
     "@taikai/scribal": "^1.0.3",

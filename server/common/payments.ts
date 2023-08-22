@@ -1,11 +1,13 @@
 import { endOfDay, isAfter, parseISO, startOfDay } from "date-fns";
 import { ParsedUrlQuery } from "querystring";
 import { Op, WhereOptions } from "sequelize";
-import { BadRequestError } from "server/errors/http-errors";
+
 
 import models from "db/models";
 
 import { caseInsensitiveEqual } from "helpers/db/conditionals";
+
+import { HttpBadRequestError } from "server/errors/http-errors";
 
 export default async function get(query: ParsedUrlQuery) {
   const {
@@ -18,7 +20,7 @@ export default async function get(query: ParsedUrlQuery) {
   } = query;
 
   if (!wallet)
-    throw new BadRequestError("Missing parameters: wallet");
+    throw new HttpBadRequestError("Missing parameters: wallet");
 
   const networkWhere: WhereOptions = networkName ? {
     name: caseInsensitiveEqual("issue.network.name", networkName.toString())
@@ -35,7 +37,7 @@ export default async function get(query: ParsedUrlQuery) {
     const finalDate = parseISO(endDate.toString())
   
     if (isAfter(initialDate, finalDate))
-      throw new BadRequestError("Invalid time interval");
+      throw new HttpBadRequestError("Invalid time interval");
 
     timeFilter.createdAt = {
       [Op.between]: [startOfDay(initialDate), endOfDay(finalDate)]
