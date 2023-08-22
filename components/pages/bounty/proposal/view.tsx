@@ -1,3 +1,4 @@
+import Comments from "components/bounty/comments/controller";
 import PullAndProposalHero from "components/bounty/pull-and-proposal-hero/controller";
 import ConnectWalletButton from "components/connect-wallet-button";
 import CustomContainer from "components/custom-container";
@@ -11,7 +12,8 @@ import ProposalDistributionList from "components/proposal/distribution/list/cont
 import ProposalPullRequestDetails from "components/proposal/pull-request-details/controller";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
-import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
+import { CurrentUserState } from "interfaces/application-state";
+import { IssueBigNumberData, IssueDataComment, PullRequest } from "interfaces/issue-data";
 import { DistributedAmounts } from "interfaces/proposal";
 
 import { ProposalPageProps } from "types/pages";
@@ -31,6 +33,9 @@ interface ProposalPageViewProps extends ProposalPageProps {
   isPrOwner: boolean;
   isProposalOwner: boolean;
   prsNeedsApproval: boolean;
+  comments: IssueDataComment[];
+  updateComments: () => void;
+  userData: CurrentUserState;
 }
 
 export default function ProposalPageView({
@@ -49,6 +54,9 @@ export default function ProposalPageView({
   isPrOwner,
   isProposalOwner,
   prsNeedsApproval,
+  comments,
+  updateComments,
+  userData
 }: ProposalPageViewProps) {
   return (
     <>
@@ -122,6 +130,18 @@ export default function ProposalPageView({
               prsNeedsApproval={prsNeedsApproval}
             />
           </div>
+        </div>
+        <div className="row mt-3 mb-5 bg-gray-900 border-radius-8 mx-0">
+        <Comments
+            comments={comments}
+            type="proposal"
+            ids={{
+              issueId: +issue?.id,
+              proposalId: proposal?.id,
+            }}
+            currentUser={userData}
+            updateData={updateComments}
+          />
         </div>
       </CustomContainer>
 

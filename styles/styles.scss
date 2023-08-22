@@ -603,6 +603,30 @@ label {
   }
 }
 
+.input-comment {
+  background-color: $gray-850 !important;
+  color: var(--bs-gray);
+  border: none !important;
+  &:focus {
+    border-color: none !important;
+  }
+}
+
+.btn-comment {
+  &:disabled {
+    border: 1px solid $gray-700 !important;
+  }
+}
+
+.settings-comment {
+  &:hover {
+    background-color: $gray-850;
+  }
+
+  .container-settings {
+    margin: 0px 6px 6px 6px 
+  }
+}
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 5px;
@@ -1624,6 +1648,10 @@ textarea.form-control {
 
 .line {
   height: 1px;
+}
+
+.p-settings {
+  padding: 8px 8px 12px 8px;
 }
 
 .image-uploader {

@@ -24,7 +24,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const foundOrValid = (v) => v ? 'found' : 'valid'
 
-    if (!["issue", "deliverable", "proposal"].includes(type)) {
+    if (!["issue", "deliverable", "proposal", "review"].includes(type)) {
       return res.status(404).json({ message: "type does not exist" });
     }
 
@@ -33,7 +33,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
         .status(404)
         .json({ message: `issueId not ${foundOrValid(!issueId)}` });
 
-    if (type === "deliverable" && (!deliverableId || !isValidNumber(deliverableId)))
+    if ((["deliverable", "review"].includes(type)) && (!deliverableId || !isValidNumber(deliverableId)))
       return res.status(404).json({ message: `deliverableId not ${foundOrValid(!deliverableId)}` });
 
     if (type === "proposal" && (!proposalId || !isValidNumber(proposalId)))
@@ -51,7 +51,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const whereCondition: WhereOptions = {};
 
-    if (deliverableId && type === "deliverable")
+    if (deliverableId && ["deliverable", "review"].includes(type))
       whereCondition.deliverableId = +deliverableId;
     if (proposalId && type === "proposal")
       whereCondition.proposalId = +proposalId;
@@ -66,6 +66,20 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
       ...(deliverableId || proposalId ? whereCondition : null),
       ...(replyId ? { replyId: +replyId } : null),
     });
+
+    if(type === 'review' && comments){
+      const deliverable = await models.pullRequest.findOne({
+        where: {
+          id: +deliverableId
+        }
+      })
+
+      if (!deliverable.reviewers.find((el) => +el === user.id)) {
+        deliverable.reviewers = [...deliverable.reviewers, user.id];
+  
+        await deliverable.save();
+      }
+    }
 
     return res.status(200).json(comments);
   } catch (error) {

@@ -9,9 +9,13 @@ import { error as LogError } from "services/logging";
 
 export default async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { issueId, proposalId, deliverableId, userId, id } = req.query;
+    const { issueId, proposalId, deliverableId, userId, type, id } = req.query;
 
     const isGovernor = await isGovernorSigned(req.headers);
+    
+    if (type && !["issue", "deliverable", "proposal", "review"].includes(type?.toString())) {
+      return res.status(404).json({ message: "type does not exist" });
+    }
 
     const filters: WhereOptions = {};
 
@@ -20,14 +24,25 @@ export default async function get(req: NextApiRequest, res: NextApiResponse) {
     if (proposalId) filters.proposalId = +proposalId;
     if (deliverableId) filters.deliverableId = +deliverableId;
     if (userId) filters.userId = +userId;
+    if (type) filters.type = type;
 
     let comments;
 
-    if ((issueId || proposalId || deliverableId || userId) && !id) {
+    const include = [
+      {
+        association: "user",
+        attributes: ["githubLogin"]
+      }
+    ]
+
+    if ((issueId || proposalId || deliverableId || userId || type) && !id) {
+      /* When we only ask for deliverableId || proposalId || issueid, 
+      this route fetches all comments related to that id, regardless of type */
       comments = await models.comments.findAll({
         where: {
           ...filters,
         },
+        include
       });
     } else {
       comments = await models.comments.findOne({
@@ -35,6 +50,7 @@ export default async function get(req: NextApiRequest, res: NextApiResponse) {
           id: +id,
           ...filters,
         },
+        include
       });
     }
 

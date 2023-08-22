@@ -10,13 +10,15 @@ import ProposalPageView from "components/pages/bounty/proposal/view";
 import {useAppState} from "contexts/app-state";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { issueParser, mergeProposalParser, pullRequestParser } from "helpers/issue";
+import { commentsParser, issueParser, mergeProposalParser, pullRequestParser } from "helpers/issue";
 import { isProposalDisputable } from "helpers/proposal";
 
-import { IssueData } from "interfaces/issue-data";
+import { IssueData, IssueDataComment } from "interfaces/issue-data";
 import { DistributedAmounts } from "interfaces/proposal";
 
 import { ProposalPageProps } from "types/pages";
+
+import getCommentsData from "x-hooks/api/comments/get-comments-data";
 
 const defaultAmount = {
   value: "0",
@@ -30,6 +32,8 @@ export default function ProposalPage(props: ProposalPageProps) {
   const [isUserAbleToDispute, setIsUserAbleToDispute] = useState(false);
   const [isDisputableOnChain, setIsDisputableOnChain] = useState<boolean>(false);
   const [missingDisputableTime, setMissingDisputableTime] = useState<string>("");
+  const [proposalComments, setProposalComments] = 
+      useState<IssueDataComment[]>(commentsParser(props?.proposal?.comments));
   const [distributedAmounts, setDistributedAmounts] =
     useState<DistributedAmounts>({
       treasuryAmount: defaultAmount,
@@ -90,6 +94,11 @@ export default function ProposalPage(props: ProposalPageProps) {
     !isPrOwner,
     !isProposalOwner,
   ].every((v) => v);
+
+  function updateProposalComments() {
+    getCommentsData({ proposalId: proposal?.id?.toString() })
+      .then((comments) => setProposalComments(commentsParser(comments)))
+  }
 
   async function getDistributedAmounts() {
     if (!proposal?.distributions || !state?.Service?.network?.amounts) return;
@@ -172,6 +181,9 @@ export default function ProposalPage(props: ProposalPageProps) {
       isPrOwner={isPrOwner}
       isProposalOwner={isProposalOwner}
       prsNeedsApproval={prsNeedsApproval}
+      comments={proposalComments}
+      updateComments={updateProposalComments}
+      userData={state.currentUser}
     />
   );
 }

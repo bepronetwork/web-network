@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 import { bountyReadyPRsHasNoInvalidProposals } from "helpers/proposal";
 
-import { IssueBigNumberData, IssueData, PullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, IssueData, IssueDataComment, PullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 export const OPEN_STATES = ["draft", "open", "ready", "proposal"];
@@ -55,3 +55,11 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   mergeProposals: issue?.mergeProposals && issue?.mergeProposals?.map(p => mergeProposalParser(p, issue?.merged)),
   benefactors: issue?.benefactors && benefactorsParser(issue)
 });
+
+export const commentsParser = (comments: IssueDataComment[]) => {
+  return comments.map(comment => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+    updatedAt: new Date(comment.updatedAt)
+  }))
+}

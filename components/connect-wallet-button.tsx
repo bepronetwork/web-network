@@ -16,7 +16,12 @@ import { changeShowWeb3 } from "contexts/reducers/update-show-prop";
 
 import { useAuthentication } from "x-hooks/use-authentication";
 
-export default function ConnectWalletButton({children = null, asModal = false, forceLogin = false,}) {
+export default function ConnectWalletButton({
+  children = null,
+  asModal = false,
+  forceLogin = false,
+  btnColor = "white",
+}) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
   const [showModal, setShowModal] = useState(false);
@@ -94,7 +99,7 @@ export default function ConnectWalletButton({children = null, asModal = false, f
   if (!state.currentUser?.walletAddress)
     return (
       <Button
-        color="white"
+        color={btnColor}
         className="text-dark bg-opacity-100"
         onClick={handleLogin}>
         <span>

@@ -2,11 +2,12 @@ import React from "react";
 
 import { useTranslation } from "next-i18next";
 
-import Comment from "components/comment";
+import Comments from "components/bounty/comments/controller";
 import CustomContainer from "components/custom-container";
 import GithubLink from "components/github-link";
-import NothingFound from "components/nothing-found";
+import ResponsiveWrapper from "components/responsive-wrapper";
 
+import { CurrentUserState } from "interfaces/application-state";
 import { PullRequest } from "interfaces/issue-data";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
@@ -14,12 +15,14 @@ import useBreakPoint from "x-hooks/use-breakpoint";
 import ApproveLink from "./actions/approve-link.view";
 import PullRequestButton from "./actions/pull-request-button";
 
+
 interface PullRequestBodyViewProps {
   currentPullRequest: PullRequest;
   isCreatingReview: boolean;
   handleShowModal: () => void;
   handleCancel: () => void;
   handleMakeReady: () => void;
+  updateComments: () => void;
   isMakeReviewButton: boolean;
   isMakeReadyReviewButton: boolean;
   isCancelButton: boolean;
@@ -28,6 +31,8 @@ interface PullRequestBodyViewProps {
   isMakingReady: boolean;
   isGithubConnected: boolean;
   githubPath: string;
+  currentUser: CurrentUserState;
+  bountyId: string;
 }
 
 export default function PullRequestBodyView({
@@ -44,6 +49,9 @@ export default function PullRequestBodyView({
   isMakingReady,
   isGithubConnected,
   githubPath,
+  updateComments,
+  currentUser,
+  bountyId
 }: PullRequestBodyViewProps) {
   const { t } = useTranslation(["common", "pull-request"]);
   
@@ -116,7 +124,7 @@ export default function PullRequestBodyView({
   }
 
   return (
-    <div className="mx-3 mt-3">
+    <div className="mt-3">
       <CustomContainer>
         {(isMobileView || isTabletView) && (
           <div className="mb-3">
@@ -127,16 +135,7 @@ export default function PullRequestBodyView({
           </div>
         )}
         <div className="">
-          <div className="row align-items-center bg-gray-900 border-radius-8 px-3 py-4">
-            <div className="row">
-              <div className="col">
-                <span className="caption-large text-uppercase">
-                  {t("pull-request:review", {
-                    count: currentPullRequest?.comments?.length,
-                  })}
-                </span>
-              </div>
-
+          <div className="row pb-2 mx-1">
               <div className={`col gap-20 p-0 d-flex flex-wrap justify-content-end`}>
                 {!(isMobileView || isTabletView) && (
                   <>
@@ -146,36 +145,28 @@ export default function PullRequestBodyView({
                   <RenderApproveButton />
                   </>
                 )}
-                <GithubLink
-                  className={(isMobileView || isTabletView) ? "text-primary caption-small" : null}
-                  forcePath={githubPath}
-                  hrefPath={`pull/${currentPullRequest?.githubId || ""}`}
-                >
-                  {t("actions.view-on-github")}
-                </GithubLink>
+                <ResponsiveWrapper xs={false} md={true}>
+                  <GithubLink
+                    className={(isMobileView || isTabletView) ? "text-primary caption-small" : null}
+                    forcePath={githubPath}
+                    hrefPath={`pull/${currentPullRequest?.githubId || ""}`}
+                  >
+                    {t("actions.view-on-github")}
+                  </GithubLink>
+                </ResponsiveWrapper>
               </div>
-            </div>
-
-            <div className="col-12 mt-4">
-              {!!currentPullRequest?.comments?.length &&
-                React.Children.toArray(currentPullRequest?.comments?.map((comment, index) => (
-                    <Comment comment={comment} key={index} />
-                  )))}
-
-              {!!currentPullRequest?.reviews?.length &&
-                React.Children.toArray(currentPullRequest?.reviews?.map((comment, index) => (
-                    <Comment comment={comment} key={index} />
-                  )))}
-
-              {!currentPullRequest?.comments?.length &&
-                !currentPullRequest?.reviews?.length && (
-                  <NothingFound
-                    description={t("pull-request:errors.no-reviews-found")}
-                  />
-                )}
-            </div>
           </div>
         </div>
+        <Comments
+          type="deliverable"
+          updateData={updateComments}
+          ids={{
+            issueId: +bountyId,
+            deliverableId: currentPullRequest?.id,
+          }}
+          comments={currentPullRequest?.comments}
+          currentUser={currentUser}
+        />
       </CustomContainer>
     </div>
   );
