@@ -42,8 +42,7 @@ export default function useAnalyticEvents() {
         ...details,
         walletAddress: state.currentUser?.walletAddress?.toString(),
         connected: state.currentUser?.connected?.toString(),
-        handle: state.currentUser?.handle,
-        login: state.currentUser?.login
+        handle: state.currentUser?.handle
       };
     }
 

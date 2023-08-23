@@ -15,7 +15,6 @@ export default function NetworkRepositoriesSettings() {
 
   return(
     <NetworkRepositoriesSettingsView
-      isGithubConnected={!!state.currentUser?.login}
       repositories={github.repositories}
       botUser={state.Settings?.github?.botUser}
       allowMerge={github?.allowMerge}

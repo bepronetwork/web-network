@@ -11,7 +11,6 @@ import {
   CancelPrePullRequestParams,
   CreatePrePullRequestParams,
   CreateReviewParams,
-  MergeClosedIssueParams,
   SearchActiveNetworkParams,
   PatchUserParams,
   User,
@@ -483,15 +482,6 @@ export default function useApi() {
       });
   }
 
-  async function mergeClosedIssue({ networkName = DEFAULT_NETWORK_NAME, ...rest } : MergeClosedIssueParams) {
-    return api
-      .post("/pull-request/merge", { networkName, ...rest})
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
   async function createReviewForPR({
     networkName = DEFAULT_NETWORK_NAME,
     event = "COMMENT",
@@ -568,7 +558,7 @@ export default function useApi() {
 
   async function getUserOf(address: string): Promise<User> {
     return api
-      .post<User[]>("/search/users/address/", [address])
+      .post<User>("/search/users/address/", [address])
       .then(({ data }) => data[0])
       .catch(() => ({} as User));
   }
@@ -1005,7 +995,6 @@ export default function useApi() {
     getUserWith,
     isNetworkOwner,
     joinAddressToUser,
-    mergeClosedIssue,
     processEvent,
     removeRepo,
     removeUser,

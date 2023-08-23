@@ -56,7 +56,6 @@
   "network-address": "Network Address",
   "add-tokens": "Add Tokens",
   "remove-tokens": "Remove Tokens",
-  "warning-connect-github": "Github account is required for changes to my network page",
   "hero": {
     "title": "Networks",
     "explanatory-text": "A list of all the networks using BEPRO network for their development",

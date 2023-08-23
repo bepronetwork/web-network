@@ -75,7 +75,6 @@ export default function MyNetworkSettings({
 
   async function handleSubmit() {
     if (
-      !state.currentUser?.login ||
       !state.currentUser?.walletAddress ||
       !state.Service?.active ||
       !forcedNetwork ||
@@ -102,7 +101,6 @@ export default function MyNetworkSettings({
           .filter((repo) => !repo.checked && repo.isSaved)
           .map(({ name, fullName }) => ({ name, fullName }))),
       creator: state.currentUser.walletAddress,
-      githubLogin: state.currentUser.login,
       networkAddress: network.networkAddress,
       accessToken: state.currentUser.accessToken,
       allowMerge: github?.allowMerge
@@ -241,7 +239,6 @@ export default function MyNetworkSettings({
         !["registry", "governance", "management"].includes(activeTab)
       }
       isUpdating={isUpdating}
-      isGithubConnected={!!state.currentUser?.login}
       handleSubmit={handleSubmit}
     />
   );

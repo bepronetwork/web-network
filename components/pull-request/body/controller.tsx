@@ -49,7 +49,6 @@ export default function PullRequestBody({
   const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isGithubConnected = !!state.currentUser?.login;
   const isPullRequestOpen = currentPullRequest?.state?.toLowerCase() === "open";
   const isPullRequestReady = !!currentPullRequest?.isReady;
   const isPullRequestCanceled = !!currentPullRequest?.isCanceled;
@@ -88,7 +87,6 @@ export default function PullRequestBody({
 
   const isApproveLink =
     isWalletConnected &&
-    isGithubConnected &&
     prsNeedsApproval &&
     canUserApprove &&
     isPullRequestReady &&
@@ -182,7 +180,6 @@ export default function PullRequestBody({
       isApproveLink={isApproveLink}
       isCancelling={isCancelling}
       isMakingReady={isMakingReady}
-      isGithubConnected={isGithubConnected}
       githubPath={state.Service?.network?.repos?.active?.githubPath}
       updateComments={updateComments}
       currentUser={state.currentUser}

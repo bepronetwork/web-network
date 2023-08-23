@@ -191,12 +191,11 @@ export default function NetworksStep({
   }
 
   async function handleSubmit() {
-    if (!state.currentUser?.walletAddress || !state.currentUser?.login || !forcedNetwork) return;
+    if (!state.currentUser?.walletAddress || !forcedNetwork) return;
 
     setIsUpdatingNetwork(true);
 
     const json = {
-      githubLogin: state.currentUser?.login,
       override: true,
       creator: state.currentUser?.walletAddress,
       networkAddress: forcedNetwork.networkAddress,

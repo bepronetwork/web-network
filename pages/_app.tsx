@@ -14,7 +14,6 @@ import Loading from "components/loading";
 import NavBar from "components/navigation/navbar/controller";
 import NoMetamaskModal from "components/no-metamask-modal/controller";
 import ReadOnlyContainer from "components/read-only-container";
-import ReAuthorizeGithubModal from "components/reauthorize-github-modal";
 import Seo from "components/seo";
 import Toaster from "components/toaster";
 import WrongNetworkModal from "components/wrong-network-modal";
@@ -41,7 +40,6 @@ function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppPr
           <ReadOnlyContainer>
             <NoMetamaskModal />
             <InvalidAccountWalletModal />
-            <ReAuthorizeGithubModal />
             <NavBar />
             <div id="root-container">
               <Component {...pageProps} />

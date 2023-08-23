@@ -84,7 +84,6 @@ export default function NetworkGovernanceSettings({
   function handleCloseMyNetwork() {
     if (
       !state.Service?.network?.active ||
-      !state.currentUser?.login ||
       !state.currentUser?.accessToken ||
       !state.currentUser?.walletAddress ||
       !state.Service?.active
@@ -96,7 +95,6 @@ export default function NetworkGovernanceSettings({
     handleCloseNetwork()
       .then(() => {
         return signMessage(IM_AM_CREATOR_NETWORK).then(async () => updateNetwork({
-          githubLogin: state.currentUser.login,
           isClosed: true,
           creator: state.currentUser.walletAddress,
           networkAddress: network?.networkAddress,
@@ -285,7 +283,6 @@ export default function NetworkGovernanceSettings({
     <NetworkGovernanceSettingsView
       networkAmounts={networkAmounts}
       networkAddress={address}
-      isGithubConnected={!!state.currentUser?.login}
       isAbleToClosed={isAbleToClosed}
       isClosing={isClosing}
       networkTokens={networkToken}

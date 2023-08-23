@@ -24,7 +24,6 @@ interface BountySettingsViewProps {
     bounty: IssueBigNumberData;
     network: ServiceNetwork;
     isWalletConnected: boolean;
-    isGithubConnected: boolean;
     isBountyInDraft: boolean;
     hasOpenPullRequest: boolean;
     isBountyOwner: boolean;
@@ -42,7 +41,6 @@ export default function BountySettingsView({
     bounty,
     network,
     isWalletConnected,
-    isGithubConnected,
     isBountyInDraft,
     hasOpenPullRequest,
     isBountyOwner,
@@ -55,7 +53,6 @@ export default function BountySettingsView({
   const node = useRef();
 
   const [show, setShow] = useState(false);
-  const [showGHModal, setShowGHModal] = useState(false);
   const [showHardCancelModal, setShowHardCancelModal] = useState(false);
 
   function handleHardCancelBounty() {
@@ -108,7 +105,6 @@ export default function BountySettingsView({
   function renderViewPullRequestLink() {
     if (
         isWalletConnected &&
-        isGithubConnected &&
         !isBountyInDraft &&
         hasOpenPullRequest
       )
@@ -178,12 +174,6 @@ export default function BountySettingsView({
       )
       return Cancel(false);
   }
-
-  function handleGithubLinkClick() {
-    if (!network?.repos?.active?.ghVisibility) setShowGHModal(true);
-
-    handleHide();
-  }
   
   function renderActions() {
     return (
@@ -197,7 +187,7 @@ export default function BountySettingsView({
                   "pull") ||
                 "issues"
               }/${bounty?.githubId || ""}`}
-              onClick={handleGithubLinkClick}
+              onClick={handleHide}
             >
               {t("actions.view-on-github")}
             </GithubLink>
@@ -233,17 +223,6 @@ export default function BountySettingsView({
             </div>
           </div>
         </div>
-        <Modal
-          title={t("modals.gh-access.title")}
-          centerTitle
-          show={showGHModal}
-          okLabel={t("actions.close")}
-          onOkClick={() => setShowGHModal(false)}
-        >
-          <h5 className="text-center">
-            <Translation ns="common" label="modals.gh-access.content" />
-          </h5>
-        </Modal>
         <Modal
           title={t("modals.hard-cancel.title")}
           centerTitle

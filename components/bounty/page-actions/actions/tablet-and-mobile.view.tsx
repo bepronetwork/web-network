@@ -1,6 +1,5 @@
 import StartWorkingButton from "components/bounty/page-actions/actions/start-working.view";
 import MultiActionButton from "components/common/buttons/multi-action/view";
-import ConnectGithub from "components/connect-github";
 
 import { Action } from "types/utils";
 
@@ -8,7 +7,6 @@ interface TabletAndMobileButtonProps {
   isCreatePr: boolean;
   isCreateProposal: boolean;
   isExecuting: boolean;
-  isConnectGithub: boolean;
   isStartWorkingButton: boolean;
   handleActionWorking: () => void;
   handleShowPRModal: (b: boolean) => void;
@@ -19,7 +17,6 @@ export default function TabletAndMobileButton({
   isCreatePr,
   isCreateProposal,
   isExecuting,
-  isConnectGithub,
   isStartWorkingButton,
   handleActionWorking,
   handleShowPRModal,
@@ -38,9 +35,6 @@ export default function TabletAndMobileButton({
       label: "Proposal",
       onClick: () => handleShowPRProposal(true),
     });
-
-  if (isConnectGithub)
-    return <ConnectGithub size="lg" />;
 
   if (isCreatePr || isCreateProposal)
     return (

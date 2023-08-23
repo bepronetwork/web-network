@@ -9,7 +9,6 @@ import {useRouter} from "next/router";
 import ConnectWalletButton from "components/connect-wallet-button";
 import {CallToAction} from "components/setup/call-to-action";
 import ChainsSetup from "components/setup/chains-setup";
-import ConnectGithubSetup from "components/setup/connect-github-setup";
 import {NetworkSetup} from "components/setup/network-setup";
 import {RegistrySetup} from "components/setup/registry-setup";
 import TabbedNavigation from "components/tabbed-navigation";
@@ -24,7 +23,7 @@ export default function SetupPage(){
   const { replace } = useRouter();
   const { t } = useTranslation(["setup", "common"])
 
-  const [activeTab, setActiveTab] = useState("githubConnection");
+  const [activeTab, setActiveTab] = useState("supportedChains");
   const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
   const { searchNetworks } = useApi();
@@ -57,25 +56,9 @@ export default function SetupPage(){
 
   const tabs = [
     {
-      eventKey: 'githubConnection',
-      title: t('common:misc.github'),
-      component: <><ConnectGithubSetup /></>
-    },
-    {
       eventKey: 'supportedChains',
       title: t('setup:chains.title'),
-      component: (
-        !currentUser?.login
-          ? <CallToAction 
-              disabled={false} 
-              executing={false} 
-              call="missing github configuration step" 
-              action="go to" 
-              color="info" 
-              onClick={() => setActiveTab('githubConnection')} 
-            />
-          : <ChainsSetup />
-      )
+      component: <ChainsSetup />
     },
     {
       eventKey: "registry",
@@ -138,7 +121,7 @@ export default function SetupPage(){
             tabs={tabs}
             forceActiveKey={activeTab}
             className="issue-tabs"
-            defaultActiveKey="githubConnection"
+            defaultActiveKey="supportedChains"
             onTransition={setActiveTab}
           />
         </Row>

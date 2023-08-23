@@ -78,7 +78,7 @@ function NewNetwork() {
   ];
 
   async function handleCreateNetwork() {
-    if (!state.currentUser?.login || !state.currentUser?.walletAddress || !state.Service?.active) return;
+    if (!state.currentUser?.walletAddress || !state.Service?.active) return;
 
     const signedMessage = await signMessage(WANT_TO_CREATE_NETWORK);
 
@@ -110,7 +110,6 @@ function NewNetwork() {
       botPermission: github.botPermission,
       creator: state.currentUser.walletAddress,
       accessToken: state.currentUser.accessToken,
-      githubLogin: state.currentUser.login,
       tokens,
       networkAddress: deployedNetworkAddress,
       isDefault: isSetupPage,
