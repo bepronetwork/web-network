@@ -2,7 +2,6 @@ import {FormCheck} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
@@ -37,52 +36,46 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
       validated={validated}
       handleClick={handleClick}
     >
-      {(state.currentUser?.login && (
-        <div>
-          <RepositoriesList
-            repositories={github.repositories}
-            networkName={details?.name?.value}
-            networkCreator={state.currentUser?.walletAddress}
-            onClick={handleRepositoryCheck}
+      <div>
+        <RepositoriesList
+          repositories={github.repositories}
+          networkName={details?.name?.value}
+          networkCreator={state.currentUser?.walletAddress}
+          onClick={handleRepositoryCheck}
+        />
+
+        <span className="caption-small text-gray px-0 mt-3">
+          {state.Settings?.github?.botUser}
+        </span>
+
+        <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
+          <FormCheck
+            className="form-control-lg px-0 pb-0 mr-1"
+            type="checkbox"
+            checked={github.botPermission}
+            onChange={handlePermissonCheck}
           />
-
-          <span className="caption-small text-gray px-0 mt-3">
-            {state.Settings?.github?.botUser}
+          <span>
+            {t("steps.repositories.give-access", {
+              user: state.Settings?.github?.botUser,
+            })}
           </span>
-
-          <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
-            <FormCheck
-              className="form-control-lg px-0 pb-0 mr-1"
-              type="checkbox"
-              checked={github.botPermission}
-              onChange={handlePermissonCheck}
-            />
-            <span>
-              {t("steps.repositories.give-access", { user: state.Settings?.github?.botUser })}
-            </span>
-          </div>
-
-          <p className="p-small text-gray-70 px-0">
-            {t("steps.repositories.you-need-to-accept")}
-          </p>
-
-          <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
-            <FormCheck
-                className="form-control-lg px-0 pb-0 mr-1"
-                type="checkbox"
-                onChange={changeAllowMergeCheckbox}
-                checked={github?.allowMerge}
-              />
-            <span>
-              {t("allow-merge")}
-            </span>
-          </div>
         </div>
-      )) || (
-        <div className="pt-3">
-          <ConnectGithub />
+
+        <p className="p-small text-gray-70 px-0">
+          {t("steps.repositories.you-need-to-accept")}
+        </p>
+
+        <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
+          <FormCheck
+            className="form-control-lg px-0 pb-0 mr-1"
+            type="checkbox"
+            onChange={changeAllowMergeCheckbox}
+            checked={github?.allowMerge}
+          />
+          <span>{t("allow-merge")}</span>
         </div>
-      )}
+      </div>
     </Step>
   );
 }

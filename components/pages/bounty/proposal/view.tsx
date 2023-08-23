@@ -3,7 +3,6 @@ import PullAndProposalHero from "components/bounty/pull-and-proposal-hero/contro
 import ConnectWalletButton from "components/connect-wallet-button";
 import CustomContainer from "components/custom-container";
 import If from "components/If";
-import NotMergeableModal from "components/not-mergeable-modal";
 import ProposalActionsButtons from "components/proposal/actions/buttons/controller";
 import ProposalActions from "components/proposal/actions/controller";
 import { ProposalDisputes } from "components/proposal/disputes-list/controller";
@@ -144,8 +143,6 @@ export default function ProposalPageView({
           />
         </div>
       </CustomContainer>
-
-      <NotMergeableModal pullRequest={pullRequest} proposal={proposal} />
 
       <ConnectWalletButton asModal={true} />
     </>

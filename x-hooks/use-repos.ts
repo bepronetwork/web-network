@@ -32,7 +32,7 @@ export function useRepos() {
 
   function getStorageFor(storageFor: "repos" | "active-repo", repo?: string) {
     const isActiveRepo = storageFor === "active-repo";
-    const keyComplement = isActiveRepo ? `:${repo}:${state.currentUser?.login}` : "";
+    const keyComplement = isActiveRepo ? `:${repo}` : "";
     
     const key = `bepro.network:${storageFor}:${query?.network}:${query?.chain}${keyComplement}`;
 

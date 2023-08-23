@@ -18,7 +18,6 @@ import { AmountCardProps } from "types/components";
 interface NetworkGovernanceSettingsViewProps {
   networkAmounts: AmountCardProps[];
   networkAddress: string;
-  isGithubConnected?: boolean;
   isAbleToClosed?: boolean;
   isClosing?: boolean;
   networkTokens: Token[];
@@ -31,7 +30,6 @@ interface NetworkGovernanceSettingsViewProps {
 export default function NetworkGovernanceSettingsView({
   networkAmounts,
   networkAddress,
-  isGithubConnected,
   isAbleToClosed,
   isClosing,
   networkTokens,
@@ -97,8 +95,8 @@ export default function NetworkGovernanceSettingsView({
           <Row className="mx-0">
             <ContractButton
               color="dark-gray"
-              disabled={!isAbleToClosed || isClosing || isGithubConnected}
-              withLockIcon={!isAbleToClosed || isGithubConnected}
+              disabled={!isAbleToClosed || isClosing}
+              withLockIcon={!isAbleToClosed}
               onClick={onCloseNetworkClick}
               isLoading={isClosing}
             >

@@ -7,7 +7,6 @@ import If from "components/If";
 import ScrollableTabs from "components/navigation/scrollable-tabs/view";
 import { TabsProps } from "components/network/settings/controller";
 import RegisterNetworkWarning from "components/network/settings/register-network-warning/controller";
-import WarningGithub from "components/profile/my-network-settings/warning-github";
 
 import { MiniTabsItem } from "types/components";
 
@@ -18,7 +17,6 @@ interface MyNetworkSettingsViewProps {
   activeTab: string;
   isAbleToSave?: boolean;
   isUpdating?: boolean;
-  isGithubConnected?: boolean;
   isWalletConnected?: boolean;
   networkAddress: string;
   isNetworkUnregistered?: boolean;
@@ -33,7 +31,6 @@ export default function MyNetworkSettingsView({
   activeTab,
   isAbleToSave,
   isUpdating,
-  isGithubConnected,
   isWalletConnected,
   networkAddress,
   isNetworkUnregistered,
@@ -52,10 +49,6 @@ export default function MyNetworkSettingsView({
           networkAddress={networkAddress}
           updateNetworkData={updateNetworkData}
         />
-      </If>
-
-      <If condition={!isGithubConnected && activeTab !== "repositories"}>
-        <WarningGithub />
       </If>
 
       <ScrollableTabs

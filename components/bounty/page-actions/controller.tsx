@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
+import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -8,6 +9,7 @@ import { addToast } from "contexts/reducers/change-toaster";
 
 import { getIssueState } from "helpers/handleTypeIssue";
 
+import { CustomSession } from "interfaces/custom-session";
 import { NetworkEvents } from "interfaces/enums/events";
 
 import useApi from "x-hooks/use-api";
@@ -17,7 +19,7 @@ import { PageActionsControllerProps } from "./page-actions";
 import PageActionsView from "./view";
 
 export default function PageActions({
-  isRepoForked = false,
+  addNewComment,
   handleEditIssue,
   isEditIssue,
   currentBounty,
@@ -36,7 +38,10 @@ export default function PageActions({
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
+  const [userId, setUserId] = useState<number>();
 
+  const session = useSession();
+  const currentUserSession = session?.data?.user as CustomSession["user"];
   const { state, dispatch } = useAppState();
   const { handleCreatePullRequest } = useBepro();
   const {
@@ -44,6 +49,7 @@ export default function PageActions({
     cancelPrePullRequest,
     startWorking,
     processEvent,
+    getUserOf
   } = useApi();
 
   const issueGithubID = currentBounty?.githubId;
@@ -57,12 +63,11 @@ export default function PageActions({
   const hasPullRequests = 
     !!currentBounty?.pullRequests?.filter((pullRequest) => pullRequest?.status !== "canceled")?.length;
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isGithubConnected = !!state.currentUser?.login;
   const isBountyOpen =
     currentBounty?.isClosed === false &&
     currentBounty?.isCanceled === false;
   const isBountyInDraft = !!currentBounty?.isDraft;
-  const isWorkingOnBounty = !!currentBounty?.working?.find((login) => login === state.currentUser?.login);
+  const isWorkingOnBounty = !!currentBounty?.working?.find((id) => +id === userId);
   const isBountyOwner =
   isWalletConnected &&
   currentBounty?.creatorAddress &&
@@ -79,34 +84,26 @@ export default function PageActions({
     !isEditIssue;
   const isStartWorkingButton =
     isWalletConnected &&
-    isGithubConnected &&
     !isBountyInDraft &&
     isBountyOpen &&
     !isWorkingOnBounty &&
-    isRepoForked &&
     isStateToWorking &&
     !!state.currentUser?.accessToken
-  const isForkRepositoryLink =
-    isGithubConnected && !isBountyInDraft && isBountyOpen && !isRepoForked;
   const isEditButton = isWalletConnected && isBountyInDraft && isBountyOwner;
 
   const rest = {
     isUpdateAmountButton,
     isStartWorkingButton,
-    isForkRepositoryLink,
     isEditButton,
     isBountyInDraft,
     isWalletConnected,
-    isGithubConnected,
     isWorkingOnBounty,
     isBountyOpen,
     isCreatePr:
       isWalletConnected &&
-      isGithubConnected &&
       isBountyOpen &&
       !isBountyInDraft &&
-      isWorkingOnBounty &&
-      isRepoForked,
+      isWorkingOnBounty,
     isCreateProposal:
       isWalletConnected &&
       isCouncilMember &&
@@ -118,7 +115,6 @@ export default function PageActions({
   async function handlePullrequest({
     title: prTitle,
     description: prDescription,
-    branch,
   }): Promise<void> {
     let pullRequestPayload = undefined;
 
@@ -127,8 +123,8 @@ export default function PageActions({
       issueGithubID,
       title: prTitle,
       description: prDescription,
-      username: state.currentUser?.login,
-      branch,
+      username: state.currentUser?.handle,
+      branch: "",
       wallet: state.currentUser.walletAddress,
     })
       .then(({
@@ -201,7 +197,6 @@ export default function PageActions({
 
     startWorking({
       issueId: currentBounty?.issueId,
-      githubLogin: state.currentUser?.login,
       networkName: state.Service?.network?.active?.name,
       wallet: state.currentUser.walletAddress,
     })
@@ -227,16 +222,23 @@ export default function PageActions({
       });
   }
 
+  useEffect(() => {
+    if(!currentUserSession?.address) return;
+
+    getUserOf(currentUserSession?.address?.toLowerCase()).then((user) => {
+      if(user?.id)
+        setUserId(user?.id)
+    })
+  }, [currentUserSession?.address])
+  
   return (
     <PageActionsView
-      ghVisibility={state.Service?.network?.repos?.active?.ghVisibility}
       showPRModal={showPRModal}
       handleShowPRModal={setShowPRModal}
       isExecuting={isExecuting}
       handlePullrequest={handlePullrequest}
       handleStartWorking={handleStartWorking}
       handleEditIssue={handleEditIssue}
-      currentUser={state.currentUser}
       bounty={currentBounty}
       updateBountyData={updateBountyData}
       {...rest}

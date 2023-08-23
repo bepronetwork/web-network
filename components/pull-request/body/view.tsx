@@ -29,7 +29,6 @@ interface PullRequestBodyViewProps {
   isApproveLink: boolean;
   isCancelling: boolean;
   isMakingReady: boolean;
-  isGithubConnected: boolean;
   githubPath: string;
   currentUser: CurrentUserState;
   bountyId: string;
@@ -47,7 +46,6 @@ export default function PullRequestBodyView({
   isApproveLink,
   isCancelling,
   isMakingReady,
-  isGithubConnected,
   githubPath,
   updateComments,
   currentUser,
@@ -67,11 +65,10 @@ export default function PullRequestBodyView({
           disabled={
             isCreatingReview ||
             isCancelling ||
-            isMakingReady ||
-            !isGithubConnected
+            isMakingReady
           }
           isLoading={isCreatingReview}
-          withLockIcon={isCancelling || isMakingReady || !isGithubConnected}
+          withLockIcon={isCancelling || isMakingReady}
         />
       );
     

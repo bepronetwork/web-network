@@ -271,8 +271,7 @@ export function useAuthentication() {
   }
 
   function updateKycSession(){
-    if(!state?.currentUser?.login
-        || !state?.currentUser?.match
+    if(!state?.currentUser?.match
         || !state?.currentUser?.accessToken
         || !state?.currentUser?.walletAddress
         || !state?.Settings?.kyc?.isKycEnabled)

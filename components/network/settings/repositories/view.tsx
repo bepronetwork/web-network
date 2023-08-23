@@ -3,15 +3,13 @@ import { FormCheck, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import ConnectGithub from "components/connect-github";
+
 import RepositoriesList from "components/custom-network/repositories-list";
-import If from "components/If";
 import NetworkTabContainer from "components/network/settings/tab-container/view";
 
 import { Repository } from "interfaces/network";
 
 interface NetworkRepositoriesSettingsViewProps {
-  isGithubConnected?: boolean;
   repositories: Repository[];
   botUser: string;
   allowMerge: boolean;
@@ -20,7 +18,6 @@ interface NetworkRepositoriesSettingsViewProps {
 }
 
 export default function NetworkRepositoriesSettingsView({
-  isGithubConnected,
   repositories,
   botUser,
   allowMerge,
@@ -36,19 +33,12 @@ export default function NetworkRepositoriesSettingsView({
           {t("custom-network:steps.repositories.label")}
         </span>
         
-        <If 
-          condition={isGithubConnected}
-          otherwise={
-            <ConnectGithub />
-          }
-        >
-          <RepositoriesList
-            repositories={repositories}
-            onClick={onRepositoryClick}
-            withLabel={false}
-            botUser={botUser}
-          />
-        </If>
+        <RepositoriesList
+          repositories={repositories}
+          onClick={onRepositoryClick}
+          withLabel={false}
+          botUser={botUser}
+        />
 
         <div className="d-flex align-items-center p-small text-white mt-4">
           <FormCheck

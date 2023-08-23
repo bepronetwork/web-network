@@ -121,8 +121,6 @@
     "confirm": "Confirm",
     "connect": "Connect",
     "disconnect": "Disconnect",
-    "connect-github": "Please, connect your GitHub account",
-    "connect-github-to-work": "To start working on this bounty, please connect your github account below.",
     "connect-wallet": "Connect Wallet",
     "connect-your-wallet": "Connect your Wallet",
     "create-one": "Create one",
@@ -315,10 +313,6 @@
         }
       }
     },
-    "gh-access": {
-      "title": "Access Denied",
-      "content": "You don’t have access to this repository, please contact the network admin."
-    },
     "hard-cancel": {
       "title": "Attention!",
       "content": "This action will return the locked amount to the original creators address along with any reward tokens and revert funding entries"
@@ -331,11 +325,6 @@
     "settings-not-loaded": {
       "title": "Failed to load settings",
       "description": "Please reload the page or contact the administrator."
-    },
-    "reauthorize-github": {
-      "title": "Reauthorize Github",
-      "description": "Your github connection has expired. Please, reauthorize the session.",
-      "button-label": "Reauthorize"
     },
     "wallet-mismatch": {
       "title": "Wallet Mismatch",
