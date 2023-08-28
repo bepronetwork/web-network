@@ -94,6 +94,10 @@ class Network extends Model {
         allowMerge: {
           type: DataTypes.BOOLEAN,
           defaultValue: true
+        },
+        banned_domains: {
+          type: DataTypes.ARRAY(DataTypes.STRING),
+          defaultValue: []
         }
       },
       {

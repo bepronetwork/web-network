@@ -54,6 +54,7 @@ export interface Network {
   issues?: IssueData[];
   allowMerge: boolean;
   repositories?: RepoInfo[];
+  banned_domains: string[];
 }
 
 export interface ThemeColors {
