@@ -10,7 +10,6 @@ import {
   changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserConnected,
-  changeCurrentUserHandle,
   changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
@@ -155,7 +154,6 @@ export function useAuthentication() {
 
     if (isUnauthenticated) {
       dispatch(changeCurrentUserConnected(false));
-      dispatch(changeCurrentUserHandle(null));
       dispatch(changeCurrentUserLogin(null));
       dispatch(changeCurrentUserAccessToken(null));
       dispatch(changeCurrentUserWallet(null));
@@ -179,7 +177,6 @@ export function useAuthentication() {
       return;
 
     if (!isSameGithubAccount) {
-      dispatch(changeCurrentUserHandle(user.name));
       dispatch(changeCurrentUserLogin(user.login));
       dispatch(changeCurrentUserAccessToken(user.accessToken));
     }
@@ -197,7 +194,7 @@ export function useAuthentication() {
 
     dispatch(changeCurrentUserConnected(true));
 
-    pushAnalytic(EventName.USER_LOGGED_IN, { username: user.name, login: user.login });
+    pushAnalytic(EventName.USER_LOGGED_IN, { login: user.login });
   }
 
   function verifyReAuthorizationNeed() {

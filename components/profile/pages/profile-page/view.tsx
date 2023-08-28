@@ -7,15 +7,17 @@ import Badge from "components/badge";
 import Button from "components/button";
 import Switch from "components/common/switch/view";
 import GithubConnectionState from "components/connections/github-connection-state/controller";
+import RemoveGithubAccount from "components/connections/remove-github-modal/controller";
 import CustomContainer from "components/custom-container";
 import { Divider } from "components/divider";
 import If from "components/If";
 import AddressWithCopy from "components/profile/address-with-copy/controller";
 import ProfileLayout from "components/profile/profile-layout";
-import { RemoveGithubAccount } from "components/profile/remove-github-modal";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
+
+import ConnectGithubAccount from "../../../connections/connect-github-modal/controller";
 
 interface ProfilePageViewProps {
   userLogin: string;
@@ -24,19 +26,23 @@ interface ProfilePageViewProps {
   walletAddress: string;
   isCouncil: boolean;
   showRemoveModal: boolean;
+  showConnectModal: boolean;
   isSaveButtonDisabled: boolean;
   isSwitchDisabled: boolean;
   isEmailInvalid: boolean;
   isConfirmationPending: boolean;
   isExecuting: boolean;
   emailVerificationError?: string;
-  handleClickDisconnect: () => void;
-  hideRemoveModal: () => void;
-  disconnectGithub: () => void;
-  handleEmailChange: (e) => void;
+  onHandleClickDisconnect: () => void;
+  onHideRemoveModal: () => void;
+  onDisconnectGithub: () => void;
+  onHandleEmailChange: (e) => void;
   onSave: () => void;
   onResend: () => void;
   onSwitchChange: (value: boolean) => void;
+  onHideModalClick: () => void;
+  onChangeMyHandleClick: () => void;
+  onConnectGithub: () => void;
 }
 
 export default function ProfilePageView({
@@ -46,19 +52,23 @@ export default function ProfilePageView({
   isNotificationEnabled,
   isCouncil,
   showRemoveModal,
+  showConnectModal,
   isSaveButtonDisabled,
   isSwitchDisabled,
   isEmailInvalid,
   isConfirmationPending,
   isExecuting,
   emailVerificationError,
-  handleClickDisconnect,
-  hideRemoveModal,
-  disconnectGithub,
-  handleEmailChange,
+  onHandleClickDisconnect,
+  onHideRemoveModal,
+  onDisconnectGithub,
+  onHandleEmailChange,
   onSave,
   onResend,
   onSwitchChange,
+  onHideModalClick,
+  onChangeMyHandleClick,
+  onConnectGithub
 }: ProfilePageViewProps) {
   const { t } = useTranslation(["common", " profile"]);
 
@@ -91,15 +101,22 @@ export default function ProfilePageView({
                 size={isTabletOrMobile ? "md" : "lg"}
                 withBorder
               />
-              <div className={`d-flex flex-column ${isTabletOrMobile ? "ms-2" : "mt-2" }`}>
+              <div className={`d-flex flex-column ${isTabletOrMobile ? "ms-2" : "mt-2" } text-truncate`}>
                 <If
                   condition={!!userLogin}
                   otherwise={
-                    <AddressWithCopy
-                      address={walletAddress}
-                      textClass={handleClasses}
-                      truncated
-                    />
+                    <div className="d-flex flex-wrap">
+                      <AddressWithCopy
+                        address={walletAddress}
+                        textClass={handleClasses}
+                        truncated
+                      />
+                      <ResponsiveWrapper md={true} xs={false}>
+                        <Button className="ms-3" onClick={onChangeMyHandleClick}>
+                          {t("profile:actions.change-my-handle")}
+                        </Button>
+                      </ResponsiveWrapper>
+                    </div>
                   }
                 >
                   <span className={handleClasses}>
@@ -125,6 +142,14 @@ export default function ProfilePageView({
             )}
           </div>
         </div>
+
+        <If condition={!userLogin}>
+          <ResponsiveWrapper md={false} xs={true}>
+            <Button onClick={onChangeMyHandleClick}>
+              {t("profile:actions.change-my-handle")}
+            </Button>
+          </ResponsiveWrapper>
+        </If>
 
         <Divider bg="gray-850" />
 
@@ -153,7 +178,7 @@ export default function ProfilePageView({
                     type="text" 
                     className={`form-control ${isEmailInvalid ? "is-invalid" : ""}`}
                     value={userEmail} 
-                    onChange={handleEmailChange}
+                    onChange={onHandleEmailChange}
                     disabled={isExecuting}
                   />
 
@@ -212,14 +237,20 @@ export default function ProfilePageView({
           <span className="caption text-white text-capitalize font-weight-medium">{t("profile:connections")}</span>
         </div>
 
-        <GithubConnectionState handleClickDisconnect={handleClickDisconnect} />
+        <GithubConnectionState onHandleClickDisconnect={onHandleClickDisconnect} />
 
         <RemoveGithubAccount
           show={showRemoveModal}
           githubLogin={userLogin}
           walletAddress={walletAddress}
-          onCloseClick={hideRemoveModal}
-          disconnectGithub={disconnectGithub}
+          onCloseClick={onHideRemoveModal}
+          onDisconnectGithub={onDisconnectGithub}
+        />
+
+        <ConnectGithubAccount 
+          show={showConnectModal} 
+          onCloseClick={onHideModalClick}
+          onOkClick={onConnectGithub}        
         />
       </ProfileLayout>
     </>

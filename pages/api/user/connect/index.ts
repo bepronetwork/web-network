@@ -49,12 +49,10 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
         
       await models.user.create({
         address,
-        githubHandle: token.name || githubLogin,
         githubLogin
       });
     } else if (action === Actions.CONNECT_GITHUB) {
       user.githubLogin = githubLogin;
-      user.githubHandle = token.name || githubLogin;
 
       await user.save();
     }

@@ -6,30 +6,35 @@ import getConfig from "next/config";
 
 import models from "db/models";
 
+import { caseInsensitiveEqual } from "helpers/db/conditionals";
+
 import { AuthProvider } from "server/auth/providers";
 
 const { serverRuntimeConfig } = getConfig();
 interface Profile {
   id: number;
-  name: string;
   login: string;
-  email: string;
   image?: string;
   avatar_url: string;
+}
+
+interface Token extends JWT {
+  address: string;
 }
 
 export const GHProvider = (currentToken: JWT, req: NextApiRequest): AuthProvider => ({
   config: GithubProvider({
     clientId: serverRuntimeConfig?.github?.clientId,
     clientSecret: serverRuntimeConfig?.github?.secret,
-    authorization:
-      "https://github.com/login/oauth/authorize?scope=read:user+user:email+repo",
+    authorization: {
+      url: "https://github.com/login/oauth/authorize",
+      params: { scope: "read:user" },
+    },
     profile(profile) {
       return {
         id: profile.id,
         name: profile.name,
         login: profile.login,
-        email: profile.email,
         image: profile.avatar_url,
       };
     },
@@ -37,33 +42,44 @@ export const GHProvider = (currentToken: JWT, req: NextApiRequest): AuthProvider
   callbacks: {
     async signIn({ profile }) {
       const { login } = (profile || {}) as Profile;
+      const { address } = currentToken as Token;
 
-      if (!login) return "/?authError=Profile not found";
+      if (!login || !address) return "/?authError=Profile not found";
 
       const callbackUrlHttpKey = "next-auth.callback-url";
       const callbackUrlHttpsKey = "__Secure-next-auth.callback-url";
 
-      const isConnectAccountsPage = req?.cookies ?
-        (req.cookies[callbackUrlHttpKey] || req.cookies[callbackUrlHttpsKey])?.includes("connect-account") : false;
+      const isGithubLoginExist = await models.user.findByGithubLogin(login);
 
-      const user = await models.user.findByGithubLogin(login);
+      const currentUser = await models.user.findOne({
+        where: {
+          address: caseInsensitiveEqual("address", address.toLowerCase())
+        }
+      });
 
-      if (!user && !isConnectAccountsPage)
-        return "/connect-account";
+      if(isGithubLoginExist){
+        const originalUrl = (req.cookies[callbackUrlHttpKey] || req.cookies[callbackUrlHttpsKey])
+        const queryError = "?isGithubLoginExist=true"
+        const verifyAlreadyExistsError = originalUrl.includes(queryError)
+        return `${verifyAlreadyExistsError ? originalUrl : originalUrl+queryError}`
+      }
+        
+
+      if(currentUser && !isGithubLoginExist) {
+        currentUser.githubLogin = login;
+        await currentUser.save()
+      }
 
       return true;
     },
-    async jwt({ profile, account, token }) {
-      const { name, login } = (profile || {}) as Profile;
-      const { provider, access_token } = account;
+    async jwt({ profile, account }) {
+      const { login } = (profile || {}) as Profile;
+      const { provider } = account;
 
       return {
-        ...token,
         ...currentToken,
-        name,
         login,
-        provider,
-        accessToken: access_token
+        provider
       };
     },
   }

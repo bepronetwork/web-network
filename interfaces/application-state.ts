@@ -85,7 +85,6 @@ export interface ConnectedChain {
 }
 
 export interface CurrentUserState {
-  handle: string;
   walletAddress: string;
   match?: MatchAccountsStatus | undefined;
   balance?: Balance | null;

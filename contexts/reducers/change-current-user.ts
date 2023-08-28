@@ -25,9 +25,6 @@ export class ChangeCurrentUser<T = CurrentUserState|Partial<CurrentUserState>> e
 
 export const changeCurrentUser = new ChangeCurrentUser();
 
-export const changeCurrentUserHandle = (handle: string) =>
-  changeCurrentUser.update({handle});
-
 export const changeCurrentUserLogin = (login: string) =>
   changeCurrentUser.update({login});
 
