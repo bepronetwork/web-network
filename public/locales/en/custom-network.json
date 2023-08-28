@@ -135,6 +135,21 @@
         }
       }
     },
+    "permissions": {
+      "title": "Permissions",
+      "domains": {
+        "title": "Blocklist domains",
+        "description": "Add or remove banned domains. Gain full control over domain restrictions on this page.",
+        "list": "Banned Domains",
+        "placeholder": "Examples: www.domain, domain.com, www.domain.com",
+        "created-message": "Banned word created",
+        "created-error": "Error create banned word",
+        "already-exists": "Banned word already exists",
+        "remove-message": "Banned word removed",
+        "remove-not-found": "Banned word not found",
+        "remove-error": "Error remove banned word"
+      }  
+    },
     "repositories": {
       "title": "Add Repositories",
       "submit-label": "Create Network",
