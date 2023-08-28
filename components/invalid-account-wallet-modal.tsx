@@ -66,7 +66,7 @@ export default function InvalidAccountWalletModal() {
             >
               <div>
                 <Avatar userLogin={currentUser?.login || "null"} />{" "}
-                <span className="ms-2">{currentUser?.handle || currentUser?.login}</span>
+                <span className="ms-2">{currentUser?.login}</span>
               </div>
 
               <ErrorMarkIcon />

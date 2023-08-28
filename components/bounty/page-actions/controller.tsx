@@ -19,7 +19,6 @@ import { PageActionsControllerProps } from "./page-actions";
 import PageActionsView from "./view";
 
 export default function PageActions({
-  addNewComment,
   handleEditIssue,
   isEditIssue,
   currentBounty,
@@ -123,7 +122,6 @@ export default function PageActions({
       issueGithubID,
       title: prTitle,
       description: prDescription,
-      username: state.currentUser?.handle,
       branch: "",
       wallet: state.currentUser.walletAddress,
     })

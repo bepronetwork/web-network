@@ -25,31 +25,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!user) 
       return res.status(404).json("User not found");
 
-    const issuesWithPullRequestsByAccount = await models.issue.findAndCountAll({
-      where: {
-        state: {
-          [Op.notIn]: ["canceled", "closed"]
-        }
-      },
-      include: [
-        {
-          association: "pullRequests",
-          required: true,
-          where: {
-            status: {
-              [Op.not]: "canceled"
-            },
-            githubLogin
-          }
-        }
-      ]
-    });
-
-    if (issuesWithPullRequestsByAccount.count > 0)
-      return res.status(409).json("PULL_REQUESTS_OPEN");
-
     user.resetedAt = new Date();
-    user.githubHandle = null;
     user.githubLogin = null;
 
     await user.save();

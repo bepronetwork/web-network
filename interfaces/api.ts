@@ -5,7 +5,6 @@ export interface RequestParams {
   wallet?: string;
 }
 export interface User {
-  githubHandle: string;
   githubLogin: string;
   address?: string;
   createdAt: string;
@@ -56,7 +55,6 @@ export interface CreatePrePullRequestParams extends RequestParams {
   issueGithubID: string;
   title: string;
   description: string;
-  username: string;
   branch: string;
 }
 

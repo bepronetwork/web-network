@@ -25,8 +25,8 @@ interface NftPayload {
   mergerAddress: string;
 }
 
-const NftParticipant = (githubHandle, percentage, address, distributedAmount) => ({
-  githubHandle,
+const NftParticipant = (handle, percentage, address, distributedAmount) => ({
+  handle,
   percentage,
   address,
   distributedAmount
@@ -135,7 +135,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const getNftParticipant = async (address, amounts) => {
       const user = await models.user.findOne({ where: { address: { [Op.iLike]: String(address) } } });
 
-      return NftParticipant(user?.githubHandle || '', amounts.percentage, address, amounts.value);
+      return NftParticipant(user?.githubLogin || '', amounts.percentage, address, amounts.value);
     }
 
     const merger = await getNftParticipant(mergerAddress, distributions.mergerAmount);

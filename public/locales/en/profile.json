@@ -4,13 +4,11 @@
   "search-wallet": "Search for Token",
   "not-found": {
     "voting-power": "Voting power not found",
-    "tokens": "Tokens not found"
+    "tokens": "Tokens not found",
+    "any-voting-power": "you do not have any voting power on any network"
   },
   "tokens": "Tokens",
   "received-in-total": "Received in total",
-  "not-found": {
-    "any-voting-power": "you do not have any voting power on any network"
-  },
   "oracle-name-placeholder": "Locked Network Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",
@@ -34,7 +32,9 @@
     "period": "Period"
   },
   "actions": {
-    "remove-github-account": "Disconnect Github Account"
+    "remove-github-account": "Disconnect Github Handle",
+    "change-my-handle": "Change my handle with github",
+    "change-handle": "Change handle"
   },
   "tips": {
     "total-balance": "Total tokens in your wallet",
@@ -44,15 +44,24 @@
     "remove-github": {
       "title": "Remove Github Account",
       "account-from-wallet": "account from the wallet",
+      "success": "Github handle removed successfully",
       "warnings": {
         "period": "The account can only be changed again after seven days",
         "pull-requests": "There must be no open pull requests on bounties for this account"
       },
       "errors": {
+        "github-already-exists": "This github handle already exists in another account",  
         "less-than-7-days": "Last account change was less than 7 days ago",
         "pull-requests-open": "There are pull requests open for this account",
         "failed-to-remove": "Failed to remove account",
         "check-requirements": "Check the requirements"
+      }
+    },
+    "connect-github": {
+      "title": "Change Handle",
+      "description": "Connect with GitHub and personalize your app profile effortlessly! By clicking the 'Connect' button, you'll use your GitHub login as your handle on the app and your GitHub avatar. It's a seamless way to bring your GitHub identity to our platform.",
+      "errors": {
+        "github-already-exists": "This github handle already exists in another account"
       }
     }
    },

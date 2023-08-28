@@ -1,5 +1,5 @@
 export enum ReduceActionName {
-  GithubHandle = "GithubHandle",
+  handle = "handle",
   MetaMaskWallet = "MetaMaskWallet",
   Loading = "Loading",
   BeproInit = "BeproInit",
