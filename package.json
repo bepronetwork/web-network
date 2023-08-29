@@ -15,7 +15,7 @@
     "dev": "cross-env NODE_OPTIONS=\"--inspect --require=elastic-apm-node/start-next.js\" next dev",
     "prebuild": "next telemetry disable",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env NODE_OPTIONS=\"--inspect --require=elastic-apm-node/start-next.js\" next start",
     "lint": "npx eslint . --fix --ext .ts,.tsx",
     "generate-settings-types": "node ./scripts/settings/generate-types.js",
     "deploy:local": "node ./scripts/deploy-v2 -n development",
