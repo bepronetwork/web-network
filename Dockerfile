@@ -15,5 +15,6 @@ COPY package*.json ./
 COPY . .
 RUN npm install --omit=dev --no-audit
 COPY --from=builder /app/.next .next
-ENV NODE_OPTIONS="--inspect --require=elastic-apm-node/start-next.js"
-CMD npm run start
+CMD npm run migrate
+ENV NODE_OPTIONS="--require=elastic-apm-node/start-next.js"
+CMD next start
