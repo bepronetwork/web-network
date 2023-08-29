@@ -1,19 +1,14 @@
-import {ReactNode, useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 
 import init, {type ApmBase} from "@elastic/apm-rum";
-import {afterFrame} from "@elastic/apm-rum-core/dist/es";
+import {afterFrame} from "@elastic/apm-rum-core";
 import getConfig from "next/config";
 import {useRouter} from "next/router";
 
-type ElasticApmRumOptions = {
-  children: ReactNode,
-  apm: ApmBase
-};
-
-export default function ElasticApmRum({children,}: ElasticApmRumOptions) {
+export default function ElasticApmRum() {
   const router = useRouter();
-  const {publicRuntimeConfig: {elastic}} = getConfig();
-  const [apm] = useState<ApmBase>(init(elastic));
+  const {publicRuntimeConfig: {elastic: {rum: elastic}}} = getConfig();
+  const [apm] = useState<ApmBase>(elastic.enabled ? init(elastic) : null);
 
   const tx = useMemo(() => {
     if (!apm)
@@ -23,14 +18,15 @@ export default function ElasticApmRum({children,}: ElasticApmRumOptions) {
 
 
   useEffect(() => {
-    if (!tx) return;
+    if (!tx)
+      return;
+
     afterFrame(() => tx && (tx as any)?.detectFinish());
 
     return () => {
       tx && (tx as any)?.detectFinish();
     }
-  })
+  }, [tx])
 
-
-  return <>{children}</>
+  return <></>
 }

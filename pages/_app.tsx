@@ -23,6 +23,7 @@ import RootProviders from "contexts";
 
 import "../styles/styles.scss";
 import "../node_modules/@primer/css/dist/markdown.css";
+import ElasticApmRum from "../components/elastic-apm-rum/controller";
 
 function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppProps) {
 
@@ -35,6 +36,7 @@ function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppPr
   return (
     <>
       <GoogleAnalytics gaMeasurementId={publicRuntimeConfig.gaMeasureID} trackPageViews />
+      <ElasticApmRum />
       <SessionProvider session={session}>
         <RootProviders>
           <Seo issueMeta={seoData} />
