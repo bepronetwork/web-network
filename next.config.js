@@ -27,6 +27,12 @@ const publicRuntimeConfig = {
   kyc:{
     isEnabled: process.env.NEXT_PUBLIC_ENABLE_KYC || false
   },
+  elastic:{
+    rum: {
+      serviceName: process.env.ELASTIC_APM_SERVICE_NAME,
+      serverUrl: process.env.ELASTIC_APM_SERVER_URL
+    }
+  }
 }
 
 // Will only be available on the server-side

@@ -36,6 +36,8 @@
     "ganache:dev": "ganache -h 0.0.0.0 -p 8545 -b 1 -a 50  -s 0x6d2119524d65ea0b15b214ef260d3acdf8ca0ec6ec68045b5785d970f5ad97bd3d0025d212e625a8a21920852cc165c10faa6d8387a0c2530d1ffc0d265d92935749"
   },
   "dependencies": {
+    "@elastic/apm-rum": "^5.14.0",
+    "@elastic/apm-rum-core": "^5.19.0",
     "@elastic/elasticsearch": "^8.2.1",
     "@metamask/eth-sig-util": "^5.0.2",
     "@metamask/jazzicon": "^2.0.0",
