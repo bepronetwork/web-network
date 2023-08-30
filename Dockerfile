@@ -11,10 +11,10 @@ RUN npm run build
 FROM node:16.16-alpine AS release
 
 WORKDIR /app
-COPY package*.json ./
 COPY . .
-RUN npm install --omit=dev --no-audit
 COPY --from=builder /app/.next .next
+COPY --from=builder /app/node_modules node_modules
+COPY --from=builder /app/package.json package.json
 CMD npm run migrate
 ENV NODE_OPTIONS="--require=elastic-apm-node/start-next.js"
 CMD next start
