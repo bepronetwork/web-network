@@ -13,8 +13,8 @@ FROM node:16.16-alpine AS release
 WORKDIR /app
 COPY . .
 COPY --from=builder /app/.next .next
-COPY --from=builder /app/node_modules node_modules
-COPY --from=builder /app/package.json package.json
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
 CMD npm run migrate
 ENV NODE_OPTIONS="--require=elastic-apm-node/start-next.js"
-CMD next start
+CMD npm run start
