@@ -3,8 +3,7 @@ import {useEffect, useState} from "react";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 
-import {useAppState} from "contexts/app-state";
-import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
+import FundModalView from "components/bounty/funding-section/fund-modal/view";
 
 import {formatNumberToCurrency} from "helpers/formatNumber";
 
@@ -12,11 +11,9 @@ import {MetamaskErrors} from "interfaces/enums/Errors";
 import { NetworkEvents } from "interfaces/enums/events";
 import { IssueBigNumberData } from "interfaces/issue-data";
 
-import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useContractTransaction from "x-hooks/use-contract-transaction";
 import useERC20 from "x-hooks/use-erc20";
-
-import FundModalView from "./view";
 
 interface FundModalProps {
   show?: boolean,
@@ -31,20 +28,26 @@ export default function FundModal({
   currentBounty,
   updateBountyData
 }: FundModalProps) {
-  const {t} = useTranslation(["common", "funding", "bounty"]);
-  const {dispatch} = useAppState();
-
-  const [isExecuting, setIsExecuting] = useState(false);
+  const { t } = useTranslation(["common", "funding", "bounty"]);
+  
+  const [isApproving, setIsApproving] = useState(false);
   const [rewardPreview, setRewardPreview] = useState("0");
   const [amountToFund, setAmountToFund] = useState<BigNumber>();
 
-  const { processEvent } = useApi();
   const { handleFundBounty } = useBepro();
   const { allowance, balance, decimals, setAddress, approve, updateAllowanceAndBalance } = useERC20();
 
-  const rewardToken = currentBounty?.rewardToken;
   const transactionalToken = currentBounty?.transactionalToken;
 
+  const [isExecuting, onFund] = useContractTransaction( NetworkEvents.BountyFunded,
+                                                        handleFundBounty,
+                                                        t("funding:modals.fund.funded-x-symbol", {
+                                                            amount: formatNumberToCurrency(amountToFund?.toFixed()),
+                                                            symbol: transactionalToken?.symbol
+                                                        }),
+                                                        t("funding:try-again"));
+
+  const rewardToken = currentBounty?.rewardToken;
   const fundBtnDisabled = [
     isExecuting,
     amountToFund?.isNaN(),
@@ -75,44 +78,26 @@ export default function FundModal({
   function fundBounty() {
     if (currentBounty?.contractId === undefined || !amountToFund) return;
 
-    setIsExecuting(true);
-
-    handleFundBounty(currentBounty.contractId, amountToFund.toFixed(), transactionalToken?.symbol, decimals)
-      .then((txInfo) => {
-        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-        
-        return processEvent(NetworkEvents.BountyFunded, undefined, {fromBlock});
-      })
-      .then(async () => {
-        const amountFormatted = formatNumberToCurrency(amountToFund.toFixed());
-        
+    onFund(currentBounty.contractId, amountToFund.toFixed(), transactionalToken?.symbol, decimals)
+      .then(() => {
         updateAllowanceAndBalance();
         updateBountyData();
         handleClose();
-
-        dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
-          amount: amountFormatted,
-          symbol: transactionalToken?.symbol
-        }), t("funding:modals.fund.funded-succesfully")));
       })
       .catch(error => {
-        if (error?.code === MetamaskErrors.UserRejected) return;
-        
         console.debug("Failed to fund bounty", error);
-        dispatch(toastError(t("funding:try-again"), t("funding:modals.fund.failed-to-fund")));
-      })
-      .finally(() => setIsExecuting(false));
+      });
   }
 
   function handleApprove() {
-    setIsExecuting(true);
+    setIsApproving(true);
     approve(amountToFund.toFixed())
       .catch(error => {
         if (error?.code === MetamaskErrors.UserRejected) return;
         
         console.debug("Failed to approve", error);
       })
-      .finally(() => setIsExecuting(false));
+      .finally(() => setIsApproving(false));
   }
 
   function handleSetAmountToFund(value) {
@@ -146,7 +131,7 @@ export default function FundModal({
       balance={balance}
       fundBtnDisabled={fundBtnDisabled}
       confirmBtn={ConfirmBtn}
-      isExecuting={isExecuting}
+      isExecuting={isExecuting || isApproving}
       rewardPreview={rewardPreview}
       amountToFund={amountToFund}
     />

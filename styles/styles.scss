@@ -981,7 +981,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .progress {
   height: math.div($m, 4);
   border-radius: math.div($m, 6);
-  background-color: rgba($white, 0.2);
+  background-color: $gray-850;
 
   &.bg-purple {
     background-color: #3e345b !important;

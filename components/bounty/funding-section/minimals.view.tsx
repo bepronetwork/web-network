@@ -30,7 +30,7 @@ export const Amount = ({
   className?: string;
   type?: "currency" | "percent";
 }) => 
-  <span className={`family-Regular ${className || "h4 text-white"}`}>
+  <span className={`d-flex align-items-center family-Regular ${className || "h4 text-white"}`}>
     {type === "currency" && formatStringToCurrency(BigNumber(amount).toFixed())}
     
     {type === "percent" && `${formatNumberToCurrency(amount, { maximumFractionDigits: 4 })}%`}

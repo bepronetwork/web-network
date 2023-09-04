@@ -544,7 +544,10 @@ export default function useBepro() {
     });
   }
 
-  async function handleFundBounty(bountyId: number, amount: string, currency?: string, tokenDecimals?: number) {
+  async function handleFundBounty(bountyId: number, 
+                                  amount: string, 
+                                  currency?: string, 
+                                  tokenDecimals?: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
         type: TransactionTypes.fundBounty,
