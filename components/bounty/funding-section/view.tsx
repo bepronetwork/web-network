@@ -10,7 +10,6 @@ import FundModal from "components/bounty/funding-section/fund-modal/controller";
 import FundingProgress from "components/bounty/funding-section/funding-progress/controller";
 import {
   Amount,
-  CaptionLarge,
   CaptionMedium,
   RowWithTwoColumns,
 } from "components/bounty/funding-section/minimals.view";
@@ -18,6 +17,7 @@ import RetractOrWithdrawModal from "components/bounty/funding-section/retract-or
 import Collapsable from "components/collapsable";
 import ConnectWalletButton from "components/connect-wallet-button";
 import ContractButton from "components/contract-button";
+import If from "components/If";
 
 import {IssueBigNumberData, fundingBenefactor} from "interfaces/issue-data";
 
@@ -33,7 +33,6 @@ interface FundingSectionViewProps {
     hasReward: boolean;
     fundsGiven: BigNumber;
     futureRewards: string;
-    collapseAction: string;
     isBountyClosed: boolean;
     isBountyInDraft: boolean;
     rewardTokenSymbol: string;
@@ -50,7 +49,6 @@ export default function FundingSectionView({
     hasReward,
     fundsGiven,
     futureRewards,
-    collapseAction,
     isBountyClosed,
     isBountyInDraft,
     rewardTokenSymbol,
@@ -58,22 +56,30 @@ export default function FundingSectionView({
 }: FundingSectionViewProps) {
   const { t } = useTranslation(["common", "funding"]);
 
-  const { isMobileView, isTabletView } = useBreakPoint();
-
   const [showFundModal, setShowFundModal] = useState(false);
   const [fundingToRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<fundingBenefactor>();
 
+  const { isMobileView, isTabletView } = useBreakPoint();
 
   const handleShowFundModal = () => setShowFundModal(true);
   const handleCloseFundModal = () => setShowFundModal(false);
   const handleCloseRetractOrWithdrawModal = () => setFundingToRetractOrWithdraw(undefined);
 
-
   if (isBountyFunded && !walletFunds?.length) return <></>;
+
+  const collapseAction = isBountyClosed ? t("funding:rewards") : t("funding:actions.manage-funding");
+  const FundsGivenAmount = 
+    <Amount 
+      amount={fundsGiven.toFixed()}
+      symbol={transactionalSymbol}
+      className="caption-medium text-white font-weight-normal"
+    />;
 
   return(
     <div className="mt-3">
-      { (!isConnected && showFundModal) && <ConnectWalletButton asModal={true} />}
+      <If condition={!isConnected && showFundModal}>
+        <ConnectWalletButton asModal={true} />
+      </If>
 
       <FundModal 
         show={isConnected && showFundModal} 
@@ -91,19 +97,39 @@ export default function FundingSectionView({
       />
 
       <RowWithTwoColumns
-        col1={<h4 className="family-Regular d-none d-lg-block">{t("funding:title")}</h4>}
-        col2={isBountyFunded || isCanceled ? <></> : 
-          <ContractButton onClick={handleShowFundModal} className="col-12">
-            {t("funding:actions.fund-bounty")}
-          </ContractButton>}
+        col1={
+          <h4 className="family-Regular d-none d-lg-block">
+            {t("funding:title")}
+          </h4>
+        }
+        col2={
+          <If condition={!isBountyFunded && !isCanceled}>
+            <ContractButton onClick={handleShowFundModal} className="col-12">
+              {t("funding:actions.fund-bounty")}
+            </ContractButton>
+          </If>
+        }
         classNameCol2={(isTabletView || isMobileView) && 'col-12'}
       />
       
-      <Row className="border-radius-8 bg-gray-850 mt-3 mx-0 p-2">
-        <Col className="d-grid gap-2">
+      <Collapsable
+        labelShow={FundsGivenAmount}
+        labelHide={FundsGivenAmount}
+        isCollapsed={isBountyFunded}
+        labelColor="gray-200"
+        activeColor="white"
+        className="gap-2 bg-gray-900"
+        headerTitle="Funds given"
+        containerClassName="bg-gray-900 mt-3 p-3 border-radius-8 border border-gray-800"
+      >
+        <Col className="mt-4 d-grid gap-2">
           <RowWithTwoColumns
-            col1={<CaptionMedium text={t("funding:current-funding")} />}
-            col2={<CaptionMedium text={t("funding:total-amount")} />}
+            col1={
+              <CaptionMedium text={t("funding:current-funding")} color="gray-600" />
+            }
+            col2={
+              <CaptionMedium text={t("funding:total-amount")} color="gray-600" />
+            }
           />
 
           <FundingProgress
@@ -113,13 +139,13 @@ export default function FundingSectionView({
             fundedPercent={bounty?.fundedPercent?.toString()}
           />
 
-          { hasReward &&
+          <If condition={hasReward}>
             <RowWithTwoColumns
               col1={
-                <CaptionLarge 
+                <CaptionMedium 
                   text={t("funding:funding-rewards")}
-                  color="white" 
-                  />
+                  color="gray-600" 
+                />
               }
               col2={
                 <Amount 
@@ -130,15 +156,18 @@ export default function FundingSectionView({
                 />
               }
             />
-          }
-          {!!walletFunds?.length && 
+          </If>
+
+          <If condition={!!walletFunds?.length}>
             <>
               <hr className="bg-disabled" />
 
               <Row className="bg-dark border-radius-8 py-3 px-2 mx-0">
                 <Col>
                   <RowWithTwoColumns
-                    col1={<CaptionMedium text={t("funding:funds-given")} color="white" />}
+                    col1={
+                      <CaptionMedium text={t("funding:funds-given")} color="white" />
+                    }
                     col2={
                       <Amount 
                         amount={fundsGiven.toFixed()}
@@ -148,10 +177,12 @@ export default function FundingSectionView({
                     }
                     filler
                   />
-                  
-                  { hasReward &&
+
+                  <If condition={hasReward}>
                     <RowWithTwoColumns 
-                      col1={<CaptionMedium text={t("funding:future-rewards")} color="white" />}
+                      col1={
+                        <CaptionMedium text={t("funding:future-rewards")} color="white" />
+                      }
                       col2={
                         <Amount 
                           amount={futureRewards}
@@ -162,31 +193,31 @@ export default function FundingSectionView({
                       }
                       filler
                     />
-                  }
+                  </If>
                 </Col>
               </Row>
 
-              <Row className="mx-0">
+              <Row className="mt-1 mx-0">
                 <Collapsable
                   labelShow={collapseAction}
                   labelHide={collapseAction}
                   labelColor="gray"
                   activeColor="white"
-                  className="gap-2"
+                  className="gap-2 mt-2 bg-gray-900"
                 >
                   {walletFunds?.map(fund => 
-                  <>
-                    <RowWithTwoColumns 
-                      key={`fund-${fund.contractId}`}
-                      className="p-2 bg-shadow border-radius-8"
-                      col1={
-                        <>
-                        <Amount 
-                          amount={fund.amount.toFixed()}
-                          symbol={transactionalSymbol}
-                          className="caption-large text-white"
-                        />
-                            {(isBountyClosed && hasReward) && (
+                    <>
+                      <RowWithTwoColumns 
+                        key={`fund-${fund.contractId}`}
+                        className="p-2 bg-dark border-radius-8"
+                        col1={
+                          <div className="d-flex align-items-center">
+                            <Amount 
+                              amount={fund.amount.toFixed()}
+                              symbol={transactionalSymbol}
+                              className="caption-large text-white"
+                            />
+                            <If condition={isBountyClosed && hasReward}>
                               <>
                                 <ArrowRight className="mx-2" />
                                 <span className="caption-medium me-2 text-uppercase">
@@ -204,32 +235,31 @@ export default function FundingSectionView({
                                   className="caption-large text-white"
                                 />
                               </>
-                            )}
-                      </>
-                      }
-                      col2={
-                          (isBountyInDraft || isBountyClosed && hasReward && !fund.withdrawn) && (
+                            </If>
+                          </div>
+                        }
+                        col2={
+                          <If condition={isBountyInDraft || isBountyClosed && hasReward && !fund.withdrawn}>
                             <ContractButton
-                            textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
-                            transparent
-                            onClick={() => setFundingToRetractOrWithdraw(fund)}
-                          >
-                            {isBountyClosed
-                              ? t("funding:actions.withdraw-funding")
-                              : t("funding:actions.retract-funding")}
-                          </ContractButton>
-                          )
-                      }
-                    />
+                              textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
+                              transparent
+                              onClick={() => setFundingToRetractOrWithdraw(fund)}
+                            >
+                              {isBountyClosed
+                                ? t("funding:actions.withdraw-funding")
+                                : t("funding:actions.retract-funding")}
+                            </ContractButton>
+                          </If>
+                        }
+                      />
                     </>)
                   }
-
                 </Collapsable>
               </Row>
             </>
-          }
+          </If>
         </Col>
-      </Row>
+      </Collapsable>
     </div>
   );
 }

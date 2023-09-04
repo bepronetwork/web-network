@@ -85,7 +85,7 @@ export default function FundModalView({
           <RowWithTwoColumns
             col1={<CaptionMedium text={t("funding:reward")} color="white" />}
             col2={
-              <div className="bg-dark-gray border-radius-8 py-2 px-3">
+              <div className="d-flex align-items-center gap-1 bg-dark-gray border-radius-8 py-2 px-3">
                 +
                 <Amount
                   amount={rewardPreview}

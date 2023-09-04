@@ -1,17 +1,12 @@
-import { useState } from "react";
-
 import { useTranslation } from "next-i18next";
 
-import { useAppState } from "contexts/app-state";
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import RetractOrWithdrawModalView from "components/bounty/funding-section/retract-or-withdraw-modal/view";
 
 import { NetworkEvents, StandAloneEvents } from "interfaces/enums/events";
 import { IssueBigNumberData, fundingBenefactor } from "interfaces/issue-data";
 
-import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-
-import RetractOrWithdrawModalView from "./view";
+import useContractTransaction from "x-hooks/use-contract-transaction";
 
 interface RetractOrWithdrawModalProps {
   show?: boolean;
@@ -30,13 +25,7 @@ export default function RetractOrWithdrawModal({
 }: RetractOrWithdrawModalProps) {
   const { t } = useTranslation(["common", "funding", "bounty"]);
 
-  const [isExecuting, setIsExecuting] = useState(false);
-
-  const { processEvent } = useApi();
-  const { handleRetractFundBounty, handleWithdrawFundRewardBounty } =
-    useBepro();
-
-  const { dispatch } = useAppState();
+  const { handleRetractFundBounty, handleWithdrawFundRewardBounty } = useBepro();
 
   const isBountyClosed = !!currentBounty?.isClosed;
   const tokenSymbol = currentBounty?.transactionalToken?.symbol;
@@ -48,63 +37,35 @@ export default function RetractOrWithdrawModal({
         ?.toFixed()
     : funding?.amount?.toFixed();
 
+  const action = isBountyClosed ? {
+    event: StandAloneEvents.BountyWithdrawReward,
+    method: handleWithdrawFundRewardBounty,
+    translation: "modals.reward.withdraw-x-symbol"
+  } : {
+    event: NetworkEvents.BountyFunded,
+    method: handleRetractFundBounty,
+    translation: "modals.retract.retract-x-symbol"
+  };
+
+  const [isExecuting, execute] = useContractTransaction(action.event,
+                                                        action.method,
+                                                        t(`funding:${action.translation}`, {
+                                                          amount: retractOrWithdrawAmount,
+                                                          symbol: tokenSymbol,
+                                                        }),
+                                                        t("funding:try-again"));
+
   function handleRetractOrWithdraw() {
     if (!currentBounty || !funding) return;
 
-    setIsExecuting(true);
-    if (isBountyClosed) {
-      handleWithdrawFundRewardBounty(currentBounty?.contractId,
-                                     funding.contractId,
-                                     retractOrWithdrawAmount,
-                                     rewardTokenSymbol)
-        .then(({ blockNumber }) => {
-          return processEvent(StandAloneEvents.BountyWithdrawReward, undefined, {
-            issueId: currentBounty?.issueId,
-            fromBlock: blockNumber
-          });
-        })
-        .then(() => {
-          updateBountyData();
-          onCloseClick();
-          dispatch(toastSuccess(t("funding:modals.reward.withdraw-x-symbol", {
-                amount: retractOrWithdrawAmount,
-                symbol: rewardTokenSymbol,
-          }),
-                                t("funding:modals.reward.withdraw-successfully")));
-        })
-        .catch((error) => {
-          console.debug("Failed to withdraw funds reward", error);
-          dispatch(toastError(t("funding:try-again"),
-                              t("funding:modals.reward.failed-to-withdraw")));
-        })
-        .finally(() => setIsExecuting(false));
-    } else {
-      handleRetractFundBounty(currentBounty?.contractId,
-                              funding.contractId)
-        .then(({ blockNumber }) => {
-          updateBountyData();
-
-          return processEvent(NetworkEvents.BountyFunded, undefined, {
-            fromBlock: blockNumber,
-          });
-        })
-        .then(async () => {
-          onCloseClick();
-          await updateBountyData();
-
-          dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
-                amount: retractOrWithdrawAmount,
-                symbol: tokenSymbol,
-          }),
-                                t("funding:modals.retract.retract-successfully")));
-        })
-        .catch((error) => {
-          console.debug("Failed to retract funds", error);
-          dispatch(toastError(t("funding:try-again"),
-                              t("funding:modals.retract.failed-to-retract")));
-        })
-        .finally(() => setIsExecuting(false));
-    }
+    execute(currentBounty?.contractId, funding.contractId, retractOrWithdrawAmount, rewardTokenSymbol)
+      .then(() => {
+        updateBountyData();
+        onCloseClick();
+      })
+      .catch((error) => {
+        console.debug("Failed to withdraw funds reward", error);
+      });
   }
 
   return (

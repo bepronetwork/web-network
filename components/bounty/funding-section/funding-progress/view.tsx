@@ -37,7 +37,11 @@ export default function FundingProgressView({
   const AmountWithPreview = ({ amount, preview = undefined, type }) => 
     <Row className="align-items-center">
       <Col>
-        <Amount amount={amount} className={isFundingModal && "caption-medium" || undefined} type={type} />
+        <Amount 
+          amount={amount} 
+          className={isFundingModal ? "caption-medium" : type === "percent" ? "base-medium" : "xl-semibold"} 
+          type={type}
+        />
       </Col>
       { isFundingModal &&
         <>
@@ -54,12 +58,20 @@ export default function FundingProgressView({
   return(
     <div>
       <RowWithTwoColumns
-        col1={<AmountWithPreview amount={fundedAmount} preview={fundPreview} type="currency" />}
-        col2={<Amount 
-                amount={fundingAmount} 
-                symbol={fundingTokenSymbol} 
-                className={isFundingModal && "caption-medium" || undefined} 
-              />}
+        col1={
+          <AmountWithPreview 
+            amount={fundedAmount} 
+            preview={fundPreview} 
+            type="currency"
+          />
+        }
+        col2={
+          <Amount 
+            amount={fundingAmount} 
+            symbol={fundingTokenSymbol} 
+            className={isFundingModal && "caption-medium" || "xl-semibold"}
+          />
+        }
       />
 
       <RowCenterBetween className="mt-1">

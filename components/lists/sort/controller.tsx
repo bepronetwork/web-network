@@ -52,7 +52,7 @@ export default function ListSort({
       router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
     }
   }
-  console.log('update', index, selectedIndex)
+
   function getDefaultValue(): SortOption {
     if (sortBy && order) {
       const optionExists = options.find((option) => option.sortBy === sortBy && option.order === order);
