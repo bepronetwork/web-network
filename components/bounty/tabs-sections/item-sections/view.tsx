@@ -14,11 +14,9 @@ interface ItemViewProps {
   data: Proposal[] | PullRequest[],
   isProposal: boolean,
   currentBounty: IssueBigNumberData;
-  approvalsRequired: number;
-  canUserApprove: boolean;
 }
 
-function ItemSectionsView({ data, isProposal, currentBounty, approvalsRequired, canUserApprove }: ItemViewProps) {
+function ItemSectionsView({ data, isProposal, currentBounty }: ItemViewProps) {
   const { t } = useTranslation(["proposal", "pullrequest", "common"]);
 
   return (
@@ -30,9 +28,7 @@ function ItemSectionsView({ data, isProposal, currentBounty, approvalsRequired, 
               <ItemRow 
                 item={item} 
                 isProposal={isProposal} 
-                currentBounty={currentBounty} 
-                approvalsRequired={approvalsRequired} 
-                canUserApprove={canUserApprove}             
+                currentBounty={currentBounty}           
               />
             )
           }))

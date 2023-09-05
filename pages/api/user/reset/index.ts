@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {getToken} from "next-auth/jwt";
-import {Op, Sequelize} from "sequelize";
+import {Sequelize} from "sequelize";
 
 import models from "db/models";
 

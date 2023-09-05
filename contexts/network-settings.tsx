@@ -56,7 +56,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
-  const { searchNetworks, searchRepositories } = useApi();
+  const { searchNetworks } = useApi();
 
   const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
@@ -148,11 +148,6 @@ export const NetworkSettingsProvider = ({ children }) => {
       newState.details.iconLogo.validated,
     ].every(condition => condition);
 
-    const githubValidate = [
-        Fields.repository.validator(newState.github?.repositories),
-        isCreating ? newState.github?.botPermission : true,
-    ].every(condition => condition);
-
     newState.settings = await handlerValidateSettings(newState.settings);
 
     const settingsValidated = [
@@ -174,13 +169,11 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     newState.tokensLocked.validated = tokensLockedValidate;
     newState.details.validated = detailsValidate;
-    newState.github.validated = githubValidate;
     newState.settings.validated = !!settingsValidated;
     newState.tokens.validated = tokensValidated;
     newState.isSettingsValidated = [
       tokensLockedValidate,
       detailsValidate,
-      githubValidate,
       settingsValidated,
       tokensValidated
     ].every(condtion=> condtion);
@@ -266,18 +259,6 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: (value: Color) => setFields(`settings.theme.colors.${value.label}`, value.code),
       validator: (value: Theme) => !value?.similar?.length
     },
-    repository: {
-      setter: (fullName: string) =>{
-        const index = networkSettings.github.repositories.findIndex((repo) => repo.fullName === fullName);
-        const selectedRepository = networkSettings.github.repositories[index];
-        selectedRepository.checked = !selectedRepository.checked;
-        setFields(`github.repositories.${index}`, selectedRepository)
-      },
-      validator: value => value.some((repository) => repository.checked)
-    },
-    permission: {
-      setter: value => setFields(`github.botPermission`, !!value)
-    },
     settlerTokenMinAmount: {
       setter: value => setFields(`tokens.settlerTokenMinAmount`, value)
     },
@@ -301,10 +282,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     parameter: {
       setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value)
-    },
-    allowMerge: {
-      setter(value) { return setFields(`github.allowMerge`, value) },
-      validator(value) { return typeof value === "boolean"; }
     }
   };
 
@@ -393,9 +370,6 @@ export const NetworkSettingsProvider = ({ children }) => {
       if(storageData?.settings)
         defaultState.settings = storageData?.settings;
 
-      if(storageData?.github)
-        defaultState.github = storageData?.github;
-
       if(storageData?.tokens)
         defaultState.tokens = storageData?.tokens;
     }
@@ -470,8 +444,6 @@ export const NetworkSettingsProvider = ({ children }) => {
         raw: undefined
     });
 
-    defaultState.github.allowMerge = network?.allowMerge;
-
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
 
@@ -536,30 +508,6 @@ export const NetworkSettingsProvider = ({ children }) => {
         .then(setRegistryToken)
         .catch(error => console.debug("Failed to load registry token", error));
   }, [state.Service?.active?.registry?.contractAddress, state.connectedChain?.name]);
-
-  // Pre Select same network on other chain repositories
-  useEffect(() => {
-    const creatingName = networkSettings?.details?.name?.value;
-    const currentAddress = state.currentUser?.walletAddress;
-    const connectedChainId = state.connectedChain?.id;
-
-    if (!creatingName || !currentAddress || !connectedChainId || !isCreating) return;
-
-    searchRepositories({
-      networkName: creatingName
-    })
-      .then(({ count, rows }) => {
-        if (count === 0) return;
-
-        const reposToSelect = rows.filter(({ network: { name, creatorAddress, chain_id } }) =>
-          toLower(name) === toLower(creatingName) &&
-          creatorAddress === currentAddress &&
-          chain_id !== connectedChainId);
-
-        reposToSelect.forEach(({ githubPath }) => Fields.repository.setter(githubPath));
-      });
-  }, [networkSettings?.details?.name?.value, state.currentUser?.walletAddress, state.connectedChain?.id, isCreating]);
-
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,

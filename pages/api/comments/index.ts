@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { withCORS, WithValidChainId } from "middleware";
+
 import get from "server/common/comments/get";
 import post from "server/common/comments/post";
-
-import { LogAccess } from "middleware/log-access";
-import { WithValidChainId } from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
@@ -21,4 +20,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(WithValidChainId(handler)));
+export default withCORS(WithValidChainId(handler));

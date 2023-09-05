@@ -48,9 +48,9 @@ export default function BountiesList({
   const { search, setSearch, clearSearch } = useSearch();
   const { getChainFromUrl } = useChain();
   
-  const { state, time, repoId, networkName } = router.query;
+  const { state, time, networkName } = router.query;
 
-  const hasFilter = !!(state || time || repoId || search || networkName);
+  const hasFilter = !!(state || time || search || networkName);
   const isOnNetwork = !!router?.query?.network;
 
   function handleSearchChange(e) {

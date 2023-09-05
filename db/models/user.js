@@ -64,6 +64,12 @@ class User extends Model {
       foreignKey: "id",
       sourceKey: "id"
     });
+
+    this.hasMany(models.issue, {
+      foreignKey: "userId",
+      sourceKey: "id",
+      as: "issues"
+    });
   }
 
   static findByAddress(address) {

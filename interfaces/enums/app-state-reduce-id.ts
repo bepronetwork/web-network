@@ -15,8 +15,6 @@ export enum AppStateReduceId {
   ActiveDAO,
   Network,
   ActiveNetwork,
-  NetworkRepos,
-  ActiveNetworkRepo,
   LastNetworkVisited,
   CurrentUser,
   CurrentUserWallet,
@@ -26,6 +24,5 @@ export enum AppStateReduceId {
   CurrentBounty,
   CurrentBountyChainData,
   Spinners,
-  SupportedChains,
-  NetworkActiveRepoProps,
+  SupportedChains
 }

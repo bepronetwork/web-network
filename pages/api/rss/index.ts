@@ -55,7 +55,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       where,
       limit: limit,
       include: [
-        { association: "network" }
+        { association: "network" },
+        { association: "chain" }
       ]
     });
 
@@ -66,11 +67,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       appTitle: "Web3 Decentralized Development",
       appDescription: "Autonomous Protocol for Decentralized Development",
       appLink: homeUrl,
-      bounties: bounties.map(({ title, createdAt, githubId, repository_id, seoImage, tags, network }) => ({
+      bounties: bounties.map(({ title, createdAt, id, seoImage, tags, network, chain }) => ({
         title,
         description: `Created on ${network.name} Network.`,
         creationDate: new Date(createdAt).toUTCString(),
-        link: `${homeUrl}/${network.name}/bounty?id=${githubId}&repoId=${repository_id}`,
+        link: `${homeUrl}/${network.name}/${chain.chainShortName}/bounty/${id}`,
         seoUrl: `${ipfsUrl}/${seoImage}`,
         tags: (tags || []).map( tag => ({ tag }))
       }))

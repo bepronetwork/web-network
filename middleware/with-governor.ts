@@ -14,11 +14,11 @@ export const withGovernor = (handler: NextApiHandler, allowedMethods = ["GET"]):
     if (isMethodAllowed(req.method, allowedMethods))
       return handler(req, res);
 
-    const roles = req.body?.context?.token?.roles || [];
+    const token = req.body?.context?.token;
     const chain = req.body?.context?.chain || [];
     const networkAddress = req.body?.networkAddress;
 
-    if (!roles.includes(UserRoleUtils.getGovernorRole(chain?.chainId, networkAddress)))
+    if (!UserRoleUtils.isGovernorOf(token, chain?.chainId, networkAddress) && !UserRoleUtils.hasAdminRole(token))
       return res.status(401).json({ message: NOT_AN_CREATOR_NETWORK });
 
     return handler(req, res);

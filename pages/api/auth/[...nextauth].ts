@@ -87,6 +87,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
         return {
           expires: session.expires,
           user: {
+            id: user.id,
             login: user.githubLogin,
             roles,
             address,

@@ -15,6 +15,7 @@ export interface BreakpointOptions {
 export interface SelectOption {
   label: string;
   value: string | number;
+  selected?: boolean;
 }
 
 export interface MouseEvents {

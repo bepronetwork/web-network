@@ -15,9 +15,10 @@ export default function ProposalPullRequestDetails({
 }: ProposalPullRequestDetailsProps) {
   const { getURLWithNetwork } = useNetwork();
 
+  // TODO BEPRO-1679: Change pull request path /pull-request/[id]
   const pullRequestHref = getURLWithNetwork("pull-request", {
-    id: issue?.githubId,
-    repoId: issue?.repository_id,
+    id: issue?.id,
+    repoId: "",
     prId: pullRequest?.githubId,
   });
 
@@ -26,7 +27,6 @@ export default function ProposalPullRequestDetails({
       githubId={pullRequest?.githubId}
       creatorGithubLogin={pullRequest?.githubLogin}
       branch={pullRequest?.userBranch}
-      repositoryPath={issue?.repository?.githubPath}
       createdAt={pullRequest?.createdAt}
       isMerged={pullRequest?.merged}
       isMergeable={pullRequest?.isMergeable}

@@ -20,6 +20,7 @@ import {formatNumberToCurrency} from "helpers/formatNumber";
 import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
 
+import useUpdateNetwork from "x-hooks/api/network/use-update-network";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 
@@ -40,7 +41,7 @@ export default function NetworksStep({
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
   const {state, dispatch} = useAppState();
-  const { searchNetworks, updateNetwork } = useApi();
+  const { searchNetworks } = useApi();
   const { signMessage } = useAuthentication();
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
@@ -201,14 +202,13 @@ export default function NetworksStep({
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
-      allowMerge: differentOrUndefined(details?.allowMerge, forcedNetwork?.allowMerge),
       logoIcon:
         details?.iconLogo?.value?.raw !== undefined
-          ? await psReadAsText(details?.iconLogo?.value?.raw)
+          ? (await psReadAsText(details?.iconLogo?.value?.raw)).toString()
           : undefined,
       fullLogo:
         details?.fullLogo?.value?.raw !== undefined
-          ? await psReadAsText(details?.fullLogo?.value?.raw)
+          ? (await psReadAsText(details?.fullLogo?.value?.raw)).toString()
           : undefined
     };
 
@@ -224,7 +224,7 @@ export default function NetworksStep({
     }
 
     await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
-      await updateNetwork(json)
+      await useUpdateNetwork(json)
       .then(() => {
         dispatch(addToast({
             type: "success",

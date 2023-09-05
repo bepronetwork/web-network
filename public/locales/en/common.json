@@ -216,7 +216,9 @@
     "copied": "Copied",
     "address-copied": "Address Copied",
     "empty-list": "Empty List",
-    "learn-more": "Learn More"
+    "learn-more": "Learn More",
+    "origin": "Origin",
+    "type": "Type"
   },
   "modals": {
     "help-modal": {

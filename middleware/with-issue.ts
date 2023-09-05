@@ -1,5 +1,4 @@
-import {NextApiHandler} from "next";
-import {Op} from "sequelize";
+import { NextApiHandler } from "next";
 
 import models from "db/models";
 
@@ -13,44 +12,36 @@ export const withIssue = (handler: NextApiHandler, methods: string[] = [ `PUT` ]
       return handler(req, res);
 
     const {
-        ids: [repoId, ghId, networkName],
+        ids: [id, networkName, chainName],
       } = req.query;
 
     const headers = req.headers;
-    const wallet = (headers.wallet as string)?.toLowerCase();
     const chainId = (headers.chain as string);
 
-    const issueId = [repoId, ghId].join("/");
-
-    const network = await models.network.findOne({
-      where: {
-        name: {
-          [Op.iLike]: String(networkName).replaceAll(" ", "-")
-        }
-      }
-    });
+    const network = await models.network.findOneByNetworkAndChainNames(networkName, chainName);
   
-    if (!network) return res.status(401).json({message:"Invalid network"});
+    if (!network) 
+      return res.status(401).json({message:"Invalid network"});
   
     const issue = await models.issue.findOne({
       where: {
-        issueId,
+        id: +id,
         network_id: network?.id
       },
-      include: [{ association: "repository" }]
+      include: [
+        { association: "user" }
+      ]
     });
   
-    if (!issue) return res.status(401).json({message: "bounty not found"});
+    if (!issue) 
+      return res.status(401).json({message: "bounty not found"});
 
     if (!chainId)
       return res.status(401).json({ message: MISSING_CHAIN_ID });
 
-    if (!wallet || wallet.toLowerCase() !== issue?.creatorAddress.toLowerCase())
-      return res.status(401).json({ message: NOT_AN_CREATOR_ISSUE });
-
     const signature = req.body?.context?.token?.signature;
     const typedMessage = req.body?.context?.typedMessage;
-    const issueCreator = issue?.creatorAddress?.toString();
+    const issueCreator = issue?.user?.address?.toString();
 
     if (!(await siweMessageService.decodeMessage(typedMessage, signature?.toString(), issueCreator)))
       return res.status(401).json({ message: NOT_AN_CREATOR_ISSUE });

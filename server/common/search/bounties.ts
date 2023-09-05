@@ -22,7 +22,6 @@ export default async function get(query: ParsedUrlQuery) {
     pullRequester,
     network,
     networkName,
-    repoId,
     transactionalTokenAddress,
     time,
     search,
@@ -45,11 +44,13 @@ export default async function get(query: ParsedUrlQuery) {
       [Op.notIn]: defaultStatesToIgnore
     };
 
-  if (state && !["disputable", "mergeable"].includes(state.toString())) {
+  if (state && !["disputable", "mergeable"].includes(state?.toString())) {
     if (state === "funding")
       whereCondition.fundingAmount = {
-        [Op.ne]: "0",
-        [Op.ne]: Sequelize.literal('"issue"."fundedAmount"'),
+        [Op.and]: [
+          { [Op.ne]: "0" },
+          { [Op.ne]: Sequelize.literal('"issue"."fundedAmount"') },
+        ]
       };
     else if (state === "open") {
       whereCondition.state[Op.in] = ["open", "ready", "proposal"];
@@ -63,7 +64,7 @@ export default async function get(query: ParsedUrlQuery) {
   }
 
   if (issueId) 
-    whereCondition.issueId = issueId;
+    whereCondition.id = +issueId;
 
   if (chainId) 
     whereCondition.chain_id = +chainId;
@@ -72,11 +73,6 @@ export default async function get(query: ParsedUrlQuery) {
     whereCondition.visible = isTrue(visible.toString());
   else if (visible !== "both")
     whereCondition.visible = true;
-
-  if (creator) 
-    whereCondition.creatorAddress = {
-      [Op.iLike]: `%${creator.toString()}%`
-    };
 
   // Time filter
   if (time) {
@@ -153,19 +149,15 @@ export default async function get(query: ParsedUrlQuery) {
                       chainShortName: { [Op.iLike]: chain.toString()}
                     } : {})]);
 
-  const repositoryAssociation = 
-    getAssociation( "repository", 
-                    ["id", "githubPath"], 
-                    !!repoId, 
-                    repoId ? { 
-                      id: +repoId
-                    } : {});
-
   const transactionalTokenAssociation = 
     getAssociation( "transactionalToken", 
                     ["address", "name", "symbol"], 
                     !!transactionalTokenAddress, 
                     transactionalTokenAddress ? { address: { [Op.iLike]: transactionalTokenAddress.toString() } } : {});
+
+  const userAssociation = getAssociation("user", undefined, !!creator, creator ? {
+    address: caseInsensitiveEqual("user.address", creator.toString())
+  } : {});
 
   const COLS_TO_CAST = ["amount", "fundingAmount"];
   const RESULTS_LIMIT = count ? +count : undefined;
@@ -198,8 +190,8 @@ export default async function get(query: ParsedUrlQuery) {
       networkAssociation,
       proposalAssociation,
       pullRequestAssociation,
-      repositoryAssociation,
       transactionalTokenAssociation,
+      userAssociation,
     ]
   }, { page: PAGE }, [[...sort, order || "DESC"]], RESULTS_LIMIT));
 

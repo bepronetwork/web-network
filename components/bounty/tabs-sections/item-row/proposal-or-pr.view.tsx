@@ -1,10 +1,8 @@
 import React from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
-import GithubLink from "components/github-link";
 import ProposalProgressSmall from "components/proposal-progress-small";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
@@ -19,8 +17,6 @@ interface ItemRowProps {
   item: Proposal | PullRequest;
   handleBtn: (ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   btnLabel: string;
-  shouldRenderApproveButton: boolean;
-  githubPath: string;
   proposal: Proposal;
   isDisputed: boolean;
   isMerged: boolean;
@@ -32,15 +28,11 @@ export default function ProposalOrPullRequestView({
   item,
   handleBtn,
   btnLabel,
-  shouldRenderApproveButton,
-  githubPath,
   proposal,
   isDisputed,
   isMerged,
   totalToBeDisputed,
 }: ItemRowProps) {
-  const { t } = useTranslation(["proposal", "pullrequest", "common"]);
-
   return (
     <>
       {isProposal && proposal ? (
@@ -71,16 +63,6 @@ export default function ProposalOrPullRequestView({
                 <Translation label={btnLabel} />
               </span>
             </Button>
-            {shouldRenderApproveButton && (
-              <GithubLink
-                forcePath={githubPath}
-                hrefPath={`pull/${(item as PullRequest)?.githubId || ""}/files`}
-                color="primary"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {t("common:actions.approve")}
-              </GithubLink>
-          )}
           </div>
         </div>
       </ReadOnlyButtonWrapper>

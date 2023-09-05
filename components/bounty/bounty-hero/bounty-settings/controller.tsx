@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import { useAppState } from "contexts/app-state";
+import { toastError } from "contexts/reducers/change-toaster";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 
@@ -20,11 +23,15 @@ export default function BountySettings({
   currentBounty: IssueBigNumberData;
   updateBountyData: (updatePrData?: boolean) => void;
 }) {
-  const [isCancelable, setIsCancelable] = useState(false);
-  const { state } = useAppState();
-  const { handleReedemIssue, handleHardCancelBounty } = useBepro();
-  const { updateWalletBalance } = useAuthentication();
+  const { t } = useTranslation(["common", "bounty"]);
 
+  const [isCancelable, setIsCancelable] = useState(false);
+
+  const { state, dispatch } = useAppState();
+  const { updateWalletBalance } = useAuthentication();
+  const { handleReedemIssue, handleHardCancelBounty } = useBepro();
+
+  const isGovernor = state.Service?.network?.active?.isGovernor;
   const objViewProps = {
     isWalletConnected: !!state.currentUser?.walletAddress,
     isBountyInDraft: !!currentBounty?.isDraft,
@@ -34,8 +41,8 @@ export default function BountySettings({
         pullRequest?.status !== "canceled"),
     isBountyOwner:
       !!state.currentUser?.walletAddress &&
-      currentBounty?.creatorAddress &&
-      currentBounty?.creatorAddress ===
+      currentBounty?.user?.address &&
+      currentBounty?.user?.address ===
         state.currentUser?.walletAddress,
 
     isFundingRequest: !!currentBounty?.isFundingRequest,
@@ -46,10 +53,14 @@ export default function BountySettings({
   };
 
   async function handleHardCancel() {
-    handleHardCancelBounty(currentBounty.contractId, currentBounty.issueId)
+    handleHardCancelBounty(currentBounty.contractId, currentBounty.id)
       .then(() => {
         updateWalletBalance();
         updateBountyData();
+      })
+      .catch(error => {
+        dispatch(toastError(t("bounty:errors.failed-to-cancel"), t("actions.failed")));
+        console.debug("Failed to cancel bounty", error);
       });
   }
 
@@ -58,10 +69,14 @@ export default function BountySettings({
     
     const isFundingRequest = currentBounty.fundingAmount.gt(0);
 
-    handleReedemIssue(currentBounty.contractId, currentBounty.issueId, isFundingRequest)
+    handleReedemIssue(currentBounty.contractId, currentBounty.id, isFundingRequest)
       .then(() => {
         updateWalletBalance(true);
         updateBountyData();
+      })
+      .catch(error => {
+        dispatch(toastError(t("bounty:errors.failed-to-cancel"), t("actions.failed")));
+        console.debug("Failed to cancel bounty", error);
       });
   }
 
@@ -76,10 +91,12 @@ export default function BountySettings({
       })();
   }, [state.Service?.active, currentBounty]);
 
+  if (!objViewProps.isBountyInDraft && !isGovernor || !isCancelable && isGovernor)
+    return <></>;
+
   return (
     <BountySettingsView
       isCancelable={isCancelable}
-      bounty={currentBounty}
       network={state.Service?.network}
       handleEditIssue={handleEditIssue}
       handleHardCancel={handleHardCancel}

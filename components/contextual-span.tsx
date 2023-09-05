@@ -48,7 +48,7 @@ export function ContextualSpan({
   const Icon = (props: SVGProps<SVGSVGElement>) => {
     const icons = {
       success: SuccessIcon,
-      danger: CloseIcon,
+      danger: InfoIconEmpty,
       warning: WarningIcon,
       info: InfoIconEmpty,
       primary: WarningIcon

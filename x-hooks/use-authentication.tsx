@@ -7,9 +7,9 @@ import {useRouter} from "next/router";
 
 import {useAppState} from "contexts/app-state";
 import {
-  changeCurrentUserAccessToken,
   changeCurrentUserBalance,
   changeCurrentUserConnected,
+  changeCurrentUserId,
   changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
@@ -155,19 +155,17 @@ export function useAuthentication() {
     if (isUnauthenticated) {
       dispatch(changeCurrentUserConnected(false));
       dispatch(changeCurrentUserLogin(null));
-      dispatch(changeCurrentUserAccessToken(null));
       dispatch(changeCurrentUserWallet(null));
       dispatch(changeCurrentUserisAdmin(null));
       dispatch(changeCurrentUserMatch(null));
+      dispatch(changeCurrentUserId(null));
 
       sessionStorage.setItem("currentWallet", "");
-
       return;
     }
 
     const user = session?.data?.user as CustomSession["user"];
-    const isSameGithubAccount = 
-      user.login === state.currentUser?.login && user.accessToken === state.currentUser?.accessToken;
+    const isSameGithubAccount = user.login === state.currentUser?.login;
     const isSameWallet = AddressValidator.compare(user.address, state.currentUser?.walletAddress);
 
     if (user.accountsMatch !== state.currentUser?.match)
@@ -178,12 +176,12 @@ export function useAuthentication() {
 
     if (!isSameGithubAccount) {
       dispatch(changeCurrentUserLogin(user.login));
-      dispatch(changeCurrentUserAccessToken(user.accessToken));
     }
 
     if (!isSameWallet) {
       const isAdmin = user.roles.includes(UserRole.ADMIN);
 
+      dispatch(changeCurrentUserId(user.id));
       dispatch(changeCurrentUserWallet(user.address));
       dispatch(changeCurrentUserisAdmin(isAdmin));
 

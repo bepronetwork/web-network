@@ -10,12 +10,12 @@ import {LogAccess} from "middleware/log-access";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
-    ids: [repoId, ghId]
+    ids: [issueId]
   } = req.query;
-  const issueId = [repoId, ghId].join("/");
+
   const issue = await models.issue.findOne({
     where: {
-      issueId,
+      id: issueId,
       seoImage: { [Op.not]: null }
     }
   });
@@ -60,4 +60,4 @@ async function Seo(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(Seo)
+export default LogAccess(Seo);

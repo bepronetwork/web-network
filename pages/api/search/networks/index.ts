@@ -62,13 +62,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         } : {}
       }
     },
-    { association: "networkToken" },
-    {
-      association: "repositories",
-      attributes: {
-        exclude: ["network_id"]
-      }
-    }
+    { association: "networkToken" }
   ];
 
   let group: string[] = []
@@ -115,8 +109,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       "tokens.id",
       "tokens->network_tokens.id",
       "chain.id",
-      "networkToken.id",
-      "repositories.id"
+      "networkToken.id"
     ]
   }
  

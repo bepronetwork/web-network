@@ -24,19 +24,19 @@ import {IssueBigNumberData, fundingBenefactor} from "interfaces/issue-data";
 import useBreakPoint from "x-hooks/use-breakpoint";
 
 interface FundingSectionViewProps {
-    walletFunds: fundingBenefactor[];
-    isBountyFunded: boolean;
-    isConnected: boolean;
-    isCanceled: boolean;
-    transactionalSymbol: string;
-    bounty: IssueBigNumberData;
-    hasReward: boolean;
-    fundsGiven: BigNumber;
-    futureRewards: string;
-    isBountyClosed: boolean;
-    isBountyInDraft: boolean;
-    rewardTokenSymbol: string;
-    updateBountyData: (updatePrData?: boolean) => void;
+  walletFunds: fundingBenefactor[];
+  isBountyFunded: boolean;
+  isConnected: boolean;
+  isCanceled: boolean;
+  transactionalSymbol: string;
+  bounty: IssueBigNumberData;
+  hasReward: boolean;
+  fundsGiven: BigNumber;
+  futureRewards: string;
+  isBountyClosed: boolean;
+  isBountyInDraft: boolean;
+  rewardTokenSymbol: string;
+  updateBountyData: (updatePrData?: boolean) => void;
 }
 
 export default function FundingSectionView({

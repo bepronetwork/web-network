@@ -239,7 +239,7 @@ export default function BountiesListView({
           {bounties?.rows?.map(issue => 
               <IssueListItem
                 issue={issue}
-                key={`${issue.repository_id}/${issue.githubId}`}
+                key={`issue-list-item-${issue.id}`}
                 variant={variantIssueItem}
               />)}
         </InfiniteScroll>

@@ -76,7 +76,7 @@ export default function CreateReviewModalView({
       <div className="container">
         <div className="mb-2">
           <p className="caption-small trans mb-2">
-            #{currentBounty?.githubId} {currentBounty?.title}
+            #{currentBounty?.id} {currentBounty?.title}
           </p>
 
           <p className="h4 mb-2">

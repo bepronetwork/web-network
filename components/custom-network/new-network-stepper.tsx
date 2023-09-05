@@ -11,7 +11,6 @@ import CreatingNetworkLoader from "components/creating-network-loader";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
-import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
 import If from "components/If";
 import Stepper from "components/stepper";
@@ -37,6 +36,7 @@ import {psReadAsText} from "helpers/file-reader";
 
 import {RegistryEvents, StandAloneEvents} from "interfaces/enums/events";
 
+import useCreateNetwork from "x-hooks/api/network/use-create-network";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useNetwork} from "x-hooks/use-network";
@@ -56,9 +56,9 @@ function NewNetwork() {
   const { signMessage } = useSignature();
   const { colorsToCSS } = useNetworkTheme();
   const { getURLWithNetwork } = useNetwork();
-  const { createNetwork, processEvent } = useApi();
+  const { processEvent } = useApi();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry, handleChangeNetworkParameter } = useBepro();
-  const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
+  const { tokensLocked, details, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
 
   const isSetupPage = router?.pathname?.toString()?.includes("setup");
 
@@ -99,25 +99,16 @@ function NewNetwork() {
     const payload = {
       name: details.name.value,
       description: details.description,
-      colors: JSON.stringify(settings.theme.colors),
-      logoIcon: await psReadAsText(details.iconLogo.value.raw),
-      fullLogo: await psReadAsText(details.fullLogo.value.raw),
-      repositories:
-        JSON.stringify(github.repositories
-          .filter((repo) => repo.checked)
-          .filter((repo) => repo?.userPermission === "ADMIN")
-          .map(({ name, fullName }) => ({ name, fullName }))),
-      botPermission: github.botPermission,
+      colors: settings.theme.colors,
+      logoIcon: (await psReadAsText(details.iconLogo.value.raw)).toString(),
+      fullLogo: (await psReadAsText(details.fullLogo.value.raw)).toString(),
       creator: state.currentUser.walletAddress,
-      accessToken: state.currentUser.accessToken,
       tokens,
       networkAddress: deployedNetworkAddress,
-      isDefault: isSetupPage,
-      signedMessage,
-      allowMerge: details.allowMerge,
+      signedMessage
     };
 
-    const networkCreated = await createNetwork(payload)
+    const networkCreated = await useCreateNetwork(payload)
       .catch((error) => {
         setCreatingNetwork(-1);
         dispatch(addToast({
@@ -265,9 +256,9 @@ function NewNetwork() {
       <style>{colorsToCSS(settings?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
-      {
-        (creatingNetwork > -1 && <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />)
-      }
+      <If condition={creatingNetwork > -1}>
+        <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />
+      </If>
 
       <If condition={hasNetwork}>
         <div className="d-flex flex-col align-items-center justify-content-center mb-3">
@@ -276,22 +267,18 @@ function NewNetwork() {
       </If>
 
       <Stepper dark={isSetupPage}>
-          <LockBeproStep validated={tokensLocked?.validated} />
+        <LockBeproStep validated={tokensLocked?.validated} />
 
-          <NetworkInformationStep validated={details?.validated} />
+        <NetworkInformationStep validated={details?.validated} />
 
-          <NetworkSettingsStep validated={settings?.validated} />
+        <NetworkSettingsStep validated={settings?.validated} />
 
-          <SelectRepositoriesStep validated={github?.validated} />
-
-          <TokenConfiguration
-            validated={isSettingsValidated}
-            handleFinish={handleCreateNetwork}
-            finishLabel={t("custom-network:steps.repositories.submit-label")}
-          />
-        </Stepper>
-
-      {/*<AlreadyHasNetworkModal show={hasNetwork} onOkClick={goToMyNetworkPage} />*/}
+        <TokenConfiguration
+          validated={isSettingsValidated}
+          handleFinish={handleCreateNetwork}
+          finishLabel={t("custom-network:steps.repositories.submit-label")}
+        />
+      </Stepper>
     </div>
   );
 }
