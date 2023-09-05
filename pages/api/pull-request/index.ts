@@ -1,23 +1,18 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import {Octokit} from "octokit";
 import {Op} from "sequelize";
 
 import models from "db/models";
-
-import * as PullRequestQueries from "graphql/pull-request";
-import * as RepositoryQueries from "graphql/repository";
 
 import {chainFromHeader} from "helpers/chain-from-header";
 import paginate from "helpers/paginate";
 import {resJsonMessage} from "helpers/res-json-message";
 
-import { withProtected } from "middleware";
+import {LogAccess} from "middleware/log-access";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
+import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
-
-import {GraphQlResponse} from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
 
@@ -110,7 +105,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     raw: true
   });
 
-  const [owner, repo] = repoInfo.githubPath.split("/");
+  const [, repo] = repoInfo.githubPath.split("/");
 
   // todo move this to a setup script on webnetwork-e2e project instead
   if(serverRuntimeConfig?.e2eEnabled === true) {
@@ -137,29 +132,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
-
-  const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
-    repo,
-    owner
-  });
-
-  const repositoryGithubId = repositoryDetails.repository.id;
-
   try {
-    const created = await githubAPI<GraphQlResponse>(PullRequestQueries.Create, {
-      repositoryId: repositoryGithubId,
-      title,
-      body,
-      head: branch,
-      base: issue.branch || serverRuntimeConfig?.github?.mainBranch,
-      maintainerCanModify: false,
-      draft: false
-    });
-
-    await models.pullRequest.create({
+    const pullRequest = await models.pullRequest.create({
       issueId: issue.id,
-      githubId: `${created.createPullRequest.pullRequest.number}`,
       githubLogin: username,
       branch,
       status: "pending",
@@ -175,7 +150,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       originCID: issue.issueId,
       userRepo: `${username}/${repo}`,
       userBranch: branch,
-      cid: `${created.createPullRequest.pullRequest.number}`
+      pullRequestId: pullRequest.id
     });
   } catch (error) {
     return res.status(error?.errors[0]?.type === "UNPROCESSABLE" && 422|| 500).json(error?.errors || error);
@@ -184,15 +159,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function del(req: NextApiRequest, res: NextApiResponse) {
-  const { 
-    repoId: repository_id, 
-    issueGithubId: githubId, 
-    bountyId: contractId, 
-    issueCid: issueId, 
-    pullRequestGithubId, 
-    customNetworkName,
-    creator,
-    userBranch
+  const {  
+    bountyId,
+    pullRequestId, 
+    customNetworkName
   } = req.body;
 
   const chain = await chainFromHeader(req);
@@ -211,24 +181,16 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   const issue = await models.issue.findOne({
     where: {
-      issueId,
-      network_id: customNetwork.id,
-      contractId,
-      repository_id,
-      githubId
-    },
-    include: [
-      { association: "repository" }
-    ]
+      id: bountyId,
+      network_id: customNetwork.id
+    }
   });
 
   if (!issue) return res.status(404).json("Invalid");
 
   const pullRequest = await models.pullRequest.findOne({
     where: {
-      githubId: String(pullRequestGithubId),
-      githubLogin: creator,
-      userBranch: userBranch,
+      id: pullRequestId,
       status: "pending",
       network_id: customNetwork.id,
     }
@@ -250,24 +212,9 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   await network.start();
 
-  const networkBounty = await network.getBounty(contractId);
+  const networkBounty = await network.getBounty(issue.contractId);
   
   if (!networkBounty) return resJsonMessage("Bounty not found", res, 404);
-
-  
-  const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
-
-  const [owner, repo] = issue.repository.githubPath.split("/");
-
-  const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
-    repo,
-    owner,
-    id: +pullRequestGithubId
-  });
-
-  await githubAPI(PullRequestQueries.Close, {
-    pullRequestId: pullRequestDetails.repository.pullRequest.id
-  });
 
   await pullRequest.destroy();
 
@@ -294,4 +241,4 @@ async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withProtected(WithValidChainId(PullRequest));
+export default  LogAccess(WithCors(WithValidChainId(PullRequest)));

@@ -49,7 +49,7 @@ export default function PaymentItem({
         onClick={handleItemClick}
       >
         <span className="text-white text-nowrap">
-          {labelBounty} #{issue?.issueId}
+          {labelBounty} #{issue?.id}
         </span>
       </Button>
     </FlexRow>

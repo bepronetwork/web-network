@@ -110,12 +110,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const issue = await models.issue.findOne({
       where: {
-        issueId: networkBounty?.cid,
+        contractId: +networkBounty?.id,
         network_id: customNetwork?.id
-      },
-      include: [
-        { association: "repository" }
-      ]
+      }
     });
 
     const [{treasury}, creatorFee, proposerFee] = await Promise.all([DAOService?.getTreasury(),
@@ -148,7 +145,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const nft = {
       title: `${networkBounty.title}`,
-      description: `NFT for bounty ${issue.githubId} created on network ${customNetwork.name}`,
+      description: `NFT for bounty ${issue.id} created on network ${customNetwork.name}`,
       image: issue.nftImage ? `${defaultConfig.urls.ipfs}/${issue.nftImage}`: "",
       properties: {
         price: formatNumberToNScale(networkBounty.tokenAmount),
@@ -157,8 +154,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         fees: BigNumber(distributions.mergerAmount.value)
                         .plus(BigNumber(distributions.proposerAmount.value)
                         .plus(BigNumber(distributions.treasuryAmount.value))).toString(),
-        repository: issue?.repository?.githubPath,
-        githubId: networkBounty?.cid.split("/")[1],
+        bountyId: networkBounty.id,
         githubPullRequestId: pullRequest.cid.toString(),
       }
     }

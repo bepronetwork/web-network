@@ -26,8 +26,6 @@ interface ItemRowProps {
   item: Proposal | PullRequest;
   handleBtn: (ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   btnLabel: string;
-  shouldRenderApproveButton: boolean;
-  githubPath: string;
   proposal: Proposal;
   isDisputed: boolean;
   isMerged: boolean;
@@ -42,8 +40,6 @@ export default function ItemRowView({
   item,
   handleBtn,
   btnLabel,
-  shouldRenderApproveButton,
-  githubPath,
   proposal,
   isDisputed,
   isMerged,
@@ -54,8 +50,6 @@ export default function ItemRowView({
       <ProposalOrPullRequestView
         handleBtn={handleBtn}
         btnLabel={btnLabel}
-        shouldRenderApproveButton={shouldRenderApproveButton}
-        githubPath={githubPath}
         proposal={proposal}
         isDisputed={isDisputed}
         isMerged={isMerged}

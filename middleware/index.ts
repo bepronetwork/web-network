@@ -1,11 +1,13 @@
 import { NextApiHandler } from "next";
 
 import { LogAccess } from "middleware/log-access";
+import { NetworkRoute } from "middleware/network-route";
 import { withAdmin } from "middleware/with-admin";
 import { withGovernor } from "middleware/with-governor";
 import { withIssue } from "middleware/with-issue";
 import { withSignature } from "middleware/with-signature";
 import { withUser } from "middleware/with-user";
+import { WithValidChainId } from "middleware/with-valid-chain-id";
 import withCors from "middleware/withCors";
 import { withJWT } from "middleware/withJwt";
 
@@ -24,5 +26,7 @@ export {
   AdminRoute,
   IssueRoute,
   withGovernor,
-  UserRoute
+  UserRoute,
+  WithValidChainId,
+  NetworkRoute
 };

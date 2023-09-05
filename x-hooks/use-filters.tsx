@@ -5,9 +5,6 @@ import {useRouter} from "next/router";
 import {useAppState} from "contexts/app-state";
 
 import {IssueFilterBoxOption} from "interfaces/filters";
-import {RepoInfo} from "interfaces/repos-list";
-
-import useApi from "x-hooks/use-api";
 
 type FiltersTypes = "time" | "repo" | "state";
 
@@ -33,9 +30,6 @@ export default function useFilters(): [
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
 
   const {state} = useAppState();
-  const { getReposWithBounties } = useApi();
-
-  const isOnNetwork = router?.pathname?.includes("[network]");
 
   function getActiveFiltersOf(opts: IssueFilterBoxOption[]) {
     return opts
@@ -64,26 +58,6 @@ export default function useFilters(): [
     return { label, value, checked };
   }
 
-  function loadRepos() {
-    function mapRepo({ id: value, githubPath: label }: RepoInfo) {
-      return makeFilterOption(label,
-                              value,
-                              (router.query?.repoId as string) === value.toString());
-    }
-
-    if (isOnNetwork)
-      setRepoFilters([
-        makeFilterOption("All", "allrepos", !router.query?.repoId)]
-        .concat(state.Service?.network?.repos?.list?.map(mapRepo)));
-    else
-        getReposWithBounties()
-          .then(data => {
-            setRepoFilters([
-              makeFilterOption("All", "allrepos", !router.query?.repoId)]
-              .concat(data.map(mapRepo)));
-          });
-  }
-
   function loadFilters() {
     const { time, state } = router.query || {};
 
@@ -101,12 +75,9 @@ export default function useFilters(): [
       makeFilterOption("Past Month", "month", time === "month"),
       makeFilterOption("Past Year", "year", time === "year")
     ]);
-
-    loadRepos();
   }
 
   useEffect(loadFilters, [router.query]);
-  useEffect(loadRepos, [state.Service?.network?.repos?.list]);
 
   function updateOpt(opts: IssueFilterBoxOption[],
                      opt: IssueFilterBoxOption,

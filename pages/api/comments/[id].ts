@@ -1,10 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import patch from "server/common/comments/patch";
 
-import { LogAccess } from "middleware/log-access";
-import { NetworkRoute } from "middleware/network-route";
-import { WithValidChainId } from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
+import { withCORS, NetworkRoute, WithValidChainId } from "middleware";
+
+import patch from "server/common/comments/patch";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
@@ -18,4 +16,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(WithValidChainId(NetworkRoute(handler))));
+export default withCORS(WithValidChainId(NetworkRoute(handler)));

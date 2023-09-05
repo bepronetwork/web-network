@@ -52,7 +52,7 @@ export default async function get(query: ParsedUrlQuery) {
     include: [
       {
         association: "issue",
-        attributes: ["id", "issueId", "title", "amount", "fundingAmount", "rewardAmount"],
+        attributes: ["id", "title", "amount", "fundingAmount", "rewardAmount"],
         required: true,
         include: [
           { 

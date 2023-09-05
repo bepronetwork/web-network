@@ -17,9 +17,8 @@ export default function PullRequestHero({currentPullRequest, currentBounty}: Pul
   const { getURLWithNetwork } = useNetwork();
 
   function handleBack() {
-    router.push(getURLWithNetwork("/bounty", {
-      id: currentBounty?.githubId,
-      repoId: currentBounty?.repository_id,
+    router.push(getURLWithNetwork("/bounty/[id]", {
+      id: currentBounty?.id
     }))
   }
 

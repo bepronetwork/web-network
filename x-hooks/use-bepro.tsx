@@ -185,10 +185,7 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
-          resolve(tx)
-          // todo should force these two after action, but we can't have it here or it will fall outside of context
-          // getDatabaseBounty(true);
-          // getChainBounty(true);
+          resolve(tx);
         })
         .catch((err: { message: string; }) => {
           failTx(err, redeemTx, reject);
@@ -217,9 +214,7 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
-          resolve(canceledBounties)
-          // getChainBounty(true);
-          // getDatabaseBounty(true);
+          resolve(canceledBounties);
         })
         .catch((err: { message: string; }) => {
           failTx(err, transaction, reject);

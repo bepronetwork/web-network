@@ -57,7 +57,7 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
 });
 
 export const commentsParser = (comments: IssueDataComment[]) => {
-  return comments.map(comment => ({
+  return comments?.map(comment => ({
     ...comment,
     createdAt: new Date(comment.createdAt),
     updatedAt: new Date(comment.updatedAt)

@@ -1,6 +1,4 @@
-import {ReactNode, createContext, useEffect} from "react";
-
-import {useRouter} from "next/router";
+import { ReactNode, createContext, useEffect } from "react";
 
 import { useAppState } from "contexts/app-state";
 import { changeCurrentBountyData } from "contexts/reducers/change-current-bounty";
@@ -10,8 +8,7 @@ import { issueParser } from "helpers/issue";
 import { CurrentBounty } from "interfaces/application-state";
 import { IssueData } from "interfaces/issue-data";
 
-import {useBounty} from "x-hooks/use-bounty";
-import { useRepos } from "x-hooks/use-repos";
+import { useBounty } from "x-hooks/use-bounty";
 
 interface ContextCurrentBounty extends Omit<CurrentBounty, "data" | "lastUpdated"> {
   data: IssueData;
@@ -25,10 +22,8 @@ const _context = {};
 
 export const BountyEffectsContext = createContext(_context);
 
-export const BountyEffectsProvider = ({ children, currentBounty }: BountyEffectsProviderProps) => {
-  const repos = useRepos();
+export const BountyEffectsProvider = ({ children, currentBounty }: BountyEffectsProviderProps) => {  
   const bounty = useBounty();
-  const { query } = useRouter();
   const { dispatch, state } = useAppState();
 
   useEffect(() => {
@@ -37,11 +32,6 @@ export const BountyEffectsProvider = ({ children, currentBounty }: BountyEffects
     dispatch(changeCurrentBountyData(parsedData));
   }, [
     currentBounty
-  ]);
-
-  useEffect(repos.updateActiveRepo, [
-    query?.repoId, 
-    state.Service?.network?.repos
   ]);
 
   useEffect(bounty.validateKycSteps, [

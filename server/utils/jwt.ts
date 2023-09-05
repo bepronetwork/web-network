@@ -14,4 +14,8 @@ export class UserRoleUtils {
   static hasGovernorRole(token: JwtToken) {
     return !!token?.roles?.find(role => role?.includes("governor"));
   }
+
+  static isGovernorOf(token: JwtToken, chainId: string, networkAddress: string) {
+    return !!token?.roles?.includes(this.getGovernorRole(chainId, networkAddress));
+  }
 }

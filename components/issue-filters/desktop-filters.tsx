@@ -16,16 +16,16 @@ export default function IssueDesktopFilters({ onlyTimeFrame = false }) {
   const node = useRef();
   const [show, setShow] = useState(false);
   const [
-    [repoOptions, stateOptions, timeOptions],
+    [, stateOptions, timeOptions],
     updateOptions,
     clearFilters,
   ] = useFilters();
-  const { pathname, query } = useRouter();
-  const { state, time, repoId } = query;
+  const { query } = useRouter();
+  const { state, time } = query;
   const { t } = useTranslation("common");
 
   function countFilters() {
-    return +!!state + +!!time + +!!repoId;
+    return +!!state + +!!time;
   }
 
   function countFiltersLabel() {
@@ -101,31 +101,16 @@ export default function IssueDesktopFilters({ onlyTimeFrame = false }) {
         {onlyTimeFrame ? (
           <FilterTimeFrame />
         ) : (
-          <>
-            {!["/explore"].includes(pathname) && (
-              <div className="bg-gray-900">
-                <IssueFilterBox
-                  className="h-100 border border-right border-gray-800"
-                  title={t("filters.repository")}
-                  options={repoOptions}
-                  filterPlaceholder={t("filters.search-repositories")}
-                  onChange={(opt, checked) =>
-                    updateOptions(repoOptions, opt, checked, "repo")
-                  }
-                />
-              </div>
-            )}
-            <div className="bg-gray-900">
-              <IssueFilterBox
-                title={t("filters.bounties.title")}
-                options={stateOptions}
-                onChange={(opt, checked) =>
-                  updateOptions(stateOptions, opt, checked, "state")
-                }
-              />
-              <FilterTimeFrame />
-            </div>
-          </>
+          <div className="bg-gray-900">
+            <IssueFilterBox
+              title={t("filters.bounties.title")}
+              options={stateOptions}
+              onChange={(opt, checked) =>
+                updateOptions(stateOptions, opt, checked, "state")
+              }
+            />
+            <FilterTimeFrame />
+          </div>
         )}
       </div>
     </div>

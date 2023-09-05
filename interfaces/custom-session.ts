@@ -14,6 +14,7 @@ export interface CustomSession extends Record<string, unknown> {
     accountsMatch?: MatchAccountsStatus | null;
     isEmailConfirmed?: boolean | null;
     emailVerificationSentAt?: string | null;
+    id?: number;
   };
   expires: ISODateString;
 }

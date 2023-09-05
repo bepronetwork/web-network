@@ -11,8 +11,7 @@ import {
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
   changeAllowedTokens,
-  changeNetworkLastVisited,
-  changeNetworkReposList
+  changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
 import { Network } from "interfaces/network";
@@ -49,7 +48,6 @@ export function useNetwork() {
 
   function dispatchNetworkContextUpdates(network: Network) {
     dispatch(changeActiveNetwork(network));
-    dispatch(changeNetworkReposList(network.repositories));
   }
 
   async function updateActiveNetwork(forceUpdate = false) {

@@ -15,9 +15,7 @@ import {
   PatchUserParams,
   User,
   PastEventsParams,
-  StartWorkingParams,
-  SearchNetworkParams,
-  updateIssueParams
+  SearchNetworkParams
 } from "interfaces/api";
 import { Curator, SearchCuratorParams } from "interfaces/curators";
 import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
@@ -27,11 +25,9 @@ import { LeaderBoard, SearchLeaderBoard } from "interfaces/leaderboard";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
-import { ReposList } from "interfaces/repos-list";
 import { Token } from "interfaces/token";
 
 import {api} from "services/api";
-import { WinStorage } from "services/win-storage";
 
 
 import {updateSupportedChains} from "../contexts/reducers/change-supported-chains";
@@ -45,16 +41,6 @@ interface NewIssueParams {
   creatorAddress: string;
   creatorGithub: string;
   repository_id: string;
-}
-
-interface CreateBounty {
-  title: string;
-  body: string;
-  creator: string;
-  repositoryId: string;
-  tags: string[];
-  isKyc?: boolean;
-  tierList?: number[];
 }
 
 interface GetNetworkProps {
@@ -71,8 +57,6 @@ type FileUploadReturn = {
   fileName: string;
   size: string;
 }[]
-
-const repoList: ReposList = [];
 
 export default function useApi() {
   const  {state, dispatch} = useAppState();
@@ -178,32 +162,6 @@ export default function useApi() {
       .catch((): IssueBigNumberData[] => ([]));
   }
 
-
-  async function searchRepositories({
-    page = "1",
-    owner = "",
-    name = "",
-    path = "",
-    networkName = DEFAULT_NETWORK_NAME,
-    chainId = "",
-    includeIssues = ""
-  }) {
-    const params = {
-      page,
-      owner,
-      name,
-      path,
-      networkName,
-      chainId,
-      includeIssues
-    };
-
-    return api
-      .get<{ rows; count: number; pages: number; currentPage: number }>("/search/repositories", { params })
-      .then(({ data }) => data)
-      .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
-  }
-
   async function getIssue(repoId: string | number,
                           ghId: string | number,
                           networkName = DEFAULT_NETWORK_NAME,
@@ -211,13 +169,6 @@ export default function useApi() {
     return api
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`, { params: { chainId } })
       .then(({ data }) => issueParser(data))
-      .catch(() => null);
-  }
-
-  async function updateIssue({repoId, ghId, networkName = DEFAULT_NETWORK_NAME, ...rest}: updateIssueParams) {
-    return api
-      .put<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`, { ...rest })
-      .then((response) => response)
       .catch(() => null);
   }
 
@@ -247,21 +198,6 @@ export default function useApi() {
       .post("/token", { ...payload })
       .then(({ data }) => data)
       .catch(() => null);
-  }
-
-  /**
-   * Ping the API to create an issue on Github, if succeed returns the CID (Repository ID on database + Issue ID on Github)
-   * @param payload
-   * @param networkName
-   * @returns string
-   */
-  async function createPreBounty(payload: CreateBounty, networkName = DEFAULT_NETWORK_NAME): Promise<string> {
-    return api
-        .post("/issue", { ...payload, networkName })
-        .then(({ data }) => data)
-        .catch((error) => {
-          throw error
-        });
   }
 
   async function getPendingFor(address: string, page = "1", networkName = DEFAULT_NETWORK_NAME) {
@@ -351,55 +287,6 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function createRepo(owner, repo, networkName = DEFAULT_NETWORK_NAME) {
-    return api
-      .post("/repos/", { owner, repo, networkName })
-      .then(({ status }) => status === 200)
-      .catch((e) => {
-        console.error("Failed to create repo", e);
-        return false;
-      });
-  }
-
-  async function getReposWithBounties() {
-    const cache = new WinStorage("getReposWithBounties", 10000, "sessionStorage");
-
-    if (cache.value)
-      return cache.value;
-
-    return api
-      .get<ReposList>("/repos", {
-        params: {
-          withBounties: "true"
-        }
-      })
-      .then(({ data }) => {
-        cache.value = data;
-
-        return data;
-      })
-      .catch(() => []);
-  }
-
-  async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME, chainId?: string) {
-    const search = new URLSearchParams({ networkName, chainId }).toString();
-
-    if (!force && repoList.length)
-      return Promise.resolve(repoList as ReposList);
-
-    return api
-      .get<ReposList>(`/repos?${search}`)
-      .then(({ data }) => data)
-      .catch(() => []);
-  }
-
-  async function removeRepo(id: string) {
-    return api
-      .delete(`/repos/${id}`)
-      .then(({ status }) => status === 200)
-      .catch(() => false);
-  }
-
   async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
                               address?: string,
                               params: PastEventsParams = { fromBlock: 0 },
@@ -473,15 +360,6 @@ export default function useApi() {
       });
   }
 
-  async function startWorking({ networkName = DEFAULT_NETWORK_NAME, ...rest } : StartWorkingParams) {
-    return api
-      .put("/issue/working", { networkName, ...rest })
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
   async function createReviewForPR({
     networkName = DEFAULT_NETWORK_NAME,
     event = "COMMENT",
@@ -501,15 +379,6 @@ export default function useApi() {
       .then(({ status }) => status === 200);
   }
 
-  async function createNetwork(networkInfo) {
-    return api
-      .post("/network", { ...networkInfo })
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
   async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
     const isArray = Array.isArray(files);
@@ -522,31 +391,6 @@ export default function useApi() {
     }
 
     return api.post("/files", form).then(({ data }) => data);
-  }
-
-  async function updateNetwork(networkInfo) {
-    return api
-      .put("/network", { ...networkInfo })
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
-  async function updateVisibleBounty(managmentInfo: {
-    issueId: string;
-    visible: boolean;
-    creator: string;
-    networkAddress: string;
-    accessToken: string;
-    override: boolean;
-  }) {
-    return api
-      .put("/network/management", { ...managmentInfo })
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
   }
 
   async function getProposal(dbId: string | number): Promise<Proposal> {
@@ -808,15 +652,6 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function repositoryHasIssues(repoPath, networkName, chainId) {
-    const search = new URLSearchParams({ repoPath, networkName, chainId }).toString();
-
-    return api
-      .get<{ rows: IssueData[]; count: number }>(`/search/issues/?${search}`)
-      .then(({ data }) => !!data.count)
-      .catch(() => false);
-  }
-
   async function resetUser(address: string, githubLogin: string) {
     return api.post("/user/reset", { address, githubLogin });
   }
@@ -971,10 +806,7 @@ export default function useApi() {
     getSupportedChains,
     createIssue,
     createToken,
-    updateIssue,
-    createNetwork,
     createPrePullRequest,
-    createRepo,
     createReviewForPR,
     getAllUsers,
     getHealth,
@@ -985,7 +817,6 @@ export default function useApi() {
     getPendingFor,
     getProposal,
     getPullRequestIssue,
-    getReposList,
     getTotalUsers,
     getTotalBounties,
     getTotalNetworks,
@@ -996,22 +827,15 @@ export default function useApi() {
     isNetworkOwner,
     joinAddressToUser,
     processEvent,
-    removeRepo,
     removeUser,
-    repositoryHasIssues,
     searchIssues,
     searchRecentIssues,
     searchNetworks,
     searchActiveNetworks,
-    searchRepositories,
     searchCurators,
     searchLeaderBoard,
-    startWorking,
-    updateNetwork,
-    updateVisibleBounty,
     uploadFiles,
     userHasPR,
-    createPreBounty,
     cancelPrePullRequest,
     resetUser,
     getSettings,
@@ -1025,7 +849,6 @@ export default function useApi() {
     patchSupportedChain,
     getKycSession,
     validateKycSession,
-    getReposWithBounties,
     getCuratorsResume
   };
 }

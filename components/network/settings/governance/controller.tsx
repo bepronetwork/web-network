@@ -14,6 +14,7 @@ import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
+import useUpdateNetwork from "x-hooks/api/network/use-update-network";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
@@ -38,9 +39,9 @@ export default function NetworkGovernanceSettings({
   const [isUpdating, setIsUpdating] = useState(false);
   const [networkToken, setNetworkToken] = useState<Token[]>();
   
+  const { processEvent } = useApi();
   const { state, dispatch } = useAppState();
   const { updateActiveNetwork } = useNetwork();
-  const { updateNetwork, processEvent } = useApi();
   const { updateWalletBalance, signMessage } = useAuthentication();
   const { handleCloseNetwork, handleChangeNetworkParameter } = useBepro();
   const {
@@ -94,11 +95,10 @@ export default function NetworkGovernanceSettings({
 
     handleCloseNetwork()
       .then(() => {
-        return signMessage(IM_AM_CREATOR_NETWORK).then(async () => updateNetwork({
+        return signMessage(IM_AM_CREATOR_NETWORK).then(async () => useUpdateNetwork({
           isClosed: true,
           creator: state.currentUser.walletAddress,
-          networkAddress: network?.networkAddress,
-          accessToken: state.currentUser?.accessToken,
+          networkAddress: network?.networkAddress
         }))
       })
       .then(() => {
@@ -145,7 +145,7 @@ export default function NetworkGovernanceSettings({
   function getChangedTokens() {
     const changedTokens = [];
 
-    if (!settingsTokens.allowedRewards || !settingsTokens.allowedTransactions || !network) return changedTokens;
+    if (!settingsTokens.allowedRewards || !settingsTokens.allowedTransactions || !networkToken) return changedTokens;
 
     const getAddress = ({ address }) => address;
     const hasEqualLength = (arr1, arr2) => arr1.length === arr2.length;
@@ -154,8 +154,8 @@ export default function NetworkGovernanceSettings({
     const allowedRewards = settingsTokens.allowedRewards.map(getAddress);
     const allowedTransactions = settingsTokens.allowedTransactions.map(getAddress);
 
-    const networkRewards = network.tokens.filter(({ isReward }) => isReward).map(getAddress);
-    const networkTransactions = network.tokens.filter(({ isTransactional }) => isTransactional).map(getAddress);
+    const networkRewards = networkToken.filter(({ isReward }) => isReward).map(getAddress);
+    const networkTransactions = networkToken.filter(({ isTransactional }) => isTransactional).map(getAddress);
 
     if (!hasEqualLength(allowedRewards, networkRewards))
       changedTokens.push("reward");
@@ -237,8 +237,8 @@ export default function NetworkGovernanceSettings({
       networkAddress: network.networkAddress,
       accessToken: state.currentUser.accessToken,
       allowedTokens: {
-       transactional: settingsTokens?.allowedTransactions?.map((token) => token?.id).filter((v) => v),
-       reward: settingsTokens?.allowedRewards?.map((token) => token?.id).filter((v) => v)
+        transactional: settingsTokens?.allowedTransactions?.map((token) => token?.id).filter((v) => v),
+        reward: settingsTokens?.allowedRewards?.map((token) => token?.id).filter((v) => v)
       }
     };
 
@@ -250,7 +250,7 @@ export default function NetworkGovernanceSettings({
 
     signMessage(IM_AM_CREATOR_NETWORK)
       .then(async () => {
-        await updateNetwork(json)
+        await useUpdateNetwork(json)
           .then(async () => {
             if (isCurrentNetwork) updateActiveNetwork(true);
 

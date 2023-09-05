@@ -40,9 +40,9 @@ export default function List({
   const { nextPage } = usePage();
   const { search, setSearch, clearSearch } = useSearch();
 
-  const { state, time, repoId } = query;
+  const { state, time } = query;
 
-  const hasFilter = !!(state || time || repoId || search);
+  const hasFilter = !!(state || time || search);
   const isOnNetwork = isOnNetworkPath(pathname);
 
   function handleSearchChange(e) {

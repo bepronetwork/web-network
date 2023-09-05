@@ -6,8 +6,10 @@ import Avatar from "components/avatar";
 import BountyItemLabel from "components/bounty-item-label";
 import BountyStatusInfo from "components/bounty-status-info";
 import PriceConversor from "components/bounty/bounty-hero/price-conversor/controller";
+import Button from "components/button";
 import CustomContainer from "components/custom-container";
 import If from "components/If";
+import OriginLinkWarningModal from "components/modals/origin-link-warning/view";
 
 import { truncateAddress } from "helpers/truncate-address";
 
@@ -18,8 +20,11 @@ import BountySettings from "./bounty-settings/controller";
 interface BountyHeroProps {
   handleEditIssue?: () => void;
   isEditIssue?: boolean;
+  isOriginModalVisible: boolean;
   bounty: IssueBigNumberData;
   updateBountyData: (updatePrData?: boolean) => void;
+  showOriginModal: () => void;
+  hideOriginModal: () => void;
   network: string | string[];
   currentState: IssueState;
 }
@@ -30,7 +35,10 @@ export default function BountyHeroView({
   bounty,
   updateBountyData,
   network,
-  currentState
+  currentState,
+  isOriginModalVisible,
+  showOriginModal,
+  hideOriginModal
 }: BountyHeroProps) {
   const { t } = useTranslation(["bounty", "common"]);
 
@@ -57,9 +65,10 @@ export default function BountyHeroView({
                   {network} /
                 </span>
                 <span className="text-break">
-                  {bounty?.githubId}
+                  {bounty?.id}
                 </span>
               </div>
+
               <div className="">
                 <BountySettings
                   currentBounty={bounty}
@@ -81,13 +90,13 @@ export default function BountyHeroView({
                       fundedAmount={bounty?.fundedAmount}
                     />
                   </div>
-                  <span className="ms-1 text-white">
-                    {currentState?.charAt(0)?.toUpperCase() +
-                      currentState?.slice(1)}
+
+                  <span className="ms-1 text-white text-capitalize">
+                    {currentState}
                   </span>
                 </div>
 
-                {bounty?.isKyc ? (
+                <If condition={bounty?.isKyc}>
                   <OverlayTrigger
                     key="bottom-githubPath"
                     placement="bottom"
@@ -104,34 +113,46 @@ export default function BountyHeroView({
                       {t("bounty:kyc.label")}
                     </div>
                   </OverlayTrigger>
-                ) : null}
+                </If>
               </div>
-              <div>{renderPriceConversor()}</div>
+
+              <div>
+                {renderPriceConversor()}
+              </div>
             </div>
+
             <h5 className="mt-3 break-title">
               {bounty?.title}
             </h5>
+
             <If condition={!!bounty?.tags?.length}>
               <div className="mt-3 border-bottom border-gray-850 pb-4">
                 <BountyTagsView tags={bounty?.tags} />
               </div>
             </If>
+
             <div 
               className={`py-3 gap-3 d-flex flex-wrap align-items-center border-top 
                 border-gray-850 justify-content-md-start`}
             >
-              <If condition={!!bounty?.repository}>
-                <BountyItemLabel label={t("common:misc.repository")} className="col-12 col-sm-auto">
-                  <span className={`text-truncate`}>
-                    {
-                      bounty?.repository?.githubPath.split("/")?.[1]
-                    }
-                  </span>
+              <If condition={!!bounty?.origin}>
+                <BountyItemLabel label={t("common:misc.origin")} className="col-12 col-sm-3 text-overflow-ellipsis">
+                  <Button
+                    transparent
+                    onClick={showOriginModal}
+                    className="p-0 m-0 font-weight-medium text-decoration-underline"
+                    textClass="text-primary"
+                  >
+                    <span className="text-lowercase">
+                      {bounty?.origin}
+                    </span>
+                  </Button>
                 </BountyItemLabel>
               </If>
-              <BountyItemLabel label={t("common:misc.branch")} className="col-12 col-sm-auto">
-                <span className={`text-truncate`}>
-                  {bounty?.branch}
+
+              <BountyItemLabel label={t("common:misc.type")} className="col-12 col-sm-auto">
+                <span className={`text-truncate text-capitalize`}>
+                  {bounty?.type}
                 </span>
               </BountyItemLabel>
 
@@ -147,17 +168,17 @@ export default function BountyHeroView({
                     <div className="d-flex flex-column justify-content-center">
                       <Avatar
                         size="xsm"
-                        userLogin={bounty?.creatorGithub}
+                        userLogin={bounty?.user?.githubLogin}
                       />{" "}
                     </div>
+
                     <span>
-                      {bounty?.creatorGithub
-                        ? bounty?.creatorGithub
-                        : truncateAddress(bounty?.creatorAddress)}
+                      {bounty?.user?.githubLogin || truncateAddress(bounty?.user?.address)}
                     </span>
                   </>
                 </BountyItemLabel>
               </div>
+
               <If condition={!!bounty?.createdAt}>
                 <BountyItemLabel
                   label={t("common:misc.opened-on")}
@@ -172,6 +193,12 @@ export default function BountyHeroView({
           </div>
         </div>
       </CustomContainer>
+
+      <OriginLinkWarningModal
+        show={isOriginModalVisible}
+        originLink={bounty?.origin}
+        onClose={hideOriginModal}
+      />
     </div>
   );
 }

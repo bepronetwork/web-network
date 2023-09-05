@@ -11,7 +11,6 @@ const ChainEvents = require("../db/models/chain-events.model");
 const TokensModel = require("../db/models/tokens.model");
 const NetworkModel = require("../db/models/network.model");
 const NetworkTokensModel = require("../db/models/network-tokens.model");
-const RepositoryModel = require("../db/models/repositories.model");
 
 const StagingAccounts = require('./staging-accounts');
 
@@ -199,7 +198,6 @@ async function main(option = 0) {
       const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
 
       NetworkModel.init(sequelize);
-      RepositoryModel.init(sequelize);
       ChainModel.init(sequelize);
       ChainEvents.init(sequelize);
       TokensModel.init(sequelize);
@@ -275,15 +273,6 @@ async function main(option = 0) {
           percentageNeededForDispute: 3,
           cancelableTime: 180 * 86400,
           proposerFeeShare: 10
-        }
-      });
-
-      await RepositoryModel.findOrCreate({
-        where: {
-          githubPath: `${NEXT_GH_OWNER}/${NEXT_GH_REPO}`
-        },
-        defaults: {
-          network_id: networkDb.id
         }
       });
 

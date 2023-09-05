@@ -6,7 +6,7 @@
   "labelWithCount_one": "{{count}} pull request",
   "labelWithCount_other": "{{count}} pull requests",
   "abbreviation": "PR",
-  "select": "Select a Pull Request",
+  "select": "Select a deliverable",
   "review_one": "review",
   "review_other": "reviews",
   "reviewWithCount_one": "{{count}} review",

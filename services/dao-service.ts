@@ -580,25 +580,22 @@ export default class DAO {
   async openBounty({
     cid,
     title,
-    repoPath,
-    branch,
-    githubUser = "",
     transactional,
     rewardToken = Defaults.nativeZeroAddress,
     tokenAmount = "0",
     rewardAmount = "0",
     fundingAmount = "0"
   }): Promise<TransactionReceipt> {
-    return this.network.openBounty(tokenAmount,
-                                   transactional,
-                                   rewardToken,
-                                   rewardAmount,
-                                   fundingAmount,
-                                   cid,
-                                   title,
-                                   repoPath,
-                                   branch,
-                                   githubUser);
+    return this.network.openBounty( tokenAmount,
+                                    transactional,
+                                    rewardToken,
+                                    rewardAmount,
+                                    fundingAmount,
+                                    cid,
+                                    title,
+                                    "",
+                                    "",
+                                    "");
   }
 
   async fundBounty(bountyId: number, amount: string, tokenDecimals?: number): Promise<TransactionReceipt> {

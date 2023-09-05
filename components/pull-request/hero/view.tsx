@@ -38,10 +38,12 @@ export default function PullRequestHeroView({
                   className="border rounded-circle border-primary p-1"
                 />
               </div>
+
               <div className="text-truncate">
                 <span className="me-2 text-white-40 caption-large">
-                  #{currentBounty?.githubId}
+                  #{currentBounty?.id}
                 </span>
+
                 <span className="text-gray caption-medium">
                   {currentBounty?.title}
                 </span>
@@ -54,10 +56,12 @@ export default function PullRequestHeroView({
               <div className="col d-flex flex-wrap align-items-center mt-3">
                 <div className="d-inline-flex align-items-center justify-content-md-start gap-2 me-2">
                   <h4>{t("pull-request:title")}</h4>
+
                   <h4 className="text-white-40">
                     #{currentPullRequest?.githubId}
                   </h4>
                 </div>
+
                 <div className="my-2">
                   <PullRequestLabels
                     merged={currentPullRequest?.merged}
@@ -66,6 +70,7 @@ export default function PullRequestHeroView({
                   />
                 </div>
               </div>
+
               <div className="col-6">
                 <div className="d-flex flex-wrap justify-content-end">
                   <PriceConversor
@@ -87,6 +92,7 @@ export default function PullRequestHeroView({
                   className="me-2"
                   userLogin={currentPullRequest?.githubLogin}
                 />{" "}
+
                 <GithubInfo
                   parent="hero"
                   variant="user"

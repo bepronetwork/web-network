@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 import { Network } from "interfaces/network";
 import { Payment } from "interfaces/payments";
-import { Proposal, INetworkProposal } from "interfaces/proposal";
+import { Proposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
 
 import { User } from "./api";
@@ -30,23 +30,14 @@ export interface IssueData {
   fundedAmount?: string;
   rewardAmount?: string;
   body: string;
-  branch?: string;
   createdAt: Date;
-  creatorAddress?: string;
-  creatorGithub?: string;
-  developers: developer[];
   dueDate?: string;
-  githubId: string;
-  issueId: string; // custom id repo/githubid
   mergeProposals: Proposal[];
   merged: string;
   numberOfComments: number;
   owner?: string;
   network_id?: number;
   pullRequests: PullRequest[];
-  repo?: string;
-  repository?: Repository;
-  repository_id?: number;
   seoImage: string;
   nftImage?: string;
   state: IssueState;
@@ -75,6 +66,11 @@ export interface IssueData {
   visible: boolean;
   kycTierList: number[];
   contractCreationDate?: string;
+  ipfsUrl?: string;
+  type?: string;
+  origin?: string;
+  userId: number;
+  user?: User;
 }
 
 export interface Disputes {
@@ -90,25 +86,6 @@ export interface IssueBigNumberData
   fundingAmount: BigNumber;
   fundedAmount: BigNumber;
   rewardAmount: BigNumber;
-}
-
-export interface IssueNetwork extends IssueBigNumberData {
-  networkName?: string;
-  totalValueLock?: BigNumber;
-  issues?: IssueBigNumberData[]
-}
-export interface IssueSearch {
-  rows: IssueNetwork[] | [],
-  count: number,
-  pages: number,
-  currentPage: number
-}
-
-export interface Repository {
-  id: number;
-  githubPath: string;
-  network?: Network;
-  mergeCommitAllowed?: boolean;
 }
 
 export interface PullRequest {
@@ -139,13 +116,6 @@ export interface PullRequest {
   isCancelable: boolean;
 }
 
-export interface developer {
-  id?: number;
-  login?: string;
-  avatar_url?: string;
-  url?: string;
-  type?: string;
-}
 export interface IssueDataComment {
   id: number;
   comment: string;
@@ -164,20 +134,6 @@ export interface IssueDataComment {
 
 export interface GithubUser {
   login: string;
-}
-
-export interface INetworkIssue {
-  _id: number;
-  canceled: boolean;
-  cid: CID | string;
-  creationDate: Date | number;
-  finalized: boolean;
-  issueGenerator: string;
-  mergeProposalAmount: number;
-  recognizedAsFinished: boolean;
-  isDraft: boolean;
-  tokensStaked: number;
-  networkProposals: INetworkProposal[];
 }
 
 export interface fundingBenefactor {

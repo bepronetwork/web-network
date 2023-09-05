@@ -28,6 +28,9 @@ export const changeCurrentUser = new ChangeCurrentUser();
 export const changeCurrentUserLogin = (login: string) =>
   changeCurrentUser.update({login});
 
+export const changeCurrentUserId = (id: number) =>
+  changeCurrentUser.update({id});  
+
 export const changeCurrentUserAccessToken = (accessToken: string) =>
   changeCurrentUser.update({accessToken});
 

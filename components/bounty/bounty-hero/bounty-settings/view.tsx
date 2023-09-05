@@ -1,6 +1,4 @@
 import {
-    MouseEventHandler,
-    ReactNode,
     useEffect,
     useRef,
     useState,
@@ -8,24 +6,19 @@ import {
   
 import { useTranslation } from "next-i18next";
   
-import ArrowUpRight from "assets/icons/arrow-up-right";
-  
 import Modal from "components/modal";
 import Translation from "components/translation";
 
 import { ServiceNetwork } from "interfaces/application-state";
-import { IssueBigNumberData } from "interfaces/issue-data";
 
 interface BountySettingsViewProps {
     handleEditIssue?: () => void;
     isEditIssue?: boolean;
     handleHardCancel?: () => void;
     handleRedeem?: () => void;
-    bounty: IssueBigNumberData;
     network: ServiceNetwork;
     isWalletConnected: boolean;
     isBountyInDraft: boolean;
-    hasOpenPullRequest: boolean;
     isBountyOwner: boolean;
     isCancelable: boolean;
     isFundingRequest: boolean;
@@ -38,11 +31,9 @@ export default function BountySettingsView({
     handleHardCancel,
     handleRedeem,
     isEditIssue,
-    bounty,
     network,
     isWalletConnected,
     isBountyInDraft,
-    hasOpenPullRequest,
     isBountyOwner,
     isCancelable,
     isFundingRequest,
@@ -76,49 +67,6 @@ export default function BountySettingsView({
     else document.removeEventListener("mousedown", handleClick);
   
     return () => document.removeEventListener("mousedown", handleClick);
-  }
-  
-  function GithubLink({
-      children,
-      forcePath,
-      hrefPath,
-      onClick,
-    }: {
-      forcePath?: string;
-      hrefPath: string;
-      children: ReactNode;
-      onClick?: MouseEventHandler<HTMLAnchorElement>;
-    }) {
-    return (
-        <a
-          href={`https://github.com/${forcePath}/${hrefPath}`}
-          target="_blank"
-          rel="noreferrer"
-          className="text-decoration-none text-white hover-gray"
-          onClick={onClick}
-        >
-          {children} <ArrowUpRight className="ms-1" />
-        </a>
-    );
-  }
-  
-  function renderViewPullRequestLink() {
-    if (
-        isWalletConnected &&
-        !isBountyInDraft &&
-        hasOpenPullRequest
-      )
-      return (
-          <span className="d-flex cursor-pointer">
-            <GithubLink
-              forcePath={bounty?.repository?.githubPath}
-              hrefPath={`pull?q=base:${bounty?.branch}`}
-              onClick={handleHide}
-            >
-              <Translation ns="pull-request" label="actions.view" />
-            </GithubLink>
-          </span>
-      );
   }
 
   function handleEditClick() {
@@ -178,21 +126,6 @@ export default function BountySettingsView({
   function renderActions() {
     return (
         <>
-          <span className="d-flex cursor-pointer">
-            <GithubLink
-              forcePath={bounty?.repository?.githubPath}
-              hrefPath={`${
-                (bounty?.state?.toLowerCase() ===
-                  "pull request" &&
-                  "pull") ||
-                "issues"
-              }/${bounty?.githubId || ""}`}
-              onClick={handleHide}
-            >
-              {t("actions.view-on-github")}
-            </GithubLink>
-          </span>
-          {renderViewPullRequestLink()}
           {renderEditButton()}
           {renderCancel()}
         </>
@@ -223,6 +156,7 @@ export default function BountySettingsView({
             </div>
           </div>
         </div>
+
         <Modal
           title={t("modals.hard-cancel.title")}
           centerTitle

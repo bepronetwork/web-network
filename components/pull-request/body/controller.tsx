@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import { useAppState } from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
+import { lowerCaseCompare } from "helpers/string";
+
 import { MetamaskErrors } from "interfaces/enums/Errors";
 import { NetworkEvents } from "interfaces/enums/events";
 import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
@@ -21,7 +23,6 @@ interface PullRequestBodyControllerProps {
   currentBounty: IssueBigNumberData;
   isCreatingReview: boolean;
   updateBountyData: () => void;
-  updatePrDetails: () => void;
   handleShowModal: () => void;
   updateComments: () => void;
 }
@@ -31,50 +32,33 @@ export default function PullRequestBody({
   currentBounty,
   isCreatingReview,
   updateBountyData,
-  updatePrDetails,
   handleShowModal,
   updateComments
 }: PullRequestBodyControllerProps) {
+  const router = useRouter();
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [isCancelling, setIsCancelling] = useState(false);
   const [isMakingReady, setIsMakingReady] = useState(false);
 
-  const { state, dispatch } = useAppState();
-
-  const router = useRouter();
-  const { getURLWithNetwork } = useNetwork();
   const { processEvent } = useApi();
-
+  const { state, dispatch } = useAppState();
+  const { getURLWithNetwork } = useNetwork();
   const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isPullRequestOpen = currentPullRequest?.state?.toLowerCase() === "open";
   const isPullRequestReady = !!currentPullRequest?.isReady;
   const isPullRequestCanceled = !!currentPullRequest?.isCanceled;
   const isPullRequestCancelable = !!currentPullRequest?.isCancelable;
-  const isPullRequestCreator =
-    currentPullRequest?.userAddress === state.currentUser?.walletAddress;
-  const branchProtectionRules =
-    state.Service?.network?.repos?.active?.branchProtectionRules;
-  const approvalsRequired = branchProtectionRules
-    ? branchProtectionRules[currentBounty?.branch]
-        ?.requiredApprovingReviewCount || 0
-    : 0;
-  const canUserApprove =
-    state.Service?.network?.repos?.active?.viewerPermission !== "READ";
-  const approvalsCurrentPr = currentPullRequest?.approvals?.total || 0;
-  const prsNeedsApproval = approvalsCurrentPr < approvalsRequired;
+  const isPullRequestCreator = lowerCaseCompare(currentPullRequest?.userAddress, state.currentUser?.walletAddress);
 
   const isMakeReviewButton =
     isWalletConnected &&
-    isPullRequestOpen &&
     isPullRequestReady &&
     !isPullRequestCanceled;
 
   const isMakeReadyReviewButton =
     isWalletConnected &&
-    isPullRequestOpen &&
     !isPullRequestReady &&
     !isPullRequestCanceled &&
     isPullRequestCreator;
@@ -85,20 +69,12 @@ export default function PullRequestBody({
     isPullRequestCancelable &&
     isPullRequestCreator;
 
-  const isApproveLink =
-    isWalletConnected &&
-    prsNeedsApproval &&
-    canUserApprove &&
-    isPullRequestReady &&
-    !isPullRequestCanceled;
-
   function handleMakeReady() {
     if (!currentBounty || !currentPullRequest) return;
 
     setIsMakingReady(true);
 
-    handleMakePullRequestReady(currentBounty.contractId,
-                               currentPullRequest.contractId)
+    handleMakePullRequestReady(currentBounty.contractId, currentPullRequest.contractId)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         return processEvent(NetworkEvents.PullRequestReady, undefined, {
@@ -132,8 +108,7 @@ export default function PullRequestBody({
   function handleCancel() {
     setIsCancelling(true);
 
-    handleCancelPullRequest(currentBounty?.contractId,
-                            currentPullRequest?.contractId)
+    handleCancelPullRequest(currentBounty?.contractId, currentPullRequest?.contractId)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         return processEvent(NetworkEvents.PullRequestCanceled, undefined, {
@@ -142,16 +117,14 @@ export default function PullRequestBody({
       })
       .then(() => {
         updateBountyData();
-        updatePrDetails();
         dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("pull-request:actions.cancel.success"),
         }));
 
-        router.push(getURLWithNetwork("/bounty", {
-            id: currentBounty.githubId,
-            repoId: currentBounty.repository_id,
+        router.push(getURLWithNetwork("/bounty/[id]", {
+            id: currentBounty.id
         }));
       })
       .catch((error) => {
@@ -177,10 +150,8 @@ export default function PullRequestBody({
       isMakeReviewButton={isMakeReviewButton}
       isMakeReadyReviewButton={isMakeReadyReviewButton}
       isCancelButton={isCancelButton}
-      isApproveLink={isApproveLink}
       isCancelling={isCancelling}
       isMakingReady={isMakingReady}
-      githubPath={state.Service?.network?.repos?.active?.githubPath}
       updateComments={updateComments}
       currentUser={state.currentUser}
       bountyId={currentBounty?.id}

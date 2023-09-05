@@ -18,7 +18,7 @@ interface PullAndProposalHeroViewPRops {
   createdAt: Date;
   creatorAddress: string;
   issueTitle: string;
-  issueGithubId: string;
+  issueId: string;
   issueAmount: BigNumber;
   transactionalTokenSymbol: string;
   isProposal: boolean;
@@ -31,7 +31,7 @@ export default function PullAndProposalHeroView({
   createdAt,
   creatorAddress,
   issueTitle,
-  issueGithubId,
+  issueId,
   isProposal,
   issueAmount,
   transactionalTokenSymbol,
@@ -55,7 +55,7 @@ export default function PullAndProposalHeroView({
 
           <div className="col-auto px-0">
             <span className="me-2 text-gray-500 caption-large font-weight-medium">
-              #{issueGithubId}
+              #{issueId}
             </span>
           </div>
 

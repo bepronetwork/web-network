@@ -12,6 +12,7 @@ import {useAppState} from "contexts/app-state";
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { commentsParser, issueParser, mergeProposalParser, pullRequestParser } from "helpers/issue";
 import { isProposalDisputable } from "helpers/proposal";
+import { lowerCaseCompare } from "helpers/string";
 
 import { IssueData, IssueDataComment } from "interfaces/issue-data";
 import { DistributedAmounts } from "interfaces/proposal";
@@ -49,13 +50,6 @@ export default function ProposalPage(props: ProposalPageProps) {
   const pullRequest = pullRequestParser(proposal?.pullRequest);
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.token");
 
-  const allowMergeCommit = issue?.repository?.mergeCommitAllowed;
-  const branchProtectionRules = state.Service?.network?.repos?.active?.branchProtectionRules;
-  const approvalsRequired = branchProtectionRules
-    ? branchProtectionRules[issue?.branch]?.requiredApprovingReviewCount || 0
-    : 0;
-  const approvalsCurrentPr = pullRequest?.approvals?.total || 0;
-  const prsNeedsApproval = approvalsCurrentPr < approvalsRequired;
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isPrOwner = toLower(pullRequest?.userAddress) === toLower(state.currentUser?.walletAddress);
   const isProposalOwner = toLower(proposal?.creator) === toLower(state.currentUser?.walletAddress);
@@ -77,8 +71,7 @@ export default function ProposalPage(props: ProposalPageProps) {
     !issue?.isCanceled,
     !proposal?.isDisputed,
     !proposal?.refusedByBountyOwner,
-    issue?.creatorAddress?.toLowerCase() ===
-    state.currentUser?.walletAddress?.toLowerCase(),
+    lowerCaseCompare(issue?.user?.address, state.currentUser?.walletAddress),
   ].every((v) => v);
 
   const isMergeable = [
@@ -89,8 +82,6 @@ export default function ProposalPage(props: ProposalPageProps) {
     !proposal?.isDisputed,
     !proposal?.refusedByBountyOwner,
     !isDisputable,
-    allowMergeCommit === true,
-    !prsNeedsApproval,
     !isPrOwner,
     !isProposalOwner,
   ].every((v) => v);
@@ -177,10 +168,8 @@ export default function ProposalPage(props: ProposalPageProps) {
       isDisputable={isDisputable}
       isRefusable={isRefusable}
       isMergeable={isMergeable}
-      allowMergeCommit={allowMergeCommit}
       isPrOwner={isPrOwner}
       isProposalOwner={isProposalOwner}
-      prsNeedsApproval={prsNeedsApproval}
       comments={proposalComments}
       updateComments={updateProposalComments}
       userData={state.currentUser}

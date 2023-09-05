@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { SSRConfig, useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -21,10 +21,7 @@ import {
   PullRequest,
 } from "interfaces/issue-data";
 
-import {
-  getBountyData,
-  getPullRequestsDetails,
-} from "x-hooks/api/bounty/get-bounty-data";
+import { getBountyData } from "x-hooks/api/bounty/get-bounty-data";
 import getCommentsData from "x-hooks/api/comments/get-comments-data";
 import CreateComment from "x-hooks/api/comments/post-comments";
 
@@ -35,8 +32,8 @@ interface PagePullRequestProps {
 }
 
 export default function PullRequestPage({ pullRequest, bounty }: PagePullRequestProps) {
-  const { t } = useTranslation(["common", "pull-request"]);
   const router = useRouter();
+  const { t } = useTranslation(["common", "pull-request"]);
 
   const { prId, review } = router.query;
 
@@ -76,21 +73,6 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
       ...currentPullRequest,
       comments: commentsParser(comments)
      }))
-  }
-
-  function updatePrDetails() {
-    getPullRequestsDetails(currentBounty?.repository?.githubPath, [
-      currentPullRequest,
-    ]).then((details) => {
-      if (details?.length > 0)
-        setCurrentPullRequest({
-          ...currentPullRequest,
-          comments: currentPullRequest.comments,
-          isMergeable: details[0]?.isMergeable,
-          merged: details[0]?.merged,
-          state: details[0]?.state,
-        });
-    });
   }
 
   function handleCreateReview(body: string) {
@@ -140,7 +122,6 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
         currentBounty={currentBounty} 
         isCreatingReview={isCreatingReview} 
         updateBountyData={updateBountyData}
-        updatePrDetails={updatePrDetails}
         updateComments={updateCommentData}
         handleShowModal={handleShowModal}      
       />
@@ -162,20 +143,14 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
   const { prId } = query;
 
-  const bountyDatabase = await getBountyData(query)
+  const bountyDatabase = await getBountyData(query);
 
-  const pullRequestDatabase = bountyDatabase?.pullRequests?.find((pr) => +pr.githubId === +prId)
+  const pullRequestDatabase = bountyDatabase?.pullRequests?.find((pr) => +pr.githubId === +prId);
 
-  const pullRequestDetail = await getPullRequestsDetails(bountyDatabase?.repository?.githubPath,
-                                                         [pullRequestDatabase]);
-
-  const pullRequestComments = await getCommentsData({ deliverableId: pullRequestDatabase?.id.toString() })
+  const pullRequestComments = await getCommentsData({ deliverableId: pullRequestDatabase?.id.toString() });
 
   const pullRequest: PullRequest = {
     ...pullRequestDatabase,
-    isMergeable: pullRequestDetail[0]?.isMergeable,
-    merged: pullRequestDetail[0]?.merged,
-    state: pullRequestDetail[0]?.state,
     comments: pullRequestComments
   }
                                                            

@@ -32,14 +32,15 @@ export default function PaymentsNetwork({
     });
   }
 
-  function redirectToNetwork(id = undefined, repoId = undefined) {
-    const isBountyRedirect = !!id && !!repoId;
-    const path = isBountyRedirect ? "/bounty" : "/bounties";
+  function redirectToNetwork(id = undefined) {
+    const isBountyRedirect = !!id;
+
+    const path = isBountyRedirect ? "/bounty/[id]" : "/bounties";
 
     push(getURLWithNetwork(path, {
       network: networkPayments?.name,
       chain: networkPayments?.chain?.chainShortName,
-      ... isBountyRedirect ? { id, repoId } : {}
+      ... isBountyRedirect ? { id } : {}
     }));
   }
 
@@ -49,11 +50,9 @@ export default function PaymentsNetwork({
 
   function goToBounty(payment) {
     return () => {
-      if (!payment?.issue?.issueId) return;
+      if (!payment?.issue?.id) return;
 
-      const [repoId, id] = payment.issue.issueId.split("/");
-
-      redirectToNetwork(id, repoId);
+      redirectToNetwork(payment?.issue?.id);
     };
   }
 

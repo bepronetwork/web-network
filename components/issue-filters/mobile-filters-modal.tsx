@@ -39,7 +39,7 @@ export default function MobileFiltersModal({
   const router = useRouter();
   const isOnNetwork = !!router?.query?.network;
   const [selectedSortIndex, setSelectedSortIndex] = useState<number>();
-  const [ [repoOptions, stateOptions, timeOptions], , , checkOption, applyFilters ] = useFilters();
+  const [ [, stateOptions, timeOptions], , , checkOption, applyFilters ] = useFilters();
 
   
   const defaultSortOptions = sortOptions ? sortOptions : [
@@ -116,11 +116,6 @@ export default function MobileFiltersModal({
       </If>
 
       <If condition={!onlyTimeFrame && !onlyProfileFilters}>
-        <FilterComponent 
-          label={t('filters.repository')}
-          options={repoOptions}
-          onChange={(e) => checkOption(e, "repo")}
-        />
         <FilterComponent 
           label={t('filters.bounties.title')}
           options={stateOptions}

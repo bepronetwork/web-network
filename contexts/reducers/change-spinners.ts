@@ -14,7 +14,6 @@ export interface Spinners {
   matching: boolean;
   connecting: boolean;
   connectingGH: boolean;
-  repos: boolean;
   changingChain: boolean;
   signingMessage: boolean;
   switchingChain: boolean;

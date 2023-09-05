@@ -12,7 +12,6 @@ interface PullRequestDetailsViewProps {
   githubId: string;
   creatorGithubLogin: string;
   branch: string;
-  repositoryPath: string;
   createdAt: Date;
   isMerged: boolean;
   isMergeable: boolean;
@@ -23,7 +22,6 @@ export default function PullRequestDetailsView({
   githubId,
   creatorGithubLogin,
   branch,
-  repositoryPath,
   createdAt,
   isMerged,
   isMergeable,
@@ -70,16 +68,6 @@ export default function PullRequestDetailsView({
               />
             </div>
           </div>
-        </div>
-
-        <div className="col-xs-12 col-xl-auto">
-          <span className="caption-small">
-            <GithubInfo
-              parent="list"
-              variant="repository"
-              label={repositoryPath}
-            />
-          </span>
         </div>
 
         <div className="col-xs-12 col-xl-auto">

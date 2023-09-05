@@ -6,8 +6,6 @@ import {IssueData} from "interfaces/issue-data";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
 
-import { RepoInfo } from "./repos-list";
-
 export interface Network {
   id: number;
   name: string;
@@ -53,7 +51,6 @@ export interface Network {
   chain?: SupportedChainData;
   issues?: IssueData[];
   allowMerge: boolean;
-  repositories?: RepoInfo[];
   banned_domains: string[];
 }
 
@@ -80,17 +77,6 @@ export interface Color {
 export interface Icon {
   preview: string;
   raw: File;
-}
-
-export interface Repository {
-  mergeCommitAllowed: boolean;
-  userPermission?: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
-  checked: boolean;
-  name: string;
-  fullName: string;
-  isSaved?: boolean;
-  hasIssues?: boolean;
-  label?: string;
 }
 
 export interface Theme {
@@ -147,12 +133,6 @@ export interface NetworkSettings {
       validated?: boolean;
     };
     validated: boolean;
-  };
-  github?: {
-    repositories: Repository[];
-    botPermission: boolean;
-    validated: boolean;
-    allowMerge: boolean;
   };
   tokens?: {
     settler: string;

@@ -22,10 +22,8 @@ interface ProposalActionsProps {
   isDisputable: boolean;
   isRefusable: boolean;
   isMergeable: boolean;
-  allowMergeCommit: boolean;
   isPrOwner: boolean;
   isProposalOwner: boolean;
-  prsNeedsApproval: boolean;
 }
 
 export default function ProposalActions({
@@ -39,10 +37,8 @@ export default function ProposalActions({
   isDisputable,
   isRefusable,
   isMergeable,
-  allowMergeCommit,
   isPrOwner,
   isProposalOwner,
-  prsNeedsApproval,
 }: ProposalActionsProps) {
   const { t } = useTranslation(["common", "pull-request", "proposal"]);
 
@@ -57,8 +53,6 @@ export default function ProposalActions({
     }),
     (isPrOwner && !isProposalDisputable && !isProposalFailedOrMerged) && t("proposal:messages.owner-pull-request"),
     (isProposalOwner && !isProposalDisputable && !isProposalFailedOrMerged) && t("proposal:messages.owner-proposal"),
-    allowMergeCommit === false && t("pull-request:errors.merge-commit"),
-    prsNeedsApproval && t("pull-request:errors.approval"),
   ].filter(warning => warning);
 
   return (

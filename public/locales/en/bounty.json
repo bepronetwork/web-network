@@ -106,7 +106,9 @@
     "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
     "description-limit": "Exceeds allowed limit of characters and files: {{value}}",
     "no-networks-chain": "The selected chain has no active networks",
-    "bounty-update": "Bounty update failed"
+    "bounty-update": "Bounty update failed",
+    "banned-domain": "This domain is banned and cannot be used to open bounties.",
+    "failed-to-cancel": "Bounty could not be canceled"
   },
   "title": "Create new Bounty",
   "fields": {
@@ -135,6 +137,20 @@
     },
     "conversion-token": {
       "not-found": "Can't convert because not found"
+    },
+    "deliverable-types": {
+      "label": "Deliverable Types",
+      "description": "Specify the type of work for this bounty.",
+      "types": {
+        "code": "Code",
+        "design": "Design",
+        "other": "Other"
+      }
+    },
+    "origin-link": {
+      "label": "Origin Link",
+      "description": "If you have a project boilerplate, a figma design, or something that might help people to work on this bounty, you can provide a link below.",
+      "placeholder": "github.com"
     }
   },
   "reward-funders": "Set Funders Reward",
@@ -205,5 +221,13 @@
   "total-amount": {
     "title": "Total Amount",
     "description": "Amount you will pay for this bounty (reward + services fees)"
+  },
+  "modals": {
+    "origin-link-warning": {
+      "title": "Origin",
+      "you-are-going-to": "You are going to navigate to",
+      "provided-by": "This link was provided by the bounty creator. Please be careful and access only if you know the domain.",
+      "open-link": "Open link"
+    }
   }
 }

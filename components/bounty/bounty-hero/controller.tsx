@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useRouter } from "next/router";
 
 import { getIssueState } from "helpers/handleTypeIssue";
@@ -19,12 +21,17 @@ export default function BountyHero({
 }) {
   const router = useRouter();
 
+  const [isOriginModalVisible, setIsOriginModalVisible] = useState(false);
+
   const { network } = router.query;
   const currentState = getIssueState({
     state: currentBounty?.state,
     amount: currentBounty?.amount,
     fundingAmount: currentBounty?.fundingAmount,
   });
+
+  const showOriginModal = () => setIsOriginModalVisible(true);
+  const hideOriginModal = () => setIsOriginModalVisible(false);
 
   return (
     <BountyHeroView
@@ -34,6 +41,9 @@ export default function BountyHero({
       currentState={currentState}
       handleEditIssue={handleEditIssue}
       isEditIssue={isEditIssue}
+      isOriginModalVisible={isOriginModalVisible}
+      showOriginModal={showOriginModal}
+      hideOriginModal={hideOriginModal}
     />
   );
 }

@@ -7,13 +7,11 @@ import { Spinners } from "contexts/reducers/change-spinners";
 import {XReducerAction} from "contexts/reducers/reducer";
 
 import {Balance} from "interfaces/balance-state";
-import {BranchesList} from "interfaces/branches-list";
 import { MatchAccountsStatus } from "interfaces/enums/api";
 import {IssueBigNumberData, IssueDataComment} from "interfaces/issue-data";
 import {kycSession} from "interfaces/kyc-session";
 import {LoadingState} from "interfaces/loading-state";
 import {Network} from "interfaces/network";
-import {ForkInfo, ForksList, RepoInfo, ReposList} from "interfaces/repos-list";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 import {ToastNotification} from "interfaces/toast-notification";
 import {Token} from "interfaces/token";
@@ -22,23 +20,6 @@ import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction}
 import DAO from "services/dao-service";
 
 import {SettingsType, Tier} from "types/settings";
-
-export interface ServiceNetworkReposActive extends RepoInfo {
-  forks?: ForkInfo[];
-  branches?: string[];
-  ghVisibility?: boolean;
-  githubPath: string;
-  branchProtectionRules?: any;
-  viewerPermission?: string;
-  id: number;
-}
-
-export interface ServiceNetworkRepos {
-  list: ReposList;
-  forks: ForksList | null;
-  branches: BranchesList | null;
-  active: ServiceNetworkReposActive | null;
-}
 
 export interface NetworkTimes {
   disputableTime: string|number;
@@ -58,7 +39,6 @@ export interface NetworkAmounts {
 export interface ServiceNetwork {
   lastVisited: string;
   active: Network | null;
-  repos: ServiceNetworkRepos | null;
   times: NetworkTimes;
   amounts: NetworkAmounts;
   noDefaultNetwork?: boolean;
@@ -96,6 +76,7 @@ export interface CurrentUserState {
   hasRegisteredNetwork?: boolean;
   kyc?: kycSession;
   kycSession?: kycSession;
+  id?: number;
 }
 
 export interface CurrentBounty {

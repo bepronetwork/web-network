@@ -103,7 +103,7 @@ export interface RewardInformationViewProps {
   updateIsFunding: (v: boolean) => void;
 }
 
-export interface RewardInformationControllerProps {
+export interface RewardInformationSectionProps {
   isFundingType: boolean;
   rewardChecked: boolean;
   transactionalToken: Token;
