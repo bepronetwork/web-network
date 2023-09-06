@@ -20,6 +20,7 @@ interface OracleToken {
 interface VotingPowerNetworkViewProps {
     oraclesLocked: BigNumber;
     oraclesDelegatedToMe: BigNumber;
+    oraclesDelegatedToOthers: BigNumber;
     oracleToken: OracleToken;
     votesSymbol: string;
     walletAddress: string;
@@ -33,6 +34,7 @@ interface VotingPowerNetworkViewProps {
 export default function VotingPowerNetworkView({
     oraclesLocked,
     oraclesDelegatedToMe,
+    oraclesDelegatedToOthers,
     oracleToken,
     votesSymbol,
     walletAddress,
@@ -48,6 +50,7 @@ export default function VotingPowerNetworkView({
       <TotalVotes
         votesLocked={oraclesLocked}
         votesDelegatedToMe={oraclesDelegatedToMe}
+        votesDelegatedToOthers={oraclesDelegatedToOthers}
         icon={oracleToken.icon}
         tokenName={oracleToken.name}
         tokenSymbol={oracleToken.symbol}
