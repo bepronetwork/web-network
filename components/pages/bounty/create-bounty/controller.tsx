@@ -16,9 +16,10 @@ import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 import {BODY_CHARACTERES_LIMIT, UNSUPPORTED_CHAIN} from "helpers/constants";
 import { addFilesToMarkdown } from "helpers/markdown";
 import {parseTransaction} from "helpers/transactions";
+import { isValidUrl } from "helpers/validateUrl";
 
 import {BountyPayload} from "interfaces/create-bounty";
-import {MetamaskErrors} from "interfaces/enums/Errors";
+import {MetamaskErrors, OriginLinkErrors} from "interfaces/enums/Errors";
 import {NetworkEvents} from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
@@ -29,7 +30,7 @@ import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
 import {getCoinInfoByContract, getCoinList} from "services/coingecko";
 
-import useCreatePreBounty from "x-hooks/api/bounty/use-create-pre-bounty";
+import { useCreatePreBounty } from "x-hooks/api/bounty";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useDao} from "x-hooks/use-dao";
@@ -75,7 +76,7 @@ export default function CreateBountyPage({
   const [networksOfConnectedChain, setNetworksOfConnectedChain] = useState<Network[]>([]);
   const [deliverableType, setDeliverableType] = useState<string>();
   const [originLink, setOriginLink] = useState<string>("");
-  const [isOriginLinkBanned, setIsOriginLinkBanned] = useState(false);
+  const [originLinkError, setOriginLinkError] = useState<OriginLinkErrors>();
 
   const rewardERC20 = useERC20();
   const transactionalERC20 = useERC20();
@@ -118,13 +119,24 @@ export default function CreateBountyPage({
     return !!currentNetwork?.banned_domains?.some(banned => link.toLowerCase().includes(banned.toLowerCase()));
   }
 
-  const validateBannedDomainDebounced = useDebouncedCallback((link: string) => {
-    setIsOriginLinkBanned(validateBannedDomain(link));
+  const validateDomainDebounced = useDebouncedCallback((link: string) => {
+    if (!link) {
+      setOriginLinkError(undefined);
+      return;
+    }
+    const isValid = isValidUrl(link);
+    const isBanned = validateBannedDomain(link);
+    if (!isValid)
+      setOriginLinkError(OriginLinkErrors.Invalid);
+    else if (isBanned) 
+      setOriginLinkError(OriginLinkErrors.Banned);
+    else 
+      setOriginLinkError(undefined);
   }, 500);
 
   function handleOriginLinkChange(newLink: string) {
     setOriginLink(newLink);
-    validateBannedDomainDebounced(newLink);
+    validateDomainDebounced(newLink);
   }
 
   async function handleCustomTokens(tokens: Token[]) {
@@ -179,7 +191,7 @@ export default function CreateBountyPage({
     )
       return true;
 
-    if (section === 1 && (!deliverableType || validateBannedDomain(originLink))) return true;
+    if (section === 1 && (!deliverableType || !!originLinkError)) return true;
 
     if (section === 2 && !isFundingType && isIssueAmount) return true;
     if (
@@ -547,7 +559,7 @@ export default function CreateBountyPage({
       updateTierList={setTierList}
       updateUploading={setIsUploading}
       originLink={originLink}
-      isOriginLinkBanned={isOriginLinkBanned}
+      originLinkError={originLinkError}
       onOriginLinkChange={handleOriginLinkChange}
       setDeliverableType={setDeliverableType}
       isFundingType={isFundingType} 

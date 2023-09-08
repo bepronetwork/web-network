@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 import Link from 'next/link';
@@ -54,7 +55,7 @@ export default function ListActiveNetworksItem({
               </div>
               <div className="d-flex align-items-center justify-content-between mt-2 text-nowrap">
                 <div className="bg-dark-gray p-1 px-2 border-radius-8">
-                  {formatNumberToNScale(network?.totalValueLock.toFixed(0),
+                  {formatNumberToNScale(BigNumber(network?.totalValueLock).toFixed(0),
                                         0) || 0}{" "}
                   <span className="text-uppercase text-gray-500">
                     TVL

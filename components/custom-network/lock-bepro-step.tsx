@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {ProgressBar} from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
+import { useSession } from "next-auth/react";
 import {useTranslation} from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
@@ -20,15 +21,19 @@ import { UNSUPPORTED_CHAIN } from "helpers/constants";
 import {formatNumberToCurrency, formatNumberToNScale} from "helpers/formatNumber";
 import {parseTransaction} from "helpers/transactions";
 
+import { CustomSession } from "interfaces/custom-session";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {StepWrapperProps} from "interfaces/stepper";
 import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
+import { UserRoleUtils } from "server/utils/jwt";
+
 import {useAuthentication} from "x-hooks/use-authentication";
 import useERC20 from "x-hooks/use-erc20";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
+  const session = useSession();
   const { t } = useTranslation(["common", "bounty","custom-network"]);
 
   const [amount, setAmount] = useState<BigNumber>();
@@ -37,6 +42,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
+  const [hasNetworkRegistered, setHasNetworkRegistered] = useState(false);
 
   const registryToken = useERC20();
   const { state, dispatch } = useAppState();
@@ -70,8 +76,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     amount?.gt(maxValue)
   ].some(c => c);
   const isUnlockBtnDisabled = 
-    lockedPercent?.isZero() || lockedPercent?.isNaN() || !!state.currentUser?.hasRegisteredNetwork;
-  const isAmountInputDisabled = !!lockedPercent?.gte(100) || !!state.currentUser?.hasRegisteredNetwork;
+    lockedPercent?.isZero() || lockedPercent?.isNaN() || !!hasNetworkRegistered;
+  const isAmountInputDisabled = !!lockedPercent?.gte(100) || !!hasNetworkRegistered;
 
   const failTx = (err, tx) => {
 
@@ -194,6 +200,13 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     state.Service?.active?.registry?.contractAddress,
     state.connectedChain?.name
   ]);
+
+  useEffect(() => {
+    if (session.status !== "authenticated" || !state.connectedChain?.id) return;
+
+    const userRoles = (session.data as CustomSession).user.roles;
+    setHasNetworkRegistered(UserRoleUtils.isGovernorOnChain(userRoles, state.connectedChain?.id));
+  }, [session, state.connectedChain?.id]);
 
   return (
     <Step

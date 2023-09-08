@@ -93,6 +93,7 @@
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",
+  "select-a-network": "Select a network",
   "support-text-branch": "If you’re unsure of what branch to choose, ask",
   "the-community": "the community",
   "select-multiple": {

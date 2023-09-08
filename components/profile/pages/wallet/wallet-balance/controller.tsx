@@ -18,27 +18,24 @@ import { Token } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import useApi from "x-hooks/use-api";
+import { useSearchCurators } from "x-hooks/api/curator";
+import { useGetTokens } from "x-hooks/api/token";
 import { useNetwork } from "x-hooks/use-network";
+import useReactQuery from "x-hooks/use-react-query";
 
 import WalletBalanceView from "./view";
 
 export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
 
-  const [totalAmount, setTotalAmount] = useState("0");
-  const [tokensOracles, setTokensOracles] = useState<TokensOracles[]>();
-  const [tokens, setTokens] = useState<TokenBalanceType[]>();
-  const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
-  const [searchState, setSearchState] = useState("");
   const [search, setSearch] = useState("");
+  const [searchState, setSearchState] = useState("");
+  const [totalAmount, setTotalAmount] = useState("0");
+  const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
-  const debouncedSearchUpdater = useDebouncedCallback((value) => setSearch(value),
-                                                      500);
+  const debouncedSearchUpdater = useDebouncedCallback((value) => setSearch(value), 500);
 
   const { state } = useAppState();
-
-  const { searchCurators, getTokens } = useApi();
   const { getURLWithNetwork } = useNetwork();
   const { query, push, pathname, asPath } = useRouter();
 
@@ -95,15 +92,13 @@ export default function WalletBalance() {
     );
   }
 
-  function loadOracleBalance() {
-    if (!state.currentUser?.walletAddress) return;
-
-    searchCurators({
+  function loadOracleBalance(): Promise<TokensOracles[]> {
+    return useSearchCurators({
       address: state.currentUser?.walletAddress,
       chainShortName:
         query?.chain?.toString() || state?.connectedChain?.shortName,
     }).then(({ rows }) => {
-      Promise.all(rows?.map(async (curator) => {
+      return Promise.all(rows?.map(async (curator) => {
         const tokenInformation = await getCoinInfoByContract(curator?.network?.networkToken?.symbol);
 
         return {
@@ -116,30 +111,31 @@ export default function WalletBalance() {
             oraclesLocked: BigNumber(curator.tokensLocked),
             networkName: curator?.network?.name,
         };
-      })).then(setTokensOracles);
+      }));
     });
   }
 
-  function loadTokensBalance() {
-    if (state.Service?.starting || !state.currentUser?.walletAddress) return;
-
-    getTokens(state?.connectedChain?.id).then((tokens) => {
-      Promise.all(tokens?.map(async (token) => {
-        const tokenData = await processToken(token?.address);
-        return { networks: token?.networks, ...tokenData };
-      })).then(setTokens);
-    });
+  function loadTokensBalance(): Promise<TokenBalanceType[]> {
+    return useGetTokens(state?.connectedChain?.id)
+      .then((tokens) => {
+        return Promise.all(tokens?.map(async (token) => {
+          const tokenData = await processToken(token?.address);
+          return { networks: token?.networks, ...tokenData };
+        }));
+      });
   }
 
-  useEffect(loadOracleBalance, [
-    state.currentUser?.walletAddress
-  ]);
+  const { data: tokensOracles } = useReactQuery(["voting-power-wallet", state.currentUser?.walletAddress],
+                                                loadOracleBalance,
+                                                { enabled: !!state.currentUser?.walletAddress });
 
-  useEffect(loadTokensBalance ,[
-    state.currentUser?.walletAddress,
-    state.connectedChain,
-    state.Service?.starting
-  ])
+  const { data: tokens } = useReactQuery( ["tokens-balance", state.currentUser?.walletAddress],
+                                          loadTokensBalance,
+                                          {
+                                            enabled:  !!state.currentUser?.walletAddress && 
+                                                      !!state.connectedChain &&
+                                                      !!state.Service?.active
+                                          });
 
   useEffect(() => {
     if (!tokens?.length) return;
@@ -170,7 +166,7 @@ export default function WalletBalance() {
       };
       push({ pathname: pathname, query: newQuery }, asPath);
     }
-  }, [query?.network])
+  }, [query?.network]);
 
   return (
     <WalletBalanceView

@@ -15,6 +15,8 @@ import If from "components/If";
 import InfoTooltip from "components/info-tooltip";
 import ReactSelect from "components/react-select";
 
+import { OriginLinkErrors } from "interfaces/enums/Errors";
+
 import { SelectOption } from "types/utils";
 
 interface BountyDetailsSectionViewProps {
@@ -31,7 +33,7 @@ interface BountyDetailsSectionViewProps {
   deliverableTypeOptions: SelectOption[];
   originLink: string;
   deliverableType: string;
-  isOriginLinkBanned: boolean;
+  originLinkError: OriginLinkErrors;
   onTitlechange: (e: ChangeEvent<HTMLInputElement>) => void;
   onDescriptionchange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   onFilesChange: (files: IFilesProps[]) => void;
@@ -58,7 +60,7 @@ export default function BountyDetailsSectionView({
   deliverableTypeOptions,
   originLink,
   deliverableType,
-  isOriginLinkBanned,
+  originLinkError,
   onTitlechange,
   onDescriptionchange,
   onFilesChange,
@@ -215,14 +217,20 @@ export default function BountyDetailsSectionView({
                 name="origin-link"
                 id="origin-link"
                 placeholder={t("fields.origin-link.placeholder")}
-                className={`form-control ${isOriginLinkBanned ? "is-invalid" : ""}`}
+                className={`form-control ${originLinkError ? "is-invalid" : ""}`}
                 value={originLink}
                 onChange={onOriginLinkchange}
               />
 
-              <If condition={isOriginLinkBanned}>
+              <If condition={originLinkError === OriginLinkErrors.Banned}>
                 <ContextualSpan context="danger" className="mt-2">
                   {t("errors.banned-domain")}
+                </ContextualSpan>
+              </If>
+
+              <If condition={originLinkError === OriginLinkErrors.Invalid}>
+                <ContextualSpan context="danger" className="mt-2">
+                  {t("errors.invalid-link")}
                 </ContextualSpan>
               </If>
             </div>

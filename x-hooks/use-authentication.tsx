@@ -29,14 +29,14 @@ import { AddressValidator } from "helpers/validators/address";
 import {EventName} from "interfaces/analytics";
 import {CustomSession} from "interfaces/custom-session";
 import { UserRole } from "interfaces/enums/roles";
-import {kycSession} from "interfaces/kyc-session";
 
 import {WinStorage} from "services/win-storage";
 
 import { SESSION_TTL } from "server/auth/config";
 
+import { useSearchCurators } from "x-hooks/api/curator";
+import { useGetKycSession, useValidateKycSession } from "x-hooks/api/kyc";
 import useAnalyticEvents from "x-hooks/use-analytic-events";
-import useApi from "x-hooks/use-api";
 import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
@@ -58,8 +58,6 @@ export function useAuthentication() {
   const { state, dispatch } = useAppState();
   const { loadNetworkAmounts } = useNetwork();
   const { pushAnalytic } = useAnalyticEvents();
-
-  const { searchCurators, getKycSession, validateKycSession } = useApi();
 
   const [balance] = useState(new WinStorage('currentWalletBalance', 1000, 'sessionStorage'));
 
@@ -124,7 +122,7 @@ export function useAuthentication() {
       state.Service.active.getOraclesResume(state.currentUser.walletAddress),
 
       state.Service.active.getBalance('settler', state.currentUser.walletAddress),
-      searchCurators({
+      useSearchCurators({
         address: state.currentUser.walletAddress,
         networkName: state.Service?.network?.active?.name,
         chainShortName: chain.chainShortName
@@ -272,8 +270,8 @@ export function useAuthentication() {
         || !state?.Settings?.kyc?.isKycEnabled)
       return
 
-    getKycSession()
-      .then((data: kycSession) => data.status !== 'VERIFIED' ? validateKycSession(data.session_id) : data)
+    useGetKycSession()
+      .then((data) => data.status !== 'VERIFIED' ? useValidateKycSession(data.session_id) : data)
       .then((session)=> dispatch(changeCurrentUserKycSession(session)))
   }
 

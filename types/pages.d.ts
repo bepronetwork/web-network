@@ -1,6 +1,7 @@
 import { IssueData } from "interfaces/issue-data";
-import { SupportedChainData } from "interfaces/supported-chain-data";
+import { Network } from "interfaces/network";
 import { Proposal } from "interfaces/proposal";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import { SearchBountiesPaginated, LeaderBoardPaginated, CuratorsListPaginated, NetworkPaymentsData } from "types/api";
 
@@ -9,6 +10,7 @@ export interface ExplorePageProps {
   bounties: SearchBountiesPaginated;
   recentBounties: IssueData[];
   recentFunding: IssueData[];
+  activeNetworks: Network[];
 }
 
 export interface NetworkCuratorsPageProps {

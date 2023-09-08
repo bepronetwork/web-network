@@ -44,6 +44,7 @@
     "@synaps-io/react-verify": "^1.0.3",
     "@taikai/dappkit": "2.1.11",
     "@taikai/scribal": "^1.0.3",
+    "@tanstack/react-query": "^4.33.0",
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
     "abort-controller": "^3.0.0",
     "axios": "^0.26.1",

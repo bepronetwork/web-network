@@ -21,7 +21,7 @@ import { Network } from "interfaces/network";
 
 import { SearchBountiesPaginated } from "types/api";
 
-import useUpdateNetwork from "x-hooks/api/network/use-update-network";
+import { useUpdateNetwork } from "x-hooks/api/network";
 import { useAuthentication } from "x-hooks/use-authentication";
 import { useNetwork } from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";

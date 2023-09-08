@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { withCORS, WithValidChainId } from "middleware";
+import { UserRoute } from "middleware";
 
 import get from "server/common/comments/get";
 import post from "server/common/comments/post";
@@ -20,4 +20,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default withCORS(WithValidChainId(handler));
+
+export default UserRoute(handler);

@@ -4,14 +4,13 @@ import {useAppState} from "../contexts/app-state";
 import {updateSettings} from "../contexts/reducers/change-settings";
 import {updateShowProp} from "../contexts/reducers/update-show-prop";
 import {WinStorage} from "../services/win-storage";
-import useApi from "./use-api";
+import { useGetSettings } from "./api/use-get-settings";
 
 /**
  * Loads settings with useEffect if not loaded previously
  */
 export function useSettings() {
   const {state, dispatch} = useAppState();
-  const {getSettings} = useApi();
 
   const [storage,] =
     useState<WinStorage>(new WinStorage('web-network.settings', 3600 * 1000, 'sessionStorage'))
@@ -32,7 +31,7 @@ export function useSettings() {
 
     dispatch(updateShowProp({failedLoadSettings: false}));
     dispatch(updateSettings({} as any));
-    getSettings()
+    useGetSettings()
       .then(settings => {
         storage.value = settings;
         // setTmpSettings(settings)

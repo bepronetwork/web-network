@@ -3,7 +3,7 @@ import { IssueData } from "interfaces/issue-data";
 
 import { api } from "services/api";
 
-export default async function useEditBounty({
+export async function useEditBounty({
   id,
   networkName,
   chainName,

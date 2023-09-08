@@ -13,7 +13,7 @@ import { getIssueState } from "helpers/handleTypeIssue";
 
 import { NetworkEvents } from "interfaces/enums/events";
 
-import useStartWorking from "x-hooks/api/bounty/use-start-working";
+import { useStartWorking } from "x-hooks/api/bounty";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 

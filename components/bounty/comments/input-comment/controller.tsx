@@ -7,7 +7,7 @@ import { addToast } from "contexts/reducers/change-toaster";
 
 import { IdsComment, TypeComment } from "interfaces/comments";
 
-import CreateComment from "x-hooks/api/comments/post-comments";
+import { CreateComment } from "x-hooks/api/comments";
 
 import InputCommentView from "./view";
 

@@ -12,3 +12,8 @@ export enum EmailConfirmationErrors {
   INVALID_LINK = "invalid-link",
   EXPIRED_LINK = "expired-link"
 }
+
+export enum OriginLinkErrors {
+  Banned = "banned",
+  Invalid = "invalid"
+}

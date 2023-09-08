@@ -9,7 +9,7 @@ import { SearchBountiesPaginated } from "types/api";
  * @param query current url query
  * @returns list of filtered bounties
  */
-export default async function getBountiesListData(query: ParsedUrlQuery) {
+export async function getBountiesListData(query: ParsedUrlQuery) {
   return api.get<SearchBountiesPaginated>("/search/issues", {
     params: query
   });

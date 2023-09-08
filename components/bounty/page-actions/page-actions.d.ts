@@ -21,7 +21,6 @@ export interface PageActionsViewProps {
 }
 
 export interface PageActionsControllerProps {
-  addNewComment?: (comment: string) => void;
   handleEditIssue?: () => void;
   isEditIssue?: boolean;
   currentBounty: IssueBigNumberData;

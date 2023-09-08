@@ -2,39 +2,38 @@ import {useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
 import { addSeconds, formatDistance } from "date-fns";
-import { toLower } from "lodash";
 import {useTranslation} from "next-i18next";
+import { useRouter } from "next/router";
 
 import ProposalPageView from "components/pages/bounty/proposal/view";
 
 import {useAppState} from "contexts/app-state";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { commentsParser, issueParser, mergeProposalParser, pullRequestParser } from "helpers/issue";
+import { commentsParser, issueParser, mergeProposalParser } from "helpers/issue";
 import { isProposalDisputable } from "helpers/proposal";
 import { lowerCaseCompare } from "helpers/string";
 
-import { IssueData, IssueDataComment } from "interfaces/issue-data";
+import { IssueData } from "interfaces/issue-data";
 import { DistributedAmounts } from "interfaces/proposal";
 
-import { ProposalPageProps } from "types/pages";
-
-import getCommentsData from "x-hooks/api/comments/get-comments-data";
+import { getCommentsData } from "x-hooks/api/comments";
+import { getProposalData } from "x-hooks/api/proposal";
+import useReactQuery from "x-hooks/use-react-query";
 
 const defaultAmount = {
   value: "0",
   percentage: "0",
 };
 
-export default function ProposalPage(props: ProposalPageProps) {
+export default function ProposalPage() {
+  const { query } = useRouter();
   const { t } = useTranslation("common");
 
   const [chaintime, setChainTime] = useState<number>();
   const [isUserAbleToDispute, setIsUserAbleToDispute] = useState(false);
   const [isDisputableOnChain, setIsDisputableOnChain] = useState<boolean>(false);
   const [missingDisputableTime, setMissingDisputableTime] = useState<string>("");
-  const [proposalComments, setProposalComments] = 
-      useState<IssueDataComment[]>(commentsParser(props?.proposal?.comments));
   const [distributedAmounts, setDistributedAmounts] =
     useState<DistributedAmounts>({
       treasuryAmount: defaultAmount,
@@ -45,32 +44,42 @@ export default function ProposalPage(props: ProposalPageProps) {
 
   const { state } = useAppState();
 
-  const proposal = mergeProposalParser(props?.proposal, props?.proposal?.issue?.merged);
-  const issue = issueParser(proposal?.issue as IssueData);
-  const pullRequest = pullRequestParser(proposal?.pullRequest);
+  const proposalId = query?.id?.toString();
+  const proposalQueryKey = ["proposal", proposalId];
+  const commentsQueryKey = ["proposal", "comments", proposalId];
+
+  const { data: proposalData } = useReactQuery(proposalQueryKey, () => getProposalData(query));
+  const { data: comments, invalidate: invalidateComments } = 
+    useReactQuery(commentsQueryKey, () => getCommentsData({ proposalId }));
+
+  const parsedProposal = mergeProposalParser(proposalData, proposalData?.issue?.merged);
+  const parsedComments = commentsParser(comments);
+
+  const issue = issueParser(parsedProposal?.issue as IssueData);
+  const pullRequest = parsedProposal?.pullRequest;
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.token");
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isPrOwner = toLower(pullRequest?.userAddress) === toLower(state.currentUser?.walletAddress);
-  const isProposalOwner = toLower(proposal?.creator) === toLower(state.currentUser?.walletAddress);
+  const isPrOwner = lowerCaseCompare(pullRequest?.userAddress, state.currentUser?.walletAddress);
+  const isProposalOwner = lowerCaseCompare(parsedProposal?.creator, state.currentUser?.walletAddress);
 
   const isDisputable = [
     isWalletConnected,
-    isProposalDisputable( proposal?.contractCreationDate,
+    isProposalDisputable( parsedProposal?.contractCreationDate,
                           BigNumber(state.Service?.network?.times?.disputableTime).toNumber(),
                           chaintime),
-    !proposal?.isDisputed,
-    !proposal?.refusedByBountyOwner,
+    !parsedProposal?.isDisputed,
+    !parsedProposal?.refusedByBountyOwner,
     !issue?.isClosed,
-    !proposal?.isMerged,
+    !parsedProposal?.isMerged,
   ].every((c) => c);
 
   const isRefusable = [
     isWalletConnected,
     !issue?.isClosed,
     !issue?.isCanceled,
-    !proposal?.isDisputed,
-    !proposal?.refusedByBountyOwner,
+    !parsedProposal?.isDisputed,
+    !parsedProposal?.refusedByBountyOwner,
     lowerCaseCompare(issue?.user?.address, state.currentUser?.walletAddress),
   ].every((v) => v);
 
@@ -78,21 +87,16 @@ export default function ProposalPage(props: ProposalPageProps) {
     isWalletConnected,
     pullRequest?.isMergeable,
     !issue?.isClosed,
-    !proposal?.isMerged,
-    !proposal?.isDisputed,
-    !proposal?.refusedByBountyOwner,
+    !parsedProposal?.isMerged,
+    !parsedProposal?.isDisputed,
+    !parsedProposal?.refusedByBountyOwner,
     !isDisputable,
     !isPrOwner,
     !isProposalOwner,
   ].every((v) => v);
 
-  function updateProposalComments() {
-    getCommentsData({ proposalId: proposal?.id?.toString() })
-      .then((comments) => setProposalComments(commentsParser(comments)))
-  }
-
   async function getDistributedAmounts() {
-    if (!proposal?.distributions || !state?.Service?.network?.amounts) return;
+    if (!parsedProposal?.distributions || !state?.Service?.network?.amounts) return;
 
     const amountTotal = BigNumber.maximum(issue?.amount || 0, issue?.fundingAmount || 0);
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = state.Service.network.amounts;
@@ -101,12 +105,12 @@ export default function ProposalPage(props: ProposalPageProps) {
                                                       mergeCreatorFeeShare,
                                                       proposerFeeShare,
                                                       amountTotal,
-                                                      proposal.distributions);
+                                                      parsedProposal.distributions);
 
     const proposals = distributions.proposals.map(({ recipient, ...rest }) => ({
       ...rest,
       recipient,
-      githubLogin: proposal?.distributions?.find(p => p.recipient === recipient)?.user?.githubLogin
+      githubLogin: parsedProposal?.distributions?.find(p => p.recipient === recipient)?.user?.githubLogin
     }));
 
     setDistributedAmounts({
@@ -119,11 +123,12 @@ export default function ProposalPage(props: ProposalPageProps) {
     if (
       !chaintime ||
       !state.Service?.network?.times?.disputableTime ||
-      !proposal?.contractCreationDate
+      !parsedProposal?.contractCreationDate
     )
       return;
 
-    const target = addSeconds(new Date(proposal?.contractCreationDate), +state.Service?.network.times.disputableTime);
+    const target = addSeconds(new Date(parsedProposal?.contractCreationDate), 
+                              +state.Service?.network.times.disputableTime);
     const missingTime = formatDistance(new Date(chaintime), target, {
       includeSeconds: true,
     });
@@ -133,7 +138,7 @@ export default function ProposalPage(props: ProposalPageProps) {
   }
 
   useEffect(changeMissingDisputableTime, [
-    proposal?.contractCreationDate,
+    parsedProposal?.contractCreationDate,
     chaintime,
     state.Service?.network?.times?.disputableTime,
   ]);
@@ -144,12 +149,12 @@ export default function ProposalPage(props: ProposalPageProps) {
   }, [state.Service?.active]);
 
   useEffect(() => {
-    if (!proposal || !state.currentUser?.walletAddress)
+    if (!parsedProposal || !state.currentUser?.walletAddress)
       setIsUserAbleToDispute(false);
     else
-      setIsUserAbleToDispute(!proposal.disputes?.some(({ address, weight }) => 
+      setIsUserAbleToDispute(!parsedProposal.disputes?.some(({ address, weight }) => 
         address === state.currentUser.walletAddress && weight.gt(0)));
-  }, [proposal, state.currentUser?.walletAddress]);
+  }, [parsedProposal, state.currentUser?.walletAddress]);
 
   useEffect(() => {
     getDistributedAmounts();
@@ -157,7 +162,7 @@ export default function ProposalPage(props: ProposalPageProps) {
 
   return (
     <ProposalPageView
-      proposal={proposal}
+      proposal={parsedProposal}
       pullRequest={pullRequest}
       issue={issue}
       distributedAmounts={distributedAmounts}
@@ -170,8 +175,8 @@ export default function ProposalPage(props: ProposalPageProps) {
       isMergeable={isMergeable}
       isPrOwner={isPrOwner}
       isProposalOwner={isProposalOwner}
-      comments={proposalComments}
-      updateComments={updateProposalComments}
+      comments={parsedComments}
+      updateComments={invalidateComments}
       userData={state.currentUser}
     />
   );

@@ -32,7 +32,7 @@ import {Token} from "interfaces/token";
 import DAO from "services/dao-service";
 import {WinStorage} from "services/win-storage";
 
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network/use-search-networks";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
@@ -56,7 +56,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
-  const { searchNetworks } = useApi();
 
   const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
@@ -223,7 +222,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         if (/bepro|taikai/gi.test(value))
           return false;
 
-        const networksWithSameName = await searchNetworks({ name: value });
+        const networksWithSameName = await useSearchNetworks({ name: value });
 
         // No networks with this name
         if (networksWithSameName.count === 0)

@@ -51,3 +51,5 @@ export const BOOTSTRAP_BREAKPOINTS = {
   xxl: 1400
 };
 export const DAY_IN_SECONDS = 24 * 60 * 60;
+export const MILLISECONDS = 1000;
+export const MINUTE_IN_MS = 60 * MILLISECONDS;

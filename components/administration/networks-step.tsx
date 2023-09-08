@@ -19,11 +19,8 @@ import {psReadAsText} from "helpers/file-reader";
 import {formatNumberToCurrency} from "helpers/formatNumber";
 import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
-
-import useUpdateNetwork from "x-hooks/api/network/use-update-network";
-import useApi from "x-hooks/use-api";
+import { useUpdateNetwork, useSearchNetworks } from "x-hooks/api/network";
 import { useAuthentication } from "x-hooks/use-authentication";
-
 
 const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
@@ -41,7 +38,6 @@ export default function NetworksStep({
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
   const {state, dispatch} = useAppState();
-  const { searchNetworks } = useApi();
   const { signMessage } = useAuthentication();
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
@@ -143,7 +139,7 @@ export default function NetworksStep({
     try {
       setIsLoading(true);
 
-      const network = await searchNetworks({ networkAddress: selectedNetworkAddress })
+      const network = await useSearchNetworks({ networkAddress: selectedNetworkAddress })
         .then(({ rows }) => rows[0]);
 
       if (network.networkAddress !== state.Service?.active.network.contractAddress)
@@ -174,13 +170,13 @@ export default function NetworksStep({
               treasury,
               networkToken]) => setForcedNetwork({
                 ...network,
-                councilAmount,
+                councilAmount: councilAmount.toString(),
                 disputableTime: +disputableTime / 1000,
                 draftTime: +draftTime / 1000,
                 oracleExchangeRate,
                 mergeCreatorFeeShare,
                 proposerFeeShare,
-                percentageNeededForDispute,
+                percentageNeededForDispute: +percentageNeededForDispute,
                 treasury,
                 networkToken
               }));

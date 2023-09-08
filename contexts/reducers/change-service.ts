@@ -44,22 +44,15 @@ export const changeNetwork = new ChangeServiceNetworkProp();
 
 export const changeStarting = (starting: boolean) => changeServiceProp.update(starting as any, 'starting');
 
-export const changeMicroServiceReady = (microReady: boolean) =>
-  changeServiceProp.update({microReady}, 'microReady');
-
 export const changeActiveDAO = (active: DAO) => changeServiceProp.update(active, 'active');
 
 export const changeNetworkLastVisited = (lastVisited: string) => changeNetwork.update({lastVisited});
-export const changeNoDefaultNetwork = (noDefaultNetwork: boolean) => changeNetwork.update({noDefaultNetwork});
 
 export const changeActiveNetwork = (active: Network) => changeNetwork.update({active});
 export const changeActiveNetworkTimes = (times: NetworkTimes) => changeNetwork.update({times});
 export const changeActiveNetworkAmounts = (amounts: NetworkAmounts) => changeNetwork.update({amounts});
 export const changeActiveAvailableChains = 
   (availableChains: SupportedChainData[]) => changeNetwork.update({availableChains});
-
-export const changeAllowedTokens = (transactional: Token[], reward: Token[]) =>
-  changeNetwork.update({tokens: {transactional, reward}})
 
 export const changeWeb3Connection = (web3Connection: Web3Connection) => 
   changeServiceProp.update(web3Connection, "web3Connection");

@@ -6,8 +6,6 @@ import { MatchAccountsStatus } from "interfaces/enums/api";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 import { kycSession } from "interfaces/kyc-session";
 
-
-
 export class ChangeCurrentUser<T = CurrentUserState|Partial<CurrentUserState>> extends SimpleAction<T> {
   constructor(id = AppStateReduceId.CurrentUser) {
     super(id, 'currentUser');
@@ -31,9 +29,6 @@ export const changeCurrentUserLogin = (login: string) =>
 export const changeCurrentUserId = (id: number) =>
   changeCurrentUser.update({id});  
 
-export const changeCurrentUserAccessToken = (accessToken: string) =>
-  changeCurrentUser.update({accessToken});
-
 export const changeCurrentUserWallet = (walletAddress: string) =>
   changeCurrentUser.update({walletAddress});
 
@@ -52,8 +47,5 @@ export const changeCurrentUserSignature = (signature: string) =>
 export const changeCurrentUserisAdmin = (isAdmin: boolean) =>
   changeCurrentUser.update({isAdmin});
 
-export const changeCurrentUserHasRegisteredNetwork = (hasRegisteredNetwork: boolean) =>
-  changeCurrentUser.update({hasRegisteredNetwork});
-
 export const changeCurrentUserKycSession = (kycSession: kycSession) =>
-  changeCurrentUser.update({kycSession})
+  changeCurrentUser.update({kycSession});

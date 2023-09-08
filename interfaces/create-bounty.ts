@@ -1,5 +1,7 @@
 import { IFilesProps } from "components/drag-and-drop";
 
+import { OriginLinkErrors } from "./enums/Errors";
+
 export interface BountyDetailsSectionProps {
   title: string;
   updateTitle: (e: string) => void;
@@ -12,7 +14,7 @@ export interface BountyDetailsSectionProps {
   isKyc: boolean;
   originLink: string;
   deliverableType: string;
-  isOriginLinkBanned?: boolean;
+  originLinkError?: OriginLinkErrors;
   onOriginLinkChange: (link: string) => void;
   updateIsKyc: (e: boolean) => void;
   updateTierList: (e: number[]) => void;

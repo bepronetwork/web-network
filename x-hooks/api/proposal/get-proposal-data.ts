@@ -9,8 +9,9 @@ import { api } from "services/api";
  * @param query current url query
  * @returns proposal
  */
-export default async function getProposalData(query: ParsedUrlQuery) {
+export async function getProposalData(query: ParsedUrlQuery) {
   return api.get<Proposal>("/merge-proposal", {
     params: query
-  });
+  })
+    .then(({ data }) => data);
 }

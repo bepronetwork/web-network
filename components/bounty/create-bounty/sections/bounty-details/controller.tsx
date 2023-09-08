@@ -28,7 +28,7 @@ export default function BountyDetailsSection({
   updateSelectedTags,
   isKyc,
   originLink,
-  isOriginLinkBanned,
+  originLinkError,
   deliverableType,
   onOriginLinkChange,
   updateIsKyc,
@@ -129,7 +129,7 @@ export default function BountyDetailsSection({
       deliverableTypeOptions={deliverableTypes}
       deliverableType={deliverableType}
       originLink={originLink}
-      isOriginLinkBanned={isOriginLinkBanned}
+      originLinkError={originLinkError}
       onTitlechange={handleChangeTitle}
       onDescriptionchange={handleChangeDescription}
       onFilesChange={updateFiles}

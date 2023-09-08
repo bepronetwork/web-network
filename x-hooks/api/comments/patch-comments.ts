@@ -7,8 +7,7 @@ import { api } from "services/api";
  * @param query current url query
  * @returns comment
  */
-export default async function HideComment(id: number,
-                                          payload: {
+export async function HideComment(id: number, payload: {
     hidden: boolean;
   }) {
   return api.patch<IssueDataComment>(`/comments/${id}`, payload);

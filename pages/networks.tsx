@@ -1,4 +1,4 @@
-import {createContext, useEffect, useState} from "react";
+import {useState} from "react";
 
 import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
@@ -8,7 +8,11 @@ import PageHero from "components/common/page-hero/view";
 import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
 
+import { Network } from "interfaces/network";
+
 import { HeroInfo } from "types/components";
+
+import { useGetHeaderNetworks, useSearchNetworks } from "x-hooks/api/network";
 
 interface price_used {
   [name: string]: number;
@@ -18,84 +22,42 @@ export interface ConvertedTokens {
 }
 
 interface NetworksPageProps {
-  numberOfNetworks: number;
-  numberOfBounties: number;
-  totalConverted: string;
-  convertedTokens?: ConvertedTokens;
-  setNumberOfNetworks: (quantity: number) => void;
-  setNumberOfBounties: (quantity: number) => void;
-  setTotalConverted: (amount: string) => void;
-  setConvertedTokens: (tokens: ConvertedTokens) => void;
+  header: {
+    totalConverted: string;
+    numberOfBounties: number;
+    numberOfNetworks: number;
+  };
+  networks: Network[];
 }
 
-export const NetworksPageContext = createContext<NetworksPageProps>({
-  numberOfNetworks: 0,
-  numberOfBounties: 0,
-  totalConverted: "0",
-  setNumberOfNetworks: (quantity: number) => console.log("incrementNumberOfNetworks", quantity),
-  setNumberOfBounties: (quantity: number) => console.log("incrementNumberOfBounties", quantity),
-  setTotalConverted: (amount: string) => console.log("incrementTotalConverted", amount),
-  setConvertedTokens: (tokens: ConvertedTokens) => console.log("includeNotConvertedToken", tokens)
-});
-
-export default function NetworksPage() {
+export default function NetworksPage({
+  header,
+  networks
+}: NetworksPageProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [totalConverted, setTotalConverted] = useState("");
-  const [numberOfNetworks, setNumberOfNetworks] = useState(0);
-  const [numberOfBounties, setNumberOfBounties] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [convertedTokens, setConvertedTokens] = useState<ConvertedTokens>();
 
-  const [infos, setInfos] = useState<HeroInfo[]>([
+  const infos: HeroInfo[] = [
     {
-      value: 0,
+      value: header.numberOfNetworks,
       label: t("custom-network:hero.number-of-networks")
     },
     {
-      value: 0,
+      value: header.numberOfBounties,
       label: t("custom-network:hero.number-of-bounties")
     },
     {
-      value: "0",
+      value: header.totalConverted,
       label: t("custom-network:hero.in-the-network"),
       currency: "USD"
     }
-  ]);
+  ];
 
-  useEffect(() => {    
-    setInfos([
-      {
-        value: numberOfNetworks,
-        label: t("custom-network:hero.number-of-networks")
-      },
-      {
-        value: numberOfBounties,
-        label: t("custom-network:hero.number-of-bounties")
-      },
-      {
-        value: +totalConverted,
-        label: t("custom-network:hero.in-the-network"),
-        currency: "USD",
-        hasConvertedTokens: !!convertedTokens,
-        setListedModalVisibility: () => setIsModalVisible(true)
-      }
-    ]);    
-  }, [numberOfNetworks, numberOfBounties, totalConverted, convertedTokens]);
-
-  const contextValue = {
-    totalConverted,
-    numberOfNetworks,
-    numberOfBounties,
-    convertedTokens,
-    setNumberOfNetworks,
-    setNumberOfBounties,
-    setTotalConverted,
-    setConvertedTokens
-  }
 
   return (
-    <NetworksPageContext.Provider value={contextValue}>
+    <>
       <div>
         <PageHero
           title={t("custom-network:hero.title")}
@@ -104,7 +66,7 @@ export default function NetworksPage() {
         />
 
         <div className="mt-4">
-          <NetworksList />
+          <NetworksList networks={networks} />
         </div>
       </div>
 
@@ -113,13 +75,25 @@ export default function NetworksPage() {
         handleClose={() => setIsModalVisible(false)} 
         networks={convertedTokens && Object.entries(convertedTokens).map(e => e[1]) || []} 
       />
-    </NetworksPageContext.Provider>
+    </>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const [header, networks] = await Promise.all([
+    useGetHeaderNetworks(),
+    useSearchNetworks({
+      isRegistered: true,
+      sortBy: "name",
+      order: "asc",
+      isNeedCountsAndTokensLocked: true
+    })
+      .then(({ rows }) => rows)
+  ]);
   return {
     props: {
+      header,
+      networks,
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

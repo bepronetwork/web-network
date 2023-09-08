@@ -11,12 +11,13 @@ import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
+import { isOnNetworkPath } from "helpers/network";
+
 import { Network } from "interfaces/network";
 
-import { WinStorage } from "services/win-storage";
-
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network";
 import useChain from "x-hooks/use-chain";
+import useReactQuery from "x-hooks/use-react-query";
 
 interface SelectNetworkProps {
   isCurrentDefault?: boolean;
@@ -37,7 +38,15 @@ export default function SelectNetwork({
 
   const { chain } = useChain();
   const { state } = useAppState();
-  const { searchNetworks } = useApi();
+
+  const chainIdToFilter = filterByConnectedChain || !isOnNetworkPath(pathname) ? 
+    state.connectedChain?.id : chain?.chainId?.toString();
+
+  const { data: networks } = useReactQuery( ["networks", chainIdToFilter], 
+                                            () => useSearchNetworks({ chainId: chainIdToFilter }),
+                                            {
+                                              enabled: !!chainIdToFilter
+                                            });
 
   function networkToOption(network: Network) {
     return {
@@ -70,39 +79,15 @@ export default function SelectNetwork({
   }
 
   function handleSelectedWithNetworkName(options) {
-    const opt = options.find(({ value }) => value?.name === query?.networkName)
+    const opt = options?.find(({ value }) => value?.name === query?.networkName)
     if(opt) setSelected(opt)
   }
 
-  function getNetworksByChainId(id: string) {
-    const cache = new WinStorage(`networks:${chain?.chainId}`, 60000, "sessionStorage");
-
-    if (cache.value){
-      const options = cache.value.map(networkToOption)
-      setOptions(options);
-      handleSelectedWithNetworkName(options);
-    } else
-      searchNetworks({
-        chainId: id
-      })
-        .then(({ rows }) => {
-          const options = rows.map(networkToOption)
-          setOptions(options)
-          handleSelectedWithNetworkName(options);
-        });
-  }
-
   useEffect(() => {
-    if (!chain && isCurrentDefault) return;
-    
-    getNetworksByChainId(chain?.chainId?.toString())
-  }, [chain, isCurrentDefault]);
-
-  useEffect(() => {
-    if(filterByConnectedChain && state.connectedChain?.id){
-      getNetworksByChainId(state.connectedChain?.id)
-    }
-  }, [state.connectedChain])
+    const options = networks?.rows?.map(networkToOption);
+    setOptions(options || [])
+    handleSelectedWithNetworkName(options);
+  }, [networks]);
 
   useEffect(() => {
     if (state.Service?.network?.active && !selected && isCurrentDefault)
@@ -124,7 +109,7 @@ export default function SelectNetwork({
           value={selected}
           options={options}
           onChange={onChange}
-          placeholder="Select a network"
+          placeholder={t("select-a-network")}
           components={{
             Option: IconOption,
             SingleValue: IconSingleValue,
