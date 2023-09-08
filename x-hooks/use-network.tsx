@@ -10,7 +10,6 @@ import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
@@ -19,7 +18,7 @@ import {ProfilePages} from "interfaces/utils";
 
 import {WinStorage} from "services/win-storage";
 
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network";
 import useChain from "x-hooks/use-chain";
 
 export function useNetwork() {
@@ -29,8 +28,7 @@ export function useNetwork() {
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
 
   const {state, dispatch} = useAppState();
-  const { chain, findSupportedChain } = useChain();
-  const {searchNetworks, getNetworkTokens} = useApi();
+  const { findSupportedChain } = useChain();
 
   function getStorageKey(networkName: string, chainId: string | number) {
     return `bepro.network:${networkName}:${chainId}`;
@@ -73,7 +71,7 @@ export function useNetwork() {
       }
     }
 
-    await searchNetworks({
+    await useSearchNetworks({
       name: queryNetworkName,
       isNeedCountsAndTokensLocked: true
     })
@@ -154,24 +152,6 @@ export function useNetwork() {
     }, `/${path}`);
   }
 
-  function loadNetworkAllowedTokens() {
-    if (!state?.Service?.network?.active || !chain)
-      return;
-
-    getNetworkTokens({
-      networkName: state?.Service?.network?.active?.name,
-      chainId: chain.chainId.toString()
-    }).then(tokens => {
-      const transactional = [];
-      const reward = [];
-
-      for (const token of tokens)
-        (token.isTransactional ? transactional : reward).push(token);
-
-      dispatch(changeAllowedTokens(transactional, reward));
-    })
-  }
-
   function loadNetworkTimes() {
     if (!state?.Service?.active?.network)
       return;
@@ -243,7 +223,6 @@ export function useNetwork() {
     clearNetworkFromStorage,
     loadNetworkTimes,
     loadNetworkAmounts,
-    loadNetworkAllowedTokens,
     goToProfilePage,
     updateNetworkAndChainMatch
   }

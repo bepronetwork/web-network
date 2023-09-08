@@ -9,7 +9,7 @@ import { api } from "services/api";
  * @param query current url query
  * @returns list of filtered comments
  */
-export default async function getCommentsData(query: ParsedUrlQuery) {
+export async function getCommentsData(query: ParsedUrlQuery) {
   return api
     .get<IssueDataComment | IssueDataComment[]>("/comments", {
       params: query,

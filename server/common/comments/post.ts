@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Sequelize, WhereOptions } from "sequelize";
+import { WhereOptions } from "sequelize";
 
 import models from "db/models";
 
@@ -7,8 +7,6 @@ import { error as LogError } from "services/logging";
 
 export default async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const headerWallet = (req.headers.wallet as string).toLowerCase();
-
     const {
       comment,
       issueId,
@@ -16,6 +14,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
       proposalId,
       type: originalType,
       replyId,
+      context
     } = req.body;
 
     const type = originalType.toLowerCase();
@@ -39,13 +38,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
     if (type === "proposal" && (!proposalId || !isValidNumber(proposalId)))
       return res.status(404).json({ message: `proposalId not ${foundOrValid(!proposalId)}` });
 
-    const user = await models.user.findOne({
-      where: {
-        address: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("address")),
-                                 "=",
-                                 headerWallet),
-      },
-    });
+    const user = context.user;
 
     if (!user) return res.status(404).json({ message: "user not found" });
 
@@ -60,7 +53,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
       issueId: +issueId,
       comment,
       type,
-      userAddress: headerWallet,
+      userAddress: user.address,
       userId: user.id,
       hidden: false,
       ...(deliverableId || proposalId ? whereCondition : null),

@@ -13,7 +13,7 @@ import { TAGS_OPTIONS } from "helpers/tags-options";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 
-import useEditBounty from "x-hooks/api/bounty/use-edit-bounty";
+import { useEditBounty } from "x-hooks/api/bounty";
 
 import BountyBodyView from "./view";
 

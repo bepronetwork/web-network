@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { SSRConfig, useTranslation } from "next-i18next";
+import { dehydrate } from "@tanstack/react-query";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
@@ -15,64 +16,42 @@ import { addToast } from "contexts/reducers/change-toaster";
 
 import { commentsParser, issueParser } from "helpers/issue";
 
-import {
-  IssueBigNumberData,
-  IssueData,
-  PullRequest,
-} from "interfaces/issue-data";
+import { getReactQueryClient } from "services/react-query";
 
-import { getBountyData } from "x-hooks/api/bounty/get-bounty-data";
-import getCommentsData from "x-hooks/api/comments/get-comments-data";
-import CreateComment from "x-hooks/api/comments/post-comments";
+import { getBountyData } from "x-hooks/api/bounty";
+import { getCommentsData, CreateComment } from "x-hooks/api/comments";
+import useReactQuery from "x-hooks/use-react-query";
 
-interface PagePullRequestProps {
-  bounty: IssueData;
-  pullRequest: PullRequest;
-  _nextI18Next?: SSRConfig;
-}
-
-export default function PullRequestPage({ pullRequest, bounty }: PagePullRequestProps) {
+export default function PullRequestPage() {
   const router = useRouter();
   const { t } = useTranslation(["common", "pull-request"]);
 
-  const { prId, review } = router.query;
+  const { id, prId, review } = router.query;
 
   const [showModal, setShowModal] = useState(!!review);
-  const [currentBounty, setCurrentBounty] = useState<IssueBigNumberData>(issueParser(bounty));
-  const [currentPullRequest, setCurrentPullRequest] = useState<PullRequest>({
-    ...pullRequest,
-    comments: commentsParser(pullRequest.comments),
-    createdAt: new Date(pullRequest.createdAt),
-  });
   const [isCreatingReview, setIsCreatingReview] = useState(false);
 
   const { state, dispatch } = useAppState();
 
+  const { data: bountyData, invalidate: invalidateBounty } = 
+    useReactQuery(["bounty", id?.toString()], () => getBountyData(router.query));
+
+  const currentPullRequest = bountyData?.pullRequests?.find((pr) => +pr.githubId === +prId);
+  const pullRequestId = currentPullRequest?.id?.toString();
+
+  const { data: commentsData, invalidate: invalidateComments } =
+    useReactQuery(["pullRequest", "comments", pullRequestId], () => getCommentsData({ deliverableId: pullRequestId }));
+
+  const currentBounty = issueParser(bountyData);
+  const comments = commentsParser(commentsData);
   const isPullRequestReady = !!currentPullRequest?.isReady;
 
   function updateBountyData() {
-    getBountyData(router.query)
-      .then(issueParser)
-      .then((bounty) => {
-        const pullRequestDatabase = bounty?.pullRequests?.find((pr) => +pr.githubId === +prId);
-
-        setCurrentBounty(bounty);
-        setCurrentPullRequest({
-          ...pullRequestDatabase,
-          isMergeable: currentPullRequest?.isMergeable,
-          merged: currentPullRequest?.merged,
-          state: currentPullRequest?.state,
-          comments: currentPullRequest.comments,
-        });
-      });
+    invalidateBounty();
   }
 
   function updateCommentData() {
-    getCommentsData({ deliverableId: currentPullRequest?.id.toString() })
-     .then((comments) => setCurrentPullRequest({
-      ...currentPullRequest,
-      comments: commentsParser(comments)
-     }))
+    invalidateComments();
   }
 
   function handleCreateReview(body: string) {
@@ -91,8 +70,8 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
         title: t("actions.success"),
         content: t("pull-request:actions.review.success"),
       }));
-      updateCommentData()
-      setShowModal(false)
+      updateCommentData();
+      setShowModal(false);
     }).catch(() => {
       dispatch(addToast({
         type: "danger",
@@ -129,7 +108,7 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
       <CreateReviewModal
         show={showModal && isPullRequestReady}
         currentBounty={currentBounty} 
-        pullRequest={currentPullRequest}
+        pullRequest={{ ...currentPullRequest , comments }}
         isExecuting={isCreatingReview}
         onConfirm={handleCreateReview}
         onCloseClick={handleCloseModal}
@@ -141,23 +120,20 @@ export default function PullRequestPage({ pullRequest, bounty }: PagePullRequest
 }
 
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
-  const { prId } = query;
+  const queryClient = getReactQueryClient();
+  const { id: bountyId, prId } = query;
 
   const bountyDatabase = await getBountyData(query);
+  await queryClient.setQueryData(["bounty", bountyId], bountyDatabase);
 
   const pullRequestDatabase = bountyDatabase?.pullRequests?.find((pr) => +pr.githubId === +prId);
-
-  const pullRequestComments = await getCommentsData({ deliverableId: pullRequestDatabase?.id.toString() });
-
-  const pullRequest: PullRequest = {
-    ...pullRequestDatabase,
-    comments: pullRequestComments
-  }
+  const pullRequestId = pullRequestDatabase?.id?.toString();
+  await queryClient.prefetchQuery(["pullRequest", "comments", pullRequestId], () => 
+    getCommentsData({ deliverableId: pullRequestId }));
                                                            
   return {
     props: {
-      bounty: bountyDatabase,
-      pullRequest,
+      dehydratedState: dehydrate(queryClient),
       ...(await serverSideTranslations(locale, [
         "common",
         "bounty",

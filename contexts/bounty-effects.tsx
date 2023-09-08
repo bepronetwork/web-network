@@ -5,17 +5,12 @@ import { changeCurrentBountyData } from "contexts/reducers/change-current-bounty
 
 import { issueParser } from "helpers/issue";
 
-import { CurrentBounty } from "interfaces/application-state";
 import { IssueData } from "interfaces/issue-data";
 
 import { useBounty } from "x-hooks/use-bounty";
-
-interface ContextCurrentBounty extends Omit<CurrentBounty, "data" | "lastUpdated"> {
-  data: IssueData;
-}
 interface BountyEffectsProviderProps {
   children: ReactNode;
-  currentBounty: ContextCurrentBounty;
+  currentBounty: IssueData;
 }
 
 const _context = {};
@@ -27,7 +22,7 @@ export const BountyEffectsProvider = ({ children, currentBounty }: BountyEffects
   const { dispatch, state } = useAppState();
 
   useEffect(() => {
-    const parsedData = issueParser(currentBounty.data);
+    const parsedData = issueParser(currentBounty);
 
     dispatch(changeCurrentBountyData(parsedData));
   }, [
@@ -35,8 +30,8 @@ export const BountyEffectsProvider = ({ children, currentBounty }: BountyEffects
   ]);
 
   useEffect(bounty.validateKycSteps, [
-      currentBounty?.data?.isKyc,
-      currentBounty?.data?.kycTierList,
+      currentBounty?.isKyc,
+      currentBounty?.kycTierList,
       state?.currentUser?.kycSession,
   ]);
 

@@ -3,7 +3,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import CreateBountyPage from "components/pages/bounty/create-bounty/controller";
 
-import useSearchNetworks from "x-hooks/api/network/use-search-networks";
+import { useSearchNetworks } from "x-hooks/api/network/use-search-networks";
 
 export default CreateBountyPage;
 

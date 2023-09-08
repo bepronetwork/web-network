@@ -10,8 +10,7 @@ interface payloadProps {
  * @param query current url query
  * @returns created Banned Word on Network
  */
-export default async function CreateBannedWord(id,
-                                               payload: payloadProps): Promise<string[]> {
+export async function CreateBannedWord(id, payload: payloadProps): Promise<string[]> {
   return api
     .post<string[]>(`/network/management/banned-words/${id}`, payload)
     .then(({ data }) => data);

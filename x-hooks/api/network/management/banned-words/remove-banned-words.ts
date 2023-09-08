@@ -10,8 +10,7 @@ interface payloadProps {
  * @param query current url query
  * @returns new Banned Words on Network
  */
-export default async function RemoveBannedWord(id,
-                                               payload: payloadProps): Promise<string[]> {
+export async function RemoveBannedWord(id, payload: payloadProps): Promise<string[]> {
   return api
     .patch<string[]>(`/network/management/banned-words/${id}`, payload)
     .then(({ data }) => data)

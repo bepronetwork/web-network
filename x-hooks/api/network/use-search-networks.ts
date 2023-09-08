@@ -2,11 +2,12 @@ import { emptyPaginatedData } from "helpers/api";
 
 import { SearchNetworkParams } from "interfaces/api";
 import { Network } from "interfaces/network";
-import { PaginatedData } from "interfaces/paginated-data";
 
 import { api } from "services/api";
 
-export default function useSearchNetworks({
+import { PaginatedData } from "types/api";
+
+export async function useSearchNetworks({
   page = "1",
   name = "",
   creatorAddress = "",
@@ -20,7 +21,7 @@ export default function useSearchNetworks({
   isNeedCountsAndTokensLocked = undefined,
   chainId = "",
   chainShortName = ""
-}: SearchNetworkParams): Promise<PaginatedData<Network>> {
+}: SearchNetworkParams) {
   const params = {
     page,
     name,
@@ -40,7 +41,7 @@ export default function useSearchNetworks({
   };
 
   return api
-    .get<PaginatedData<Network>>("/search/networks", { params })
+    .get<PaginatedData<Network>>(`/search/networks`, { params })
     .then(({ data }) => data)
-    .catch(() => emptyPaginatedData);
+    .catch(() => emptyPaginatedData as PaginatedData<Network>);
 }

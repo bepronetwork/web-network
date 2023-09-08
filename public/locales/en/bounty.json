@@ -108,7 +108,8 @@
     "no-networks-chain": "The selected chain has no active networks",
     "bounty-update": "Bounty update failed",
     "banned-domain": "This domain is banned and cannot be used to open bounties.",
-    "failed-to-cancel": "Bounty could not be canceled"
+    "failed-to-cancel": "Bounty could not be canceled",
+    "invalid-link": "Invalid link provided"
   },
   "title": "Create new Bounty",
   "fields": {

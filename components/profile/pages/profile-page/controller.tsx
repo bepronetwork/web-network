@@ -15,7 +15,7 @@ import { isValidEmail } from "helpers/validators/email";
 
 import { CustomSession } from "interfaces/custom-session";
 
-import updateUserEmail from "x-hooks/api/user/update-email";
+import { useUpdateEmail } from "x-hooks/api/user";
 import { useAuthentication } from "x-hooks/use-authentication";
 import { useNetwork } from "x-hooks/use-network";
 
@@ -58,7 +58,7 @@ export default function ProfilePage() {
   function handleUpdateEmail(email: string) {
     setIsExecuting(true);
 
-    return updateUserEmail(email)
+    return useUpdateEmail(email)
       .catch(error => {
         dispatch(toastError(t("email-errors.try-again-later"), t("email-errors.failed-to-update")));
         console.debug("Failed to update user email", error);

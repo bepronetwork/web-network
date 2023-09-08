@@ -9,7 +9,7 @@ import { NetworkPaymentsData, PaymentsData } from "types/api";
  * @param query current url query
  * @returns list of filtered bounties
  */
-export default async function getPaymentsData(query: ParsedUrlQuery) {
+export async function getPaymentsData(query: ParsedUrlQuery) {
   return api.get<PaymentsData | NetworkPaymentsData>("/payments", {
     params: query
   });

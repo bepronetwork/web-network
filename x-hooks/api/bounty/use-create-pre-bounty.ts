@@ -15,7 +15,7 @@ interface CreatePreBounty {
   networkName: string;
 }
 
-export default function useCreatePreBounty(payload: CreatePreBounty): Promise<IssueData> {
+export function useCreatePreBounty(payload: CreatePreBounty): Promise<IssueData> {
   return api
     .post<IssueData>("/issue", payload)
     .then(({ data }) => data);

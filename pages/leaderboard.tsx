@@ -5,7 +5,7 @@ import LeaderBoardPage from "components/pages/leaderboard/view";
 
 import { emptyPaginatedData } from "helpers/api";
 
-import getLeaderboardData from "x-hooks/api/get-leaderboard-data";
+import { getLeaderboardData } from "x-hooks/api/leaderboard";
 
 export default LeaderBoardPage;
 

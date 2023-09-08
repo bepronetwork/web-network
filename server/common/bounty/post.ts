@@ -6,6 +6,7 @@ import Issue from "db/models/issue.model";
 
 import { chainFromHeader } from "helpers/chain-from-header";
 import { lowerCaseIncludes } from "helpers/string";
+import { isValidUrl } from "helpers/validateUrl";
 
 import { add } from "services/ipfs-service";
 
@@ -41,6 +42,9 @@ export async function post(req: NextApiRequest): Promise<Issue> {
 
   if (!network || network?.isClosed)
     throw new HttpBadRequestError("Invalid network");
+
+  if (origin && !isValidUrl(origin))
+    throw new HttpBadRequestError("Invalid origin provided");
 
   const isOriginBanned = origin ? 
     network.banned_domains.some(banned => lowerCaseIncludes(origin, banned)) : false;

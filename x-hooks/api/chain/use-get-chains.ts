@@ -9,7 +9,7 @@ import { api } from "services/api";
  * @param query current url query
  * @returns list of filtered chains
  */
-export default async function getChainsData(query: ParsedUrlQuery): Promise<SupportedChainData> {
+export async function useGetChains(query?: ParsedUrlQuery): Promise<SupportedChainData[]> {
   return api.get("/chains", {
     params: query
   })

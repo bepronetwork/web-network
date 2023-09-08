@@ -18,6 +18,7 @@ export default function ExplorePageView({
   recentBounties,
   recentFunding,
   networkName,
+  activeNetworks,
 }: ExplorePageViewProps) {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
 
@@ -48,7 +49,7 @@ export default function ExplorePageView({
         infos={infos}
       />
 
-      <ListActiveNetworks />
+      <ListActiveNetworks networks={activeNetworks} />
 
       <ListRecentIssues
         recentBounties={recentBounties}

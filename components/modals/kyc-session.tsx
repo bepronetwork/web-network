@@ -11,14 +11,13 @@ import Translation from "components/translation";
 import {useAppState} from 'contexts/app-state';
 import {changeCurrentUserKycSession} from 'contexts/reducers/change-current-user';
 
-import useApi from 'x-hooks/use-api';
+import { useValidateKycSession } from 'x-hooks/api/kyc';
 
 export function KycSessionModal() {
   const [show, setShow] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [timer, setTimer] = useState(null);
 
-  const {validateKycSession} = useApi()
   const {state, dispatch} = useAppState()
 
   const session = state?.currentUser?.kycSession;
@@ -26,7 +25,7 @@ export function KycSessionModal() {
 
   function handlerValidateSession() {
     if (session?.session_id)
-      validateKycSession(session?.session_id)
+      useValidateKycSession(session?.session_id)
         .then((data) => {
           dispatch(changeCurrentUserKycSession(data))
         })

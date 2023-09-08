@@ -10,7 +10,7 @@ import Stepper from "components/stepper";
 
 import {Network} from "interfaces/network";
 
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network";
 
 import {useAppState} from "../contexts/app-state";
 
@@ -19,9 +19,6 @@ export default function AdministrationPage() {
   const [currentStep, setCurrentStep] = useState(1);
 
   const { state } = useAppState();
-
-  const {searchNetworks} = useApi();
-
 
   function handleChangeStep(stepToGo) {
     setCurrentStep(stepToGo === currentStep ? 0 : stepToGo);
@@ -33,7 +30,7 @@ export default function AdministrationPage() {
     if (!state.Service?.network?.active?.isGovernor)
       router.push("/networks");
     else
-      searchNetworks({})
+      useSearchNetworks({})
         .then(({ count, rows }) => {
           if (count > 0) setNetworks(rows);
         })

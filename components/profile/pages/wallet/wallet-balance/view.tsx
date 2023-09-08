@@ -177,7 +177,7 @@ export default function WalletBalanceView({
             handleNetworkLink={
               isOnNetwork ? null : () => handleNetworkLink(token)
             }
-            amount={token?.oraclesLocked.toFixed()}
+            amount={token?.oraclesLocked?.toFixed()}
             symbol={token?.symbol}
           />
         ))}

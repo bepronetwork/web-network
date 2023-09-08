@@ -15,41 +15,41 @@ import TabbedNavigation from "components/tabbed-navigation";
 
 import {useAppState} from "contexts/app-state";
 
-import {Network} from "interfaces/network";
-
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network";
+import useReactQuery from "x-hooks/use-react-query";
 
 export default function SetupPage(){
   const { replace } = useRouter();
-  const { t } = useTranslation(["setup", "common"])
+  const { t } = useTranslation(["setup", "common"]);
 
   const [activeTab, setActiveTab] = useState("supportedChains");
-  const [defaultNetwork, setDefaultNetwork] = useState<Network>();
 
-  const { searchNetworks } = useApi();
   const { state: { currentUser, supportedChains, connectedChain } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
   const isAdmin = !!currentUser?.isAdmin;
 
-  useEffect(() => {
-    if (isConnected && !isAdmin)
-      replace("/networks");
-  }, [currentUser?.isAdmin, currentUser?.walletAddress]);
-
   function searchForNetwork() {
-    if (!isConnected || !isAdmin) return;
-
-    searchNetworks({
+    return useSearchNetworks({
       isDefault: true
     })
       .then(({ rows, count }) => {
         if (count > 0)
-          setDefaultNetwork(rows[0]);
+          return rows[0];
+        return null;
       });
   }
 
-  useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
+  const { data: defaultNetwork } = useReactQuery( ["network", "default"],
+                                                  searchForNetwork,
+                                                  {
+                                                    enabled: isConnected && isAdmin
+                                                  });
+
+  useEffect(() => {
+    if (isConnected && !isAdmin)
+      replace("/networks");
+  }, [currentUser?.isAdmin, currentUser?.walletAddress]);
 
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;

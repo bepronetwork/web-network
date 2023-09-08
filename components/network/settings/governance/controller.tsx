@@ -14,7 +14,7 @@ import { StandAloneEvents } from "interfaces/enums/events";
 import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
-import useUpdateNetwork from "x-hooks/api/network/use-update-network";
+import { useUpdateNetwork } from "x-hooks/api/network";
 import useApi from "x-hooks/use-api";
 import { useAuthentication } from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";

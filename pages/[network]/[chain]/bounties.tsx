@@ -12,7 +12,7 @@ import { emptyBountiesPaginated, emptyNetworkOverview } from "helpers/api";
 
 import { SearchBountiesPaginated } from "types/api";
 
-import getBountiesListData from "x-hooks/api/bounty/get-bounties-list-data";
+import { getBountiesListData } from "x-hooks/api/bounty";
 import getNetworkOverviewData from "x-hooks/api/get-overview-data";
 import {useBounty} from "x-hooks/use-bounty";
 

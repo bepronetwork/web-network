@@ -61,7 +61,6 @@ interface ProposalModalProps {
 }
 
 export default function ProposalModal({
-  amountTotal,
   pullRequests = [],
   show,
   onCloseClick,
@@ -80,8 +79,8 @@ export default function ProposalModal({
 
   const {state} = useAppState();
 
-  const { handleProposeMerge } = useBepro();
   const { processEvent } = useApi();
+  const { handleProposeMerge } = useBepro();
 
   async function handleClickCreate(): Promise<void> {
     if (!currentPullRequest) return;

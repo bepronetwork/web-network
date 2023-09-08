@@ -7,7 +7,7 @@ import { api } from "services/api";
  * @param query current url query
  * @returns created comment
  */
-export default async function CreateComment(payload: {
+export async function CreateComment(payload: {
   comment: string;
   issueId: number;
   type: "deliverable" | "issue" | "proposal" | "review";

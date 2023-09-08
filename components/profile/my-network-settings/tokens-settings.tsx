@@ -12,7 +12,8 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import {Token, TokenType} from "interfaces/token";
 
-import useApi from "x-hooks/use-api";
+import { useGetTokens } from "x-hooks/api/token";
+import useReactQuery from "x-hooks/use-react-query";
 
 export default function TokensSettings({
   isGovernorRegistry = false,
@@ -27,19 +28,21 @@ export default function TokensSettings({
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const {state} = useAppState();
-
   const [isLoadingTokens, setIsLoadingTokens] = useState<boolean>(false);
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>();
   const [allowedRewardTokensList, setAllowedRewardTokensList] = useState<Token[]>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
   const [allowedTransactionalTokensList, setAllowedTransactionalTokensList] = useState<Token[]>();
+  
+  const { state } = useAppState();
+  const { fields } = useNetworkSettings();
 
-  const { getTokens } = useApi();
-
-  const {
-    fields
-  } = useNetworkSettings();
+  const connectedChainId = state.connectedChain?.id;
+  const { data: dbTokens } = useReactQuery( ["tokens", connectedChainId],
+                                            () => useGetTokens(connectedChainId),
+                                            {
+                                              enabled: !!connectedChainId
+                                            });
 
   const tokenNotInSelected = ({ address }: Token,
     selecteds: Token[],
@@ -48,14 +51,11 @@ export default function TokensSettings({
     (t.isReward === true)
     return (!selecteds?.find((f) => f.address === address && handleConditional(f)))
   }
-    
 
   async function getAllowedTokensContract() {
     setIsLoadingTokens(true);
 
     try {
-      const dbTokens = await getTokens(state.connectedChain?.id);
-
       const { 
         dbRewardAllowed,
         dbTransactionalAllowed
@@ -114,10 +114,8 @@ export default function TokensSettings({
   }
 
   useEffect(() => {
-    if (!state.Service?.active || !state.connectedChain?.id) return;
-
+    if (!state.Service?.active || !state.connectedChain?.id || !dbTokens) return;
     getAllowedTokensContract();
-      
   }, [state.Service?.active, state.connectedChain?.id, isGovernorRegistry]);
 
   useEffect(() => {
