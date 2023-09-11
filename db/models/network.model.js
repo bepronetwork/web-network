@@ -98,6 +98,10 @@ class Network extends Model {
         banned_domains: {
           type: DataTypes.ARRAY(DataTypes.STRING),
           defaultValue: []
+        },
+        allow_list: {
+          type: DataTypes.ARRAY(DataTypes.STRING),
+          defaultValue: [],
         }
       },
       {
