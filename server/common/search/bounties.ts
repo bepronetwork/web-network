@@ -208,8 +208,8 @@ export default async function get(query: ParsedUrlQuery) {
     where: {
       state: {
         [Op.notIn]: ["pending", "canceled"],
-        visible: true
-      }
+      },
+      visible: true,
     }
   });
 
