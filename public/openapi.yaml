@@ -553,7 +553,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Bounty'
-
   /merge-proposal/{id}/:
     get:
       parameters:
@@ -575,6 +574,90 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MergeProposal'
+  /network/management/{id}/whitelist/:
+    get:
+      description: "retrieves the list for the allow list of the network"
+      responses:
+        400:
+          description: "invalid params"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        200:
+          description: "results the list if no address given"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /network/management/{id}/whitelist/{address}:
+    post:
+      description: "adds a new address to the allow_list column"
+      responses:
+        400:
+          description: "invalid params"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        200:
+          description: "created returns the updated list"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      description: "checks for allow list or existence of address"
+      responses:
+        400:
+          description: "invalid params"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        200:
+          description: "results the list if no address given"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  allowed:
+                    type: boolean
+    delete:
+      description: "removes an item from the list"
+      responses:
+        400:
+          description: "invalid params"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        200:
+          description: "deleted, returns the updated array"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
   /nft/:
     post:
       description: create a nft for the given bounty
@@ -854,7 +937,7 @@ paths:
           name: type
           required: true
           schema:
-            enum: [all, open, closed]
+            enum: [ all, open, closed ]
             type: string
             default: all
         - in: query
@@ -889,7 +972,7 @@ paths:
         - in: query
           name: isCurrentlyCurator
           schema:
-            enum: [true, false]
+            enum: [ true, false ]
             type: string
       responses:
         404:
@@ -997,7 +1080,7 @@ paths:
         - in: query
           name: order
           schema:
-            enum: [DESC, ASC]
+            enum: [ DESC, ASC ]
             type: string
       responses:
         404:
@@ -1099,7 +1182,7 @@ paths:
         - in: query
           name: order
           schema:
-            enum: [DESC, ASC]
+            enum: [ DESC, ASC ]
             type: string
       responses:
         200:
@@ -1178,7 +1261,7 @@ paths:
         - in: query
           name: order
           schema:
-            enum: [DESC, ASC]
+            enum: [ DESC, ASC ]
             type: string
       responses:
         200:
