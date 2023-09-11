@@ -47,8 +47,10 @@ export default async function get(query: ParsedUrlQuery) {
   if (state && !["disputable", "mergeable"].includes(state.toString())) {
     if (state === "funding")
       whereCondition.fundingAmount = {
-        [Op.ne]: "0",
-        [Op.ne]: Sequelize.literal('"issue"."fundedAmount"'),
+        [Op.and]: [
+          { [Op.ne]: "0" },
+          { [Op.ne]: Sequelize.literal('"issue"."fundedAmount"') },
+        ]
       };
     else if (state === "open") {
       whereCondition.state[Op.in] = ["open", "ready", "proposal"];
@@ -205,8 +207,9 @@ export default async function get(query: ParsedUrlQuery) {
   const totalBounties = await models.issue.count({
     where: {
       state: {
-        [Op.notIn]: ["pending", "canceled"]
-      }
+        [Op.notIn]: ["pending", "canceled"],
+      },
+      visible: true,
     }
   });
 
