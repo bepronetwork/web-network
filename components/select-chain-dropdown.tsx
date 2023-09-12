@@ -23,6 +23,8 @@ interface SelectChainDropdownProps {
   className?: string;
   isDisabled?: boolean;
   placeHolder?: string;
+  shouldMatchChain?: boolean;
+  readonly?: boolean;
 }
 
 interface ChainOption {
@@ -39,7 +41,9 @@ export default function SelectChainDropdown({
   className = "text-uppercase",
   onSelect,
   isDisabled,
-  placeHolder
+  placeHolder,
+  shouldMatchChain = true,
+  readonly,
 }: SelectChainDropdownProps) {
   const { t } = useTranslation("common");
 
@@ -48,6 +52,9 @@ export default function SelectChainDropdown({
 
   const { isDesktopView } = useBreakPoint();
   const { state: { Service, supportedChains, connectedChain, currentUser, spinners } } = useAppState();
+
+  const placeholder = 
+    !shouldMatchChain ? t("misc.all-chains") : placeHolder ? placeHolder : t("forms.select-placeholder");
 
   function chainToOption(chain: SupportedChainData | Partial<SupportedChainData>, isDisabled?: boolean): ChainOption {
     return {
@@ -68,6 +75,8 @@ export default function SelectChainDropdown({
   }
 
   async function selectSupportedChain({value}) {
+    if (readonly) return;
+
     const chain = supportedChains?.find(({ chainId }) => +chainId === +value.chainId);
 
     if (!chain || chain?.chainId === selected?.value?.chainId)
@@ -78,6 +87,11 @@ export default function SelectChainDropdown({
   }
 
   function updateSelectedChainMatchConnected() {
+    if (!shouldMatchChain) {
+      setSelectedChain(null);
+      return;
+    }
+
     let chain = undefined;
 
     if (isOnNetwork && Service?.network?.active?.chain)
@@ -140,7 +154,8 @@ export default function SelectChainDropdown({
     options,
     Service?.network?.active?.chain,
     connectedChain?.id,
-    spinners
+    spinners,
+    shouldMatchChain
   ]);
 
   return(
@@ -154,7 +169,7 @@ export default function SelectChainDropdown({
           options={options}
           value={selected}
           onChange={selectSupportedChain}
-          placeholder={placeHolder ? placeHolder : t("forms.select-placeholder")}
+          placeholder={placeholder}
           isDisabled={isDisabled || !supportedChains?.length || !!defaultChain}
           isSearchable={false}
           readOnly={true}
