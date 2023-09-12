@@ -219,7 +219,8 @@
     "empty-list": "Empty List",
     "learn-more": "Learn More",
     "origin": "Origin",
-    "type": "Type"
+    "type": "Type",
+    "all-chains": "All Chains"
   },
   "modals": {
     "help-modal": {
