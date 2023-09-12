@@ -25,6 +25,7 @@ import useNetworkTheme from "x-hooks/use-network-theme";
 
 import NetworkManagement from "./management/view";
 import NetworkPermissions from "./permissions/banned-words/controller";
+import AllowList from "./permissions/allow-list/allow-list-controller";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -192,7 +193,10 @@ export default function MyNetworkSettings({
         eventKey: "permissions",
         title: t("custom-network:steps.permissions.title"),
         component: (
-          <NetworkPermissions network={network}/>
+          <>
+            <NetworkPermissions network={network}/>
+            <AllowList networkId={network.id} />
+          </>
         )
       }
     ])

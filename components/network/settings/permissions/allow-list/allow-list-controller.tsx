@@ -8,7 +8,7 @@ import useDeleteAllowListEntry
   from "../../../../../x-hooks/api/network/management/allow-list/use-delete-allow-list-entry";
 import useAddAllowListEntry from "../../../../../x-hooks/api/network/management/allow-list/use-add-allow-list-entry";
 
-type AllowListProps = {networkId: null};
+type AllowListProps = {networkId: number};
 
 export default function AllowList({networkId}: AllowListProps) {
   const {data: allowListOfNetwork, invalidate} =
