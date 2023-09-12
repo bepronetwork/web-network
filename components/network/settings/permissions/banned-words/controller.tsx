@@ -1,13 +1,17 @@
-import { useState } from "react";
+import {useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { useAppState } from "contexts/app-state";
-import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
+import {useAppState} from "../../../../../contexts/app-state";
+import {toastError, toastSuccess} from "../../../../../contexts/reducers/change-toaster";
 
-import { Network } from "interfaces/network";
+import {Network} from "../../../../../interfaces/network";
 
-import { getBannedWordsData, CreateBannedWord, RemoveBannedWord } from "x-hooks/api/network/management/banned-words";
+import {
+  CreateBannedWord,
+  getBannedWordsData,
+  RemoveBannedWord
+} from "../../../../../x-hooks/api/network/management/banned-words";
 
 import NetworkPermissionsView from "./view";
 

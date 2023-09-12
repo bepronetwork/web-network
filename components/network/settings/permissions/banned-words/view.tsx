@@ -1,10 +1,10 @@
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import { Divider } from "components/divider";
+import {Divider} from "../../../../divider";
 
-import NetworkTabContainer from "../tab-container/view";
-import PermissionInput from "./input/view";
-import PermissionsItem from "./item/view";
+import NetworkTabContainer from "../../tab-container/view";
+import PermissionInput from "../../../../common/inputs/permission-input/permission-input";
+import PermissionListItem from "../../../../common/lists/permission-list/permission-list-item";
 
 interface NetworkPermissionsViewProps {
   domain: string;
@@ -41,7 +41,7 @@ export default function NetworkPermissionsView({
           <div className="d-flex flex-column mt-4">
             <span className="mb-4">{t("steps.permissions.domains.list")}</span>
             {domains.map((value, key) => (
-              <PermissionsItem
+              <PermissionListItem
                 value={value}
                 id={key}
                 onTrashClick={handleRemoveDomain}
