@@ -6,9 +6,6 @@ import MultiActionButton from "components/common/buttons/multi-action/view";
 import If from "components/If";
 import InternalLink from "components/internal-link";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
-import {useSession} from "next-auth/react";
-import {CustomSession} from "../../interfaces/custom-session";
-import {UserRoleUtils} from "../../server/utils/jwt";
 
 interface Action {
   label: string;
@@ -18,20 +15,15 @@ interface Action {
 interface CreateNetworkBountyButtonViewProps {
   isOnNetwork: boolean;
   actions: Action[];
+  userCanCreateBounties?: boolean;
 }
 
 export default function CreateNetworkBountyButtonView({
   isOnNetwork,
+  userCanCreateBounties,
   actions
 }: CreateNetworkBountyButtonViewProps) {
   const { t } = useTranslation("common");
-  const session = useSession();
-
-  const userCanCreateBounties =
-    (session?.data as CustomSession)?.user?.roles
-      ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles)
-      : true // if no session roles are found we will let the normal flow deal with an unauthenticated user
-
 
   return(
     <ReadOnlyButtonWrapper>
