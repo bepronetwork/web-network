@@ -25,8 +25,7 @@
         "ArrayExpression": "first",
         "CallExpression": {
           "arguments": "first"
-        },
-        "SwitchCase": 1
+        }
       }
     ],
     "no-prototype-builtins": 0,
