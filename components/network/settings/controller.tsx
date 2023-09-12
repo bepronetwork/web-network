@@ -1,33 +1,30 @@
-import { ReactNode, useEffect, useState } from "react";
+import {ReactNode, useEffect, useState} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import NetworkGovernanceSettings from "components/network/settings/governance/controller";
 import NetworkLogoAndColorsSettings from "components/network/settings/logo-and-colors/controller";
 import NetworkRegistrySettings from "components/network/settings/registry/controller";
 import MyNetworkSettingsView from "components/network/settings/view";
 
-import { useAppState } from "contexts/app-state";
-import { useNetworkSettings } from "contexts/network-settings";
-import {
-  toastError,
-  toastSuccess
-} from "contexts/reducers/change-toaster";
+import {useAppState} from "contexts/app-state";
+import {useNetworkSettings} from "contexts/network-settings";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
 
-import { IM_AM_CREATOR_NETWORK } from "helpers/constants";
-import { psReadAsText } from "helpers/file-reader";
+import {IM_AM_CREATOR_NETWORK} from "helpers/constants";
+import {psReadAsText} from "helpers/file-reader";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 
-import { SearchBountiesPaginated } from "types/api";
+import {SearchBountiesPaginated} from "types/api";
 
-import { useUpdateNetwork } from "x-hooks/api/network";
-import { useAuthentication } from "x-hooks/use-authentication";
-import { useNetwork } from "x-hooks/use-network";
+import {useUpdateNetwork} from "x-hooks/api/network";
+import {useAuthentication} from "x-hooks/use-authentication";
+import {useNetwork} from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
 
 import NetworkManagement from "./management/view";
-import NetworkPermissions from "./permissions/controller";
+import NetworkPermissions from "./permissions/banned-words/controller";
 
 interface MyNetworkSettingsProps {
   network: Network;
