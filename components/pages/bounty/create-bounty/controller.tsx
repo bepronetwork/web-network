@@ -4,7 +4,7 @@ import {NumberFormatValues} from "react-number-format";
 import BigNumber from "bignumber.js";
 import {useTranslation} from "next-i18next";
 import router, {useRouter} from "next/router";
-import { useDebouncedCallback } from "use-debounce";
+import {useDebouncedCallback} from "use-debounce";
 
 import {IFilesProps} from "components/drag-and-drop";
 import CreateBountyPageView from "components/pages/bounty/create-bounty/view";
@@ -14,9 +14,9 @@ import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
 import {BODY_CHARACTERES_LIMIT, UNSUPPORTED_CHAIN} from "helpers/constants";
-import { addFilesToMarkdown } from "helpers/markdown";
+import {addFilesToMarkdown} from "helpers/markdown";
 import {parseTransaction} from "helpers/transactions";
-import { isValidUrl } from "helpers/validateUrl";
+import {isValidUrl} from "helpers/validateUrl";
 
 import {BountyPayload} from "interfaces/create-bounty";
 import {MetamaskErrors, OriginLinkErrors} from "interfaces/enums/Errors";
@@ -30,13 +30,16 @@ import {SimpleBlockTransactionPayload} from "interfaces/transaction";
 
 import {getCoinInfoByContract, getCoinList} from "services/coingecko";
 
-import { useCreatePreBounty } from "x-hooks/api/bounty";
+import {useCreatePreBounty} from "x-hooks/api/bounty";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import {useDao} from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
+import {useSession} from "next-auth/react";
+import {CustomSession} from "../../../../interfaces/custom-session";
+import {UserRoleUtils} from "../../../../server/utils/jwt";
 
 const ZeroNumberFormatValues = {
   value: "",
@@ -77,6 +80,13 @@ export default function CreateBountyPage({
   const [deliverableType, setDeliverableType] = useState<string>();
   const [originLink, setOriginLink] = useState<string>("");
   const [originLinkError, setOriginLinkError] = useState<OriginLinkErrors>();
+  const session = useSession();
+
+  const userCanCreateBounties =
+    (session?.data as CustomSession)?.user?.roles
+      ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles)
+      : true // if no session roles are found we will let the normal flow deal with an unauthenticated user
+
 
   const rewardERC20 = useERC20();
   const transactionalERC20 = useERC20();
@@ -592,7 +602,8 @@ export default function CreateBountyPage({
         funders_reward:
           (rewardAmount.value && isFundingType) &&
           `${rewardAmount.value} ${rewardToken?.symbol}`,
-      }} 
+      }}
+      allowCreateBounty={userCanCreateBounties}
     />
   );
 }
