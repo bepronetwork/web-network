@@ -8,17 +8,17 @@ import post from "../../../../../../server/common/network/management/whitelist/p
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
-    case "GET":
-      await get(req, res);
-      break;
-    case "POST":
-      await post(req, res);
-      break;
-    case "DELETE":
-      await deleteEntry(req, res);
-      break;
-    default:
-      res.status(405);
+  case "GET":
+    await get(req, res);
+    break;
+  case "POST":
+    await post(req, res);
+    break;
+  case "DELETE":
+    await deleteEntry(req, res);
+    break;
+  default:
+    res.status(405);
   }
 
   res.end();
