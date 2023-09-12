@@ -1,7 +1,8 @@
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
-import Button from "components/button";
-import { FormGroup } from "components/form-group";
+import Button from "../../../button";
+import {FormGroup} from "../../../form-group";
+import {ReactNode} from "react";
 
 interface PermissionInputProps {
   placeholder?: string;
@@ -9,14 +10,20 @@ interface PermissionInputProps {
   onChange: (newValue: string) => void;
   onClickAdd: () => void;
   disabledButton?: boolean;
+  onBlur?: () => void;
+  error?: string | ReactNode;
+  hint?: string | ReactNode;
 }
 
 export default function PermissionInput({
   placeholder,
   value,
   onChange,
+  onBlur = () => {},
   onClickAdd,
-  disabledButton
+  disabledButton,
+  error,
+  hint,
 }: PermissionInputProps) {
   const { t } = useTranslation(["common"]);
 
@@ -29,7 +36,10 @@ export default function PermissionInput({
         colProps={{ xs: "12", md: "6", xl: "5" }}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         label=""
+        error={error}
+        hint={hint}
       />
       <div className="mt-2">
         <Button onClick={onClickAdd} disabled={disabledButton}>{t("misc.add")}</Button>

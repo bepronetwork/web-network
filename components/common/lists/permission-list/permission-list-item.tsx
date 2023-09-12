@@ -1,4 +1,4 @@
-import TrashIcon from "assets/icons/trash-icon";
+import TrashIcon from "../../../../assets/icons/trash-icon";
 
 interface PermissionsItemProps {
   value: string;
@@ -6,7 +6,7 @@ interface PermissionsItemProps {
   onTrashClick: (v: string) => void;
 }
 
-export default function PermissionsItem({
+export default function PermissionListItem({
   value,
   id,
   onTrashClick,
