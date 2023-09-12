@@ -3,12 +3,8 @@ import {isZeroAddress} from "ethereumjs-util";
 
 import {useAppState} from "contexts/app-state";
 
-import {
-  CancelPrePullRequestParams,
-  CreatePrePullRequestParams,
-  PastEventsParams
-} from "interfaces/api";
-import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
+import {CancelPrePullRequestParams, CreatePrePullRequestParams, PastEventsParams} from "interfaces/api";
+import {NetworkEvents, RegistryEvents, StandAloneEvents} from "interfaces/enums/events";
 
 import {api} from "services/api";
 
@@ -25,26 +21,26 @@ export default function useApi() {
   const  {state, dispatch} = useAppState();
   const DEFAULT_NETWORK_NAME = state?.Service?.network?.active?.name
 
-  api.interceptors.request.use(config => {
-
-    if (typeof window === 'undefined')
-      return config;
-
-    const currentWallet = sessionStorage.getItem("currentWallet") || ''
-    const currentSignature = sessionStorage.getItem("currentSignature") || undefined;
-    const currentChainId = sessionStorage.getItem("currentChainId") || 0;
-
-    if (currentWallet)
-      config.headers["wallet"] = currentWallet;
-
-    if (currentSignature)
-      config.headers["signature"] = currentSignature;
-
-    if (+currentChainId)
-      config.headers["chain"] = +currentChainId;
-
-    return config;
-  });
+  // api.interceptors.request.use(config => {
+  //
+  //   if (typeof window === 'undefined')
+  //     return config;
+  //
+  //   const currentWallet = sessionStorage.getItem("currentWallet") || ''
+  //   const currentSignature = sessionStorage.getItem("currentSignature") || undefined;
+  //   const currentChainId = sessionStorage.getItem("currentChainId") || 0;
+  //
+  //   if (currentWallet)
+  //     config.headers["wallet"] = currentWallet;
+  //
+  //   if (currentSignature)
+  //     config.headers["signature"] = currentSignature;
+  //
+  //   if (+currentChainId)
+  //     config.headers["chain"] = +currentChainId;
+  //
+  //   return config;
+  // });
 
   async function createToken(payload: {address: string; minAmount: string; chainId: number }) {
     return api

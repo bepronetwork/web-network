@@ -1,5 +1,6 @@
 export enum UserRole {
   USER = "user",
   ADMIN = "admin",
-  GOVERNOR = "governor"
+  GOVERNOR = "governor",
+  CREATE_BOUNTY = "create-bounty",
 }

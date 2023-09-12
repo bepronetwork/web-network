@@ -1,19 +1,19 @@
-import { NextApiRequest } from "next";
-import { JWT } from "next-auth/jwt";
+import {NextApiRequest} from "next";
+import {JWT} from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getCsrfToken } from "next-auth/react";
+import {getCsrfToken} from "next-auth/react";
 
 import models from "db/models";
 
-import { caseInsensitiveEqual } from "helpers/db/conditionals";
-import { AddressValidator } from "helpers/validators/address";
+import {caseInsensitiveEqual} from "helpers/db/conditionals";
+import {AddressValidator} from "helpers/validators/address";
 
-import { UserRole } from "interfaces/enums/roles";
+import {UserRole} from "interfaces/enums/roles";
 
-import { siweMessageService } from "services/ethereum/siwe";
+import {siweMessageService} from "services/ethereum/siwe";
 
-import { AuthProvider } from "server/auth/providers";
-import { UserRoleUtils } from "server/utils/jwt";
+import {AuthProvider} from "server/auth/providers";
+import {UserRoleUtils} from "server/utils/jwt";
 
 export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthProvider => ({
   config: CredentialsProvider({
@@ -90,6 +90,15 @@ export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthPr
         .then(networks => 
           networks.map(({ networkAddress, chain_id }) => UserRoleUtils.getGovernorRole(chain_id, networkAddress)))
         .catch(() => []);
+
+      const result = await models.network.find({
+        attributes: ["allow_list"],
+        where: {networkId: req.headers.networkId}
+      });
+
+      if (!result?.allow_list.length || result?.allow_list?.length && result.allow_list.includes(address))
+        roles.push(UserRole.CREATE_BOUNTY);
+
 
       roles.push(...governorOf);
 
