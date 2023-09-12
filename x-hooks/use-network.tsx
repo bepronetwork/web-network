@@ -13,12 +13,12 @@ import {
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
-import { Network } from "interfaces/network";
+import {Network} from "interfaces/network";
 import {ProfilePages} from "interfaces/utils";
 
 import {WinStorage} from "services/win-storage";
 
-import { useSearchNetworks } from "x-hooks/api/network";
+import {useSearchNetworks} from "x-hooks/api/network";
 import useChain from "x-hooks/use-chain";
 
 export function useNetwork() {
@@ -26,6 +26,7 @@ export function useNetwork() {
 
   const [networkName, setNetworkName] = useState<string>('');
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
+  const [lastNetworkId,] = useState(new WinStorage(`lastNetworkId`, 0, 'localStorage'));
 
   const {state, dispatch} = useAppState();
   const { findSupportedChain } = useChain();
@@ -97,6 +98,7 @@ export function useNetwork() {
 
           const newCachedData = new WinStorage(getStorageKey(data.name, data.chain.chainId), 3600, `sessionStorage`);
           newCachedData.value = data;
+          lastNetworkId.value = data.id;
 
           dispatch(changeNetworkLastVisited(queryNetworkName));
           dispatchNetworkContextUpdates(newCachedData.value);
