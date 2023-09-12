@@ -7,8 +7,8 @@ import If from "components/If";
 import InternalLink from "components/internal-link";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import {useSession} from "next-auth/react";
-import {UserRole} from "../../interfaces/enums/roles";
 import {CustomSession} from "../../interfaces/custom-session";
+import {UserRoleUtils} from "../../server/utils/jwt";
 
 interface Action {
   label: string;
@@ -27,6 +27,12 @@ export default function CreateNetworkBountyButtonView({
   const { t } = useTranslation("common");
   const session = useSession();
 
+  const userCanCreateBounties =
+    (session?.data as CustomSession)?.user?.roles
+      ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles)
+      : true // if no session roles are found we will let the normal flow deal with an unauthenticated user
+
+
   return(
     <ReadOnlyButtonWrapper>
       <If 
@@ -40,7 +46,7 @@ export default function CreateNetworkBountyButtonView({
           />
         }
       >
-        <If condition={(session?.data as CustomSession)?.user?.roles?.includes(UserRole.CREATE_BOUNTY)}>
+        <If condition={userCanCreateBounties}>
           <InternalLink
             href={"/create-bounty"}
             icon={<PlusIcon />}
