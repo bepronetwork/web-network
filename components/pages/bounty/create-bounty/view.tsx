@@ -1,16 +1,18 @@
-import { MouseEvent } from "react";
+import {MouseEvent} from "react";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import CreateBountyCard from "components/bounty/create-bounty/create-bounty-card";
 import CreateBountyContainer from "components/bounty/create-bounty/create-bounty-container";
 import CreateBountySteps from "components/bounty/create-bounty/create-bounty-steps";
 import BountyDetailsSection from "components/bounty/create-bounty/sections/bounty-details/controller";
-import CreateBountyReviewSection from "components/bounty/create-bounty/sections/review/view";
-import { CreateBountyReviewSectionProps } from "components/bounty/create-bounty/sections/review/view";
+import CreateBountyReviewSection, {
+  CreateBountyReviewSectionProps
+} from "components/bounty/create-bounty/sections/review/view";
 import RewardInformationSection from "components/bounty/create-bounty/sections/reward-information/controller";
-import SelectNetworkSection from "components/bounty/create-bounty/sections/select-network/view";
-import { SelectNetworkSectionProps } from "components/bounty/create-bounty/sections/select-network/view";
+import SelectNetworkSection, {
+  SelectNetworkSectionProps
+} from "components/bounty/create-bounty/sections/select-network/view";
 import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
 import ContractButton from "components/contract-button";
@@ -18,11 +20,12 @@ import CustomContainer from "components/custom-container";
 import If from "components/If";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
-import { TERMS_AND_CONDITIONS_LINK } from "helpers/constants";
+import {TERMS_AND_CONDITIONS_LINK} from "helpers/constants";
 
-import { BountyDetailsSectionProps } from "interfaces/create-bounty";
+import {BountyDetailsSectionProps} from "interfaces/create-bounty";
 
-import { RewardInformationSectionProps } from "types/components";
+import {RewardInformationSectionProps} from "types/components";
+import Modal from "../../../modal";
 
 interface CreateBountyPageViewProps 
   extends SelectNetworkSectionProps, 
@@ -42,6 +45,7 @@ interface CreateBountyPageViewProps
   onApproveClick: () => void;
   onNextOrCreateButtonClick: () => void;
   onSectionHeaderClick: (i: number) => void;
+  allowCreateBounty?: boolean;
 }
 
 export default function CreateBountyPageView({
@@ -190,6 +194,10 @@ export default function CreateBountyPageView({
   return (
     <CreateBountyContainer>
       <CustomContainer col="col-xs-12 col-xl-10 px-0">
+        <Modal show={!rest.allowCreateBounty} onCloseDisabled={true}
+               title={t('bounty:not-allowed-modal.title')}>
+          <p>{t('bounty:not-allowed-modal.content')}</p>
+        </Modal>
         <CreateBountySteps
           steps={creationSteps}
           currentSection={currentSection}
