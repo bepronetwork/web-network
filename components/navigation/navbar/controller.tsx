@@ -10,7 +10,7 @@ export default function NavBar() {
   const { pathname } = useRouter();
 
   const { state } = useAppState();
-  const { getURLWithNetwork } = useNetwork();
+  const { getURLWithNetwork, activeNetworkId } = useNetwork();
 
   const isOnNetwork = pathname?.includes("[network]");
   const networkLogo = state.Service?.network?.active?.fullLogo;
@@ -21,6 +21,7 @@ export default function NavBar() {
 
   return (
     <NavBarView
+      networkId={activeNetworkId}
       isOnNetwork={isOnNetwork}
       isCurrentNetworkClosed={state.Service?.network?.active?.isClosed}
       isConnected={!!state.currentUser?.walletAddress}

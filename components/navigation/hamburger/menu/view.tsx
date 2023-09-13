@@ -1,6 +1,6 @@
-import { Offcanvas } from "react-bootstrap";
+import {Offcanvas} from "react-bootstrap";
 
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import ArrowLeft from "assets/icons/arrow-left";
 import ArrowRight from "assets/icons/arrow-right";
@@ -15,9 +15,9 @@ import InternalLink from "components/internal-link";
 import ChainSelector from "components/navigation/chain-selector/controller";
 import ProfileLinks from "components/profile/profile-links";
 
-import { truncateAddress } from "helpers/truncate-address";
+import {truncateAddress} from "helpers/truncate-address";
 
-import { Link } from "types/utils";
+import {Link} from "types/utils";
 
 interface HamburgerMenuViewProps {
   show: boolean;
@@ -30,6 +30,7 @@ interface HamburgerMenuViewProps {
   onShowProfileLinks: () => void;
   onHideProfileLinks: () => void;
   onHideHamburger: () => void;
+  networkId: number;
 }
 
 export default function HamburgerMenuView({
@@ -43,6 +44,7 @@ export default function HamburgerMenuView({
   onShowProfileLinks,
   onHideProfileLinks,
   onHideHamburger,
+  networkId,
 }: HamburgerMenuViewProps) {
   const { t } = useTranslation("common");
 
@@ -128,6 +130,7 @@ export default function HamburgerMenuView({
 
               <div className="d-flex flex-column gap-4 py-3">
                 <CreateNetworkBountyButton
+                  networkId={networkId}
                   actionCallBack={onHideHamburger}
                 />
 

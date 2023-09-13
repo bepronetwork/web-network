@@ -6,6 +6,8 @@ import Database from "db/models";
 
 import {resJsonMessage} from "../../../../../helpers/res-json-message";
 import {ErrorMessages} from "../../../../errors/error-messages";
+import {HttpBadRequestError} from "../../../../errors/http-errors";
+
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (!req.query?.address || req.query?.networkId || (req.query?.address && !isAddress(req.query.address as string)))
@@ -24,7 +26,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!result)
-    return resJsonMessage(ErrorMessages.NoNetworkFoundOrUserAllowed, res, 400);
+    throw new HttpBadRequestError(ErrorMessages.NoNetworkFoundOrUserAllowed)
 
 
   const [, updatedAllowList] = await Database.network.update({
@@ -37,5 +39,5 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     returning: true,
   });
 
-  return res.status(200).json(updatedAllowList.allow_list); // an array of the new values
+  return updatedAllowList.allow_list; // an array of the new values
 }

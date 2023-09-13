@@ -91,16 +91,13 @@ export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthPr
           networks.map(({ networkAddress, chain_id }) => UserRoleUtils.getGovernorRole(chain_id, networkAddress)))
         .catch(() => []);
 
-      const result = await models.network.find({
-        attributes: ["allow_list"],
-        where: {networkId: req.headers.networkId}
-      });
+      const allowBountyCreationOnNetworks = await models.network
+        .findAll({attributes: ["allow_list", "id"],})
+        .then((rows) =>
+          rows.filter(({allow_list}) => (!allow_list.length || allow_list.includes(address)))
+            .map(({id}) => UserRoleUtils.getCreateBountyRole(id)))
 
-      if (!result?.allow_list.length || result?.allow_list?.length && result.allow_list.includes(address))
-        roles.push(UserRole.CREATE_BOUNTY);
-
-
-      roles.push(...governorOf);
+      roles.push(...governorOf, ...allowBountyCreationOnNetworks);
 
       return {
         ...token,

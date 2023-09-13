@@ -5,6 +5,8 @@ import {isAddress} from "web3-utils";
 import Database from "../../../../../db/models";
 import {resJsonMessage} from "../../../../../helpers/res-json-message";
 import {ErrorMessages} from "../../../../errors/error-messages";
+import {HttpBadRequestError} from "../../../../errors/http-errors";
+
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (!req.query?.address || req.query?.networkId || (req.query?.address && !isAddress(req.query.address as string)))
@@ -21,7 +23,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!result)
-    return resJsonMessage(ErrorMessages.NoNetworkFoundOrUserNotAllowed, res, 200);
+    throw new HttpBadRequestError(ErrorMessages.NoNetworkFoundOrUserNotAllowed)
 
   const [, updatedAllowList] = await Database.network.update({
     allow_list: [...result.allow_list.splice(1, result.allow_list.findIndex(req.query.address))],
@@ -29,5 +31,5 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   })
 
 
-  return res.status(200).json(updatedAllowList);
+  return updatedAllowList;
 }
