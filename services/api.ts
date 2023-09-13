@@ -23,7 +23,6 @@ api.interceptors.request.use(config => {
   const currentWallet = sessionStorage.getItem("currentWallet") || ''
   const currentSignature = sessionStorage.getItem("currentSignature") || undefined;
   const currentChainId = sessionStorage.getItem("currentChainId") || 0;
-  const currentNetwork = sessionStorage.getItem(`lastNetworkId`) || null;
 
   if (currentWallet)
     config.headers["wallet"] = currentWallet;
@@ -33,9 +32,6 @@ api.interceptors.request.use(config => {
 
   if (+currentChainId)
     config.headers["chain"] = +currentChainId;
-
-  if (currentNetwork !== null)
-    config.headers["networkId"] = +currentNetwork;
 
   return config;
 });
