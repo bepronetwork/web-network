@@ -148,7 +148,18 @@
         "remove-message": "Banned word removed",
         "remove-not-found": "Banned word not found",
         "remove-error": "Error remove banned word"
-      }  
+      },
+      "allow-list": {
+        "title": "Bounty creation allow list",
+        "description": "Curate a list of addresses that can create bounties",
+        "hint": "value must be a valid address",
+        "list": "",
+        "error": {
+          "already-exists": "User already exists on the allow list",
+          "not-address": "Written value is not a valid address",
+          "": ""
+        }
+      }
     },
     "repositories": {
       "title": "Add Repositories",

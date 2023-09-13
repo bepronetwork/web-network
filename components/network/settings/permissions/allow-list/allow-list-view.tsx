@@ -30,9 +30,6 @@ export default function AllowListView({value, onValueChange, onAddClick, allowLi
       <If condition={allowList.length > 0}>
         <>
           <div className="d-flex flex-column mt-4">
-            <span className="mb-4">
-              <Translation ns="custom-network" label="steps.permissions.allow-list.list" />
-            </span>
             {allowList.map((address, index) =>
               <PermissionListItem value={address} id={index} onTrashClick={onTrashClick} />)}
           </div>
