@@ -14,7 +14,6 @@ interface NavBarViewProps {
   isConnected: boolean;
   brandHref: string | UrlObject;
   logoUrl: string;
-  networkId: number;
 }
 
 export default function NavBarView({
@@ -23,7 +22,6 @@ export default function NavBarView({
   isConnected,
   brandHref,
   logoUrl,
-  networkId,
 }: NavBarViewProps) {
   const isClosedAlertVisible = isOnNetwork && isCurrentNetworkClosed;
   const paddingY = isConnected ? "py-0" : "py-3";
@@ -57,7 +55,7 @@ export default function NavBarView({
             <NavBarLinks />
           </div>
 
-          <NavBarActions networkId={networkId} />
+          <NavBarActions />
         </div>
       </div>
     </div>
