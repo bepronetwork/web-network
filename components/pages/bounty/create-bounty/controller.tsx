@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {NumberFormatValues} from "react-number-format";
 
 import BigNumber from "bignumber.js";
+import {useSession} from "next-auth/react";
 import {useTranslation} from "next-i18next";
 import router, {useRouter} from "next/router";
 import {useDebouncedCallback} from "use-debounce";
@@ -37,7 +38,7 @@ import {useDao} from "x-hooks/use-dao";
 import useERC20 from "x-hooks/use-erc20";
 import {useNetwork} from "x-hooks/use-network";
 import useNetworkChange from "x-hooks/use-network-change";
-import {useSession} from "next-auth/react";
+
 import {CustomSession} from "../../../../interfaces/custom-session";
 import {UserRoleUtils} from "../../../../server/utils/jwt";
 
@@ -84,7 +85,7 @@ export default function CreateBountyPage({
 
   const userCanCreateBounties =
     (session?.data as CustomSession)?.user?.roles
-      ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles)
+      ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles, currentNetwork.id)
       : true // if no session roles are found we will let the normal flow deal with an unauthenticated user
 
 

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { UrlObject } from "url";
+import {UrlObject} from "url";
 
 import ClosedNetworkAlert from "components/closed-network-alert";
 import BrandLogo from "components/common/brand-logo/view";
@@ -14,6 +14,7 @@ interface NavBarViewProps {
   isConnected: boolean;
   brandHref: string | UrlObject;
   logoUrl: string;
+  networkId: number;
 }
 
 export default function NavBarView({
@@ -22,6 +23,7 @@ export default function NavBarView({
   isConnected,
   brandHref,
   logoUrl,
+  networkId,
 }: NavBarViewProps) {
   const isClosedAlertVisible = isOnNetwork && isCurrentNetworkClosed;
   const paddingY = isConnected ? "py-0" : "py-3";
@@ -55,7 +57,7 @@ export default function NavBarView({
             <NavBarLinks />
           </div>
 
-          <NavBarActions />
+          <NavBarActions networkId={networkId} />
         </div>
       </div>
     </div>

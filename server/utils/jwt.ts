@@ -7,6 +7,10 @@ export class UserRoleUtils {
     return `${UserRole.GOVERNOR}:${chainId}_${networkAddress}`;
   }
 
+  static getCreateBountyRole(networkId: number) {
+    return `${UserRole.CREATE_BOUNTY}:${networkId}`;
+  }
+
   static hasAdminRole(token: JwtToken) {
     return !!token?.roles?.includes("admin");
   }
@@ -23,7 +27,7 @@ export class UserRoleUtils {
     return !!roles?.find(role => role?.includes(`governor:${chainId}`));
   }
 
-  static hasCreateBountyRole(roles: string[] = []) {
-    return roles.includes(UserRole.CREATE_BOUNTY);
+  static hasCreateBountyRole(roles: string[] = [], onNetworkId: number) {
+    return roles.includes(UserRoleUtils.getCreateBountyRole(onNetworkId));
   }
 }
