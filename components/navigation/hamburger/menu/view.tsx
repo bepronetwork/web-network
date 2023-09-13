@@ -30,7 +30,6 @@ interface HamburgerMenuViewProps {
   onShowProfileLinks: () => void;
   onHideProfileLinks: () => void;
   onHideHamburger: () => void;
-  networkId: number;
 }
 
 export default function HamburgerMenuView({
@@ -44,7 +43,6 @@ export default function HamburgerMenuView({
   onShowProfileLinks,
   onHideProfileLinks,
   onHideHamburger,
-  networkId,
 }: HamburgerMenuViewProps) {
   const { t } = useTranslation("common");
 
@@ -130,7 +128,6 @@ export default function HamburgerMenuView({
 
               <div className="d-flex flex-column gap-4 py-3">
                 <CreateNetworkBountyButton
-                  networkId={networkId}
                   actionCallBack={onHideHamburger}
                 />
 

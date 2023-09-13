@@ -15,12 +15,10 @@ interface Action {
 interface CreateNetworkBountyButtonViewProps {
   isOnNetwork: boolean;
   actions: Action[];
-  userCanCreateBounties?: boolean;
 }
 
 export default function CreateNetworkBountyButtonView({
   isOnNetwork,
-  userCanCreateBounties,
   actions
 }: CreateNetworkBountyButtonViewProps) {
   const { t } = useTranslation("common");
@@ -38,15 +36,13 @@ export default function CreateNetworkBountyButtonView({
           />
         }
       >
-        <If condition={userCanCreateBounties}>
-          <InternalLink
-            href={"/create-bounty"}
-            icon={<PlusIcon />}
-            label={t("main-nav.new-bounty") as string}
-            iconBefore
-            uppercase
-          />
-        </If>
+        <InternalLink
+          href={"/create-bounty"}
+          icon={<PlusIcon />}
+          label={t("main-nav.new-bounty") as string}
+          iconBefore
+          uppercase
+        />
       </If>
   </ReadOnlyButtonWrapper>
   );

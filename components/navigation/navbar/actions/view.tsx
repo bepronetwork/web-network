@@ -6,7 +6,7 @@ import HamburgerButton from "components/navigation/hamburger/controller";
 import ResponsiveWrapper from "components/responsive-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 
-export default function NavBarActions({networkId}: {networkId: number}) {
+export default function NavBarActions() {
   return(
     <>
       <div className="d-flex flex-row align-items-center gap-3">
@@ -15,7 +15,7 @@ export default function NavBarActions({networkId}: {networkId: number}) {
           xl={true}
         >
           <div className="d-flex gap-3 align-items-center">
-            <CreateNetworkBountyButton networkId={networkId} />
+            <CreateNetworkBountyButton />
 
             <HelpButton />
           </div>
@@ -37,7 +37,7 @@ export default function NavBarActions({networkId}: {networkId: number}) {
             xs={true}
             xl={false}
           >
-            <CreateNetworkBountyButton networkId={networkId} />
+            <CreateNetworkBountyButton />
           </ResponsiveWrapper>
         </ConnectWalletButton>
 

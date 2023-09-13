@@ -29,7 +29,7 @@ export default function HamburgerMenu({
   
   const { state } = useAppState();
   const { signOut } = useAuthentication();
-  const { getURLWithNetwork, activeNetworkId } = useNetwork();
+  const { getURLWithNetwork } = useNetwork();
 
   const isOnNetwork = isOnNetworkPath(pathname);
 
@@ -61,7 +61,6 @@ export default function HamburgerMenu({
 
   return(
     <HamburgerMenuView
-      networkId={activeNetworkId}
       show={show}
       userLogin={state.currentUser?.login}
       userAddress={state.currentUser?.walletAddress}
