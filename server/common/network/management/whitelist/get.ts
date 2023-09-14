@@ -8,13 +8,14 @@ import {ErrorMessages} from "../../../../errors/error-messages";
 import {HttpBadRequestError} from "../../../../errors/http-errors";
 
 export default async function get(req: NextApiRequest, res: NextApiResponse) {
-  if (!req.query?.networkId || (req.query?.address && !isAddress(req.query?.address as string)))
+  const address = !req.query?.address ? "" : typeof req.query.address !== "string" ? req.query.address.join() : req.query.address;
+  if (!req.query?.networkId || (address && !isAddress(address)))
     return resJsonMessage("invalid arguments", res, 400);
 
-  const result = await Database.network.find({
+  const result = await Database.network.findOne({
     attributes: ["allow_list"],
     where: {
-      ... !req.query?.address ? {allow_list: {[Op.contains]: [req.query?.address]}} : {},
+      ... req.query?.address ? {allow_list: {[Op.contains]: [req.query?.address]}} : {},
       id: req.query.networkId,
     }
   });
@@ -22,8 +23,7 @@ export default async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!result)
     throw new HttpBadRequestError(ErrorMessages.NoNetworkFoundOrUserNotAllowed)
 
-  return res.status(200)
-    .json(req.query?.address
-      ? {allowed: result.allow_list.includes(req.query?.address)}
-      : result.allow_list);
+  return req.query?.address
+    ? {allowed: result.allow_list.includes(req.query?.address)}
+    : result.allow_list;
 }

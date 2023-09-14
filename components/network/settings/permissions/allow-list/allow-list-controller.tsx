@@ -11,13 +11,13 @@ import useAddAllowListEntry from "../../../../../x-hooks/api/network/management/
 type AllowListProps = {networkId: number};
 
 export default function AllowList({networkId}: AllowListProps) {
-  const {data: allowListOfNetwork, invalidate} =
-    useReactQuery(['allow-list', networkId], () => useGetAllowList(networkId));
+  const {data: allowListOfNetwork, isFetching: isLoading, invalidate} =
+    useReactQuery<string[]>(['allow-list', networkId], () => useGetAllowList(networkId), {initialData: []});
   const [address, setAddress] = useState("");
-  const [dAddress] = useDebounce(address, 100);
+  const [dAddress] = useDebounce(address, 300);
 
   function inputError() {
-    return !isAddress(dAddress) ? "not-address" : allowListOfNetwork.includes(dAddress) ? "already-exists" : "";
+    return !isAddress(address) ? "not-address" : allowListOfNetwork.includes(address) ? "already-exists" : "";
   }
 
   async function onTrashClick(address: string) {
@@ -27,7 +27,6 @@ export default function AllowList({networkId}: AllowListProps) {
     } catch (e) {
       console.warn(`Failed to remove allow-list entry`, e);
     }
-
   }
 
   async function onAddClick() {
@@ -36,6 +35,7 @@ export default function AllowList({networkId}: AllowListProps) {
     try {
       await useAddAllowListEntry(networkId, dAddress);
       await invalidate();
+      setAddress("");
     } catch (e) {
       console.warn(`Failed to add allow list entry`, e);
     }
@@ -43,7 +43,8 @@ export default function AllowList({networkId}: AllowListProps) {
 
   return <AllowListView error={inputError()}
                         allowList={allowListOfNetwork}
-                        value={dAddress}
+                        isLoading={isLoading}
+                        value={address}
                         onValueChange={setAddress}
                         onAddClick={onAddClick}
                         onTrashClick={onTrashClick} />

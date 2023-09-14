@@ -81,12 +81,9 @@ export default function CreateBountyPage({
   const [deliverableType, setDeliverableType] = useState<string>();
   const [originLink, setOriginLink] = useState<string>("");
   const [originLinkError, setOriginLinkError] = useState<OriginLinkErrors>();
+  const [userCanCreateBounties, setUserCanCreateBounties] = useState<boolean>(true);
+  const [showCannotCreateBountyModal, setShowCannotCreateBountyModal] = useState<boolean>(true);
   const session = useSession();
-
-  const userCanCreateBounties =
-    (session?.data as CustomSession)?.user?.roles
-      ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles, currentNetwork.id)
-      : true // if no session roles are found we will let the normal flow deal with an unauthenticated user
 
 
   const rewardERC20 = useERC20();
@@ -174,6 +171,9 @@ export default function CreateBountyPage({
   }
 
   function verifyNextStepAndCreate(newSection?: number) {
+    if (!userCanCreateBounties)
+      return true;
+
     const section = newSection || currentSection
     if (isLoadingCreateBounty) return true;
 
@@ -428,6 +428,9 @@ export default function CreateBountyPage({
   }
 
   function handleNextStep() {
+    if (!userCanCreateBounties)
+      return;
+
     if (currentSection + 1 < steps.length){
       setCurrentSection((prevState) => prevState + 1);
     }
@@ -494,6 +497,15 @@ export default function CreateBountyPage({
   useEffect(() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }), [currentSection])
   useEffect(() => handleMinAmount('transactional'), [issueAmount])
   useEffect(() => handleMinAmount('reward'), [rewardAmount])
+  useEffect(() => {
+    setUserCanCreateBounties(!currentNetwork?.id ? true :
+      (session?.data as CustomSession)?.user?.roles
+        ? UserRoleUtils.hasCreateBountyRole((session?.data as CustomSession)?.user?.roles, currentNetwork?.id)
+        : true) // if no session roles are found we will let the normal flow deal with an unauthenticated user
+  }, [currentNetwork]);
+  useEffect(() => {
+    setShowCannotCreateBountyModal(!userCanCreateBounties)
+  }, [userCanCreateBounties]);
 
   useEffect(() => {
     cleanFields();
@@ -605,6 +617,8 @@ export default function CreateBountyPage({
           `${rewardAmount.value} ${rewardToken?.symbol}`,
       }}
       allowCreateBounty={userCanCreateBounties}
+      showCannotCreateBountyModal={showCannotCreateBountyModal}
+      closeCannotCreateBountyModal={() => setShowCannotCreateBountyModal(false)}
     />
   );
 }

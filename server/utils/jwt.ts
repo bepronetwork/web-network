@@ -28,6 +28,6 @@ export class UserRoleUtils {
   }
 
   static hasCreateBountyRole(roles: string[] = [], onNetworkId: number) {
-    return roles.includes(UserRoleUtils.getCreateBountyRole(onNetworkId));
+    return !onNetworkId ? false : roles.includes(UserRoleUtils.getCreateBountyRole(onNetworkId));
   }
 }
