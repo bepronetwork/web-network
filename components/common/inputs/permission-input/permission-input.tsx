@@ -3,6 +3,7 @@ import {useTranslation} from "next-i18next";
 import Button from "../../../button";
 import {FormGroup} from "../../../form-group";
 import {ReactNode} from "react";
+import clsx from "clsx";
 
 interface PermissionInputProps {
   placeholder?: string;
@@ -13,6 +14,7 @@ interface PermissionInputProps {
   onBlur?: () => void;
   error?: string | ReactNode;
   hint?: string | ReactNode;
+  isLoading?: boolean;
 }
 
 export default function PermissionInput({
@@ -23,7 +25,7 @@ export default function PermissionInput({
   onClickAdd,
   disabledButton,
   error,
-  hint,
+  isLoading
 }: PermissionInputProps) {
   const { t } = useTranslation(["common"]);
 
@@ -39,10 +41,9 @@ export default function PermissionInput({
         onBlur={onBlur}
         label=""
         error={error}
-        hint={hint}
       />
-      <div className="mt-2">
-        <Button onClick={onClickAdd} disabled={disabledButton}>{t("misc.add")}</Button>
+      <div className={clsx({"mt-1": !error, "mtn-4": error})}>
+        <Button onClick={onClickAdd} disabled={disabledButton} isLoading={isLoading}>{t("misc.add")}</Button>
       </div>
     </div>
   );

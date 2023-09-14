@@ -2,7 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import {AdminRoute} from "middleware";
 
-import {error as logError} from "services/logging";
+import {Logger} from "services/logging";
 
 import deleteEntry from "server/common/network/management/whitelist/delete";
 import get from "server/common/network/management/whitelist/get";
@@ -10,6 +10,8 @@ import post from "server/common/network/management/whitelist/post";
 
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  Logger.changeActionName(`AllowList`);
+
   try {
     switch (req.method) {
     case "GET":
@@ -25,9 +27,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(405);
     }
   } catch (e) {
-    logError(e);
+    Logger.error(e, `AllowListError`, {method: req.method});
     res.status(e?.status || 500)
-      .json({message: e?.message || e?.toString(), cause: e?.cause?.message || e?.cause?.toString()})
+      .json({message: e?.message || e?.toString()});
+    return;
   }
 
   res.end();

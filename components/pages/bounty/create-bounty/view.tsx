@@ -26,6 +26,7 @@ import {BountyDetailsSectionProps} from "interfaces/create-bounty";
 
 import {RewardInformationSectionProps} from "types/components";
 import Modal from "../../../modal";
+import {WarningSpan} from "../../../warning-span";
 
 interface CreateBountyPageViewProps 
   extends SelectNetworkSectionProps, 
@@ -46,6 +47,8 @@ interface CreateBountyPageViewProps
   onNextOrCreateButtonClick: () => void;
   onSectionHeaderClick: (i: number) => void;
   allowCreateBounty?: boolean;
+  showCannotCreateBountyModal?: boolean;
+  closeCannotCreateBountyModal?(): void;
 }
 
 export default function CreateBountyPageView({
@@ -183,6 +186,10 @@ export default function CreateBountyPageView({
               </If>
             </ContractButton>
           </If>
+
+          <If condition={!rest.allowCreateBounty} >
+            <WarningSpan text={t('bounty:allow-list.not-allowed')} />
+          </If>
         </div>
       </>
     );
@@ -194,9 +201,9 @@ export default function CreateBountyPageView({
   return (
     <CreateBountyContainer>
       <CustomContainer col="col-xs-12 col-xl-10 px-0">
-        <Modal show={!rest.allowCreateBounty} onCloseDisabled={true}
-               title={t('bounty:not-allowed-modal.title')}>
-          <p>{t('bounty:not-allowed-modal.content')}</p>
+        <Modal show={rest.showCannotCreateBountyModal} onCloseClick={rest.closeCannotCreateBountyModal}
+               title={t('bounty:modals.allow-list.title')}>
+          <p className="text-center">{t('bounty:modals.allow-list.content')}</p>
         </Modal>
         <CreateBountySteps
           steps={creationSteps}
