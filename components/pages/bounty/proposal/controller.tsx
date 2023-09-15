@@ -60,8 +60,6 @@ export default function ProposalPage() {
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.token");
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isPrOwner = lowerCaseCompare(pullRequest?.userAddress, state.currentUser?.walletAddress);
-  const isProposalOwner = lowerCaseCompare(parsedProposal?.creator, state.currentUser?.walletAddress);
 
   const isDisputable = [
     isWalletConnected,
@@ -85,14 +83,11 @@ export default function ProposalPage() {
 
   const isMergeable = [
     isWalletConnected,
-    pullRequest?.isMergeable,
     !issue?.isClosed,
     !parsedProposal?.isMerged,
     !parsedProposal?.isDisputed,
     !parsedProposal?.refusedByBountyOwner,
     !isDisputable,
-    !isPrOwner,
-    !isProposalOwner,
   ].every((v) => v);
 
   async function getDistributedAmounts() {
@@ -173,8 +168,6 @@ export default function ProposalPage() {
       isDisputable={isDisputable}
       isRefusable={isRefusable}
       isMergeable={isMergeable}
-      isPrOwner={isPrOwner}
-      isProposalOwner={isProposalOwner}
       comments={parsedComments}
       updateComments={invalidateComments}
       userData={state.currentUser}

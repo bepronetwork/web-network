@@ -59,7 +59,7 @@ export default function ProposalActionsView({
       </div>
 
       <div className="mt-5">
-        <If condition={!pullRequest?.isMergeable && !proposal?.isMerged}>
+        <If condition={!isMergeable && !proposal?.isMerged}>
           <span className="text-uppercase text-danger caption-small">
             {t("pull-request:errors.merge-conflicts")}
           </span>

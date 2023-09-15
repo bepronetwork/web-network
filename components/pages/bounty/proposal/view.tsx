@@ -28,8 +28,6 @@ interface ProposalPageViewProps extends ProposalPageProps {
   isDisputable: boolean;
   isRefusable: boolean;
   isMergeable: boolean;
-  isPrOwner: boolean;
-  isProposalOwner: boolean;
   comments: IssueDataComment[];
   updateComments: () => void;
   userData: CurrentUserState;
@@ -47,8 +45,6 @@ export default function ProposalPageView({
   isDisputable,
   isRefusable,
   isMergeable,
-  isPrOwner,
-  isProposalOwner,
   comments,
   updateComments,
   userData
@@ -119,8 +115,6 @@ export default function ProposalPageView({
               isDisputable={isDisputable}
               isRefusable={isRefusable}
               isMergeable={isMergeable}
-              isPrOwner={isPrOwner}
-              isProposalOwner={isProposalOwner}
             />
           </div>
         </div>
