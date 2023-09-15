@@ -4,6 +4,7 @@ import PermissionInput from "../../../../common/inputs/permission-input/permissi
 import If from "../../../../If";
 import PermissionListItem from "../../../../common/lists/permission-list/permission-list-item";
 import {Spinner} from "react-bootstrap";
+import {useTranslation} from "next-i18next";
 
 type AllowListViewProps = {
   allowList: string[],
@@ -16,6 +17,7 @@ type AllowListViewProps = {
 }
 
 export default function AllowListView({value, onValueChange, onAddClick, allowList, onTrashClick, error, isLoading}: AllowListViewProps) {
+  const { t } = useTranslation(["custom-network"]);
 
   return <NetworkTabContainer>
     <div className="d-flex flex-column my-4">
@@ -27,7 +29,7 @@ export default function AllowListView({value, onValueChange, onAddClick, allowLi
       </p>
       <PermissionInput error={(value && error) && <Translation ns="custom-network" label={`steps.permissions.allow-list.error.${error}`} />}
                        value={value}
-                       placeholder="0xYourAllowedAddress"
+                       placeholder={t("custom-network:steps.permissions.allow-list.place-holder")}
                        onChange={onValueChange}
                        onClickAdd={onAddClick} />
       <If condition={isLoading}>
