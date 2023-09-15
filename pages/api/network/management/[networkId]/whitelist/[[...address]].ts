@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {AdminRoute} from "middleware";
+import {GovernorRoute} from "middleware";
 
 import {Logger} from "services/logging";
 
@@ -36,4 +36,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default AdminRoute(handler);
+export default GovernorRoute(handler);
