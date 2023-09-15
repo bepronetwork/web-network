@@ -21,9 +21,7 @@
     "distribution-cant-done": "This distribution can't be done try another one",
     "proposal-refused": "Proposal Refused",
     "proposal-disputed": "Proposal Disputed",
-    "in-disputable-time": "{{time}} until dispute period ends",
-    "owner-pull-request": "You cannot accept a proposal containing your own pull request",
-    "owner-proposal": "You cannot accept a proposal created by you"
+    "in-disputable-time": "{{time}} until dispute period ends"
   },
   "errors": {
     "not-found": "No proposals found",

@@ -22,8 +22,6 @@ interface ProposalActionsProps {
   isDisputable: boolean;
   isRefusable: boolean;
   isMergeable: boolean;
-  isPrOwner: boolean;
-  isProposalOwner: boolean;
 }
 
 export default function ProposalActions({
@@ -36,23 +34,16 @@ export default function ProposalActions({
   missingDisputableTime,
   isDisputable,
   isRefusable,
-  isMergeable,
-  isPrOwner,
-  isProposalOwner,
+  isMergeable
 }: ProposalActionsProps) {
   const { t } = useTranslation(["common", "pull-request", "proposal"]);
 
   const { state } = useAppState();
 
-  const isProposalFailedOrMerged = !proposal?.refusedByBountyOwner || !proposal?.isMerged;
-  const isProposalDisputable = isDisputableOnChain && isDisputable;
-
   const warnings = [
     isDisputableOnChain && t("proposal:messages.in-disputable-time", {
       time: missingDisputableTime,
-    }),
-    (isPrOwner && !isProposalDisputable && !isProposalFailedOrMerged) && t("proposal:messages.owner-pull-request"),
-    (isProposalOwner && !isProposalDisputable && !isProposalFailedOrMerged) && t("proposal:messages.owner-proposal"),
+    })
   ].filter(warning => warning);
 
   return (
