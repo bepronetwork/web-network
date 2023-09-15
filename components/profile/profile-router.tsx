@@ -5,9 +5,9 @@ import { useRouter } from "next/router";
 import MyNetworkPage from "components/pages/profile/my-network/controller";
 import PaymentsPage from "components/pages/profile/payments/controller";
 import BountiesPage from "components/profile/pages/bounties";
+import DeliverablesPage from "components/profile/pages/deliverables";
 import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
-import PullRequestsPage from "components/profile/pages/pull-requests";
 import VotingPowerPage from "components/profile/pages/voting-power/controller";
 import WalletPage from "components/profile/pages/wallet/view";
 
@@ -24,7 +24,7 @@ export default function ProfileRouter(props: ProfilePageProps) {
     Route("/profile/voting-power", VotingPowerPage),
     Route("/profile/payments", PaymentsPage),
     Route("/profile/bounties", BountiesPage),
-    Route("/profile/pull-requests", PullRequestsPage),
+    Route("/profile/deliverables", DeliverablesPage),
     Route("/profile/proposals", ProposalsPage),
     Route("/profile/my-network", MyNetworkPage),
   ];

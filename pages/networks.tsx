@@ -99,7 +99,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "bounty",
         "connect-wallet-button",
         "custom-network",
-        "pull-request",
+        "deliverable",
       ])),
     },
   };

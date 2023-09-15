@@ -7,14 +7,12 @@ import { useAppState } from "contexts/app-state";
 import {
   IssueBigNumberData,
   IssueData,
-  PullRequest,
 } from "interfaces/issue-data";
 import { DistributedAmounts, Proposal } from "interfaces/proposal";
 
 interface ProposalActionsProps {
   proposal: Proposal;
   issue: IssueData | IssueBigNumberData;
-  pullRequest: PullRequest;
   distributedAmounts: DistributedAmounts;
   isUserAbleToDispute: boolean;
   isDisputableOnChain: boolean;
@@ -27,7 +25,6 @@ interface ProposalActionsProps {
 export default function ProposalActions({
   proposal,
   issue,
-  pullRequest,
   distributedAmounts,
   isUserAbleToDispute,
   isDisputableOnChain,
@@ -36,7 +33,7 @@ export default function ProposalActions({
   isRefusable,
   isMergeable
 }: ProposalActionsProps) {
-  const { t } = useTranslation(["common", "pull-request", "proposal"]);
+  const { t } = useTranslation(["common", "deliverable", "proposal"]);
 
   const { state } = useAppState();
 
@@ -50,7 +47,6 @@ export default function ProposalActions({
     <ProposalActionsView
       proposal={proposal}
       issue={issue}
-      pullRequest={pullRequest}
       distributedAmounts={distributedAmounts}
       percentageNeededForDispute={
         +state.Service?.network?.amounts?.percentageNeededForDispute

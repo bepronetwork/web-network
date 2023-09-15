@@ -6,7 +6,7 @@ import { SearchBountiesPaginated } from "types/api";
 
 import { getBountiesListData } from "x-hooks/api/bounty";
 
-type UserType = "proposer" | "creator" | "pullRequester" | "governor";
+type UserType = "proposer" | "creator" | "deliverabler" | "governor";
 
 export async function useGetProfileBounties(query: ParsedUrlQuery, type: UserType ) {
   const filter = type === "governor" ? { 

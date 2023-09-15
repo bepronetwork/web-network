@@ -122,10 +122,10 @@ class Issue extends Model {
       sourceKey: "id",
       as: "developers"
     });
-    this.hasMany(models.pullRequest, {
+    this.hasMany(models.deliverable, {
       foreignKey: "issueId",
       sourceKey: "id",
-      as: "pullRequests"
+      as: "deliverables"
     });
     this.hasMany(models.mergeProposal, {
       foreignKey: "issueId",

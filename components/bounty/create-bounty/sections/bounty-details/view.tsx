@@ -4,9 +4,9 @@ import { FormCheck } from "react-bootstrap";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 
-import CreateBountyDescription from "components/bounty/create-bounty/create-bounty-description";
 import BountyLabel from "components/bounty/create-bounty/create-bounty-label";
 import CheckButtons from "components/check-buttons/controller";
+import DescriptionAndPreview from "components/common/description-and-preview/controller";
 import { ContextualSpan } from "components/contextual-span";
 import { Divider } from "components/divider";
 import { IFilesProps } from "components/drag-and-drop";
@@ -111,7 +111,7 @@ export default function BountyDetailsSectionView({
       </div>
 
       <div className="form-group">
-        <CreateBountyDescription
+        <DescriptionAndPreview
           description={description}
           handleChangeDescription={onDescriptionchange}
           bodyLength={bodyLength}

@@ -9,7 +9,7 @@ export default function ReviewsNumberView({ reviewers, className }: { reviewers:
 
       <span className="label-m text-uppercase text-gray-500 ml-1">
         <Translation
-          ns="pull-request"
+          ns="deliverable"
           label="review"
           params={{ count: reviewers }}
         />

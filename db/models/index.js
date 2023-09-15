@@ -6,7 +6,6 @@ import Developers from "./developer.model";
 import Issues from "./issue.model";
 import MergeProposals from "./mergeproposal";
 import Network from "./network.model";
-import PullRequests from "./pullRequest.model";
 import Repositories from "./repositories.model";
 import User from "./user";
 import Tokens from "./tokens.model";
@@ -23,6 +22,7 @@ import HeaderInformation from './header-information';
 import KycSession from './kyc-session.model'
 import Delegation from './delegation.model'
 import Comments from './comments.model'
+import Deliverables from './deliverable.model'
 
 const Database = { sequelize: null };
 
@@ -36,7 +36,6 @@ Database.developer = Developers;
 Database.issue = Issues;
 Database.mergeProposal = MergeProposals;
 Database.repositories = Repositories;
-Database.pullRequest = PullRequests;
 Database.chainEvents = ChainEvents;
 Database.network = Network;
 Database.tokens = Tokens;
@@ -53,6 +52,8 @@ Database.headerInformation = HeaderInformation;
 Database.kycSession = KycSession;
 Database.delegation = Delegation;
 Database.comments = Comments;
+Database.deliverable = Deliverables;
+
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {

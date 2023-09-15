@@ -10,12 +10,14 @@ export default function Comments({
   type,
   ids,
   updateData,
+  disableCreateComment
 }: {
   comments: IssueDataComment[];
   currentUser?: CurrentUserState;
   type: TypeComment;
   ids: IdsComment;
   updateData: (updatePrData?: boolean) => void;
+  disableCreateComment?: boolean;
 }) {
   return (
     <BountyCommentsView
@@ -24,6 +26,7 @@ export default function Comments({
       type={type}
       ids={ids}
       updateData={updateData}
+      disableCreateComment={disableCreateComment}
     />
   );
 }

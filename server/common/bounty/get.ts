@@ -15,7 +15,9 @@ export async function get(req: NextApiRequest): Promise<Issue> {
 
   const include = [
     { association: "developers" },
-    { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
+    { association: "deliverables", where: { prContractId: { [Op.not]: null } }, required: false,
+      include: [{ association: "user" }, { association: "comments"}]
+    },
     { association: "mergeProposals", include: [{ association: "distributions" }, { association: "disputes" }]  },
     { association: "transactionalToken" },
     { association: "rewardToken" },

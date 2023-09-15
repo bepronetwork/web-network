@@ -16,7 +16,7 @@ export default function CommentSettingsView({
   isGovernor,
   hidden,
 }: CommentSettingsViewProps) {
-  const { t } = useTranslation(["common", "pull-request", "bounty"]);
+  const { t } = useTranslation(["common", "deliverable", "bounty"]);
 
   const items = [
     {

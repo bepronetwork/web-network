@@ -1,0 +1,89 @@
+{
+    "label": "Deliverable",
+    "title": "Deliverable",
+    "label_one": "deliverable",
+    "label_other": "deliverables",
+    "labelWithCount_one": "{{count}} deliverable",
+    "labelWithCount_other": "{{count}} deliverables",
+    "abbreviation": "DR",
+    "select": "Select a deliverable",
+    "review_one": "review",
+    "review_other": "reviews",
+    "reviewWithCount_one": "{{count}} review",
+    "reviewWithCount_other": "{{count}} reviews",
+    "find-a-bounty": "Find a bounty to work on",
+    "loc": "LOC",
+    "create": {
+        "title": "Create Deliverable",
+        "description": "A deliverable is the work you have done to deliver what was asked by the bounty creator. By creating a deliverable you are indicating that you finished the work and it could be reviewed and proposed as solution by the curators.",
+        "type": "Deliverable type",
+        "description-type": "Indicate the type of work you have done.",
+        "info-type": "Provide a link to your work.",
+        "markdown-helper": "Finding yourself lost with markdown language?",
+        "markdown-link": "See how to use it",
+        "labels": {
+            "origin-link": "Origin Link",
+            "preview": "Preview",
+            "title": "Title"
+        },
+        "placeholders": {
+            "origin-link": "github.com",
+            "preview": "Preview your embedded link",
+            "title": "Deliverable title..."
+        }
+    },
+    "actions": {
+      "create": {
+        "title": "Create Deliverable",
+        "success": "Created Deliverable",
+        "error": "To create deliverable"
+      },
+      "preview": {
+        "error": "Currently we do not support this embed",
+        "error-protocol": "Missing protocol. example: https://app.bepro.network/",
+        "video-error": "Your browser does not support the video tag."
+      },
+      "merge": {
+        "title": "Merge",
+        "success": "",
+        "error": ""
+      },
+      "review": {
+        "success": "Review submitted",
+        "error": "To submit review"
+      },
+      "view": "View Deliverables",
+      "make-ready": {
+        "title": "Make ready for review",
+        "success": "Deliverable is ready for review",
+        "error": "Failed to make deliverable ready for review"
+      },
+      "cancel": {
+        "title": "Cancel Deliverable",
+        "success": "Deliverable cancelled",
+        "error": "Failed to cancel deliverable"
+      },
+      "go-to-deliverable": "Go to Deliverable"
+    },
+    "status": {
+      "ready-to-merge": "Ready",
+      "draft": "Draft",
+      "merged": "Merged",
+      "conflicts": "Conflicts",
+      "closed": "Closed",
+      "broken-tests": "Broken tests",
+      "accepted": "Accepted",
+      "disputed": "Disputed",
+      "failed": "Failed",
+      "needs-approval": "Pending approval"
+    },
+    "errors": {
+      "not-found": "No deliverables found",
+      "no-reviews-found": "No reviews found",
+      "merge-conflicts": "Deliverable has merge conflicts and can't be merged",
+      "you-dont-have-deliverables": "You don't have any Deliverables. Find a Bounty to work on.",
+      "deliverable-participants": "Failed to get participants",
+      "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the network governor.",
+      "approval": "Please contact repository admin for deliverable approval before merging is enabled."
+    }
+  }

@@ -4,26 +4,26 @@ import BigNumber from "bignumber.js";
 import Link from "next/link";
 import { UrlObject } from "url";
 
-import Avatar from "components/avatar";
+import AvatarOrIdenticon from "components/avatar-or-identicon";
+import { IPRLabel } from "components/deliverable/labels/controller";
 import Identicon from "components/identicon";
-import { IPRLabel } from "components/pull-request/labels/controller";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import { PullRequest } from "interfaces/issue-data";
+import { Deliverable } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import ReviewsNumberView from "../reviews-number.view";
 import ItemRowIdView from "./id.view";
 import ItemRowLabelsView from "./labels.view";
-import ProposalOrPullRequestView from "./proposal-or-pr.view";
+import ProposalOrDeliverableView from "./proposal-or-deliverable.view";
 
 interface ItemRowProps {
   id: string | number;
   status?: IPRLabel[];
   href?: UrlObject | string;
   isProposal?: boolean;
-  item: Proposal | PullRequest;
+  item: Proposal | Deliverable;
   handleBtn: (ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   btnLabel: string;
   proposal: Proposal;
@@ -45,9 +45,9 @@ export default function ItemRowView({
   isMerged,
   totalToBeDisputed,
 }: ItemRowProps) {
-  function RenderProposalOrPullRequest() {
+  function RenderProposalOrDeliverable() {
     return (
-      <ProposalOrPullRequestView
+      <ProposalOrDeliverableView
         handleBtn={handleBtn}
         btnLabel={btnLabel}
         proposal={proposal}
@@ -60,7 +60,7 @@ export default function ItemRowView({
   }
 
   return (
-    <Link passHref key={`${item?.githubLogin}-${id}`} href={href || "#"}>
+    <Link passHref key={`${id}`} href={href || "#"}>
       <div
         className={`row d-flex flex-row py-3 px-2 border-radius-8 bg-gray-900 align-items-center ${
           href ? "cursor-pointer" : ""
@@ -69,13 +69,19 @@ export default function ItemRowView({
         <div className="col-10 col-md-8 d-flex flex-row align-items-center gap-3">
           <ItemRowIdView id={id} className="col-1 d-none d-xl-block" />
           <div className="text-truncate col-md-5 col-xl-4 d-flex align-items-center gap-2">
-            {item?.githubLogin ? (
+            {(item as Deliverable)?.user ? (
               <>
-                <Avatar userLogin={item?.githubLogin} size="sm" />
+                <AvatarOrIdenticon
+                  user={(item as Deliverable)?.user?.githubLogin}
+                  address={(item as Deliverable)?.user?.address}
+                  size="sm"
+                />
                 <span
-                  className={`text-uppercase text-white caption text-truncate`}
+                  className={`text-uppercase text-white caption text-truncate mt-1`}
                 >
-                  {item?.githubLogin}
+                  {(item as Deliverable)?.user?.githubLogin
+                    ? (item as Deliverable)?.user?.githubLogin
+                    : truncateAddress((item as Deliverable)?.user?.address)}
                 </span>
               </>
             ) : (
@@ -93,7 +99,7 @@ export default function ItemRowView({
           </div>
           {!isProposal && (
             <ReviewsNumberView
-              reviewers={(item as PullRequest)?.reviewers?.length || 0}
+              reviewers={(item as Deliverable)?.comments?.length || 0}
               className="col-xs-12 d-xl-none d-none d-sm-block"
             />
           )}
@@ -107,7 +113,7 @@ export default function ItemRowView({
 
         {!isProposal && (
           <ReviewsNumberView
-            reviewers={(item as PullRequest)?.reviewers?.length || 0}
+            reviewers={(item as Deliverable)?.comments?.filter(e => e.type === 'review')?.length || 0}
             className="d-block d-sm-none mb-2 mt-4"
           />
         )}
@@ -121,13 +127,13 @@ export default function ItemRowView({
           />
         ) : (
           <div className="d-block d-sm-none mt-3">
-            <RenderProposalOrPullRequest />
+            <RenderProposalOrDeliverable />
           </div>
         )}
 
         <div className="col-lg-4 col-md d-none d-sm-block">
           <div className="d-flex flex-row gap-3 justify-content-end align-items-center">
-            <RenderProposalOrPullRequest />
+            <RenderProposalOrDeliverable />
             <ItemRowIdView
               id={id}
               className="d-none d-xl-none d-sm-none d-md-block"

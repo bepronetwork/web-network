@@ -5,20 +5,20 @@ import CustomContainer from "components/custom-container";
 import If from "components/If";
 import ProposalActionsButtons from "components/proposal/actions/buttons/controller";
 import ProposalActions from "components/proposal/actions/controller";
+import ProposalDeliverableDetails from "components/proposal/deliverable-details/controller";
 import { ProposalDisputes } from "components/proposal/disputes-list/controller";
 import DistributionBar from "components/proposal/distribution/bar/view";
 import ProposalDistributionList from "components/proposal/distribution/list/controller";
-import ProposalPullRequestDetails from "components/proposal/pull-request-details/controller";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 import { CurrentUserState } from "interfaces/application-state";
-import { IssueBigNumberData, IssueDataComment, PullRequest } from "interfaces/issue-data";
+import { Deliverable, IssueBigNumberData, IssueDataComment } from "interfaces/issue-data";
 import { DistributedAmounts } from "interfaces/proposal";
 
 import { ProposalPageProps } from "types/pages";
 
 interface ProposalPageViewProps extends ProposalPageProps {
-  pullRequest: PullRequest;
+  deliverable: Deliverable;
   issue: IssueBigNumberData;
   distributedAmounts: DistributedAmounts;
   networkTokenSymbol: string;
@@ -36,7 +36,7 @@ interface ProposalPageViewProps extends ProposalPageProps {
 export default function ProposalPageView({
   proposal,
   issue,
-  pullRequest,
+  deliverable,
   distributedAmounts,
   networkTokenSymbol,
   isUserAbleToDispute,
@@ -71,8 +71,8 @@ export default function ProposalPageView({
 
         <div className="row mt-3 bg-gray-900 rounded-5 border border-gray-850 p-3 mx-0">
           <div className="col p-0">
-            <ProposalPullRequestDetails
-              pullRequest={pullRequest}
+            <ProposalDeliverableDetails
+              deliverable={deliverable}
               issue={issue}
             />
 
@@ -107,7 +107,6 @@ export default function ProposalPageView({
             <ProposalActions
               proposal={proposal}
               issue={issue}
-              pullRequest={pullRequest}
               distributedAmounts={distributedAmounts}
               isUserAbleToDispute={isUserAbleToDispute}
               isDisputableOnChain={isDisputableOnChain}

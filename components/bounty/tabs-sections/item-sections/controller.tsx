@@ -1,10 +1,10 @@
 import ItemSectionsView from "components/bounty/tabs-sections/item-sections/view";
 
-import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
+import { Deliverable, IssueBigNumberData } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 interface ItemProps {
-  data: Proposal[] | PullRequest[],
+  data: Proposal[] | Deliverable[],
   isProposal: boolean,
   currentBounty: IssueBigNumberData;
 }

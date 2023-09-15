@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         "common",
         "bounty",
         "proposal",
-        "pull-request",
+        "deliverable",
         "connect-wallet-button",
       ])),
     },

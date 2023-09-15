@@ -316,7 +316,7 @@ export default function useBepro() {
                                          cid: number ) {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
-        type: TransactionTypes.createPullRequest,
+        type: TransactionTypes.createDeliverable,
         network: state.Service?.network?.active
       } as any]);
       dispatch(tx);
@@ -341,7 +341,7 @@ export default function useBepro() {
   async function handleMakePullRequestReady(bountyId: number, pullRequestId: number) {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
-        type: TransactionTypes.makePullRequestReady,
+        type: TransactionTypes.makeDeliverableReady,
         network: state.Service?.network?.active
       } as any]);
       dispatch(tx);
@@ -360,7 +360,7 @@ export default function useBepro() {
   async function handleCancelPullRequest(bountyId: number, pullRequestId: number) {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
-        type: TransactionTypes.cancelPullRequest,
+        type: TransactionTypes.cancelDeliverable,
         network: state.Service?.network?.active} as any]);
 
       dispatch(tx);

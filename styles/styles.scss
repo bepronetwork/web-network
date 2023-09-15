@@ -75,6 +75,10 @@ li {
   cursor: not-allowed;
 }
 
+.cursor-default {
+  cursor: default !important;
+}
+
 .text-purple {
   color: var(--bs-purple) !important;
 }
@@ -600,6 +604,10 @@ label {
   }
   &:focus {
     border-color: #6873E9 !important;
+  }
+
+  &.bg-gray-850 {
+    background-color: $gray-850 !important;
   }
 }
 
@@ -1482,6 +1490,10 @@ textarea.form-control {
   }
 
   img {
+    max-width: 100%;
+  }
+
+  video {
     max-width: 100%;
   }
 }

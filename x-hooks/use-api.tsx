@@ -4,8 +4,6 @@ import {isZeroAddress} from "ethereumjs-util";
 import {useAppState} from "contexts/app-state";
 
 import {
-  CancelPrePullRequestParams,
-  CreatePrePullRequestParams,
   PastEventsParams
 } from "interfaces/api";
 import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
@@ -51,27 +49,6 @@ export default function useApi() {
       .post("/token", { ...payload })
       .then(({ data }) => data)
       .catch(() => null);
-  }
-
-  async function createPrePullRequest({
-    networkName = DEFAULT_NETWORK_NAME,
-    ...rest
-  } : CreatePrePullRequestParams) {
-    return api
-      .post("/pull-request/", { networkName, ...rest })
-      .then(({ data }) => data)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
-  async function cancelPrePullRequest({networkName = DEFAULT_NETWORK_NAME, ...rest} : CancelPrePullRequestParams) {
-    return api
-      .delete("/pull-request/", { data: { customNetworkName: networkName, ...rest } })
-      .then(({ data }) => data)
-      .catch((error) => {
-        throw error;
-      });
   }
 
   async function processEvent(event: NetworkEvents | RegistryEvents | StandAloneEvents,
@@ -215,10 +192,8 @@ export default function useApi() {
 
   return {
     createToken,
-    createPrePullRequest,
     processEvent,
     uploadFiles,
-    cancelPrePullRequest,
     resetUser,
     createNFT,
     addSupportedChain,
