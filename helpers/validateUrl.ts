@@ -1,7 +1,7 @@
 export function isValidUrl(url: string) {
   try {
     new URL(url);
-    return true;
+    return url.startsWith("http://") || url.startsWith("https://");
   } catch (err) {
     return false;
   }

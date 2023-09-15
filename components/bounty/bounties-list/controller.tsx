@@ -23,7 +23,7 @@ interface BountiesListProps {
   emptyMessage?: string;
   buttonMessage?: string;
   variant?: "bounty-hall" | "profile" | "network" | "management"
-  type?: "bounties" | "pull-requests" | "proposals";
+  type?: "bounties" | "deliverables" | "proposals";
   hideFilter?: boolean;
 }
 

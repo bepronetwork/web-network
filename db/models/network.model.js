@@ -121,12 +121,6 @@ class Network extends Model {
       sourceKey: "id"
     });
 
-    this.hasMany(models.pullRequest, {
-      foreignKey: "network_id",
-      sourceKey: "id",
-      as: "pullRequests"
-    });
-
     this.hasMany(models.mergeProposal, {
       foreignKey: "network_id",
       sourceKey: "id",

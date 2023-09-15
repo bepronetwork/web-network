@@ -9,7 +9,6 @@ import ProposalProgressBar from "components/proposal-progress-bar";
 import {
   IssueBigNumberData,
   IssueData,
-  PullRequest,
 } from "interfaces/issue-data";
 import { DistributedAmounts, Proposal } from "interfaces/proposal";
 
@@ -18,7 +17,6 @@ import ProposalActionsButtons from "./buttons/controller";
 interface ProposalActionsViewProps {
   proposal: Proposal;
   issue: IssueData | IssueBigNumberData;
-  pullRequest: PullRequest;
   distributedAmounts: DistributedAmounts;
   percentageNeededForDispute: number;
   warnings: string[];
@@ -31,7 +29,6 @@ interface ProposalActionsViewProps {
 export default function ProposalActionsView({
   proposal,
   issue,
-  pullRequest,
   distributedAmounts,
   percentageNeededForDispute,
   warnings,
@@ -40,7 +37,7 @@ export default function ProposalActionsView({
   isDisputable,
   isMergeable,
 }: ProposalActionsViewProps) {
-  const { t } = useTranslation(["common", "pull-request", "proposal"]);
+  const { t } = useTranslation(["common", "deliverable", "proposal"]);
 
   const hasWarnings = !!warnings?.length;
 
@@ -59,12 +56,6 @@ export default function ProposalActionsView({
       </div>
 
       <div className="mt-5">
-        <If condition={!isMergeable && !proposal?.isMerged}>
-          <span className="text-uppercase text-danger caption-small">
-            {t("pull-request:errors.merge-conflicts")}
-          </span>
-        </If>
-
         <If condition={isDisputable || isRefusable || isMergeable}>
           <div className="mt-3">
             <ProposalActionsButtons

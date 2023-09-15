@@ -40,7 +40,7 @@ export default function BountySettingsView({
     isBountyFunded,
     isBountyOpen
   }: BountySettingsViewProps) {
-  const { t } = useTranslation(["common", "pull-request", "bounty"]);
+  const { t } = useTranslation(["common", "deliverable", "bounty"]);
   const node = useRef();
 
   const [show, setShow] = useState(false);

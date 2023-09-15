@@ -60,20 +60,6 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
       ...(replyId ? { replyId: +replyId } : null),
     });
 
-    if(type === 'review' && comments){
-      const deliverable = await models.pullRequest.findOne({
-        where: {
-          id: +deliverableId
-        }
-      })
-
-      if (!deliverable.reviewers.find((el) => +el === user.id)) {
-        deliverable.reviewers = [...deliverable.reviewers, user.id];
-  
-        await deliverable.save();
-      }
-    }
-
     return res.status(200).json(comments);
   } catch (error) {
     res.status(500).json(error);

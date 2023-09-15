@@ -37,7 +37,7 @@ export interface IssueData {
   numberOfComments: number;
   owner?: string;
   network_id?: number;
-  pullRequests: PullRequest[];
+  deliverables: Deliverable[];
   seoImage: string;
   nftImage?: string;
   state: IssueState;
@@ -88,6 +88,25 @@ export interface IssueBigNumberData
   rewardAmount: BigNumber;
 }
 
+export interface Deliverable {
+  id: number;
+  deliverableUrl: string;
+  ipfsLink: string;
+  title: string;
+  description: string;
+  canceled: boolean;
+  markedReadyForReview: boolean;
+  accepted: boolean;
+  issueId: number;
+  bountyId?: number;
+  prContractId?: number;
+  user?: User;
+  comments?: IssueDataComment[];
+  userId: number;
+  isCancelable: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface PullRequest {
   createdAt: Date;
   githubId: string;

@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query, local
     payments: () => useGetProfilePayments(queryWithWallet),
     bounties: () => useGetProfileBounties(queryWithWallet, "creator").then(bountiesResult),
     proposals: () => useGetProfileBounties(queryWithWallet, "proposer").then(bountiesResult),
-    "pull-requests": () => useGetProfileBounties(queryWithWallet, "pullRequester").then(bountiesResult),
+    "deliverables": () => useGetProfileBounties(queryWithWallet, "deliverabler").then(bountiesResult),
     "my-network": () => useGetProfileBounties(query, "governor").then(bountiesResult),
   };
 
@@ -45,7 +45,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query, local
         "my-oracles",
         "connect-wallet-button",
         "profile",
-        "pull-request",
+        "deliverable",
         "custom-network",
         "setup",
         "change-token-modal",

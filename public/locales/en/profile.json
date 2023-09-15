@@ -47,12 +47,12 @@
       "success": "Github handle removed successfully",
       "warnings": {
         "period": "The account can only be changed again after seven days",
-        "pull-requests": "There must be no open pull requests on bounties for this account"
+        "deliverables": "There must be no open deliverables on bounties for this account"
       },
       "errors": {
         "github-already-exists": "This github handle already exists in another account",  
         "less-than-7-days": "Last account change was less than 7 days ago",
-        "pull-requests-open": "There are pull requests open for this account",
+        "deliverables-open": "There are deliverables open for this account",
         "failed-to-remove": "Failed to remove account",
         "check-requirements": "Check the requirements"
       }

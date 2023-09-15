@@ -9,7 +9,7 @@ interface TabletAndMobileButtonProps {
   isExecuting: boolean;
   isStartWorkingButton: boolean;
   handleActionWorking: () => void;
-  handleShowPRModal: (b: boolean) => void;
+  onCreateDeliverableClick: () => void;
   handleShowPRProposal: (b: boolean) => void;
 }
 
@@ -19,15 +19,15 @@ export default function TabletAndMobileButton({
   isExecuting,
   isStartWorkingButton,
   handleActionWorking,
-  handleShowPRModal,
+  onCreateDeliverableClick,
   handleShowPRProposal,
 }: TabletAndMobileButtonProps) {
   const actions: Action[] = [];
 
   if (isCreatePr)
     actions.push({
-      label: "Pull Request",
-      onClick: () => handleShowPRModal(true),
+      label: "Deliverable",
+      onClick: () => onCreateDeliverableClick(),
     });
 
   if (isCreateProposal)

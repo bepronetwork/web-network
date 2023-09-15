@@ -57,8 +57,8 @@
     "not-found": "No pull requests found",
     "no-reviews-found": "No reviews found",
     "merge-conflicts": "Pull request has merge conflicts and can't be merged",
-    "you-dont-have-pull-requests": "You don't have any Pull Requests. Find a Bounty to work on.",
-    "pull-request-participants": "Failed to get participants",
+    "you-dont-have-deliverables": "You don't have any Deliverables. Find a Bounty to work on.",
+    "deliverable-participants": "Failed to get participants",
     "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the network governor.",
     "approval": "Please contact repository admin for pull request approval before merging is enabled."
   }

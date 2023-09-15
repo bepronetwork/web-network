@@ -37,7 +37,7 @@ export default function PullAndProposalHeroView({
   transactionalTokenSymbol,
   onBackClick,
 }: PullAndProposalHeroViewPRops) {
-  const { t } = useTranslation([isProposal ? "proposal" : "pull-request", "common"]);
+  const { t } = useTranslation([isProposal ? "proposal" : "deliverable", "common"]);
 
   return (
     <div className="w-100 border-bottom border-gray-800">

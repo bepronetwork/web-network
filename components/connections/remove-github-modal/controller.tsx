@@ -42,7 +42,7 @@ export default function RemoveGithubAccount({
       .catch((error) => {
         if (error?.response?.status === 409) {
           const message = {
-            PULL_REQUESTS_OPEN: t("modals.remove-github.errors.pull-requests-open"),
+            PULL_REQUESTS_OPEN: t("modals.remove-github.errors.deliverables-open"),
           };
 
           dispatch(toastError(message[error.response.data],

@@ -1,7 +1,7 @@
 "use strict";
 const { getValueToLowerCase } = require("../../helpers/db/getters");
 const { Model, DataTypes } = require("sequelize");
-const DeliverableModel = require("./pullRequest.model");
+const DeliverableModel = require("./deliverable.model")
 const ProposalModel = require("./mergeproposal");
 
 class Comments extends Model {
@@ -46,7 +46,7 @@ class Comments extends Model {
           type: DataTypes.INTEGER,
           allowNull: true,
           references: {
-            model: "pull_requests",
+            model: "deliverables",
             key: "id",
           },
         },
@@ -122,7 +122,7 @@ class Comments extends Model {
       as: "issue",
     });
 
-    this.belongsTo(models.pullRequest, {
+    this.belongsTo(models.deliverable, {
       foreignKey: "deliverableId",
       sourceKey: "id",
       as: "deliverable",

@@ -80,7 +80,7 @@
       "voting-power": "Voting Power",
       "payments": "Payments",
       "bounties": "Bounties",
-      "pull-requests": "Pull Requests",
+      "deliverables": "Deliverables",
       "proposals": "Proposals",
       "my-network": "Custom Network",
       "support-center": "Support Center",
@@ -134,7 +134,7 @@
     "reply-on-github": "Reply on Github",
     "review": "Review",
     "view-proposal": "View Proposal",
-    "view-pull-request": "View Pull Request",
+    "view-deliverable": "View Deliverable",
     "make-a-review": "Make a Review",
     "success": "Success",
     "view-on-github": "View on Github",
@@ -254,8 +254,8 @@
       "title": "Merging bounty",
       "closed-bounty": "This bounty was closed and distributed but the code was unable to be merged.",
       "open-bounty": "This proposal has github conflicts and cannot be merged. Please, fix it before doing so.",
-      "go-to-pr": "Go to Pull Request",
-      "success-message": "Pull Request merged",
+      "go-to-pr": "Go to Deliverable",
+      "success-message": "Deliverable accepted",
       "merge-failed": "Merge Failed",
       "retry-merge": "Retry Merge"
     },
@@ -343,7 +343,7 @@
     },
     "select-placeholder": "Select...",
     "select-placeholder-chain": "Select a supported chain",
-    "create-pull-request": {
+    "create-deliverable": {
       "title": {
         "label": "Title",
         "placeholder": "Your bounty title"
@@ -406,10 +406,10 @@
       "redeem-bounty": "Cancel bounty",
       "approve-settler": "Approve Network Token",
       "recognize-finished": "Recognize bounty as finished",
-      "create-pull-request": "Create Pull Request",
-      "make-pull-request-ready": "Make Pull Request Ready",
+      "create-deliverable": "Create Deliverable",
+      "make-deliverable-ready": "Make Deliverable Ready",
       "update-bounty-amount": "Update Bounty Amount",
-      "cancel-pull-request": "Cancel Pull Request",
+      "cancel-deliverable": "Cancel Deliverable",
       "refused-by-owner": "Refuse Bounty Proposal",
       "deploy-network-v2": "Deploy Network_v2",
       "set-dispatcher": "Set Dispatcher",

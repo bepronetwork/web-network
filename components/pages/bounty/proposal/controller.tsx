@@ -10,7 +10,7 @@ import ProposalPageView from "components/pages/bounty/proposal/view";
 import {useAppState} from "contexts/app-state";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { commentsParser, issueParser, mergeProposalParser } from "helpers/issue";
+import { commentsParser, deliverableParser, issueParser, mergeProposalParser } from "helpers/issue";
 import { isProposalDisputable } from "helpers/proposal";
 import { lowerCaseCompare } from "helpers/string";
 
@@ -54,9 +54,8 @@ export default function ProposalPage() {
 
   const parsedProposal = mergeProposalParser(proposalData, proposalData?.issue?.merged);
   const parsedComments = commentsParser(comments);
-
   const issue = issueParser(parsedProposal?.issue as IssueData);
-  const pullRequest = parsedProposal?.pullRequest;
+  const deliverable = deliverableParser(parsedProposal?.deliverable);
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.token");
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
@@ -83,6 +82,7 @@ export default function ProposalPage() {
 
   const isMergeable = [
     isWalletConnected,
+    deliverable?.markedReadyForReview && !deliverable?.canceled,
     !issue?.isClosed,
     !parsedProposal?.isMerged,
     !parsedProposal?.isDisputed,
@@ -158,7 +158,7 @@ export default function ProposalPage() {
   return (
     <ProposalPageView
       proposal={parsedProposal}
-      pullRequest={pullRequest}
+      deliverable={deliverable}
       issue={issue}
       distributedAmounts={distributedAmounts}
       networkTokenSymbol={networkTokenSymbol}

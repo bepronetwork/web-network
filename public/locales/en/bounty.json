@@ -9,12 +9,12 @@
   "view-all-addresses": "view all address",
   "search": "Search for a bounty by title, description or tags",
   "description_proposal": "Reviewed implementations by the network curators ready to be approved by the network curators.",
-  "description_pull-request": "Raw implementations from the network developers ready to be reviewed by anyone and approved into proposals by the network curators",
+  "description_deliverable": "Raw implementations from the network developers ready to be reviewed by anyone and approved into proposals by the network curators",
   "info": {
     "funded": "Funded",
     "working": "Users working",
-    "pull-requests_one": "Pull request",
-    "pull-requests_other": "Pull requests",
+    "deliverable": "Deliverable",
+    "deliverables_other": "Deliverables",
     "proposals_one": "proposal",
     "proposals_other": "proposals",
     "reviews_one": "review",
@@ -109,7 +109,7 @@
     "bounty-update": "Bounty update failed",
     "banned-domain": "This domain is banned and cannot be used to open bounties.",
     "failed-to-cancel": "Bounty could not be canceled",
-    "invalid-link": "Invalid link provided"
+    "invalid-link": "Invalid link provided. Please check if the link has the protocol (http/https) or the link is correct."
   },
   "title": "Create new Bounty",
   "fields": {

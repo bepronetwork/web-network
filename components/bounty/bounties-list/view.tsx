@@ -26,7 +26,7 @@ interface BountiesListViewProps {
   emptyMessage?: string;
   buttonMessage?: string;
   variant: "bounty-hall" | "profile" | "network" | "management";
-  type: "bounties" | "pull-requests" | "proposals";
+  type: "bounties" | "deliverables" | "proposals";
   searchString: string;
   isOnNetwork?: boolean;
   isConnected?: boolean;
@@ -60,7 +60,7 @@ export default function BountiesListView({
   onEnterPressed,
   currentChain
 }: BountiesListViewProps) {
-  const { t } = useTranslation(["common", "bounty", "pull-request", "proposal"]);
+  const { t } = useTranslation(["common", "bounty", "deliverable", "proposal"]);
 
   const isManagement = variant === "management";
   const isProfile = variant === "profile";
@@ -80,7 +80,7 @@ export default function BountiesListView({
 
   const listTitleByType = {
     "bounties": t("bounty:label_other"),
-    "pull-requests": t("pull-request:label_other"),
+    "deliverables": t("deliverable:label_other"),
     "proposals": t("proposal:label_other")
   };
 

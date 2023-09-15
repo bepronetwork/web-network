@@ -10,7 +10,7 @@ class MergeProposal extends Model {
   static init(sequelize) {
     super.init({
         issueId: DataTypes.INTEGER,
-        pullRequestId: DataTypes.INTEGER,
+        deliverableId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
         contractId: DataTypes.INTEGER,
         creator: {
@@ -66,10 +66,10 @@ class MergeProposal extends Model {
       as: "issue"
     });
 
-    this.belongsTo(models.pullRequest, {
-      foreignKey: "pullRequestId",
+    this.belongsTo(models.deliverable, {
+      foreignKey: "deliverableId",
       sourceKey: "id",
-      as: "pullRequest"
+      as: "deliverable"
     });
     
     this.belongsTo(models.network, {

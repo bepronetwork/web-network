@@ -8,7 +8,8 @@ interface CheckButtonsProps {
   checked?: string | number | string[] | number[];
   options: SelectOption[];
   multiple?: boolean;
-  onClick: (value: SelectOption | SelectOption[]) => void;
+  onClick?: (value: SelectOption | SelectOption[]) => void;
+  disabled?: boolean;
 }
 
 interface SelectedOptions {
@@ -20,6 +21,7 @@ export default function CheckButtons({
   options,
   multiple,
   onClick,
+  disabled
 }: CheckButtonsProps) {
   const [selected, setSelected] = useState<SelectedOptions>({});
 
@@ -47,8 +49,9 @@ export default function CheckButtons({
 
   return(
     <CheckButtonsView
-      options={options.map(toOptionWithSelected)}
-      onClick={handleClick}
+      options={options?.map(toOptionWithSelected)}
+      onClick={onClick ? handleClick : () => null}
+      disabled={disabled}
     />
   );
 }

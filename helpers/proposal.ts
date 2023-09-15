@@ -11,15 +11,15 @@ export function isProposalDisputable(createdAt: Date | number, disputableTime: n
  * @throws Error
  */
 export const bountyReadyPRsHasNoInvalidProposals = (bounty: IssueData | IssueBigNumberData) : number => {
-  const readyPRsIds = bounty.pullRequests.filter(pr => pr.isReady && !pr.isCanceled).map(pr => pr.id);
+  const readyPRsIds = bounty.deliverables.filter(pr => pr.markedReadyForReview && !pr.canceled).map(pr => pr.id);
 
   if (!readyPRsIds.length) return 0;
 
-  const readyPRsWithoutProposals = readyPRsIds.filter(pr => !bounty.mergeProposals.find(p => p.pullRequestId === pr));
+  const readyPRsWithoutProposals = readyPRsIds.filter(pr => !bounty.mergeProposals.find(p => p.deliverableId === pr));
 
   if (readyPRsWithoutProposals.length) return 3;
 
-  const proposalsWithDisputeState = bounty.mergeProposals.filter(p => readyPRsIds.includes(p.pullRequestId));
+  const proposalsWithDisputeState = bounty.mergeProposals.filter(p => readyPRsIds.includes(p.deliverableId));
 
   const invalidProposals = proposalsWithDisputeState.filter(p =>  p.isDisputed || p.refusedByBountyOwner);
 
