@@ -7,6 +7,7 @@ import models from "db/models";
 
 import {caseInsensitiveEqual} from "helpers/db/conditionals";
 import {AddressValidator} from "helpers/validators/address";
+import {toLower} from "helpers/string";
 
 import {UserRole} from "interfaces/enums/roles";
 
@@ -94,8 +95,11 @@ export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthPr
       const allowBountyCreationOnNetworks = await models.network
         .findAll({attributes: ["allow_list", "id"],})
         .then((rows) =>
-          rows.filter(({allow_list}) => (!allow_list.length || allow_list.includes(address)))
+          rows.filter(({allow_list}) =>
+              (!allow_list.length || (allow_list.length && (allow_list.map(toLower)).includes(toLower(address)))))
             .map(({id}) => UserRoleUtils.getCreateBountyRole(id)))
+
+      console.log(`allowBountyCreationOnNetworks`, allowBountyCreationOnNetworks)
 
       roles.push(...governorOf, ...allowBountyCreationOnNetworks);
 
