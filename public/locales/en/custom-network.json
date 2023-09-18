@@ -153,6 +153,7 @@
         "title": "Bounty creation allow list",
         "description": "Curate a list of addresses that can create bounties",
         "hint": "value must be a valid address",
+        "place-holder": "0xValidAddress",
         "list": "",
         "error": {
           "already-exists": "User already exists on the allow list",
