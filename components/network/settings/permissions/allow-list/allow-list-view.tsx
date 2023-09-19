@@ -1,10 +1,12 @@
-import NetworkTabContainer from "../../tab-container/view";
-import Translation from "../../../../translation";
-import PermissionInput from "../../../../common/inputs/permission-input/permission-input";
-import If from "../../../../If";
-import PermissionListItem from "../../../../common/lists/permission-list/permission-list-item";
 import {Spinner} from "react-bootstrap";
+
 import {useTranslation} from "next-i18next";
+
+import PermissionInput from "../../../../common/inputs/permission-input/permission-input";
+import PermissionListItem from "../../../../common/lists/permission-list/permission-list-item";
+import If from "../../../../If";
+import Translation from "../../../../translation";
+import NetworkTabContainer from "../../tab-container/view";
 
 type AllowListViewProps = {
   allowList: string[],
@@ -27,26 +29,18 @@ export default function AllowListView({value, onValueChange, onAddClick, allowLi
       <p className="mt-2 text-gray-200">
         <Translation ns="custom-network" label="steps.permissions.allow-list.description" />
       </p>
-      <PermissionInput error={(value && error) && <Translation ns="custom-network" label={`steps.permissions.allow-list.error.${error}`} />}
+      <PermissionInput error={(value && error) && <Translation ns="custom-network"
+                                                               label={`steps.permissions.allow-list.error.${error}`} />}
                        value={value}
                        placeholder={t("custom-network:steps.permissions.allow-list.place-holder")}
                        onChange={onValueChange}
                        onClickAdd={onAddClick} />
-      <If condition={isLoading}>
         <div className="d-flex flex-column mt-4">
-          <div className="col-md-5 col-12 text-center">
-            <Spinner animation={"border"} />
-          </div>
+          <If condition={!isLoading}
+              children={allowList?.map((address, index) =>
+                <PermissionListItem value={address} id={index} onTrashClick={onTrashClick} />)}
+              otherwise={<div className="col-md-5 col-12 text-center"><Spinner animation={"border"} /></div>} />
         </div>
-      </If>
-      <If condition={allowList?.length > 0 && !isLoading}>
-        <>
-          <div className="d-flex flex-column mt-4">
-            {allowList.map((address, index) =>
-              <PermissionListItem value={address} id={index} onTrashClick={onTrashClick} />)}
-          </div>
-        </>
-      </If>
     </div>
   </NetworkTabContainer>
 }
