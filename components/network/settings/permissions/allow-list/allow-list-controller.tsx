@@ -11,8 +11,8 @@ import useAddAllowListEntry from "../../../../../x-hooks/api/network/management/
 type AllowListProps = {networkId: number};
 
 export default function AllowList({networkId}: AllowListProps) {
-  const {data: allowListOfNetwork, isFetching: isLoading, invalidate} =
-    useReactQuery<string[]>(['allow-list', networkId], () => useGetAllowList(networkId), {initialData: []});
+  const {data: allowListOfNetwork, isFetching, isLoading, invalidate} =
+    useReactQuery<string[]>(['allow-list', networkId], () => useGetAllowList(networkId));
   const [address, setAddress] = useState("");
   const [dAddress] = useDebounce(address, 300);
 
@@ -43,7 +43,7 @@ export default function AllowList({networkId}: AllowListProps) {
 
   return <AllowListView error={inputError()}
                         allowList={allowListOfNetwork}
-                        isLoading={isLoading}
+                        isLoading={isLoading || isFetching}
                         value={address}
                         onValueChange={setAddress}
                         onAddClick={onAddClick}
