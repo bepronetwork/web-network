@@ -11,7 +11,7 @@ const findReducer = (id: number) =>
 
 export const addReducer = <T = any>(reducer: XReducer<T>) => {
   const action = findReducer(reducer.id);
-  console.debug(`${!action ? 'Added' : 'Skipped'} ${reducer.id}, ${reducer.stateKey}, ${AppStateReduceId[reducer.id]}`);
+  //console.debug(`${!action ? 'Added' : 'Skipped'} ${reducer.id}, ${reducer.stateKey}, ${AppStateReduceId[reducer.id]}`);
   return (!action && Actions.push(reducer)) || false;
 }
 

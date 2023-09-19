@@ -240,7 +240,7 @@ export default function CreateBountyPage({
   }
 
   async function allowCreateIssue() {
-    if (!Service?.active || !transactionalToken || issueAmount.floatValue <= 0)
+    if (!Service?.active || !transactionalToken || issueAmount.floatValue <= 0 || !userCanCreateBounties)
       return;
 
     setIsLoadingApprove(true);

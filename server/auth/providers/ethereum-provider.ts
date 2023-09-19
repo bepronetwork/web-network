@@ -99,8 +99,6 @@ export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthPr
               (!allow_list.length || (allow_list.length && (allow_list.map(toLower)).includes(toLower(address)))))
             .map(({id}) => UserRoleUtils.getCreateBountyRole(id)))
 
-      console.log(`allowBountyCreationOnNetworks`, allowBountyCreationOnNetworks)
-
       roles.push(...governorOf, ...allowBountyCreationOnNetworks);
 
       return {
