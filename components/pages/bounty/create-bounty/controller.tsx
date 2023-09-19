@@ -41,6 +41,7 @@ import useNetworkChange from "x-hooks/use-network-change";
 
 import {CustomSession} from "../../../../interfaces/custom-session";
 import {UserRoleUtils} from "../../../../server/utils/jwt";
+import useGetIsAllowed from "../../../../x-hooks/api/network/management/allow-list/use-get-is-allowed";
 
 const ZeroNumberFormatValues = {
   value: "",
@@ -270,6 +271,7 @@ export default function CreateBountyPage({
 
   const isApproveButtonDisabled = (): boolean =>
     [
+      userCanCreateBounties,
       !isTokenApproved,
       !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token),
     ].some((value) => value === false);
@@ -278,7 +280,11 @@ export default function CreateBountyPage({
     if (!deliverableType || !transactionalToken || !Service?.active || !currentUser)
       return;
 
+    if (!(await useGetIsAllowed(currentNetwork.id, currentUser.walletAddress))?.allowed) // triple check for bounty creation permission
+      return (setShowCannotCreateBountyModal(true), null);
+
     setIsLoadingCreateBounty(true);
+
 
     try {
       const payload = {
@@ -305,7 +311,8 @@ export default function CreateBountyPage({
       });
 
       if (!savedIssue) {
-        return dispatch(toastError(t("bounty:errors.creating-bounty")));
+        dispatch(toastError(t("bounty:errors.creating-bounty")))
+        return;
       }
 
       const transactionToast = addTx([
