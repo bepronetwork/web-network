@@ -19,6 +19,7 @@ import {
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
   DEFAULT_PROPOSER_FEE,
+  STATIC_URL_PATHS,
   UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
@@ -219,7 +220,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           return undefined;
 
         // Reserved names
-        if (/bepro|taikai/gi.test(value))
+        if (/bepro|taikai/gi.test(value) || STATIC_URL_PATHS.includes(value?.toLowerCase()))
           return false;
 
         const networksWithSameName = await useSearchNetworks({ name: value });

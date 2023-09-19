@@ -53,3 +53,23 @@ export const BOOTSTRAP_BREAKPOINTS = {
 export const DAY_IN_SECONDS = 24 * 60 * 60;
 export const MILLISECONDS = 1000;
 export const MINUTE_IN_MS = 60 * MILLISECONDS;
+export const STATIC_URL_PATHS = [
+  "bounty",
+  "network",
+  "networks",
+  "leaderboard",
+  "explore",
+  "new-network",
+  "setup",
+  "explore",
+  "create-bounty",
+  "api-doc",
+  "administration",
+  "404",
+  "profile",
+  "auth",
+  "deliverable",
+  "proposal",
+  "curators",
+  "bounties",
+];

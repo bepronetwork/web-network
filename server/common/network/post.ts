@@ -4,7 +4,7 @@ import { Op } from "sequelize";
 import Database from "db/models";
 
 import { chainFromHeader } from "helpers/chain-from-header";
-import { WANT_TO_CREATE_NETWORK } from "helpers/constants";
+import { STATIC_URL_PATHS, WANT_TO_CREATE_NETWORK } from "helpers/constants";
 import { handleCreateSettlerToken, handlefindOrCreateTokens } from "helpers/handleNetworkTokens";
 
 import DAO from "services/dao-service";
@@ -41,6 +41,12 @@ export async function post(req: NextApiRequest) {
 
   const validateSignature = assumedOwner => 
     ethereumMessageService.decodeMessage(typedMessage, signedMessage, assumedOwner);
+
+  // Reserved names
+  const invalidName = value => /bepro|taikai/gi.test(value) || STATIC_URL_PATHS.includes(value?.toLowerCase())
+
+  if(invalidName(name)) 
+    throw new HttpForbiddenError("Invalid network name");
 
   if (!validateSignature(creator))
     throw new HttpForbiddenError("Invalid signature");
