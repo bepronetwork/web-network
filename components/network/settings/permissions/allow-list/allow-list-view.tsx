@@ -18,7 +18,14 @@ type AllowListViewProps = {
   error: "" | "not-address" | "already-exists",
 }
 
-export default function AllowListView({value, onValueChange, onAddClick, allowList, onTrashClick, error, isLoading}: AllowListViewProps) {
+export default function AllowListView({
+                                        value,
+                                        onValueChange,
+                                        onAddClick,
+                                        allowList,
+                                        onTrashClick,
+                                        error,
+                                        isLoading}: AllowListViewProps) {
   const { t } = useTranslation(["custom-network"]);
 
   return <NetworkTabContainer>
