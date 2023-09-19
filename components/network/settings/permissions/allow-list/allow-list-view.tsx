@@ -32,6 +32,7 @@ export default function AllowListView({value, onValueChange, onAddClick, allowLi
       <PermissionInput error={(value && error) && <Translation ns="custom-network"
                                                                label={`steps.permissions.allow-list.error.${error}`} />}
                        value={value}
+                       disabledButton={!value || !!error}
                        placeholder={t("custom-network:steps.permissions.allow-list.place-holder")}
                        onChange={onValueChange}
                        onClickAdd={onAddClick} />
