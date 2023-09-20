@@ -3,4 +3,5 @@ export enum ErrorMessages {
   NoNetworkFoundOrUserNotAllowed = "no network found or user does not exist in allow_list",
   NoNetworkFoundOrUserAllowed = "no network or user is already allowed",
   InvalidPayload = "invalid payload",
+  NoNetworkFound = "invalid network",
 }
