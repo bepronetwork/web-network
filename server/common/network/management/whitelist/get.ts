@@ -8,7 +8,7 @@ import {HttpBadRequestError} from "../../../../errors/http-errors";
 
 export default async function get(req: NextApiRequest, res: NextApiResponse) {
   const address = !req.query?.address ? "" : typeof req.query.address !== "string" ? req.query.address.join() : req.query.address;
-  if (!req.query?.networkId || !address || (address && !isAddress(address)))
+  if (!req.query?.networkId || (address && !isAddress(address)))
     throw new HttpBadRequestError(ErrorMessages.InvalidPayload);
 
   const result = await Database.network.findOne({
@@ -21,7 +21,7 @@ export default async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!result)
     throw new HttpBadRequestError(ErrorMessages.NoNetworkFound)
 
-  return req.query?.address
+  return address
     ? {allowed: result.allow_list.map(toLower).includes(toLower(address))}
     : result.allow_list;
 }
