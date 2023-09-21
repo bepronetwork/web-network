@@ -48,7 +48,7 @@ export default function AllowListView({
           <span className="mb-4"><Translation ns="custom-network" label="steps.permissions.allow-list.list-title" /></span>
           <If condition={!isLoading}
               children={allowList?.map((address, index) =>
-                <PermissionListItem value={truncateAddress(address, 10, 8)} id={index} onTrashClick={onTrashClick} />)}
+                <PermissionListItem value={address} label={truncateAddress(address, 10, 8)} id={index} onTrashClick={onTrashClick} />)}
               otherwise={<div className="col-md-5 col-12 text-center"><Spinner animation={"border"} /></div>} />
         </div>
     </div>
