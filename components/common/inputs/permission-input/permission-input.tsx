@@ -32,7 +32,7 @@ export default function PermissionInput({
   return (
     <div className="d-flex align-items-center flex-wrap mb-4">
       <FormGroup
-        className="me-3"
+        className="me-md-3"
         placeholder={placeholder}
         variant="input"
         colProps={{ xs: "12", md: "6", xl: "5" }}
@@ -42,7 +42,7 @@ export default function PermissionInput({
         label=""
         error={error}
       />
-      <div className={clsx({"mt-1": !error, "mtn-4": error})}>
+      <div className={clsx({"mt-1": !error, "mtn-4": error, "d-grid d-md-block col-12 col-md-1": true})}>
         <Button onClick={onClickAdd} disabled={disabledButton} isLoading={isLoading}>{t("misc.add")}</Button>
       </div>
     </div>
