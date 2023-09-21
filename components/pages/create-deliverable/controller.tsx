@@ -99,6 +99,12 @@ export default function CreateDeliverablePage({
     }
   }, 500);
 
+  
+  function verifyProtocol(url: string): boolean {
+    const regex = /^(https?:\/\/)/;
+    return regex.test(url);
+  }
+
   function onChangeTitle(e: ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
   }

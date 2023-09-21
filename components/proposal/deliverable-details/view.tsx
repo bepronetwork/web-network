@@ -3,29 +3,25 @@ import { UrlObject } from "url";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import DateLabel from "components/date-label";
-import PullRequestLabels from "components/deliverable/labels/controller";
 import InternalLink from "components/internal-link";
-import Translation from "components/translation";
+
+import { truncateAddress } from "helpers/truncate-address";
 
 import { User } from "interfaces/api";
 
 interface DeliverableDetailsViewProps {
   id: number;
   user: User;
-  deliverableUrl: string;
+  deliverableTitle?: string;
   createdAt: Date;
-  isMerged: boolean;
-  isMergeable: boolean;
   deliverableHref: UrlObject;
 }
 
 export default function DeliverableDetailsView({
   id,
   user,
-  deliverableUrl,
+  deliverableTitle,
   createdAt,
-  isMerged,
-  isMergeable,
   deliverableHref,
 }: DeliverableDetailsViewProps) {
   const { t } = useTranslation("deliverable");
@@ -49,25 +45,23 @@ export default function DeliverableDetailsView({
           />
         </div>
 
-        <div className="col-auto">
-          <PullRequestLabels merged={isMerged} isMergeable={isMergeable} />
+        <div className="col-xs-12 col-xl text-overflow-ellipsis">
+          <span className="base-medium text-gray-100">
+            {deliverableTitle}
+          </span>
         </div>
       </div>
 
-      <div className="row align-items-center mt-2 gap-3">
+      <div className="row align-items-center mt-2 gap-2">
         <div className="col-xs-12 col-xl-auto">
           <div className="row align-items-center">
             <div className="col-auto">
               <AvatarOrIdenticon user={user?.githubLogin} address={user?.address} />
             </div>
+            <div className="col-auto p-0">
+              {user?.githubLogin ? `@${user?.githubLogin}` : user?.address ? truncateAddress(user?.address) : null}
+            </div>
           </div>
-        </div>
-
-        <div className="col-xs-12 col-xl-auto">
-          <span className="caption-small text-light-gray text-uppercase">
-            <Translation label={"branch"} />:
-            <span className="text-primary">{deliverableUrl}</span>
-          </span>
         </div>
 
         <div className="col-xs-12 col-xl-auto">

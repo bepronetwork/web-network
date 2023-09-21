@@ -130,3 +130,12 @@ export interface LinkProps {
   href?: ProfilePages;
   icon?: (props?: SVGProps<SVGSVGElement>) => ReactElement
 }
+
+export interface PaymentInfoProps {
+  address: string;
+  login: string;
+  amount: string;
+  symbol: string;
+  percentage: string;
+  label: string;
+}

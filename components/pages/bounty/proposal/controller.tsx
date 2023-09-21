@@ -31,7 +31,6 @@ export default function ProposalPage() {
   const { t } = useTranslation("common");
 
   const [chaintime, setChainTime] = useState<number>();
-  const [isUserAbleToDispute, setIsUserAbleToDispute] = useState(false);
   const [isDisputableOnChain, setIsDisputableOnChain] = useState<boolean>(false);
   const [missingDisputableTime, setMissingDisputableTime] = useState<string>("");
   const [distributedAmounts, setDistributedAmounts] =
@@ -44,7 +43,7 @@ export default function ProposalPage() {
 
   const { state } = useAppState();
 
-  const proposalId = query?.id?.toString();
+  const proposalId = query?.proposalId?.toString();
   const proposalQueryKey = ["proposal", proposalId];
   const commentsQueryKey = ["proposal", "comments", proposalId];
 
@@ -59,6 +58,9 @@ export default function ProposalPage() {
   const networkTokenSymbol = state.Service?.network?.active?.networkToken?.symbol || t("misc.token");
 
   const isWalletConnected = !!state.currentUser?.walletAddress;
+
+  const isUserAbleToDispute = isWalletConnected ? !parsedProposal.disputes?.some(({ address, weight }) => 
+    lowerCaseCompare(address, state.currentUser?.walletAddress) && weight.gt(0)) : false;
 
   const isDisputable = [
     isWalletConnected,
@@ -142,14 +144,6 @@ export default function ProposalPage() {
     if (state.Service?.active)
       state.Service?.active.getTimeChain().then(setChainTime);
   }, [state.Service?.active]);
-
-  useEffect(() => {
-    if (!parsedProposal || !state.currentUser?.walletAddress)
-      setIsUserAbleToDispute(false);
-    else
-      setIsUserAbleToDispute(!parsedProposal.disputes?.some(({ address, weight }) => 
-        address === state.currentUser.walletAddress && weight.gt(0)));
-  }, [parsedProposal, state.currentUser?.walletAddress]);
 
   useEffect(() => {
     getDistributedAmounts();

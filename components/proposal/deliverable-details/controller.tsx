@@ -15,8 +15,7 @@ export default function ProposalDeliverableDetails({
 }: ProposalDeliverableDetailsProps) {
   const { getURLWithNetwork } = useNetwork();
 
-  // TODO BEPRO-1679: Change pull request path /pull-request/[id]
-  const deliverableHref = getURLWithNetwork("deliverable", {
+  const deliverableHref = getURLWithNetwork("/bounty/[id]/deliverable/[deliverableId]", {
     id: issue?.id,
     deliverableId: deliverable.id,
   });
@@ -25,11 +24,9 @@ export default function ProposalDeliverableDetails({
     <DeliverableDetailsView
       id={deliverable?.id}
       createdAt={deliverable?.createdAt}
-      isMerged={deliverable?.accepted}
-      isMergeable={!deliverable?.canceled && deliverable?.markedReadyForReview}
       deliverableHref={deliverableHref}
-      deliverableUrl={deliverable?.deliverableUrl} 
+      deliverableTitle={deliverable?.title}
       user={deliverable?.user}    
-      />
+    />
   );
 }

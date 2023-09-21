@@ -1,4 +1,4 @@
-import { IssueBigNumberData } from "interfaces/issue-data";
+import { Deliverable, IssueBigNumberData } from "interfaces/issue-data";
 
 export interface PageActionsViewProps {
   handleEditIssue: () => void;
@@ -12,6 +12,7 @@ export interface PageActionsViewProps {
   isUpdateAmountButton: boolean;
   isStartWorkingButton: boolean;
   isEditButton: boolean;
+  deliverables: Deliverable[];
   updateBountyData: (updatePrData?: boolean) => void;
 }
 

@@ -11,7 +11,8 @@
   "actions": {
     "new": "New Proposal",
     "create": "Create Proposal",
-    "propose-distribution": "Propose Distribution"
+    "propose-distribution": "Propose Distribution",
+    "cancel": "Cancel"
   },
   "messages": {
     "no-decimals-supported": "No decimals supported",
@@ -23,13 +24,15 @@
     "proposal-disputed": "Proposal Disputed",
     "in-disputable-time": "{{time}} until dispute period ends",
     "owner-deliverable": "You cannot accept a proposal containing your own deliverable",
-    "owner-proposal": "You cannot accept a proposal created by you"
+    "owner-proposal": "You cannot accept a proposal created by you",
+    "proposal-created": "Proposal created"
   },
   "errors": {
     "not-found": "No proposals found",
     "pr-cant-merged": "Can't be merged",
     "distribution-already-exists": "This distribution already exists on another proposal",
-    "you-dont-have-proposals": "You don't have any proposals. Find a ready bounty to propose."
+    "you-dont-have-proposals": "You don't have any proposals. Find a ready bounty to propose.",
+    "failed-to-create": "Failed to create proposal"
   },
   "status": {
     "refused": "Refused by bounty owner",
@@ -52,6 +55,16 @@
     "total": "total",
     "network-fee": "Network Fee",
     "network-fee-description": "We charge a {{percentage}}% convenience fee on every distribution. This makes sure we can keep improving the platform"
+  },
+  "create-modal": {
+    "title": "New Proposal",
+    "deliverable-creator": "Deliverable Creator",
+    "proposal-creator": "Proposal Creator",
+    "select-a-deliverable": "Select a Deliverable",
+    "preview-deliverable": "Preview Deliverable",
+    "view-deliverable": "View Deliverable",
+    "payment": "Payment",
+    "fees-info": "Complete fees information can be seen after creating proposal."
   },
   "disputes": {
     "title": "Addresses disputed"

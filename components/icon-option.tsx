@@ -28,7 +28,7 @@ export default function IconOption(props) {
             </span>
           }
 
-          <span>
+          <span className="text-overflow-ellipsis">
             {props.data.label}
           </span>
 

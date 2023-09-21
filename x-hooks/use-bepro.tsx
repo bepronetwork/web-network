@@ -224,8 +224,7 @@ export default function useBepro() {
 
   async function handleProposeMerge(bountyId: number,
                                     pullRequestId: number,
-                                    addresses: string[],
-                                    amounts: number[] ): Promise<TransactionReceipt | Error> {
+                                    recipient: string): Promise<TransactionReceipt> {
 
     return new Promise(async (resolve, reject) => {
 
@@ -236,8 +235,8 @@ export default function useBepro() {
       dispatch(tx);
 
       await state.Service?.active
-        .createProposal(bountyId, pullRequestId, addresses, amounts)
-        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+        .createProposal(bountyId, pullRequestId, [recipient], [100])
+        .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })

@@ -196,6 +196,7 @@ export default function CreateDeliverablePageView({
             <a
               href="https://www.markdownguide.org/getting-started/"
               target="_blank"
+              rel="noopener noreferer"
             >
               {t("deliverable:create.markdown-link")}
             </a>
