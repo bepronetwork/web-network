@@ -1,11 +1,10 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Op} from "sequelize";
 import {isAddress} from "web3-utils";
 
 import Database from "../../../../../db/models";
 import {ErrorMessages} from "../../../../errors/error-messages";
 import {HttpBadRequestError} from "../../../../errors/http-errors";
-import {lowerCaseCompare} from "../../../../../helpers/string";
+import {lowerCaseCompare, lowerCaseIncludes} from "../../../../../helpers/string";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -17,11 +16,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     attributes: ["allow_list"],
     where: {
       id: req.query.networkId,
-      allow_list: {[Op.contains]: [address.toString()]}
     }
   });
 
-  if (!result)
+  if (!result || !lowerCaseIncludes(address, result?.allow_list || []))
     throw new HttpBadRequestError(ErrorMessages.NoNetworkFoundOrUserNotAllowed)
 
   const [, updatedAllowList] =
