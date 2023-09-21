@@ -7,6 +7,7 @@ import PermissionListItem from "../../../../common/lists/permission-list/permiss
 import If from "../../../../If";
 import Translation from "../../../../translation";
 import NetworkTabContainer from "../../tab-container/view";
+import {truncateAddress} from "../../../../../helpers/truncate-address";
 
 type AllowListViewProps = {
   allowList: string[],
@@ -43,10 +44,11 @@ export default function AllowListView({
                        placeholder={t("custom-network:steps.permissions.allow-list.place-holder")}
                        onChange={onValueChange}
                        onClickAdd={onAddClick} />
-        <div className="d-flex flex-column mt-4">
+        <div className="mt-4" >
+          <span className="mb-4"><Translation ns="custom-network" label="steps.permissions.allow-list.list-title" /></span>
           <If condition={!isLoading}
               children={allowList?.map((address, index) =>
-                <PermissionListItem value={address} id={index} onTrashClick={onTrashClick} />)}
+                <PermissionListItem value={truncateAddress(address, 10, 8)} id={index} onTrashClick={onTrashClick} />)}
               otherwise={<div className="col-md-5 col-12 text-center"><Spinner animation={"border"} /></div>} />
         </div>
     </div>

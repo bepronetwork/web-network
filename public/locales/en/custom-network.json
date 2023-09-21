@@ -151,6 +151,7 @@
       },
       "allow-list": {
         "title": "Bounty creation allow list",
+        "list-title": "Allowed addresses",
         "description": "Curate a list of addresses that can create bounties",
         "hint": "value must be a valid address",
         "place-holder": "0xValidAddress",
