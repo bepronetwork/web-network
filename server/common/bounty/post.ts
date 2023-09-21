@@ -1,16 +1,17 @@
-import { NextApiRequest } from "next";
-import { Op } from "sequelize";
+import {NextApiRequest} from "next";
+import {Op} from "sequelize";
 
 import models from "db/models";
 import Issue from "db/models/issue.model";
 
-import { chainFromHeader } from "helpers/chain-from-header";
-import { lowerCaseIncludes } from "helpers/string";
-import { isValidUrl } from "helpers/validateUrl";
+import {chainFromHeader} from "helpers/chain-from-header";
+import {lowerCaseIncludes} from "helpers/string";
+import {isValidUrl} from "helpers/validateUrl";
 
-import { add } from "services/ipfs-service";
+import {add} from "services/ipfs-service";
 
-import { HttpBadRequestError, HttpUnauthorizedError } from "server/errors/http-errors";
+import {HttpBadRequestError, HttpUnauthorizedError} from "server/errors/http-errors";
+import {ErrorMessages} from "../../errors/error-messages";
 
 export async function post(req: NextApiRequest): Promise<Issue> {
   const {
@@ -51,6 +52,12 @@ export async function post(req: NextApiRequest): Promise<Issue> {
 
   if (isOriginBanned)
     throw new HttpBadRequestError("Banned origin provided");
+
+  const userCanCreateBounty =
+    !network.allow_list?.length || lowerCaseIncludes(req.headers.wallet as string, network.allow_list);
+
+  if (!userCanCreateBounty)
+    throw new HttpBadRequestError(ErrorMessages.CreateBountyNotAllowList);
 
   const user = await models.user.findByAddress(context.token.address);
 

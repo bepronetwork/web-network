@@ -70,4 +70,7 @@ export const isTrue = (str: string) => str === "true";
 
 export const lowerCaseCompare = (str: string, strToCompare: string) => toLower(str) === toLower(strToCompare);
 
-export const lowerCaseIncludes = (str: string, strToCompare: string) => toLower(str).includes(toLower(strToCompare));
+export const lowerCaseIncludes = (str: string, strToCompare: string|string[]) =>
+  typeof strToCompare === "string"
+    ? toLower(str).includes(toLower(strToCompare))
+    : strToCompare.map(toLower).includes(toLower(str))
