@@ -37,6 +37,15 @@ export default function PageActions({
   const { state, dispatch } = useAppState();
   const { getURLWithNetwork } = useNetwork();
 
+  function getDeliverablesAbleToBeProposed() {
+    const isProposalValid = p => !p?.isDisputed && !p?.isMerged && !p?.refusedByBountyOwner;
+    const deliverables = currentBounty?.deliverables;
+    const deliverableIdsOfValidProposals = 
+      currentBounty?.mergeProposals?.filter(isProposalValid)?.map(p => p?.deliverableId) || [];
+    return deliverables.filter(d => !deliverableIdsOfValidProposals.includes(d.id) && d.markedReadyForReview);
+  }
+
+  const deliverablesAbleToBeProposed = getDeliverablesAbleToBeProposed();
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
   const isBountyReadyToPropose = !!currentBounty?.isReady;
   const bountyState = getIssueState({
@@ -44,8 +53,6 @@ export default function PageActions({
     amount: currentBounty?.amount,
     fundingAmount: currentBounty?.fundingAmount,
   });
-  const hasDeliverables = 
-    !!currentBounty?.deliverables?.filter((deliverable) => !deliverable.canceled)?.length;
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isBountyOpen = currentBounty?.isClosed === false && currentBounty?.isCanceled === false;
   const isBountyInDraft = !!currentBounty?.isDraft;
@@ -86,7 +93,7 @@ export default function PageActions({
       isCouncilMember &&
       isBountyOpen &&
       isBountyReadyToPropose &&
-      hasDeliverables,
+      !!deliverablesAbleToBeProposed?.length,
   };
 
   function onCreateDeliverableClick() {
@@ -130,6 +137,7 @@ export default function PageActions({
       handleEditIssue={handleEditIssue}
       bounty={currentBounty}
       updateBountyData={updateBountyData}
+      deliverables={deliverablesAbleToBeProposed}
       {...rest}
     />
   );

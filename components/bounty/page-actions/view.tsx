@@ -10,11 +10,10 @@ import TabletAndMobileButton from "components/bounty/page-actions/actions/tablet
 import UpdateAmountButton from "components/bounty/page-actions/actions/update-amount.view";
 import { PageActionsViewProps } from "components/bounty/page-actions/page-actions";
 import If from "components/If";
-import ProposalModal from "components/proposal/create-proposal-modal";
+import ProposalModal from "components/proposal/new-proposal-modal/controller";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
-
 
 export default function PageActionsView({
   bounty,
@@ -28,7 +27,8 @@ export default function PageActionsView({
   isUpdateAmountButton,
   isStartWorkingButton,
   isEditButton,
-  updateBountyData
+  updateBountyData,
+  deliverables
 }: PageActionsViewProps) {
   const { t } = useTranslation([
     "common",
@@ -115,8 +115,7 @@ export default function PageActionsView({
           />
 
           <ProposalModal
-            amountTotal={bounty?.amount}
-            deliverables={bounty?.deliverables}
+            deliverables={deliverables}
             show={showPRProposal}
             onCloseClick={() => setShowPRProposal(false)}
             currentBounty={bounty}

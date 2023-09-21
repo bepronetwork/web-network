@@ -2,9 +2,9 @@ import { ChangeEvent } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import Avatar from "components/avatar";
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Button from "components/button";
+import ContractButton from "components/contract-button";
 import GithubInfo from "components/github-info";
 import Modal from "components/modal";
 
@@ -13,8 +13,6 @@ import { formatDate } from "helpers/formatDate";
 import { Deliverable, IssueBigNumberData } from "interfaces/issue-data";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
-
-import ContractButton from "../../contract-button";
 
 interface CreateReviewModalViewProps {
   show: boolean;

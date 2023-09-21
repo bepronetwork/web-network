@@ -37,7 +37,7 @@ export default function NetworksPage({
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [convertedTokens, setConvertedTokens] = useState<ConvertedTokens>();
+  const [convertedTokens,] = useState<ConvertedTokens>();
 
   const infos: HeroInfo[] = [
     {

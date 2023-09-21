@@ -138,7 +138,6 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
   const { deliverableId } = query;
 
   const Dbdeliverable = await getDeliverable(+deliverableId);
-
   return {
     props: {
       bounty: Dbdeliverable.issue,

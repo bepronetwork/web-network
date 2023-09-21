@@ -77,7 +77,7 @@ export function ContextualSpan({
               <div className={`ball-sm bg-${context} me-2 mt-2`} />
             )}
           </div>
-          <div className={`col-12 ${classNameChildren}`}>
+          <div className={`lh-1 col-12 ${classNameChildren}`}>
             {children}  
           </div>
         </FlexRow>

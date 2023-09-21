@@ -4,7 +4,6 @@ import { UserRoute, WithValidChainId } from "middleware";
 
 import post from "server/common/deliverable/post";
 
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
   case "POST":

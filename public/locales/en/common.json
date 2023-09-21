@@ -490,5 +490,9 @@
     },
     "button": "Comment",
     "not-connect-wallet": "You are not connected to your wallet. To comment please connect your wallet."
-  } 
+  },
+  "open-graph-preview": {
+    "no-preview": "No preview available",
+    "view-link": "View Link"
+  }
 }

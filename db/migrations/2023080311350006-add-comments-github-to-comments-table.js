@@ -21,7 +21,34 @@ const PullRequestReviews =
   }
 }`;
 
-async function handleAddComments(queryInterface, users, comment, id, type, prId) {
+function getUpdatedLink(commentBody, networkName, chainName, bountyId) {
+  const link = commentBody.split("](")[1].slice(0, -1);
+  try {
+    const linkUrl = new URL(link);
+
+    return `${linkUrl.origin}/${networkName}/${chainName}/bounty/${bountyId}`;
+  } catch (error) {
+    console.log("Failed to get updated link from: ", link);
+    return link;
+  }
+}
+
+async function updateCommentLinkOnGithub(octokit, comment, owner, repo, networkName, chainName, bountyId) {
+  try {
+    const updatedLink = getUpdatedLink(comment.body, networkName, chainName, bountyId);
+    const updatedBody = `${comment.body.split(" - ")[0]} - [check your bounty](${updatedLink})`;
+    await octokit.rest.issues.updateComment({
+      owner,
+      repo,
+      comment_id: comment.id,
+      body: updatedBody,
+    });
+  } catch (error) {
+    console.log("Failed to update comment on github", {comment: comment.body, networkName, chainName, bountyId}, error );
+  }
+}
+
+async function handleAddComments(queryInterface, users, comment, id, type, prId, networkName = null, chainName = null) {
   const getCommentCreateData = (userId, userAddress, body) => ({
     userId,
     userAddress,
@@ -51,7 +78,7 @@ async function handleAddComments(queryInterface, users, comment, id, type, prId)
           }
           //Example text: "has a solution - [check your bounty](https://)"
           if (/solution/.test(comment.body)) {
-            text = `finished a solution -${comment.body.split("-")[1]}`;
+            text = `Finished a solution - [check your bounty](${getUpdatedLink(comment.body, networkName, chainName, id)})`;
             break;
           }
         }
@@ -79,6 +106,8 @@ async function up(queryInterface, Sequelize) {
   if (SKIP_MIGRATION_SEED_COMMENTS_DATE_GITHUB === "true") return;
 
   const issues = await getAllFromTable(queryInterface, "issues");
+  const networks = await getAllFromTable(queryInterface, "networks");
+  const chains = await getAllFromTable(queryInterface, "chains");
   const openIssues = issues?.filter(issue => issue.state !== "pending" && !!issue.issueId);
 
   if (!openIssues?.length) return;
@@ -93,10 +122,18 @@ async function up(queryInterface, Sequelize) {
 
   try {
     let repository;
+    let network;
+    let chain;
 
     for (const issue of openIssues) {
       if (issue.repository_id !== repository?.id)
         repository = repositories.find(({ id }) => id === issue.repository_id);
+      
+        if (issue.network_id !== network?.id)
+          network = networks.find(({ id }) => id === issue.network_id);
+      
+        if (issue.chain_id !== chain?.chainId)
+          chain = chains.find(({ chainId }) => chainId === issue.chain_id);
 
       const [owner, repo] = repository?.githubPath?.split("/");
 
@@ -107,7 +144,9 @@ async function up(queryInterface, Sequelize) {
       });
 
       for (const comment of commentsGithub) {
-        await handleAddComments(queryInterface, users, comment, issue?.id, "issue");
+        await handleAddComments(queryInterface, users, comment, issue?.id, "issue", null, network.name, chain.chainShortName);
+        if (comment.body.includes("check your bounty"))
+          await updateCommentLinkOnGithub(octokit, comment, owner, repo, network.name, chain.chainShortName, issue.id);
       }
 
       const pullRequestsOfIssue = pullRequests?.filter(pr => pr.issueId === issue.id);

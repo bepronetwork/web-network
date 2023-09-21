@@ -13,8 +13,6 @@ export default async function del(req: NextApiRequest, res: NextApiResponse) {
 
   const isGovernor = UserRoleUtils.hasGovernorRole(context.token);
 
-  console.log('isGovernor', isGovernor)
-
   const deliverable = await models.deliverable.findOne({
     where: {
       id: id,
