@@ -1,16 +1,7 @@
 'use strict';
 
 const { Web3Connection, Network_v2 } = require("@taikai/dappkit");
-
-const ChainModel = require("../models/chain.model");
-const NetworkModel = require("../models/network.model");
-const CuratorsModel = require("../models/curator-model");
-const IssueModel = require("../models/issue.model");
-const RepositoryModel = require("../models/repositories.model");
-const MergeProposalModel = require("../models/mergeproposal");
-const TokenModel = require("../models/tokens.model");
-const DelegationModel = require("../models/delegation.model");
-const DisputeModel = require("../models/dispute-model");
+const { getAllFromTable } = require("../../helpers/db/rawQueries");
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -71,39 +62,15 @@ module.exports = {
       }
     });
 
-    [
-      ChainModel,
-      NetworkModel,
-      CuratorsModel,
-      IssueModel,
-      RepositoryModel,
-      MergeProposalModel,
-      TokenModel,
-      DelegationModel,
-      DisputeModel
-    ].forEach(model => model.init(queryInterface.sequelize));
-
-    [
-      ChainModel,
-      NetworkModel,
-      CuratorsModel
-    ].forEach(model => model.associate(queryInterface.sequelize.models));
-
-    const chains = await ChainModel.findAll({
-      include: [
-        {
-          association: "networks",
-          include: [
-            { association: "curators" }
-          ]
-        }
-      ]
-    });
-
+    const chains = await getAllFromTable(queryInterface, "chains");
+    
     if (!chains.length) return;
 
+    const allNetworks = await getAllFromTable(queryInterface, "networks");
+    const allCurators = await getAllFromTable(queryInterface, "curators");
+
     try {
-      for (const { chainId, chainRpc, networks } of chains) {
+      for (const { chainId, chainRpc } of chains) {
         const web3Connection = new Web3Connection({
           skipWindowAssignment: true,
           web3Host: chainRpc,
@@ -111,7 +78,11 @@ module.exports = {
 
         await web3Connection.start();
 
-        for (const { networkAddress, curators } of networks) {
+        const networks = allNetworks.filter(n => n.chain_id === chainId);
+        if (!networks.length) continue;
+
+        for (const { id, networkAddress } of networks) {
+          const curators = allCurators.filter(c => c.networkId === id);
           if (!curators.length) continue;
 
           const networkV2 = new Network_v2(web3Connection, networkAddress);
