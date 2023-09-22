@@ -1,5 +1,5 @@
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 import CreateNetworkBountyButtonView from "components/create-network-bounty-button/view";
 
@@ -8,7 +8,7 @@ interface CreateNetworkBountyButtonProps {
 }
 
 export default function CreateNetworkBountyButton({
-  actionCallBack
+  actionCallBack,
 }: CreateNetworkBountyButtonProps) {
   const { t } = useTranslation("common");
   const { pathname, push } = useRouter();

@@ -229,6 +229,13 @@
       "you-are-going-to": "You are going to navigate to",
       "provided-by": "This link was provided by the bounty creator. Please be careful and access only if you know the domain.",
       "open-link": "Open link"
+    },
+    "allow-list": {
+      "title": "Not allowed",
+      "content": "Creation of bounties is restricted on this network to a curated list of addresses. Please, select another network or contact the network governor."
     }
+  },
+  "allow-list": {
+    "not-allowed": "Bounty creation is not allowed with this address"
   }
 }

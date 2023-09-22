@@ -1,4 +1,4 @@
-import { useTranslation } from "next-i18next";
+import {useTranslation} from "next-i18next";
 
 import PlusIcon from "assets/icons/plus-icon";
 
@@ -37,12 +37,12 @@ export default function CreateNetworkBountyButtonView({
         }
       >
         <InternalLink
-            href={"/create-bounty"}
-            icon={<PlusIcon />}
-            label={t("main-nav.new-bounty") as string}
-            iconBefore
-            uppercase
-          />
+          href={"/create-bounty"}
+          icon={<PlusIcon />}
+          label={t("main-nav.new-bounty") as string}
+          iconBefore
+          uppercase
+        />
       </If>
   </ReadOnlyButtonWrapper>
   );
