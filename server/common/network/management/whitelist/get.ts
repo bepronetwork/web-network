@@ -22,6 +22,6 @@ export default async function get(req: NextApiRequest, res: NextApiResponse) {
     throw new HttpBadRequestError(ErrorMessages.NoNetworkFound)
 
   return address
-    ? {allowed: result.allow_list.map(toLower).includes(toLower(address))}
+    ? {allowed: !result.allow_list.length ? true : result.allow_list.map(toLower).includes(toLower(address))}
     : result.allow_list;
 }
