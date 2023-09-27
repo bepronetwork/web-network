@@ -85,14 +85,14 @@ export function FormGroup({
           <Form.Control
             type="text"
             onChange={handleChange}
-            onBlur={_ => rest?.onBlur()}
+            onBlur={_ => rest?.onBlur?.()}
             className={error && "is-invalid" || ""}
             {...rest}
           /> ||
           <InputNumber
             classSymbol={"text-primary"}
             onValueChange={handleNumberFormatChange}
-            onBlur={() => rest?.onBlur()}
+            onBlur={() => rest?.onBlur?.()}
             allowNegative={false}
             decimalScale={decimalScale}
             error={!!error}

@@ -3,100 +3,112 @@
   <meta charset="UTF-8">
   <title>Email Verification</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     .container {
       width: 100%;
-
+      padding: 32px;
+      font-family: 'Inter', sans-serif;
       background-color: #fff;
     }
 
-    .container > div {
-      margin: 0 auto;
-      width: 80%;
+    img {
+      margin-bottom: 32px;
     }
 
-    .section {
-      padding: 20px;
-      width: 100%;
+    h1 {
+      color: #282A2F;
+      font-weight: 500;
+      font-size: 21px;
+      margin-bottom: 32px;
+      margin-top: 0;
     }
 
-    .logo {
-      background-color: #4250E4;
-      height: 50px;
+    hr {
+      height: 1px;
+      border: none;
+      background-color: #EFF1F4;
+      margin-bottom: 32px;
     }
 
-    .logo img {
-      display: block;
-      margin: auto;
-      width: max-content;
+    p {
+      color: #282A2F;
+      font-weight: 400;
+      font-size: 14px;
+      margin-bottom: 32px;
     }
 
-    .content {
-      text-align: center;
-    }
-
-    .content h2 {
-      color: #4250E4;
-      margin-bottom: 30px;
-    }
-
-    .content p {
-      color: #797979;
-      font-weight: bold;
-      font-size: 15px;
-      margin-bottom: 40px;
-    }
-
-    .content a {
+    #bepro-network, #twitter, #instagram, #linkedin, #discord {
+      color: #73758C;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 15px;
       text-decoration: none;
-      background-color: #4250E4;
-      padding: 12px 18px;
-      border-radius: 4px;
+    }
+
+    #bepro-network:hover, #twitter:hover, #instagram:hover, #linkedin:hover, #discord:hover {
+      color: #6366F1;
+    }
+
+    #verify-link {
+      text-decoration: none;
+      background-color: #6366F1;
+      display: block;
+      width: 141px;
+      height: 40px;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 32px;
       
       color: #fff;
-      font-weight: bold;
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 40px;
     }
-
-    .social {
-      background-color: #4250E4;
-
-      text-align: center;
-
-      padding-top: 35px;
-      padding-bottom: 35px;
-    }
-
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="section logo">
-      <img src="{{host}}/images/logo-white.png" alt="Bepro Logo" height="50">
-    </div>
+    <img src="{{host}}/images/bepro-icon.png" alt="Bepro Logo" height="40" width="40">
 
-    <div class="section content">
-      <h2>Email Verification</h2>
-      <p>Please verify your email by clicking on the link below</p>
-      <a href="{{verifyLink}}" target="_blank">Verify Email</a>
-    </div>
+    <h1>
+      Email Verification
+    </h1>
 
-    <div class="section social">
-      <a href="{{twitter}}" target="_blank">
-        <img src="{{host}}/images/social/twitter.png" alt="Twitter Logo" height="25">
-      </a>
+    <hr />
 
-      <a href="{{instagram}}" target="_blank">
-        <img src="{{host}}/images/social/instagram.png" alt="Instagram Logo" height="25">
-      </a>
+    <p>
+      Please verify your email by clicking on the link below.
+    </p>
 
-      <a href="{{linkedin}}" target="_blank">
-        <img src="{{host}}/images/social/linkedin.png" alt="Linkedin Logo" height="25">
-      </a>
+    <a id="verify-link" href="{{verifyLink}}" target="_blank">
+      Verify Email
+    </a>
 
-      <a href="{{discord}}" target="_blank">
-        <img src="{{host}}/images/social/discord.png" alt="Discord Logo" height="25">
-      </a>
-    </div>
+    <hr />
+
+    <a id="bepro-network" class="social-link" href="{{host}}" target="_blank">
+      Bepro Network
+    </a>
+
+    <a id="twitter" class="social-link" href="{{twitter}}" target="_blank">
+      Twitter
+    </a>
+
+    <a id="instagram" class="social-link" href="{{instagram}}" target="_blank">
+      Instagram
+    </a>
+
+    <a id="linkedin" class="social-link" href="{{linkedin}}" target="_blank">
+      LinkedIn
+    </a>
+
+    <a id="discord" class="social-link" href="{{discord}}" target="_blank">
+      Discord
+    </a>
   </div>
 </body>
 </html>
