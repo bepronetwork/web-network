@@ -29,8 +29,9 @@ export default function ChainSelector({
   const isCreateBountyPage = pathname?.includes("create-bounty");
   const isCreateNetworkPage = pathname?.includes("new-network");
   const isCreateDeliverablePage = pathname?.includes("create-deliverable");
-  const shouldMatchChain = 
-    isFilter || isWalletPage || isOnNetwork || isCreateBountyPage || isCreateNetworkPage || isCreateDeliverablePage;
+  const isSetupPage = pathname?.includes("setup");
+  const shouldMatchChain = isFilter || isWalletPage || isOnNetwork || isCreateBountyPage ||
+    isCreateNetworkPage || isCreateDeliverablePage || isSetupPage;
 
   async function handleNetworkSelected(chain: SupportedChainData) {
     if (!shouldMatchChain) return;
