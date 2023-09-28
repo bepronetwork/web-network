@@ -49,7 +49,7 @@ export default function PullRequestLabels({
     case t("status.conflicts").toLowerCase(): {
       return "danger";
     }
-    case t("status.closed").toLowerCase(): {
+    case t("status.canceled").toLowerCase(): {
       return "danger";
     }
     case t("status.disputed").toLowerCase(): {
@@ -77,7 +77,7 @@ export default function PullRequestLabels({
     if (isMergeable) return t("status.ready-to-merge");
     if (needsApproval) return t("status.needs-approval");
     
-    return t("status.closed");
+    return t("status.canceled");
   }
 
   function getPullRequestLabelClass(): string {

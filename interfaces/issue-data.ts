@@ -106,6 +106,7 @@ export interface Deliverable {
   isCancelable: boolean;
   createdAt: Date;
   updatedAt: Date;
+  issue?: IssueData;
 }
 export interface PullRequest {
   createdAt: Date;

@@ -1,9 +1,10 @@
+import {ReactNode} from "react";
+
+import clsx from "clsx";
 import {useTranslation} from "next-i18next";
 
 import Button from "../../../button";
 import {FormGroup} from "../../../form-group";
-import {ReactNode} from "react";
-import clsx from "clsx";
 
 interface PermissionInputProps {
   placeholder?: string;
@@ -21,7 +22,7 @@ export default function PermissionInput({
   placeholder,
   value,
   onChange,
-  onBlur = () => {},
+  onBlur,
   onClickAdd,
   disabledButton,
   error,

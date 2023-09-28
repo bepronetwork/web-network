@@ -337,7 +337,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleMakePullRequestReady(bountyId: number, pullRequestId: number) {
+  async function handleMakePullRequestReady(bountyId: number, pullRequestId: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
         type: TransactionTypes.makeDeliverableReady,
@@ -346,7 +346,7 @@ export default function useBepro() {
       dispatch(tx);
 
       await state.Service?.active.setPullRequestReadyToReview(bountyId, pullRequestId)
-      .then((txInfo: unknown) => {
+      .then((txInfo: TransactionReceipt) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })
@@ -356,7 +356,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleCancelPullRequest(bountyId: number, pullRequestId: number) {
+  async function handleCancelPullRequest(bountyId: number, pullRequestId: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
         type: TransactionTypes.cancelDeliverable,
@@ -365,7 +365,7 @@ export default function useBepro() {
       dispatch(tx);
 
       await state.Service?.active.cancelPullRequest(bountyId, pullRequestId)
-      .then((txInfo: unknown) => {
+      .then((txInfo: TransactionReceipt) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })

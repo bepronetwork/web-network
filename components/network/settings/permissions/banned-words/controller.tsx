@@ -4,15 +4,12 @@ import {useTranslation} from "next-i18next";
 
 import {useAppState} from "../../../../../contexts/app-state";
 import {toastError, toastSuccess} from "../../../../../contexts/reducers/change-toaster";
-
 import {Network} from "../../../../../interfaces/network";
-
 import {
   CreateBannedWord,
   getBannedWordsData,
   RemoveBannedWord
 } from "../../../../../x-hooks/api/network/management/banned-words";
-
 import NetworkPermissionsView from "./view";
 
 interface NetworkPermissionsProps {

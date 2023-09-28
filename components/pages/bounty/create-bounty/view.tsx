@@ -25,6 +25,7 @@ import {TERMS_AND_CONDITIONS_LINK} from "helpers/constants";
 import {BountyDetailsSectionProps} from "interfaces/create-bounty";
 
 import {RewardInformationSectionProps} from "types/components";
+
 import Modal from "../../../modal";
 import {WarningSpan} from "../../../warning-span";
 

@@ -1,12 +1,14 @@
-import useReactQuery from "../../../../../x-hooks/use-react-query";
 import {useState} from "react";
+
 import {useDebounce} from "use-debounce";
 import {isAddress} from "web3-utils";
-import AllowListView from "./allow-list-view";
-import useGetAllowList from "../../../../../x-hooks/api/network/management/allow-list/use-get-allow-list";
+
+import useAddAllowListEntry from "../../../../../x-hooks/api/network/management/allow-list/use-add-allow-list-entry";
 import useDeleteAllowListEntry
   from "../../../../../x-hooks/api/network/management/allow-list/use-delete-allow-list-entry";
-import useAddAllowListEntry from "../../../../../x-hooks/api/network/management/allow-list/use-add-allow-list-entry";
+import useGetAllowList from "../../../../../x-hooks/api/network/management/allow-list/use-get-allow-list";
+import useReactQuery from "../../../../../x-hooks/use-react-query";
+import AllowListView from "./allow-list-view";
 
 type AllowListProps = {networkId: number};
 

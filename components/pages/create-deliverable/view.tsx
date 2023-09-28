@@ -10,6 +10,7 @@ import CheckButtons from "components/check-buttons/controller";
 import DescriptionAndPreview from "components/common/description-and-preview/controller";
 import { ContextualSpan } from "components/contextual-span";
 import If from "components/If";
+import MakeDeliverableRedyModal from "components/modals/make-deliverable-ready/controller";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 import { OriginLinkErrors } from "interfaces/enums/Errors";
@@ -35,6 +36,8 @@ interface CreateDeliverablePageViewProps {
   previewIsLoading: boolean;
   createIsLoading: boolean;
   originLinkError: OriginLinkErrors;
+  createdDeliverableId: number;
+  bountyContractId: number;
 }
 
 export default function CreateDeliverablePageView({
@@ -53,6 +56,8 @@ export default function CreateDeliverablePageView({
   previewIsLoading,
   createIsLoading,
   originLinkError,
+  createdDeliverableId,
+  bountyContractId,
 }: CreateDeliverablePageViewProps) {
   const { t } = useTranslation(["common", "bounty", "deliverable"]);
 
@@ -228,6 +233,11 @@ export default function CreateDeliverablePageView({
       </div>
 
       </div>
+
+      <MakeDeliverableRedyModal
+        bountyContractId={bountyContractId}
+        deliverableId={createdDeliverableId}
+      />
     </div>
   );
 }
