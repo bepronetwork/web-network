@@ -85,7 +85,7 @@ export function FormGroup({
           <Form.Control
             type="text"
             onChange={handleChange}
-            onBlur={_ => rest?.onBlur?.()}
+            onBlur={() => rest?.onBlur?.()}
             className={error && "is-invalid" || ""}
             {...rest}
           /> ||

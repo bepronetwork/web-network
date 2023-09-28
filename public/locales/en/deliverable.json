@@ -13,6 +13,7 @@
     "reviewWithCount_other": "{{count}} reviews",
     "find-a-bounty": "Find a bounty to work on",
     "loc": "LOC",
+    "make-ready-warning": "If the deliverable is ready to be reviewed by curators, please mark it as so by using the \"Make Ready for Review\" button.",
     "create": {
         "title": "Create Deliverable",
         "description": "A deliverable is the work you have done to deliver what was asked by the bounty creator. By creating a deliverable you are indicating that you finished the work and it could be reviewed and proposed as solution by the curators.",
@@ -75,7 +76,8 @@
       "accepted": "Accepted",
       "disputed": "Disputed",
       "failed": "Failed",
-      "needs-approval": "Pending approval"
+      "needs-approval": "Pending approval",
+      "canceled": "Canceled"
     },
     "errors": {
       "not-found": "No deliverables found",
@@ -85,5 +87,14 @@
       "deliverable-participants": "Failed to get participants",
       "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the network governor.",
       "approval": "Please contact repository admin for deliverable approval before merging is enabled."
+    },
+    "modals": {
+      "make-ready": {
+        "title": "Make Ready for Review",
+        "action": "Mark as ready",
+        "description": "If the deliverable is ready to be reviewed by curators, please mark it as so.",
+        "success": "Marked deliverable as ready.",
+        "error": "Failed to mark deliverable as ready."
+      }
     }
   }

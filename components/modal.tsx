@@ -5,6 +5,7 @@ import { kebabCase } from "lodash";
 import CloseIcon from "assets/icons/close-icon";
 
 import Button from "components/button";
+import If from "components/If";
 
 import { Modal as ModalProps } from "types/modal";
 
@@ -44,24 +45,27 @@ export default function Modal({
     if (okLabel || cancelLabel)
       return (
         <div className="mb-2 d-flex flex-row justify-content-between">
-          {cancelLabel && (
-            <button className="btn btn-gray-850" onClick={() => onCloseClick()} disabled={onCloseDisabled}>
-              {cancelLabel}
-            </button>
-          )}
-
-          {okLabel && (
-            <button
-              disabled={okDisabled || isExecuting}
-              className={`btn btn-${okColor}`}
-              onClick={() => onOkClick()}
+          <If condition={!!cancelLabel}>
+            <Button
+              color="gray-850"
+              onClick={onCloseClick}
+              disabled={onCloseDisabled || isExecuting}
             >
-              {okLabel}
-              { isExecuting && 
-                <span className="spinner-border spinner-border-xs ml-1" />
-              }
-            </button>
-          )}
+              <span>{cancelLabel}</span>
+            </Button>
+          </If>
+
+          <If condition={!!okLabel}>
+            <Button
+              color={okColor}
+              onClick={onOkClick}
+              disabled={okDisabled || isExecuting}
+              isLoading={isExecuting}
+              withLockIcon={okDisabled}
+            >
+              <span>{okLabel}</span>
+            </Button>
+          </If>
         </div>
       );
     return <></>;

@@ -40,7 +40,7 @@ export default function DeliverablePage({ deliverable, bounty }: PageDeliverable
   const { data: deliverableData, invalidate: invalidateDeliverable } = 
   useReactQuery(["deliverable", +deliverableId], () => getDeliverable(+deliverableId));  
 
-  const [showModal, setShowModal] = useState(!!review);
+  const [showModal, setShowModal] = useState(review === "true");
   const [currentBounty, setCurrentBounty] = useState<IssueBigNumberData>(issueParser(bounty));
   const [currentDeliverable, setCurrentDeliverable] = 
     useState<Deliverable>(deliverableParser(deliverable, bounty?.mergeProposals));

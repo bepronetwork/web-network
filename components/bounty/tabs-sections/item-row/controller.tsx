@@ -44,7 +44,8 @@ export default function ItemRow({
                                                         proposal.contractId === +(item as Proposal)?.contractId);
   const isDisputed = !!proposal?.isDisputed;
   const isMerged = (item as Proposal)?.isMerged;
-  const isDraftDeliverable = !(item as Deliverable)?.canceled && !(item as Deliverable)?.markedReadyForReview
+  const isCanceledDeliverable = !!(item as Deliverable)?.canceled;
+  const isDraftDeliverable = !isCanceledDeliverable && !(item as Deliverable)?.markedReadyForReview;
   if (!isProposal) {
     status.push({
       merged: (item as Deliverable)?.accepted,
@@ -76,7 +77,7 @@ export default function ItemRow({
 
   const btnLabel = isProposal
     ? "actions.view-proposal"
-    : isDraftDeliverable
+    : isDraftDeliverable || isCanceledDeliverable
     ? "actions.view-deliverable"
     : "actions.review";
 
