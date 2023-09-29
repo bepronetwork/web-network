@@ -19,6 +19,9 @@ export default function Comments({
   updateData: (updatePrData?: boolean) => void;
   disableCreateComment?: boolean;
 }) {
+
+  if(!comments?.length && disableCreateComment) return null;
+  
   return (
     <BountyCommentsView
       comments={comments}
