@@ -12,6 +12,7 @@ import {
   BOUNTY_TITLE_LIMIT,
   MAX_TAGS,
 } from "helpers/constants";
+import { getOriginLinkPlaceholder } from "helpers/origin-link-placeholder";
 
 import { BountyDetailsSectionProps } from "interfaces/create-bounty";
 
@@ -130,6 +131,7 @@ export default function BountyDetailsSection({
       deliverableType={deliverableType}
       originLink={originLink}
       originLinkError={originLinkError}
+      originLinkPlaceHolder={getOriginLinkPlaceholder(t, deliverableType)}
       onTitlechange={handleChangeTitle}
       onDescriptionchange={handleChangeDescription}
       onFilesChange={updateFiles}

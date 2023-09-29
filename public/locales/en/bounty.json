@@ -151,7 +151,12 @@
     "origin-link": {
       "label": "Origin Link",
       "description": "If you have a project boilerplate, a figma design, or something that might help people to work on this bounty, you can provide a link below.",
-      "placeholder": "github.com"
+      "placeholders": {
+        "default": "Repository link, figma template, etc",
+        "code": "Repository link",
+        "design": "Figma template, or link to design",
+        "other": "Link to document, etc"
+      }
     }
   },
   "reward-funders": "Set Funders Reward",
