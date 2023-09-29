@@ -1,3 +1,4 @@
+const { Web3Connection, Network_v2 } = require("@taikai/dappkit");
 const { Octokit } = require("octokit");
 const { getAllFromTable } = require("../../helpers/db/rawQueries");
 const { ipfsAdd } = require("../../helpers/db/ipfsAdd");
@@ -32,61 +33,84 @@ async function up(queryInterface, Sequelize) {
   });
 
   try {
-    for (const pullRequest of pullRequests) {
-      const issue = openIssues.find(({ id }) => id === pullRequest.issueId);
-      const chain = chains.find(({ chainId }) => chainId === issue.chain_id);
-      const network = networks.find(({ id }) => id === issue.network_id);
-      const user = users.find(
-        ({ address, githubLogin }) =>
-          address?.toLowerCase() === pullRequest?.userAddress?.toLowerCase() ||
-          githubLogin?.toLowerCase() === pullRequest?.githubLogin?.toLowerCase()
-      );
-      const repository = repositories.find(
-        ({ id }) => id === issue.repository_id
-      );
-
-      const [owner, repo] = repository?.githubPath?.split("/");
-
-      const { data: pullRequestGithub } = await octokit.rest.pulls.get({
-        owner,
-        repo,
-        pull_number: pullRequest.githubId,
+    for (const chain of chains) {
+      const web3Connection = new Web3Connection({
+        skipWindowAssignment: true,
+        web3Host: chain.chainRpc,
       });
 
-      const ipfsObject = {
-        name: "BEPRO Deliverable",
-        description: pullRequestGithub.body,
-        properties: {
-          title: pullRequestGithub.title,
-          deliverableUrl: pullRequestGithub.html_url,
-          bountyUrl: `${NEXT_PUBLIC_HOME_URL}/${network.name}/${chain.chainShortName}/bounty/${issue.id}`,
-        },
-      };
+      await web3Connection.start();
+      for (const network of networks.filter(
+        ({ chain_id }) => chain.chainId === chain_id
+      )) {
+        const networkV2 = new Network_v2(web3Connection, network.networkAddress);
 
-      const { hash } = await ipfsAdd(ipfsObject, true);
+        await networkV2.loadContract();
 
-      const ipfsLink = `${ipfsUrl.value}/${hash}`;
+        for (const issue of openIssues.filter(({ network_id }) => network_id === network.id)) { 
+          const bounty = await networkV2.getBounty(issue?.contractId);
 
-      if (!hash) throw new TypeError(`error adding deliverable to ipfs`);
+          for (const pullRequest of pullRequests.filter(({ issueId }) => issueId === issue.id)) {
+            if (!bounty?.pullRequests || !pullRequest?.contractId) continue;
 
-      await queryInterface.bulkInsert("deliverables", [
-        {
-          deliverableUrl: pullRequestGithub.html_url,
-          ipfsLink,
-          title: pullRequestGithub.title,
-          description: pullRequestGithub.body,
-          canceled: pullRequest.status === "canceled" ? true : false,
-          markedReadyForReview: pullRequest.status === "ready" ? true : false,
-          accepted: pullRequestGithub.merged ? true : false,
-          issueId: issue.id,
-          bountyId: issue.contractId,
-          prContractId: pullRequest.contractId,
-          userId: user?.id,
-          createdAt: pullRequest.createdAt,
-          updatedAt: pullRequest.updatedAt,
-        },
-      ]);
+            const currentPrContract = bounty?.pullRequests?.find(({id}) => id === pullRequest.contractId)
+
+            const user = users.find(
+              ({ address, githubLogin }) =>
+                address?.toLowerCase() === pullRequest?.userAddress?.toLowerCase() ||
+                githubLogin?.toLowerCase() === pullRequest?.githubLogin?.toLowerCase()
+            );
+            const repository = repositories.find(
+              ({ id }) => id === issue.repository_id
+            );
+
+            const [owner, repo] = repository?.githubPath?.split("/");
+
+            const { data: pullRequestGithub } = await octokit.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pullRequest.githubId,
+            });
+      
+            const ipfsObject = {
+              name: "BEPRO Deliverable",
+              description: pullRequestGithub.body,
+              properties: {
+                title: pullRequestGithub.title,
+                deliverableUrl: pullRequestGithub.html_url,
+                bountyUrl: `${NEXT_PUBLIC_HOME_URL}/${network.name}/${chain.chainShortName}/bounty/${issue.id}`,
+              },
+            };
+      
+            const { hash } = await ipfsAdd(ipfsObject, true);
+      
+            const ipfsLink = `${ipfsUrl.value}/${hash}`;
+      
+            if (!hash) throw new TypeError(`error adding deliverable to ipfs`);
+      
+            await queryInterface.bulkInsert("deliverables", [
+              {
+                deliverableUrl: pullRequestGithub.html_url,
+                ipfsLink,
+                title: pullRequestGithub.title,
+                description: pullRequestGithub.body,
+                canceled: !!currentPrContract?.canceled,
+                markedReadyForReview: !!currentPrContract?.ready,
+                accepted: pullRequestGithub.merged ? true : false,
+                issueId: issue.id,
+                bountyId: issue.contractId,
+                prContractId: pullRequest.contractId,
+                userId: user?.id,
+                createdAt: pullRequest.createdAt,
+                updatedAt: pullRequest.updatedAt,
+              },
+            ]);
+          }
+
+        }
+      }
     }
+
   } catch (error) {
     console.log(
       "Failed to fill deliverables from pull requests",

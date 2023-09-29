@@ -40,7 +40,7 @@ export default function TotalVotes({
           infoTooltip={t("profile:tips.total-oracles", {
             tokenName: tokenName,
           })}
-          total={votesLocked.plus(votesDelegatedToMe).toFixed()} 
+          total={votesLocked.plus(votesDelegatedToMe)?.toFixed()} 
           votesSymbol={votesSymbol} 
           variant={variant} 
           tokenColor={tokenColor}        
@@ -49,7 +49,7 @@ export default function TotalVotes({
 
       <VotesAmount
         label={t("profile:locked-by-me")}
-        amount={votesLocked.toFixed()}
+        amount={votesLocked?.toFixed()}
         networkIcon={icon}
         votesSymbol={votesSymbol}
         tokenSymbol={tokenSymbol}
@@ -60,7 +60,7 @@ export default function TotalVotes({
 
       <VotesAmount
         label={t("profile:deletaged-to-me")}
-        amount={votesDelegatedToMe.toFixed()}
+        amount={votesDelegatedToMe?.toFixed()}
         networkIcon={icon}
         votesSymbol={votesSymbol}
         tokenSymbol={tokenSymbol}
@@ -71,7 +71,7 @@ export default function TotalVotes({
 
       <VotesAmount
         label={t("profile:deletaged-to-others")}
-        amount={votesDelegatedToOthers.toFixed()}
+        amount={votesDelegatedToOthers?.toFixed()}
         networkIcon={icon}
         votesSymbol={votesSymbol}
         tokenSymbol={tokenSymbol}

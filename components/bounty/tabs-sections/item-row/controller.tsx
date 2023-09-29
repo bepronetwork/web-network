@@ -75,9 +75,11 @@ export default function ItemRow({
     .multipliedBy(state.Service?.network?.amounts?.totalNetworkToken)
     .dividedBy(100);
 
+  const isCurator = !!state?.Service?.network?.active?.isCouncil;
+
   const btnLabel = isProposal
     ? "actions.view-proposal"
-    : isDraftDeliverable || isCanceledDeliverable
+    : (isDraftDeliverable || isCanceledDeliverable || !isCurator)
     ? "actions.view-deliverable"
     : "actions.review";
 

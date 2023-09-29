@@ -46,6 +46,7 @@ export default function DeliverableBody({
                                                           t("deliverable:actions.cancel.success"),
                                                           t("deliverable:actions.cancel.error"));
 
+  const isCouncil = !!state?.Service?.network?.active?.isCouncil;
   const isWalletConnected = !!state.currentUser?.walletAddress;
   const isDeliverableReady = currentDeliverable?.markedReadyForReview;
   const isDeliverableCanceled = currentDeliverable?.canceled;
@@ -55,7 +56,8 @@ export default function DeliverableBody({
   const isMakeReviewButton =
     isWalletConnected &&
     isDeliverableReady &&
-    !isDeliverableCanceled;
+    !isDeliverableCanceled &&
+    isCouncil
 
   const isMakeReadyReviewButton =
     isWalletConnected &&
@@ -102,6 +104,7 @@ export default function DeliverableBody({
       isMakingReady={isMakingReady}
       updateComments={updateComments}
       currentUser={state.currentUser}
+      isCouncil={isCouncil}
       bountyId={currentBounty?.id}
     />
   );

@@ -1,6 +1,6 @@
 "use strict";
 const { getValueToLowerCase } = require("../../helpers/db/getters");
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Sequelize } = require("sequelize");
 
 class Curators extends Model {
   static init(sequelize) {
@@ -71,6 +71,14 @@ class Curators extends Model {
     this.hasMany(models.dispute, {
       foreignKey: "address",
       targetKey: "address"
+    });
+  }
+
+  static findByAddress(address) {
+    return this.findOne({
+      where: {
+        address: Sequelize.where(Sequelize.fn("lower", Sequelize.col("address")), address?.toLowerCase())
+      }
     });
   }
 }

@@ -3,6 +3,7 @@ import { ReactElement } from "react";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
+import { ContextualSpan } from "components/contextual-span";
 import If from "components/If";
 import NothingFound from "components/nothing-found";
 import NetworkColumns from "components/profile/network-columns";
@@ -12,7 +13,6 @@ import ResponsiveWrapper from "components/responsive-wrapper";
 import { Curator } from "interfaces/curators";
 import { Network } from "interfaces/network";
 
-import VotingPowerInfoCard from "./info-card/controller";
 import PageItemView from "./page-item/view";
 import VotingPowerRowView from "./voting-power-row/view";
 interface VotingPowerMultiNetworkViewProps {
@@ -62,7 +62,9 @@ export default function VotingPowerMultiNetworkView({
   return (
     <>
       <div className="mt-5">
-        <VotingPowerInfoCard />
+        <ContextualSpan isAlert isDismissable context='info' className="bg-info-10">
+        {t("profile:need-network-to-manage")}
+        </ContextualSpan>
       </div>
 
       <If condition={!!networks?.length && !network}>
