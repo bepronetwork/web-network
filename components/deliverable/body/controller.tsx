@@ -91,6 +91,7 @@ export default function DeliverableBody({
 
   return (
     <DeliverableBodyView
+      currentBounty={currentBounty}
       currentDeliverable={currentDeliverable}
       isCreatingReview={isCreatingReview}
       showMakeReadyWarning={showMakeReadyWarning}
@@ -105,7 +106,6 @@ export default function DeliverableBody({
       updateComments={updateComments}
       currentUser={state.currentUser}
       isCouncil={isCouncil}
-      bountyId={currentBounty?.id}
     />
   );
 }

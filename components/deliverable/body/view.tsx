@@ -6,7 +6,7 @@ import CustomContainer from "components/custom-container";
 import If from "components/If";
 
 import { CurrentUserState } from "interfaces/application-state";
-import { Deliverable } from "interfaces/issue-data";
+import { Deliverable, IssueBigNumberData } from "interfaces/issue-data";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
 
@@ -16,6 +16,7 @@ import DeliverableDescription from "./description/view";
 import DeliverableOriginLink from "./origin-link/controller";
 
 interface DeliverableBodyViewProps {
+  currentBounty: IssueBigNumberData;
   currentDeliverable: Deliverable;
   isCreatingReview: boolean;
   showMakeReadyWarning: boolean;
@@ -30,10 +31,10 @@ interface DeliverableBodyViewProps {
   isMakingReady: boolean;
   currentUser: CurrentUserState;
   isCouncil: boolean;
-  bountyId: string;
 }
 
 export default function DeliverableBodyView({
+  currentBounty,
   currentDeliverable,
   isCreatingReview,
   showMakeReadyWarning,
@@ -47,14 +48,13 @@ export default function DeliverableBodyView({
   isMakingReady,
   updateComments,
   currentUser,
-  isCouncil,
-  bountyId
+  isCouncil
 }: DeliverableBodyViewProps) {  
   const { t } = useTranslation("deliverable");
   const { isMobileView, isTabletView } = useBreakPoint();
 
   function RenderMakeReviewButton({ className = "" }) {
-    if (isMakeReviewButton)
+    if (isMakeReviewButton && !currentBounty?.isClosed)
       return (
         <DeliverableButton
           type="review"
@@ -153,12 +153,12 @@ export default function DeliverableBodyView({
             type="deliverable"
             updateData={updateComments}
             ids={{
-              issueId: +bountyId,
+              issueId: +currentBounty?.id,
               deliverableId: currentDeliverable?.id,
             }}
             comments={currentDeliverable?.comments}
             currentUser={currentUser}
-            disableCreateComment={currentDeliverable?.canceled || !isCouncil}
+            disableCreateComment={currentDeliverable?.canceled || currentBounty?.isClosed || !isCouncil}
           />
         )}
       </CustomContainer>

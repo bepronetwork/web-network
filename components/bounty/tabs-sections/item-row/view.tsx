@@ -58,8 +58,9 @@ export default function ItemRowView({
         isMerged={isMerged}
         totalToBeDisputed={totalToBeDisputed} 
         isProposal={isProposal} 
-        item={item}
-      />
+        item={item}      
+        status={status}
+        />
     );
   }
 
