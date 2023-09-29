@@ -88,6 +88,10 @@
       "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the network governor.",
       "approval": "Please contact repository admin for deliverable approval before merging is enabled."
     },
+    "infos": {
+      "curators": "In order to make a comment/review on this deliverable you need to be a curator, ",
+      "get-voting-power": "get voting power."
+    },
     "modals": {
       "make-ready": {
         "title": "Make Ready for Review",

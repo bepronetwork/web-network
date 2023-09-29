@@ -14,7 +14,7 @@ module.exports = {
           UPDATE "merge_proposals" AS proposal
           SET "deliverableId" = d."id"
           FROM "pull_requests" AS pr
-          JOIN "deliverables" AS d ON pr."contractId" = d."prContractId"
+          JOIN "deliverables" AS d ON pr."contractId" = d."prContractId" AND pr."issueId" = d."issueId"
           WHERE proposal."pullRequestId" = pr."id"
         `);
 
