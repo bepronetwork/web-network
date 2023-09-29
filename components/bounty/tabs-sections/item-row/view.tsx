@@ -91,9 +91,9 @@ export default function ItemRowView({
           </div>
 
           <If condition={isProposal}>
-            <div className="col-md-3 col-xl-3">
+            <div className="col-md-3 col-xl-3 mgt-3">
               <span className="text-uppercase caption text-gray-500">
-              <Translation label={"deliverable:label"} /> #{(item as Proposal)?.deliverableId}
+                <Translation label={"deliverable:label"} /> #{(item as Proposal)?.deliverableId}
               </span>
             </div>
           </If>
