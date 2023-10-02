@@ -7,7 +7,7 @@ import {useRouter} from "next/router";
 
 export default function ElasticApmRum() {
   const router = useRouter();
-  const {publicRuntimeConfig: {elastic: {rum: elastic}}} = getConfig();
+  const {serverRuntimeConfig: {elastic: {rum: elastic}}} = getConfig();
   const [apm] = useState<ApmBase>(elastic.enabled ? init(elastic) : null);
 
   const tx = useMemo(() => {
