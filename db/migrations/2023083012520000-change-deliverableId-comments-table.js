@@ -14,7 +14,7 @@ module.exports = {
       UPDATE "comments" AS c
       SET "newDeliverableId" = d."id"
       FROM "pull_requests" AS pr
-      JOIN "deliverables" AS d ON pr."contractId" = d."prContractId"
+      JOIN "deliverables" AS d ON pr."contractId" = d."prContractId" AND pr."issueId" = d."issueId"
       WHERE c."deliverableId" = pr."id"
     `);
 
