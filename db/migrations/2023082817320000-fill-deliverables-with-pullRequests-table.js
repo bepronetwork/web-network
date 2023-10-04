@@ -51,7 +51,7 @@ async function up(queryInterface, Sequelize) {
           const bounty = await networkV2.getBounty(issue?.contractId);
 
           for (const pullRequest of pullRequests.filter(({ issueId }) => issueId === issue.id)) {
-            if (!bounty?.pullRequests || !pullRequest?.contractId) continue;
+            if (!bounty?.pullRequests) continue;
 
             const currentPrContract = bounty?.pullRequests?.find(({id}) => id === pullRequest.contractId)
 

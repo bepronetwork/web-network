@@ -7,6 +7,7 @@ import { UrlObject } from "url";
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import { IPRLabel } from "components/deliverable/labels/controller";
 import If from "components/If";
+import Translation from "components/translation";
 
 import { truncateAddress } from "helpers/truncate-address";
 
@@ -74,7 +75,7 @@ export default function ItemRowView({
         <div className="col-10 col-md-8 d-flex flex-row align-items-center gap-3">
           <ItemRowIdView id={id} className="col-1 d-none d-xl-block" />
 
-          <div className="text-truncate col-md-5 col-xl-4 d-flex align-items-center gap-2">
+          <div className="text-truncate col-md-5 col-xl-3 d-flex align-items-center gap-2">
             <AvatarOrIdenticon
               user={userGithubLogin}
               address={userAddress}
@@ -82,11 +83,21 @@ export default function ItemRowView({
             />
 
             <span
-              className={`text-uppercase text-white caption text-truncate mt-1`}
+              className={`${
+                isProposal ? "d-none d-sm-block" : ""
+              } text-uppercase text-white caption text-truncate mt-1`}
             >
               {userGithubLogin ? userGithubLogin : truncateAddress(userAddress)}
             </span>
           </div>
+
+          <If condition={isProposal}>
+            <div className="col-md-3 col-xl-3 mgt-3">
+              <span className="text-uppercase caption text-gray-500">
+                <Translation label={"deliverable:label"} /> #{(item as Proposal)?.deliverableId}
+              </span>
+            </div>
+          </If>
 
           <If condition={!isProposal}>
             <ReviewsNumberView
