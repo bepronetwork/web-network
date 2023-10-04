@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {GovernorRoute} from "middleware";
+import { withProtected, WithValidChainId, withGovernor } from "middleware";
 
 import {Logger} from "services/logging";
 
@@ -36,4 +36,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default GovernorRoute(handler);
+export default withProtected(WithValidChainId(withGovernor(handler, ["GET", "DELETE"])));

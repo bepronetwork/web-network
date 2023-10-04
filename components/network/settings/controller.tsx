@@ -195,7 +195,7 @@ export default function MyNetworkSettings({
         component: (
           <>
             <NetworkPermissions network={network}/>
-            <AllowList networkId={network.id} />
+            <AllowList networkId={network.id} networkAddress={network.networkAddress} />
           </>
         )
       }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 
 import NetworkGovernanceSettingsView from "components/network/settings/governance/view";
@@ -33,6 +34,7 @@ export default function NetworkGovernanceSettings({
   address,
   updateEditingNetwork
 }: GovernanceProps) {
+  const { update: updateSession } = useSession();
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [isClosing, setIsClosing] = useState(false);
@@ -85,7 +87,6 @@ export default function NetworkGovernanceSettings({
   function handleCloseMyNetwork() {
     if (
       !state.Service?.network?.active ||
-      !state.currentUser?.accessToken ||
       !state.currentUser?.walletAddress ||
       !state.Service?.active
     )
@@ -103,9 +104,8 @@ export default function NetworkGovernanceSettings({
       })
       .then(() => {
         updateWalletBalance(true);
-
         if (isCurrentNetwork) updateActiveNetwork(true);
-
+        updateSession();
         return updateEditingNetwork();
       })
       .then(() =>
@@ -235,7 +235,6 @@ export default function NetworkGovernanceSettings({
       creator: state.currentUser.walletAddress,
       githubLogin: state.currentUser.login,
       networkAddress: network.networkAddress,
-      accessToken: state.currentUser.accessToken,
       allowedTokens: {
         transactional: settingsTokens?.allowedTransactions?.map((token) => token?.id).filter((v) => v),
         reward: settingsTokens?.allowedRewards?.map((token) => token?.id).filter((v) => v)

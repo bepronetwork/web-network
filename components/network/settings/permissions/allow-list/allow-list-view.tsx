@@ -51,7 +51,8 @@ export default function AllowListView({
           <If 
             condition={!isLoading}
             children={allowList?.map((address, index) => 
-              <PermissionListItem 
+              <PermissionListItem
+                key={address}
                 value={address} 
                 label={truncateAddress(address, 10, 8)} 
                 id={index} 

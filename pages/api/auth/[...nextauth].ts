@@ -60,8 +60,11 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       },
       async jwt(params) {
         try {
-          const provider = params?.account?.provider;
+          const isUpdate = params?.trigger === "update";
+          if (isUpdate)
+            return ethereumProvider.callbacks.jwt(params);
 
+          const provider = params?.account?.provider;
           switch (provider) {
           case "github":
             return githubProvider.callbacks.jwt(params);
