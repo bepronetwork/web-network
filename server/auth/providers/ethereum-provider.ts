@@ -6,8 +6,8 @@ import {getCsrfToken} from "next-auth/react";
 import models from "db/models";
 
 import {caseInsensitiveEqual} from "helpers/db/conditionals";
-import {AddressValidator} from "helpers/validators/address";
 import {toLower} from "helpers/string";
+import {AddressValidator} from "helpers/validators/address";
 
 import {UserRole} from "interfaces/enums/roles";
 
@@ -87,9 +87,10 @@ export const EthereumProvider = (currentToken: JWT, req: NextApiRequest): AuthPr
       if (AddressValidator.isAdmin(address))
         roles.push(UserRole.ADMIN);
 
+      const activeNetwork = ({ isClosed, isRegistered }) => !isClosed && isRegistered;
+      const getRole = ({ networkAddress, chain_id }) => UserRoleUtils.getGovernorRole(chain_id, networkAddress);
       const governorOf = await models.network.findAllOfCreatorAddress(address)
-        .then(networks => 
-          networks.map(({ networkAddress, chain_id }) => UserRoleUtils.getGovernorRole(chain_id, networkAddress)))
+        .then(networks => networks.filter(activeNetwork).map(getRole))
         .catch(() => []);
 
       const allowBountyCreationOnNetworks = await models.network

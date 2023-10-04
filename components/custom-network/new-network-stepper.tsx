@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import {isZeroAddress} from "ethereumjs-util";
+import { useSession } from "next-auth/react";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
@@ -45,7 +46,7 @@ import useSignature from "x-hooks/use-signature";
 
 function NewNetwork() {
   const router = useRouter();
-
+  const { update: updateSession } = useSession();
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [hasNetwork, setHasNetwork] = useState(false);
@@ -211,10 +212,13 @@ function NewNetwork() {
     await processEvent(RegistryEvents.NetworkRegistered, state.connectedChain?.registry, {
       fromBlock: registrationTx.blockNumber
     })
-      .then(() => router.push(getURLWithNetwork("/", {
-        network: payload.name,
-        chain: state.connectedChain?.shortName
-      })))
+      .then(() => {
+        updateSession();
+        router.push(getURLWithNetwork("/", {
+          network: payload.name,
+          chain: state.connectedChain?.shortName
+        }));
+      })
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({

@@ -17,7 +17,7 @@ const RouteMiddleware = (handler: NextApiHandler) => withCORS(withJWT(handler));
 const AdminRoute = (handler: NextApiHandler) => withProtected(withAdmin(handler));
 const IssueRoute = (handler: NextApiHandler) => withProtected(withIssue(handler));
 const UserRoute = (handler: NextApiHandler) => withProtected(withUser(handler));
-const GovernorRoute = (handler: NextApiHandler) => withProtected(withGovernor(handler))
+const GovernorRoute = (handler: NextApiHandler) => withProtected(WithValidChainId(withGovernor(handler)));
 
 export {
   withCORS,

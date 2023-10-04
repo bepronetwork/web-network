@@ -15,7 +15,7 @@ export const withGovernor = (handler: NextApiHandler, allowedMethods = ["GET"]):
       return handler(req, res);
 
     const token = req.body?.context?.token;
-    const chain = req.body?.context?.chain || [];
+    const chain = req.body?.context?.chain;
     const networkAddress = req.body?.networkAddress;
 
     if (!UserRoleUtils.isGovernorOf(token, chain?.chainId, networkAddress) && !UserRoleUtils.hasAdminRole(token))
