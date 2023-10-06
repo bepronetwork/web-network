@@ -63,3 +63,7 @@ export interface DistributedAmounts {
     githubLogin?: string;
   }[];
 }
+
+export interface DistributionsProps extends DistributedAmounts {
+  totalServiceFees: BigNumber;
+}

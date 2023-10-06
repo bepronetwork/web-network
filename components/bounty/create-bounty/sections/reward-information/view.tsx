@@ -8,7 +8,7 @@ import ResponsiveWrapper from "components/responsive-wrapper";
 import { RewardInformationViewProps } from "types/components";
 
 import CreateBountyRewardInfo from "../../create-bounty-reward-info";
-import CreateBountyTokenAmount from "../../token-amount/create-bounty-token-amount";
+import CreateBountyTokenAmount from "../../token-amount/controller";
 import RewardInformationBalanceView from "./balance/view";
 
 export default function RewardInformationSectionView({
@@ -71,7 +71,7 @@ export default function RewardInformationSectionView({
       <>
         <CreateBountyTokenAmount
           currentToken={fieldParams[type].token}
-          setCurrentToken={fieldParams[type].setToken}
+          updateCurrentToken={fieldParams[type].setToken}
           customTokens={fieldParams[type].tokens}
           userAddress={currentUserWallet}
           defaultToken={fieldParams[type].default}
@@ -79,12 +79,11 @@ export default function RewardInformationSectionView({
           addToken={addToken}
           decimals={fieldParams[type].decimals}
           issueAmount={fieldParams[type].amount}
-          setIssueAmount={fieldParams[type].setAmount}
+          updateIssueAmount={fieldParams[type].setAmount}
           tokenBalance={fieldParams[type].balance}
           isFunders={type === "reward" ? false : true}
           needValueValidation={!isFundingType || type === "reward"}
           isFunding={isFundingType}
-          labelSelect={fieldParams[type].label}
         />
       </>
     );
