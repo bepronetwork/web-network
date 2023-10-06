@@ -9,9 +9,9 @@ import StartWorkingButton from "components/bounty/page-actions/actions/start-wor
 import TabletAndMobileButton from "components/bounty/page-actions/actions/tablet-and-mobile.view";
 import UpdateAmountButton from "components/bounty/page-actions/actions/update-amount.view";
 import { PageActionsViewProps } from "components/bounty/page-actions/page-actions";
+import UpdateBountyAmountModal from "components/bounty/update-bounty-amount-modal/controller";
 import If from "components/If";
 import ProposalModal from "components/proposal/new-proposal-modal/controller";
-import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
 

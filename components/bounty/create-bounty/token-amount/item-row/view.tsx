@@ -9,12 +9,14 @@ export default function RenderItemRow({
   label = "",
   description = "",
   borderBottom = true,
+  classNameChildren,
   handleLink,
 }: {
   children: ReactElement;
   label: string;
   description: string;
   borderBottom?: boolean;
+  classNameChildren?: string;
   handleLink?: () => void;
 }) {
   const { t } = useTranslation(["common"]);
@@ -59,7 +61,13 @@ export default function RenderItemRow({
             description
           )}
         </div>
-        <div className="col-md-4 col-12 mt-1">{children}</div>
+        <div
+          className={
+            classNameChildren ? classNameChildren : "col-md-4 col-12 mt-1"
+          }
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
