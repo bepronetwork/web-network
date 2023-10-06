@@ -8,10 +8,13 @@ interface OpenGraphPreviewViewProps {
   isFetching: boolean;
   isImage: boolean;
   previewPlaceholder?: string
+  errorPlaceholder?: string
   preview: string;
   showOpenLink?: boolean;
   url: string;
   openLinkText?: string;
+  noPreviewAvailable: boolean;
+  isError: boolean;
 }
 
 export default function OpenGraphPreviewView({
@@ -22,6 +25,9 @@ export default function OpenGraphPreviewView({
   showOpenLink,
   url,
   openLinkText,
+  noPreviewAvailable,
+  isError,
+  errorPlaceholder,
 }: OpenGraphPreviewViewProps) {
   const { t } = useTranslation("common");
 
@@ -35,21 +41,28 @@ export default function OpenGraphPreviewView({
           condition={!!preview}
           otherwise={
             <span className="p-5 sm-regular text-gray-600">
-              { previewPlaceholder || t("open-graph-preview.no-preview") }
+              <If
+                condition={!isError}
+                otherwise={errorPlaceholder || t("open-graph-preview.failed-to-get")}
+              >
+                { noPreviewAvailable || !previewPlaceholder ? t("open-graph-preview.no-preview") : previewPlaceholder }
+              </If>
             </span>
           }
         >
           <If
             condition={isImage}
             otherwise={
-              <video src={preview} controls></video>
+              <video src={preview} controls>
+                {t("open-graph-preview.video-not-supported")}
+              </video>
             }
           >
             <img src={preview} className="border-radius-8" />
           </If>
         </If>
 
-        <If condition={showOpenLink && !!preview}>
+        <If condition={showOpenLink}>
           <div className="w-100 text-left mt-3">
             <a
               href={url}
@@ -58,7 +71,7 @@ export default function OpenGraphPreviewView({
               className="sm-regular text-decoration-none text-blue-200"
             >
               <span className="mr-1">
-                { openLinkText || t("open-graph-preview.view-link") }
+                { openLinkText || t("open-graph-preview.open-link") }
               </span>
 
               <ArrowUpRight />

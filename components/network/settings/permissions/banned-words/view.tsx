@@ -1,9 +1,9 @@
 import {useTranslation} from "next-i18next";
 
-import PermissionInput from "../../../../common/inputs/permission-input/permission-input";
-import PermissionListItem from "../../../../common/lists/permission-list/permission-list-item";
-import {Divider} from "../../../../divider";
-import NetworkTabContainer from "../../tab-container/view";
+import PermissionInput from "components/common/inputs/permission-input/permission-input";
+import PermissionListItem from "components/common/lists/permission-list/permission-list-item";
+import {Divider} from "components/divider";
+import NetworkTabContainer from "components/network/settings/tab-container/view";
 
 interface NetworkPermissionsViewProps {
   domain: string;

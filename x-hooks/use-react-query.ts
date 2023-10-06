@@ -7,6 +7,7 @@ export default function useReactQuery<T>( key: (string | number)[],
   const query = useQuery<T>({
     queryKey: key, 
     queryFn: getFn,
+    retry: false,
     ...options
   });
   const queryClient = useQueryClient();

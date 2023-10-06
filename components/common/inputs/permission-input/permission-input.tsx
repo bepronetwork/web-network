@@ -3,8 +3,8 @@ import {ReactNode} from "react";
 import clsx from "clsx";
 import {useTranslation} from "next-i18next";
 
-import Button from "../../../button";
-import {FormGroup} from "../../../form-group";
+import Button from "components/button";
+import {FormGroup} from "components/form-group";
 
 interface PermissionInputProps {
   placeholder?: string;
