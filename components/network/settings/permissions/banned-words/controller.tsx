@@ -2,15 +2,18 @@ import {useState} from "react";
 
 import {useTranslation} from "next-i18next";
 
-import {useAppState} from "../../../../../contexts/app-state";
-import {toastError, toastSuccess} from "../../../../../contexts/reducers/change-toaster";
-import {Network} from "../../../../../interfaces/network";
+import NetworkPermissionsView from "components/network/settings/permissions/banned-words/view";
+
+import {useAppState} from "contexts/app-state";
+import {toastError, toastSuccess} from "contexts/reducers/change-toaster";
+
+import {Network} from "interfaces/network";
+
 import {
   CreateBannedWord,
   getBannedWordsData,
   RemoveBannedWord
-} from "../../../../../x-hooks/api/network/management/banned-words";
-import NetworkPermissionsView from "./view";
+} from "x-hooks/api/network/management/banned-words";
 
 interface NetworkPermissionsProps {
   network: Network;

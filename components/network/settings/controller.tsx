@@ -4,6 +4,9 @@ import {useTranslation} from "next-i18next";
 
 import NetworkGovernanceSettings from "components/network/settings/governance/controller";
 import NetworkLogoAndColorsSettings from "components/network/settings/logo-and-colors/controller";
+import NetworkManagement from "components/network/settings/management/view";
+import AllowList from "components/network/settings/permissions/allow-list/allow-list-controller";
+import NetworkPermissions from "components/network/settings/permissions/banned-words/controller";
 import NetworkRegistrySettings from "components/network/settings/registry/controller";
 import MyNetworkSettingsView from "components/network/settings/view";
 
@@ -22,10 +25,6 @@ import {useUpdateNetwork} from "x-hooks/api/network";
 import {useAuthentication} from "x-hooks/use-authentication";
 import {useNetwork} from "x-hooks/use-network";
 import useNetworkTheme from "x-hooks/use-network-theme";
-
-import NetworkManagement from "./management/view";
-import AllowList from "./permissions/allow-list/allow-list-controller";
-import NetworkPermissions from "./permissions/banned-words/controller";
 
 interface MyNetworkSettingsProps {
   network: Network;

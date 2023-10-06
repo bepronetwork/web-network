@@ -2,12 +2,13 @@ import {Spinner} from "react-bootstrap";
 
 import {useTranslation} from "next-i18next";
 
-import {truncateAddress} from "../../../../../helpers/truncate-address";
-import PermissionInput from "../../../../common/inputs/permission-input/permission-input";
-import PermissionListItem from "../../../../common/lists/permission-list/permission-list-item";
-import If from "../../../../If";
-import Translation from "../../../../translation";
-import NetworkTabContainer from "../../tab-container/view";
+import PermissionInput from "components/common/inputs/permission-input/permission-input";
+import PermissionListItem from "components/common/lists/permission-list/permission-list-item";
+import If from "components/If";
+import NetworkTabContainer from "components/network/settings/tab-container/view";
+import Translation from "components/translation";
+
+import {truncateAddress} from "helpers/truncate-address";
 
 type AllowListViewProps = {
   allowList: string[],
@@ -48,18 +49,15 @@ export default function AllowListView({
           <span className="mb-4">
             <Translation ns="custom-network" label="steps.permissions.allow-list.list-title" />
           </span>
-          <If 
-            condition={!isLoading}
-            children={allowList?.map((address, index) => 
-              <PermissionListItem
-                key={address}
-                value={address} 
-                label={truncateAddress(address, 10, 8)} 
-                id={index} 
-                onTrashClick={onTrashClick} 
-              />)}
-            otherwise={<div className="col-md-5 col-12 text-center"><Spinner animation={"border"} /></div>}
-          />
+          <If condition={!isLoading}
+              children={allowList?.map((address, index) =>
+                <PermissionListItem 
+                  value={address} 
+                  label={truncateAddress(address, 10, 8)} 
+                  id={index} 
+                  onTrashClick={onTrashClick} 
+                />)}
+              otherwise={<div className="col-md-5 col-12 text-center"><Spinner animation={"border"} /></div>} />
         </div>
     </div>
   </NetworkTabContainer>

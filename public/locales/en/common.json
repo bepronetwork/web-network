@@ -493,6 +493,9 @@
   },
   "open-graph-preview": {
     "no-preview": "No preview available",
-    "view-link": "View Link"
+    "view-link": "View Link",
+    "open-link": "Open Link",
+    "failed-to-get": "Failed to get link preview",
+    "video-not-supported": "Your browser does not support the video tag"
   }
 }

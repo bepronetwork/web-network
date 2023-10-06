@@ -40,6 +40,7 @@
         "error": "To create deliverable"
       },
       "preview": {
+        "failed-to-get": "Failed to get link information, please provide a valid link.",
         "error": "Currently we do not support this embed",
         "error-protocol": "Missing protocol. example: https://app.bepro.network/",
         "video-error": "Your browser does not support the video tag."
