@@ -176,7 +176,7 @@ export default async function get(query: ParsedUrlQuery) {
 
     sort.push(...columns);
   } else
-    sort.push("updatedAt");
+    sort.push("createdAt");
 
   const useSubQuery = isMergeableState || isDisputableState ? false : undefined;
 
