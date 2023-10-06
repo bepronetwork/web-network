@@ -1,11 +1,11 @@
-import { ParsedUrlQuery } from "querystring";
+import {ParsedUrlQuery} from "querystring";
 
-import { api } from "services/api";
+import {api} from "services/api";
 
-import { ExplorePageProps } from "types/pages";
+import {ExplorePageProps} from "types/pages";
 
-import { getBountiesListData } from "x-hooks/api/bounty";
-import { useSearchActiveNetworks } from "x-hooks/api/network";
+import {getBountiesListData} from "x-hooks/api/bounty";
+import {useSearchActiveNetworks} from "x-hooks/api/network";
 
 /**
  * Get explore page data from api based on the current url query
@@ -22,10 +22,10 @@ export default async function getExplorePageData(query: ParsedUrlQuery): Promise
     getBountiesListData(query)
       .then(({ data }) => data)
       .catch(() => ({ count: 0, rows: [], currentPage: 1, pages: 1, totalBounties: 0 })),
-    getBountiesListData({ count: "3", state: "open" })
+    getBountiesListData({ count: "3", state: "open", network })
       .then(({ data }) => data.rows)
       .catch(() => []),
-    getBountiesListData({ count: "3", state: "funding" })
+    getBountiesListData({ count: "3", state: "funding", network })
       .then(({ data }) => data.rows)
       .catch(() => []),
     useSearchActiveNetworks({
