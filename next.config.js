@@ -70,6 +70,13 @@ const serverRuntimeConfig = {
     apiKey: process.env.NEXT_SENDGRID_MAIL_API_KEY,
     from: process.env.NEXT_SENDGRID_MAIL_FROM,
     verificationCodeExpiration: process.env.NEXT_MAIL_VERIFICATION_EXPIRATION || 24
+  },
+  elastic:{
+    rum: {
+      serviceName: process.env.ELASTIC_APM_SERVICE_NAME,
+      serverUrl: process.env.ELASTIC_APM_SERVER_URL
+    },
+    active: process.env.ELASTIC_APM_ACTIVE === "true"
   }
 }
 

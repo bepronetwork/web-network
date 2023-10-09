@@ -93,6 +93,7 @@
     "yargs": "^17.4.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@metamask/providers": "^8.1.1",
     "@octokit/types": "^6.34.0",
     "@types/cookie": "^0.4.1",
