@@ -10,6 +10,7 @@ export const LogAccess = (handler: NextApiHandler) => {
       headers: {"X-Forwarded-For": xForwarded, "CF-Connecting-IP": cfConnectingIp},
       socket: {remoteAddress}
     } = req;
+    console.log("#### headers", req.headers)
     const _query = Object.fromEntries(new URLSearchParams(url.split('?')[1]));
     const query = Object.keys(_query).length ? _query : null;
     const body = req?.body || null;
