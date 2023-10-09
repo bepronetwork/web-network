@@ -67,6 +67,7 @@ export interface ChainFilterProps {
   chains: SupportedChainData[];
   direction?: Direction;
   onChange?: (value: string | number) => void;
+  label?: boolean;
 }
 
 export interface AmountCardProps {

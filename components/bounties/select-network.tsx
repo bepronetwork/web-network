@@ -39,14 +39,11 @@ export default function SelectNetwork({
   const { chain } = useChain();
   const { state } = useAppState();
 
-  const chainIdToFilter = filterByConnectedChain || !isOnNetworkPath(pathname) ? 
-    state.connectedChain?.id : chain?.chainId?.toString();
+  const chainIdToFilter = filterByConnectedChain ? !isOnNetworkPath(pathname) ? 
+      state.connectedChain?.id : chain?.chainId?.toString() : undefined
 
   const { data: networks } = useReactQuery( ["networks", chainIdToFilter], 
-                                            () => useSearchNetworks({ chainId: chainIdToFilter }),
-                                            {
-                                              enabled: !!chainIdToFilter
-                                            });
+                                            () => useSearchNetworks({ chainId: chainIdToFilter }));
 
   function networkToOption(network: Network) {
     return {
@@ -104,6 +101,7 @@ export default function SelectNetwork({
         onChange={onChange}
         selectedIndex={options?.findIndex((opt) =>
             opt?.value?.networkAddress === selected?.value?.networkAddress)}
+        isClearable
       >
         <ReactSelect
           value={selected}

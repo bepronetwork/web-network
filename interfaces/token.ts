@@ -8,6 +8,7 @@ export type TokenType = 'reward' | 'transactional';
 
 export interface Token {
   id?: number;
+  chain_id?: number;
   address: string;
   name: string;
   symbol: string;
