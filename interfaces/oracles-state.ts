@@ -44,6 +44,7 @@ export interface TokensOracles {
   icon: string | ReactElement;
   oraclesLocked: BigNumber;
   address: string;
+  chainId?: number;
 }
 
 interface Info {

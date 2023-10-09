@@ -189,7 +189,10 @@ export default function BountiesListView({
 
               <div className="d-none d-xl-flex">
                 <If condition={isProfile}>
-                  <SelectNetwork isCurrentDefault={isProfile && isOnNetwork} />
+                <SelectNetwork
+                    isCurrentDefault={isProfile && isOnNetwork}
+                    filterByConnectedChain={isOnNetwork ? true : false}
+                  />
                 </If>
               </div>
             </div>

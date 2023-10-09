@@ -16,6 +16,7 @@ export default function ChainFilter({
   chains,
   direction = "horizontal",
   onChange,
+  label = true
 }: ChainFilterProps) {
   const { query } = useRouter();
   
@@ -49,6 +50,7 @@ export default function ChainFilter({
       onChange={onChainChange}
       direction={direction}
       isMobile={isMobileView || isTabletView}
+      label={label}
     />
   );
 }

@@ -47,3 +47,6 @@ export interface PaymentsPageProps {
   payments: NetworkPaymentsData[];
   chains: SupportedChainData[];
 }
+export interface WalletPageProps {
+  chains: SupportedChainData[];
+}

@@ -10,15 +10,14 @@ import { FlexColumn, FlexRow } from "components/common/flex-box/view";
 import If from "components/If";
 import InfoTooltip from "components/info-tooltip";
 import IssueMobileFilters from "components/issue-filters/mobile-filters";
-import ChainSelector from "components/navigation/chain-selector/controller";
+import ChainFilter from "components/lists/filters/chain/controller";
 import NothingFound from "components/nothing-found";
 import { TokenBalanceType } from "components/profile/token-balance";
 import ResponsiveWrapper from "components/responsive-wrapper";
-import TokenIcon from "components/token-icon";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
-import { TokensOracles } from "interfaces/oracles-state";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import NetworkItem from "../../../network-item/controller";
 
@@ -28,13 +27,12 @@ interface WalletBalanceViewProps {
   hasNoConvertedToken: boolean;
   defaultFiat: string;
   tokens: TokenBalanceType[];
-  tokensOracles: TokensOracles[];
   searchString: string;
-  handleNetworkLink?: (token: TokensOracles) => void;
   onSearchClick: () => void;
   onSearchInputChange: (event) => void;
   onEnterPressed: (event) => void;
   onClearSearch: () => void;
+  chains: SupportedChainData[]
 }
 
 export default function WalletBalanceView({
@@ -43,11 +41,10 @@ export default function WalletBalanceView({
   hasNoConvertedToken,
   defaultFiat,
   tokens,
-  tokensOracles,
+  chains,
   searchString,
   onSearchClick,
   onSearchInputChange,
-  handleNetworkLink,
   onEnterPressed,
   onClearSearch,
 }: WalletBalanceViewProps) {
@@ -89,16 +86,19 @@ export default function WalletBalanceView({
         </div>
         <div className="col-auto">
           <ResponsiveWrapper xs={true} md={false}>
-            <IssueMobileFilters onlyProfileFilters={true} hideSort showChainSelector/>
+            <IssueMobileFilters chainOptions={chains} onlyProfileFilters={true} hideSort />
           </ResponsiveWrapper>
           <ResponsiveWrapper xs={false} md={true}>
             <div className="d-flex align-items-center me-3">
               <label className="caption-small font-weight-medium text-gray-100 text-nowrap mr-1">
                 {t("misc.chain")}
               </label>
-              <ChainSelector />
+              <ChainFilter
+                chains={chains}
+                label={false}
+              />
             </div>
-            <SelectNetwork isCurrentDefault={isOnNetwork} filterByConnectedChain/>
+            <SelectNetwork isCurrentDefault={isOnNetwork} filterByConnectedChain={isOnNetwork ? true : false} />
           </ResponsiveWrapper>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function WalletBalanceView({
         </span>
       </FlexRow>
       <FlexRow className="d-flex flex-wrap justify-content-between align-items-center mb-2">
-        <span className="text-white mt-2">{t("labels.recivedintotal")}</span>
+        <span className="text-white mt-2">{t("profile:balances-transactional-tokens")}</span>
         <div className="d-flex mt-2 caption-medium text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
           {formatStringToCurrency(totalAmount)}
           <span className="text-white-30 ml-1 mr-2">
@@ -139,45 +139,13 @@ export default function WalletBalanceView({
           )
         }
       >
-        {tokens?.map((token) => (
+        {tokens?.map((token, key) => (
           <NetworkItem
-            key={`balance-${token?.address}`}
+            key={`balance-${key}-${token?.address}`}
             type="voting"
             iconNetwork={token?.icon}
             networkName={token?.name}
             amount={token?.balance?.toString()}
-            symbol={token?.symbol}
-          />
-        ))}
-      </If>
-
-      <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
-        <span className="h4 family-Regular text-white font-weight-medium">
-          {t("main-nav.nav-avatar.voting-power")}
-        </span>
-      </FlexRow>
-
-      <If
-        condition={tokensOracles?.length > 0}
-        otherwise={
-          tokensOracles && (
-            <div className="pt-4">
-              <NothingFound description={t("profile:not-found.voting-power")} />
-            </div>
-          )
-        }
-      >
-        {tokensOracles?.map((token, key) => (
-          <NetworkItem
-            key={`voting-${token?.address}-${key}`}
-            type="voting"
-            iconNetwork={token?.icon ? token?.icon : <TokenIcon />}
-            networkName={token?.name}
-            subNetworkText={token?.networkName}
-            handleNetworkLink={
-              isOnNetwork ? null : () => handleNetworkLink(token)
-            }
-            amount={token?.oraclesLocked?.toFixed()}
             symbol={token?.symbol}
           />
         ))}

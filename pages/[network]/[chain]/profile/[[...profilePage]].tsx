@@ -7,6 +7,7 @@ import ProfileRouter from "components/profile/profile-router";
 
 import { ProfilePageProps } from "types/pages";
 
+import { useGetChains } from "x-hooks/api/chain";
 import { useGetProfileBounties, useGetProfilePayments } from "x-hooks/api/pages/profile";
 
 const { serverRuntimeConfig: { auth: { secret } } } = getConfig();
@@ -28,6 +29,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query, local
 
   const getDataFn = {
     payments: () => useGetProfilePayments(queryWithWallet),
+    wallet: () => useGetChains().then(chains => ({ chains })).catch(() => ({ chains: [] })),
     bounties: () => useGetProfileBounties(queryWithWallet, "creator").then(bountiesResult),
     proposals: () => useGetProfileBounties(queryWithWallet, "proposer").then(bountiesResult),
     "deliverables": () => useGetProfileBounties(queryWithWallet, "deliverabler").then(bountiesResult),

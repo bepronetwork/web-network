@@ -5,9 +5,11 @@ import { useRouter } from "next/router";
 
 import SelectNetwork from "components/bounties/select-network";
 import If from "components/If";
+import ChainFilter from "components/lists/filters/chain/controller";
 import ListSort from "components/lists/sort/controller";
 import Modal from "components/modal";
-import ChainSelector from "components/navigation/chain-selector/controller";
+
+import { SupportedChainData } from "interfaces/supported-chain-data";
 
 import { SortOption } from "types/components";
 
@@ -23,7 +25,7 @@ interface MobileFiltersModalProps {
   onlyProfileFilters?: boolean;
   sortOptions?: SortOption[];
   hideSort?: boolean;
-  showChainSelector?: boolean;
+  chainOptions?: SupportedChainData[];
 }
 
 export default function MobileFiltersModal({
@@ -32,7 +34,7 @@ export default function MobileFiltersModal({
   onlyTimeFrame,
   onlyProfileFilters,
   sortOptions,
-  showChainSelector,
+  chainOptions,
   hideSort = false
 }: MobileFiltersModalProps) {
   const { t } = useTranslation(["common"]);
@@ -70,13 +72,15 @@ export default function MobileFiltersModal({
   ];
 
   function handleSortBy() {
-
     const query = {
       ...router.query,
-      sortBy: defaultSortOptions[selectedSortIndex].sortBy,
-      order: defaultSortOptions[selectedSortIndex].order,
       page: "1"
     };
+
+    if(selectedSortIndex){
+      query['sortBy'] = defaultSortOptions[selectedSortIndex].sortBy
+      query['order'] = defaultSortOptions[selectedSortIndex].order
+    }
 
     router.push({ pathname: router.pathname, query }, router.asPath, { shallow: false, scroll: false });
   }
@@ -98,9 +102,9 @@ export default function MobileFiltersModal({
         handleSortBy();
       }}
     >
-      <If condition={showChainSelector && !isOnNetwork}>
+      <If condition={chainOptions && !isOnNetwork}>
         <ContainerFilterView label={t("misc.chain")}>
-          <ChainSelector isFilter />
+            <ChainFilter chains={chainOptions} label={false} />
         </ContainerFilterView>
       </If>
       <If condition={onlyProfileFilters}>
@@ -111,7 +115,7 @@ export default function MobileFiltersModal({
         <SelectNetwork
           isCurrentDefault={isOnNetwork}
           onlyProfileFilters={onlyProfileFilters}
-          filterByConnectedChain
+          filterByConnectedChain={isOnNetwork ? true : false}
         />
       </If>
 

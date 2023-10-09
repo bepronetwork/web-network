@@ -8,7 +8,7 @@
     "any-voting-power": "you do not have any voting power on any network"
   },
   "tokens": "Tokens",
-  "received-in-total": "Received in total",
+  "balances-transactional-tokens": "Balances for transactional tokens",
   "oracle-name-placeholder": "Locked Network Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",
