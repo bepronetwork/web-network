@@ -4,7 +4,12 @@ import {debug, log, Logger} from "services/logging";
 
 export const LogAccess = (handler: NextApiHandler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    const {url, method} = req as any;
+    const {
+      url,
+      method,
+      headers: {"X-Forwarded-For": xForwarded, "CF-Connecting-IP": cfConnectingIp},
+      socket: {remoteAddress}
+    } = req;
     const _query = Object.fromEntries(new URLSearchParams(url.split('?')[1]));
     const query = Object.keys(_query).length ? _query : null;
     const body = req?.body || null;
@@ -13,7 +18,7 @@ export const LogAccess = (handler: NextApiHandler) => {
 
     const payload = (query || body) ? ({ ... query ? {query} : {}, ... body ? {body} : {}}) : '';
 
-    log(`access`, {pathname, method});
+    log(`access`, {pathname, method, connection: {xForwarded, remoteAddress, cfConnectingIp}});
     if (payload)
       debug(`access-payload`, {pathname, payload, method});
 
@@ -27,7 +32,8 @@ export const LogAccess = (handler: NextApiHandler) => {
     } catch (e) {
       Logger.error(e, `access-error`, {method, pathname, payload});
       res.status(e?.status || 500).end();
+    } finally {
+      Logger.changeActionName(``); // clean action just in case;
     }
-    Logger.changeActionName(``); // clean action just in case;
   }
 }
