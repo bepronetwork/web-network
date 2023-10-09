@@ -65,7 +65,14 @@ const serverRuntimeConfig = {
   e2eEnabled: process.env.NEXT_E2E_TESTNET || false,
   scheduleInterval: process.env.NEXT_E2E_TESTNET || 60,
   logLevel: process.env.LOG_LEVEL,
-  logStackTrace: process.env.ELASTIC_INDEX_STACK_TRACE === "true"
+  logStackTrace: process.env.ELASTIC_INDEX_STACK_TRACE === "true",
+  elastic:{
+    rum: {
+      serviceName: process.env.ELASTIC_APM_SERVICE_NAME,
+      serverUrl: process.env.ELASTIC_APM_SERVER_URL
+    },
+    active: process.env.ELASTIC_APM_ACTIVE === "true"
+  }
 }
 
 module.exports = () => {
