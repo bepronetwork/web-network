@@ -63,7 +63,7 @@ export default function OpenGraphPreviewView({
         </If>
 
         <If condition={showOpenLink}>
-          <div className="w-100 text-left mt-3">
+          <div className="w-100 text-left mt-3 text-truncate text-blue-200">
             <a
               href={url}
               target="_blank"
