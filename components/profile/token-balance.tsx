@@ -88,7 +88,7 @@ export default function TokenBalance({
         </span>
       </ResponsiveWrapper>
       <FlexRow>
-        {(type === "delegation" && onTakeBackClick) &&
+        {(type === "delegation" && onTakeBackClick && variant === 'network') &&
           <ContractButton
             onClick={onTakeBackClick}
             color="gray-850"
