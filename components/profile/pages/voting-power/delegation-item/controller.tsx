@@ -36,14 +36,12 @@ export default function DelegationItem({
 
   const { updateWalletBalance } = useAuthentication();
 
-  const isNetworkVariant = variant === "network";
   const delegationAmount = BigNumber(delegation?.amount)?.toFixed() || "0";
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const votesSymbol = t("token-votes", { token: currentOracleToken?.symbol });
 
   function handleShow() {
-    if (isNetworkVariant) return null;
     setShow(true);
   }
 
