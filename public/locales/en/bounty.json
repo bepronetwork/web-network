@@ -1,13 +1,13 @@
 {
-  "label": "bounty",
-  "label_one": "bounty",
-  "label_other": "bounties",
-  "labelWithCount_one": "{{count}} bounty",
-  "labelWithCount_other": "{{count}} bounties",
+  "label": "task",
+  "label_one": "task",
+  "label_other": "tasks",
+  "labelWithCount_one": "{{count}} task",
+  "labelWithCount_other": "{{count}} tasks",
   "no-comments-available": "_No comments available_",
   "description": "description",
   "view-all-addresses": "view all address",
-  "search": "Search for a bounty by title, description or tags",
+  "search": "Search for a task by title, description or tags",
   "description_proposal": "Reviewed implementations by the marketplace curators ready to be approved by the marketplace curators.",
   "description_deliverable": "Raw implementations from the marketplace developers ready to be reviewed by anyone and approved into proposals by the marketplace curators",
   "info": {
@@ -22,7 +22,7 @@
     "opened-on": "Opened on"
   },
   "steps": {
-    "title": "Bounty State",
+    "title": "Task State",
     "draft": "Draft",
     "funding": "Funding",
     "development": "Development",
@@ -30,19 +30,19 @@
     "validation": "validation & disputes",
     "closed": "closed & distributed",
     "select-network": "Select Marketplace",
-    "details": "Bounty details",
+    "details": "Task details",
     "reward": "Reward Information",
     "review": "Review",
     "github": "Github Information"
   },
   "descriptions": {
-    "select-network": "Select the network and marketplace you want to create your bounty",
-    "details": "Enter the necessary information to understand your bounty",
+    "select-network": "Select the network and marketplace you want to create your task",
+    "details": "Enter the necessary information to understand your task",
     "github": "Inform the repository and the branch where the solution will be made",
-    "reward": "When creating a new bounty, you have two options regarding the reward:",
-    "reward-1": "Self-fund: You use your own money to create the bounty. This means you will be responsible for providing the reward money that will be given to the person who successfully completes the task.",
-    "reward-2": "Seek funding: You can seek funding for the bounty. This means you can look for other individuals who are willing to contribute to the reward money.",
-    "review": "In this step you will view the main information and get a sense of how your bounty is doing"
+    "reward": "When creating a new task, you have two options regarding the reward:",
+    "reward-1": "Self-fund: You use your own money to create the task. This means you will be responsible for providing the reward money that will be given to the person who successfully completes the task.",
+    "reward-2": "Seek funding: You can seek funding for the task. This means you can look for other individuals who are willing to contribute to the reward money.",
+    "review": "In this step you will view the main information and get a sense of how your task is doing"
   },
   "status": {
     "ready": "ready",
@@ -64,13 +64,13 @@
   "actions": {
     "redeem": "Redeem",
     "update-amount": "Update Amount",
-    "edit-bounty": "Edit Bounty",
+    "edit-bounty": "Edit task",
     "owner-cancel": "Owner cancel",
-    "update-bounty": "Bounty updated successfully",
-    "canceled-bounty": "Bounty canceled successfully",
+    "update-bounty": "Task updated successfully",
+    "canceled-bounty": "Task canceled successfully",
     "recognize-finished": {
       "title": "Recognize as finished",
-      "error": "Failed to mark bounty as finished"
+      "error": "Failed to mark task as finished"
     },
     "comment": {
       "success": "Comment successfully created",
@@ -78,8 +78,8 @@
     },
     "start-working": {
       "title": "Start Working",
-      "success": "To start working on this bounty",
-      "error": "To start working on this bounty"
+      "success": "To start working on this task",
+      "error": "To start working on this task"
     },
     "kyc": {
       "identify-to-start": "Start KYC"
@@ -88,34 +88,34 @@
   "management": {
     "label": "Management",
     "name": "Name",
-    "link": "Bounty Link",
-    "hide": "Hide Bounty",
+    "link": "Task Link",
+    "hide": "Hide task",
     "cancel": "Cancel"
   },
   "errors": {
-    "fetching": "Error fetching bounty",
+    "fetching": "Error fetching task",
     "no-workers": "No one is working",
-    "no-bounties": "No bounties",
-    "no-bounties-in-draft": "No bounties in draft",
-    "no-bounties-to-merge": "No bounties ready to merge",
-    "creating-bounty": "Error creating bounty",
-    "bounty-canceled": "Bounty creation canceled",
-    "sync": "The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty",
-    "exceeds-allowance": "Bounty amount exceeds your allowance",
+    "no-bounties": "No tasks",
+    "no-bounties-in-draft": "No tasks in draft",
+    "no-bounties-to-merge": "No tasks ready to merge",
+    "creating-bounty": "Error creating task",
+    "bounty-canceled": "Task creation canceled",
+    "sync": "The task was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your task",
+    "exceeds-allowance": "Task amount exceeds your allowance",
     "exceeds-minimum-amount": "Minimum amount is {{amount}}",
     "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
     "description-limit": "Exceeds allowed limit of characters and files: {{value}}",
     "no-networks-chain": "The selected network has no active marketplaces",
-    "bounty-update": "Bounty update failed",
-    "banned-domain": "This domain is banned and cannot be used to open bounties.",
-    "failed-to-cancel": "Bounty could not be canceled",
+    "bounty-update": "Task update failed",
+    "banned-domain": "This domain is banned and cannot be used to open tasks.",
+    "failed-to-cancel": "Task could not be canceled",
     "invalid-link": "Invalid link provided. Please check if the link has the protocol (http/https) or the link is correct."
   },
-  "title": "Create new Bounty",
+  "title": "Create new Task",
   "fields": {
     "title": {
       "label": "Title",
-      "placeholder": "Your bounty title"
+      "placeholder": "Your task title"
     },
     "description": {
       "label": "Description",
@@ -141,7 +141,7 @@
     },
     "deliverable-types": {
       "label": "Deliverable Types",
-      "description": "Specify the type of work for this bounty.",
+      "description": "Specify the type of work for this task.",
       "types": {
         "code": "Code",
         "design": "Design",
@@ -150,7 +150,7 @@
     },
     "origin-link": {
       "label": "Origin Link",
-      "description": "If you have a project boilerplate, a figma design, or something that might help people to work on this bounty, you can provide a link below.",
+      "description": "If you have a project boilerplate, a figma design, or something that might help people to work on this task, you can provide a link below.",
       "placeholders": {
         "default": "Repository link, figma template, etc",
         "code": "Repository link",
@@ -160,28 +160,28 @@
     }
   },
   "reward-funders": "Set Funders Reward",
-  "reward-funders-description": "Reward anyone who funds this bounty.",
+  "reward-funders-description": "Reward anyone who funds this task.",
   "review": {
     "repository": "Repository",
     "branch": "Branch"
   },
-  "create-bounty": "Create Bounty", 
+  "create-bounty": "Create Task", 
   "create-funding": "Create Funding Request", 
   "not-found-funding": "Funding requests make the community itself fund ideas they would like for their applications",
-  "not-found-bounty": "Not found recent bounties",
+  "not-found-bounty": "Not found recent tasks",
   "next-step": "Next Step",
-  "bounty-created": "Bounty created",
-  "in-bounties": "in Bounties",
+  "bounty-created": "Task created",
+  "in-bounties": "in Tasks",
   "distributed": "distributed",
-  "title-bounties": "Bounty Hall",
-  "sub-title-bounties": "A collection of the most recent bounties and MVP Marketplaces on our ecosystem",
+  "title-bounties": "Task Hall",
+  "sub-title-bounties": "A collection of the most recent tasks and MVP Marketplaces on our ecosystem",
   "most-active-networks": "Most Active Marketplaces",
-  "recent-bounties": "Recent Bounties",
+  "recent-bounties": "Recent Tasks",
   "recent-funding": "Recent Funding requests",
-  "all-bounties": "All Bounties",
+  "all-bounties": "All Tasks",
   "explore-all": "Explore All",
-  "recent-bounties-empty": "Not found recent bounties",
-  "edit-text": "You are currently editing a bounty",
+  "recent-bounties-empty": "Not found recent tasks",
+  "edit-text": "You are currently editing a task",
   "save-changes": "Save Changes",
   "cancel-changes": "Cancel Changes",
   "preview": "preview",
@@ -195,8 +195,8 @@
   "kyc": {
     "is-required": "Required KYC validation",
     "refresh": "Refresh Session",
-    "tool-tip": "Become mandatory do a KYC validation to participate on bounty.",
-    "bounty-tool-tip": "This bounty requires KYC , you can activate it in your profile",
+    "tool-tip": "Become mandatory do a KYC validation to participate on task.",
+    "bounty-tool-tip": "This task requires KYC , you can activate it in your profile",
     "identify-to-start": "Start KYC",
     "identify-kyc": "Start KYC",
     "identified": "Successfully identified, you can close this modal",
@@ -207,12 +207,12 @@
   "proposal-creator": "Proposal Creator",
   "proposal-merger": "Merger",
   "network-fee": "Marketplace Fee",
-  "bounty-examples": "See bounty examples",
+  "bounty-examples": "See task examples",
   "finding-yourself-lost": "Finding yourself lost?",
   "terms-and-conditions": "terms and conditions.",
-  "creating-this-bounty": "By creating this bounty you agree to our",
-  "see-bounty": "See Bounty",
-  "created-success": "Bounty created successfully!",
+  "creating-this-bounty": "By creating this task you agree to our",
+  "see-bounty": "See Task",
+  "created-success": "Task created successfully!",
   "service-fee": {
     "title": "Service Fees",
     "description": "You Can find more information in our",
@@ -226,21 +226,21 @@
   "set-funders-reward-description": "Amount you want to pay for the funders as recompense for their participation",
   "total-amount": {
     "title": "Total Amount",
-    "description": "Amount you will pay for this bounty (reward + services fees)"
+    "description": "Amount you will pay for this task (reward + services fees)"
   },
   "modals": {
     "origin-link-warning": {
       "title": "Origin",
       "you-are-going-to": "You are going to navigate to",
-      "provided-by": "This link was provided by the bounty creator. Please be careful and access only if you know the domain.",
+      "provided-by": "This link was provided by the task creator. Please be careful and access only if you know the domain.",
       "open-link": "Open link"
     },
     "allow-list": {
       "title": "Not allowed",
-      "content": "Creation of bounties is restricted on this marketplace to a curated list of addresses. Please, select another marketplace or contact the marketplace governor."
+      "content": "Creation of tasks is restricted on this marketplace to a curated list of addresses. Please, select another marketplace or contact the marketplace governor."
     }
   },
   "allow-list": {
-    "not-allowed": "Bounty creation is not allowed with this address"
+    "not-allowed": "Task creation is not allowed with this address"
   }
 }

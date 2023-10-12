@@ -20,15 +20,15 @@
     "no-records-found": "No records found",
     "clear-filter": "Clear filter",
     "bounties": {
-      "title": "Bounty state",
-      "all": "All bounties",
-      "open": "Open bounties",
-      "draft": "Draft bounties",
-      "closed": "Closed bounties",
-      "not-found": "Bounties not found",
-      "open-not-found": "Open bounties not found",
-      "draft-not-found": "Draft bounties not found",
-      "closed-not-found": "Closed bounties not found"
+      "title": "Task state",
+      "all": "All tasks",
+      "open": "Open tasks",
+      "draft": "Draft tasks",
+      "closed": "Closed tasks",
+      "not-found": "Tasks not found",
+      "open-not-found": "Open tasks not found",
+      "draft-not-found": "Draft tasks not found",
+      "closed-not-found": "Closed tasks not found"
     },
     "timeframe": {
       "title": "Timeframe",
@@ -43,12 +43,12 @@
     "payments-notfound": "you haven’t received any payments."
   },
   "heroes": {
-    "in-progress": "Bounties in progress",
+    "in-progress": "Tasks in progress",
     "bounties": {
-      "title": "Bounties",
-      "subtitle": "find a bounty that you want to work on, create a solution and get paid"
+      "title": "Tasks",
+      "subtitle": "find a task that you want to work on, create a solution and get paid"
     },
-    "bounties-closed": "Closed bounties",
+    "bounties-closed": "Closed tasks",
     "in-network": "In the Marketplace",
     "protocol-members": "Protocol members",
     "my-account": "My account",
@@ -63,23 +63,23 @@
     "curators": "Curators",
     "leaderboard": "Leaderboard",
     "Oracle": "bv{{token}}",
-    "new-bounty": "Create bounty",
+    "new-bounty": "Create task",
     "explore": "Explore",
-    "bounty-hall": "Bounty Hall",
+    "bounty-hall": "Task Hall",
     "get-started": "Get Started",
     "connect": "Connect",
     "connect-wallet": "Connect Wallet",
     "new-network": "New Marketplace",
     "my-network": "My Marketplace",
     "networks": "Marketplaces",
-    "bounties": "Bounties",
+    "bounties": "Tasks",
     "nav-avatar": {
       "my-profile": "My profile",
       "profile": "Profile",
       "wallet": "Wallet",
       "voting-power": "Voting Power",
       "payments": "Payments",
-      "bounties": "Bounties",
+      "bounties": "Tasks",
       "deliverables": "Deliverables",
       "proposals": "Proposals",
       "my-network": "Custom Marketplace",
@@ -142,7 +142,7 @@
     "take-back": "Take Back",
     "install": "Install",
     "try-again": "Try Again",
-    "view-bounties": "View Bounties",
+    "view-bounties": "View Tasks",
     "reconnect-account": "Reconnect account",
     "unlock-all": "Unlock all",
     "back-to-top": "Back to Top",
@@ -211,7 +211,7 @@
     "owner": "Owner",
     "apply": "apply",
     "create": "Create",
-    "bounty": "Bounty",
+    "bounty": "Task",
     "choose-one": "Choose one",
     "networks": "Marketplaces",
     "copied": "Copied",
@@ -251,8 +251,8 @@
       "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection or connect with github already registered and disconnect from this wallet"
     },
     "not-mergeable": {
-      "title": "Merging bounty",
-      "closed-bounty": "This bounty was closed and distributed but the code was unable to be merged.",
+      "title": "Merging task",
+      "closed-bounty": "This task was closed and distributed but the code was unable to be merged.",
       "open-bounty": "This proposal has github conflicts and cannot be merged. Please, fix it before doing so.",
       "go-to-pr": "Go to Deliverable",
       "success-message": "Deliverable accepted",
@@ -283,7 +283,7 @@
       "create-review": "Create Review"
     },
     "set-bounty-draft": {
-      "title": "Set bounty as draft"
+      "title": "Set task as draft"
     },
     "mobile-information": {
       "title": "MetaMask Mobile",
@@ -296,11 +296,11 @@
       "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
     },
     "wrong-network": {
-      "please-connect": "Please, connect to a supported marketplace",
+      "please-connect": "Please, connect to a supported network",
       "connect-to-network-chain": "To interact with this marketplace, please connect to the network below",
       "network": "marketplace",
       "on-your-wallet": "on your metamask wallet",
-      "change-network": "Change Marketplace",
+      "change-network": "Change Network",
       "error-invalid-rpcUrl": "rpcUrls error expected an array with at least one valid string HTTPS url",
       "error-failed-rpcUrl": "Request rpcUrl failed"
     },
@@ -310,7 +310,7 @@
       "error-message": "You need to unlock all your BEPRO before doing this"
     },
     "update-bounty-amount": {
-      "title": "Update Bounty Amount",
+      "title": "Update Task Amount",
       "fields": {
         "amount": {
           "label": "Amount"
@@ -346,7 +346,7 @@
     "create-deliverable": {
       "title": {
         "label": "Title",
-        "placeholder": "Your bounty title"
+        "placeholder": "Your task title"
       },
       "description": {
         "label": "Description",
@@ -364,7 +364,7 @@
   "errors": {
     "approve-transaction": "Failed to approve transaction",
     "creating-issue": "Failed to create github issue!",
-    "failed-update-bounty": "Failed to update bounty!",
+    "failed-update-bounty": "Failed to update task!",
     "read-only-network": "This marketplace is closed. It is set to read-only mode.",
     "results-truncated": "Results Truncated",
     "not-available-chain": "Marketplace not present on this network",
@@ -397,24 +397,24 @@
       "lock": "Lock",
       "unlock": "Unlock",
       "approval": "Approval",
-      "open-bounty": "Open bounty",
+      "open-bounty": "Open task",
       "delegate": "Delegate",
       "removing-delegation": "Removing Delegation",
-      "dispute": "Dispute bounty",
+      "dispute": "Dispute task",
       "propose": "Propose merge request",
-      "close-bounty": "Close bounty",
-      "redeem-bounty": "Cancel bounty",
+      "close-bounty": "Close task",
+      "redeem-bounty": "Cancel task",
       "approve-settler": "Approve Marketplace Token",
-      "recognize-finished": "Recognize bounty as finished",
+      "recognize-finished": "Recognize task as finished",
       "create-deliverable": "Create Deliverable",
       "make-deliverable-ready": "Make Deliverable Ready",
-      "update-bounty-amount": "Update Bounty Amount",
+      "update-bounty-amount": "Update Task Amount",
       "cancel-deliverable": "Cancel Deliverable",
-      "refused-by-owner": "Refuse Bounty Proposal",
-      "deploy-network-v2": "Deploy Marketplace_v2",
+      "refused-by-owner": "Refuse Task Proposal",
+      "deploy-network-v2": "Deploy Marketplace",
       "set-dispatcher": "Set Dispatcher",
       "register-network": "Register Marketplace",
-      "deploy-bounty-token": "Deploy Bounty Token",
+      "deploy-bounty-token": "Deploy Task Token",
       "set-draft-time": "Set Draft Time",
       "set-disputable-time": "Set Disputable Time",
       "set-council-amount": "Set Curator Amount",
@@ -423,12 +423,12 @@
       "set-oracle-exchange-rate": "Set Oracle Exchange Rate",
       "set-proposer-fee-share": "Set Proposer Fee Share",
       "set-merge-creator-fee-share": "Set Merge Creator Fee Share",
-      "fund-bounty": "Fund Bounty",
-      "retract-fund": "Retract Bounty Fund",
-      "withdraw-fund-reward-bounty": "Withdraw Reward Bounty Fund",
+      "fund-bounty": "Fund Task",
+      "retract-fund": "Retract Task Fund",
+      "withdraw-fund-reward-bounty": "Withdraw Reward Task Fund",
       "deploy-erc20-token": "Deploy ERC20 Token",
       "config-fees": "Config Fees",
-      "deploy-registry": "Deploy Marketplace Registry",
+      "deploy-registry": "Deploy Registry",
       "change-allowed-tokens": "Change Allowed Tokens",
       "close-network": "Close Marketplace",
       "amount-for-network-creation": "Amount For Marketplace Creation",
@@ -440,8 +440,8 @@
     "types": {
       "newest": "Newest",
       "oldest": "Oldest",
-      "highest-bounty": "Highest Bounty",
-      "lowest-bounty": "Lowest Bounty"
+      "highest-bounty": "Highest Reward",
+      "lowest-bounty": "Lowest Reward"
     }
   },
   "drag-and-drop":{

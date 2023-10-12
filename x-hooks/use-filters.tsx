@@ -63,10 +63,10 @@ export default function useFilters(): [
 
     setStateFilters([
       makeFilterOption("All", "allstates", !state),
-      makeFilterOption("Open Bounties", "open", state === "open"),
-      makeFilterOption("Funding Bounties", "funding", state === "funding"),
-      makeFilterOption("Draft Bounties", "draft", state === "draft"),
-      makeFilterOption("Closed Bounties", "closed", state === "closed")
+      makeFilterOption("Open Tasks", "open", state === "open"),
+      makeFilterOption("Funding Tasks", "funding", state === "funding"),
+      makeFilterOption("Draft Tasks", "draft", state === "draft"),
+      makeFilterOption("Closed Tasks", "closed", state === "closed")
     ]);
 
     setTimeFilters([

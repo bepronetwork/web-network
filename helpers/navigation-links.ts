@@ -15,7 +15,7 @@ import { ProfilePages } from "interfaces/utils";
 
 export const NAVIGATION_LINKS = {
   network: [
-    { label: "bounties", href: "/bounties" },
+    { label: "Tasks", href: "/bounties" },
     { label: "curators", href: "/curators" },
   ],
   global: [
