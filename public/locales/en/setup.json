@@ -4,8 +4,8 @@
     "title": "Registry",
     "changing-labels": {
       "bounty-fees": "Bounty Fees",
-      "network-creation-fee": "Network Creation Fee",
-      "network-creation-amount": "Network Creation Amount",
+      "network-creation-fee": "Marketplace Creation Fee",
+      "network-creation-amount": "Marketplace Creation Amount",
       "transactional": "Transactional Tokens",
       "reward": "Reward Tokens"
     },
@@ -17,15 +17,15 @@
       "treasury": {
         "label": "Treasury",
         "placeholder": "Treasury wallet address",
-        "description": "Wallet that will receive the network registry fees"
+        "description": "Wallet that will receive the marketplace registry fees"
       },
       "network-creation-amount": {
-        "label": "Network Creation Amount",
-        "description": "Amount needed to be locked on registry to register a network"
+        "label": "Marketplace Creation Amount",
+        "description": "Amount needed to be locked on registry to register a marketplace"
       },
       "network-creation-fee": {
-        "label": "Network Creation Fee",
-        "description": "Percentage of the network creation amount charged when a network is registered"
+        "label": "Marketplace Creation Fee",
+        "description": "Percentage of the marketplace creation amount charged when a marketplace is registered"
       },
       "close-bounty-fee": {
         "label": "Close Bounty Fee",
@@ -36,7 +36,7 @@
         "description": "Percentage of the bounty amount charged when a bounty is canceled"
       },
       "governance-token": {
-        "label": "Network Creation Token (BEPRO)"
+        "label": "Marketplace Creation Token (BEPRO)"
       },
       "nft-token": {
         "label": "NFT Bounty Token"
@@ -44,7 +44,7 @@
     },
     "cta": {
       "dispatcher": {
-        "call": "The Bounty Token requires Network Registry to be set as dispatcher",
+        "call": "The Bounty Token requires Marketplace Registry to be set as dispatcher",
         "action": "Set dispatcher"
       },
       "allow-transactional": {
@@ -84,7 +84,7 @@
       }
     },
     "actions": {
-      "deploy-registry": "Deploy Network Registry",
+      "deploy-registry": "Deploy Marketplace Registry",
       "deploy-erc20": "Deploy New ERC20 Token",
       "deploy-bounty-token": "Deploy New Bounty Token",
       "save-registry": "Save Registry"
@@ -92,7 +92,7 @@
     "success": {
       "deploy": {
         "title": "Registry deployed",
-        "content": "See the Network Registry field"
+        "content": "See the Marketplace Registry field"
       },
       "dispatcher-setted": "Dispatcher setted",
       "allow": "Token allowed"
@@ -103,19 +103,19 @@
       "greater-than": "Value must be greater than {{min}}",
       "less-than": "Value must be less than {{max}}",
       "missing-limits": "Missing limits values",
-      "deploy": "Failed to deploy Network Registry",
+      "deploy": "Failed to deploy Marketplace Registry",
       "dispatcher": "Failed to set dispatcher",
       "allow": "Failed to allow token",
-      "already-saved": "Network Registry already saved"
+      "already-saved": "Marketplace Registry already saved"
     }
   },
   "network": {
-    "title": "Network",
+    "title": "Marketplace",
     "errors": {
-      "network-already-saved": "Default Network already saved, please visit {{network}} settings page."
+      "network-already-saved": "Default Marketplace already saved, please visit {{network}} settings page."
     }
   },
   "chains": {
-    "title": "Chains"
+    "title": "Networks"
   }
 }

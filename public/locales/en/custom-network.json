@@ -1,35 +1,35 @@
 {
-  "title": "Custom Network",
+  "title": "Custom Marketplace",
   "query-url": "Query URL",
-  "close-network": "Close network",
-  "tokens-staked": "{{symbol}} in the network",
+  "close-network": "Close marketplace",
+  "tokens-staked": "{{symbol}} in the marketplace",
   "tokens-staked-description": "TOKEN staked",
   "oracles-staked": "Locked {{symbol}}",
-  "oracles-staked-description": "The amount of tokens locked by users to curate the network",
+  "oracles-staked-description": "The amount of tokens locked by users to curate the marketplace",
   "tvl": "TVL",
   "tvl-description": "Total Value Locked",
   "open-bounties": "Open bounties",
   "open-bounties-description": "Number of bounties available to work",
   "total-bounties": "Total bounties",
-  "total-bounties-description": "Number of bounties in the network",
-  "network-settings": "Network Settings",
-  "network-create-warning": "A fee of amount will be taken when the network is created.",
-  "network-amount-to-create": "{{amount}} {{symbol}} will be taken from this {{totalAmount}} {{symbol}} locked when you create the network",
+  "total-bounties-description": "Number of bounties in the marketplace",
+  "network-settings": "Marketplace Settings",
+  "network-create-warning": "A fee of amount will be taken when the marketplace is created.",
+  "network-amount-to-create": "{{amount}} {{symbol}} will be taken from this {{totalAmount}} {{symbol}} locked when you create the marketplace",
   "dispute-time": "Dispute time",
   "percentage-for-dispute": "Percentage for dispute",
   "redeem-time": "Draft time",
   "council-amount": "Curator Amount",
   "network-bounty-hall": {
     "title": "{{network}} Bounty hall",
-    "description": "A collection of the most recent bounties of {{network}} networks"
+    "description": "A collection of the most recent bounties of {{network}} marketplaces"
   },
   "cancelable-time": {
     "label": "Cancelable Time",
-    "description": "After this time the network governor can cancel a stuck bounty. Min. {{min}}."
+    "description": "After this time the marketplace governor can cancel a stuck bounty. Min. {{min}}."
   },
   "oracle-exchange-rate": {
     "label": "Oracle Exchange Rate",
-    "description": "Exchange rate applied when locking or unlocking tokens into the network. Min. {{min}}.",
+    "description": "Exchange rate applied when locking or unlocking tokens into the marketplace. Min. {{min}}.",
     "unable-to-change": "Unable to change because there are {{amount}} {{symbol}} locked."
   },
   "merger-fee": {
@@ -49,19 +49,19 @@
     "title-governor": "Registry Governor",
     "config-fees": "Config Fees",
     "save-fees-config": "Save fees config",
-    "save-create-network-fee": "Save Create Network Fee",
-    "save-create-network-amount": "Save Create Network Amount"
+    "save-create-network-fee": "Save Create Marketplace Fee",
+    "save-create-network-amount": "Save Create Marketplace Amount"
   },
-  "network-info": "Network info",
-  "network-address": "Network Address",
+  "network-info": "Marketplace info",
+  "network-address": "Marketplace Address",
   "add-tokens": "Add Tokens",
   "remove-tokens": "Remove Tokens",
   "hero": {
-    "title": "Networks",
-    "explanatory-text": "A list of all the networks using BEPRO network for their development",
-    "number-of-networks": "Number of networks",
+    "title": "Marketplaces",
+    "explanatory-text": "A list of all the marketplaces using BEPRO marketplace for their development",
+    "number-of-networks": "Number of marketplaces",
     "number-of-bounties": "Total number of bounties",
-    "in-the-network": "In networks"
+    "in-the-network": "In marketplaces"
   },
   "network-list-bar": {
     "number-of-bounties": "Number of bounties",
@@ -71,12 +71,12 @@
   "steps": {
     "lock": {
       "title": "Lock {{currency}}",
-      "you-need-to-lock": "To create a network you will need to lock {{creatorAmount}} {{currency}}",
+      "you-need-to-lock": "To create a marketplace you will need to lock {{creatorAmount}} {{currency}}",
       "full": "FULL"
     },
     "network-information": {
-      "title": "Network information",
-      "you-can-change": "You can change this information later in your Network Settings page.",
+      "title": "Marketplace information",
+      "you-can-change": "You can change this information later in your Marketplace Settings page.",
       "fields": {
         "logo-icon": {
           "label": "logo icon"
@@ -86,14 +86,14 @@
         },
         "name": {
           "label": "Display name",
-          "default": "Network name",
+          "default": "Marketplace name",
           "temporary": "temporary query url",
-          "helper": "This will be you network name, it also affects your query URL.",
-          "available": "This network name is available.",
-          "unavailable": "This network name is not available. Please pick a different name."
+          "helper": "This will be you marketplace name, it also affects your query URL.",
+          "available": "This marketplace name is available.",
+          "unavailable": "This marketplace name is not available. Please pick a different name."
         },
         "description": {
-          "label": "Network Description",
+          "label": "Marketplace Description",
           "placeholder": "Type a description..."
         },
         "colors": {
@@ -104,10 +104,10 @@
       "logo-helper": "The logos must be in .svg format"
     },
     "network-settings": {
-      "title": "Network Settings",
+      "title": "Marketplace Settings",
       "fields": {
         "colors": {
-          "label": "Network Colors",
+          "label": "Marketplace Colors",
           "similar-colors": "These colors are very similar. Please pick a different color.",
           "more-colors": "More colors",
           "types": {
@@ -127,7 +127,7 @@
         "other-settings": {
           "title": "Other Settings",
           "parameters-warning": "Changing these parameters will launch a new transaction for each one.",
-          "warning-registry": "These values were chosen by the network registry and are subject to change",
+          "warning-registry": "These values were chosen by the marketplace registry and are subject to change",
           "warning-add-remove-allowed-tokens": "If there is removal and addition of tokens, two transactions will be required"
         },
         "fees": {
@@ -165,19 +165,19 @@
     },
     "repositories": {
       "title": "Add Repositories",
-      "submit-label": "Create Network",
+      "submit-label": "Create Marketplace",
       "give-access": "Give access to the {{user}} as an org maintainer.",
       "you-need-to-accept": "You need to accept this so the bot can interact with the repositories.",
       "label": "Repositories",
-      "used-by-other-network": "The highlighted repositories are already being used by another network.",
+      "used-by-other-network": "The highlighted repositories are already being used by another marketplace.",
       "has-bounties": "The highlighted repositories already have bounties and can't be removed.",
       "no-repositories-selected": "No repositories selected. At least one repository is required.",
       "user-permission-not-admin_one": "Your permission level on this repository does not allow giving access.",
       "user-permission-not-admin_other": "Your permission level on these repositories does not allow giving access.",
       "no-merge-commit-permission_one": "Repository {{repos}} don't support \"merge commits\" merge type. Please, allow that in the repository settings.", 
       "no-merge-commit-permission_other": "Repositories {{repos}} doesn't support \"merge commits\" merge type. Please, allow that in the repositories settings.",
-      "without-bot-collab_one": "Repository {{repos}} don't have {{bot}} bot as collaborator. Please, remove the repository from the network and re-add it.",
-      "without-bot-collab_other": "Repositories {{repos}} doesn't have {{bot}} bot as collaborator. Please, remove the repositories from the network and re-add them."
+      "without-bot-collab_one": "Repository {{repos}} don't have {{bot}} bot as collaborator. Please, remove the repository from the marketplace and re-add it.",
+      "without-bot-collab_other": "Repositories {{repos}} doesn't have {{bot}} bot as collaborator. Please, remove the repositories from the marketplace and re-add them."
     },
     "token-configuration": {
       "title": "Governance Token",
@@ -188,8 +188,8 @@
       },
       "fields": {
         "tokens-dropdown": {
-          "label": "Network Token address",
-          "description": "Add an ERC20 token to be used as network token."
+          "label": "Marketplace Token address",
+          "description": "Add an ERC20 token to be used as marketplace token."
         },
         "name": {
           "label": "Name"
@@ -262,31 +262,31 @@
   },
   "modals": {
     "loader": {
-      "being-prepared": "Your network is being prepared",
+      "being-prepared": "Your marketplace is being prepared",
       "dont-close-window": "Please, don't close this window",
       "steps": {
-        "deploy-network": "Deploying Network_v2",
-        "changing-draft-time": "Deploying Network_v2 (Changing draft time)",
-        "changing-disputable-time": "Deploying Network_v2 (Changing disputable time)",
-        "changing-dispute-percentage": "Deploying Network_v2 (Changing dispute percentage)",
-        "changing-council-amount": "Deploying Network_v2 (Changing curator amount)",
-        "changing-cancelable-time": "Deploying Network_v2 (Changing cancelable time)",
-        "changing-oracle-exchange-rate": "Deploying Network_v2 (Changing oracle exchange rate)",
-        "changing-merger-fee": "Deploying Network_v2 (Changing merger fee)",
-        "changing-proposer-fee": "Deploying Network_v2 (Changing proposer fee)",
+        "deploy-network": "Deploying Marketplace_v2",
+        "changing-draft-time": "Deploying Marketplace_v2 (Changing draft time)",
+        "changing-disputable-time": "Deploying Marketplace_v2 (Changing disputable time)",
+        "changing-dispute-percentage": "Deploying Marketplace_v2 (Changing dispute percentage)",
+        "changing-council-amount": "Deploying Marketplace_v2 (Changing curator amount)",
+        "changing-cancelable-time": "Deploying Marketplace_v2 (Changing cancelable time)",
+        "changing-oracle-exchange-rate": "Deploying Marketplace_v2 (Changing oracle exchange rate)",
+        "changing-merger-fee": "Deploying Marketplace_v2 (Changing merger fee)",
+        "changing-proposer-fee": "Deploying Marketplace_v2 (Changing proposer fee)",
         "set-dispatcher": "Setting Bounty Token Dispatcher",
-        "add-to-registry": "Registering Network_v2",
-        "sync-web-network": "Synchronizing Web-network"
+        "add-to-registry": "Registering Marketplace_v2",
+        "sync-web-network": "Synchronizing Web-marketplace"
       }
     },
     "update-github-token": {
       "title": "Update your Github Token",
-      "description": "To create your custom network we need permission to access your repositories",
+      "description": "To create your custom marketplace we need permission to access your repositories",
       "update-now": "Update now"
     },
     "deploy-nft-token": {
       "title": "New NFT",
-      "description": "Deploy a New NFT Token for your network"
+      "description": "Deploy a New NFT Token for your marketplace"
     },
     "not-listed-tokens": {
       "title": "Not listed tokens"
@@ -294,27 +294,27 @@
   },
   "messages": {
     "refresh-the-page": "Refresh the page for the changes to take effect.",
-    "network-closed": "Network closed.",
+    "network-closed": "Marketplace closed.",
     "updated-parameters": "Updated {{updated}} of {{total}} params",
-    "network-registered": "Network Registered"
+    "network-registered": "Marketplace Registered"
   },
   "errors": {
-    "failed-to-create-network": "Failed to create network {{error}}",
-    "failed-to-register-network": "Failed to register network {{error}}",
-    "failed-to-update-network": "Failed to update network {{error}}",
-    "failed-to-close-network": "Failed to close network {{error}}",
+    "failed-to-create-network": "Failed to create marketplace {{error}}",
+    "failed-to-register-network": "Failed to register marketplace {{error}}",
+    "failed-to-update-network": "Failed to update marketplace {{error}}",
+    "failed-to-close-network": "Failed to close marketplace {{error}}",
     "invalid-format": "Invalid format",
     "images-too-big": "Your images are too big, maximum 1MB for both files combined",
-    "not-found": "No networks found",
+    "not-found": "No marketplaces found",
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
     "percentage-for-dispute": "Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.",
     "redeem-time": "The time after a bounty creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",
     "council-amount": "The amount of {{token}} locked needed to be a curator. Min. {{min}} and Max. {{max}}.",
-    "updating-values": "Error updating network values",
+    "updating-values": "Error updating marketplace values",
     "updated-parameters": "Failed to update {{failed}} params",
-    "network-not-registered": "This network has yet to be registered to be usable, please do so.",
-    "failed-to-update-network-id": "Failed to update network chain id",
-    "you-dont-have-a-custom-network": "You don't have a custom network created"
+    "network-not-registered": "This marketplace has yet to be registered to be usable, please do so.",
+    "failed-to-update-network-id": "Failed to update marketplace network id",
+    "you-dont-have-a-custom-network": "You don't have a custom marketplace created"
   },
   "tabs": {
     "logo-and-colours": "Logo & Colors",

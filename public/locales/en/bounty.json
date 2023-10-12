@@ -8,8 +8,8 @@
   "description": "description",
   "view-all-addresses": "view all address",
   "search": "Search for a bounty by title, description or tags",
-  "description_proposal": "Reviewed implementations by the network curators ready to be approved by the network curators.",
-  "description_deliverable": "Raw implementations from the network developers ready to be reviewed by anyone and approved into proposals by the network curators",
+  "description_proposal": "Reviewed implementations by the marketplace curators ready to be approved by the marketplace curators.",
+  "description_deliverable": "Raw implementations from the marketplace developers ready to be reviewed by anyone and approved into proposals by the marketplace curators",
   "info": {
     "funded": "Funded",
     "working": "Users working",
@@ -29,14 +29,14 @@
     "finalized": "Finished",
     "validation": "validation & disputes",
     "closed": "closed & distributed",
-    "select-network": "Select Network",
+    "select-network": "Select Marketplace",
     "details": "Bounty details",
     "reward": "Reward Information",
     "review": "Review",
     "github": "Github Information"
   },
   "descriptions": {
-    "select-network": "Select the chain and network you want to create your bounty",
+    "select-network": "Select the network and marketplace you want to create your bounty",
     "details": "Enter the necessary information to understand your bounty",
     "github": "Inform the repository and the branch where the solution will be made",
     "reward": "When creating a new bounty, you have two options regarding the reward:",
@@ -105,7 +105,7 @@
     "exceeds-minimum-amount": "Minimum amount is {{amount}}",
     "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
     "description-limit": "Exceeds allowed limit of characters and files: {{value}}",
-    "no-networks-chain": "The selected chain has no active networks",
+    "no-networks-chain": "The selected network has no active marketplaces",
     "bounty-update": "Bounty update failed",
     "banned-domain": "This domain is banned and cannot be used to open bounties.",
     "failed-to-cancel": "Bounty could not be canceled",
@@ -174,8 +174,8 @@
   "in-bounties": "in Bounties",
   "distributed": "distributed",
   "title-bounties": "Bounty Hall",
-  "sub-title-bounties": "A collection of the most recent bounties and MVP Networks on our ecosystem",
-  "most-active-networks": "Most Active Networks",
+  "sub-title-bounties": "A collection of the most recent bounties and MVP Marketplaces on our ecosystem",
+  "most-active-networks": "Most Active Marketplaces",
   "recent-bounties": "Recent Bounties",
   "recent-funding": "Recent Funding requests",
   "all-bounties": "All Bounties",
@@ -191,7 +191,7 @@
   "seeking-funding": "Seeking Funding",
   "balance": "Total Balance:",
   "edit": "edit",
-  "most-active-network-empty": "Not found active networks",
+  "most-active-network-empty": "Not found active marketplaces",
   "kyc": {
     "is-required": "Required KYC validation",
     "refresh": "Refresh Session",
@@ -206,7 +206,7 @@
   },
   "proposal-creator": "Proposal Creator",
   "proposal-merger": "Merger",
-  "network-fee": "Network Fee",
+  "network-fee": "Marketplace Fee",
   "bounty-examples": "See bounty examples",
   "finding-yourself-lost": "Finding yourself lost?",
   "terms-and-conditions": "terms and conditions.",
@@ -217,7 +217,7 @@
     "title": "Service Fees",
     "description": "You Can find more information in our",
     "doc": "Documentation",
-    "support-message": "Amount paid to incentivize the community to participate on the network"
+    "support-message": "Amount paid to incentivize the community to participate on the marketplace"
   },
   "step-of": "Step {{currentStep}} of {{maxSteps}}",
   "step": "Step {{currentStep}}",
@@ -237,7 +237,7 @@
     },
     "allow-list": {
       "title": "Not allowed",
-      "content": "Creation of bounties is restricted on this network to a curated list of addresses. Please, select another network or contact the network governor."
+      "content": "Creation of bounties is restricted on this marketplace to a curated list of addresses. Please, select another marketplace or contact the marketplace governor."
     }
   },
   "allow-list": {

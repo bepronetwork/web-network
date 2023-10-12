@@ -59,7 +59,7 @@
     "merge-conflicts": "Pull request has merge conflicts and can't be merged",
     "you-dont-have-deliverables": "You don't have any Deliverables. Find a Bounty to work on.",
     "deliverable-participants": "Failed to get participants",
-    "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the network governor.",
+    "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the marketplace governor.",
     "approval": "Please contact repository admin for pull request approval before merging is enabled."
   }
 }
