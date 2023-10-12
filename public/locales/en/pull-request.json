@@ -11,7 +11,7 @@
   "review_other": "reviews",
   "reviewWithCount_one": "{{count}} review",
   "reviewWithCount_other": "{{count}} reviews",
-  "find-a-bounty": "Find a bounty to work on",
+  "find-a-bounty": "Find a task to work on",
   "loc": "LOC",
   "actions": {
     "create": {
@@ -57,7 +57,7 @@
     "not-found": "No pull requests found",
     "no-reviews-found": "No reviews found",
     "merge-conflicts": "Pull request has merge conflicts and can't be merged",
-    "you-dont-have-deliverables": "You don't have any Deliverables. Find a Bounty to work on.",
+    "you-dont-have-deliverables": "You don't have any Deliverables. Find a Task to work on.",
     "deliverable-participants": "Failed to get participants",
     "merge-commit": "This proposal can't be merged because the repository don't allow \"merge commits\". Please contact the marketplace governor.",
     "approval": "Please contact repository admin for pull request approval before merging is enabled."

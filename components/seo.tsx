@@ -37,7 +37,7 @@ const Seo: React.FC<ISeoProps> = ({ issueMeta }) => {
                 url: `${homeUrl}/api/seo/${issueId}`,
                 width: 1200,
                 height: 670,
-                alt: "Bounty Info",
+                alt: "Task Info",
                 type: "image/jpeg"
               }
             ],

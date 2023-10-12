@@ -47,7 +47,7 @@
       "success": "Github handle removed successfully",
       "warnings": {
         "period": "The account can only be changed again after seven days",
-        "deliverables": "There must be no open deliverables on bounties for this account"
+        "deliverables": "There must be no open deliverables on tasks for this account"
       },
       "errors": {
         "github-already-exists": "This github handle already exists in another account",  
@@ -67,7 +67,7 @@
    },
    "notifications-form": {
       "title": "Notifications",
-      "message": "Allow Bepro Marketplace to send you updates via email. These can include updates to bounties, app updates, etc.",
+      "message": "Allow Bepro Marketplace to send you updates via email. These can include updates to tasks, app updates, etc.",
       "invalid-email": "Invalid email",
       "re-send-email": "A confirmation email was sent, please check your inbox and spam box.",
       "re-send": "Re-send",

@@ -3,7 +3,7 @@
   "registry": {
     "title": "Registry",
     "changing-labels": {
-      "bounty-fees": "Bounty Fees",
+      "bounty-fees": "Task Fees",
       "network-creation-fee": "Marketplace Creation Fee",
       "network-creation-amount": "Marketplace Creation Amount",
       "transactional": "Transactional Tokens",
@@ -28,27 +28,27 @@
         "description": "Percentage of the marketplace creation amount charged when a marketplace is registered"
       },
       "close-bounty-fee": {
-        "label": "Close Bounty Fee",
-        "description": "Percentage of the bounty amount charged when a bounty is closed"
+        "label": "Close Task Fee",
+        "description": "Percentage of the task amount charged when a task is closed"
       },
       "cancel-bounty-fee": {
-        "label": "Cancel Bounty Fee",
-        "description": "Percentage of the bounty amount charged when a bounty is canceled"
+        "label": "Cancel Task Fee",
+        "description": "Percentage of the task amount charged when a task is canceled"
       },
       "governance-token": {
         "label": "Marketplace Creation Token (BEPRO)"
       },
       "nft-token": {
-        "label": "NFT Bounty Token"
+        "label": "NFT Task Token"
       }
     },
     "cta": {
       "dispatcher": {
-        "call": "The Bounty Token requires Marketplace Registry to be set as dispatcher",
+        "call": "The Task Token requires Marketplace Registry to be set as dispatcher",
         "action": "Set dispatcher"
       },
       "allow-transactional": {
-        "call": "For the Registry Token to be used in bounties it needs to be allowed",
+        "call": "For the Registry Token to be used in tasks it needs to be allowed",
         "action": "Allow as transactional"
       },
       "allow-reward": {

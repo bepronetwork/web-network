@@ -10,18 +10,18 @@
   "try-again": "Something went wrong. Try again later.",
   "fund": "fund",
   "actions": {
-    "fund-bounty": "Fund Bounty",
+    "fund-bounty": "Fund Task",
     "manage-funding": "Manage Funding",
     "retract-funding": "Retract Funding",
     "withdraw-funding": "Withdraw Reward"
   },
   "modals": {
     "fund": {
-      "title": "Fund Bounty",
+      "title": "Fund Task",
       "description": "You are about to fund",
-      "funded-succesfully": "Bounty Funded Sucessfully",
+      "funded-succesfully": "Task Funded Sucessfully",
       "funded-x-symbol": "Funded {{amount}} {{symbol}}",
-      "failed-to-fund": "Failed to fund bounty",
+      "failed-to-fund": "Failed to fund task",
       "fields": {
         "fund-amount": {
           "label": "Fund Amount"

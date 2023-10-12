@@ -8,10 +8,10 @@
   "oracles-staked-description": "The amount of tokens locked by users to curate the marketplace",
   "tvl": "TVL",
   "tvl-description": "Total Value Locked",
-  "open-bounties": "Open bounties",
-  "open-bounties-description": "Number of bounties available to work",
-  "total-bounties": "Total bounties",
-  "total-bounties-description": "Number of bounties in the marketplace",
+  "open-bounties": "Open tasks",
+  "open-bounties-description": "Number of tasks available to work",
+  "total-bounties": "Total tasks",
+  "total-bounties-description": "Number of tasks in the marketplace",
   "network-settings": "Marketplace Settings",
   "network-create-warning": "A fee of amount will be taken when the marketplace is created.",
   "network-amount-to-create": "{{amount}} {{symbol}} will be taken from this {{totalAmount}} {{symbol}} locked when you create the marketplace",
@@ -20,12 +20,12 @@
   "redeem-time": "Draft time",
   "council-amount": "Curator Amount",
   "network-bounty-hall": {
-    "title": "{{network}} Bounty hall",
-    "description": "A collection of the most recent bounties of {{network}} marketplaces"
+    "title": "{{network}} Task hall",
+    "description": "A collection of the most recent tasks of {{network}} marketplaces"
   },
   "cancelable-time": {
     "label": "Cancelable Time",
-    "description": "After this time the marketplace governor can cancel a stuck bounty. Min. {{min}}."
+    "description": "After this time the marketplace governor can cancel a stuck task. Min. {{min}}."
   },
   "oracle-exchange-rate": {
     "label": "Oracle Exchange Rate",
@@ -34,11 +34,11 @@
   },
   "merger-fee": {
     "label": "Merger Fee",
-    "description": "Percentage of the bounty amount distributed to the wallet that closed the bounty. Max. {{max}}."
+    "description": "Percentage of the task amount distributed to the wallet that closed the task. Max. {{max}}."
   },
   "proposer-fee": {
     "label": "Proposal Creator Fee",
-    "description": "Percentage of the bounty amount distributed to the wallet that created the accepted proposal. Max. {{max}}."
+    "description": "Percentage of the task amount distributed to the wallet that created the accepted proposal. Max. {{max}}."
   },
   "save-settings": "Save settings",
   "config-tokens-registry": "Config Allowed Tokens",
@@ -60,13 +60,13 @@
     "title": "Marketplaces",
     "explanatory-text": "A list of all the marketplaces using BEPRO marketplace for their development",
     "number-of-networks": "Number of marketplaces",
-    "number-of-bounties": "Total number of bounties",
+    "number-of-bounties": "Total number of tasks",
     "in-the-network": "In marketplaces"
   },
   "network-list-bar": {
-    "number-of-bounties": "Number of bounties",
+    "number-of-bounties": "Number of tasks",
     "token-locked": "TOKEN locked",
-    "open-bounties": "Open bounties"
+    "open-bounties": "Open tasks"
   },
   "steps": {
     "lock": {
@@ -150,9 +150,9 @@
         "remove-error": "Error remove banned word"
       },
       "allow-list": {
-        "title": "Bounty creation allow list",
+        "title": "Task creation allow list",
         "list-title": "Allowed addresses",
-        "description": "Curate a list of addresses that can create bounties",
+        "description": "Curate a list of addresses that can create tasks",
         "hint": "value must be a valid address",
         "place-holder": "0xValidAddress",
         "list": "",
@@ -170,7 +170,7 @@
       "you-need-to-accept": "You need to accept this so the bot can interact with the repositories.",
       "label": "Repositories",
       "used-by-other-network": "The highlighted repositories are already being used by another marketplace.",
-      "has-bounties": "The highlighted repositories already have bounties and can't be removed.",
+      "has-bounties": "The highlighted repositories already have tasks and can't be removed.",
       "no-repositories-selected": "No repositories selected. At least one repository is required.",
       "user-permission-not-admin_one": "Your permission level on this repository does not allow giving access.",
       "user-permission-not-admin_other": "Your permission level on these repositories does not allow giving access.",
@@ -251,11 +251,11 @@
         },
         "cancel-fee": {
           "label": "Cancel Fee",
-          "description": "Percentage of bounty amount charged when a bounty is canceled. Minimum {{min}} and Maximum {{max}}"
+          "description": "Percentage of task amount charged when a task is canceled. Minimum {{min}} and Maximum {{max}}"
         },
         "close-fee": {
           "label": "Close Fee",
-          "description": "Percentage of bounty amount charged when a bounty is closed. Minimum {{min}} and Maximum {{max}}"
+          "description": "Percentage of task amount charged when a task is closed. Minimum {{min}} and Maximum {{max}}"
         }
       }
     }
@@ -265,18 +265,18 @@
       "being-prepared": "Your marketplace is being prepared",
       "dont-close-window": "Please, don't close this window",
       "steps": {
-        "deploy-network": "Deploying Marketplace_v2",
-        "changing-draft-time": "Deploying Marketplace_v2 (Changing draft time)",
-        "changing-disputable-time": "Deploying Marketplace_v2 (Changing disputable time)",
-        "changing-dispute-percentage": "Deploying Marketplace_v2 (Changing dispute percentage)",
-        "changing-council-amount": "Deploying Marketplace_v2 (Changing curator amount)",
-        "changing-cancelable-time": "Deploying Marketplace_v2 (Changing cancelable time)",
-        "changing-oracle-exchange-rate": "Deploying Marketplace_v2 (Changing oracle exchange rate)",
-        "changing-merger-fee": "Deploying Marketplace_v2 (Changing merger fee)",
-        "changing-proposer-fee": "Deploying Marketplace_v2 (Changing proposer fee)",
+        "deploy-network": "Deploying Marketplace",
+        "changing-draft-time": "Deploying Marketplace (Changing draft time)",
+        "changing-disputable-time": "Deploying Marketplace (Changing disputable time)",
+        "changing-dispute-percentage": "Deploying Marketplace (Changing dispute percentage)",
+        "changing-council-amount": "Deploying Marketplace (Changing curator amount)",
+        "changing-cancelable-time": "Deploying Marketplace (Changing cancelable time)",
+        "changing-oracle-exchange-rate": "Deploying Marketplace (Changing oracle exchange rate)",
+        "changing-merger-fee": "Deploying Marketplace (Changing merger fee)",
+        "changing-proposer-fee": "Deploying Marketplace (Changing proposer fee)",
         "set-dispatcher": "Setting Bounty Token Dispatcher",
-        "add-to-registry": "Registering Marketplace_v2",
-        "sync-web-network": "Synchronizing Web-marketplace"
+        "add-to-registry": "Registering Marketplace",
+        "sync-web-network": "Synchronizing Marketplace"
       }
     },
     "update-github-token": {
@@ -308,7 +308,7 @@
     "not-found": "No marketplaces found",
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
     "percentage-for-dispute": "Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.",
-    "redeem-time": "The time after a bounty creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",
+    "redeem-time": "The time after a task creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",
     "council-amount": "The amount of {{token}} locked needed to be a curator. Min. {{min}} and Max. {{max}}.",
     "updating-values": "Error updating marketplace values",
     "updated-parameters": "Failed to update {{failed}} params",
@@ -322,5 +322,5 @@
     "governance": "Governance",
     "registry": "Registry"
   },
-  "allow-merge": "Allow automatic merge of pull-request when bounty is distributed (by ticking this off this merging and closing of pull-requests will have to be made manually)"
+  "allow-merge": "Allow automatic merge of pull-request when task is distributed (by ticking this off this merging and closing of pull-requests will have to be made manually)"
 }
