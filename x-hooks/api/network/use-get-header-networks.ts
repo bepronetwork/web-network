@@ -6,9 +6,9 @@ export async function useGetHeaderNetworks() {
   return api
     .get<HeaderNetworksProps>(`/header/networks`)
     .then(({ data }) => ({
-      totalConverted: data.TVL,
-      numberOfBounties: data.bounties,
-      numberOfNetworks: data.number_of_network,
+      totalConverted: data.TVL || 0,
+      numberOfBounties: data.bounties || 0,
+      numberOfNetworks: data.number_of_network || 0,
     }))
     .catch((error) => {
       console.debug("Failed got header networks", error.toString());

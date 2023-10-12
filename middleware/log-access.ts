@@ -7,7 +7,7 @@ export const LogAccess = (handler: NextApiHandler) => {
     const {
       url,
       method,
-      headers: {"X-Forwarded-For": xForwarded, "CF-Connecting-IP": cfConnectingIp},
+      headers: {"x-forwarded-for": xForwarded, "cf-connecting-ip": cfConnectingIp},
       socket: {remoteAddress}
     } = req;
     const _query = Object.fromEntries(new URLSearchParams(url.split('?')[1]));

@@ -12,6 +12,11 @@ export interface BreakpointOptions {
   xxl?: boolean;
 }
 
+export interface GroupedSelectOption {
+  label: string;
+  options: SelectOption[];
+}
+
 export interface SelectOption {
   label: string;
   value: string | number;

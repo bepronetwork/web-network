@@ -241,6 +241,12 @@ li {
         .react-select__option + .react-select__option {
           margin-top: 6px;
         }
+
+        .react-select__group {
+          &-heading {
+            color: $white;
+          }
+        }
       }
     }
     &__value {
@@ -2050,6 +2056,7 @@ input[type="color"] {
 }
 
 .select-network-dropdown {
+  min-width: 140px;
   max-width: 168px;
   text-transform: uppercase;
   font-size: 12px;
