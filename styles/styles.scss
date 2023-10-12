@@ -1519,6 +1519,7 @@ textarea.form-control {
 }
 
 .list-actions {
+  z-index: 0;
   border-radius: 0;
 
   &.sticky-top {
