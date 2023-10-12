@@ -15,11 +15,11 @@ import { ProfilePages } from "interfaces/utils";
 
 export const NAVIGATION_LINKS = {
   network: [
-    { label: "Tasks", href: "/bounties" },
+    { label: "bounties", href: "/bounties" },
     { label: "curators", href: "/curators" },
   ],
   global: [
-    { label: "marketplaces", href: "/marketplaces" },
+    { label: "networks", href: "/marketplaces" },
     { label: "leaderboard", href: "/leaderboard" },
   ],
   both: [
