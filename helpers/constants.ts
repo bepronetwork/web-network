@@ -73,3 +73,89 @@ export const STATIC_URL_PATHS = [
   "curators",
   "bounties",
 ];
+export const BOUNTY_TAGS = [
+  {
+    type: "Technology",
+    tags: [
+      "Full Stack Development",
+      "Front-End Development",
+      "Back-End Development",
+      "Mobile App Development",
+      "Web Design",
+      "Ecommerce Website Development",
+      "UX/UI Design",
+      "CMS Development",
+      "Testing",
+      "Scripting & Automation",
+    ]
+  },
+  {
+    type: "Marketing",
+    tags: [
+      "SEO",
+      "Social Media Marketing",
+      "Other Digital Marketing",
+      "Sales & Business Development",
+      "Marketing Strategy",
+      "Marketing Automation",
+    ]
+  },
+  {
+    type: "Design",
+    tags: [
+      "Graphic Design",
+      "Logo Design",
+      "Illustration",
+      "Branding",
+      "Packaging Design",
+      "Print Design",
+      "Presentation Design",
+      "Infographic Design",
+      "Motion Graphics Design",
+      "User Experience Design",
+    ]
+  },
+  {
+    type: "Writing and Translation",
+    tags: [
+      "Content Writing",
+      "Copywriting",
+      "Technical Writing",
+      "Creative Writing",
+      "Translation",
+      "Proofreading & Editing",
+      "Article Writing",
+      "Blog Writing",
+      "Resume Writing",
+    ]
+  },
+  {
+    type: "Legal",
+    tags: [
+      "Contract Law",
+      "Intellectual Property Law",
+      "Corporate Law",
+      "Employment Law",
+      "Immigration Law",
+      "Legal Writing",
+      "Legal Research",
+      "Tax Law",
+      "Trademark Law",
+    ]
+  },
+  {
+    type: "Video and Audio production",
+    tags: [
+      "Video Editing",
+      "Audio Editing",
+      "Voice Over",
+      "Sound Design",
+      "Music Production",
+      "Audio Production",
+      "Video Production",
+      "Podcast Production",
+      "Audio Mixing",
+      "Audio Mastering",
+    ]
+  },
+];

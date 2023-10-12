@@ -17,7 +17,7 @@ import ReactSelect from "components/react-select";
 
 import { OriginLinkErrors } from "interfaces/enums/Errors";
 
-import { SelectOption } from "types/utils";
+import { GroupedSelectOption, SelectOption } from "types/utils";
 
 interface BountyDetailsSectionViewProps {
   title: string;
@@ -25,7 +25,7 @@ interface BountyDetailsSectionViewProps {
   files: IFilesProps[];
   bodyLength: number;
   tags: SelectOption[];
-  tagsOptions: SelectOption[];
+  tagsOptions: GroupedSelectOption[];
   titleExceedsLimit: boolean;
   isKycEnabled: boolean;
   kycCheck: boolean;

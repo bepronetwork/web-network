@@ -10,8 +10,8 @@ import {isValidUrl} from "helpers/validateUrl";
 
 import {add} from "services/ipfs-service";
 
+import {ErrorMessages} from "server/errors/error-messages";
 import {HttpBadRequestError, HttpUnauthorizedError} from "server/errors/http-errors";
-import {ErrorMessages} from "../../errors/error-messages";
 
 export async function post(req: NextApiRequest): Promise<Issue> {
   const {
