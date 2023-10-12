@@ -5,11 +5,11 @@
   "not-found": {
     "voting-power": "Voting power not found",
     "tokens": "Tokens not found",
-    "any-voting-power": "you do not have any voting power on any network"
+    "any-voting-power": "you do not have any voting power on any marketplace"
   },
   "tokens": "Tokens",
   "balances-transactional-tokens": "Balances for transactional tokens",
-  "oracle-name-placeholder": "Locked Network Token",
+  "oracle-name-placeholder": "Locked Marketplace Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",
   "total-votes": "Total Votes",
@@ -17,16 +17,16 @@
   "connect-wallet": "Connect Wallet",
   "council": "Curator",
   "connect-github": "Connect Github",
-  "go-to-network": "Go to Network",
+  "go-to-network": "Go to Marketplace",
   "total-received": "Total received",
   "connections": "Connections",
   "voting-power": "Voting Power",
-  "need-network-to-manage": "To manage your voting power you need to be in a especific network",
+  "need-network-to-manage": "To manage your voting power you need to be in a especific marketplace",
   "network-columns": {
-    "network-name": "Network name",
+    "network-name": "Marketplace name",
     "total-votes": "Total votes",
     "total-received": "Total received",
-    "network-link": "Network link"
+    "network-link": "Marketplace link"
   },
   "payments": {
     "period": "Period"
@@ -38,7 +38,7 @@
   },
   "tips": {
     "total-balance": "Total tokens in your wallet",
-    "total-oracles": "Total {{tokenName}} token locked available for network curation"
+    "total-oracles": "Total {{tokenName}} token locked available for marketplace curation"
   },
   "modals": {
     "remove-github": {
@@ -67,7 +67,7 @@
    },
    "notifications-form": {
       "title": "Notifications",
-      "message": "Allow Bepro Network to send you updates via email. These can include updates to bounties, app updates, etc.",
+      "message": "Allow Bepro Marketplace to send you updates via email. These can include updates to bounties, app updates, etc.",
       "invalid-email": "Invalid email",
       "re-send-email": "A confirmation email was sent, please check your inbox and spam box.",
       "re-send": "Re-send",

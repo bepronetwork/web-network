@@ -19,7 +19,7 @@ export const NAVIGATION_LINKS = {
     { label: "curators", href: "/curators" },
   ],
   global: [
-    { label: "networks", href: "/networks" },
+    { label: "marketplaces", href: "/marketplaces" },
     { label: "leaderboard", href: "/leaderboard" },
   ],
   both: [

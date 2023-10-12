@@ -53,7 +53,7 @@
     "contributor": "Contributor {{count}}",
     "contributor-description": "User who actively participated in the development of the Bounty’s solution",
     "total": "total",
-    "network-fee": "Network Fee",
+    "network-fee": "Marketplace Fee",
     "network-fee-description": "We charge a {{percentage}}% convenience fee on every distribution. This makes sure we can keep improving the platform"
   },
   "create-modal": {
