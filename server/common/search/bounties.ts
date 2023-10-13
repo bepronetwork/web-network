@@ -196,8 +196,9 @@ export default async function get(query: ParsedUrlQuery) {
   const totalBounties = await models.issue.count({
     where: {
       state: {
-        [Op.notIn]: ["pending", "canceled"]
-      }
+        [Op.notIn]: ["pending", "canceled"],
+      },
+      visible: true,
     }
   });
 
