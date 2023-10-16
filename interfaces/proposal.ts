@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 import { User } from "interfaces/api";
 import { BaseModel } from "interfaces/db/base";
-import { IssueBigNumberData, IssueData, PullRequest } from "interfaces/issue-data";
+import { Deliverable, IssueBigNumberData, IssueData, IssueDataComment } from "interfaces/issue-data";
 
 export interface ProposalDistribution extends BaseModel {
   recipient: string;
@@ -22,7 +22,7 @@ export interface Proposal extends BaseModel {
   githubLogin: string;
   isMerged?: boolean;
   issueId?: number;
-  pullRequestId?: number;
+  deliverableId?: number;
   contractId?: number;
   creator?: string;
   network_id: number;
@@ -33,7 +33,8 @@ export interface Proposal extends BaseModel {
   isDisputed?: boolean;
   disputes?: ProposalDisputes[];
   issue?: IssueData | IssueBigNumberData;
-  pullRequest?: PullRequest;
+  deliverable?: Deliverable;
+  comments?: IssueDataComment[];
 }
 
 export interface INetworkProposal {
@@ -61,4 +62,8 @@ export interface DistributedAmounts {
     recipient: string;
     githubLogin?: string;
   }[];
+}
+
+export interface DistributionsProps extends DistributedAmounts {
+  totalServiceFees: BigNumber;
 }

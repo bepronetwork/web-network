@@ -193,10 +193,20 @@ export default function TokensDropdown({
       </div>
     </RSComponents.SingleValue>
     )}
+
+  function Label({children}) {
+    if(noLabel) return <>{children}</>
+
+    return (
+      <div className="form-group">
+        <label className="caption-small mb-2">{label || t("misc.token")}</label>
+        {children}
+      </div>
+    )
+  }
     
   return (
-    <div className="form-group">
-      {!noLabel && <label className="caption-small mb-2">{label || t("misc.token")}</label>}
+    <Label>
       <Creatable
         className="react-select-container"
         classNamePrefix="react-select"
@@ -219,6 +229,6 @@ export default function TokensDropdown({
         setToken={handleAddOption}
         setClose={() => setIsModalVisible(false)}
       />
-    </div>
+    </Label>
   );
 }

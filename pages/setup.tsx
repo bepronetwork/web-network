@@ -4,81 +4,61 @@ import {Container, Row} from "react-bootstrap";
 import {GetServerSideProps} from "next";
 import {useTranslation} from "next-i18next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import getConfig from "next/config";
 import {useRouter} from "next/router";
 
 import ConnectWalletButton from "components/connect-wallet-button";
 import {CallToAction} from "components/setup/call-to-action";
 import ChainsSetup from "components/setup/chains-setup";
-import ConnectGithubSetup from "components/setup/connect-github-setup";
 import {NetworkSetup} from "components/setup/network-setup";
 import {RegistrySetup} from "components/setup/registry-setup";
 import TabbedNavigation from "components/tabbed-navigation";
 
 import {useAppState} from "contexts/app-state";
 
-import {Network} from "interfaces/network";
-
-import useApi from "x-hooks/use-api";
-
-const { publicRuntimeConfig: { adminWallet } } = getConfig();
+import { useSearchNetworks } from "x-hooks/api/network";
+import useReactQuery from "x-hooks/use-react-query";
 
 export default function SetupPage(){
   const { replace } = useRouter();
-  const { t } = useTranslation(["setup", "common"])
+  const { t } = useTranslation(["setup", "common"]);
 
-  const [activeTab, setActiveTab] = useState("githubConnection");
-  const [defaultNetwork, setDefaultNetwork] = useState<Network>();
+  const [activeTab, setActiveTab] = useState("supportedChains");
 
-  const { searchNetworks } = useApi();
   const { state: { currentUser, supportedChains, connectedChain } } = useAppState();
 
   const isConnected = !!currentUser?.walletAddress;
-  const isAdmin = adminWallet?.toLowerCase() === currentUser?.walletAddress?.toLowerCase();
-
-  useEffect(() => {
-    if (isConnected && adminWallet && !isAdmin)
-      replace("/networks");
-  }, [adminWallet, currentUser?.walletAddress]);
+  const isAdmin = !!currentUser?.isAdmin;
 
   function searchForNetwork() {
-    if (!isConnected || !isAdmin) return;
-
-    searchNetworks({
+    return useSearchNetworks({
       isDefault: true
     })
       .then(({ rows, count }) => {
         if (count > 0)
-          setDefaultNetwork(rows[0]);
+          return rows[0];
+        return null;
       });
   }
 
-  useEffect(searchForNetwork, [isConnected, isAdmin, currentUser?.walletAddress]);
+  const { data: defaultNetwork } = useReactQuery( ["network", "default"],
+                                                  searchForNetwork,
+                                                  {
+                                                    enabled: isConnected && isAdmin
+                                                  });
+
+  useEffect(() => {
+    if (isConnected && !isAdmin)
+      replace("/networks");
+  }, [currentUser?.isAdmin, currentUser?.walletAddress]);
 
   if (!currentUser?.walletAddress)
     return <ConnectWalletButton asModal />;
 
   const tabs = [
     {
-      eventKey: 'githubConnection',
-      title: t('common:misc.github'),
-      component: <><ConnectGithubSetup /></>
-    },
-    {
       eventKey: 'supportedChains',
       title: t('setup:chains.title'),
-      component: (
-        !currentUser?.login
-          ? <CallToAction 
-              disabled={false} 
-              executing={false} 
-              call="missing github configuration step" 
-              action="go to" 
-              color="info" 
-              onClick={() => setActiveTab('githubConnection')} 
-            />
-          : <ChainsSetup />
-      )
+      component: <ChainsSetup />
     },
     {
       eventKey: "registry",
@@ -141,7 +121,7 @@ export default function SetupPage(){
             tabs={tabs}
             forceActiveKey={activeTab}
             className="issue-tabs"
-            defaultActiveKey="githubConnection"
+            defaultActiveKey="supportedChains"
             onTransition={setActiveTab}
           />
         </Row>

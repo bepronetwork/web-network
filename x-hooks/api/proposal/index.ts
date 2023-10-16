@@ -1,0 +1,1 @@
+export * from "x-hooks/api/proposal/get-proposal-data";

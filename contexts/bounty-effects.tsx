@@ -1,32 +1,37 @@
-import {createContext, useEffect} from "react";
-
-import {useRouter} from "next/router";
+import { ReactNode, createContext, useEffect } from "react";
 
 import { useAppState } from "contexts/app-state";
+import { changeCurrentBountyData } from "contexts/reducers/change-current-bounty";
 
-import {useBounty} from "x-hooks/use-bounty";
-import useChain from "x-hooks/use-chain";
+import { issueParser } from "helpers/issue";
+
+import { IssueData } from "interfaces/issue-data";
+
+import { useBounty } from "x-hooks/use-bounty";
+interface BountyEffectsProviderProps {
+  children: ReactNode;
+  currentBounty: IssueData;
+}
 
 const _context = {};
 
 export const BountyEffectsContext = createContext(_context);
 
-export const BountyEffectsProvider = ({children}) => {
+export const BountyEffectsProvider = ({ children, currentBounty }: BountyEffectsProviderProps) => {  
   const bounty = useBounty();
-  const { chain } = useChain();
-  const { query } = useRouter();
-  const { state } = useAppState();
+  const { dispatch, state } = useAppState();
 
   useEffect(() => {
-    bounty.getDatabaseBounty();
+    const parsedData = issueParser(currentBounty);
+
+    dispatch(changeCurrentBountyData(parsedData));
   }, [
-    chain,
-    query?.id,
-    query?.repoId,
+    currentBounty
   ]);
+
   useEffect(bounty.validateKycSteps, [
-      state?.currentBounty?.data?.isKyc,
-      state?.currentBounty?.data?.kycTierList,
+      currentBounty?.isKyc,
+      currentBounty?.kycTierList,
       state?.currentUser?.kycSession,
   ]);
 

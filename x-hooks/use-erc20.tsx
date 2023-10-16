@@ -16,10 +16,28 @@ import { SimpleBlockTransactionPayload } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
 
+export interface useERC20 {
+  name: string;
+  symbol: string;
+  minimum: string;
+  balance: BigNumber;
+  address: string;
+  decimals: number;
+  loadError: boolean;
+  allowance: BigNumber;
+  totalSupply: BigNumber;
+  approve: (amount: string) => Promise<void>;
+  setAddress: (_address: string) => void;
+  setSpender: (_address: string) => void;
+  deploy: (name: string, symbol: string, cap: string, ownerAddress: string) => Promise<TransactionReceipt>;
+  updateAllowanceAndBalance: () => void;
+}
+
 export default function useERC20() {
   const [name, setName] = useState<string>();
   const [decimals, setDecimals] = useState(18);
   const [symbol, setSymbol] = useState<string>();
+  const [minimum, setMinimum] = useState<string>();
   const [spender, setSpender] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [balance, setBalance] = useState(BigNumber(0));
@@ -69,6 +87,7 @@ export default function useERC20() {
       setAddress(newAddress);
     setName("");
     setSymbol("");
+    setMinimum("");
     setDecimals(18);
     setTotalSupply(BigNumber(0));
     setBalance(BigNumber(0));
@@ -83,11 +102,12 @@ export default function useERC20() {
         setDefaults();
     } else if (address && !name && isServiceReady && state.connectedChain?.matchWithNetworkChain !== false)
       state.Service?.active.getERC20TokenData(address)
-        .then(async ({ name, symbol, decimals, totalSupply }) => {
+        .then(async ({ name, symbol, decimals, totalSupply, minimum }) => {
           setName(name);
           setSymbol(symbol);
           setDecimals(decimals);
           setTotalSupply(totalSupply);
+          setMinimum(minimum);
           setLoadError(false);
         })
         .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
@@ -141,9 +161,10 @@ export default function useERC20() {
       setSpender(_address);
   }
 
-  return {
+  const ERC20data: useERC20 = {
     name,
     symbol,
+    minimum,
     balance,
     address,
     decimals,
@@ -155,5 +176,7 @@ export default function useERC20() {
     setSpender: _setSpender,
     deploy,
     updateAllowanceAndBalance
-  };
+  }
+
+  return ERC20data
 }

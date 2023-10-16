@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
 
 import { useAppState } from "contexts/app-state";
 
@@ -17,8 +16,6 @@ interface FundingSectionProps {
 }
 
 export default function FundingSection({ currentBounty, updateBountyData }: FundingSectionProps) {
-  const { t } = useTranslation(["common", "funding"]);
-
   const [walletFunds, setWalletFunds] = useState<fundingBenefactor[]>();
 
   const { state } = useAppState();
@@ -28,23 +25,13 @@ export default function FundingSection({ currentBounty, updateBountyData }: Fund
   const isBountyClosed = !!currentBounty?.isClosed;
   const isBountyFunded = !!currentBounty?.isFunded;
   const isBountyInDraft = !!currentBounty?.isDraft;
-  const transactionalSymbol =
-    currentBounty?.transactionalToken?.symbol;
+  const transactionalSymbol = currentBounty?.transactionalToken?.symbol;
   const rewardTokenSymbol = currentBounty?.rewardToken?.symbol;
-
-  const fundsGiven =
-    walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) ||
-    BigNumber(0);
-
+  const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
   const futureRewards = fundsGiven
     .multipliedBy(currentBounty?.rewardAmount)
     .dividedBy(currentBounty?.fundingAmount)
     .toFixed();
-
-  const collapseAction = isBountyClosed
-    ? t("funding:rewards")
-    : t("funding:actions.manage-funding");
-
   const isCanceled =
     getIssueState({
       state: currentBounty?.state,
@@ -56,7 +43,7 @@ export default function FundingSection({ currentBounty, updateBountyData }: Fund
     if (!state.currentUser?.walletAddress || !currentBounty) return;
 
     const funds = 
-      currentBounty?.benefactors.filter((fund) => fund.address === state.currentUser.walletAddress);
+      currentBounty?.benefactors?.filter((fund) => fund.address === state.currentUser.walletAddress);
 
     setWalletFunds(funds);
   }, [state.currentUser, currentBounty]);
@@ -75,7 +62,6 @@ export default function FundingSection({ currentBounty, updateBountyData }: Fund
       hasReward={hasReward}
       fundsGiven={fundsGiven}
       futureRewards={futureRewards}
-      collapseAction={collapseAction}
       isBountyClosed={isBountyClosed}
       isBountyInDraft={isBountyInDraft}
       rewardTokenSymbol={rewardTokenSymbol}

@@ -1,9 +1,6 @@
-import {promises as fs} from "fs";
-import Handlebars from "handlebars";
 import cache from "memory-cache";
 import {NextApiRequest, NextApiResponse} from "next";
 import getConfig from "next/config";
-import path from "path";
 import {Op} from "sequelize";
 
 import models from "db/models";
@@ -11,6 +8,9 @@ import models from "db/models";
 import {LogAccess} from "middleware/log-access";
 
 import {error as LogError} from 'services/logging';
+
+import { GeneralTemplates } from "server/templates";
+import { TemplateProcessor } from "server/utils/template";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -55,7 +55,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       where,
       limit: limit,
       include: [
-        { association: "network" }
+        { association: "network" },
+        { association: "chain" }
       ]
     });
 
@@ -66,21 +67,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       appTitle: "Web3 Decentralized Development",
       appDescription: "Autonomous Protocol for Decentralized Development",
       appLink: homeUrl,
-      bounties: bounties.map(({ title, createdAt, githubId, repository_id, seoImage, tags, network }) => ({
+      bounties: bounties.map(({ title, createdAt, id, seoImage, tags, network, chain }) => ({
         title,
         description: `Created on ${network.name} Network.`,
         creationDate: new Date(createdAt).toUTCString(),
-        link: `${homeUrl}/${network.name}/bounty?id=${githubId}&repoId=${repository_id}`,
+        link: `${homeUrl}/${network.name}/${chain.chainShortName}/bounty/${id}`,
         seoUrl: `${ipfsUrl}/${seoImage}`,
         tags: (tags || []).map( tag => ({ tag }))
       }))
     };
 
-    const rssTemplate = await fs.readFile(path.join(process.cwd(), "templates") + "/rss.hbs", "utf8");
-
-    const handlebar = Handlebars.compile(rssTemplate);
-
-    const result = handlebar(templateData);
+    const result = await new TemplateProcessor(GeneralTemplates.RSS).compile(templateData);
 
     const ttlSetting = await models.settings.findAll({
       where: { 

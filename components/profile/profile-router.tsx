@@ -2,23 +2,19 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/router";
 
+import MyNetworkPage from "components/pages/profile/my-network/controller";
 import PaymentsPage from "components/pages/profile/payments/controller";
 import BountiesPage from "components/profile/pages/bounties";
-import MyNetworkPage from "components/profile/pages/my-network";
+import DeliverablesPage from "components/profile/pages/deliverables";
 import ProfilePage from "components/profile/pages/profile-page/controller";
 import ProposalsPage from "components/profile/pages/proposals";
-import PullRequestsPage from "components/profile/pages/pull-requests";
 import VotingPowerPage from "components/profile/pages/voting-power/controller";
-
-import { useAppState } from "contexts/app-state";
+import WalletPage from "components/profile/pages/wallet/view";
 
 import { ProfilePageProps } from "types/pages";
-import WalletPage from "./pages/wallet/view";
 
 export default function ProfileRouter(props: ProfilePageProps) {
-  const { pathname, asPath, query, push } = useRouter();
-
-  const { state: { currentUser } } = useAppState();
+  const { asPath, push } = useRouter();
 
   const Route = (path, page) => ({ path, page });
 
@@ -28,7 +24,7 @@ export default function ProfileRouter(props: ProfilePageProps) {
     Route("/profile/voting-power", VotingPowerPage),
     Route("/profile/payments", PaymentsPage),
     Route("/profile/bounties", BountiesPage),
-    Route("/profile/pull-requests", PullRequestsPage),
+    Route("/profile/deliverables", DeliverablesPage),
     Route("/profile/proposals", ProposalsPage),
     Route("/profile/my-network", MyNetworkPage),
   ];
@@ -39,22 +35,6 @@ export default function ProfileRouter(props: ProfilePageProps) {
     if (!currentRoute)
       push("/404");
   }, [currentRoute]);
-
-  useEffect(() => {
-    if (!currentUser?.walletAddress || !query) return;
-
-    push({
-      pathname,
-      query: {
-        ...query,
-        wallet: currentUser?.walletAddress,
-      }
-    }, asPath, {
-      shallow: false,
-      scroll: false,
-    });
-
-  }, [currentUser?.walletAddress, asPath]);
 
   if (currentRoute)
     return <currentRoute.page {...props} />;

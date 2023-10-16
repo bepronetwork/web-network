@@ -75,6 +75,10 @@ li {
   cursor: not-allowed;
 }
 
+.cursor-default {
+  cursor: default !important;
+}
+
 .text-purple {
   color: var(--bs-purple) !important;
 }
@@ -180,7 +184,6 @@ li {
 
 .react-select {
   &-container {
-    min-width: fit-content;
     width: 100%;
   }
   &-container & {
@@ -226,7 +229,6 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
-      min-width: fit-content;
       border-radius: 4px;
       border: 1px solid $gray-800;
       background-color: $gray-900;
@@ -238,6 +240,12 @@ li {
 
         .react-select__option + .react-select__option {
           margin-top: 6px;
+        }
+
+        .react-select__group {
+          &-heading {
+            color: $white;
+          }
         }
       }
     }
@@ -601,8 +609,36 @@ label {
   &:focus {
     border-color: #6873E9 !important;
   }
+
+  &.bg-gray-850 {
+    background-color: $gray-850 !important;
+  }
 }
 
+.input-comment {
+  background-color: $gray-850 !important;
+  color: var(--bs-gray);
+  border: none !important;
+  &:focus {
+    border-color: none !important;
+  }
+}
+
+.btn-comment {
+  &:disabled {
+    border: 1px solid $gray-700 !important;
+  }
+}
+
+.settings-comment {
+  &:hover {
+    background-color: $gray-850;
+  }
+
+  .container-settings {
+    margin: 0px 6px 6px 6px 
+  }
+}
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 5px;
@@ -768,40 +804,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
-.input-funded {
-  border: none;
-  background-color: $gray-900;
-  font-size: 24px;
-  &:focus {
-    border: none;
-    background-color: $gray-900;
-  }
-  &:hover {
-    border: none;
-  }
-}
-
-.input-fund {
-  border: 1px solid $gray-700;
-  background-color: $gray-900;
-  font-size: 24px;
-  &:focus {
-    border: 1px solid $gray-700;
-    background-color: $gray-900;
-  }
-}
-
-.symbol-fund {
-  background-color: $gray-900 !important;
-  font-size: 24px;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.convert-value {
-  font-size: 20px;
-}
-
 .ball {
   width: 8px;
   height: 8px;
@@ -827,6 +829,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: $gray-300;
     background-color: $gray-800;
   }
+}
+
+.form-switch
+.form-check-input {
+  width: 40px;
+  height: 20px;
+}
+
+.form-check-input {
+  background-color: $gray-200;
 }
 
 .badge-opaque {
@@ -981,7 +993,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .progress {
   height: math.div($m, 4);
   border-radius: math.div($m, 6);
-  background-color: rgba($white, 0.2);
+  background-color: $gray-850;
 
   &.bg-purple {
     background-color: #3e345b !important;
@@ -1484,6 +1496,10 @@ textarea.form-control {
   img {
     max-width: 100%;
   }
+
+  video {
+    max-width: 100%;
+  }
 }
 
 .main-nav-link {
@@ -1503,11 +1519,12 @@ textarea.form-control {
 }
 
 .list-actions {
+  z-index: 0;
   border-radius: 0;
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.43em;
+    top: 4.416em;
   }
 
   .input-group {
@@ -1593,8 +1610,8 @@ textarea.form-control {
 
 .scroll-top-button {
   position: fixed;
-  bottom: 50px;
-  right: 20px;
+  bottom: 10px;
+  right: 10px;
   z-index: 99;
 
   background-color: transparent;
@@ -1648,6 +1665,10 @@ textarea.form-control {
 
 .line {
   height: 1px;
+}
+
+.p-settings {
+  padding: 8px 8px 12px 8px;
 }
 
 .image-uploader {
@@ -1884,6 +1905,17 @@ input[type="color"] {
       }
     }
   }
+  &-blue-200 {
+    svg {
+      path {
+        fill: $blue-200;
+      }
+    }
+  }
+}
+
+.min-vh-90 {
+  min-height: 90vh;
 }
 
 .nav-link-gradient {
@@ -1907,7 +1939,6 @@ input[type="color"] {
 .profile {
   &-content {
     min-height: calc(100vh - $navbar-height);
-    height: max-content;
     border-left: 1px solid $dark-gray;
   }
 }
@@ -2026,6 +2057,7 @@ input[type="color"] {
 }
 
 .select-network-dropdown {
+  min-width: 140px;
   max-width: 168px;
   text-transform: uppercase;
   font-size: 12px;
@@ -2072,5 +2104,17 @@ input[type="color"] {
 .overflow-wrap {
   &-anywhere {
     overflow-wrap: anywhere;
+  }
+}
+
+.text-overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line-between-children {
+  > *:not(:last-child) {
+    border-bottom: 1px solid $gray-800;
   }
 }

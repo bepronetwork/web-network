@@ -11,7 +11,6 @@ import {useAuthentication} from "x-hooks/use-authentication";
 import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
 import {useNetwork} from "x-hooks/use-network";
-import {useRepos} from "x-hooks/use-repos";
 import {useSettings} from "x-hooks/use-settings";
 import {useTransactions} from "x-hooks/use-transactions";
 
@@ -24,7 +23,6 @@ export const GlobalEffectsProvider = ({children}) => {
   const session = useSession();
   
   const dao = useDao();
-  const repos = useRepos();
   const network = useNetwork();
   const { chain } = useChain();
   const settings = useSettings();
@@ -52,7 +50,7 @@ export const GlobalEffectsProvider = ({children}) => {
     Service?.network?.active?.chain_id,
     connectedChain?.id,
     connectedChain?.registry,
-    currentUser?.connected,
+    currentUser?.connected
   ]);
 
   useEffect(() => {
@@ -63,31 +61,21 @@ export const GlobalEffectsProvider = ({children}) => {
     Service?.network?.active?.chain_id,
   ]);
 
-  useEffect(repos.loadRepos, [
-    query?.network,
-    chain,
-    state.Service?.network?.active
-  ]);
-  useEffect(repos.updateActiveRepo, [query?.repoId, Service?.network?.repos]);
-
-  useEffect(auth.validateGhAndWallet, [session?.data, currentUser?.walletAddress]);
-  useEffect(auth.updateWalletAddress, [currentUser?.connected]);
-  useEffect(auth.listenToAccountsChanged, [Service]);
   useEffect(auth.updateWalletBalance, [currentUser?.walletAddress, Service?.active?.network?.contractAddress]);
-  useEffect(auth.updateKycSession, [state?.currentUser?.login,
-                                    state?.currentUser?.accessToken,
+  useEffect(auth.updateKycSession, [state?.currentUser?.accessToken,
                                     state?.currentUser?.match,
                                     state?.currentUser?.walletAddress,
                                     state?.Settings?.kyc?.tierList]);
-  useEffect(auth.updateCurrentUserLogin, [session?.data?.user]);
   useEffect(auth.verifyReAuthorizationNeed, [currentUser?.walletAddress]);
+  useEffect(() => {
+    auth.syncUserDataWithSession();
+  }, [session]);
   
   useEffect(() => {
     network.updateActiveNetwork();
   }, [query?.network, query?.chain]);
   useEffect(network.loadNetworkTimes, [Service?.active?.network]);
   useEffect(network.loadNetworkAmounts, [Service?.active?.network?.contractAddress, chain]);
-  useEffect(network.loadNetworkAllowedTokens, [Service?.network?.active, chain]);
   useEffect(network.updateNetworkAndChainMatch, [
     connectedChain?.id,
     query?.network,

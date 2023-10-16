@@ -12,7 +12,7 @@ export default function FilterComponent({
   onChange: (e) => void;
 }) {
 
-  function getCurrentFilter(options) {
+  function getCurrentFilter(options: IssueFilterBoxOption[]) {
     return options?.find(({ checked }) => checked);
   }
 

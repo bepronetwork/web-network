@@ -3,33 +3,24 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
+import { getAssociation } from "helpers/db/models";
 import { resJsonMessage } from "helpers/res-json-message";
 
-import { WithJwt } from "middleware";
-import {LogAccess} from "middleware/log-access";
+import { RouteMiddleware } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: { [Op.notIn]: ["pending", "canceled"] }, visible: true};
   const {
     state,
     issueId,
-    repoId,
-    creator,
     address,
     networkName,
   } = req.query || {};
 
   if (state) whereCondition.state = state;
 
-  if (issueId) whereCondition.issueId = issueId;
-
-  if (repoId) whereCondition.repository_id = repoId;
-
-  if (creator) whereCondition.creatorGithub = creator;
-
-  if (address) whereCondition.creatorAddress = address;
+  if (issueId) whereCondition.id = issueId;
 
   const networks = await models.network.findAll({
     where: {
@@ -45,8 +36,19 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
 
   whereCondition.network_id = { [Op.in]: networks.map(network => network.id) };
 
+  const userAssociation = getAssociation("user", undefined, !!address, {
+    where: {
+      address: {
+        [Op.iLike]: `%${address.toString()}%`
+      }
+    }
+  });
+
   const issueCount = await models.issue.count({
-    where: whereCondition
+    where: whereCondition,
+    include: [
+      userAssociation
+    ]
   });
 
   return res.status(200).json(issueCount);
@@ -65,4 +67,4 @@ async function getAll(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(WithJwt(WithValidChainId(getAll))));
+export default RouteMiddleware(WithValidChainId(getAll));

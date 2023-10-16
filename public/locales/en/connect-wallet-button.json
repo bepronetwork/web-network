@@ -1,4 +1,6 @@
 {
   "title": "Connect your MetaMask Wallet",
-  "this-page-needs-access-to-your-wallet-address": "This page needs access to your wallet address"
+  "this-page-needs-access-to-your-wallet-address": "This page needs access to your wallet address",
+  "web3Connection-error": "Web3Connection not found",
+  "refresh-page": "Please refresh the page"
 }

@@ -4,12 +4,13 @@ import { BigNumber } from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import { FlexRow } from "components/common/flex-box/view";
-import NetworkItem from "components/profile/network-item/controller";
+import VotingPowerSubTitle from "components/profile/pages/voting-power/sub-title/controller";
+import VotesAmount from "components/profile/pages/voting-power/total-votes/votes-amount/view";
 
-import VotingPowerSubTitle from "../sub-title/controller";
 interface TotalVotesProps {
   votesLocked: BigNumber;
   votesDelegatedToMe: BigNumber;
+  votesDelegatedToOthers: BigNumber;
   icon: string | ReactNode;
   tokenName: string;
   tokenColor?: string;
@@ -21,6 +22,7 @@ interface TotalVotesProps {
 export default function TotalVotes({
   votesLocked,
   votesDelegatedToMe,
+  votesDelegatedToOthers,
   icon,
   tokenName,
   tokenSymbol,
@@ -30,19 +32,6 @@ export default function TotalVotes({
 } : TotalVotesProps) {
   const { t } = useTranslation(["common", "profile"]);
 
-  function getAmountItem(amount) {
-    return <NetworkItem
-      type="voting"
-      iconNetwork={icon}
-      amount={amount}
-      symbol={votesSymbol}
-      networkName={tokenSymbol}
-      primaryColor={tokenColor}
-      subNetworkText={votesSymbol}
-      variant={variant}
-    />;
-  }
-
   return(
     <div className="border border-gray-800 p-4 border-radius-4 col-12">
       <FlexRow className="mb-3 justify-content-between align-items-center flex-wrap">
@@ -51,24 +40,44 @@ export default function TotalVotes({
           infoTooltip={t("profile:tips.total-oracles", {
             tokenName: tokenName,
           })}
-          total={votesLocked.plus(votesDelegatedToMe).toFixed()} 
+          total={votesLocked.plus(votesDelegatedToMe)?.toFixed()} 
           votesSymbol={votesSymbol} 
           variant={variant} 
           tokenColor={tokenColor}        
         />
       </FlexRow>
 
-      <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3">
-        <span>{t("profile:locked-by-me")}</span>
-      </div>
+      <VotesAmount
+        label={t("profile:locked-by-me")}
+        amount={votesLocked?.toFixed()}
+        networkIcon={icon}
+        votesSymbol={votesSymbol}
+        tokenSymbol={tokenSymbol}
+        tokenColor={tokenColor}
+        variant={variant}
+        className="mb-4"
+      />
 
-      {getAmountItem(votesLocked.toFixed())}
+      <VotesAmount
+        label={t("profile:deletaged-to-me")}
+        amount={votesDelegatedToMe?.toFixed()}
+        networkIcon={icon}
+        votesSymbol={votesSymbol}
+        tokenSymbol={tokenSymbol}
+        tokenColor={tokenColor}
+        variant={variant}
+        className="mb-4"
+      />
 
-      <div className="caption-large text-capitalize family-Regular text-white font-weight-500 mb-3 mt-4">
-        <span>{t("profile:deletaged-to-me")}</span>
-      </div>
-
-      {getAmountItem(votesDelegatedToMe.toFixed())}
+      <VotesAmount
+        label={t("profile:deletaged-to-others")}
+        amount={votesDelegatedToOthers?.toFixed()}
+        networkIcon={icon}
+        votesSymbol={votesSymbol}
+        tokenSymbol={tokenSymbol}
+        tokenColor={tokenColor}
+        variant={variant}
+      />
     </div>
   );
 }

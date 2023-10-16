@@ -1,8 +1,13 @@
-import { ReactNode } from "react";
+import { ReactNode, ChangeEvent, SVGProps, ReactElement } from "react";
+import { NumberFormatValues } from "react-number-format";
+
+import BigNumber from "bignumber.js";
 
 import { Currency } from "interfaces/currency";
 import { IssueBigNumberData } from "interfaces/issue-data";
 import { SupportedChainData } from "interfaces/supported-chain-data";
+import { Token } from "interfaces/token";
+import { ProfilePages } from "interfaces/utils";
 
 import { SearchBountiesPaginated } from "types/api";
 import { BreakpointOptions, Direction, SelectOption } from "types/utils";
@@ -62,4 +67,76 @@ export interface ChainFilterProps {
   chains: SupportedChainData[];
   direction?: Direction;
   onChange?: (value: string | number) => void;
+  label?: boolean;
+}
+
+export interface AmountCardProps {
+  title: string;
+  amount?: number;
+  description: string;
+  fixed?: number;
+}
+export interface RewardInformationViewProps {
+  isFundingType: boolean;
+  defaultValue: {
+    value: string;
+    formattedValue: string;
+    floatValue: number;
+  };
+  currentUserWallet: string;
+  rewardChecked: boolean;
+  transactionalToken: Token;
+  rewardToken: Token;
+  bountyDecimals: number;
+  rewardDecimals: number;
+  issueAmount: NumberFormatValues;
+  rewardAmount: NumberFormatValues;
+  bountyTokens: Token[];
+  rewardTokens: Token[];
+  rewardBalance: BigNumber;
+  bountyBalance: BigNumber;
+  updateRewardToken: (v: Token) => void;
+  updateTransactionalToken: (v: Token) => void;
+  addToken: (newToken: Token) => Promise<void>;
+  handleRewardChecked: (v: ChangeEvent<HTMLInputElement>) => void;
+  updateIssueAmount: (v: NumberFormatValues) => void;
+  updateRewardAmount: (v: NumberFormatValues) => void;
+  updateIsFunding: (v: boolean) => void;
+}
+
+export interface RewardInformationSectionProps {
+  isFundingType: boolean;
+  rewardChecked: boolean;
+  transactionalToken: Token;
+  rewardToken: Token;
+  bountyDecimals: number;
+  rewardDecimals: number;
+  issueAmount: NumberFormatValues;
+  rewardAmount: NumberFormatValues;
+  bountyTokens: Token[];
+  rewardTokens: Token[];
+  rewardBalance: BigNumber;
+  bountyBalance: BigNumber;
+  updateRewardToken: (v: Token) => void;
+  updateTransactionalToken: (v: Token) => void;
+  addToken: (newToken: Token) => Promise<void>;
+  handleRewardChecked: (v: ChangeEvent<HTMLInputElement>) => void;
+  updateIssueAmount: (v: NumberFormatValues) => void;
+  updateRewardAmount: (v: NumberFormatValues) => void;
+  updateIsFundingType: (v: boolean) => void;
+}
+
+export interface LinkProps {
+  label: string;
+  href?: ProfilePages;
+  icon?: (props?: SVGProps<SVGSVGElement>) => ReactElement
+}
+
+export interface PaymentInfoProps {
+  address: string;
+  login: string;
+  amount: string;
+  symbol: string;
+  percentage: string;
+  label: string;
 }

@@ -60,7 +60,7 @@ export default function InputNumber({
     <Component {...(shouldBeWrapped && { className: `form-group mb-0 ${fullWidth ? 'w-100' : ''}` })}>
       {label && typeof label === 'string' ? (
         <label
-          className="caption-medium mb-2 text-gray-50 font-weight-500 d-flex align-items-center text-capitalize"
+          className="caption-small mb-2 text-gray-100 font-weight-500 d-flex align-items-center text-capitalize"
           id={id}
         >
           <span className="mr-1">{label}</span>{" "}
@@ -122,7 +122,7 @@ export default function InputNumber({
       </div>
       {helperText && (
         <div
-          className={clsx("caption-medium text-gray-500 font-weight-500 my-2", {
+          className={clsx("my-2", {
             className,
             ...errorStyle
           })}

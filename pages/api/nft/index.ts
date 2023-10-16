@@ -11,9 +11,8 @@ import {formatNumberToNScale} from "helpers/formatNumber";
 import {resJsonMessage} from "helpers/res-json-message";
 import {Settings} from "helpers/settings";
 
-import { LogAccess } from "middleware/log-access";
+import { withProtected } from "middleware";
 import {WithValidChainId} from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 import DAO from "services/dao-service";
 import ipfsService from "services/ipfs-service";
@@ -26,8 +25,8 @@ interface NftPayload {
   mergerAddress: string;
 }
 
-const NftParticipant = (githubHandle, percentage, address, distributedAmount) => ({
-  githubHandle,
+const NftParticipant = (handle, percentage, address, distributedAmount) => ({
+  handle,
   percentage,
   address,
   distributedAmount
@@ -111,12 +110,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const issue = await models.issue.findOne({
       where: {
-        issueId: networkBounty?.cid,
+        contractId: +networkBounty?.id,
         network_id: customNetwork?.id
-      },
-      include: [
-        { association: "repository" }
-      ]
+      }
     });
 
     const [{treasury}, creatorFee, proposerFee] = await Promise.all([DAOService?.getTreasury(),
@@ -136,7 +132,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const getNftParticipant = async (address, amounts) => {
       const user = await models.user.findOne({ where: { address: { [Op.iLike]: String(address) } } });
 
-      return NftParticipant(user?.githubHandle || '', amounts.percentage, address, amounts.value);
+      return NftParticipant(user?.githubLogin || '', amounts.percentage, address, amounts.value);
     }
 
     const merger = await getNftParticipant(mergerAddress, distributions.mergerAmount);
@@ -149,8 +145,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const nft = {
       title: `${networkBounty.title}`,
-      description: `NFT for bounty ${issue.githubId} created on network ${customNetwork.name}`,
-      image: issue.seoImage? `${defaultConfig.urls.ipfs}/${issue.seoImage}`: "",
+      description: `NFT for bounty ${issue.id} created on network ${customNetwork.name}`,
+      image: issue.nftImage ? `${defaultConfig.urls.ipfs}/${issue.nftImage}`: "",
       properties: {
         price: formatNumberToNScale(networkBounty.tokenAmount),
         merger,
@@ -158,8 +154,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         fees: BigNumber(distributions.mergerAmount.value)
                         .plus(BigNumber(distributions.proposerAmount.value)
                         .plus(BigNumber(distributions.treasuryAmount.value))).toString(),
-        repository: issue?.repository?.githubPath,
-        githubId: networkBounty?.cid.split("/")[1],
+        bountyId: networkBounty.id,
         githubPullRequestId: pullRequest.cid.toString(),
       }
     }
@@ -191,4 +186,4 @@ async function NftMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(WithValidChainId(NftMethods)));
+export default withProtected(WithValidChainId(NftMethods));

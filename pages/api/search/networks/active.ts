@@ -6,25 +6,34 @@ import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import {withCORS} from "middleware";
+import {lowerCaseIncludes} from "../../../../helpers/string";
+import {HttpBadRequestError} from "../../../../server/errors/http-errors";
+import {isAddress} from "web3-utils";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
   const { name, creatorAddress, isClosed, isRegistered, page, sortBy, order} = req.query || {};
 
+  if (creatorAddress && !isAddress(creatorAddress?.toString()))
+    throw new HttpBadRequestError("provided creator address is not an address")
+
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) };
   
   if (isClosed)
-    whereCondition.isClosed = isClosed;
+    whereCondition.isClosed = isClosed === "true";
 
   if (isRegistered)
-    whereCondition.isRegistered = isRegistered;
+    whereCondition.isRegistered = isRegistered === "true";
 
   if (name)
     whereCondition.name = name;
+
+  if ((order && !lowerCaseIncludes(order?.toString(), ["desc", "asc"])) ||
+    (sortBy && !lowerCaseIncludes(sortBy?.toString(), ["updatedat", "createdat"])))
+    throw new HttpBadRequestError("wrong order/sort argument")
     
   const include = [
     { association: "tokens" },
@@ -92,4 +101,4 @@ async function SearchNetworks(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default LogAccess(WithCors(SearchNetworks));
+export default withCORS(SearchNetworks);

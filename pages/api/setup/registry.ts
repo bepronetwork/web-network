@@ -7,7 +7,7 @@ import {CHAIN_NOT_CONFIGURED, NOT_AN_ADMIN} from "helpers/constants";
 import {isAdmin} from "helpers/is-admin";
 import {resJsonMessage} from "helpers/res-json-message";
 
-import {LogAccess} from "middleware/log-access";
+import { AdminRoute } from "middleware";
 
 import DAO from "services/dao-service";
 import {error as LogError, Logger} from 'services/logging';
@@ -83,4 +83,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 Logger.changeActionName(`Setup`);
 
-export default LogAccess(handler);
+export default AdminRoute(handler);

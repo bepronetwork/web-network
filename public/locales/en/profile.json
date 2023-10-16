@@ -4,14 +4,12 @@
   "search-wallet": "Search for Token",
   "not-found": {
     "voting-power": "Voting power not found",
-    "tokens": "Tokens not found"
+    "tokens": "Tokens not found",
+    "any-voting-power": "you do not have any voting power on any marketplace"
   },
   "tokens": "Tokens",
-  "received-in-total": "Received in total",
-  "not-found": {
-    "any-voting-power": "you do not have any voting power on any network"
-  },
-  "oracle-name-placeholder": "Locked Network Token",
+  "balances-transactional-tokens": "Balances for transactional tokens",
+  "oracle-name-placeholder": "Locked Marketplace Token",
   "deletaged-to-me": "Delegated to me",
   "deletaged-to-others": "Delegated to others",
   "total-votes": "Total Votes",
@@ -19,41 +17,70 @@
   "connect-wallet": "Connect Wallet",
   "council": "Curator",
   "connect-github": "Connect Github",
-  "go-to-network": "Go to Network",
+  "go-to-network": "Go to Marketplace",
   "total-received": "Total received",
   "connections": "Connections",
   "voting-power": "Voting Power",
-  "need-network-to-manage": "To manage your voting power you need to be in a especific network",
+  "need-network-to-manage": "To manage your voting power you need to be in a especific marketplace",
   "network-columns": {
-    "network-name": "Network name",
+    "network-name": "Marketplace name",
     "total-votes": "Total votes",
     "total-received": "Total received",
-    "network-link": "Network link"
+    "network-link": "Marketplace link"
   },
   "payments": {
     "period": "Period"
   },
   "actions": {
-    "remove-github-account": "Disconnect Github Account"
+    "remove-github-account": "Disconnect Github Handle",
+    "change-my-handle": "Change my handle with github",
+    "change-handle": "Change handle"
   },
   "tips": {
     "total-balance": "Total tokens in your wallet",
-    "total-oracles": "Total {{tokenName}} token locked available for network curation"
+    "total-oracles": "Total {{tokenName}} token locked available for marketplace curation"
   },
   "modals": {
     "remove-github": {
       "title": "Remove Github Account",
       "account-from-wallet": "account from the wallet",
+      "success": "Github handle removed successfully",
       "warnings": {
         "period": "The account can only be changed again after seven days",
-        "pull-requests": "There must be no open pull requests on bounties for this account"
+        "deliverables": "There must be no open deliverables on tasks for this account"
       },
       "errors": {
+        "github-already-exists": "This github handle already exists in another account",  
         "less-than-7-days": "Last account change was less than 7 days ago",
-        "pull-requests-open": "There are pull requests open for this account",
+        "deliverables-open": "There are deliverables open for this account",
         "failed-to-remove": "Failed to remove account",
         "check-requirements": "Check the requirements"
       }
+    },
+    "connect-github": {
+      "title": "Change Handle",
+      "description": "Connect with GitHub and personalize your app profile effortlessly! By clicking the 'Connect' button, you'll use your GitHub login as your handle on the app and your GitHub avatar. It's a seamless way to bring your GitHub identity to our platform.",
+      "errors": {
+        "github-already-exists": "This github handle already exists in another account"
+      }
     }
+   },
+   "notifications-form": {
+      "title": "Notifications",
+      "message": "Allow Bepro Marketplace to send you updates via email. These can include updates to tasks, app updates, etc.",
+      "invalid-email": "Invalid email",
+      "re-send-email": "A confirmation email was sent, please check your inbox and spam box.",
+      "re-send": "Re-send",
+      "success-toast": {
+        "title": "Success",
+        "content": "Email confirmed"
+      }
+   },
+   "email-errors": {
+    "invalid-link": "Invalid confirmation link",
+    "already-confirmed": "Email already confirmed",
+    "expired-link": "This confirmation link is expired. Try re-sending another email.",
+    "failed-to-update": "Failed to update email",
+    "try-again-later": "Something went wrong, try again later"
    }
 }

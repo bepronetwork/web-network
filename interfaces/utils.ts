@@ -5,6 +5,6 @@ export type ProfilePages =
   "voting-power" |
   "payments" |
   "bounties" |
-  "pull-requests" |
+  "deliverables" |
   "proposals" | 
   "my-network";

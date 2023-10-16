@@ -12,9 +12,15 @@ export interface BreakpointOptions {
   xxl?: boolean;
 }
 
+export interface GroupedSelectOption {
+  label: string;
+  options: SelectOption[];
+}
+
 export interface SelectOption {
   label: string;
   value: string | number;
+  selected?: boolean;
 }
 
 export interface MouseEvents {
@@ -57,4 +63,10 @@ export interface TotalFiatNetworks {
   value: number;
   price: number;
   networkId: number;
+}
+
+export interface Field {
+  value?: string | string[] | number;
+  originalValue?: string | string[] | number;
+  error?: string;
 }

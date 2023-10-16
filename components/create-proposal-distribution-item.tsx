@@ -5,7 +5,6 @@ import Avatar from "components/avatar";
 import InputNumber from "components/input-number";
 
 interface Props {
-  githubHandle: string;
   githubLogin: string;
   onChangeDistribution(params: { [key: string]: number }): void;
   isDisable?: boolean;
@@ -15,7 +14,6 @@ interface Props {
 }
 
 export default function CreateProposalDistributionItem({
-  githubHandle,
   githubLogin,
   onChangeDistribution,
   isDisable = false,
@@ -25,7 +23,7 @@ export default function CreateProposalDistributionItem({
 
   function handleValueChange(params: NumberFormatValues) {
     setValue(params.floatValue);
-    onChangeDistribution({ [githubHandle]: params.floatValue || 0 });
+    onChangeDistribution({ [githubLogin]: params.floatValue || 0 });
   }
   // Wasted logic.
   // todo: move within InputNumber itself.
@@ -39,7 +37,7 @@ export default function CreateProposalDistributionItem({
     }
 
     setValue(enhancedValue);
-    onChangeDistribution({ [githubHandle]: enhancedValue || 0 });
+    onChangeDistribution({ [githubLogin]: enhancedValue || 0 });
   }
 
   return (
@@ -47,7 +45,7 @@ export default function CreateProposalDistributionItem({
       {githubLogin && (
         <Avatar userLogin={githubLogin} className="me-2 mt-1" />
       )}
-      <span className="flex-grow-1 caption-small">@{githubHandle}</span>
+      <span className="flex-grow-1 caption-small">@{githubLogin}</span>
       <div className="flex-shrink-0 w-20">
         <InputNumber
           value={value}

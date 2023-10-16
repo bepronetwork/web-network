@@ -1,21 +1,37 @@
-import {NextApiRequest} from "next";
-import {getToken} from "next-auth/jwt";
+import { NextApiHandler } from "next";
+import { getToken } from "next-auth/jwt";
+import getConfig from "next/config";
 
-import {INVALID_JWT_TOKEN} from "helpers/error-messages";
+import { MISSING_JWT_TOKEN } from "helpers/error-messages";
 
-import {Logger} from "services/logging";
+import { Logger } from "services/logging";
 
-Logger.changeActionName(`WithJWT()`);
+import { isMethodAllowed } from "server/utils/http";
 
-const WithJwt = (handler, allowMethods = ['GET']) => {
-  return async (req: NextApiRequest, res) => {
+const { serverRuntimeConfig } = getConfig();
 
-    if (allowMethods.map(v => v.toLowerCase()).includes(req.method.toLowerCase()))
+Logger.changeActionName(`withJWT()`);
+
+export const withJWT = (handler: NextApiHandler, allowedMethods = ['GET']): NextApiHandler => {
+  return async (req, res) => {
+    if (isMethodAllowed(req.method, allowedMethods))
       return handler(req, res);
 
-    if (!await getToken({req}))
-      return res.status(401).json({message: INVALID_JWT_TOKEN});
+    const token = await getToken({ req, secret: serverRuntimeConfig?.auth?.secret });
+    
+    if (!token)
+      return res.status(401).json({ message: MISSING_JWT_TOKEN });
+
+    const bodyWithContext = {
+      ...req.body,
+      context: {
+        ...req.body?.context,
+        token
+      }
+    };
+
+    req.body = bodyWithContext;
+
+    return handler(req, res);
   };
 };
-
-export default WithJwt;

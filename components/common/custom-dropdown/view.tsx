@@ -3,22 +3,37 @@ import { Dropdown } from "react-bootstrap";
 
 import ArrowDown from "assets/icons/arrow-down";
 
+import If from "components/If";
+
 import { CustomDropdownItem } from "types/components";
 
 interface CustomDropdownProps {
   btnContent: ReactNode;
   items: CustomDropdownItem[];
+  withoutArrow?: boolean;
+  className?: string;
+  bg?: "dark" | "light";
+  size?: "sm" | "md";
 }
 
 export default function CustomDropdown({
   btnContent,
   items,
+  withoutArrow,
+  bg = "dark",
+  size = "md",
+  className
 }: CustomDropdownProps) {
   return(
-    <Dropdown className="custom-dropdown">
-      <Dropdown.Toggle className="not-svg">
+    <Dropdown
+      align="end"
+      className={`${className ? className :'custom-dropdown'} ${bg}`}
+    >
+      <Dropdown.Toggle className={`not-svg ${size === "sm" ? "p-0" : ""}`}>
         {btnContent}
-        <ArrowDown />
+        <If condition={!withoutArrow}>
+          <ArrowDown />
+        </If>
       </Dropdown.Toggle>
 
       <Dropdown.Menu>

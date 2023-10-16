@@ -5,16 +5,19 @@ export interface RequestParams {
   wallet?: string;
 }
 export interface User {
-  githubHandle: string;
   githubLogin: string;
   address?: string;
   createdAt: string;
   id: number;
   updatedAt: string;
+  email?: string;
+  isEmailConfirmed?: string;
+  emailVerificationCode?: string;
+  emailVerificationSentAt?: string | Date;
 }
 
 export interface PastEventsParams {
-  id? :number;
+  id?: number;
   fromBlock: number;
   toBlock?: number;
   chainId?: string;
@@ -52,32 +55,18 @@ export interface CreatePrePullRequestParams extends RequestParams {
   issueGithubID: string;
   title: string;
   description: string;
-  username: string;
   branch: string;
 }
 
 export interface CancelPrePullRequestParams extends RequestParams {
-  repoId: string;
-  issueGithubId: string;
   bountyId: string;
-  issueCid: string; 
-  pullRequestGithubId: string;
+  pullRequestId: string;
   customNetworkName: string;
   creator: string;
-  userBranch: string;
-  userRepo: string;
 }
 
 export interface StartWorkingParams extends RequestParams {
-  issueId: string;
-  githubLogin: string;
-}
-
-export interface MergeClosedIssueParams extends RequestParams {
-  issueId: string;
-  pullRequestId: string;
-  mergeProposalId: string | number;
-  address: string;
+  id: string;
 }
 
 export interface CreateReviewParams extends RequestParams {
@@ -95,9 +84,9 @@ export interface PatchUserParams extends RequestParams {
 }
 
 export interface updateIssueParams extends RequestParams {
-  repoId: string | number;
-  ghId: string | number;
+  id: string | number;
   networkName: string;
+  chainName: string;
   body?: string;
   tags?: string[];
 }

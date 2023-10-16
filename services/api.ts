@@ -15,6 +15,27 @@ export const kycApi = axios.create({
   baseURL: `${publicRuntimeConfig?.urls?.kyc}`
 });
 
+api.interceptors.request.use(config => {
+
+  if (typeof window === 'undefined')
+    return config;
+
+  const currentWallet = sessionStorage.getItem("currentWallet") || ''
+  const currentSignature = sessionStorage.getItem("currentSignature") || undefined;
+  const currentChainId = sessionStorage.getItem("currentChainId") || 0;
+
+  if (currentWallet)
+    config.headers["wallet"] = currentWallet;
+
+  if (currentSignature)
+    config.headers["signature"] = currentSignature;
+
+  if (+currentChainId)
+    config.headers["chain"] = +currentChainId;
+
+  return config;
+});
+
 api.interceptors.response.use((response) => response,
                               (error) => {
                                 console.debug("Failed", error);

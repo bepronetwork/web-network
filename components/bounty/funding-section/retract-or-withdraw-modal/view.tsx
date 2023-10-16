@@ -54,7 +54,7 @@ export default function RetractOrWithdrawModalView({
               : t("funding:modals.retract.description")}
           </h4>
 
-          <div className="bg-dark-gray border-radius-8 py-2 px-3 mb-2">
+          <div className="d-flex bg-dark-gray border-radius-8 py-2 px-3 mb-2 justify-content-center">
             <Amount
               amount={retractOrWithdrawAmount}
               symbol={isBountyClosed ? rewardTokenSymbol : tokenSymbol}

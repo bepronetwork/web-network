@@ -8,13 +8,10 @@ import PaymentsNetwork from "components/pages/profile/payments/network/controlle
 
 import { useAppState } from "contexts/app-state";
 
-import { toLower } from "helpers/string";
 import { getPricesAndConvert } from "helpers/tokens";
 
 import { PaymentsPageProps } from "types/pages";
 import { TotalFiatNetworks } from "types/utils";
-
-import useQueryFilter from "x-hooks/use-query-filter";
 
 export default function PaymentsPage({ 
   payments,
@@ -27,7 +24,6 @@ export default function PaymentsPage({
   const [totalFiatNetworks, setTotalFiatNetworks] = useState<TotalFiatNetworks[]>([]);
   
   const { state } = useAppState();
-  const { value, setValue } = useQueryFilter({ wallet: null });
 
   const isNetworkPayments = !!router?.query?.networkName && !!payments?.length;
   const fiatSymbol = state?.Settings?.currency?.defaultFiat?.toUpperCase();
@@ -53,11 +49,6 @@ export default function PaymentsPage({
         setHasNoConvertedToken(!!noConverted.length);
       });
   }, [payments]);
-
-  useEffect(() => {
-    if (!value?.wallet || toLower(value?.wallet) !== toLower(state.currentUser?.walletAddress))
-      setValue({ wallet: state.currentUser?.walletAddress || "" }, true);
-  }, [state.currentUser?.walletAddress]);
 
   if (isNetworkPayments)
     return(

@@ -5,20 +5,23 @@ import {useTranslation} from "next-i18next";
 import { useRouter } from "next/router";
 
 import Button from "components/button";
+import TermsAndConditions from "components/common/terms-and-conditions/view";
 import ConnectWalletButton from "components/connect-wallet-button";
 import Modal from "components/modal";
 import SelectChainDropdown from "components/select-chain-dropdown";
 
 import {useAppState} from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
+import { updateSupportedChains } from "contexts/reducers/change-supported-chains";
 
-import { UNSUPPORTED_CHAIN } from "helpers/constants";
+import { MINUTE_IN_MS, UNSUPPORTED_CHAIN } from "helpers/constants";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
-import useApi from "x-hooks/use-api";
+import { useGetChains } from "x-hooks/api/chain";
 import { useDao } from "x-hooks/use-dao";
 import useNetworkChange from "x-hooks/use-network-change";
+import useReactQuery from "x-hooks/use-react-query";
 
 type typeError = { code?: number; message?: string }
 
@@ -32,13 +35,19 @@ export default function WrongNetworkModal() {
   const [networkChain, setNetworkChain] = useState<SupportedChainData>(null);
   const [chosenSupportedChain, setChosenSupportedChain] = useState<SupportedChainData>(null);
 
-  const api = useApi();
   const { connect } = useDao();
   const { handleAddNetwork } = useNetworkChange();
   const {
     dispatch,
     state: { connectedChain, currentUser, Service, supportedChains, loading, spinners }
   } = useAppState();
+
+  useReactQuery(["supportedChains"], () => useGetChains().then(chains => { 
+    dispatch(updateSupportedChains(chains));
+    return chains; 
+  }), {
+    staleTime: MINUTE_IN_MS
+  });
 
   const isRequired = [
     pathname?.includes("new-network"),
@@ -106,7 +115,6 @@ export default function WrongNetworkModal() {
 
   const isButtonDisabled = () => [isAddingNetwork].some((values) => values);
 
-  useEffect(() => { api.getSupportedChains() }, []);
   useEffect(updateNetworkChain, [Service?.network?.active?.chain_id, supportedChains, query?.network]);
   useEffect(changeShowModal, [
     currentUser?.walletAddress,
@@ -160,26 +168,8 @@ export default function WrongNetworkModal() {
         {error && (
           <p className="caption-small text-uppercase text-danger">{error}</p>
         )}
-        <div className="small-info text-light-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
-          {t("misc.by-connecting")}{" "}
-          <a
-            href="https://www.bepro.network/terms"
-            target="_blank"
-            className="text-decoration-none"
-            rel="noreferrer"
-          >
-            {t("misc.terms-and-conditions")}
-          </a>{" "}
-          <br /> {t("misc.and")}{" "}
-          <a
-            href="https://taikai.network/privacy"
-            target="_blank"
-            className="text-decoration-none"
-            rel="noreferrer"
-          >
-            {t("misc.privacy-policy")}
-          </a>
-        </div>
+
+        <TermsAndConditions />
       </div>
     </Modal>
   );

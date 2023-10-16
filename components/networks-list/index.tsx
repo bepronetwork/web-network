@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {useState} from "react";
 
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
@@ -9,33 +9,28 @@ import NetworkListItem from "components/networks-list/network-list-item";
 import NothingFound from "components/nothing-found";
 
 import {useAppState} from "contexts/app-state";
-import {changeLoadState} from "contexts/reducers/change-load";
 
 import {orderByProperty} from "helpers/array";
 
 import {Network} from "interfaces/network";
 
-import {NetworksPageContext} from "pages/networks";
-
-import useApi from "x-hooks/use-api";
 import {useNetwork} from "x-hooks/use-network";
 
-export default function NetworksList() {
+interface NetworkListProps {
+  networks: Network[];
+}
+
+export default function NetworksList({
+  networks
+}: NetworkListProps) {
   const router = useRouter();
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [order, setOrder] = useState(["name", "asc"]);
-  const [networks, setNetworks] = useState<Network[]>([]);
 
   const { getURLWithNetwork } = useNetwork();
-  const { searchNetworks, getHeaderNetworks } = useApi();
 
-  const { state, dispatch } = useAppState();
-  const { 
-    setNumberOfNetworks, 
-    setNumberOfBounties, 
-    setTotalConverted, 
-  } = useContext(NetworksPageContext);
+  const { state } = useAppState();
 
   function handleOrderChange(newOrder) {
     setOrder(newOrder);
@@ -47,32 +42,6 @@ export default function NetworksList() {
         chain: chainName
     }));
   }
-
-  useEffect(() => {    
-    dispatch(changeLoadState(true));
-
-    getHeaderNetworks()
-      .then(({ TVL, bounties, number_of_network }) => {
-        setTotalConverted(TVL.toFixed() || "0");
-        setNumberOfNetworks(number_of_network || 0);
-        setNumberOfBounties(bounties || 0);
-      })
-      .catch(error => console.log("Failed to retrieve header data", error));
-
-    searchNetworks({
-      isRegistered: true,
-      sortBy: "name",
-      order: "asc",
-      isNeedCountsAndTokensLocked: true
-    })
-      .then(({ rows }) => setNetworks(rows))
-      .catch((error) => {
-        console.log("Failed to retrieve networks list", error);
-      })
-      .finally(() => {
-        dispatch(changeLoadState(false));
-      });
-  }, []);
 
   return (
     <div className="container-xl px-4 px-xl-0">

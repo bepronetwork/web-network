@@ -4,32 +4,41 @@ import {Op} from "sequelize";
 
 import models from "db/models";
 
-import {LogAccess} from "middleware/log-access";
+import { caseInsensitiveEqual } from "helpers/db/conditionals";
 
-import {error as LogError} from "services/logging";
+import { withProtected } from "middleware";
+
+import { Logger } from "services/logging";
 
 enum Actions {
   REGISTER = "register",
-  RESET = "reset"
+  CONNECT_GITHUB = "github"
 }
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {
   let action;
 
   try {
-    const token = await getToken({req});
+    const token = await getToken({ req });
 
-    const githubLogin = token.login;
-    const address = req.body.wallet?.toString().toLowerCase();
+    const githubLogin = token.login.toString();
+    const address = token.address.toString();
 
-    const user = await models.user.findOne({ 
+    const user = await models.user.findOne({
       where: { 
-        [Op.or]: [{ address }, {githubLogin }]
+        [Op.or]: [
+          { 
+            address: caseInsensitiveEqual("address", address)
+          },
+          {
+            githubLogin: caseInsensitiveEqual("githubLogin", githubLogin)
+          }
+        ]
       }
     });
 
     if (!user) action = Actions.REGISTER;
-    else if (user.address && !user.githubLogin && user.resetedAt) action = Actions.RESET;
+    else if (user.address && !user.githubLogin) action = Actions.CONNECT_GITHUB;
 
     if (!action) 
       return res.status(409).json("No actions needed for this user");
@@ -40,25 +49,22 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
         
       await models.user.create({
         address,
-        githubHandle: token.name || githubLogin,
         githubLogin
       });
-    } else if (action === Actions.RESET) {
-      
+    } else if (action === Actions.CONNECT_GITHUB) {
       user.githubLogin = githubLogin;
-      user.githubHandle = token.name || githubLogin;
 
       await user.save();
     }
 
     return res.status(200).json("Success");
   } catch (error) {
-    LogError(`Failed to ${action || "no action"} user`, { req, error: error?.toString() });
+    Logger.error(error, `Failed to ${action || "no action"} user`, { req });
     return res.status(500).json(error?.toString());
   }
 }
 
-export default LogAccess(async function ConnectUser(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "patch":
     await patch(req, res);
@@ -69,4 +75,6 @@ export default LogAccess(async function ConnectUser(req: NextApiRequest, res: Ne
   }
 
   res.end();
-})
+}
+
+export default withProtected(handler);

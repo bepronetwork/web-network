@@ -6,8 +6,6 @@ import BountiesList from "components/bounty/bounties-list/controller";
 import PageHero from "components/common/page-hero/view";
 import CustomContainer from "components/custom-container";
 
-import { BountyEffectsProvider } from "contexts/bounty-effects";
-
 import { ExplorePageProps } from "types/pages";
 
 interface ExplorePageViewProps extends ExplorePageProps {
@@ -20,6 +18,7 @@ export default function ExplorePageView({
   recentBounties,
   recentFunding,
   networkName,
+  activeNetworks,
 }: ExplorePageViewProps) {
   const { t } = useTranslation(["common", "custom-network", "bounty"]);
 
@@ -43,14 +42,14 @@ export default function ExplorePageView({
     t("bounty:sub-title-bounties");
 
   return (
-    <BountyEffectsProvider>
+    <>
       <PageHero
         title={heroTitle}
         subtitle={heroSubTitle}
         infos={infos}
       />
 
-      <ListActiveNetworks />
+      <ListActiveNetworks networks={activeNetworks} />
 
       <ListRecentIssues
         recentBounties={recentBounties}
@@ -67,6 +66,6 @@ export default function ExplorePageView({
           variant="bounty-hall"
         />
       </CustomContainer>
-    </BountyEffectsProvider>
+    </>
   );
 }

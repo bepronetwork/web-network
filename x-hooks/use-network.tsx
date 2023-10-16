@@ -10,15 +10,15 @@ import {
   changeActiveNetwork,
   changeActiveNetworkAmounts,
   changeActiveNetworkTimes,
-  changeAllowedTokens,
   changeNetworkLastVisited
 } from "contexts/reducers/change-service";
 
+import {Network} from "interfaces/network";
 import {ProfilePages} from "interfaces/utils";
 
 import {WinStorage} from "services/win-storage";
 
-import useApi from "x-hooks/use-api";
+import {useSearchNetworks} from "x-hooks/api/network";
 import useChain from "x-hooks/use-chain";
 
 export function useNetwork() {
@@ -26,10 +26,10 @@ export function useNetwork() {
 
   const [networkName, setNetworkName] = useState<string>('');
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
+  const [activeNetworkId, setActiveNetworkId] = useState<number>();
 
   const {state, dispatch} = useAppState();
-  const { chain, findSupportedChain } = useChain();
-  const {searchNetworks, getNetworkTokens} = useApi();
+  const { findSupportedChain } = useChain();
 
   function getStorageKey(networkName: string, chainId: string | number) {
     return `bepro.network:${networkName}:${chainId}`;
@@ -43,6 +43,10 @@ export function useNetwork() {
 
     if (networkName)
       new WinStorage(getStorageKey(networkName, chainId), 0, `sessionStorage`).delete();
+  }
+
+  function dispatchNetworkContextUpdates(network: Network) {
+    dispatch(changeActiveNetwork(network));
   }
 
   async function updateActiveNetwork(forceUpdate = false) {
@@ -62,13 +66,13 @@ export function useNetwork() {
 
         const cachedNetworkData = new WinStorage(storageKey, 3000, `sessionStorage`);
         if (forceUpdate === false && cachedNetworkData.value) {
-          dispatch(changeActiveNetwork(cachedNetworkData.value));
+          dispatchNetworkContextUpdates(cachedNetworkData.value);
           return;
         }
       }
     }
 
-    await searchNetworks({
+    await useSearchNetworks({
       name: queryNetworkName,
       isNeedCountsAndTokensLocked: true
     })
@@ -94,9 +98,10 @@ export function useNetwork() {
 
           const newCachedData = new WinStorage(getStorageKey(data.name, data.chain.chainId), 3600, `sessionStorage`);
           newCachedData.value = data;
+          setActiveNetworkId(data.id);
 
           dispatch(changeNetworkLastVisited(queryNetworkName));
-          dispatch(changeActiveNetwork(newCachedData.value));
+          dispatchNetworkContextUpdates(newCachedData.value);
         }
 
         const available = rows
@@ -147,24 +152,6 @@ export function useNetwork() {
         ...params
       }
     }, `/${path}`);
-  }
-
-  function loadNetworkAllowedTokens() {
-    if (!state?.Service?.network?.active || !chain)
-      return;
-
-    getNetworkTokens({
-      networkName: state?.Service?.network?.active?.name,
-      chainId: chain.chainId.toString()
-    }).then(tokens => {
-      const transactional = [];
-      const reward = [];
-
-      for (const token of tokens)
-        (token.isTransactional ? transactional : reward).push(token);
-
-      dispatch(changeAllowedTokens(transactional, reward));
-    })
   }
 
   function loadNetworkTimes() {
@@ -233,12 +220,12 @@ export function useNetwork() {
 
   return {
     networkName,
+    activeNetworkId,
     updateActiveNetwork,
     getURLWithNetwork,
     clearNetworkFromStorage,
     loadNetworkTimes,
     loadNetworkAmounts,
-    loadNetworkAllowedTokens,
     goToProfilePage,
     updateNetworkAndChainMatch
   }

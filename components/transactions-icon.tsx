@@ -5,11 +5,11 @@ import CompleteIcon from "assets/icons/transactions/complete";
 import { ContestIcon } from "assets/icons/transactions/contest";
 import CurrencyIcon from "assets/icons/transactions/currency";
 import { DelegateIcon } from "assets/icons/transactions/delegate";
+import DeliverableIcon from "assets/icons/transactions/deliverable";
 import EditIcon from "assets/icons/transactions/edit";
 import { LockIcon } from "assets/icons/transactions/lock";
 import MergeIcon from "assets/icons/transactions/merge";
 import { OpenBountyIcon } from "assets/icons/transactions/open-bounty";
-import PullRequestIcon from "assets/icons/transactions/pull-request";
 import ReadyIcon from "assets/icons/transactions/ready";
 import SettingsIcon from "assets/icons/transactions/settings";
 import { TakeBackIcon } from "assets/icons/transactions/take-back";
@@ -36,10 +36,10 @@ export function TransactionIcon({ type } : TransactionIconProps) {
     [TransactionTypes.redeemIssue]: <CancelIcon />,
     [TransactionTypes.approveSettlerToken]: <ApprovalIcon />,
     [TransactionTypes.recognizedAsFinish]: <ReadyIcon />,
-    [TransactionTypes.createPullRequest]: <PullRequestIcon />,
-    [TransactionTypes.makePullRequestReady]: <ReadyIcon />,
+    [TransactionTypes.createDeliverable]: <DeliverableIcon />,
+    [TransactionTypes.makeDeliverableReady]: <ReadyIcon />,
     [TransactionTypes.updateBountyAmount]: <UpdateIcon />,
-    [TransactionTypes.cancelPullRequest]: <CancelIcon />,
+    [TransactionTypes.cancelDeliverable]: <CancelIcon />,
     [TransactionTypes.refuseProposal]: <ContestIcon />,
     [TransactionTypes.deployNetworkV2]: <CurrencyIcon />,
     [TransactionTypes.setNFTDispatcher]: <SettingsIcon />,

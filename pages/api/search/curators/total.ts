@@ -6,9 +6,8 @@ import models from "db/models";
 
 import { resJsonMessage } from "helpers/res-json-message";
 
-import { LogAccess } from "middleware/log-access";
+import { withCORS } from "middleware";
 import { WithValidChainId } from "middleware/with-valid-chain-id";
-import WithCors from "middleware/withCors";
 
 import { error } from "services/logging";
 
@@ -84,4 +83,4 @@ async function TotalCurators(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(WithValidChainId(TotalCurators)));
+export default withCORS(WithValidChainId(TotalCurators));

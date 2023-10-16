@@ -1,24 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+
+import { PageActionsControllerProps } from "components/bounty/page-actions/page-actions";
+import PageActionsView from "components/bounty/page-actions/view";
 
 import { useAppState } from "contexts/app-state";
 import { addToast } from "contexts/reducers/change-toaster";
 
 import { getIssueState } from "helpers/handleTypeIssue";
 
-import { NetworkEvents } from "interfaces/enums/events";
-
-import useApi from "x-hooks/use-api";
-import useBepro from "x-hooks/use-bepro";
-
-import { PageActionsControllerProps } from "./page-actions";
-import PageActionsView from "./view";
+import { useStartWorking } from "x-hooks/api/bounty";
+import { useNetwork } from "x-hooks/use-network";
 
 export default function PageActions({
-  isRepoForked = false,
-  addNewComment,
   handleEditIssue,
   isEditIssue,
   currentBounty,
@@ -26,28 +22,30 @@ export default function PageActions({
 }: PageActionsControllerProps) {
   const { t } = useTranslation([
     "common",
-    "pull-request",
+    "deliverable",
     "bounty",
     "proposal",
   ]);
 
   const {
-    query: { repoId },
+    query,
+    push
   } = useRouter();
 
   const [isExecuting, setIsExecuting] = useState(false);
-  const [showPRModal, setShowPRModal] = useState(false);
 
   const { state, dispatch } = useAppState();
-  const { handleCreatePullRequest } = useBepro();
-  const {
-    createPrePullRequest,
-    cancelPrePullRequest,
-    startWorking,
-    processEvent,
-  } = useApi();
+  const { getURLWithNetwork } = useNetwork();
 
-  const issueGithubID = currentBounty?.githubId;
+  function getDeliverablesAbleToBeProposed() {
+    const isProposalValid = p => !p?.isDisputed && !p?.isMerged && !p?.refusedByBountyOwner;
+    const deliverables = currentBounty?.deliverables;
+    const deliverableIdsOfValidProposals = 
+      currentBounty?.mergeProposals?.filter(isProposalValid)?.map(p => p?.deliverableId) || [];
+    return deliverables.filter(d => !deliverableIdsOfValidProposals.includes(d.id) && d.markedReadyForReview);
+  }
+
+  const deliverablesAbleToBeProposed = getDeliverablesAbleToBeProposed();
   const isCouncilMember = !!state.Service?.network?.active?.isCouncil;
   const isBountyReadyToPropose = !!currentBounty?.isReady;
   const bountyState = getIssueState({
@@ -55,20 +53,11 @@ export default function PageActions({
     amount: currentBounty?.amount,
     fundingAmount: currentBounty?.fundingAmount,
   });
-  const hasPullRequests = 
-    !!currentBounty?.pullRequests?.filter((pullRequest) => pullRequest?.status !== "canceled")?.length;
   const isWalletConnected = !!state.currentUser?.walletAddress;
-  const isGithubConnected = !!state.currentUser?.login;
-  const isBountyOpen =
-    currentBounty?.isClosed === false &&
-    currentBounty?.isCanceled === false;
+  const isBountyOpen = currentBounty?.isClosed === false && currentBounty?.isCanceled === false;
   const isBountyInDraft = !!currentBounty?.isDraft;
-  const isWorkingOnBounty = !!currentBounty?.working?.find((login) => login === state.currentUser?.login);
-  const isBountyOwner =
-  isWalletConnected &&
-  currentBounty?.creatorAddress &&
-  currentBounty?.creatorAddress ===
-    state.currentUser?.walletAddress
+  const isWorkingOnBounty = !!currentBounty?.working?.find(id => +id === +state.currentUser?.id);
+  const isBountyOwner = isWalletConnected && currentBounty?.user?.address === state.currentUser?.walletAddress;
   const isFundingRequest = !!currentBounty?.isFundingRequest
   const isStateToWorking = ["proposal", "open", "ready"].some((value) => value === bountyState)
   const isUpdateAmountButton =
@@ -80,140 +69,51 @@ export default function PageActions({
     !isEditIssue;
   const isStartWorkingButton =
     isWalletConnected &&
-    isGithubConnected &&
     !isBountyInDraft &&
     isBountyOpen &&
     !isWorkingOnBounty &&
-    isRepoForked &&
-    isStateToWorking &&
-    !!state.currentUser?.accessToken
-  const isForkRepositoryLink =
-    isGithubConnected && !isBountyInDraft && isBountyOpen && !isRepoForked;
+    isStateToWorking;
   const isEditButton = isWalletConnected && isBountyInDraft && isBountyOwner;
 
   const rest = {
     isUpdateAmountButton,
     isStartWorkingButton,
-    isForkRepositoryLink,
     isEditButton,
     isBountyInDraft,
     isWalletConnected,
-    isGithubConnected,
     isWorkingOnBounty,
     isBountyOpen,
     isCreatePr:
       isWalletConnected &&
-      isGithubConnected &&
       isBountyOpen &&
       !isBountyInDraft &&
-      isWorkingOnBounty &&
-      isRepoForked,
+      isWorkingOnBounty,
     isCreateProposal:
       isWalletConnected &&
       isCouncilMember &&
       isBountyOpen &&
       isBountyReadyToPropose &&
-      hasPullRequests,
+      !!deliverablesAbleToBeProposed?.length,
   };
 
-  async function handlePullrequest({
-    title: prTitle,
-    description: prDescription,
-    branch,
-  }): Promise<void> {
-    let pullRequestPayload = undefined;
-
-    await createPrePullRequest({
-      repoId: String(repoId),
-      issueGithubID,
-      title: prTitle,
-      description: prDescription,
-      username: state.currentUser?.login,
-      branch,
-      wallet: state.currentUser.walletAddress,
-    })
-      .then(({
-          bountyId,
-          originRepo,
-          originBranch,
-          originCID,
-          userRepo,
-          userBranch,
-          cid,
-        }) => {
-        pullRequestPayload = {
-            repoId,
-            issueGithubId: issueGithubID,
-            bountyId,
-            issueCid: originCID,
-            pullRequestGithubId: cid,
-            customNetworkName: state.Service?.network?.lastVisited,
-            creator: userRepo.split("/")[0],
-            userBranch,
-            userRepo,
-            wallet: state.currentUser.walletAddress,
-        };
-
-        return handleCreatePullRequest(bountyId,
-                                       originRepo,
-                                       originBranch,
-                                       originCID,
-                                       userRepo,
-                                       userBranch,
-                                       cid);
-      })
-      .then((txInfo) => {
-        return processEvent(NetworkEvents.PullRequestCreated, undefined, {
-          fromBlock: (txInfo as { blockNumber: number }).blockNumber,
-        });
-      })
-      .then(() => {
-        setShowPRModal(false);
-        dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("pull-request:actions.create.success"),
-        }));
-
-        return updateBountyData(true);
-      })
-      .catch((err) => {
-        if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
-
-        if (err.response?.status === 422 && err.response?.data) {
-          err.response?.data?.map((item) =>
-            dispatch(addToast({
-                type: "danger",
-                title: t("actions.failed"),
-                content: item.message,
-            })));
-        } else {
-          dispatch(addToast({
-              type: "danger",
-              title: t("actions.failed"),
-              content: t("pull-request:actions.create.error"),
-          }));
-        }
-      });
+  function onCreateDeliverableClick() {
+    push(getURLWithNetwork("/bounty/[id]/create-deliverable", query));
   }
 
   async function handleStartWorking() {
     setIsExecuting(true);
 
-    startWorking({
-      issueId: currentBounty?.issueId,
-      githubLogin: state.currentUser?.login,
-      networkName: state.Service?.network?.active?.name,
-      wallet: state.currentUser.walletAddress,
+    useStartWorking({
+      id: currentBounty?.id,
+      networkName: state.Service?.network?.active?.name
     })
-      .then((response) => {
+      .then(() => {
         dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("bounty:actions.start-working.success"),
         }));
 
-        addNewComment(response.data);
         return updateBountyData();
       })
       .then(() => setIsExecuting(false))
@@ -228,19 +128,16 @@ export default function PageActions({
         setIsExecuting(false);
       });
   }
-
+  
   return (
     <PageActionsView
-      ghVisibility={state.Service?.network?.repos?.active?.ghVisibility}
-      showPRModal={showPRModal}
-      handleShowPRModal={setShowPRModal}
       isExecuting={isExecuting}
-      handlePullrequest={handlePullrequest}
+      onCreateDeliverableClick={onCreateDeliverableClick}
       handleStartWorking={handleStartWorking}
       handleEditIssue={handleEditIssue}
-      currentUser={state.currentUser}
       bounty={currentBounty}
       updateBountyData={updateBountyData}
+      deliverables={deliverablesAbleToBeProposed}
       {...rest}
     />
   );

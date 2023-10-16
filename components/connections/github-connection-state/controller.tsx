@@ -1,22 +1,23 @@
-import { useAppState } from "../../../contexts/app-state";
-import { useAuthentication } from "../../../x-hooks/use-authentication";
-import GithubConnectionStateView from "./view";
+import GithubConnectionStateView from "components/connections/github-connection-state/view";
+
+import { useAppState } from "contexts/app-state";
+
+import { useAuthentication } from "x-hooks/use-authentication";
 
 interface GithubConnectionStateProps {
-  handleClickDisconnect?: () => void;
+  onHandleClickDisconnect?: () => void;
 }
 
 export default function GithubConnectionState({
-  handleClickDisconnect,
+  onHandleClickDisconnect,
 }: GithubConnectionStateProps) {
   const { state } = useAppState();
-  const { connectWallet, connectGithub } = useAuthentication();
+  const {  signInWallet } = useAuthentication();
 
   return (
     <GithubConnectionStateView
-      connectGithub={connectGithub}
-      connectWallet={connectWallet}
-      handleClickDisconnect={handleClickDisconnect}
+      connectWallet={signInWallet}
+      onHandleClickDisconnect={onHandleClickDisconnect}
       userLogin={state?.currentUser?.login}
       walletAddress={state.currentUser?.walletAddress}
     />

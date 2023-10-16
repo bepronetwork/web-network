@@ -4,40 +4,78 @@ import { useTranslation } from "next-i18next";
 
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
+import Button from "components/button";
+import Switch from "components/common/switch/view";
 import GithubConnectionState from "components/connections/github-connection-state/controller";
+import RemoveGithubAccount from "components/connections/remove-github-modal/controller";
 import CustomContainer from "components/custom-container";
+import { Divider } from "components/divider";
+import If from "components/If";
+import AddressWithCopy from "components/profile/address-with-copy/controller";
 import ProfileLayout from "components/profile/profile-layout";
-import { RemoveGithubAccount } from "components/profile/remove-github-modal";
 import ResponsiveWrapper from "components/responsive-wrapper";
-
-import { truncateAddress } from "helpers/truncate-address";
 
 import useBreakPoint from "x-hooks/use-breakpoint";
 
+import ConnectGithubAccount from "../../../connections/connect-github-modal/controller";
+
 interface ProfilePageViewProps {
   userLogin: string;
+  userEmail?: string;
+  isNotificationEnabled: boolean;
   walletAddress: string;
   isCouncil: boolean;
-  handleClickDisconnect: () => void;
-  hideRemoveModal: () => void;
   showRemoveModal: boolean;
-  disconnectGithub: () => void;
+  showConnectModal: boolean;
+  isSaveButtonDisabled: boolean;
+  isSwitchDisabled: boolean;
+  isEmailInvalid: boolean;
+  isConfirmationPending: boolean;
+  isExecuting: boolean;
+  emailVerificationError?: string;
+  onHandleClickDisconnect: () => void;
+  onHideRemoveModal: () => void;
+  onDisconnectGithub: () => void;
+  onHandleEmailChange: (e) => void;
+  onSave: () => void;
+  onResend: () => void;
+  onSwitchChange: (value: boolean) => void;
+  onHideModalClick: () => void;
+  onChangeMyHandleClick: () => void;
+  onConnectGithub: () => void;
 }
 
 export default function ProfilePageView({
   userLogin,
   walletAddress,
+  userEmail,
+  isNotificationEnabled,
   isCouncil,
-  handleClickDisconnect,
-  hideRemoveModal,
-  disconnectGithub,
   showRemoveModal,
+  showConnectModal,
+  isSaveButtonDisabled,
+  isSwitchDisabled,
+  isEmailInvalid,
+  isConfirmationPending,
+  isExecuting,
+  emailVerificationError,
+  onHandleClickDisconnect,
+  onHideRemoveModal,
+  onDisconnectGithub,
+  onHandleEmailChange,
+  onSave,
+  onResend,
+  onSwitchChange,
+  onHideModalClick,
+  onChangeMyHandleClick,
+  onConnectGithub
 }: ProfilePageViewProps) {
   const { t } = useTranslation(["common", " profile"]);
 
   const { isMobileView, isTabletView } = useBreakPoint();
 
   const isTabletOrMobile = isMobileView || isTabletView ? true : false;
+  const handleClasses = "text-white xl-semibold font-weight-medium text-truncate";
 
   return (
     <>
@@ -50,7 +88,7 @@ export default function ProfilePageView({
       </div>
 
       <ProfileLayout>
-        <div className="row mb-5">
+        <div className="row mb-4">
           <div className="col">
             <div
               className={`${
@@ -61,15 +99,38 @@ export default function ProfilePageView({
                 user={userLogin}
                 address={walletAddress}
                 size={isTabletOrMobile ? "md" : "lg"}
+                withBorder
               />
-              <div className="text-truncate">
-                <h4
-                  className={`${
-                    isTabletOrMobile ? "ms-2" : "mt-2"
-                  } text-gray-100 font-weight-medium text-uppercase text-truncate mr-2`}
+              <div className={`d-flex flex-column ${isTabletOrMobile ? "ms-2" : "mt-2" } text-truncate`}>
+                <If
+                  condition={!!userLogin}
+                  otherwise={
+                    <div className="d-flex flex-wrap">
+                      <AddressWithCopy
+                        address={walletAddress}
+                        textClass={handleClasses}
+                        truncated
+                      />
+                      <ResponsiveWrapper md={true} xs={false}>
+                        <Button className="ms-3" onClick={onChangeMyHandleClick}>
+                          {t("profile:actions.change-my-handle")}
+                        </Button>
+                      </ResponsiveWrapper>
+                    </div>
+                  }
                 >
-                  {userLogin ? userLogin : truncateAddress(walletAddress)}
-                </h4>
+                  <span className={handleClasses}>
+                    {userLogin}
+                  </span>
+                </If>
+
+                <If condition={!!userLogin}>
+                  <AddressWithCopy
+                    address={walletAddress}
+                    textClass="caption-medium font-weight-normal text-capitalize text-gray-300"
+                    truncated
+                  />
+                </If>
               </div>
             </div>
             {isCouncil && (
@@ -82,18 +143,120 @@ export default function ProfilePageView({
           </div>
         </div>
 
-        <div className="row mb-3">
+        <If condition={!userLogin}>
+          <ResponsiveWrapper md={false} xs={true}>
+            <div className="col">
+              <div className="row mx-0">
+                <Button onClick={onChangeMyHandleClick}>
+                  {t("profile:actions.change-my-handle")}
+                </Button>
+              </div>
+            </div>
+          </ResponsiveWrapper>
+        </If>
+
+        <Divider bg="gray-850" />
+
+        <div className="row mb-4 mt-4">
+          <div className="col-12 col-lg-8">
+            <div className="d-flex align-items-center justify-content-between mb-1">
+              <span className="base-medium text-white">{t("profile:notifications-form.title")}</span>
+
+              <Switch
+                value={isNotificationEnabled}
+                onChange={onSwitchChange}
+                disabled={isSwitchDisabled}
+              />  
+            </div>
+
+            <div className="row">
+              <span className="text-gray-500 xs-medium font-weight-normal">
+              {t("profile:notifications-form.message")}
+              </span>
+            </div>
+
+            <If condition={isNotificationEnabled}>
+              <div className="row mt-3 align-items-center gap-2 gap-md-0">
+                <div className="col-12 col-md-6">
+                  <input 
+                    type="text" 
+                    className={`form-control ${isEmailInvalid ? "is-invalid" : ""}`}
+                    value={userEmail} 
+                    onChange={onHandleEmailChange}
+                    disabled={isExecuting}
+                  />
+
+                  <If condition={isEmailInvalid}>
+                    <small className="xs-small text-danger">{t("profile:notifications-form.invalid-email")}</small>
+                  </If>
+                </div>
+
+                <div className="col-12 col-md-auto">
+                  <div className="row mx-0">
+                    <Button
+                      onClick={onSave}
+                      disabled={isSaveButtonDisabled}
+                      isLoading={isExecuting}
+                    >
+                      {t("actions.save")}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <If condition={!!emailVerificationError}>
+                <div className="row align-items-center mt-3">
+                  <div className="col-6">
+                    <small className="xs-medium text-danger">
+                      {t(`profile:email-errors.${emailVerificationError}`)}
+                    </small>
+                  </div>
+
+                  <div className="col-auto">
+                    <Button
+                      onClick={onResend}
+                      disabled={isExecuting || !emailVerificationError}
+                      isLoading={emailVerificationError && isExecuting}
+                    >
+                       {t("profile:notifications-form.re-send")}
+                    </Button>
+                  </div>
+                </div>
+              </If>
+
+              <If condition={isConfirmationPending && !emailVerificationError}>
+                <div className="row align-items-center mt-3">
+                  <div className="col">
+                    <span className="text-info xs-medium font-weight-normal">
+                      {t("profile:notifications-form.re-send-email")}
+                    </span>
+                  </div>
+                </div>
+              </If>
+            </If>
+          </div>
+        </div>
+
+        <Divider bg="gray-850" />
+
+        <div className="row mt-4 mb-3">
           <span className="caption text-white text-capitalize font-weight-medium">{t("profile:connections")}</span>
         </div>
 
-        <GithubConnectionState handleClickDisconnect={handleClickDisconnect} />
+        <GithubConnectionState onHandleClickDisconnect={onHandleClickDisconnect} />
 
         <RemoveGithubAccount
           show={showRemoveModal}
           githubLogin={userLogin}
           walletAddress={walletAddress}
-          onCloseClick={hideRemoveModal}
-          disconnectGithub={disconnectGithub}
+          onCloseClick={onHideRemoveModal}
+          onDisconnectGithub={onDisconnectGithub}
+        />
+
+        <ConnectGithubAccount 
+          show={showConnectModal} 
+          onCloseClick={onHideModalClick}
+          onOkClick={onConnectGithub}        
         />
       </ProfileLayout>
     </>

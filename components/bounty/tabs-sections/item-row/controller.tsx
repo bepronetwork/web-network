@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { useAppState } from "contexts/app-state";
 
-import { IssueBigNumberData, PullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, Deliverable } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import { useNetwork } from "x-hooks/use-network";
@@ -14,45 +14,48 @@ import { useNetwork } from "x-hooks/use-network";
 import ItemRowView from "./view";
 
 interface ItemRowProps {
-  item: Proposal | PullRequest;
+  item: Proposal | Deliverable;
   isProposal: boolean;
   currentBounty: IssueBigNumberData;
-  approvalsRequired: number;
-  canUserApprove: boolean;
 }
 
 export default function ItemRow({
   item,
   isProposal,
-  currentBounty,
-  approvalsRequired,
-  canUserApprove,
+  currentBounty
 }: ItemRowProps) {
   const { state } = useAppState();
 
   const router = useRouter();
   const { getURLWithNetwork } = useNetwork();
 
-  const pathRedirect = isProposal ? "/proposal" : "/pull-request";
-  const valueRedirect = {
-    id: currentBounty?.githubId,
-    repoId: currentBounty?.repository_id,
-    prId: undefined,
-    proposalId: undefined,
+  const pathRedirect = isProposal ? "bounty/[id]/proposal/[proposalId]" : "bounty/[id]/deliverable/[deliverableId]";
+  const valueRedirect: {
+    id: number | string;
+    deliverableId?: number;
+    proposalId?: number;
+    review?: boolean;
+  } = {
+    id: currentBounty?.id
   };
   const status = [];
 
-  const proposal = currentBounty?.mergeProposals?.find((proposal) => proposal.contractId === +item?.contractId);
+  const proposal = currentBounty?.mergeProposals?.find((proposal) => 
+                                                        proposal.contractId === +(item as Proposal)?.contractId);
   const isDisputed = !!proposal?.isDisputed;
   const isMerged = (item as Proposal)?.isMerged;
-
+  const isCanceledDeliverable = !!(item as Deliverable)?.canceled;
+  const isDraftDeliverable = !isCanceledDeliverable && !(item as Deliverable)?.markedReadyForReview;
   if (!isProposal) {
     status.push({
-      merged: (item as PullRequest)?.merged,
-      isMergeable: (item as PullRequest)?.isMergeable,
-      isDraft: (item as PullRequest)?.status === "draft",
+      merged: (item as Deliverable)?.accepted,
+      isMergeable:
+        (item as Deliverable)?.markedReadyForReview &&
+        !currentBounty?.deliverables?.find((d) => d.accepted) &&
+        !(item as Deliverable)?.canceled,
+      isDraft: isDraftDeliverable,
     });
-    valueRedirect.prId = (item as PullRequest)?.githubId;
+    valueRedirect.deliverableId = (item as Deliverable)?.id;
   } else if (proposal) {
     if (isDisputed || isMerged) {
       status.push({
@@ -64,26 +67,27 @@ export default function ItemRow({
     valueRedirect.proposalId = item?.id;
   }
 
-  const approvalsCurrentPr = (item as PullRequest)?.approvals?.total || 0;
-  const shouldRenderApproveButton =
-    approvalsCurrentPr < approvalsRequired && canUserApprove && !isProposal;
   const itemId = isProposal
-    ? item?.contractId + 1
-    : (item as PullRequest)?.githubId;
+    ? (item as Proposal)?.contractId + 1
+    : (item as Deliverable)?.id;
+
   const totalToBeDisputed = BigNumber(state.Service?.network?.amounts?.percentageNeededForDispute)
     .multipliedBy(state.Service?.network?.amounts?.totalNetworkToken)
     .dividedBy(100);
+
+  const isCurator = !!state?.Service?.network?.active?.isCouncil;
+
   const btnLabel = isProposal
     ? "actions.view-proposal"
-    : (item as PullRequest)?.status === "draft"
-    ? "actions.view-pull-request"
+    : (isDraftDeliverable || isCanceledDeliverable || !isCurator)
+    ? "actions.view-deliverable"
     : "actions.review";
 
   function handleBtn(ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     ev.preventDefault();
-    router.push?.(getURLWithNetwork(pathRedirect, {
-        ...valueRedirect,
-        review: (item as PullRequest)?.status === "ready",
+    router.push(getURLWithNetwork(pathRedirect, {
+      ...valueRedirect,
+      ... !isProposal ? { review: (item as Deliverable)?.markedReadyForReview } : {}
     }));
   }
 
@@ -94,11 +98,9 @@ export default function ItemRow({
       item={item}
       href={getURLWithNetwork(pathRedirect, valueRedirect)}
       handleBtn={handleBtn}
-      githubPath={state.Service?.network?.repos?.active?.githubPath}
       isProposal={isProposal}
       status={status}
       btnLabel={btnLabel}
-      shouldRenderApproveButton={shouldRenderApproveButton}
       proposal={proposal}
       isDisputed={isDisputed}
       isMerged={isMerged}

@@ -1,6 +1,5 @@
 import {isZeroAddress} from "ethereumjs-util";
 import {NextApiRequest, NextApiResponse} from "next";
-import getConfig from "next/config";
 import {Op} from "sequelize";
 import {isAddress} from "web3-utils";
 
@@ -11,8 +10,7 @@ import {resJsonMessage} from "helpers/res-json-message";
 
 import {MiniChainInfo} from "interfaces/mini-chain";
 
-import {withCors} from "middleware";
-import {AdminRoute} from "middleware/admin-route";
+import {AdminRoute} from "middleware";
 
 import {error} from "services/logging";
 
@@ -30,11 +28,6 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
     [body.eventsApi, 'missing events api'],
     [body.explorer, 'missing explorer'],
   ].filter(([value]) => !value).map(([,error]) => error);
-
-  const {publicRuntimeConfig} = getConfig();
-  const {wallet} = req.headers;
-  if ((wallet as string)?.toLowerCase() !== publicRuntimeConfig.adminWallet.toLowerCase())
-    return res.status(401).json({message: 'nope.'});
 
   if (missingValues.length)
     return res.status(400).json({message: missingValues});
@@ -188,4 +181,4 @@ async function ChainMethods(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(AdminRoute(ChainMethods));
+export default AdminRoute(ChainMethods);

@@ -96,7 +96,7 @@ export default function PaymentsNetworkView({
                 onClick={goToBounty(payment)}
                 outline
               >
-                {t("misc.bounty")} #{payment?.issue?.issueId}
+                {t("misc.bounty")} #{payment?.issue?.id}
               </Button>
             </div>
           </div>

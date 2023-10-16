@@ -18,7 +18,7 @@ interface PullAndProposalHeroViewPRops {
   createdAt: Date;
   creatorAddress: string;
   issueTitle: string;
-  issueGithubId: string;
+  issueId: string;
   issueAmount: BigNumber;
   transactionalTokenSymbol: string;
   isProposal: boolean;
@@ -31,13 +31,13 @@ export default function PullAndProposalHeroView({
   createdAt,
   creatorAddress,
   issueTitle,
-  issueGithubId,
+  issueId,
   isProposal,
   issueAmount,
   transactionalTokenSymbol,
   onBackClick,
 }: PullAndProposalHeroViewPRops) {
-  const { t } = useTranslation([isProposal ? "proposal" : "pull-request", "common"]);
+  const { t } = useTranslation([isProposal ? "proposal" : "deliverable", "common"]);
 
   return (
     <div className="w-100 border-bottom border-gray-800">
@@ -55,7 +55,7 @@ export default function PullAndProposalHeroView({
 
           <div className="col-auto px-0">
             <span className="me-2 text-gray-500 caption-large font-weight-medium">
-              #{issueGithubId}
+              #{issueId}
             </span>
           </div>
 

@@ -5,8 +5,7 @@ import models from "db/models";
 
 import { handleCreateSettlerToken } from "helpers/handleNetworkTokens";
 
-import { AdminRoute } from "middleware/admin-route";
-import WithCors from "middleware/withCors";
+import { AdminRoute } from "middleware";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { address, minAmount, chainId } = req.body;
@@ -39,4 +38,4 @@ async function Token(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default WithCors(AdminRoute(Token));
+export default AdminRoute(Token);

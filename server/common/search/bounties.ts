@@ -19,10 +19,9 @@ export default async function get(query: ParsedUrlQuery) {
     visible,
     creator,
     proposer,
-    pullRequester,
+    deliverabler,
     network,
     networkName,
-    repoId,
     transactionalTokenAddress,
     time,
     search,
@@ -39,12 +38,13 @@ export default async function get(query: ParsedUrlQuery) {
   if (["disputable", "mergeable", "proposable"].includes(state?.toString()))
     defaultStatesToIgnore.push("closed", "draft");
 
-  // Issue table columns
-  whereCondition.state = {
-    [Op.notIn]: defaultStatesToIgnore
-  };
+  if (!creator)
+    // Issue table columns
+    whereCondition.state = {
+      [Op.notIn]: defaultStatesToIgnore
+    };
 
-  if (state && !["disputable", "mergeable"].includes(state.toString())) {
+  if (state && !["disputable", "mergeable"].includes(state?.toString())) {
     if (state === "funding")
       whereCondition.fundingAmount = {
         [Op.and]: [
@@ -64,7 +64,7 @@ export default async function get(query: ParsedUrlQuery) {
   }
 
   if (issueId) 
-    whereCondition.issueId = issueId;
+    whereCondition.id = +issueId;
 
   if (chainId) 
     whereCondition.chain_id = +chainId;
@@ -73,11 +73,6 @@ export default async function get(query: ParsedUrlQuery) {
     whereCondition.visible = isTrue(visible.toString());
   else if (visible !== "both")
     whereCondition.visible = true;
-
-  if (creator) 
-    whereCondition.creatorAddress = {
-      [Op.iLike]: `%${creator.toString()}%`
-    };
 
   // Time filter
   if (time) {
@@ -132,16 +127,14 @@ export default async function get(query: ParsedUrlQuery) {
                         }
                     ] : []);
 
-  const pullRequestAssociation = 
-    getAssociation( "pullRequests", 
+  const deliverableAssociation = 
+    getAssociation( "deliverables", 
                     undefined, 
-                    !!pullRequester, 
-                    {
-                      status: {
-                        [Op.not]: "canceled",
-                      },
-                      ... pullRequester ? { userAddress: { [Op.iLike]: pullRequester.toString() } } : {}
-                    });
+                    false, 
+                    {},
+                    [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
+                      address: { [Op.iLike]: deliverabler?.toString() }
+                    }: {})]);
 
   const networkAssociation = 
     getAssociation( "network", 
@@ -154,19 +147,15 @@ export default async function get(query: ParsedUrlQuery) {
                       chainShortName: { [Op.iLike]: chain.toString()}
                     } : {})]);
 
-  const repositoryAssociation = 
-    getAssociation( "repository", 
-                    ["id", "githubPath"], 
-                    !!repoId, 
-                    repoId ? { 
-                      id: +repoId
-                    } : {});
-
   const transactionalTokenAssociation = 
     getAssociation( "transactionalToken", 
                     ["address", "name", "symbol"], 
                     !!transactionalTokenAddress, 
                     transactionalTokenAddress ? { address: { [Op.iLike]: transactionalTokenAddress.toString() } } : {});
+
+  const userAssociation = getAssociation("user", undefined, !!creator, creator ? {
+    address: caseInsensitiveEqual("user.address", creator.toString())
+  } : {});
 
   const COLS_TO_CAST = ["amount", "fundingAmount"];
   const RESULTS_LIMIT = count ? +count : undefined;
@@ -187,7 +176,7 @@ export default async function get(query: ParsedUrlQuery) {
 
     sort.push(...columns);
   } else
-    sort.push("updatedAt");
+    sort.push("createdAt");
 
   const useSubQuery = isMergeableState || isDisputableState ? false : undefined;
 
@@ -198,9 +187,9 @@ export default async function get(query: ParsedUrlQuery) {
     include: [
       networkAssociation,
       proposalAssociation,
-      pullRequestAssociation,
-      repositoryAssociation,
+      deliverableAssociation,
       transactionalTokenAssociation,
+      userAssociation,
     ]
   }, { page: PAGE }, [[...sort, order || "DESC"]], RESULTS_LIMIT));
 

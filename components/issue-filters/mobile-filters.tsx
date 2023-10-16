@@ -5,6 +5,8 @@ import FilterIcon from "assets/icons/filter-icon";
 import Button from "components/button";
 import MobileFiltersModal from "components/issue-filters/mobile-filters-modal";
 
+import { SupportedChainData } from "interfaces/supported-chain-data";
+
 import { SortOption } from "types/components";
 
 interface IssueMobileFiltersProps {
@@ -12,7 +14,7 @@ interface IssueMobileFiltersProps {
   onlyProfileFilters?: boolean;
   sortOptions?: SortOption[];
   hideSort?: boolean;
-  showChainSelector?: boolean;
+  chainOptions?: SupportedChainData[];
 }
 
 export default function IssueMobileFilters({
@@ -20,7 +22,7 @@ export default function IssueMobileFilters({
   onlyProfileFilters = false,
   sortOptions,
   hideSort,
-  showChainSelector = false
+  chainOptions,
 }: IssueMobileFiltersProps) {
   const [showModal, setShowModal] = useState(false);
 
@@ -49,7 +51,7 @@ export default function IssueMobileFilters({
         onlyProfileFilters={onlyProfileFilters}
         sortOptions={sortOptions}
         hideSort={hideSort}
-        showChainSelector={showChainSelector}
+        chainOptions={chainOptions}
       />
     </>
   );

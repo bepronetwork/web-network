@@ -3,8 +3,8 @@ import { Row } from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
 
-import Delegations from "components/profile/pages/voting-power/delegations/controller";
 import { Divider } from "components/divider";
+import Delegations from "components/profile/pages/voting-power/delegations/controller";
 import OraclesActions from "components/profile/pages/voting-power/oracles/actions/controller";
 import OraclesDelegate from "components/profile/pages/voting-power/oracles/delegate/controller";
 import TotalVotes from "components/profile/pages/voting-power/total-votes/view";
@@ -20,6 +20,7 @@ interface OracleToken {
 interface VotingPowerNetworkViewProps {
     oraclesLocked: BigNumber;
     oraclesDelegatedToMe: BigNumber;
+    oraclesDelegatedToOthers: BigNumber;
     oracleToken: OracleToken;
     votesSymbol: string;
     walletAddress: string;
@@ -33,6 +34,7 @@ interface VotingPowerNetworkViewProps {
 export default function VotingPowerNetworkView({
     oraclesLocked,
     oraclesDelegatedToMe,
+    oraclesDelegatedToOthers,
     oracleToken,
     votesSymbol,
     walletAddress,
@@ -48,6 +50,7 @@ export default function VotingPowerNetworkView({
       <TotalVotes
         votesLocked={oraclesLocked}
         votesDelegatedToMe={oraclesDelegatedToMe}
+        votesDelegatedToOthers={oraclesDelegatedToOthers}
         icon={oracleToken.icon}
         tokenName={oracleToken.name}
         tokenSymbol={oracleToken.symbol}

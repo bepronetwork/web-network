@@ -25,12 +25,15 @@ export default function VotingPowerRowView({
   key,
 }: VotingPowerDataProps) {
   const { t } = useTranslation(["common"]);
+
+  const votesDelegatedToOthers = delegations?.reduce((acc, curr) => acc.plus(curr?.amount), BigNumber("0"));
   
   return (
     <div className="col-12" key={key}>
       <TotalVotes
         votesLocked={BigNumber(tokensLocked)}
         votesDelegatedToMe={BigNumber(delegatedToMe)}
+        votesDelegatedToOthers={votesDelegatedToOthers}
         icon={<Indicator bg={network?.colors?.primary} size="lg" />}
         tokenColor={network?.colors?.primary}
         tokenName={network?.networkToken?.name}

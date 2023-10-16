@@ -19,6 +19,7 @@ import {
   DEFAULT_ORACLE_EXCHANGE_RATE,
   DEFAULT_PERCENTAGE_FOR_DISPUTE,
   DEFAULT_PROPOSER_FEE,
+  STATIC_URL_PATHS,
   UNSUPPORTED_CHAIN
 } from "helpers/constants";
 import {DefaultNetworkSettings} from "helpers/custom-network";
@@ -32,9 +33,8 @@ import {Token} from "interfaces/token";
 import DAO from "services/dao-service";
 import {WinStorage} from "services/win-storage";
 
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network/use-search-networks";
 import useNetworkTheme from "x-hooks/use-network-theme";
-import useOctokit from "x-hooks/use-octokit";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
@@ -57,8 +57,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const {state} = useAppState();
   const { DefaultTheme } = useNetworkTheme();
-  const { getUserRepositories } = useOctokit();
-  const { searchNetworks, searchRepositories } = useApi();
 
   const IPFS_URL = state.Settings?.urls?.ipfs;
   const LIMITS = {
@@ -70,7 +68,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const isCreating = useMemo(() => ["/new-network", "/setup"].includes(router.pathname), [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
-  const isSetup = useMemo(() => router.pathname === "/setup", [router.pathname]);
   const network =
     useMemo(() =>
       forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
@@ -151,11 +148,6 @@ export const NetworkSettingsProvider = ({ children }) => {
       newState.details.iconLogo.validated,
     ].every(condition => condition);
 
-    const githubValidate = [
-        Fields.repository.validator(newState.github?.repositories),
-        isCreating ? newState.github?.botPermission : true,
-    ].every(condition => condition);
-
     newState.settings = await handlerValidateSettings(newState.settings);
 
     const settingsValidated = [
@@ -177,13 +169,11 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     newState.tokensLocked.validated = tokensLockedValidate;
     newState.details.validated = detailsValidate;
-    newState.github.validated = githubValidate;
     newState.settings.validated = !!settingsValidated;
     newState.tokens.validated = tokensValidated;
     newState.isSettingsValidated = [
       tokensLockedValidate,
       detailsValidate,
-      githubValidate,
       settingsValidated,
       tokensValidated
     ].every(condtion=> condtion);
@@ -230,10 +220,10 @@ export const NetworkSettingsProvider = ({ children }) => {
           return undefined;
 
         // Reserved names
-        if (/bepro|taikai/gi.test(value))
+        if (/bepro|taikai/gi.test(value) || STATIC_URL_PATHS.includes(value?.toLowerCase()))
           return false;
 
-        const networksWithSameName = await searchNetworks({ name: value });
+        const networksWithSameName = await useSearchNetworks({ name: value });
 
         // No networks with this name
         if (networksWithSameName.count === 0)
@@ -269,18 +259,6 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: (value: Color) => setFields(`settings.theme.colors.${value.label}`, value.code),
       validator: (value: Theme) => !value?.similar?.length
     },
-    repository: {
-      setter: (fullName: string) =>{
-        const index = networkSettings.github.repositories.findIndex((repo) => repo.fullName === fullName);
-        const selectedRepository = networkSettings.github.repositories[index];
-        selectedRepository.checked = !selectedRepository.checked;
-        setFields(`github.repositories.${index}`, selectedRepository)
-      },
-      validator: value => value.some((repository) => repository.checked)
-    },
-    permission: {
-      setter: value => setFields(`github.botPermission`, !!value)
-    },
     settlerTokenMinAmount: {
       setter: value => setFields(`tokens.settlerTokenMinAmount`, value)
     },
@@ -304,10 +282,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     parameter: {
       setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value)
-    },
-    allowMerge: {
-      setter(value) { return setFields(`github.allowMerge`, value) },
-      validator(value) { return typeof value === "boolean"; }
     }
   };
 
@@ -354,61 +328,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     return tokensLocked;
   }
 
-  async function loadGHRepos(){
-    const repositories = [];
-
-    if(state.currentUser?.login) {
-      const botUser = !isCreating ? state.Settings?.github?.botUser : undefined
-      const githubRepositories = await getUserRepositories(state.currentUser?.login, botUser);
-
-      const filtered = githubRepositories
-          .filter(repo => {
-            const isOwner = state.currentUser.login === repo?.nameWithOwner.split("/")[0];
-
-            if((isOwner || repo?.isInOrganization) && !repo?.isFork && !repo?.isArchived)
-              return repo;
-          })
-          .map(repo => ({
-            checked: false,
-            isSaved: false,
-            hasIssues: false,
-            userPermission:repo.viewerPermission,
-            name: repo?.name,
-            fullName: repo?.nameWithOwner,
-            mergeCommitAllowed: repo.mergeCommitAllowed,
-            collaborators: repo.collaborators
-          }));
-
-      if (!isCreating) {
-        const repositoryAlreadyExists =  await searchRepositories({
-          networkName: network?.name,
-          chainId: state.connectedChain?.id,
-          includeIssues: "true"
-        })
-          .then(({ rows }) =>
-          Promise.all(rows.map( async repo => {
-            const repoOnGh = filtered.find(({ fullName }) => fullName === repo.githubPath);
-
-            return {
-              checked: true,
-              isSaved: true,
-              name: repo.githubPath.split("/")[1],
-              fullName: repo.githubPath,
-              hasIssues: !!repo.issues.length,
-              mergeCommitAllowed: repoOnGh?.mergeCommitAllowed || false,
-              collaborators: repoOnGh?.collaborators || [],
-            };
-          })));
-
-        repositories.push(...repositoryAlreadyExists);
-      }
-
-      repositories.push(...filtered.filter(repo => !repositories.find((repoB) => repoB.fullName === repo.fullName)));
-    }
-
-    return repositories;
-  }
-
   async function loadDefaultSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = JSON.parse(JSON.stringify(DefaultNetworkSettings)); //Deep Copy, More: https://www.codingem.com/javascript-clone-object
 
@@ -439,8 +358,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.settings.treasury.closeFee = validatedParameter(DEFAULT_CLOSE_FEE);
     defaultState.settings.treasury.validated = true;
 
-    defaultState.github.repositories = await loadGHRepos();
-
     const storageData = storage.getItem();
 
     if(storageData){
@@ -452,9 +369,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
       if(storageData?.settings)
         defaultState.settings = storageData?.settings;
-
-      if(storageData?.github)
-        defaultState.github = storageData?.github;
 
       if(storageData?.tokens)
         defaultState.tokens = storageData?.tokens;
@@ -530,11 +444,8 @@ export const NetworkSettingsProvider = ({ children }) => {
         raw: undefined
     });
 
-    defaultState.github.allowMerge = network?.allowMerge;
-
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
-    defaultState.github.repositories = await loadGHRepos();
 
     setForcedNetwork((prev)=>({
       ...prev,
@@ -581,7 +492,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     else if(isCreating)
       loadDefaultSettings().finally(()=> setIsLoadingData(false));
   }, [
-    state.currentUser?.login,
     state.currentUser?.walletAddress,
     forcedService,
     network,
@@ -598,30 +508,6 @@ export const NetworkSettingsProvider = ({ children }) => {
         .then(setRegistryToken)
         .catch(error => console.debug("Failed to load registry token", error));
   }, [state.Service?.active?.registry?.contractAddress, state.connectedChain?.name]);
-
-  // Pre Select same network on other chain repositories
-  useEffect(() => {
-    const creatingName = networkSettings?.details?.name?.value;
-    const currentAddress = state.currentUser?.walletAddress;
-    const connectedChainId = state.connectedChain?.id;
-
-    if (!creatingName || !currentAddress || !connectedChainId || !isCreating) return;
-
-    searchRepositories({
-      networkName: creatingName
-    })
-      .then(({ count, rows }) => {
-        if (count === 0) return;
-
-        const reposToSelect = rows.filter(({ network: { name, creatorAddress, chain_id } }) =>
-          toLower(name) === toLower(creatingName) &&
-          creatorAddress === currentAddress &&
-          chain_id !== connectedChainId);
-
-        reposToSelect.forEach(({ githubPath }) => Fields.repository.setter(githubPath));
-      });
-  }, [networkSettings?.details?.name?.value, state.currentUser?.walletAddress, state.connectedChain?.id, isCreating]);
-
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,

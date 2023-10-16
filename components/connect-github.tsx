@@ -1,11 +1,11 @@
 import { useTranslation } from "next-i18next";
 
+import Button from "components/button";
 import GithubImage from "components/github-image";
 
-import { useAuthentication } from "x-hooks/use-authentication";
+import { useAppState } from "contexts/app-state";
 
-import {useAppState} from "../contexts/app-state";
-import Button from "./button";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 interface IProps{
   size?: 'md' | 'sm' | 'lg';
@@ -13,15 +13,15 @@ interface IProps{
 
 export default function ConnectGithub({size = 'md'}:IProps) {
   const { t } = useTranslation("common");
-  const { connectGithub } = useAuthentication();
-  const {state} = useAppState()
 
+  const {state} = useAppState()
+  const { signInGithub } = useAuthentication();
 
   if (['lg', 'sm'].includes(size)) {
     return (
       <Button
         className={size === "lg" && "col-12"}
-        onClick={connectGithub}
+        onClick={signInGithub}
         disabled={state.spinners?.connectingGH}
         isLoading={state.spinners?.connectingGH}
       >
@@ -45,7 +45,7 @@ export default function ConnectGithub({size = 'md'}:IProps) {
                 className="d-inline btn btn-primary text-uppercase"
                 disabled={state.spinners?.connectingGH || !state.currentUser?.walletAddress}
                 isLoading={state.spinners?.connectingGH}
-                onClick={connectGithub}>
+                onClick={signInGithub}>
                 {t("actions.connect")}
               </Button>
             </span>

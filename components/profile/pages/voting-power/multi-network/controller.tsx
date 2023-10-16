@@ -1,25 +1,35 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 
 import { useRouter } from "next/router";
+
+import VotingPowerMultiNetworkView from "components/profile/pages/voting-power/multi-network/view";
 
 import { useAppState } from "contexts/app-state";
 
 import { Curator } from "interfaces/curators";
 
-import useApi from "x-hooks/use-api";
+import { useSearchCurators } from "x-hooks/api/curator";
 import { useNetwork } from "x-hooks/use-network";
-
-import VotingPowerMultiNetworkView from "./view";
+import useReactQuery from "x-hooks/use-react-query";
 
 export default function VotingPowerMultiNetwork() {
   const { push } = useRouter();
 
-  const [networks, setNetworks] = useState<Curator[]>([]);
   const [network, setNetwork] = useState<Curator>();
 
   const { state } = useAppState();
-  const { searchCurators } = useApi();
   const { getURLWithNetwork } = useNetwork();
+
+  function getNetworksVotingPower() {
+    return useSearchCurators({
+      address: state.currentUser?.walletAddress,
+    })
+      .then(({ rows }) => rows);
+  }
+
+  const { data: networks } = useReactQuery( ["voting-power-multi", state.currentUser?.walletAddress],
+                                            getNetworksVotingPower,
+                                            { enabled: !!state.currentUser?.walletAddress });
 
   function goToNetwork(network) {
     push(getURLWithNetwork("/bounties", {
@@ -49,16 +59,6 @@ export default function VotingPowerMultiNetwork() {
   function clearNetwork() {
     setNetwork(undefined)
   }
-
-  useEffect(() => {
-    if (state.currentUser?.walletAddress)
-      searchCurators({
-        address: state.currentUser?.walletAddress,
-      })
-        .then(({ rows }) => setNetworks(rows))
-        .catch((error) =>
-          console.debug("Failed to fetch voting power data", error));
-  }, [state.currentUser?.walletAddress]);
 
   return (
     <VotingPowerMultiNetworkView

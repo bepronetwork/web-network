@@ -1,6 +1,6 @@
 import { Defaults } from "@taikai/dappkit";
 
-import { Repository, ThemeColors } from "interfaces/network";
+import { ThemeColors } from "interfaces/network";
 import { Token } from "interfaces/token";
 
 const ZeroField = () => ({
@@ -66,12 +66,6 @@ export const DefaultNetworkSettings = {
       validated: undefined
     },
     validated: undefined
-  },
-  github: {
-    repositories: [] as Repository[],
-    botPermission: false,
-    validated: false,
-    allowMerge: true,
   },
   tokens: {
     settler: "",

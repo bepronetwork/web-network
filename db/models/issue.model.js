@@ -5,8 +5,6 @@ const { BigNumber } = require("bignumber.js");
 class Issue extends Model {
   static init(sequelize) {
     super.init({
-      issueId: DataTypes.INTEGER,
-      githubId: DataTypes.STRING,
       state: DataTypes.STRING,
       creatorAddress: {
         type: DataTypes.STRING,
@@ -28,13 +26,13 @@ class Issue extends Model {
         type: DataTypes.STRING,
         defaultValue: "0"
       },
-      repository_id: DataTypes.STRING,
       title: DataTypes.TEXT,
       body: DataTypes.TEXT,
       branch: DataTypes.STRING,
       working: DataTypes.ARRAY(DataTypes.STRING),
       merged: DataTypes.STRING,
       seoImage: DataTypes.STRING,
+      nftImage: DataTypes.STRING,
       network_id: DataTypes.INTEGER,
       contractId: DataTypes.INTEGER,
       transactionalTokenId: DataTypes.INTEGER,
@@ -99,6 +97,16 @@ class Issue extends Model {
       contractCreationDate: {
         type: DataTypes.STRING,
         allowNull: true
+      },
+      ipfsUrl: DataTypes.STRING,
+      type: DataTypes.STRING,
+      origin: DataTypes.TEXT,
+      userId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "users",
+          key: "id"
+        }
       }
     },
     {
@@ -114,10 +122,10 @@ class Issue extends Model {
       sourceKey: "id",
       as: "developers"
     });
-    this.hasMany(models.pullRequest, {
+    this.hasMany(models.deliverable, {
       foreignKey: "issueId",
       sourceKey: "id",
-      as: "pullRequests"
+      as: "deliverables"
     });
     this.hasMany(models.mergeProposal, {
       foreignKey: "issueId",
@@ -162,6 +170,16 @@ class Issue extends Model {
       foreignKey: "chain_id",
       targetKey: "chainId",
       as: "chain"
+    });
+    this.belongsTo(models.user, {
+      foreignKey: "userId",
+      targetKey: "id",
+      as: "user"
+    });
+    this.hasMany(models.comment, {
+      foreignKey: "issueId",
+      sourceKey: "id",
+      as: "comments"
     });
   }
 }

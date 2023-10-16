@@ -2,7 +2,7 @@ import {changeChain} from "contexts/reducers/change-chain";
 import {changeCurrentBounty} from "contexts/reducers/change-current-bounty";
 import {changeCurrentUser} from "contexts/reducers/change-current-user";
 import {changeLoad} from "contexts/reducers/change-load";
-import {changeActiveRepoProps, changeNetwork, changeRepos, changeServiceProp} from "contexts/reducers/change-service";
+import {changeNetwork, changeServiceProp} from "contexts/reducers/change-service";
 import {changeSettings,} from "contexts/reducers/change-settings";
 import {changeSpinners} from "contexts/reducers/change-spinners";
 import {changeSupportedChains} from "contexts/reducers/change-supported-chains";
@@ -26,11 +26,9 @@ export default function loadApplicationStateReducers() {
     changeShowProp,
     changeServiceProp,
     changeNetwork,
-    changeRepos,
     changeCurrentBounty,
     changeSpinners,
     changeSettings,
-    changeActiveRepoProps,
     changeSupportedChains
   ].forEach(addReducer);
 

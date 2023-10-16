@@ -3,7 +3,7 @@ import {SimpleAction} from "contexts/reducers/reducer";
 import {State} from "interfaces/application-state";
 import {AppStateReduceId} from "interfaces/enums/app-state-reduce-id";
 
-interface Spinners {
+export interface Spinners {
   proposals: boolean;
   pullRequests: boolean;
   bountyState: boolean;
@@ -14,7 +14,6 @@ interface Spinners {
   matching: boolean;
   connecting: boolean;
   connectingGH: boolean;
-  repos: boolean;
   changingChain: boolean;
   signingMessage: boolean;
   switchingChain: boolean;
@@ -38,23 +37,8 @@ class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {
 
 export const changeSpinners = new ChangeSpinners();
 
-export const changeSpinnerProposal = (proposals: boolean) =>
-  changeSpinners.update({proposals});
-
-export const changeSpinnerPullRequests = (pullRequests: boolean) =>
-  changeSpinners.update({pullRequests});
-
-export const changeSpinnerBountyState = (bountyState: boolean) =>
-  changeSpinners.update({bountyState});
-
-export const changeWalletSpinnerTo = (wallet: boolean) =>
-  changeSpinners.update({wallet});
-
 export const changeConnecting = (connecting: boolean) =>
   changeSpinners.update({connecting});
-
-export const changeConnectingGH = (connectingGH: boolean) =>
-  changeSpinners.update({connectingGH});
 
 export const changeChangingChain = (changingChain: boolean) =>
   changeSpinners.update({changingChain});

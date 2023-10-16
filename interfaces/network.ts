@@ -51,6 +51,7 @@ export interface Network {
   chain?: SupportedChainData;
   issues?: IssueData[];
   allowMerge: boolean;
+  banned_domains: string[];
 }
 
 export interface ThemeColors {
@@ -76,17 +77,6 @@ export interface Color {
 export interface Icon {
   preview: string;
   raw: File;
-}
-
-export interface Repository {
-  mergeCommitAllowed: boolean;
-  userPermission?: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
-  checked: boolean;
-  name: string;
-  fullName: string;
-  isSaved?: boolean;
-  hasIssues?: boolean;
-  label?: string;
 }
 
 export interface Theme {
@@ -143,12 +133,6 @@ export interface NetworkSettings {
       validated?: boolean;
     };
     validated: boolean;
-  };
-  github?: {
-    repositories: Repository[];
-    botPermission: boolean;
-    validated: boolean;
-    allowMerge: boolean;
   };
   tokens?: {
     settler: string;

@@ -15,6 +15,7 @@ import {DeployBountyTokenModal} from "components/setup/deploy-bounty-token-modal
 import {DeployERC20Modal} from "components/setup/deploy-erc20-modal";
 
 import {useAppState} from "contexts/app-state";
+import { updateSupportedChains } from "contexts/reducers/change-supported-chains";
 import {toastError, toastInfo, toastSuccess} from "contexts/reducers/change-toaster";
 
 import { DAPPKIT_LINK } from "helpers/constants";
@@ -25,10 +26,11 @@ import {SupportedChainData} from "interfaces/supported-chain-data";
 
 import { RegistryParameters } from "types/dappkit";
 
+import { useGetChains } from "x-hooks/api/chain";
 import useApi from "x-hooks/use-api";
-import {useAuthentication} from "x-hooks/use-authentication";
 import useBepro from "x-hooks/use-bepro";
 import useChain from "x-hooks/use-chain";
+import useReactQuery from "x-hooks/use-react-query";
 import {useSettings} from "x-hooks/use-settings";
 
 interface RegistrySetupProps { 
@@ -76,10 +78,13 @@ export function RegistrySetup({
 
   const { loadSettings } = useSettings();
   const { findSupportedChain } = useChain();
-  const { signMessage } = useAuthentication();
   const { handleDeployRegistry, handleSetDispatcher, handleChangeAllowedTokens } = useBepro();
-  const { patchSupportedChain, processEvent, updateChainRegistry, getSupportedChains, createToken } = useApi();
+  const { patchSupportedChain, processEvent, updateChainRegistry, createToken } = useApi();
   const { dispatch, state: { currentUser, Service, connectedChain, supportedChains } } = useAppState();
+  const { invalidate: invalidateChains } = useReactQuery(["supportedChains"], () => useGetChains().then(chains => { 
+    dispatch(updateSupportedChains(chains));
+    return chains; 
+  }));
 
   function isEmpty(value: string) {
     return value.trim() === "";
@@ -149,8 +154,6 @@ export function RegistrySetup({
         setRegistry(previous => ({ ...previous, value: contractAddress}));
 
         Service?.active?.loadRegistry(false, contractAddress);
-
-        await signMessage();
 
         return setChainRegistry(contractAddress);
       })
@@ -266,7 +269,7 @@ export function RegistrySetup({
           return;
         }
         dispatch(toastSuccess(`Updated chain ${chain.chainId} with ${address} `))
-        return getSupportedChains(true);
+        return invalidateChains();
       })
   }
 

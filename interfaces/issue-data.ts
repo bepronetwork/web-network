@@ -2,8 +2,10 @@ import BigNumber from "bignumber.js";
 
 import { Network } from "interfaces/network";
 import { Payment } from "interfaces/payments";
-import { Proposal, INetworkProposal } from "interfaces/proposal";
+import { Proposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
+
+import { User } from "./api";
 
 export type IssueState =
   | "pending"
@@ -28,24 +30,16 @@ export interface IssueData {
   fundedAmount?: string;
   rewardAmount?: string;
   body: string;
-  branch?: string;
   createdAt: Date;
-  creatorAddress?: string;
-  creatorGithub?: string;
-  developers: developer[];
   dueDate?: string;
-  githubId: string;
-  issueId: string; // custom id repo/githubid
   mergeProposals: Proposal[];
   merged: string;
   numberOfComments: number;
   owner?: string;
   network_id?: number;
-  pullRequests: PullRequest[];
-  repo?: string;
-  repository?: Repository;
-  repository_id?: number;
+  deliverables: Deliverable[];
   seoImage: string;
+  nftImage?: string;
   state: IssueState;
   title: string;
   updatedAt?: Date;
@@ -72,6 +66,11 @@ export interface IssueData {
   visible: boolean;
   kycTierList: number[];
   contractCreationDate?: string;
+  ipfsUrl?: string;
+  type?: string;
+  origin?: string;
+  userId: number;
+  user?: User;
 }
 
 export interface Disputes {
@@ -89,25 +88,26 @@ export interface IssueBigNumberData
   rewardAmount: BigNumber;
 }
 
-export interface IssueNetwork extends IssueBigNumberData {
-  networkName?: string;
-  totalValueLock?: BigNumber;
-  issues?: IssueBigNumberData[]
-}
-export interface IssueSearch {
-  rows: IssueNetwork[] | [],
-  count: number,
-  pages: number,
-  currentPage: number
-}
-
-export interface Repository {
+export interface Deliverable {
   id: number;
-  githubPath: string;
-  network?: Network;
-  mergeCommitAllowed?: boolean;
+  deliverableUrl: string;
+  ipfsLink: string;
+  title: string;
+  description: string;
+  canceled: boolean;
+  markedReadyForReview: boolean;
+  accepted: boolean;
+  issueId: number;
+  bountyId?: number;
+  prContractId?: number;
+  user?: User;
+  comments?: IssueDataComment[];
+  userId: number;
+  isCancelable: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  issue?: IssueData;
 }
-
 export interface PullRequest {
   createdAt: Date;
   githubId: string;
@@ -121,7 +121,6 @@ export interface PullRequest {
   updatedAt: Date;
   issue?: IssueData;
   comments?: IssueDataComment[];
-  reviews?: IssueDataComment[];
   status?: string;
   reviewers?: string[];
   contractId?: number;
@@ -137,37 +136,24 @@ export interface PullRequest {
   isCancelable: boolean;
 }
 
-export interface developer {
-  id?: number;
-  login?: string;
-  avatar_url?: string;
-  url?: string;
-  type?: string;
-}
-
 export interface IssueDataComment {
-  body: string;
-  created_at: string | number | Date;
-  updated_at: string | number | Date;
-  author: string;
+  id: number;
+  comment: string;
+  hidden: boolean;
+  type: string;
+  issueId: number;
+  proposalId?: number;
+  deliverableId?: number;
+  userId: number;
+  userAddress: string;
+  replyId?: number;
+  updatedAt: Date;
+  createdAt: Date;
+  user: User;
 }
 
 export interface GithubUser {
   login: string;
-}
-
-export interface INetworkIssue {
-  _id: number;
-  canceled: boolean;
-  cid: CID | string;
-  creationDate: Date | number;
-  finalized: boolean;
-  issueGenerator: string;
-  mergeProposalAmount: number;
-  recognizedAsFinished: boolean;
-  isDraft: boolean;
-  tokensStaked: number;
-  networkProposals: INetworkProposal[];
 }
 
 export interface fundingBenefactor {

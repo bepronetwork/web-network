@@ -267,6 +267,13 @@ $utilities: map-merge(
           state: hover
         )
       ),
+    "width":
+      map-merge(
+        map-get($utilities, "width"),
+        (
+          responsive: true
+        )
+      ),
     "border":
       map-merge(
         map-get($utilities, "border"),

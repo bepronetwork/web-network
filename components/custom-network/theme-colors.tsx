@@ -11,7 +11,7 @@ import ColorInput from "components/color-input";
 const MoreColoursButton = ({label, isVisible, onClick}) => {
   const posfix = isVisible ? <ArrowUp width={6.33} height={3.22} /> : <ArrowDown width={6.33} height={3.22} />;
 
-  return <Button onClick={onClick} textClass="px-0 text-primary" transparent>
+  return <Button onClick={onClick} textClass="px-0 text-primary font-weight-medium" transparent>
     {label}
     <span className="ml-1 svg-primary">{posfix}</span>
   </Button>;
@@ -45,10 +45,10 @@ export default function ThemeColors({ colors, similar, setColor }) {
 
   return (
     <>
-      <div className="row border-radius-8 justify-content-center mb-2">
+      <div className="row border-radius-8 justify-content-center mb-2 gy-3">
         {
           colorsEntries.slice(0, 3).map(color => 
-          <div className="col-4" key={color.label}>
+          <div className="col-12 col-md-4" key={color.label}>
             <ColorInput
               label={color.label}
               code={color.code}
@@ -69,7 +69,7 @@ export default function ThemeColors({ colors, similar, setColor }) {
         <div className="row bg-dark-gray p-3 border-radius-8 mt-2 mx-0">
           {
             colorsEntries.slice(3, 15).map(color => 
-            <div className="col-3" key={color.label}>
+            <div className="col-12 col-md-4 col-lg-3" key={color.label}>
               <ColorInput
                 label={color.label}
                 code={color.code}

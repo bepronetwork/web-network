@@ -3,8 +3,7 @@ import {Op, WhereOptions} from "sequelize";
 
 import models from "db/models";
 
-import {LogAccess} from "middleware/log-access";
-import WithCors from "middleware/withCors";
+import { withCORS } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -42,4 +41,4 @@ async function GetAll(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
-export default LogAccess(WithCors(GetAll));
+export default withCORS(GetAll);

@@ -7,13 +7,12 @@ import PageHero from "components/common/page-hero/view";
 import CustomContainer from "components/custom-container";
 
 import {useAppState} from "contexts/app-state";
-import {BountyEffectsProvider} from "contexts/bounty-effects";
 
 import { emptyBountiesPaginated, emptyNetworkOverview } from "helpers/api";
 
 import { SearchBountiesPaginated } from "types/api";
 
-import getBountiesListData from "x-hooks/api/bounty/get-bounties-list-data";
+import { getBountiesListData } from "x-hooks/api/bounty";
 import getNetworkOverviewData from "x-hooks/api/get-overview-data";
 import {useBounty} from "x-hooks/use-bounty";
 
@@ -58,7 +57,7 @@ export default function BountiesPage({
   ];
 
   return (
-    <BountyEffectsProvider>
+    <>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
@@ -71,7 +70,7 @@ export default function BountiesPage({
           variant="network"
         />
       </CustomContainer>
-    </BountyEffectsProvider>
+    </>
   );
 }
 

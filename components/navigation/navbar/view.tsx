@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { UrlObject } from "url";
+import {UrlObject} from "url";
 
 import ClosedNetworkAlert from "components/closed-network-alert";
 import BrandLogo from "components/common/brand-logo/view";

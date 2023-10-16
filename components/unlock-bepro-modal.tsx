@@ -27,7 +27,7 @@ export default function UnlockBeproModal({
   onCloseClick,
   networkTokenSymbol
 }) {
-  const { t } = useTranslation(["common", "pull-request"]);
+  const { t } = useTranslation(["common", "deliverable"]);
 
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [amountToUnlock, setAmountToUnlock] = useState<BigNumber>();

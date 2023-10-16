@@ -185,10 +185,7 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, redeemTx.payload[0] as SimpleBlockTransactionPayload)]))
-          resolve(tx)
-          // todo should force these two after action, but we can't have it here or it will fall outside of context
-          // getDatabaseBounty(true);
-          // getChainBounty(true);
+          resolve(tx);
         })
         .catch((err: { message: string; }) => {
           failTx(err, redeemTx, reject);
@@ -217,9 +214,7 @@ export default function useBepro() {
         .then((canceledBounties) => {
           if (!canceledBounties?.[issueId]) throw new Error('Failed');
           dispatch(updateTx([parseTransaction(tx, transaction.payload[0] as SimpleBlockTransactionPayload)]))
-          resolve(canceledBounties)
-          // getChainBounty(true);
-          // getDatabaseBounty(true);
+          resolve(canceledBounties);
         })
         .catch((err: { message: string; }) => {
           failTx(err, transaction, reject);
@@ -229,8 +224,7 @@ export default function useBepro() {
 
   async function handleProposeMerge(bountyId: number,
                                     pullRequestId: number,
-                                    addresses: string[],
-                                    amounts: number[] ): Promise<TransactionReceipt | Error> {
+                                    recipient: string): Promise<TransactionReceipt> {
 
     return new Promise(async (resolve, reject) => {
 
@@ -241,8 +235,8 @@ export default function useBepro() {
       dispatch(tx);
 
       await state.Service?.active
-        .createProposal(bountyId, pullRequestId, addresses, amounts)
-        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+        .createProposal(bountyId, pullRequestId, [recipient], [100])
+        .then((txInfo: TransactionReceipt) => {
           dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]))
           resolve(txInfo);
         })
@@ -321,7 +315,7 @@ export default function useBepro() {
                                          cid: number ) {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
-        type: TransactionTypes.createPullRequest,
+        type: TransactionTypes.createDeliverable,
         network: state.Service?.network?.active
       } as any]);
       dispatch(tx);
@@ -343,16 +337,16 @@ export default function useBepro() {
     });
   }
 
-  async function handleMakePullRequestReady(bountyId: number, pullRequestId: number) {
+  async function handleMakePullRequestReady(bountyId: number, pullRequestId: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
-        type: TransactionTypes.makePullRequestReady,
+        type: TransactionTypes.makeDeliverableReady,
         network: state.Service?.network?.active
       } as any]);
       dispatch(tx);
 
       await state.Service?.active.setPullRequestReadyToReview(bountyId, pullRequestId)
-      .then((txInfo: unknown) => {
+      .then((txInfo: TransactionReceipt) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })
@@ -362,16 +356,16 @@ export default function useBepro() {
     });
   }
 
-  async function handleCancelPullRequest(bountyId: number, pullRequestId: number) {
+  async function handleCancelPullRequest(bountyId: number, pullRequestId: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const tx = addTx([{
-        type: TransactionTypes.cancelPullRequest,
+        type: TransactionTypes.cancelDeliverable,
         network: state.Service?.network?.active} as any]);
 
       dispatch(tx);
 
       await state.Service?.active.cancelPullRequest(bountyId, pullRequestId)
-      .then((txInfo: unknown) => {
+      .then((txInfo: TransactionReceipt) => {
         dispatch(updateTx([parseTransaction(txInfo, tx.payload[0] as SimpleBlockTransactionPayload)]));
         resolve(txInfo);
       })
@@ -544,7 +538,10 @@ export default function useBepro() {
     });
   }
 
-  async function handleFundBounty(bountyId: number, amount: string, currency?: string, tokenDecimals?: number) {
+  async function handleFundBounty(bountyId: number, 
+                                  amount: string, 
+                                  currency?: string, 
+                                  tokenDecimals?: number): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTx([{
         type: TransactionTypes.fundBounty,

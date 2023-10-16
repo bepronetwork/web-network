@@ -1,7 +1,6 @@
 import {  useEffect, useState } from "react";
 
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -12,48 +11,44 @@ import { useAppState } from "contexts/app-state";
 
 import { getPricesAndConvert } from "helpers/tokens";
 
-
-import { TokensOracles } from "interfaces/oracles-state";
+import { SupportedChainData } from "interfaces/supported-chain-data";
 import { Token } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
+import DAO from "services/dao-service";
 
-import useApi from "x-hooks/use-api";
-import { useNetwork } from "x-hooks/use-network";
+import { useGetTokens } from "x-hooks/api/token";
+import useReactQuery from "x-hooks/use-react-query";
 
 import WalletBalanceView from "./view";
+interface WalletBalanceProps {
+  chains: SupportedChainData[];
+}
 
-export default function WalletBalance() {
-  const { t } = useTranslation(["common", "profile"]);
-
-  const [totalAmount, setTotalAmount] = useState("0");
-  const [tokensOracles, setTokensOracles] = useState<TokensOracles[]>();
-  const [tokens, setTokens] = useState<TokenBalanceType[]>();
-  const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
-  const [searchState, setSearchState] = useState("");
+export default function WalletBalance({
+  chains
+}: WalletBalanceProps) {
   const [search, setSearch] = useState("");
+  const [searchState, setSearchState] = useState("");
+  const [totalAmount, setTotalAmount] = useState("0");
+  const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
-  const debouncedSearchUpdater = useDebouncedCallback((value) => setSearch(value),
-                                                      500);
+  const debouncedSearchUpdater = useDebouncedCallback((value) => setSearch(value), 500);
 
   const { state } = useAppState();
-
-  const { searchCurators, getTokens } = useApi();
-  const { getURLWithNetwork } = useNetwork();
   const { query, push, pathname, asPath } = useRouter();
 
   const getAddress = (token: string | Token) =>
     typeof token === "string" ? token : token?.address;
 
-  async function processToken(token: string | Token) {
+  async function processToken(token: string | Token, service: DAO) {
     const [tokenData, balance] = await Promise.all([
       typeof token === "string"
-        ? state.Service?.active?.getERC20TokenData(token)
+        ? service.getERC20TokenData(token)
         : token,
-      state.Service?.active?.getTokenBalance(getAddress(token),
-                                             state?.currentUser?.walletAddress),
+      service.getTokenBalance(getAddress(token),
+                              state?.currentUser?.walletAddress),
     ]);
-
     const tokenInformation = await getCoinInfoByContract(tokenData?.symbol);
 
     return {
@@ -83,63 +78,61 @@ export default function WalletBalance() {
     debouncedSearchUpdater(e.target.value);
   }
 
-  function handleSearchFilter(name = "", symbol = "", networks) {
-    const hasNetworkName = query?.networkName
+  function handleSearchFilter(name = "", symbol = "", networks, chainId) {
+    const hasNetworkName = query?.networkName;
     const isNetwork = !!networks.find(({ name }) =>
-      hasNetworkName?.toString().toLowerCase() === name?.toLowerCase());
+        hasNetworkName?.toString().toLowerCase() === name?.toLowerCase());
+    const hasChainName = query?.networkChain;
+    const isChain = !!chains.find((chain) =>
+        chain.chainId === chainId &&
+        hasChainName?.toString().toLowerCase() ===
+          chain.chainShortName.toLowerCase());
 
     return (
       (name.toLowerCase().indexOf(search.toLowerCase()) >= 0 ||
         symbol.toLowerCase().indexOf(search.toLowerCase()) >= 0) &&
-      (hasNetworkName ? isNetwork : true)
+      (hasNetworkName ? isNetwork : true) &&
+      (hasChainName ? isChain : true)
     );
   }
 
-  function loadOracleBalance() {
-    if (!state.currentUser?.walletAddress) return;
+  function loadDaoService(chainRpc: string) {
+    const daoService: DAO = new DAO({
+      web3Host: chainRpc,
+      skipWindowAssignment: true,
+    })
+  
+    daoService.start()
 
-    searchCurators({
-      address: state.currentUser?.walletAddress,
-      chainShortName:
-        query?.chain?.toString() || state?.connectedChain?.shortName,
-    }).then(({ rows }) => {
-      Promise.all(rows?.map(async (curator) => {
-        const tokenInformation = await getCoinInfoByContract(curator?.network?.networkToken?.symbol);
+    return daoService
+  }
 
+  function loadTokensBalance(): Promise<TokenBalanceType[]> {
+    const currentChains = chains.map(({ chainRpc, chainId }) => ({
+      web3Connection: loadDaoService(chainRpc),
+      chainId 
+    }))
+
+    return useGetTokens().then((tokens) => {
+      return Promise.all(tokens?.map(async (token) => {
+        const chain = currentChains.find(({ chainId }) => chainId === token.chain_id);
+        const tokenData = await processToken(token?.address,
+                                             chain.web3Connection);
         return {
-            symbol: t("$oracles", {
-              token: curator?.network?.networkToken?.symbol,
-            }),
-            name: `${t("misc.locked")} ${curator?.network?.networkToken?.name}`,
-            address: curator?.network?.networkToken?.address,
-            icon: <TokenIcon src={tokenInformation?.icon as string} />,
-            oraclesLocked: BigNumber(curator.tokensLocked),
-            networkName: curator?.network?.name,
+                  networks: token?.networks,
+                  ...tokenData,
+                  chain_id: token.chain_id,
         };
-      })).then(setTokensOracles);
+      }));
     });
   }
 
-  function loadTokensBalance() {
-    if (state.Service?.starting || !state.currentUser?.walletAddress) return;
-
-    getTokens(state?.connectedChain?.id).then((tokens) => {
-      Promise.all(tokens?.map(async (token) => {
-        const tokenData = await processToken(token?.address);
-        return { networks: token?.networks, ...tokenData };
-      })).then(setTokens);
-    });
-  }
-
-  useEffect(loadOracleBalance, [
-    state.currentUser?.walletAddress
-  ]);
-
-  useEffect(loadTokensBalance ,[
-    state.currentUser?.walletAddress,
-    state.connectedChain,
-    state.Service?.starting
-  ])
+  const { data: tokens } = useReactQuery( ["tokens-balance", state.currentUser?.walletAddress],
+                                          loadTokensBalance,
+                                          {
+                                            enabled:  !!state.currentUser?.walletAddress && 
+                                                      !!state.supportedChains
+                                          });
 
   useEffect(() => {
     if (!tokens?.length) return;
@@ -170,7 +163,7 @@ export default function WalletBalance() {
       };
       push({ pathname: pathname, query: newQuery }, asPath);
     }
-  }, [query?.network])
+  }, [query?.network]);
 
   return (
     <WalletBalanceView
@@ -178,21 +171,14 @@ export default function WalletBalance() {
       isOnNetwork={!!query?.network}
       hasNoConvertedToken={hasNoConvertedToken}
       defaultFiat={state?.Settings?.currency?.defaultFiat}
-      tokens={tokens?.filter(({ name, symbol, networks }) =>
-        handleSearchFilter(name, symbol, networks))}
-      tokensOracles={tokensOracles?.filter(({ name, symbol, networkName }) =>
-        handleSearchFilter(name, symbol, [{ name: networkName }]))}
-      handleNetworkLink={(token: TokensOracles) => {
-        push(getURLWithNetwork("/", {
-            chain: state?.connectedChain?.shortName,
-            network: token?.networkName,
-        }));
-      }}
+      tokens={tokens?.filter(({ name, symbol, networks, chain_id }) =>
+        handleSearchFilter(name, symbol, networks, chain_id))}
       searchString={searchState}
       onSearchClick={updateSearch}
       onSearchInputChange={handleSearchChange}
       onEnterPressed={handleSearch}
       onClearSearch={handleClearSearch}
+      chains={chains}
     />
   );
 }

@@ -19,10 +19,8 @@ import {psReadAsText} from "helpers/file-reader";
 import {formatNumberToCurrency} from "helpers/formatNumber";
 import {getQueryableText, urlWithoutProtocol} from "helpers/string";
 
-
-import useApi from "x-hooks/use-api";
+import { useUpdateNetwork, useSearchNetworks } from "x-hooks/api/network";
 import { useAuthentication } from "x-hooks/use-authentication";
-
 
 const {publicRuntimeConfig: {urls: {homeURL}}} = getConfig();
 
@@ -40,7 +38,6 @@ export default function NetworksStep({
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
   const {state, dispatch} = useAppState();
-  const { searchNetworks, updateNetwork } = useApi();
   const { signMessage } = useAuthentication();
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
@@ -142,7 +139,7 @@ export default function NetworksStep({
     try {
       setIsLoading(true);
 
-      const network = await searchNetworks({ networkAddress: selectedNetworkAddress })
+      const network = await useSearchNetworks({ networkAddress: selectedNetworkAddress })
         .then(({ rows }) => rows[0]);
 
       if (network.networkAddress !== state.Service?.active.network.contractAddress)
@@ -173,13 +170,13 @@ export default function NetworksStep({
               treasury,
               networkToken]) => setForcedNetwork({
                 ...network,
-                councilAmount,
+                councilAmount: councilAmount.toString(),
                 disputableTime: +disputableTime / 1000,
                 draftTime: +draftTime / 1000,
                 oracleExchangeRate,
                 mergeCreatorFeeShare,
                 proposerFeeShare,
-                percentageNeededForDispute,
+                percentageNeededForDispute: +percentageNeededForDispute,
                 treasury,
                 networkToken
               }));
@@ -191,25 +188,23 @@ export default function NetworksStep({
   }
 
   async function handleSubmit() {
-    if (!state.currentUser?.walletAddress || !state.currentUser?.login || !forcedNetwork) return;
+    if (!state.currentUser?.walletAddress || !forcedNetwork) return;
 
     setIsUpdatingNetwork(true);
 
     const json = {
-      githubLogin: state.currentUser?.login,
       override: true,
       creator: state.currentUser?.walletAddress,
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
-      allowMerge: differentOrUndefined(details?.allowMerge, forcedNetwork?.allowMerge),
       logoIcon:
         details?.iconLogo?.value?.raw !== undefined
-          ? await psReadAsText(details?.iconLogo?.value?.raw)
+          ? (await psReadAsText(details?.iconLogo?.value?.raw)).toString()
           : undefined,
       fullLogo:
         details?.fullLogo?.value?.raw !== undefined
-          ? await psReadAsText(details?.fullLogo?.value?.raw)
+          ? (await psReadAsText(details?.fullLogo?.value?.raw)).toString()
           : undefined
     };
 
@@ -225,7 +220,7 @@ export default function NetworksStep({
     }
 
     await signMessage(IM_AM_CREATOR_NETWORK).then(async () => {
-      await updateNetwork(json)
+      await useUpdateNetwork(json)
       .then(() => {
         dispatch(addToast({
             type: "success",

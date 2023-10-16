@@ -1,13 +1,35 @@
+import { CurrentUserState } from "interfaces/application-state";
+import { IdsComment, TypeComment } from "interfaces/comments";
+import { IssueDataComment } from "interfaces/issue-data";
+
 import BountyCommentsView from "./view";
 
-export default function BountyComments({
+export default function Comments({
   comments = [],
-  repo,
-  issueId,
+  currentUser,
+  type,
+  ids,
+  updateData,
+  disableCreateComment
+}: {
+  comments: IssueDataComment[];
+  currentUser?: CurrentUserState;
+  type: TypeComment;
+  ids: IdsComment;
+  updateData: (updatePrData?: boolean) => void;
+  disableCreateComment?: boolean;
 }) {
-  const replyRef =
-    (comments?.length > 0 && comments[0]?.html_url) ||
-    `https://github.com/${repo}/issues/${issueId}`;
 
-  return <BountyCommentsView comments={comments} replyRef={replyRef} />;
+  if(!comments?.length && disableCreateComment) return null;
+  
+  return (
+    <BountyCommentsView
+      comments={comments}
+      currentUser={currentUser}
+      type={type}
+      ids={ids}
+      updateData={updateData}
+      disableCreateComment={disableCreateComment}
+    />
+  );
 }

@@ -1,5 +1,5 @@
 "use strict";
-const {Model, DataTypes} = require("sequelize");
+const {Model, DataTypes, Sequelize} = require("sequelize");
 const {getValueToLowerCase} = require("../../helpers/db/getters");
 
 class Network extends Model {
@@ -94,6 +94,14 @@ class Network extends Model {
         allowMerge: {
           type: DataTypes.BOOLEAN,
           defaultValue: true
+        },
+        banned_domains: {
+          type: DataTypes.ARRAY(DataTypes.STRING),
+          defaultValue: []
+        },
+        allow_list: {
+          type: DataTypes.ARRAY(DataTypes.STRING),
+          defaultValue: [],
         }
       },
       {
@@ -115,12 +123,6 @@ class Network extends Model {
     this.hasMany(models.repositories, {
       foreignKey: "network_id",
       sourceKey: "id"
-    });
-
-    this.hasMany(models.pullRequest, {
-      foreignKey: "network_id",
-      sourceKey: "id",
-      as: "pullRequests"
     });
 
     this.hasMany(models.mergeProposal, {
@@ -148,6 +150,40 @@ class Network extends Model {
     });
 
     this.belongsToMany(models.tokens, {through: 'network_tokens'});
+  }
+
+  static findAllOfCreatorAddress(creatorAddress) {
+    return this.findAll({
+      where: {
+        creatorAddress: Sequelize.where(Sequelize.fn("lower", Sequelize.col("creatorAddress")), creatorAddress?.toLowerCase())
+      }
+    });
+  }
+
+  static findOneByNetworkAddress(address, chainId = null) {
+    return this.findOne({
+      where: {
+        networkAddress: Sequelize.where(Sequelize.fn("lower", Sequelize.col("networkAddress")), address?.toLowerCase()),
+        ... chainId ? { chain_id: chainId } : {}
+      }
+    });
+  }
+
+  static findOneByNetworkAndChainNames(networkName, chainName) {
+    return this.findOne({
+      where: {
+        name: Sequelize.where(Sequelize.fn("lower", Sequelize.col("name")), networkName?.toLowerCase())
+      },
+      include: [
+        {
+          association: "chain",
+          required: true,
+          where: {
+            chainShortName: Sequelize.where(Sequelize.fn("lower", Sequelize.col("chainShortName")), chainName?.toLowerCase())
+          }
+        }
+      ]
+    });
   }
 }
 

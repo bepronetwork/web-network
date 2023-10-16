@@ -3,7 +3,7 @@ import { Op, Sequelize, WhereOptions } from "sequelize";
 
 import Database from "db/models";
 
-import {withCors} from "middleware";
+import { withCORS } from "middleware";
 
 import { error as logError } from 'services/logging';
 
@@ -73,4 +73,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(handler);
+export default withCORS(handler);

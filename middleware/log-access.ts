@@ -7,7 +7,7 @@ export const LogAccess = (handler: NextApiHandler) => {
     const {
       url,
       method,
-      headers: {"X-Forwarded-For": xForwarded, "CF-Connecting-IP": cfConnectingIp},
+      headers: {"x-forwarded-for": xForwarded, "cf-connecting-ip": cfConnectingIp},
       socket: {remoteAddress}
     } = req;
     const _query = Object.fromEntries(new URLSearchParams(url.split('?')[1]));
@@ -31,6 +31,7 @@ export const LogAccess = (handler: NextApiHandler) => {
       debug(`${method} access-end`, pathname)
     } catch (e) {
       Logger.error(e, `access-error`, {method, pathname, payload});
+      res.status(e?.status || 500).end();
     } finally {
       Logger.changeActionName(``); // clean action just in case;
     }

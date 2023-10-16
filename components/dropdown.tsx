@@ -3,7 +3,7 @@ import Select, {Props as ReactSelectProps} from 'react-select';
 
 import {useTranslation} from "next-i18next";
 
-type DropdownOption = {
+export type DropdownOption = {
   label: string;
   value: string;
 }

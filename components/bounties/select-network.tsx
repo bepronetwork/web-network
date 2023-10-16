@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import NativeSelectWrapper from "components/common/native-select-wrapper/view";
 import IconOption from "components/icon-option";
 import IconSingleValue from "components/icon-single-value";
 import NetworkLogo from "components/network-logo";
@@ -10,12 +11,13 @@ import ReactSelect from "components/react-select";
 
 import { useAppState } from "contexts/app-state";
 
+import { isOnNetworkPath } from "helpers/network";
+
 import { Network } from "interfaces/network";
 
-import { WinStorage } from "services/win-storage";
-
-import useApi from "x-hooks/use-api";
+import { useSearchNetworks } from "x-hooks/api/network";
 import useChain from "x-hooks/use-chain";
+import useReactQuery from "x-hooks/use-react-query";
 
 interface SelectNetworkProps {
   isCurrentDefault?: boolean;
@@ -36,7 +38,12 @@ export default function SelectNetwork({
 
   const { chain } = useChain();
   const { state } = useAppState();
-  const { searchNetworks } = useApi();
+
+  const chainIdToFilter = filterByConnectedChain ? !isOnNetworkPath(pathname) ? 
+      state.connectedChain?.id : chain?.chainId?.toString() : undefined
+
+  const { data: networks } = useReactQuery( ["networks", chainIdToFilter], 
+                                            () => useSearchNetworks({ chainId: chainIdToFilter }));
 
   function networkToOption(network: Network) {
     return {
@@ -69,39 +76,15 @@ export default function SelectNetwork({
   }
 
   function handleSelectedWithNetworkName(options) {
-    const opt = options.find(({ value }) => value?.name === query?.networkName)
+    const opt = options?.find(({ value }) => value?.name === query?.networkName)
     if(opt) setSelected(opt)
   }
 
-  function getNetworksByChainId(id: string) {
-    const cache = new WinStorage(`networks:${chain?.chainId}`, 60000, "sessionStorage");
-
-    if (cache.value){
-      const options = cache.value.map(networkToOption)
-      setOptions(options);
-      handleSelectedWithNetworkName(options);
-    } else
-      searchNetworks({
-        chainId: id
-      })
-        .then(({ rows }) => {
-          const options = rows.map(networkToOption)
-          setOptions(options)
-          handleSelectedWithNetworkName(options);
-        });
-  }
-
   useEffect(() => {
-    if (!chain && isCurrentDefault) return;
-    
-    getNetworksByChainId(chain?.chainId?.toString())
-  }, [chain, isCurrentDefault]);
-
-  useEffect(() => {
-    if(filterByConnectedChain && state.connectedChain?.id){
-      getNetworksByChainId(state.connectedChain?.id)
-    }
-  }, [state.connectedChain])
+    const options = networks?.rows?.map(networkToOption);
+    setOptions(options || [])
+    handleSelectedWithNetworkName(options);
+  }, [networks]);
 
   useEffect(() => {
     if (state.Service?.network?.active && !selected && isCurrentDefault)
@@ -113,18 +96,25 @@ export default function SelectNetwork({
       <span className='caption-small font-weight-medium text-gray-100 text-nowrap mr-1'>
         {t("misc.network")}
       </span>
-
-      <ReactSelect
-        value={selected}
+      <NativeSelectWrapper
         options={options}
         onChange={onChange}
-        placeholder="Select a network"
-        components={{
-          Option: IconOption,
-          SingleValue: IconSingleValue
-        }}
+        selectedIndex={options?.findIndex((opt) =>
+            opt?.value?.networkAddress === selected?.value?.networkAddress)}
         isClearable
-      />
+      >
+        <ReactSelect
+          value={selected}
+          options={options}
+          onChange={onChange}
+          placeholder={t("select-a-network")}
+          components={{
+            Option: IconOption,
+            SingleValue: IconSingleValue,
+          }}
+          isClearable
+        />
+      </NativeSelectWrapper>
     </div>
   );
 }

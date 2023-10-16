@@ -39,7 +39,8 @@ export function ContextualSpan({
 
   const contextColor = color || context;
   const CLASSES = clsx([
-    `p family-Regular ${icon ? 'font-weight-500 align-items-center' : 'font-weight-400'} border-radius-4  mx-0`,
+    `p family-Regular ${icon ? 'font-weight-500 align-items-center' : 'font-weight-400'} border-radius-4`,
+    isAlert ? "mx-0" : "px-0",
     `text-${contextColor} ${className}`,
     isAlert && `bg-${contextColor}-25 p-3 border border-${contextColor} border-radius-8 justify-content-between`
   ]);
@@ -47,7 +48,7 @@ export function ContextualSpan({
   const Icon = (props: SVGProps<SVGSVGElement>) => {
     const icons = {
       success: SuccessIcon,
-      danger: CloseIcon,
+      danger: InfoIconEmpty,
       warning: WarningIcon,
       info: InfoIconEmpty,
       primary: WarningIcon
@@ -76,7 +77,7 @@ export function ContextualSpan({
               <div className={`ball-sm bg-${context} me-2 mt-2`} />
             )}
           </div>
-          <div className={`col-12 ${classNameChildren}`}>
+          <div className={`lh-1 col ${classNameChildren}`}>
             {children}  
           </div>
         </FlexRow>

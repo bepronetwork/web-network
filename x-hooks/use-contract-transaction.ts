@@ -7,7 +7,7 @@ import { useAppState } from "contexts/app-state";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
-import { NetworkEvents, RegistryEvents } from "interfaces/enums/events";
+import { NetworkEvents, RegistryEvents, StandAloneEvents } from "interfaces/enums/events";
 
 import useApi from "x-hooks/use-api";
 
@@ -18,7 +18,7 @@ interface ExecutionResult {
 
 type useContractTransactionHook = [boolean, (...args: unknown[]) => Promise<ExecutionResult>, (value: boolean) => void];
 
-export default function useContractTransaction( event: RegistryEvents | NetworkEvents,
+export default function useContractTransaction( event: RegistryEvents | NetworkEvents | StandAloneEvents,
                                                 method: (...args) => Promise<TransactionReceipt>,
                                                 successMessage?: string,
                                                 errorMessage?: string): 
@@ -47,7 +47,7 @@ export default function useContractTransaction( event: RegistryEvents | NetworkE
         });
       } catch (error) {
         if (errorMessage && error?.code !== MetamaskErrors.UserRejected)
-          dispatch(toastError(successMessage, t("actions.failed")));
+          dispatch(toastError(errorMessage, t("actions.failed")));
 
         reject(error);
       } finally {

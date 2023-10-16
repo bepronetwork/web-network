@@ -29,7 +29,7 @@ export default function PullAndProposalHero({
       createdAt={createdAt}
       creatorAddress={creatorAddress}
       issueTitle={issue?.title}
-      issueGithubId={issue?.githubId}
+      issueId={issue?.id}
       isProposal={isProposal}
       issueAmount={BigNumber(issue?.amount)}
       transactionalTokenSymbol={issue?.transactionalToken?.symbol}

@@ -1,6 +1,7 @@
 import { useTranslation } from "next-i18next";
 
 import NativeSelectWrapper from "components/common/native-select-wrapper/view";
+import If from "components/If";
 import ReactSelect from "components/react-select";
 
 import { Direction, SelectOption } from "types/utils";
@@ -11,6 +12,7 @@ interface ChainFilterViewProps {
   direction: Direction;
   isMobile: boolean;
   onChange: (value: SelectOption) => void;
+  label: boolean;
 }
 
 export default function ChainFilterView({
@@ -19,6 +21,7 @@ export default function ChainFilterView({
   direction,
   isMobile,
   onChange,
+  label
 }: ChainFilterViewProps) {
   const { t } = useTranslation("common");
 
@@ -27,11 +30,13 @@ export default function ChainFilterView({
   
   return(
     <div className="row align-items-center gx-2 gy-2">
-      <div className={labelClass}>
-        <label className="text-capitalize text-white font-weight-normal caption-medium">
-          {t("misc.chain")}
-        </label>
-      </div>
+      <If condition={label}>
+        <div className={labelClass}>
+          <label className="text-capitalize text-white font-weight-normal caption-medium">
+            {t("misc.chain")}
+          </label>
+        </div>
+      </If>
 
       <div className="col">
         <NativeSelectWrapper

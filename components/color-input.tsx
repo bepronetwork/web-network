@@ -33,12 +33,12 @@ export default function ColorInput({ label, code, onChange, onlyColorCode = fals
   return (
     <div className="d-flex flex-column mb-2">
       <span
-        className={`caption-small text-${(error && "danger") || "gray"} mt-2 mb-1`}
+        className={`caption-small font-weight-medium text-${(error && "danger") || "gray-100"} mt-2 mb-1`}
       >
         {label}
       </span>
 
-      <div className={`d-flex flex-row align-items-center bg-black border-radius-8 
+      <div className={`d-flex flex-row align-items-center bg-gray-900 border-radius-4 
         custom-color-input-wrapper cursor-pointer`} onClick={focusInput}>
         <div className={`custom-color-input mr-1 ${(error && "is-invalid") || ""}`}>
           <input

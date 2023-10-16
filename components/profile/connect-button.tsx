@@ -1,12 +1,11 @@
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 
-import CheckMarkIcon from "assets/icons/checkmark-icon";
-import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
 
 import Avatar from "components/avatar";
 import GithubImage from "components/github-image";
+import If from "components/If";
 
 import { truncateAddress } from "helpers/truncate-address";
 
@@ -40,11 +39,6 @@ function ConnectionButton({
     github: credential ? <Avatar userLogin={credential} /> : <GithubImage width={28} height={28} opacity={1} />,
     wallet: <Image src={metamaskLogo} width={28} height={28} />
   };
-
-  const STATE_ICON = {
-    success: <CheckMarkIcon />,
-    danger: <ErrorMarkIcon />
-  }
 
   const LABELS = {
     github: t("common:misc.github"),
@@ -81,17 +75,20 @@ function ConnectionButton({
 
   return(
     <div className="d-flex flex-column">
-      { variant === "profile" && <label className="caption-medium mb-2">{LABELS[type]}</label> }
+      <If condition={variant === "profile"}>
+        <label className="caption-medium mb-2">{LABELS[type]}</label>
+      </If>
 
       <div className={CLASSES_BUTTON.join(" ")} onClick={handleConnect}>
-      {ICONS[type]}
+        {ICONS[type]}
+
         <span className="text-truncate ml-2 caption-large text-white font-weight-medium flex-grow-1">
           {CREDENTIALS[type]}
         </span>
-        {isLoading && (
+
+        <If condition={isLoading}>
           <span className="spinner-border spinner-border-xs ml-1" />
-        )}
-        {STATE_ICON[state]}
+        </If>
       </div>
     </div>
   );
