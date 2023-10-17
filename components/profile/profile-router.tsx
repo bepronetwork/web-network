@@ -39,7 +39,8 @@ export default function ProfileRouter(props: ProfilePageProps) {
   useEffect(() => {
     push({ pathname, query: {
       ...query,
-      networkName: null
+      networkName: null,
+      networkChain: null
     } }, asPath);
   }, [asPath]);
 
