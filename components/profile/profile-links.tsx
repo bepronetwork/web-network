@@ -21,11 +21,13 @@ export default function ProfileLinks({
 
   const { getURLWithNetwork } = useNetwork();
 
+  const cleanQuery = { ...query, networkName: null, networkChain: null };
+
   const getHref = (href = "") =>
     query?.network ? `/${query?.network}/${query?.chain}/profile/${href}` : `/profile/${href}`;
   const getUrl = () => query?.network ?
-    getURLWithNetwork("/profile/[[...profilePage]]") :
-    { pathname: "/profile/[[...profilePage]]", query };
+    getURLWithNetwork("/profile/[[...profilePage]]", cleanQuery) :
+    { pathname: "/profile/[[...profilePage]]", query: cleanQuery };
   const isActive = href => asPath.endsWith(`/profile${href ? `/${href}` : ""}`);
 
   const ProfileLink = ({ label, href, icon }: LinkProps) => (

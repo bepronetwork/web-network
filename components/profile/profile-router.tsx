@@ -14,7 +14,7 @@ import WalletPage from "components/profile/pages/wallet/view";
 import { ProfilePageProps } from "types/pages";
 
 export default function ProfileRouter(props: ProfilePageProps) {
-  const { query, pathname, asPath, push } = useRouter();
+  const { asPath, push } = useRouter();
 
   const Route = (path, page) => ({ path, page });
 
@@ -35,14 +35,6 @@ export default function ProfileRouter(props: ProfilePageProps) {
     if (!currentRoute)
       push("/404");
   }, [currentRoute]);
-
-  useEffect(() => {
-    push({ pathname, query: {
-      ...query,
-      networkName: null,
-      networkChain: null
-    } }, asPath);
-  }, [asPath]);
 
   if (currentRoute)
     return <currentRoute.page {...props} />;
