@@ -9,6 +9,8 @@ import TokenIcon from "components/token-icon";
 
 import { useAppState } from "contexts/app-state";
 
+import { MINUTE_IN_MS } from "helpers/constants";
+
 import { SupportedChainData } from "interfaces/supported-chain-data";
 import { Token } from "interfaces/token";
 
@@ -138,8 +140,8 @@ export default function WalletBalance({
     useReactQuery(["tokens-balance", state.currentUser?.walletAddress],
                   loadTokensBalance,
                   {
-                      enabled:  !!state.currentUser?.walletAddress && 
-                                !!state.supportedChains
+                    enabled: !!state.currentUser?.walletAddress && !!state.supportedChains,
+                    staleTime: MINUTE_IN_MS
                   });
 
   useEffect(() => {
