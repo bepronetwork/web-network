@@ -77,7 +77,7 @@ export default function SelectNetwork({
 
   function handleSelectedWithNetworkName(options) {
     const opt = options?.find(({ value }) => value?.name === query?.networkName)
-    if(opt) setSelected(opt)
+    setSelected(opt);
   }
 
   useEffect(() => {
