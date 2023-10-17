@@ -9,6 +9,7 @@ import { ProfilePageProps } from "types/pages";
 
 import { useGetChains } from "x-hooks/api/chain";
 import { useGetProfileBounties, useGetProfilePayments } from "x-hooks/api/pages/profile";
+import { useGetTokens } from "x-hooks/api/token";
 
 const { serverRuntimeConfig: { auth: { secret } } } = getConfig();
 
@@ -29,7 +30,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query, local
 
   const getDataFn = {
     payments: () => useGetProfilePayments(queryWithWallet),
-    wallet: () => useGetChains().then(chains => ({ chains })).catch(() => ({ chains: [] })),
+    wallet: () => Promise.all([
+      useGetTokens().then(tokens => tokens?.filter(token => token?.isTransactional)).catch(() => []),
+      useGetChains().catch(() => [])
+    ])
+      .then(([tokens, chains]) => ({ tokens, chains })),
     bounties: () => useGetProfileBounties(queryWithWallet, "creator").then(bountiesResult),
     proposals: () => useGetProfileBounties(queryWithWallet, "proposer").then(bountiesResult),
     "deliverables": () => useGetProfileBounties(queryWithWallet, "deliverabler").then(bountiesResult),
