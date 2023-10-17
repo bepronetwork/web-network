@@ -53,8 +53,11 @@ export default function WalletBalance({
 
   async function processToken(token: Token, service: DAO) {
     const [tokenInformation, balance] = await Promise.all([
-      getCoinInfoByContract(token?.symbol),
-      service.getTokenBalance(getAddress(token), state?.currentUser?.walletAddress),
+      getCoinInfoByContract(token?.symbol)
+        .catch(() => ({ prices: {}, icon: null })),
+      service
+        .getTokenBalance(getAddress(token), state?.currentUser?.walletAddress)
+        .catch(() => BigNumber(0)),
     ]);
 
     return {
