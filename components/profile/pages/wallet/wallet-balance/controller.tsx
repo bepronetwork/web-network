@@ -141,15 +141,19 @@ export default function WalletBalance({
 
   useEffect(() => {
     if (!isLoading && isSuccess) {
-      setTokensWithBalance(tokensData.map(token => toTokenWithBalance(token)));
-      const hasNoConverted = tokensData.some(token => !token?.price);
+      const filteredTokens = tokensData
+        .map(token => toTokenWithBalance(token))
+        .filter(({ name, symbol, networks, chain_id }) => handleSearchFilter(name, symbol, networks, chain_id))
+      setTokensWithBalance(filteredTokens);
+      const hasNoConverted = filteredTokens.some(token => !token?.price);
       setHasNoConvertedToken(hasNoConverted);
       const total = hasNoConverted ? 
-        tokensData.reduce( (acc, token) => BigNumber(token.balance).plus(acc), BigNumber(0)) :
-        tokensData.reduce( (acc, token) => BigNumber(token.balance).multipliedBy(token.price).plus(acc), BigNumber(0));
+        filteredTokens.reduce((acc, token) => BigNumber(token.balance).plus(acc), BigNumber(0)) :
+        filteredTokens.reduce((acc, token) => 
+          BigNumber(token.balance).multipliedBy(token.price).plus(acc), BigNumber(0));
       setTotalAmount(total.toFixed());
     }
-  }, [tokensData]);
+  }, [tokensData, query?.networkName, query?.networkChain]);
 
   useEffect(() => {
     if(!query?.networkName && query?.network){
@@ -167,8 +171,7 @@ export default function WalletBalance({
       isOnNetwork={!!query?.network}
       hasNoConvertedToken={hasNoConvertedToken}
       defaultFiat={state?.Settings?.currency?.defaultFiat}
-      tokens={tokensWithBalance?.filter(({ name, symbol, networks, chain_id }) =>
-        handleSearchFilter(name, symbol, networks, chain_id))}
+      tokens={tokensWithBalance}
       searchString={searchState}
       onSearchClick={updateSearch}
       onSearchInputChange={handleSearchChange}
