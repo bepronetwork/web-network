@@ -100,7 +100,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
       </div>
       <div className="overflow-auto tx-container mt-1 pt-2">
         {(!transactions || !transactions.length) && emptyTransaction()}
-        {transactions.sort((a, b) => a.date < b.date ? 1 : 0).map(renderTransactionRow)}
+        {transactions.reverse().map(renderTransactionRow)}
       </div>
     </div>
   );
