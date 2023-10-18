@@ -7,17 +7,16 @@ import ReactSelect from "components/react-select";
 
 import { MAX_TAGS } from "helpers/constants";
 
+import { GroupedSelectOption, SelectOption } from "types/utils";
+
 import BountyTagsView from "../bounty-tags/view";
 
 interface BountyEditTagViewProps {
   isEdit: boolean;
   selectedTags: string[];
   preview?: boolean;
-  handleChangeTags: (v: string[]) => void;
-  tagsOptions: {
-    label: string;
-    value: string;
-  }[];
+  handleChangeTags: (tags: SelectOption[]) => void;
+  tagsOptions: GroupedSelectOption[];
 }
 
 export default function BountyEditTagView({
