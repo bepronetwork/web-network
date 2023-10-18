@@ -40,8 +40,8 @@ export default function ProposalDistributionListView({
                   t("proposal:merge-modal.contributor-description")))
       : []),
     getItem(distributedAmounts?.mergerAmount,
-            t("proposal:merge-modal.proposal-merger"),
-            t("proposal:merge-modal.proposal-merger-description")),
+            t("proposal:merge-modal.proposal-accepter"),
+            t("proposal:merge-modal.proposal-accepter-description")),
     getItem(distributedAmounts?.treasuryAmount,
             t("proposal:merge-modal.network-fee"),
             t("proposal:merge-modal.network-fee-description", {

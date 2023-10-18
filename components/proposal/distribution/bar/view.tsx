@@ -31,8 +31,8 @@ export default function DistributionBar({
     {
       ...merge,
       progressColor: "gray-700",
-      label: t("proposal:merge-modal.proposal-merger"),
-      description: t("proposal:merge-modal.proposal-merger-description"),
+      label: t("proposal:merge-modal.proposal-accepter"),
+      description: t("proposal:merge-modal.proposal-accepter-description"),
     },
     {
       ...treasury,
