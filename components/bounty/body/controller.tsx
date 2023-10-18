@@ -9,7 +9,6 @@ import { addToast, toastError } from "contexts/reducers/change-toaster";
 
 import { BODY_CHARACTERES_LIMIT } from "helpers/constants";
 import { addFilesToMarkdown } from "helpers/markdown";
-import { TAGS_OPTIONS } from "helpers/tags-options";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
 
@@ -31,12 +30,10 @@ export default function BountyBody({
   updateBountyData
 }: BountyBodyControllerProps) {
   const { t } = useTranslation(["common", "bounty"]);
-
   const [body, setBody] = useState<string>(currentBounty?.body);
   const [files, setFiles] = useState<IFilesProps[]>([]);
   const [isPreview, setIsPreview] = useState<boolean>(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>(TAGS_OPTIONS.filter((tag) =>
-    currentBounty?.tags?.includes(tag.value)).map((e) => e.value));
+  const [selectedTags, setSelectedTags] = useState<string[]>(currentBounty.tags);
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const { state, dispatch } = useAppState();

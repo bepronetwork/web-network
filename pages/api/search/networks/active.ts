@@ -1,15 +1,16 @@
 import BigNumber from "bignumber.js";
 import {NextApiRequest, NextApiResponse} from "next";
 import {Op, WhereOptions} from "sequelize";
+import {isAddress} from "web3-utils";
 
 import models from "db/models";
 
 import {paginateArray} from "helpers/paginate";
 
 import {withCORS} from "middleware";
+
 import {lowerCaseIncludes} from "../../../../helpers/string";
 import {HttpBadRequestError} from "../../../../server/errors/http-errors";
-import {isAddress} from "web3-utils";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -58,12 +59,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   })
 
   const result = networks.map((network) => {
+    const tokensLocked = network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
+                                                   BigNumber(0))
+    const delegatedLocked = network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.delegatedToMe || 0),
+                                                      BigNumber(0))                                       
+
     return {
             name: network?.name,
             fullLogo: network?.fullLogo,
             logoIcon: network?.logoIcon,
-            totalValueLock: network?.curators?.reduce((ac, cv) => BigNumber(ac).plus(cv?.tokensLocked || 0),
-                                                      BigNumber(0)),
+            totalValueLock: tokensLocked?.plus(delegatedLocked),
             totalIssues: network?.issues?.length || 0,
             countIssues: network?.issues?.length || 0,
             chain: network?.chain
