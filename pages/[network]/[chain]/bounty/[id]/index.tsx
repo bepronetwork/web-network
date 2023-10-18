@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { dehydrate } from "@tanstack/react-query";
+import BigNumber from "bignumber.js";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
@@ -17,6 +18,7 @@ import If from "components/If";
 import { useAppState } from "contexts/app-state";
 import { BountyEffectsProvider } from "contexts/bounty-effects";
 
+import { getDeveloperAmount } from "helpers/calculateDistributedAmounts";
 import { commentsParser, issueParser } from "helpers/issue";
 
 import { IssueData } from "interfaces/issue-data";
@@ -30,6 +32,8 @@ import useReactQuery from "x-hooks/use-react-query";
 export default function PageIssue() {
   const { query } = useRouter();
 
+  const { state } = useAppState();
+
   const bountyId = query?.id;
   const bountyQueryKey = ["bounty", bountyId.toString()];
   const commentsQueryKey = ["bounty", "comments", bountyId.toString()];
@@ -38,12 +42,22 @@ export default function PageIssue() {
   const { data: comments, invalidate: invalidateComments } = 
     useReactQuery(commentsQueryKey, () => getCommentsData({ issueId: bountyId, type: "issue" }));
 
-  const parsedBounty = issueParser(bounty);
+  const treasury = state.Service?.network?.amounts?.treasury;
+  const mergeCreatorFeeShare = state.Service?.network?.amounts?.mergeCreatorFeeShare;
+  const proposerFeeShare = state.Service?.network?.amounts?.proposerFeeShare;
+
+  const developerAmount = getDeveloperAmount( treasury,
+                                              mergeCreatorFeeShare,
+                                              proposerFeeShare,
+                                              BigNumber(bounty?.amount));
+
+  const parsedBounty = issueParser({
+    ...bounty,
+    developerAmount
+  });
   const parsedComments = commentsParser(comments);
 
   const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
-
-  const { state } = useAppState();
 
   async function updateBountyData() {
     invalidateBounty();
