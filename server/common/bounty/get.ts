@@ -1,9 +1,11 @@
+import BigNumber from "bignumber.js";
 import { NextApiRequest } from "next";
 import { Op, Sequelize } from "sequelize";
 
 import models from "db/models";
 import Issue from "db/models/issue.model";
 
+import { getDeveloperAmount } from "helpers/calculateDistributedAmounts";
 import { chainFromHeader } from "helpers/chain-from-header";
 
 import { HttpBadRequestError, HttpNotFoundError } from "server/errors/http-errors";
@@ -24,7 +26,7 @@ export async function get(req: NextApiRequest): Promise<Issue> {
     { association: "benefactors" },
     { association: "disputes" },
     { association: "user" },
-    { association: "network", include: [{ association: "chain", attributes: [ "chainShortName" ] }] },
+    {  association: "network", include: [ { association: "chain", attributes: [ "chainShortName" ] } ] },
   ];
 
   const chainHeader = await chainFromHeader(req);
@@ -63,6 +65,10 @@ export async function get(req: NextApiRequest): Promise<Issue> {
 
   if (!issue)
     throw new HttpNotFoundError("Issue not found");
+
+  issue.dataValues.developerAmount = getDeveloperAmount(issue.network.mergeCreatorFeeShare,
+                                                        issue.network.proposerFeeShare,
+                                                        BigNumber(issue?.amount));
 
   return issue;
 }

@@ -30,6 +30,8 @@ import useReactQuery from "x-hooks/use-react-query";
 export default function PageIssue() {
   const { query } = useRouter();
 
+  const { state } = useAppState();
+
   const bountyId = query?.id;
   const bountyQueryKey = ["bounty", bountyId.toString()];
   const commentsQueryKey = ["bounty", "comments", bountyId.toString()];
@@ -42,8 +44,6 @@ export default function PageIssue() {
   const parsedComments = commentsParser(comments);
 
   const [isEditIssue, setIsEditIssue] = useState<boolean>(false);
-
-  const { state } = useAppState();
 
   async function updateBountyData() {
     invalidateBounty();

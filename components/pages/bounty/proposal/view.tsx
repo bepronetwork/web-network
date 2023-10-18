@@ -51,7 +51,9 @@ export default function ProposalPageView({
 }: ProposalPageViewProps) {
   return (
     <>
-      <PullAndProposalHero proposal={proposal} />
+      <PullAndProposalHero
+        proposal={proposal}
+      />
 
       <CustomContainer>
         <If condition={isMergeable}>

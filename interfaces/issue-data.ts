@@ -29,6 +29,7 @@ export interface IssueData {
   fundingAmount?: string;
   fundedAmount?: string;
   rewardAmount?: string;
+  developerAmount?: string;
   body: string;
   createdAt: Date;
   dueDate?: string;
@@ -81,8 +82,9 @@ export interface Disputes {
 }
 
 export interface IssueBigNumberData 
-  extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount" | "rewardAmount"> {
+  extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount" | "rewardAmount" | "developerAmount" > {
   amount: BigNumber;
+  developerAmount: BigNumber;
   fundingAmount: BigNumber;
   fundedAmount: BigNumber;
   rewardAmount: BigNumber;
