@@ -29,6 +29,7 @@ export interface IssueData {
   fundingAmount?: string;
   fundedAmount?: string;
   rewardAmount?: string;
+  developerAmount?: BigNumber;
   body: string;
   createdAt: Date;
   dueDate?: string;
