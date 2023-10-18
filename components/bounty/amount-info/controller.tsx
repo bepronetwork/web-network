@@ -13,7 +13,7 @@ export default function BountyAmount({
 }) {
   const isFundingRequest = !!bounty?.fundingAmount?.gt(0);
   const bountyAmount =
-    (isFundingRequest ? bounty?.fundingAmount : bounty?.amount) ||
+    (isFundingRequest ? bounty?.fundingAmount : bounty?.developerAmount) ||
     BigNumber("0");
   const isActive = ["closed", "canceled"].includes(bounty?.state);
 

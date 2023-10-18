@@ -1,6 +1,9 @@
+import BigNumber from "bignumber.js";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import models from "db/models";
+
+import { getDeveloperAmount } from "helpers/calculateDistributedAmounts";
 
 import { Logger } from "services/logging";
 
@@ -32,6 +35,11 @@ export default async function get(req: NextApiRequest, res: NextApiResponse) {
       },
       include,
     });
+
+    deliverable.dataValues.issue.dataValues.developerAmount = 
+      getDeveloperAmount( deliverable.issue.network.mergeCreatorFeeShare,
+                          deliverable.issue.network.proposerFeeShare,
+                          BigNumber(deliverable.issue.amount));
 
     return res.status(200).json(deliverable);
   } catch (error) {

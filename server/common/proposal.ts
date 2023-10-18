@@ -1,8 +1,10 @@
+import BigNumber from "bignumber.js";
 import { ParsedUrlQuery } from "querystring";
 import { Sequelize } from "sequelize";
 
 import models from "db/models";
 
+import { getDeveloperAmount } from "helpers/calculateDistributedAmounts";
 import { caseInsensitiveEqual } from "helpers/db/conditionals";
 import { getAssociation } from "helpers/db/models";
 
@@ -39,7 +41,7 @@ export default async function get(query: ParsedUrlQuery) {
         getAssociation("transactionalToken", ["name", "symbol"]),
         getAssociation("user", ["address", "githubLogin"]),
       ]),
-      getAssociation("network", [], true, {
+      getAssociation("network", ["mergeCreatorFeeShare", "proposerFeeShare"], true, {
         name: caseInsensitiveEqual("network.name", network?.toString())
       }, [
         getAssociation("chain", [], true, {
@@ -51,6 +53,12 @@ export default async function get(query: ParsedUrlQuery) {
 
   if (!proposal)
     throw new HttpNotFoundError("Proposal not found");
+
+  const mergeCreatorFeeShare = proposal.network.mergeCreatorFeeShare;
+  const proposerFeeShare = proposal.network.proposerFeeShare;
+  proposal.dataValues.issue.dataValues.developerAmount = getDeveloperAmount(mergeCreatorFeeShare,
+                                                                            proposerFeeShare,
+                                                                            BigNumber(proposal.issue.amount));
 
   return proposal;
 }

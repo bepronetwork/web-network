@@ -128,7 +128,7 @@ export default function FundingSectionView({
               <CaptionMedium text={t("funding:current-funding")} color="gray-600" />
             }
             col2={
-              <CaptionMedium text={t("funding:total-amount")} color="gray-600" />
+              <CaptionMedium text={t("funding:gross-total-amount")} color="gray-600" />
             }
           />
 
