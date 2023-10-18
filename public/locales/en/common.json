@@ -72,7 +72,9 @@
     "new-network": "New Marketplace",
     "my-network": "My Marketplace",
     "networks": "Marketplaces",
+    "marketplaces": "Marketplaces",
     "bounties": "Tasks",
+    "tasks": "Tasks",
     "nav-avatar": {
       "my-profile": "My profile",
       "profile": "Profile",
@@ -155,7 +157,8 @@
     "clear-all": "Clear All",
     "apply": "Apply",
     "clear": "Clear",
-    "save": "Save"
+    "save": "Save",
+    "accept": "Accept"
   },
   "misc": {
     "by": "by",

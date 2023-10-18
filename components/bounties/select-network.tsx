@@ -77,14 +77,14 @@ export default function SelectNetwork({
 
   function handleSelectedWithNetworkName(options) {
     const opt = options?.find(({ value }) => value?.name === query?.networkName)
-    if(opt) setSelected(opt)
+    setSelected(opt);
   }
 
   useEffect(() => {
     const options = networks?.rows?.map(networkToOption);
     setOptions(options || [])
     handleSelectedWithNetworkName(options);
-  }, [networks]);
+  }, [networks, query?.networkName]);
 
   useEffect(() => {
     if (state.Service?.network?.active && !selected && isCurrentDefault)
