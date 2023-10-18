@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
+import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useAppState } from "contexts/app-state";
 
-import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
+import calculateDistributedAmounts, { getAmountWithFeesOfAmount } from "helpers/calculateDistributedAmounts";
 
 import { DistributionsProps } from "interfaces/proposal";
 import { Token } from "interfaces/token";
@@ -72,18 +73,27 @@ export default function CreateBountyTokenAmount({
     if (!value || !Service?.network?.amounts) return;
   
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
+    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
 
     const handleNumberFormat = (v: BigNumber) => ({
       value: v.toFixed(),
       floatValue: v.toNumber(),
       formattedValue: v.toFixed()
     })
+
+    const amountOfType = type === "reward" ? 
+      getAmountWithFeesOfAmount(value, networkFee, mergeCreatorFeeShare, proposerFeeShare) : BigNumber(value);
   
-    const initialDistributions = calculateDistributedAmounts(treasury,
-                                                             mergeCreatorFeeShare,
-                                                             proposerFeeShare,
-                                                             BigNumber(value),
-                                                        [{recipient: currentUser?.walletAddress, percentage: 100}]);
+    const initialDistributions = calculateDistributedAmounts( treasury,
+                                                              mergeCreatorFeeShare,
+                                                              proposerFeeShare,
+                                                              amountOfType,
+                                                              [
+                                                                {
+                                                                  recipient: currentUser?.walletAddress,
+                                                                  percentage: 100
+                                                                }
+                                                              ]);
 
     const { mergerAmount, proposerAmount, treasuryAmount } = initialDistributions;
 
@@ -132,7 +142,7 @@ export default function CreateBountyTokenAmount({
           amount: currentToken?.minimum,
       }));
     } else {
-      if(isFunders) debouncedDistributionsUpdater(values.value, type)
+      debouncedDistributionsUpdater(values.value, type);
       setType(values);
       if (inputError) setInputError("");
     }
@@ -151,12 +161,6 @@ export default function CreateBountyTokenAmount({
   }
 
   useEffect(handleUpdateToken, [currentToken?.minimum]);
-
-  useEffect(() => {
-    if(issueAmount?.value && !rewardAmount?.value){
-      debouncedDistributionsUpdater(issueAmount.value, 'total')
-    }
-  }, [issueAmount])
 
   return (
     <CreateBountyTokenAmountView
