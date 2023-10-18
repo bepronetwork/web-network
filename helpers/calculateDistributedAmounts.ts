@@ -49,14 +49,13 @@ export default function calculateDistributedAmounts(treasury,
   };
 }
 
-export function getDeveloperAmount( treasury,
-                                    mergerFee: string | number,
+export function getDeveloperAmount( mergerFee: string | number,
                                     proposerFee: string | number,
-                                    bountyAmount: BigNumber) {
-  const distributedAmounts = calculateDistributedAmounts( treasury,
+                                    bountyAmount: BigNumber): string {
+  const distributedAmounts = calculateDistributedAmounts( { treasury: "0x123", closeFee: 10 },
                                                           mergerFee, 
                                                           proposerFee, 
                                                           bountyAmount, 
                                                           [{recipient: "0x00", percentage: 100}]);
-  return BigNumber(distributedAmounts?.proposals?.at(0)?.value);
+  return distributedAmounts?.proposals?.at(0)?.value;
 }
