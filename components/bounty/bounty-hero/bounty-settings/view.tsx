@@ -9,14 +9,12 @@ import { useTranslation } from "next-i18next";
 import Modal from "components/modal";
 import Translation from "components/translation";
 
-import { ServiceNetwork } from "interfaces/application-state";
-
 interface BountySettingsViewProps {
     handleEditIssue?: () => void;
     isEditIssue?: boolean;
     handleHardCancel?: () => void;
     handleRedeem?: () => void;
-    network: ServiceNetwork;
+    isGovernor: boolean;
     isWalletConnected: boolean;
     isBountyInDraft: boolean;
     isBountyOwner: boolean;
@@ -31,7 +29,7 @@ export default function BountySettingsView({
     handleHardCancel,
     handleRedeem,
     isEditIssue,
-    network,
+    isGovernor,
     isWalletConnected,
     isBountyInDraft,
     isBountyOwner,
@@ -105,8 +103,8 @@ export default function BountySettingsView({
           />
         </span>
       );
-  
-    if (network?.active?.isGovernor && isCancelable)
+
+    if (isGovernor && isCancelable)
       return Cancel(true);
   
     const isDraftOrNotFunded = isFundingRequest
