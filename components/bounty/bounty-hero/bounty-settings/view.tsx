@@ -136,12 +136,12 @@ export default function BountySettingsView({
       <>
         <div className="position-relative d-flex justify-content-end" ref={node}>
           <div
-            className={`cursor-pointer border ${
+            className={`cursor-pointer hover-white border ${
               (show && "border-primary") || "border-gray-850"
             } border-radius-8 d-flex`}
             onClick={() => setShow(!show)}
           >
-            <span className="mx-2 mb-2">. . .</span>
+            <span className="mx-2 my-1">{t("common:misc.options")}</span>
           </div>
   
           <div
