@@ -48,3 +48,15 @@ export default function calculateDistributedAmounts(treasury,
     }),
   };
 }
+
+export function getDeveloperAmount( treasury,
+                                    mergerFee: string | number,
+                                    proposerFee: string | number,
+                                    bountyAmount: BigNumber) {
+  const distributedAmounts = calculateDistributedAmounts( treasury,
+                                                          mergerFee, 
+                                                          proposerFee, 
+                                                          bountyAmount, 
+                                                          [{recipient: "0x00", percentage: 100}]);
+  return BigNumber(distributedAmounts?.proposals?.at(0)?.value);
+}
