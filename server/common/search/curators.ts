@@ -78,8 +78,20 @@ export default async function get(query: ParsedUrlQuery) {
 
   const totalCurators = await models.curator.count({
     where: {
-      isCurrentlyCurator: true
-    }
+      isCurrentlyCurator: true,
+    },
+    ...(network
+      ? {
+          include: {
+            association: "network",
+            required: true,
+            attributes: [],
+            where: {
+              name: caseInsensitiveEqual("network.name", network.toString()),
+            },
+          },
+      }
+      : null),
   });
 
   return {
