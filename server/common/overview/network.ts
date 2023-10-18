@@ -83,6 +83,7 @@ export default async function get(query: ParsedUrlQuery) {
       ],
       where: {
         transactionalTokenId: network.network_token_id,
+        network_id: network.id,
         state: "closed"
       }
     }),
