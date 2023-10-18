@@ -45,7 +45,7 @@ export default function BountyHeroView({
   function renderPriceConversor() {
     return (
       <PriceConversor
-        currentValue={bounty?.amount}
+        currentValue={bounty?.developerAmount}
         currency={
           bounty?.transactionalToken?.symbol ||
           t("common:misc.token")
