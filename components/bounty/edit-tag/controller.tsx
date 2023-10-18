@@ -1,4 +1,4 @@
-import { TAGS_OPTIONS } from "helpers/tags-options";
+import { BOUNTY_TAGS } from "helpers/constants";
 
 import BountyEditTagView from "./view";
 
@@ -22,7 +22,13 @@ export default function BountyEditTag({
 
   return (
     <BountyEditTagView
-      tagsOptions={TAGS_OPTIONS}
+      tagsOptions={BOUNTY_TAGS.map(({ type, tags }) => ({
+        label: type,
+        options: tags.map((tag) => ({
+          label: tag,
+          value: tag,
+        }))
+      }))}
       handleChangeTags={handleChangeTags}
       selectedTags={selectedTags}
       preview={preview}
