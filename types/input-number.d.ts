@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { NumberFormatProps, NumberFormatValues } from "react-number-format";
+import { NumberFormatProps, NumberFormatValues, SourceInfo } from "react-number-format";
 
 export interface InputNumber extends NumberFormatProps {
   label?: string | ReactElement;
@@ -8,7 +8,7 @@ export interface InputNumber extends NumberFormatProps {
   error?: boolean;
   success?: boolean;
   warning?: boolean;
-  onValueChange?: (values: NumberFormatValues) => void;
+  onValueChange?: (values: NumberFormatValues, sourceInfo?: SourceInfo) => void;
   value?: number | string | null;
   suffix?: string;
   classSymbol?: string;
