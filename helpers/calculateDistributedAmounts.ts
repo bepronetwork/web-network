@@ -86,12 +86,25 @@ export function getAmountWithFeesOfAmount(amount: string,
   return amountWithFee;
 }
 
-export function calculateTotalAmountFromGivenReward(reward: number, f1: number, f2: number, f3: number) {
+export function calculateTotalAmountFromGivenReward(reward: number,
+                                                    networkFee: number,
+                                                    mergerFee: number,
+                                                    proposerFee: number) {
   const _reward = BigNumber(reward);
-  const _f1 = BigNumber(f1);
-  const _f2 = BigNumber(f2);
-  const _f3 = BigNumber(f3);
+  const _networkFee = BigNumber(networkFee);
+  const _mergerFee = BigNumber(mergerFee);
+  const _proposerFee = BigNumber(proposerFee);
   const _one = BigNumber(1);
 
-  return _reward.div(_one.minus(_f1).minus(_one.minus(_f1).times(_f2)).minus(_one.minus(_f1).minus(_one.minus(_f1).times(_f2)).times(_f3)))
+  return _reward.div(_one
+    .minus(_networkFee)
+    .minus(_one
+      .minus(_networkFee)
+      .times(_mergerFee))
+    .minus(_one
+      .minus(_networkFee)
+      .minus(_one
+        .minus(_networkFee)
+        .times(_mergerFee))
+      .times(_proposerFee)));
 }
