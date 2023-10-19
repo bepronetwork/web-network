@@ -9,6 +9,7 @@ import {useDebouncedCallback} from "use-debounce";
 import {useAppState} from "contexts/app-state";
 
 import calculateDistributedAmounts, {calculateTotalAmountFromGivenReward} from "helpers/calculateDistributedAmounts";
+import { CHAIN_DEFAULT_DECIMALS } from "helpers/constants";
 
 import {DistributionsProps} from "interfaces/proposal";
 import {Token} from "interfaces/token";
@@ -133,14 +134,15 @@ export default function CreateBountyTokenAmount({
     const distributions = { totalServiceFees, ...initialDistributions}
 
     if(type === 'reward'){
-      const total = BigNumber(_calculateTotalAmountFromGivenReward(value))
+      const total = BigNumber(_calculateTotalAmountFromGivenReward(value).toFixed(CHAIN_DEFAULT_DECIMALS));
       updateIssueAmount(handleNumberFormat(total))
       if (amountIsGtBalance(total.toNumber(), tokenBalance))
         setInputError(t("bounty:errors.exceeds-allowance"));
     }
 
     if(type === 'total'){
-      const rewardValue = BigNumber(calculateRewardAmountGivenTotalAmount(value));
+      const rewardValue = 
+        BigNumber(BigNumber(calculateRewardAmountGivenTotalAmount(value)).toFixed(CHAIN_DEFAULT_DECIMALS));
       setRewardAmount(handleNumberFormat(rewardValue))
     }
 
