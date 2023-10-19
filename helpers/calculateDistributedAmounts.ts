@@ -59,33 +59,6 @@ export function getDeveloperAmount( mergerFee: string | number,
   return distributedAmounts?.proposals?.at(0)?.value;
 }
 
-export function getAmountWithFeesOfAmount(amount: string,
-                                          networkFee: string | number,
-                                          mergerFee: string | number,
-                                          proposerFee: string | number): BigNumber {
-  let amountWithFee = BigNumber(amount);
-  const tolerance = 0.0000000000000000001;
-  const bnNetworkFee = BigNumber(networkFee).div(100);
-  const bnMergerFee = BigNumber(mergerFee).div(100);
-  const bnProposerFee = BigNumber(proposerFee).div(100);
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const oldBountyAmount = amountWithFee;
-    const networkAmount = amountWithFee.multipliedBy(bnNetworkFee);
-    const mergerAmount = amountWithFee.minus(networkAmount).multipliedBy(bnMergerFee);
-    const proposerAmount = amountWithFee.minus(networkAmount).minus(mergerAmount).multipliedBy(bnProposerFee);
-
-    amountWithFee = BigNumber(amount).plus(networkAmount).plus(mergerAmount).plus(proposerAmount);
-
-    if (amountWithFee.minus(oldBountyAmount).absoluteValue().lt(tolerance)) {
-      break;
-    }
-  }
-
-  return amountWithFee;
-}
-
 export function calculateTotalAmountFromGivenReward(reward: number,
                                                     networkFee: number,
                                                     mergerFee: number,
