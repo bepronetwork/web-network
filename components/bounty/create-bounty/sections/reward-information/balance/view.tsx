@@ -1,5 +1,7 @@
 import { useTranslation } from "next-i18next";
 
+import { formatStringToCurrency } from "helpers/formatNumber";
+
 export default function RewardInformationBalanceView({
   amount,
   symbol,
@@ -11,7 +13,7 @@ export default function RewardInformationBalanceView({
 
   return (
     <div className="text-truncate">
-      <span className="text-gray">{t("bounty:balance")}</span> {amount}{" "}
+      <span className="text-gray">{t("bounty:balance")}</span> {formatStringToCurrency(amount)}{" "}
       {symbol || t("common:misc.token")}
     </div>
   );
