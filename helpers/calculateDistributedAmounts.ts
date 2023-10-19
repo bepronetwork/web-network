@@ -1,8 +1,7 @@
-import { ProposalDetail } from "@taikai/dappkit";
-import { Defaults } from "@taikai/dappkit";
+import {Defaults, ProposalDetail} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 
-import { DistributedAmounts, ProposalDistribution } from "interfaces/proposal";
+import {DistributedAmounts, ProposalDistribution} from "interfaces/proposal";
 
 const bigNumberPercentage = 
   (value1: BigNumber, value2: BigNumber) => value1.dividedBy(value2).multipliedBy(100).toFixed(2);
@@ -85,4 +84,8 @@ export function getAmountWithFeesOfAmount(amount: string,
   }
 
   return amountWithFee;
+}
+
+export function calculateTotalAmountFromGivenReward(reward: number, f1: number, f2: number, f3: number) {
+  return reward / (1-f1-(1-f1)*f2-(1-f1-(1-f1)*f2)*f3);
 }

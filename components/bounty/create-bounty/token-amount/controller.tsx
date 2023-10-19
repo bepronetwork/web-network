@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import { NumberFormatValues } from "react-number-format";
+import {useEffect, useState} from "react";
+import {NumberFormatValues} from "react-number-format";
 
-import { Defaults } from "@taikai/dappkit";
+import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { useDebouncedCallback } from "use-debounce";
+import {useTranslation} from "next-i18next";
+import {useDebouncedCallback} from "use-debounce";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import calculateDistributedAmounts, { getAmountWithFeesOfAmount } from "helpers/calculateDistributedAmounts";
+import calculateDistributedAmounts, {calculateTotalAmountFromGivenReward} from "helpers/calculateDistributedAmounts";
 
-import { DistributionsProps } from "interfaces/proposal";
-import { Token } from "interfaces/token";
+import {DistributionsProps} from "interfaces/proposal";
+import {Token} from "interfaces/token";
 
 import CreateBountyTokenAmountView from "./view";
 
@@ -65,9 +65,34 @@ export default function CreateBountyTokenAmount({
     state: { currentUser, Service },
   } = useAppState();
 
-  const debouncedDistributionsUpdater = useDebouncedCallback((value, type) => handleDistributions(value, type), 500);
+  const debouncedDistributionsUpdater =
+    useDebouncedCallback((value, type) =>
+      handleDistributions(value, type), 500);
 
   const amountIsGtBalance = (v: string | number, balance: BigNumber) => BigNumber(v).gt(balance)
+
+
+  function calculateRewardAmountGivenTotalAmount(value: number) {
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
+    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
+
+    const _value = BigNumber(value);
+
+    console.log(networkFee, mergeCreatorFeeShare, proposerFeeShare)
+
+    const treasuryAmount = _value.multipliedBy(networkFee/100);
+    const mergerFee = _value.minus(treasuryAmount).multipliedBy(+mergeCreatorFeeShare/100);
+    const proposerFee = _value.minus(treasuryAmount).minus(mergerFee).multipliedBy(+proposerFeeShare/100);
+
+    return _value.minus(treasuryAmount).minus(mergerFee).minus(proposerFee).toNumber();
+  }
+
+  function _calculateTotalAmountFromGivenReward(reward: number) {
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
+    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
+
+    return calculateTotalAmountFromGivenReward(reward, +networkFee/100, +mergeCreatorFeeShare/100, +proposerFeeShare/100)
+  }
 
   function handleDistributions(value, type) {
     if (!value || !Service?.network?.amounts) return;
@@ -81,8 +106,15 @@ export default function CreateBountyTokenAmount({
       formattedValue: v.toFixed()
     })
 
-    const amountOfType = type === "reward" ? 
-      getAmountWithFeesOfAmount(value, networkFee, mergeCreatorFeeShare, proposerFeeShare) : BigNumber(value);
+    // const amountOfType = type === "reward" ?
+    //   getAmountWithFeesOfAmount(value, networkFee, mergeCreatorFeeShare, proposerFeeShare) : BigNumber(value);
+
+    console.log("type === reward",type === "reward")
+
+    const amountOfType =
+      BigNumber(type === "reward"
+        ? calculateTotalAmountFromGivenReward(value, networkFee, +mergeCreatorFeeShare, +proposerFeeShare)
+        : value);
   
     const initialDistributions = calculateDistributedAmounts( treasury,
                                                               mergeCreatorFeeShare,
@@ -106,13 +138,16 @@ export default function CreateBountyTokenAmount({
     const distributions = { totalServiceFees, ...initialDistributions}
 
     if(type === 'reward'){
-      const total = totalServiceFees.plus(rewardAmount?.value) 
+      const total = BigNumber(_calculateTotalAmountFromGivenReward(value))
+      console.log(`reward`, value, `total`, total.toNumber())
       updateIssueAmount(handleNumberFormat(total))
-      amountIsGtBalance(total.toNumber(), tokenBalance) && setInputError(t("bounty:errors.exceeds-allowance"));
+      if (amountIsGtBalance(total.toNumber(), tokenBalance))
+        setInputError(t("bounty:errors.exceeds-allowance"));
     }
 
     if(type === 'total'){
-      const rewardValue = BigNumber(issueAmount?.value).minus(totalServiceFees) 
+      const rewardValue = BigNumber(calculateRewardAmountGivenTotalAmount(value));
+      console.log(`total`, value, `reward`, rewardValue.toNumber())
       setRewardAmount(handleNumberFormat(rewardValue))
     }
 
