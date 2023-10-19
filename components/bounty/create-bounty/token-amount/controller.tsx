@@ -89,29 +89,26 @@ export default function CreateBountyTokenAmount({
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
     const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
 
-    return calculateTotalAmountFromGivenReward(reward, +networkFee/100, +mergeCreatorFeeShare/100, +proposerFeeShare/100)
+    return calculateTotalAmountFromGivenReward( reward, 
+                                                +networkFee/100,
+                                                +mergeCreatorFeeShare/100,
+                                                +proposerFeeShare/100)
   }
 
   function handleDistributions(value, type) {
     if (!value || !Service?.network?.amounts) return;
   
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
-    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
 
     const handleNumberFormat = (v: BigNumber) => ({
       value: v.toFixed(),
       floatValue: v.toNumber(),
       formattedValue: v.toFixed()
-    })
-
-    // const amountOfType = type === "reward" ?
-    //   getAmountWithFeesOfAmount(value, networkFee, mergeCreatorFeeShare, proposerFeeShare) : BigNumber(value);
-
-    console.log("type === reward",type === "reward")
+    });
 
     const amountOfType =
       BigNumber(type === "reward"
-        ? calculateTotalAmountFromGivenReward(value, networkFee, +mergeCreatorFeeShare, +proposerFeeShare)
+        ? _calculateTotalAmountFromGivenReward(value)
         : value);
   
     const initialDistributions = calculateDistributedAmounts( treasury,
@@ -137,7 +134,6 @@ export default function CreateBountyTokenAmount({
 
     if(type === 'reward'){
       const total = BigNumber(_calculateTotalAmountFromGivenReward(value))
-      console.log(`reward`, value, `total`, total.toFixed())
       updateIssueAmount(handleNumberFormat(total))
       if (amountIsGtBalance(total.toNumber(), tokenBalance))
         setInputError(t("bounty:errors.exceeds-allowance"));
@@ -145,7 +141,6 @@ export default function CreateBountyTokenAmount({
 
     if(type === 'total'){
       const rewardValue = BigNumber(calculateRewardAmountGivenTotalAmount(value));
-      console.log(`total`, value, `reward`, rewardValue)
       setRewardAmount(handleNumberFormat(rewardValue))
     }
 
