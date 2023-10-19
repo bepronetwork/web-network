@@ -23,6 +23,8 @@ export default function RewardInformationSection({
   rewardTokens,
   rewardBalance,
   bountyBalance,
+  previewAmount,
+  distributions,
   updateRewardToken,
   updateTransactionalToken,
   addToken,
@@ -30,6 +32,8 @@ export default function RewardInformationSection({
   updateIssueAmount,
   updateRewardAmount,
   updateIsFundingType,
+  setPreviewAmount,
+  setDistributions,
 }: RewardInformationSectionProps) {
   const {
     state: { currentUser },
@@ -61,6 +65,8 @@ export default function RewardInformationSection({
       rewardTokens={rewardTokens}
       rewardBalance={rewardBalance}
       bountyBalance={bountyBalance}
+      previewAmount={previewAmount}
+      distributions={distributions}
       updateRewardToken={updateRewardToken}
       updateTransactionalToken={updateTransactionalToken}
       addToken={addToken}
@@ -68,6 +74,8 @@ export default function RewardInformationSection({
       updateIssueAmount={updateIssueAmount}
       updateRewardAmount={updateRewardAmount}
       updateIsFunding={handleIsFunding}
+      setPreviewAmount={setPreviewAmount}
+      setDistributions={setDistributions}
     />
   );
 }

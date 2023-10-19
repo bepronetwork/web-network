@@ -26,6 +26,7 @@ import {NetworkEvents} from "interfaces/enums/events";
 import {TransactionStatus} from "interfaces/enums/transaction-status";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 import {Network} from "interfaces/network";
+import { DistributionsProps } from "interfaces/proposal";
 import {SupportedChainData} from "interfaces/supported-chain-data";
 import {Token} from "interfaces/token";
 import {SimpleBlockTransactionPayload} from "interfaces/transaction";
@@ -58,6 +59,7 @@ export default function CreateBountyPage({
   networks: allNetworks
 }: CreateBountyPageProps) {
   const { query } = useRouter();
+  const session = useSession();
   const { t } = useTranslation(["common", "bounty"]);
 
   const [files, setFiles] = useState<IFilesProps[]>([]);
@@ -85,7 +87,8 @@ export default function CreateBountyPage({
   const [originLinkError, setOriginLinkError] = useState<OriginLinkErrors>();
   const [userCanCreateBounties, setUserCanCreateBounties] = useState<boolean>(true);
   const [showCannotCreateBountyModal, setShowCannotCreateBountyModal] = useState<boolean>(true);
-  const session = useSession();
+  const [previewAmount, setPreviewAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
+  const [distributions, setDistributions] = useState<DistributionsProps>();
 
 
   const rewardERC20 = useERC20();
@@ -627,6 +630,10 @@ export default function CreateBountyPage({
       allowCreateBounty={userCanCreateBounties}
       showCannotCreateBountyModal={showCannotCreateBountyModal}
       closeCannotCreateBountyModal={() => setShowCannotCreateBountyModal(false)}
+      previewAmount={previewAmount}
+      setPreviewAmount={setPreviewAmount}
+      distributions={distributions}
+      setDistributions={setDistributions}
     />
   );
 }

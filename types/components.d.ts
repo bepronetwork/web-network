@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js";
 
 import { Currency } from "interfaces/currency";
 import { IssueBigNumberData } from "interfaces/issue-data";
+import { DistributionsProps } from "interfaces/proposal";
 import { SupportedChainData } from "interfaces/supported-chain-data";
 import { Token } from "interfaces/token";
 import { ProfilePages } from "interfaces/utils";
@@ -95,6 +96,8 @@ export interface RewardInformationViewProps {
   rewardTokens: Token[];
   rewardBalance: BigNumber;
   bountyBalance: BigNumber;
+  previewAmount: NumberFormatValues;
+  distributions: DistributionsProps;
   updateRewardToken: (v: Token) => void;
   updateTransactionalToken: (v: Token) => void;
   addToken: (newToken: Token) => Promise<void>;
@@ -102,6 +105,8 @@ export interface RewardInformationViewProps {
   updateIssueAmount: (v: NumberFormatValues) => void;
   updateRewardAmount: (v: NumberFormatValues) => void;
   updateIsFunding: (v: boolean) => void;
+  setPreviewAmount: (v: NumberFormatValues) => void;
+  setDistributions: (v: DistributionsProps) => void;
 }
 
 export interface RewardInformationSectionProps {
@@ -117,6 +122,8 @@ export interface RewardInformationSectionProps {
   rewardTokens: Token[];
   rewardBalance: BigNumber;
   bountyBalance: BigNumber;
+  previewAmount: NumberFormatValues;
+  distributions: DistributionsProps;
   updateRewardToken: (v: Token) => void;
   updateTransactionalToken: (v: Token) => void;
   addToken: (newToken: Token) => Promise<void>;
@@ -124,6 +131,8 @@ export interface RewardInformationSectionProps {
   updateIssueAmount: (v: NumberFormatValues) => void;
   updateRewardAmount: (v: NumberFormatValues) => void;
   updateIsFundingType: (v: boolean) => void;
+  setPreviewAmount: (v: NumberFormatValues) => void;
+  setDistributions: (v: DistributionsProps) => void;
 }
 
 export interface LinkProps {

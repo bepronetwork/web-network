@@ -37,6 +37,10 @@ interface CreateBountyTokenAmountProps {
   decimals: number;
   isFunding: boolean;
   needValueValidation: boolean;
+  previewAmount: NumberFormatValues;
+  distributions: DistributionsProps;
+  setPreviewAmount: (v: NumberFormatValues) => void;
+  setDistributions: (v: DistributionsProps) => void;
 }
 
 export default function CreateBountyTokenAmount({
@@ -55,12 +59,14 @@ export default function CreateBountyTokenAmount({
   needValueValidation,
   decimals = 18,
   isFunding = false,
+  previewAmount,
+  distributions,
+  setPreviewAmount,
+  setDistributions
 }: CreateBountyTokenAmountProps) {
   const { t } = useTranslation(["bounty", "common", "proposal"]);
   const [show, setShow] = useState<boolean>(false);
-  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
   const [inputError, setInputError] = useState("");
-  const [distributions, setDistributions] = useState<DistributionsProps>();
   const {
     state: { currentUser, Service },
   } = useAppState();
@@ -141,14 +147,14 @@ export default function CreateBountyTokenAmount({
 
     if(type === 'total'){
       const rewardValue = BigNumber(calculateRewardAmountGivenTotalAmount(value));
-      setRewardAmount(handleNumberFormat(rewardValue))
+      setPreviewAmount(handleNumberFormat(rewardValue))
     }
 
     setDistributions(distributions)
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues, type: 'reward' | 'total') {
-    const setType = type === 'reward' ? setRewardAmount : updateIssueAmount
+    const setType = type === 'reward' ? setPreviewAmount : updateIssueAmount
 
     if(needValueValidation && amountIsGtBalance(values.floatValue, tokenBalance)){
       setInputError(t("bounty:errors.exceeds-allowance"));
@@ -203,7 +209,7 @@ export default function CreateBountyTokenAmount({
       labelSelect={labelSelect}
       tokenBalance={tokenBalance}
       issueAmount={issueAmount}
-      rewardAmount={rewardAmount}
+      rewardAmount={previewAmount}
       isFunders={isFunders}
       decimals={decimals}
       isFunding={isFunding}
