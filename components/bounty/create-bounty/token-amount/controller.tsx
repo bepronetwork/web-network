@@ -78,13 +78,11 @@ export default function CreateBountyTokenAmount({
 
     const _value = BigNumber(value);
 
-    console.log(networkFee, mergeCreatorFeeShare, proposerFeeShare)
+    const treasuryAmount = _value.times(networkFee/100);
+    const mergerFee = _value.minus(treasuryAmount).times(+mergeCreatorFeeShare/100);
+    const proposerFee = _value.minus(treasuryAmount).minus(mergerFee).times(+proposerFeeShare/100);
 
-    const treasuryAmount = _value.multipliedBy(networkFee/100);
-    const mergerFee = _value.minus(treasuryAmount).multipliedBy(+mergeCreatorFeeShare/100);
-    const proposerFee = _value.minus(treasuryAmount).minus(mergerFee).multipliedBy(+proposerFeeShare/100);
-
-    return _value.minus(treasuryAmount).minus(mergerFee).minus(proposerFee).toNumber();
+    return _value.minus(treasuryAmount).minus(mergerFee).minus(proposerFee).toFixed();
   }
 
   function _calculateTotalAmountFromGivenReward(reward: number) {
@@ -139,7 +137,7 @@ export default function CreateBountyTokenAmount({
 
     if(type === 'reward'){
       const total = BigNumber(_calculateTotalAmountFromGivenReward(value))
-      console.log(`reward`, value, `total`, total.toNumber())
+      console.log(`reward`, value, `total`, total.toFixed())
       updateIssueAmount(handleNumberFormat(total))
       if (amountIsGtBalance(total.toNumber(), tokenBalance))
         setInputError(t("bounty:errors.exceeds-allowance"));
@@ -147,7 +145,7 @@ export default function CreateBountyTokenAmount({
 
     if(type === 'total'){
       const rewardValue = BigNumber(calculateRewardAmountGivenTotalAmount(value));
-      console.log(`total`, value, `reward`, rewardValue.toNumber())
+      console.log(`total`, value, `reward`, rewardValue)
       setRewardAmount(handleNumberFormat(rewardValue))
     }
 

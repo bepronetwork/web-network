@@ -87,5 +87,11 @@ export function getAmountWithFeesOfAmount(amount: string,
 }
 
 export function calculateTotalAmountFromGivenReward(reward: number, f1: number, f2: number, f3: number) {
-  return reward / (1-f1-(1-f1)*f2-(1-f1-(1-f1)*f2)*f3);
+  const _reward = BigNumber(reward);
+  const _f1 = BigNumber(f1);
+  const _f2 = BigNumber(f2);
+  const _f3 = BigNumber(f3);
+  const _one = BigNumber(1);
+
+  return _reward.div(_one.minus(_f1).minus(_one.minus(_f1).times(_f2)).minus(_one.minus(_f1).minus(_one.minus(_f1).times(_f2)).times(_f3)))
 }
