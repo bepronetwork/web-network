@@ -92,8 +92,11 @@ export default function CreateBountyTokenAmountView({
         allowNegative={false}
         max={tokenBalance.toFixed()}
         decimalScale={decimals}
-        onValueChange={(e) =>
-          e.value !== issueAmount.value && onIssueAmountValueChange(e, "total")
+        onValueChange={
+          (e, sourceInfo) => {
+            if (e.value !== rewardAmount.value && sourceInfo?.source === "event")
+              onIssueAmountValueChange(e, "total");
+          }
         }
         error={!!inputError}
         helperText={

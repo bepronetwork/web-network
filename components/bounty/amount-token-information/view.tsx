@@ -57,6 +57,7 @@ export default function AmountTokenInformation({
             ? t("bounty:set-funded-reward-description")
             : t("bounty:set-reward-description")
         }
+        tooltip={t("approximated-values-warning")}
         classNameChildren={classNameInputs}
       >
         <InputNumber
