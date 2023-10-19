@@ -242,5 +242,15 @@
   },
   "allow-list": {
     "not-allowed": "Task creation is not allowed with this address"
+  },
+  "review-section": {
+    "marketplace": "Marketplace",
+    "title": "Title",
+    "description": "Description",
+    "tags": "Tags",
+    "originLink": "Origin Link",
+    "deliverableType": "Deliverable Type",
+    "totalAmount": "Total Amount",
+    "fundersReward": "Funders Reward"
   }
 }

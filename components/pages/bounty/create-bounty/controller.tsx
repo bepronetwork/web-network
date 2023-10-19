@@ -15,6 +15,7 @@ import {toastError, toastWarning} from "contexts/reducers/change-toaster";
 import {addTx, updateTx} from "contexts/reducers/change-tx-list";
 
 import {BODY_CHARACTERES_LIMIT, UNSUPPORTED_CHAIN} from "helpers/constants";
+import { formatStringToCurrency } from "helpers/formatNumber";
 import {addFilesToMarkdown} from "helpers/markdown";
 import {parseTransaction} from "helpers/transactions";
 import {isValidUrl} from "helpers/validateUrl";
@@ -616,12 +617,12 @@ export default function CreateBountyPage({
         title: bountyTitle,
         description: addFilesInDescription(bountyDescription),
         tags: selectedTags && selectedTags,
-        origin_link: originLink,
-        deliverable_type: deliverableType,
-        reward: `${issueAmount.value} ${transactionalToken?.symbol}`,
-        funders_reward:
+        originLink: originLink,
+        deliverableType: deliverableType,
+        totalAmount: `${formatStringToCurrency(issueAmount.value)} ${transactionalToken?.symbol}`,
+        fundersReward:
           (rewardAmount.value && isFundingType) &&
-          `${rewardAmount.value} ${rewardToken?.symbol}`,
+          `${formatStringToCurrency(rewardAmount.value)} ${rewardToken?.symbol}`,
       }}
       allowCreateBounty={userCanCreateBounties}
       showCannotCreateBountyModal={showCannotCreateBountyModal}
