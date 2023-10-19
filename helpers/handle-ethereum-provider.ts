@@ -26,12 +26,11 @@ export default function handleEthereumProvider(handleChainUpdate: (v: number) =>
         newProvider.removeAllListeners(`chainChanged`);
 
         newProvider.on(`chainChanged`, (evt) => {
-          console.log("evt", evt);
           handleChainUpdate(+evt);
         });
       }
     }
 
-    console.log("window.ethereum errors", err);
+    console.debug("window.ethereum errors", err);
   }
 }
