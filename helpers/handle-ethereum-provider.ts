@@ -17,11 +17,13 @@ export default function handleEthereumProvider(handleChainUpdate: (v: number) =>
     const regex = /isConnected is not a function/g;
 
     if (regex.test(err?.message)) {
-      const newProvider = (window.ethereum as { [key: string]: any })?.providerMap?.get("MetaMask"); //eslint-disable-line
+      const newProvider = (window.ethereum as any)?.selectedProvider //eslint-disable-line
+
       if (newProvider) {
+        if(newProvider?.isMetaMask !== undefined && !newProvider?.isMetaMask) handleError()
+
         if (newProvider.isConnected())
           handleChainUpdate(+window.ethereum.chainId);
-        else handleError();
 
         newProvider.removeAllListeners(`chainChanged`);
 
