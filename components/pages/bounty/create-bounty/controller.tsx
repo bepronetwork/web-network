@@ -248,12 +248,12 @@ export default function CreateBountyPage({
     setIsLoadingApprove(true);
 
     let tokenAddress = transactionalToken.address;
-    let bountyValue = issueAmount.value;
+    let bountyValue = issueAmount.formattedValue;
     let tokenERC20 = transactionalERC20;
 
     if (rewardChecked && rewardToken?.address && rewardAmount.floatValue > 0) {
       tokenAddress = rewardToken.address;
-      bountyValue = rewardAmount.value;
+      bountyValue = rewardAmount.formattedValue;
       tokenERC20 = rewardERC20;
     }
 
@@ -291,7 +291,7 @@ export default function CreateBountyPage({
       const payload = {
         title: bountyTitle,
         body: addFilesInDescription(bountyDescription),
-        amount: issueAmount.value,
+        amount: issueAmount.formattedValue,
         creatorAddress: currentUser.walletAddress,
         githubUser: currentUser?.login,
         deliverableType,
@@ -336,14 +336,14 @@ export default function CreateBountyPage({
 
       if (isFundingType && !rewardChecked) {
         bountyPayload.tokenAmount = "0";
-        bountyPayload.fundingAmount = issueAmount.value;
+        bountyPayload.fundingAmount = issueAmount.formattedValue;
       }
 
       if (isFundingType && rewardChecked) {
         bountyPayload.tokenAmount = "0";
-        bountyPayload.rewardAmount = rewardAmount.value;
+        bountyPayload.rewardAmount = rewardAmount.formattedValue;
         bountyPayload.rewardToken = rewardToken.address;
-        bountyPayload.fundingAmount = issueAmount.value;
+        bountyPayload.fundingAmount = issueAmount.formattedValue;
       }
 
       const networkBounty = await Service?.active
