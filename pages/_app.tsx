@@ -12,6 +12,7 @@ import {GoogleAnalytics} from "nextjs-google-analytics";
 import ConsentCookie from "components/consent-cokie";
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 import Loading from "components/loading";
+import MissingMetamaskModal from "components/missing-metamask-modal/controller";
 import NavBar from "components/navigation/navbar/controller";
 import NoMetamaskModal from "components/no-metamask-modal/controller";
 import ReadOnlyContainer from "components/read-only-container";
@@ -52,6 +53,7 @@ function App({ Component, pageProps: { session, seoData, ...pageProps } }: AppPr
                   <Component {...pageProps} />
                 </div>
                 <WrongNetworkModal />
+                <MissingMetamaskModal />
                 <Toaster />
                 <Loading />
               </ReadOnlyContainer>
