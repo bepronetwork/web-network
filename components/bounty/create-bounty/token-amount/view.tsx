@@ -107,7 +107,7 @@ export default function CreateBountyTokenAmountView({
     if (isFunding && isFunders) return null;
     return (
       <RewardInformationBalanceView
-        amount={tokenBalance.toFixed()}
+        amount={tokenBalance.toFixed(5)}
         symbol={currentToken?.symbol}
       />
     );

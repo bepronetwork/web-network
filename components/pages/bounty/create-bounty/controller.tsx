@@ -256,7 +256,10 @@ export default function CreateBountyPage({
       tokenERC20 = rewardERC20;
     }
 
-    handleApproveToken(tokenAddress, bountyValue, undefined, transactionalToken?.symbol)
+    console.log("bountyValue", bountyValue)
+    console.log("toFixed", BigNumber(bountyValue).toFixed(18))
+
+    handleApproveToken(tokenAddress, BigNumber(bountyValue).toFixed(18), undefined, transactionalToken?.symbol)
       .then(() => {
         return tokenERC20.updateAllowanceAndBalance();
       })
