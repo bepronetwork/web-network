@@ -138,7 +138,7 @@
       "max": "Use max"
     },
     "conversion-token": {
-      "not-found": "Can't convert because not found"
+      "not-found": "Error when trying to search Coingecko"
     },
     "deliverable-types": {
       "label": "Deliverable Types",
