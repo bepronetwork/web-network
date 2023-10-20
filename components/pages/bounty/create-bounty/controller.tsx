@@ -470,10 +470,10 @@ export default function CreateBountyPage({
 
     if (!isFundingType)
       approved = isAmountApproved(transactionalERC20.allowance,
-                                  BigNumber(issueAmount.value));
+                                  BigNumber(issueAmount.formattedValue));
     else if (rewardChecked)
       approved = isAmountApproved(rewardERC20.allowance,
-                                  BigNumber(rewardAmount.value));
+                                  BigNumber(rewardAmount.formattedValue));
 
     setIsTokenApproved(approved);
   }, [
