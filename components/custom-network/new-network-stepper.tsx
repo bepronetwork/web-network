@@ -267,7 +267,7 @@ function NewNetwork() {
 
       <If condition={hasNetwork}>
         <div className="d-flex flex-col align-items-center justify-content-center mb-3">
-          <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
+          <ContextualSpan context="info" children={t("modals.already-has-network.content")} className="text-center"/>
         </div>
         <div className="d-flex justify-content-center">
           <ChainSelector />
