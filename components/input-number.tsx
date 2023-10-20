@@ -44,13 +44,13 @@ export default function InputNumber({
   const shouldBeWrapped = label || helperText;
   const Component = shouldBeWrapped ? "div" : Fragment;
 
-  function handleInputChange(e) {
+  function handleInputChange(e, sourceInfo) {
     setInputValue(e?.target?.value || null)
 
     clearTimeout(debounce.current)
 
     debounce.current = setTimeout(() => {
-      onValueChange?.(e)
+      onValueChange?.(e, sourceInfo);
     }, 500)
   }
 

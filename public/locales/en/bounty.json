@@ -14,6 +14,7 @@
     "funded": "Funded",
     "working": "Users working",
     "deliverable": "Deliverable",
+    "deliverables_one": "Deliverable",
     "deliverables_other": "Deliverables",
     "proposals_one": "proposal",
     "proposals_other": "proposals",
@@ -242,5 +243,16 @@
   },
   "allow-list": {
     "not-allowed": "Task creation is not allowed with this address"
-  }
+  },
+  "review-section": {
+    "marketplace": "Marketplace",
+    "title": "Title",
+    "description": "Description",
+    "tags": "Tags",
+    "originLink": "Origin Link",
+    "deliverableType": "Deliverable Type",
+    "totalAmount": "Total Amount",
+    "fundersReward": "Funders Reward"
+  },
+  "approximated-values-warning": "Defining the Reward amount will result in approximate values in the contract. If you want exact values, set the Total Amount first."
 }

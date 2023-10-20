@@ -57,6 +57,7 @@ export default function AmountTokenInformation({
             ? t("bounty:set-funded-reward-description")
             : t("bounty:set-reward-description")
         }
+        tooltip={t("approximated-values-warning")}
         classNameChildren={classNameInputs}
       >
         <InputNumber
@@ -68,9 +69,11 @@ export default function AmountTokenInformation({
           max={tokenBalance?.toFixed()}
           allowNegative={false}
           decimalScale={decimals}
-          onValueChange={(e) =>
-            e.value !== rewardAmount.value &&
-            onIssueAmountValueChange(e, "reward")
+          onValueChange={
+            (e, sourceInfo) => {
+              if (e.value !== rewardAmount.value && sourceInfo?.source === "event")
+                onIssueAmountValueChange(e, "reward");
+            }
           }
         />
       </RenderItemRow>
@@ -84,7 +87,7 @@ export default function AmountTokenInformation({
           symbol={currentToken?.symbol}
           classSymbol=""
           thousandSeparator
-          value={distributions?.totalServiceFees?.toFixed()}
+          value={distributions?.totalServiceFees?.decimalPlaces(5)?.toFixed() || ""}
           disabled
         />
       </RenderItemRow>
@@ -103,9 +106,11 @@ export default function AmountTokenInformation({
           allowNegative={false}
           max={tokenBalance?.toFixed()}
           decimalScale={decimals}
-          onValueChange={(e) =>
-            e.value !== issueAmount.value &&
-            onIssueAmountValueChange(e, "total")
+          onValueChange={
+            (e, sourceInfo) => {
+              if (e.value !== rewardAmount.value && sourceInfo?.source === "event")
+                onIssueAmountValueChange(e, "total");
+            }
           }
           error={!!inputError}
           helperText={

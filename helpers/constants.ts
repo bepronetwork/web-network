@@ -159,3 +159,4 @@ export const BOUNTY_TAGS = [
     ]
   },
 ];
+export const CHAIN_DEFAULT_DECIMALS = 18;

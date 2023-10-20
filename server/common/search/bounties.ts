@@ -111,6 +111,7 @@ export default async function get(query: ParsedUrlQuery) {
                     undefined, 
                     !!proposer || !!proposalId || isMergeableState || isDisputableState, 
                     {
+                      contractId: { [Op.not]: null },
                       ... proposer ? { creator: { [Op.iLike]: proposer.toString() } } : {},
                       ... proposalId ? { id: proposalId } : {},
                       ... isMergeableState || isDisputableState ? {
@@ -133,7 +134,7 @@ export default async function get(query: ParsedUrlQuery) {
     getAssociation( "deliverables", 
                     undefined, 
                     false, 
-                    {},
+                    { prContractId: { [Op.not]: null } },
                     [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
                       address: { [Op.iLike]: deliverabler?.toString() }
                     }: {})]);

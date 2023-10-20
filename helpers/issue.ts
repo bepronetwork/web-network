@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
 
-import { bountyReadyPRsHasNoInvalidProposals } from "helpers/proposal";
+import {bountyReadyPRsHasNoInvalidProposals} from "helpers/proposal";
 
-import { Deliverable, IssueBigNumberData, IssueData, IssueDataComment } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
+import {Deliverable, IssueBigNumberData, IssueData, IssueDataComment} from "interfaces/issue-data";
+import {Proposal} from "interfaces/proposal";
 
 export const OPEN_STATES = ["draft", "open", "ready", "proposal"];
 
@@ -44,24 +44,26 @@ export const benefactorsParser = (issue: IssueData) =>
 
 export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   ...issue,
-  createdAt: new Date(issue.createdAt),
-  updatedAt: new Date(issue.updatedAt),
-  fundedAt: new Date(issue.fundedAt),
+  createdAt: new Date(issue?.createdAt || 1),
+  updatedAt: new Date(issue?.updatedAt || 1),
+  fundedAt: new Date(issue?.fundedAt || 1),
   isReady: (issue?.mergeProposals && issue?.deliverables) && bountyReadyPRsHasNoInvalidProposals(issue) !== 0,
   amount: BigNumber(issue?.amount),
   fundingAmount: BigNumber(issue?.fundingAmount),
   fundedAmount: BigNumber(issue?.fundedAmount),
   rewardAmount: BigNumber(issue?.rewardAmount),
   developerAmount: BigNumber(issue?.developerAmount),
-  deliverables: issue?.deliverables && issue?.deliverables?.map(p => deliverableParser(p, issue?.mergeProposals)),
-  mergeProposals: issue?.mergeProposals && issue?.mergeProposals?.map(p => mergeProposalParser(p, issue?.merged)),
+  deliverables: issue?.deliverables &&
+    issue?.deliverables?.map(p => deliverableParser(p, issue?.mergeProposals)),
+  mergeProposals: issue?.mergeProposals &&
+    issue?.mergeProposals?.map(p => mergeProposalParser(p, issue?.merged)),
   benefactors: issue?.benefactors && benefactorsParser(issue)
 });
 
 export const commentsParser = (comments: IssueDataComment[]) => {
   return comments?.map(comment => ({
     ...comment,
-    createdAt: new Date(comment.createdAt),
-    updatedAt: new Date(comment.updatedAt)
+    createdAt: new Date(comment?.createdAt || 0),
+    updatedAt: new Date(comment?.updatedAt || 0)
   }))
 }

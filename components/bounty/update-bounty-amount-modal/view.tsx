@@ -102,7 +102,7 @@ export default function UpdateBountyAmountModalView({
         />
         <div className="d-flex justify-content-end">
           <span className="text-gray me-1">{t('bounty:balance')}</span>
-          {formatStringToCurrency(transactionalERC20.balance.toFixed())}{" "}
+          {formatStringToCurrency(transactionalERC20.balance.toFixed(5))}{" "}
           {transactionalERC20.symbol}
         </div>
       </div>

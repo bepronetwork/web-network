@@ -408,49 +408,53 @@ export default function IssueListItem({
           </ResponsiveWrapper>
 
           <div className="row align-items-center border-xl-top border-gray-850 pt-3">
-            <ResponsiveWrapper xs={false} xl={true}>
-              <div className="row w-100 align-items-center justify-content-md-start">
-                <BountyItemLabel label="ID" className="col-auto">
-                  <IssueTag />
-                </BountyItemLabel>
+            <div className="col-12">
+              <ResponsiveWrapper xs={false} xl={true} className="row">
+                <div className="col-12">
+                  <div className="row align-items-center justify-content-md-start">
+                    <BountyItemLabel label="ID" className="col-auto">
+                      <IssueTag />
+                    </BountyItemLabel>
 
-                <BountyItemLabel label="Type" className="col-auto">
-                  <span className="text-gray text-truncate text-capitalize">
-                    {issue?.type}
-                  </span>
-                </BountyItemLabel>
+                    <BountyItemLabel label="Type" className="col-auto">
+                      <span className="text-gray text-truncate text-capitalize">
+                        {issue?.type}
+                      </span>
+                    </BountyItemLabel>
 
-                <ResponsiveWrapper xs={false} xxl={true} className="col-auto">
-                  <RenderIssueData state={issueState} />
-                </ResponsiveWrapper>
+                    <ResponsiveWrapper xs={false} xxl={true} className="col-auto">
+                      <RenderIssueData state={issueState} />
+                    </ResponsiveWrapper>
 
-                <BountyItemLabel
-                  label={t("info.opened-on")}
-                  className="col-auto"
-                >
-                  <span className="text-gray text-truncate">
-                    {issue?.createdAt?.toLocaleDateString("PT")}
-                  </span>
-                </BountyItemLabel>
+                    <BountyItemLabel
+                      label={t("info.opened-on")}
+                      className="col-auto"
+                    >
+                      <span className="text-gray text-truncate">
+                        {issue?.createdAt?.toLocaleDateString("PT")}
+                      </span>
+                    </BountyItemLabel>
 
-                <div className="col d-flex justify-content-end">
+                    <div className="col d-flex justify-content-end">
+                      <BountyAmount bounty={issue} size={size} />
+                    </div>
+                  </div>
+                </div>
+              </ResponsiveWrapper>
+              <ResponsiveWrapper
+                xs={true}
+                xl={false}
+                className="row align-items-center justify-content-between"
+              >
+                <div className="col mw-50-auto network-name">
+                  <BountyTagsView tags={[issue?.network?.name]} />
+                </div>
+
+                <div className="col-auto">
                   <BountyAmount bounty={issue} size={size} />
                 </div>
-              </div>
-            </ResponsiveWrapper>
-            <ResponsiveWrapper
-              xs={true}
-              xl={false}
-              className="row align-items-center justify-content-between"
-            >
-              <div className="col mw-50-auto network-name">
-                <BountyTagsView tags={[issue?.network?.name]} />
-              </div>
-
-              <div className="col-auto px-0">
-                <BountyAmount bounty={issue} size={size} />
-              </div>
-            </ResponsiveWrapper>
+              </ResponsiveWrapper>
+            </div>
           </div>
         </div>
       </div>

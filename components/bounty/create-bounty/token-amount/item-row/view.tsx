@@ -2,6 +2,8 @@ import { ReactElement } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import If from "components/If";
+import InfoTooltip from "components/info-tooltip";
 import ResponsiveWrapper from "components/responsive-wrapper";
 
 export default function RenderItemRow({
@@ -9,6 +11,7 @@ export default function RenderItemRow({
   label = "",
   description = "",
   borderBottom = true,
+  tooltip,
   classNameChildren,
   handleLink,
 }: {
@@ -16,6 +19,7 @@ export default function RenderItemRow({
   label: string;
   description: string;
   borderBottom?: boolean;
+  tooltip?: string;
   classNameChildren?: string;
   handleLink?: () => void;
 }) {
@@ -36,7 +40,12 @@ export default function RenderItemRow({
       }`}
     >
       <div className="d-flex justify-content-between">
-        <label className="text-white">{label}</label>
+        <label className="d-flex align-items-center gap-2 text-white">
+          {label}
+          <If condition={!!tooltip}>
+            <InfoTooltip description={tooltip} />
+          </If>
+        </label>
         {handleLink && (
           <ResponsiveWrapper xs={true} md={false}>
             {Link()}

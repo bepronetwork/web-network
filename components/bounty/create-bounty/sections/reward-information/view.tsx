@@ -25,6 +25,8 @@ export default function RewardInformationSectionView({
   rewardTokens,
   rewardBalance,
   bountyBalance,
+  previewAmount,
+  distributions,
   updateRewardToken,
   updateTransactionalToken,
   addToken,
@@ -32,6 +34,8 @@ export default function RewardInformationSectionView({
   updateIssueAmount,
   updateRewardAmount,
   updateIsFunding,
+  setPreviewAmount,
+  setDistributions,
 }: RewardInformationViewProps) {
   const { t } = useTranslation(["common", "bounty"]);
 
@@ -84,6 +88,10 @@ export default function RewardInformationSectionView({
           isFunders={type === "reward" ? false : true}
           needValueValidation={!isFundingType || type === "reward"}
           isFunding={isFundingType}
+          previewAmount={previewAmount}
+          distributions={distributions}
+          setPreviewAmount={setPreviewAmount}
+          setDistributions={setDistributions}
         />
       </>
     );

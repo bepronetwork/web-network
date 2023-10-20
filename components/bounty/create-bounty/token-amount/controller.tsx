@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
-import { NumberFormatValues } from "react-number-format";
+import {useEffect, useState} from "react";
+import {NumberFormatValues} from "react-number-format";
 
+import {Defaults} from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { useDebouncedCallback } from "use-debounce";
+import {useTranslation} from "next-i18next";
+import {useDebouncedCallback} from "use-debounce";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
+import calculateDistributedAmounts, {calculateTotalAmountFromGivenReward} from "helpers/calculateDistributedAmounts";
 
-import { DistributionsProps } from "interfaces/proposal";
-import { Token } from "interfaces/token";
+import {DistributionsProps} from "interfaces/proposal";
+import {Token} from "interfaces/token";
 
 import CreateBountyTokenAmountView from "./view";
 
@@ -36,6 +37,10 @@ interface CreateBountyTokenAmountProps {
   decimals: number;
   isFunding: boolean;
   needValueValidation: boolean;
+  previewAmount: NumberFormatValues;
+  distributions: DistributionsProps;
+  setPreviewAmount: (v: NumberFormatValues) => void;
+  setDistributions: (v: DistributionsProps) => void;
 }
 
 export default function CreateBountyTokenAmount({
@@ -54,36 +59,82 @@ export default function CreateBountyTokenAmount({
   needValueValidation,
   decimals = 18,
   isFunding = false,
+  previewAmount,
+  distributions,
+  setPreviewAmount,
+  setDistributions
 }: CreateBountyTokenAmountProps) {
   const { t } = useTranslation(["bounty", "common", "proposal"]);
   const [show, setShow] = useState<boolean>(false);
-  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
   const [inputError, setInputError] = useState("");
-  const [distributions, setDistributions] = useState<DistributionsProps>();
   const {
     state: { currentUser, Service },
   } = useAppState();
 
-  const debouncedDistributionsUpdater = useDebouncedCallback((value, type) => handleDistributions(value, type), 500);
+  const debouncedDistributionsUpdater =
+    useDebouncedCallback((value, type) =>
+      handleDistributions(value, type), 500);
 
   const amountIsGtBalance = (v: string | number, balance: BigNumber) => BigNumber(v).gt(balance)
 
+
+  function calculateRewardAmountGivenTotalAmount(value: number) {
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
+    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
+
+    const _value = BigNumber(value);
+
+    const treasuryAmount = _value.times(networkFee/100);
+    const mergerFee = _value.minus(treasuryAmount).times(+mergeCreatorFeeShare/100);
+    const proposerFee = _value.minus(treasuryAmount).minus(mergerFee).times(+proposerFeeShare/100);
+
+    return _value.minus(treasuryAmount).minus(mergerFee).minus(proposerFee).toFixed();
+  }
+
+  function _calculateTotalAmountFromGivenReward(reward: number) {
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
+    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
+
+    return calculateTotalAmountFromGivenReward( reward, 
+                                                +networkFee/100,
+                                                +mergeCreatorFeeShare/100,
+                                                +proposerFeeShare/100)
+  }
+
+  const handleNumberFormat = (v: BigNumber) => ({
+    value: v.decimalPlaces(5, 0).toFixed(),
+    floatValue: v.toNumber(),
+    formattedValue: v.decimalPlaces(10, 0).toFixed()
+  });
+
   function handleDistributions(value, type) {
-    if (!value || !Service?.network?.amounts) return;
-  
+    if (!Service?.network?.amounts) return;
+    if (!value) {
+      setDistributions(undefined);
+      if (type === "reward")
+        updateIssueAmount(ZeroNumberFormatValues);
+      else
+        setPreviewAmount(ZeroNumberFormatValues);
+      return;
+    }
+
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
 
-    const handleNumberFormat = (v: BigNumber) => ({
-      value: v.toFixed(),
-      floatValue: v.toNumber(),
-      formattedValue: v.toFixed()
-    })
+    const amountOfType =
+      BigNumber(type === "reward"
+        ? _calculateTotalAmountFromGivenReward(value)
+        : value);
   
-    const initialDistributions = calculateDistributedAmounts(treasury,
-                                                             mergeCreatorFeeShare,
-                                                             proposerFeeShare,
-                                                             BigNumber(value),
-                                                        [{recipient: currentUser?.walletAddress, percentage: 100}]);
+    const initialDistributions = calculateDistributedAmounts( treasury,
+                                                              mergeCreatorFeeShare,
+                                                              proposerFeeShare,
+                                                              amountOfType,
+                                                              [
+                                                                {
+                                                                  recipient: currentUser?.walletAddress,
+                                                                  percentage: 100
+                                                                }
+                                                              ]);
 
     const { mergerAmount, proposerAmount, treasuryAmount } = initialDistributions;
 
@@ -96,21 +147,22 @@ export default function CreateBountyTokenAmount({
     const distributions = { totalServiceFees, ...initialDistributions}
 
     if(type === 'reward'){
-      const total = totalServiceFees.plus(rewardAmount?.value) 
+      const total = BigNumber(_calculateTotalAmountFromGivenReward(value));
       updateIssueAmount(handleNumberFormat(total))
-      amountIsGtBalance(total.toNumber(), tokenBalance) && setInputError(t("bounty:errors.exceeds-allowance"));
+      if (amountIsGtBalance(total.toNumber(), tokenBalance))
+        setInputError(t("bounty:errors.exceeds-allowance"));
     }
 
     if(type === 'total'){
-      const rewardValue = BigNumber(issueAmount?.value).minus(totalServiceFees) 
-      setRewardAmount(handleNumberFormat(rewardValue))
+      const rewardValue = BigNumber(calculateRewardAmountGivenTotalAmount(value));
+      setPreviewAmount(handleNumberFormat(rewardValue))
     }
 
     setDistributions(distributions)
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues, type: 'reward' | 'total') {
-    const setType = type === 'reward' ? setRewardAmount : updateIssueAmount
+    const setType = type === 'reward' ? setPreviewAmount : updateIssueAmount
 
     if(needValueValidation && amountIsGtBalance(values.floatValue, tokenBalance)){
       setInputError(t("bounty:errors.exceeds-allowance"));
@@ -132,8 +184,8 @@ export default function CreateBountyTokenAmount({
           amount: currentToken?.minimum,
       }));
     } else {
-      if(isFunders) debouncedDistributionsUpdater(values.value, type)
-      setType(values);
+      debouncedDistributionsUpdater(values.value, type);
+      setType(handleNumberFormat(BigNumber(values.value)));
       if (inputError) setInputError("");
     }
   }
@@ -152,12 +204,6 @@ export default function CreateBountyTokenAmount({
 
   useEffect(handleUpdateToken, [currentToken?.minimum]);
 
-  useEffect(() => {
-    if(issueAmount?.value && !rewardAmount?.value){
-      debouncedDistributionsUpdater(issueAmount.value, 'total')
-    }
-  }, [issueAmount])
-
   return (
     <CreateBountyTokenAmountView
       currentToken={currentToken}
@@ -171,7 +217,7 @@ export default function CreateBountyTokenAmount({
       labelSelect={labelSelect}
       tokenBalance={tokenBalance}
       issueAmount={issueAmount}
-      rewardAmount={rewardAmount}
+      rewardAmount={previewAmount}
       isFunders={isFunders}
       decimals={decimals}
       isFunding={isFunding}
