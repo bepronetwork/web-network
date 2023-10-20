@@ -87,7 +87,7 @@ export default function AmountTokenInformation({
           symbol={currentToken?.symbol}
           classSymbol=""
           thousandSeparator
-          value={distributions?.totalServiceFees?.decimalPlaces(5)?.toFixed()}
+          value={distributions?.totalServiceFees?.decimalPlaces(5)?.toFixed() || ""}
           disabled
         />
       </RenderItemRow>

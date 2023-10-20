@@ -102,7 +102,15 @@ export default function CreateBountyTokenAmount({
   }
 
   function handleDistributions(value, type) {
-    if (!value || !Service?.network?.amounts) return;
+    if (!Service?.network?.amounts) return;
+    if (!value) {
+      setDistributions(undefined);
+      if (type === "reward")
+        updateIssueAmount(ZeroNumberFormatValues);
+      else
+        setPreviewAmount(ZeroNumberFormatValues);
+      return;
+    }
   
     const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
 
