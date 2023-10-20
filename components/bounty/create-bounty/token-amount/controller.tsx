@@ -101,6 +101,12 @@ export default function CreateBountyTokenAmount({
                                                 +proposerFeeShare/100)
   }
 
+  const handleNumberFormat = (v: BigNumber) => ({
+    value: v.decimalPlaces(5, 0).toFixed(),
+    floatValue: v.toNumber(),
+    formattedValue: v.decimalPlaces(10, 0).toFixed()
+  });
+
   function handleDistributions(value, type) {
     if (!Service?.network?.amounts) return;
     if (!value) {
@@ -111,14 +117,8 @@ export default function CreateBountyTokenAmount({
         setPreviewAmount(ZeroNumberFormatValues);
       return;
     }
-  
-    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
 
-    const handleNumberFormat = (v: BigNumber) => ({
-      value: v.decimalPlaces(5, 0).toFixed(),
-      floatValue: v.toNumber(),
-      formattedValue: v.decimalPlaces(10, 0).toFixed()
-    });
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
 
     const amountOfType =
       BigNumber(type === "reward"
@@ -185,7 +185,7 @@ export default function CreateBountyTokenAmount({
       }));
     } else {
       debouncedDistributionsUpdater(values.value, type);
-      setType(values);
+      setType(handleNumberFormat(BigNumber(values.value)));
       if (inputError) setInputError("");
     }
   }
