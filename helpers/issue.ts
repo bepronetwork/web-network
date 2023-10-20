@@ -54,9 +54,9 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   rewardAmount: BigNumber(issue?.rewardAmount),
   developerAmount: BigNumber(issue?.developerAmount),
   deliverables: issue?.deliverables &&
-    issue?.deliverables?.filter(d => d.prContractId)?.map(p => deliverableParser(p, issue?.mergeProposals)),
+    issue?.deliverables?.map(p => deliverableParser(p, issue?.mergeProposals)),
   mergeProposals: issue?.mergeProposals &&
-    issue?.mergeProposals?.filter(m => m.contractId)?.map(p => mergeProposalParser(p, issue?.merged)),
+    issue?.mergeProposals?.map(p => mergeProposalParser(p, issue?.merged)),
   benefactors: issue?.benefactors && benefactorsParser(issue)
 });
 
