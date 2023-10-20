@@ -53,8 +53,10 @@ export const issueParser = (issue: IssueData) : IssueBigNumberData => ({
   fundedAmount: BigNumber(issue?.fundedAmount),
   rewardAmount: BigNumber(issue?.rewardAmount),
   developerAmount: BigNumber(issue?.developerAmount),
-  deliverables: issue?.deliverables && issue?.deliverables?.map(p => deliverableParser(p, issue?.mergeProposals)),
-  mergeProposals: issue?.mergeProposals && issue?.mergeProposals?.map(p => mergeProposalParser(p, issue?.merged)),
+  deliverables: issue?.deliverables &&
+    issue?.deliverables?.filter(d => d.prContractId)?.map(p => deliverableParser(p, issue?.mergeProposals)),
+  mergeProposals: issue?.mergeProposals &&
+    issue?.mergeProposals?.filter(m => m.contractId)?.map(p => mergeProposalParser(p, issue?.merged)),
   benefactors: issue?.benefactors && benefactorsParser(issue)
 });
 
