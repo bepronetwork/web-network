@@ -111,7 +111,19 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
   const queryClient = getReactQueryClient();
   const bountyId = query.id;
 
-  const bountyData = await getBountyData(query);
+  const bountyData = await getBountyData(query).catch(error => {
+    console.log("getBountyData error", error.toString());
+    return null;
+  });
+
+  if (!bountyData)
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/${query?.network}/${query?.chain}/bounties`,
+      },
+      props:{},
+    };
 
   await queryClient.setQueryData(["bounty", bountyId], bountyData);
   await queryClient.prefetchQuery(["bounty", "comments", bountyId], () => 
