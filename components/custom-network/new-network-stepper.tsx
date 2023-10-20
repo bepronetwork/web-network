@@ -14,6 +14,7 @@ import NetworkInformationStep from "components/custom-network/network-informatio
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
 import If from "components/If";
+import ChainSelector from "components/navigation/chain-selector/controller";
 import Stepper from "components/stepper";
 
 import {useAppState} from "contexts/app-state";
@@ -268,21 +269,26 @@ function NewNetwork() {
         <div className="d-flex flex-col align-items-center justify-content-center mb-3">
           <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
         </div>
+        <div className="d-flex justify-content-center">
+          <ChainSelector />
+        </div>
       </If>
 
-      <Stepper dark={isSetupPage}>
-        <LockBeproStep validated={tokensLocked?.validated} />
+      <If condition={!hasNetwork}>
+        <Stepper dark={isSetupPage}>
+          <LockBeproStep validated={tokensLocked?.validated} />
 
-        <NetworkInformationStep validated={details?.validated} />
+          <NetworkInformationStep validated={details?.validated} />
 
-        <NetworkSettingsStep validated={settings?.validated} />
+          <NetworkSettingsStep validated={settings?.validated} />
 
-        <TokenConfiguration
-          validated={isSettingsValidated}
-          handleFinish={handleCreateNetwork}
-          finishLabel={t("custom-network:steps.repositories.submit-label")}
-        />
-      </Stepper>
+          <TokenConfiguration
+            validated={isSettingsValidated}
+            handleFinish={handleCreateNetwork}
+            finishLabel={t("custom-network:steps.repositories.submit-label")}
+          />
+        </Stepper>
+      </If>
     </div>
   );
 }
