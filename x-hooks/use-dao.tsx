@@ -7,8 +7,10 @@ import {useAppState} from "contexts/app-state";
 import {changeChain as changeChainReducer} from "contexts/reducers/change-chain";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
+import { changeMissingMetamask } from "contexts/reducers/update-show-prop";
 
 import {SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
+import handleEthereumProvider from "helpers/handle-ethereum-provider";
 import { lowerCaseCompare } from "helpers/string";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
@@ -55,6 +57,7 @@ export function useDao() {
       .then(address => {
         if (address === "0x00") return null;
 
+        handleEthereumProvider(dispatchChainUpdate, () => dispatch(changeMissingMetamask(true)))
         return address;
       })
       .catch(error => {
@@ -105,7 +108,7 @@ export function useDao() {
             console.error("Failed to load network", networkAddress);
             return;
           }
-          // dispatch(changeActiveDAO(service));
+          listenChainChanged()
           console.debug("Network started");
         })
         .catch(error => {
@@ -247,18 +250,7 @@ export function useDao() {
     if (!window.ethereum || !state.supportedChains?.length)
       return;
 
-    window.ethereum.removeAllListeners(`chainChanged`);
-
-    if (window.ethereum.isConnected())
-      dispatchChainUpdate(+window.ethereum.chainId);
-
-    window.ethereum.on(`connected`, evt => {
-      console.debug(`Metamask connected`, evt);
-    });
-
-    window.ethereum.on(`chainChanged`, evt => {
-      dispatchChainUpdate(+evt);
-    });
+    handleEthereumProvider(dispatchChainUpdate, () => dispatch(changeMissingMetamask(true)))
   }
 
   return {

@@ -6,8 +6,10 @@ import Indicator from "components/indicator";
 
 import {useAppState} from "contexts/app-state";
 import {changeChain} from "contexts/reducers/change-chain";
+import { changeMissingMetamask } from "contexts/reducers/update-show-prop";
 
 import { SUPPORT_LINK, UNSUPPORTED_CHAIN } from "helpers/constants";
+import handleEthereumProvider from "helpers/handle-ethereum-provider";
 
 import {NetworkColors} from "interfaces/enums/network-colors";
 
@@ -39,19 +41,7 @@ export default function NetworkIdentifier() {
     if (!window.ethereum || !state.supportedChains?.length)
       return;
 
-    window.ethereum.removeAllListeners(`chainChanged`);
-
-    if (window.ethereum.isConnected())
-      dispatchChainUpdate(+window.ethereum.chainId);
-
-    window.ethereum.on(`connected`, evt => {
-      console.debug(`Metamask connected`, evt);
-    });
-
-    window.ethereum.on(`chainChanged`, evt => {
-      dispatchChainUpdate(+evt);
-    });
-
+    handleEthereumProvider(dispatchChainUpdate, () => dispatch(changeMissingMetamask(true)))
   }, [state.supportedChains]);
 
   return (

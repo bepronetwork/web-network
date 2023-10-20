@@ -158,7 +158,8 @@
     "apply": "Apply",
     "clear": "Clear",
     "save": "Save",
-    "accept": "Accept"
+    "accept": "Accept",
+    "reload": "Reload"
   },
   "misc": {
     "by": "by",
@@ -298,6 +299,10 @@
       "title": "MetaMask not Detected",
       "eth-not-available": "No ETH account available",
       "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
+    },
+    "missing-metamask": {
+      "title": "Metamask communication problem",
+      "description": "The application could not communicate properly with the Metamask extension, please disable other wallets that you might have"
     },
     "wrong-network": {
       "please-connect": "Please, connect to a supported network",
