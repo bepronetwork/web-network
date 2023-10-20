@@ -1,15 +1,15 @@
 import React from "react";
 
 import BigNumber from "bignumber.js";
-import { useRouter } from "next/router";
-import { v4 as uuidv4 } from "uuid";
+import {useRouter} from "next/router";
+import {v4 as uuidv4} from "uuid";
 
-import { useAppState } from "contexts/app-state";
+import {useAppState} from "contexts/app-state";
 
-import { IssueBigNumberData, Deliverable } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
+import {Deliverable, IssueBigNumberData} from "interfaces/issue-data";
+import {Proposal} from "interfaces/proposal";
 
-import { useNetwork } from "x-hooks/use-network";
+import {useNetwork} from "x-hooks/use-network";
 
 import ItemRowView from "./view";
 
@@ -87,7 +87,7 @@ export default function ItemRow({
     ev.preventDefault();
     router.push(getURLWithNetwork(pathRedirect, {
       ...valueRedirect,
-      ... !isProposal ? { review: (item as Deliverable)?.markedReadyForReview } : {}
+      ... !isProposal ? { review: false } : {}
     }));
   }
 
