@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
+import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { useDebouncedCallback } from "use-debounce";
@@ -8,7 +9,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { useAppState } from "contexts/app-state";
 import { toastError } from "contexts/reducers/change-toaster";
 
-import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
+import calculateDistributedAmounts, { calculateTotalAmountFromGivenReward } from "helpers/calculateDistributedAmounts";
 
 import { NetworkEvents } from "interfaces/enums/events";
 import { DistributionsProps } from "interfaces/proposal";
@@ -79,15 +80,15 @@ export default function UpdateBountyAmountModal({
   const handleApprove = async () => {
     setIsExecuting(true);
 
-    handleApproveToken(transactionalAddress,
-                       BigNumber(issueAmount.floatValue).toFixed(),
-                       undefined,
-                       transactionalERC20?.symbol)
+    handleApproveToken( transactionalAddress,
+                        issueAmount.formattedValue,
+                        undefined,
+                        transactionalERC20?.symbol)
       .then(() => {
         return transactionalERC20.updateAllowanceAndBalance();
       })
       .catch((error) => {
-        dispatch(toastError(`Failed to approve:`, error));
+        dispatch(toastError(error.toString(), `Failed to approve`));
       })
       .finally(() => {
         setIsExecuting(false);
@@ -97,9 +98,9 @@ export default function UpdateBountyAmountModal({
   const handleSubmit = async () => {
     setIsExecuting(true);
 
-    handleUpdateBountyAmount(bountyId,
-                             BigNumber(issueAmount.floatValue).toFixed(),
-                             transactionalERC20?.symbol)
+    handleUpdateBountyAmount( bountyId,
+                              issueAmount.formattedValue,
+                              transactionalERC20?.symbol)
       .then((txInfo) => {
         return processEvent(NetworkEvents.BountyUpdated, undefined, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber,
@@ -116,23 +117,36 @@ export default function UpdateBountyAmountModal({
       });
   };
 
+  const handleNumberFormat = (v: BigNumber) => ({
+    value: v.decimalPlaces(5, 0).toFixed(),
+    floatValue: v.toNumber(),
+    formattedValue: v.decimalPlaces(10, 0).toFixed()
+  });
+
+
   function handleDistributions(value, type) {
     if (!value || !Service?.network?.amounts) return;
 
-    const { treasury, mergeCreatorFeeShare, proposerFeeShare } =
-      Service.network.amounts;
+    const { treasury, mergeCreatorFeeShare, proposerFeeShare } = Service.network.amounts;
+    const networkFee = treasury.treasury !== Defaults.nativeZeroAddress ? treasury.closeFee : 0;
+    const amountOfType =
+      BigNumber(type === "reward"
+        ? calculateTotalAmountFromGivenReward(value, 
+                                              +networkFee/100,
+                                              +mergeCreatorFeeShare/100,
+                                              +proposerFeeShare/100)
+        : value);
 
-    const handleNumberFormat = (v: BigNumber) => ({
-      value: v.toFixed(),
-      floatValue: v.toNumber(),
-      formattedValue: v.toFixed(),
-    });
-
-    const initialDistributions = calculateDistributedAmounts(treasury,
-                                                             mergeCreatorFeeShare,
-                                                             proposerFeeShare,
-                                                             BigNumber(value),
-      [{ recipient: currentUser?.walletAddress, percentage: 100 }]);
+    const initialDistributions = calculateDistributedAmounts( treasury,
+                                                              mergeCreatorFeeShare,
+                                                              proposerFeeShare,
+                                                              amountOfType,
+                                                              [
+                                                                { 
+                                                                  recipient: currentUser?.walletAddress, 
+                                                                  percentage: 100 
+                                                                }
+                                                              ]);
 
     const { mergerAmount, proposerAmount, treasuryAmount } =
       initialDistributions;
