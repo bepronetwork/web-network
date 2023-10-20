@@ -29,7 +29,7 @@ export default function PriceConversorModal({
 }:IPriceConversiorModalProps) {
 
   const [options, setOptions] = useState<Options[]>(defaultValue);
-  const [currentValue, setValue] = useState<number>(value?.toNumber() || 0);
+  const [currentValue, setValue] = useState<number>(value?.decimalPlaces(5)?.toNumber() || 0);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [currentToken, setCurrentToken] = useState<string>();
   const [errorCoinInfo, setErrorCoinInfo] = useState<boolean>(false);
