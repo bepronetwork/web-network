@@ -267,28 +267,24 @@ function NewNetwork() {
 
       <If condition={hasNetwork}>
         <div className="d-flex flex-col align-items-center justify-content-center mb-3">
-          <ContextualSpan context="info" children={t("modals.already-has-network.content")} className="text-center"/>
-        </div>
-        <div className="d-flex justify-content-center">
-          <ChainSelector />
+          <ContextualSpan context="info" children={t("modals.already-has-network.content")} />
         </div>
       </If>
 
-      <If condition={!hasNetwork}>
-        <Stepper dark={isSetupPage}>
-          <LockBeproStep validated={tokensLocked?.validated} />
+      
+      <Stepper dark={isSetupPage} hasNetwork={hasNetwork}>
+        <LockBeproStep validated={tokensLocked?.validated} />
 
-          <NetworkInformationStep validated={details?.validated} />
+        <NetworkInformationStep validated={details?.validated} />
 
-          <NetworkSettingsStep validated={settings?.validated} />
+        <NetworkSettingsStep validated={settings?.validated} />
 
-          <TokenConfiguration
-            validated={isSettingsValidated}
-            handleFinish={handleCreateNetwork}
-            finishLabel={t("custom-network:steps.repositories.submit-label")}
-          />
-        </Stepper>
-      </If>
+        <TokenConfiguration
+          validated={isSettingsValidated}
+          handleFinish={handleCreateNetwork}
+          finishLabel={t("custom-network:steps.repositories.submit-label")}
+        />
+      </Stepper>
     </div>
   );
 }
