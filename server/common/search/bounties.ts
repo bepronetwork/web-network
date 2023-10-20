@@ -111,6 +111,7 @@ export default async function get(query: ParsedUrlQuery) {
                     undefined, 
                     !!proposer || !!proposalId || isMergeableState || isDisputableState, 
                     {
+                      contractId: { [Op.not]: null },
                       ... proposer ? { creator: { [Op.iLike]: proposer.toString() } } : {},
                       ... proposalId ? { id: proposalId } : {},
                       ... isMergeableState || isDisputableState ? {

@@ -20,10 +20,18 @@ export async function get(req: NextApiRequest): Promise<Issue> {
 
   const include = [
     { association: "developers" },
-    { association: "deliverables", where: { prContractId: { [Op.not]: null } }, required: false,
+    { 
+      association: "deliverables", 
+      where: { prContractId: { [Op.not]: null } }, 
+      required: false,
       include: [{ association: "user" }, { association: "comments"}]
     },
-    { association: "mergeProposals", include: [{ association: "distributions" }, { association: "disputes" }]  },
+    { 
+      association: "mergeProposals", 
+      where: { contractId: { [Op.not]: null } },
+      include: [{ association: "distributions" }, { association: "disputes" }],
+      required: false
+    },
     { association: "transactionalToken" },
     { association: "rewardToken" },
     { association: "benefactors" },
