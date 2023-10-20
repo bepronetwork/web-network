@@ -133,7 +133,7 @@ export default async function get(query: ParsedUrlQuery) {
     getAssociation( "deliverables", 
                     undefined, 
                     false, 
-                    {},
+                    { prContractId: { [Op.not]: null } },
                     [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
                       address: { [Op.iLike]: deliverabler?.toString() }
                     }: {})]);
