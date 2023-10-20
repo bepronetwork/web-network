@@ -3,10 +3,11 @@ import { useTranslation } from "next-i18next";
 import BountyDescription from "components/bounty/description/controller";
 import BountyEditTag from "components/bounty/edit-tag/controller";
 import BountyStatusProgress from "components/bounty/status-progress/controller";
-import Button from "components/button";
 import { IFilesProps } from "components/drag-and-drop";
 
 import { IssueBigNumberData } from "interfaces/issue-data";
+
+import BodyEditButtons from "./edit-buttons/view";
 
 interface BountyBodyProps {
   isEditIssue: boolean;
@@ -45,7 +46,7 @@ export default function BountyBodyView({
   handleUpdateBounty,
   isDisableUpdateIssue,
   walletAddress,
-  bounty
+  bounty,
 }: BountyBodyProps) {
   const { t } = useTranslation(["common", "bounty"]);
 
@@ -80,40 +81,19 @@ export default function BountyBodyView({
                 />
               </>
               {isEditIssue && (
-                <>
-                  <div className="d-flex flex-row justify-content-between my-3">
-                    <Button
-                      color="danger"
-                      onClick={handleCancelEdit}
-                      disabled={false}
-                    >
-                      {t("bounty:cancel-changes")}
-                    </Button>
-                    <div className="d-flex">
-                      <Button
-                        outline={true}
-                        className="d-flex flex-shrink-0 w-40 btn-block"
-                        onClick={() => handleIsPreview(!isPreview)}
-                        disabled={isUploading}
-                      >
-                        {!isPreview ? t("bounty:preview") : t("bounty:edit")}
-                      </Button>
-                      <Button
-                        className="d-flex flex-shrink-0 w-40 btn-block"
-                        onClick={handleUpdateBounty}
-                        disabled={isDisableUpdateIssue()}
-                        isLoading={isUploading}
-                      >
-                        {t("bounty:save-changes")}
-                      </Button>
-                    </div>
-                  </div>
-                </>
+                <BodyEditButtons 
+                  handleUpdateBounty={handleUpdateBounty} 
+                  handleCancelEdit={handleCancelEdit} 
+                  handleIsPreview={() => handleIsPreview(!isPreview)} 
+                  isPreview={isPreview} 
+                  isDisableUpdateIssue={isDisableUpdateIssue()} 
+                  isUploading={isUploading} 
+                />
               )}
             </div>
           </div>
           <div className="col-12 col-md-4">
-              <BountyStatusProgress currentBounty={bounty}/>
+            <BountyStatusProgress currentBounty={bounty} />
           </div>
         </div>
       </div>
