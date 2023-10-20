@@ -9,9 +9,10 @@ import {Settings} from "helpers/settings";
 import {LogAccess} from "middleware/log-access";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    ids: [issueId]
-  } = req.query;
+  const {ids: [issueId]} = req.query;
+
+  if (isNaN(+issueId))
+    return res.status(400).json("wrong parameter values");
 
   const issue = await models.issue.findOne({
     where: {
