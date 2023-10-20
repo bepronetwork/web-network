@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export default function Stepper({ dark = false, children }) {
+export default function Stepper({ hasNetwork = false, dark = false, children }) {
   const [activeStep, setActiveStep] = useState(0);
   const [viewedSteps, setViewedSteps] = useState<number[]>([0]);
   const [validatedSteps, setValidatedSteps] = useState<boolean[]>([])
@@ -10,6 +10,11 @@ export default function Stepper({ dark = false, children }) {
 
     if (stepToGo <= activeStep || isEveryBeforeValidated) setActiveStep(stepToGo);
   }
+
+  useEffect(() => {
+    if(hasNetwork)
+      setActiveStep(-1)
+  }, [hasNetwork])
 
   useEffect(() => {
     setViewedSteps([...new Set([...viewedSteps, activeStep])]);
