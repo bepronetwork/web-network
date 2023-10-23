@@ -81,28 +81,26 @@ export function useNetwork() {
           throw new Error("No networks found");
         }
 
-        if (queryChainName) {
-          const data = rows.find((network) =>
+        const data = queryChainName ? rows.find((network) =>
               network?.chain?.chainShortName?.toLowerCase() ===
-              queryChainName?.toLowerCase());
+              queryChainName?.toLowerCase()) : rows[0];
 
-          if (!data.isRegistered) {
-            if (state.currentUser?.walletAddress === data.creatorAddress)
-              return replace(getURLWithNetwork("/profile/my-network", {
-                network: data.name,
-                chain: data.chain.chainShortName
-              }));
-            else
-              throw new Error("Network not registered");
-          }
-
-          const newCachedData = new WinStorage(getStorageKey(data.name, data.chain.chainId), 3600, `sessionStorage`);
-          newCachedData.value = data;
-          setActiveNetworkId(data.id);
-
-          dispatch(changeNetworkLastVisited(queryNetworkName));
-          dispatchNetworkContextUpdates(newCachedData.value);
+        if (!data.isRegistered && !!queryChainName) {
+          if (state.currentUser?.walletAddress === data.creatorAddress)
+            return replace(getURLWithNetwork("/profile/my-network", {
+              network: data.name,
+              chain: data.chain.chainShortName
+            }));
+          else
+            throw new Error("Network not registered");
         }
+
+        const newCachedData = new WinStorage(getStorageKey(data.name, data.chain.chainId), 3600, `sessionStorage`);
+        newCachedData.value = data;
+        setActiveNetworkId(data.id);
+
+        dispatch(changeNetworkLastVisited(queryNetworkName));
+        dispatchNetworkContextUpdates(newCachedData.value);
 
         const available = rows
           .filter(({ isRegistered, isClosed }) => isRegistered && !isClosed)
