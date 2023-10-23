@@ -271,8 +271,7 @@ function NewNetwork() {
         </div>
       </If>
 
-      
-      <Stepper dark={isSetupPage} hasNetwork={hasNetwork}>
+      <Stepper dark={isSetupPage} disableActiveStep={hasNetwork}>
         <LockBeproStep validated={tokensLocked?.validated} />
 
         <NetworkInformationStep validated={details?.validated} />
