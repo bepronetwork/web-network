@@ -14,7 +14,7 @@ import {useNetworkSettings} from "contexts/network-settings";
 import {StepWrapperProps} from "interfaces/stepper";
 import {Token} from "interfaces/token";
 
-import { useGetTokens } from "x-hooks/api/token";
+import {useGetTokens} from "x-hooks/api/token";
 import useReactQuery from "x-hooks/use-react-query";
 
 export default function TokenConfiguration({
@@ -104,7 +104,7 @@ export default function TokenConfiguration({
     if(!state?.currentUser?.walletAddress || !state?.Service?.active || !BigNumber(tokensLocked.needed).gt(0)) return
 
     state?.Service?.active.getRegistryParameter("networkCreationFeePercentage").then(createFee => {
-      setCreateNetworkAmount(BigNumber(BigNumber(createFee).multipliedBy(tokensLocked.needed)).toFixed());
+      setCreateNetworkAmount(BigNumber(createFee).div(100).multipliedBy(tokensLocked.needed).toFixed())
     })
 
   }, [state?.currentUser?.walletAddress, tokensLocked.needed])
