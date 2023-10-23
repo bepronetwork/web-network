@@ -303,6 +303,7 @@
     "failed-to-register-network": "Failed to register marketplace {{error}}",
     "failed-to-update-network": "Failed to update marketplace {{error}}",
     "failed-to-close-network": "Failed to close marketplace {{error}}",
+    "something-went-wrong": "Something went wrong. Please talk to us on our discord.",
     "invalid-format": "Invalid format",
     "images-too-big": "Your images are too big, maximum 1MB for both files combined",
     "not-found": "No marketplaces found",

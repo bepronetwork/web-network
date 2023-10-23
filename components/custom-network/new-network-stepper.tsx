@@ -110,16 +110,14 @@ function NewNetwork() {
     };
 
     const networkCreated = await useCreateNetwork(payload)
-      .catch((error) => {
+      .catch(error => {
+        console.debug("useCreateNetwork", error);
         setCreatingNetwork(-1);
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
-            content: t("custom-network:errors.failed-to-create-network", {
-              error,
-            }),
+            content: t("custom-network:errors.something-went-wrong"),
         }));
-
         return false;
       });
 
