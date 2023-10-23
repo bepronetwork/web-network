@@ -74,7 +74,9 @@ export function useNetwork() {
 
     await useSearchNetworks({
       name: queryNetworkName,
-      isNeedCountsAndTokensLocked: true
+      isNeedCountsAndTokensLocked: true,
+      sortBy: "id",
+      order: "ASC"
     })
       .then(({count, rows}) => {
         if (count === 0) {
