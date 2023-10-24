@@ -15,7 +15,7 @@ class Network extends Model {
           type: DataTypes.STRING,
           unique: "network_chain_unique"
         },
-        description: DataTypes.STRING,
+        description: DataTypes.TEXT,
         colors: DataTypes.JSON,
         networkAddress: {
           type: DataTypes.STRING,

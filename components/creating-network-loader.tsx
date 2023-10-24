@@ -10,8 +10,11 @@ export default function CreatingNetworkLoader({
 }) {
   const { t } = useTranslation(["custom-network"]);
 
+  if (currentStep < 0)
+    return <></>;
+
   const maxStep = steps?.reduce((max, step) => Math.max(max, step.id), 0);
-  const show = !!(currentStep >= 0 && currentStep < steps.length)
+  const show = !!(currentStep >= 0 && currentStep < steps.length);
 
   //note: zindex-2000 its necessary to modal be above the transactions dropdown
   return (
