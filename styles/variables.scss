@@ -195,7 +195,18 @@ $enable-validation-icons: false;
 
 $modal-content-border-radius: math.div($m, 2);
 
-$input-border-radius: 8px;
+$input-font-family: "Space Grotesk", sans-serif;
+
+$input-bg: $gray-850;
+$input-disabled-bg: $gray-900;
+$input-color: $gray-50;
+$input-placeholder-color: $gray-400;
+$input-border-color: $gray-800;
+$input-focus-border-color: var(--bs-primary);
+$input-focus-box-shadow: none;
+
+$input-group-addon-bg: $gray-850;
+$input-group-addon-border-color: $gray-800;
 
 // Tooltip
 $tooltip-opacity: 1;

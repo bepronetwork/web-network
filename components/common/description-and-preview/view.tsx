@@ -70,7 +70,7 @@ export default function DescriptionAndPreviewView({
           <>
             <textarea
               tabIndex={0}
-              className={clsx(`form-control form-bounty ${
+              className={clsx(`form-control ${
                 textAreaColor ? `bg-${textAreaColor}` : ""
               }`,
                               {
