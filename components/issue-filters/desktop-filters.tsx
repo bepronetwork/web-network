@@ -83,7 +83,7 @@ export default function IssueDesktopFilters({ onlyTimeFrame = false }) {
       )}
 
       <Button
-        color="gray-900"
+        color="gray-850"
         className={`${(show && "border-primary") || ""} rounded-2 m-0`}
         onClick={() => setShow(!show)}
       >
@@ -101,7 +101,7 @@ export default function IssueDesktopFilters({ onlyTimeFrame = false }) {
         {onlyTimeFrame ? (
           <FilterTimeFrame />
         ) : (
-          <div className="bg-gray-900">
+          <div className="bg-gray-850">
             <IssueFilterBox
               title={t("filters.bounties.title")}
               options={stateOptions}

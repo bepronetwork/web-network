@@ -22,7 +22,7 @@ export default function IssueFilterBox({
   }
 
   return (
-    <div className={`filter-box px-2 pt-2 bg-gray-900 ${className}`}>
+    <div className={`filter-box px-2 pt-2 bg-gray-850 ${className}`}>
       <div
         className={`text-uppercase caption text-white mn-2 p-2 ${
           (!filterPlaceholder && "pb-3") || ""
@@ -43,7 +43,7 @@ export default function IssueFilterBox({
       )) ||
         ""}
       <div
-        className={`bg-gray-900 mxn-2 px-2 filter-content ${
+        className={`bg-gray-850 mxn-2 px-2 filter-content ${
           (filterPlaceholder && "filter-search") || ""
         }`}
       >

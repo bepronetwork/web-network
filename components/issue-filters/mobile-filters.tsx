@@ -37,7 +37,7 @@ export default function IssueMobileFilters({
   return (
     <>
       <Button
-        color="gray-900"
+        color="gray-850"
         className={`border border-gray-800 rounded-2 not-svg`}
         onClick={handleShowModal}
       >
