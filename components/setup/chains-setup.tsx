@@ -127,7 +127,7 @@ export default function ChainsSetup() {
     <div className="content-wrapper border-top-0 p-3">
       <div className="row">
         <div className="col">
-          <InputGroup className="border-radius-8">
+          <InputGroup className="border-radius-4">
             <InputGroup.Text className="cursor-pointer" onKeyDown={(e) => e?.key === "Enter" ? handleSearch() : null}>
               <SearchIcon onClick={handleSearch} />
             </InputGroup.Text>
@@ -139,7 +139,7 @@ export default function ChainsSetup() {
               onChange={e => setSearch(e?.target?.value)} />
 
             <button
-              className="btn bg-black border-0 py-0 px-3"
+              className="btn bg-gray-850 border-0 py-0 px-3 border-radius-4 svg-gray"
               onClick={() => setSearch('')}>
               <CloseIcon width={10} height={10} />
             </button>
