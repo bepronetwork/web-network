@@ -153,7 +153,7 @@ export default function BountiesListView({
           className={"row align-items-center list-actions sticky-top bg-body"}
         >
           <div className="col">
-            <InputGroup className="border-radius-8">
+            <InputGroup className="border-radius-4">
               <InputGroup.Text className="cursor-pointer" onClick={onSearchClick}>
                 <SearchIcon />
               </InputGroup.Text>
@@ -168,7 +168,7 @@ export default function BountiesListView({
 
               <If condition={showClearButton}>
                 <button
-                  className="btn bg-gray-900 border-0 py-0 px-3"
+                  className="btn bg-gray-850 border-0 py-0 px-3"
                   onClick={onClearSearch}
                 >
                   <CloseIcon width={10} height={10} />
