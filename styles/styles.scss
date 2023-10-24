@@ -189,20 +189,19 @@ li {
   &-container & {
     &__control {
       border: 1px solid $gray-800;
-      background-color: $gray-900;
+      background-color: $gray-850;
       min-height: 38px;
       box-shadow: none;
       border-radius: 4px;
       &:hover {
         border-color: $gray-700;
-        background-color: $gray-850;
       }
       &--is-focused {
         border-color: var(--bs-primary);
       }
       &--menu-is-open {
         border-color: var(--bs-primary) !important;
-        background-color: $gray-800;
+        background-color: $gray-850;
       }
       &--is-disabled {
         border-color: transparent;
@@ -231,7 +230,7 @@ li {
     &__menu {
       border-radius: 4px;
       border: 1px solid $gray-800;
-      background-color: $gray-900;
+      background-color: $gray-850;
       z-index: 4;
       padding: 6px;
       &-list {
@@ -257,6 +256,10 @@ li {
         overflow: hidden;
         text-overflow: ellipsis;
         padding-right: 0;
+
+        .react-select__input {
+          color: $gray-50 !important;
+        }
       }
     }
     &__option {
@@ -269,11 +272,11 @@ li {
 
       &--is-selected {
         color: $white;
-        background-color: $gray-850;
+        background-color: $gray-800;
       }
       &:hover {
         color: $white;
-        background-color: $gray-850;
+        background-color: $gray-800;
       }
       &:active {
         background-color: transparent;
@@ -281,7 +284,7 @@ li {
     }
   }
   &__input {
-    color: transparentize($white, 0.4);
+    color: $gray-50;
   }
 }
 
@@ -638,10 +641,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
   .input-group-text {
     border: none;
-    color: $gray-700;
+    color: $gray-600;
 
     &.group-disabled {
-      color: $gray-800;
+      color: $gray-700;
       background-color: $gray-900;
     }
   }
