@@ -14,6 +14,7 @@ import NetworkInformationStep from "components/custom-network/network-informatio
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
 import If from "components/If";
+import ChainSelector from "components/navigation/chain-selector/controller";
 import Stepper from "components/stepper";
 
 import {useAppState} from "contexts/app-state";
@@ -268,7 +269,7 @@ function NewNetwork() {
         </div>
       </If>
 
-      <Stepper dark={isSetupPage}>
+      <Stepper dark={isSetupPage} disableActiveStep={hasNetwork}>
         <LockBeproStep validated={tokensLocked?.validated} />
 
         <NetworkInformationStep validated={details?.validated} />
