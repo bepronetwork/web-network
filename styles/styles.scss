@@ -2118,3 +2118,10 @@ input[type="color"] {
     border-bottom: 1px solid $gray-800;
   }
 }
+
+.hackerfest-card-bg {
+  background: url(../public/images/hackfest-pattern.png), lightgray 50% / cover no-repeat;
+  background-size: 100%;
+  background-position-y: center;
+  box-shadow: 0px 4px 13px 0px #000;
+}
