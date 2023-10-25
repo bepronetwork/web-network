@@ -15,6 +15,6 @@ export default function ChainIcon({
 } : ChainIconProps) {
   const ipfsUrl = publicRuntimeConfig?.urls?.ipfs;
   if (src && ipfsUrl)
-    return <img className="rounded-circle bg-white p-1" src={`${ipfsUrl}/${src}`} height={size} width={size} />
+    return <img className="rounded-circle" src={`${ipfsUrl}/${src}`} height={size} width={size} />
   return <QuestionMarkIcon height={size} width={size} />;
 }
