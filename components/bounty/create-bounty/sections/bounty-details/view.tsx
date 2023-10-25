@@ -95,7 +95,7 @@ export default function BountyDetailsSectionView({
 
             <input
               type="text"
-              className={clsx("form-control form-bounty rounded-lg", {
+              className={clsx("form-control rounded-lg", {
                 "border border-1 border-danger border-radius-8": titleExceedsLimit,
               })}
               placeholder={t("fields.title.placeholder")}
