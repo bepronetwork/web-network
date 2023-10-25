@@ -43,8 +43,8 @@ export default function OraclesDelegateView({
           label={t("my-oracles:fields.oracles.label")}
           value={tokenAmount}
           symbol={t("misc.votes")}
-          classSymbol="text-purple bg-gray-900"
-          className="bg-gray-900"
+          classSymbol="text-purple bg-gray-850"
+          className="bg-gray-850"
           onValueChange={handleChangeOracles}
           min={0}
           placeholder={t("my-oracles:fields.oracles.placeholder")}
@@ -75,7 +75,7 @@ export default function OraclesDelegateView({
             value={delegatedTo}
             onChange={handleChangeAddress}
             type="text"
-            className={`form-control bg-gray-900 ${
+            className={`form-control bg-gray-850 ${
               ((isAddressesEqual || addressError)&& "is-invalid") || ""
             }`}
             placeholder={t("my-oracles:fields.address.placeholder")}
