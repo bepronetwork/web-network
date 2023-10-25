@@ -136,7 +136,7 @@ export default async function get(query: ParsedUrlQuery) {
                     false, 
                     { prContractId: { [Op.not]: null } },
                     [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
-                      address: caseInsensitiveEqual("user.address", deliverabler.toString())
+                      address: caseInsensitiveEqual("address", deliverabler.toString())
                     }: {})]);
 
   const networkAssociation = 
