@@ -121,7 +121,7 @@ export default function BountiesListView({
             </h4>
 
             <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
-              {bounties?.count || 0}
+              {type === 'deliverables' ? bounties?.totalBounties : bounties?.count || 0}
             </span>
           </div>
 

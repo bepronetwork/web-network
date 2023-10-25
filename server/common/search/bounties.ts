@@ -35,6 +35,8 @@ export default async function get(query: ParsedUrlQuery) {
 
   const whereCondition: WhereOptions = {};
 
+  const includeTotalBounties = []
+
   const defaultStatesToIgnore = ["pending", "canceled"];
 
   if (["disputable", "mergeable", "proposable"].includes(state?.toString()))
@@ -218,13 +220,24 @@ export default async function get(query: ParsedUrlQuery) {
       }
     });
 
+  if (deliverabler)
+    includeTotalBounties.push(getAssociation( "deliverables", 
+                                              undefined, 
+                                              !!deliverabler, 
+      { prContractId: { [Op.not]: null } },
+                                              [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
+        address: caseInsensitiveEqual("address", deliverabler.toString())
+                                              }: {})]))
+  
+
   const totalBounties = await models.issue.count({
-    where: {
-      state: {
-        [Op.notIn]: ["pending", "canceled"],
+      where: {
+        state: {
+          [Op.notIn]: ["pending", "canceled"],
+        },
+        visible: true,
       },
-      visible: true,
-    }
+      include: includeTotalBounties,
   });
 
   return {
