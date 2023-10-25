@@ -71,6 +71,11 @@ export default function UpdateBountyAmountModal({
   const needsApproval = !!BigNumber(issueAmount.floatValue)?.gt(transactionalERC20.allowance);
   const exceedsBalance = !!BigNumber(issueAmount.floatValue)?.gt(transactionalERC20.balance);
 
+  function onCloseModalClick() {
+    resetValues();
+    handleClose();
+  }
+
   const resetValues = () => {
     updateIssueAmount(ZeroNumberFormatValues)
     setRewardAmount(ZeroNumberFormatValues)
@@ -181,7 +186,7 @@ export default function UpdateBountyAmountModal({
     const setType = type === "reward" ? setRewardAmount : updateIssueAmount;
 
     if (amountIsGtBalance(values.floatValue, transactionalERC20.balance)) {
-      setInputError(t("bounty:errors.exceeds-allowance"));
+      setInputError(t("bounty:errors.exceeds-balance"));
       setType(values);
     } else if (+values.floatValue > +currentToken?.currentValue) {
       setType(ZeroNumberFormatValues);
@@ -243,7 +248,7 @@ export default function UpdateBountyAmountModal({
       exceedsBalance={exceedsBalance}
       transactionalERC20={transactionalERC20}
       handleSubmit={handleSubmit}
-      handleClose={handleClose}
+      handleClose={onCloseModalClick}
       handleApprove={handleApprove} 
       rewardAmount={rewardAmount} 
       issueAmount={issueAmount} 
