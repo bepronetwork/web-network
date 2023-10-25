@@ -83,16 +83,6 @@ export default function BountySettings({
     const isHardCancel = (isCancelable && isGovernor)
     const isOwnerCancel = (isBountyInDraft && isOwner)
 
-    console.log({
-      isBountyOwner,
-      isBountyInDraft,
-      isGovernor,
-      isCancelable,
-      isOwner,
-      isHardCancel,
-      isOwnerCancel
-    })
-
     return (isOwnerCancel || isHardCancel)
   }
 
