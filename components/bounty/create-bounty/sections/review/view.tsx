@@ -37,7 +37,7 @@ export default function CreateBountyReviewSection({
               {t(`review-section.${name}`)}
             </div>
 
-            <div className="col-md-9 text-truncate">
+            <div className="col text-wrap">
               { Array.isArray(value) ?
                 <div className="d-flex flex-wrap">
                   {value.map((item, key) => (
