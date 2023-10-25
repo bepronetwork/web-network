@@ -36,7 +36,9 @@ $blue: #4250e4;
 $blue-dark: #283089;
 // Fix-ME: Remove disabled color
 $disabled: #423b51;
-
+$green-500: #35E0AD;
+$blue-50: #ECEDFC;
+$blue-600: #3540B6;
 
 $orange-500: #FF6A2C;
 
@@ -111,6 +113,10 @@ $more-bg: (
   "blue-dark": $blue-dark,
   "blue-shadow": $bg-blue-shadow,
   "yellow-500": $yellow-500,
+  "green-500": $green-500,
+  "green-500-90": #104334E5,
+  "blue-50": $blue-50,
+  "blue-600": $blue-600,
 );
 
 $more-colors: (
@@ -138,6 +144,10 @@ $more-colors: (
   "black": $black,
   "white": #fff,
   "yellow-500": $yellow-500,
+  "green-500": $green-500,
+  "green-500-90": #104334E5,
+  "blue-50": $blue-50,
+  "blue-600": $blue-600,
 );
 
 $more-roundend: (

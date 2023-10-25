@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 import ListActiveNetworks from "components/bounties/list-active-networks";
 import ListRecentIssues from "components/bounties/list-recent-issues";
 import BountiesList from "components/bounty/bounties-list/controller";
+import HackFestCard from "components/cards/hackfest/view";
 import PageHero from "components/common/page-hero/view";
 import CustomContainer from "components/custom-container";
 
@@ -43,6 +44,8 @@ export default function ExplorePageView({
 
   return (
     <>
+      <HackFestCard />
+
       <PageHero
         title={heroTitle}
         subtitle={heroSubTitle}
