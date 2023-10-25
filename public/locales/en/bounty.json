@@ -104,6 +104,7 @@
     "sync": "The task was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your task",
     "exceeds-allowance": "Task amount exceeds your allowance",
     "exceeds-balance": "Task amount exceeds your balance",
+    "exceeds-available": "Total amount exceeds available amount",
     "exceeds-minimum-amount": "Minimum amount is {{amount}}",
     "title-character-limit": "Exceeds allowed limit of 130 characters: {{value}}", 
     "description-limit": "Exceeds allowed limit of characters and files: {{value}}",
