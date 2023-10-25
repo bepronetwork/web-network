@@ -108,8 +108,7 @@ export default function PageActionsView({
         <>
           <UpdateBountyAmountModal
             show={showUpdateAmount}
-            transactionalAddress={bounty?.transactionalToken?.address}
-            bountyId={bounty?.contractId}
+            bounty={bounty}
             handleClose={() => setShowUpdateAmount(false)}
             updateBountyData={updateBountyData}
           />
