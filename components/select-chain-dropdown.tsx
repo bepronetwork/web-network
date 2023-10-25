@@ -12,8 +12,6 @@ import {useAppState} from "contexts/app-state";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
-import {getChainIcon, getChainIconsList} from "services/chain-id";
-
 import useBreakPoint from "x-hooks/use-breakpoint";
 
 interface SelectChainDropdownProps {
@@ -114,20 +112,13 @@ export default function SelectChainDropdown({
   async function updateOptions() {
     if (!supportedChains || (isOnNetwork && !Service?.network?.availableChains)) return;
 
-    await getChainIconsList(); // request the chainsIconsList so we don't do it on the loop
-
-    const chainsWithIcon = await Promise.all(supportedChains
-      .filter(isChainConfigured)
-      .map(async (chain) => ({
-        ...chain,
-        icon: await getChainIcon(chain.icon)
-      })));
+    const configuredChains = supportedChains.filter(isChainConfigured);
 
     if (isOnNetwork)
-      setOptions(chainsWithIcon.map(chain =>
+      setOptions(configuredChains.map(chain =>
         chainToOption(chain, !Service?.network?.availableChains?.find(({ chainId }) => chainId === chain.chainId))));
     else
-      setOptions(chainsWithIcon.map(chain => chainToOption(chain)));
+      setOptions(configuredChains.map(chain => chainToOption(chain)));
   }
 
   function getNativeOptions() {

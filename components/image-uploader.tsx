@@ -6,13 +6,14 @@ import UploadIcon from "assets/icons/upload";
 
 export default function ImageUploader({
   name,
-  description,
+  description = "",
   value,
   onChange,
   lg = false,
   error = false,
   className = "",
   isLoading = false,
+  accept = ".svg"
 }) {
   const { t } = useTranslation("custom-network");
 
@@ -72,7 +73,7 @@ export default function ImageUploader({
         type="file"
         id={name}
         style={{ display: "none" }}
-        accept=".svg"
+        accept={accept}
         onChange={handleChange}
       />
     </div>
