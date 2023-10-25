@@ -188,8 +188,6 @@ export function useDao() {
 
     console.debug("Starting DAOService");
 
-    dispatch(changeStarting(true));
-
     const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
     const registryAddress = isConfigured ? _registry : undefined;
@@ -211,7 +209,7 @@ export function useDao() {
     console.debug("DAOService started", daoProps);
 
     window.DAOService = daoService;
-    dispatch(changeStarting(false));
+
     dispatch(changeActiveDAO(daoService));
   }
 
