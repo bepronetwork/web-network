@@ -6,7 +6,7 @@ import UploadIcon from "assets/icons/upload";
 
 export default function ImageUploader({
   name,
-  description = "",
+  description = undefined,
   value,
   onChange,
   lg = false,
