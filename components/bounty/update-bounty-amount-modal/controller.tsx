@@ -248,6 +248,7 @@ export default function UpdateBountyAmountModal({
       return;
 
     transactionalERC20.setAddress(transactionalAddress);
+    transactionalERC20.updateAllowanceAndBalance();
   }, [transactionalAddress, Service?.active, currentUser, show]);
 
   return (
