@@ -256,5 +256,8 @@
     "totalAmount": "Total Amount",
     "fundersReward": "Funders Reward"
   },
-  "approximated-values-warning": "Defining the Reward amount will result in approximate values in the contract. If you want exact values, set the Total Amount first."
+  "approximated-values-warning": "Defining the Reward amount will result in approximate values in the contract. If you want exact values, set the Total Amount first.",
+  "your-balance": "Your balance",
+  "locked-in-the-task": "Locked in the Task",
+  "available": "Available"
 }

@@ -107,20 +107,21 @@ export default function UpdateBountyAmountModalView({
         />
 
         <div className="d-flex justify-content-end">
-          <span className="text-gray me-1">Your Balance: </span>
+          <span className="text-gray me-1">{t("bounty:your-balance")}: </span>
           {formatStringToCurrency(transactionalERC20.balance.toFixed(2))}{" "}
           {transactionalERC20.symbol}
         </div>
 
         <div className="d-flex justify-content-end">
-          <span className="text-gray me-1">Locked in the Task:</span>
+          <span className="text-gray me-1">{t("bounty:locked-in-the-task")}:</span>
           {formatStringToCurrency(taskAmount.toFixed(2))}{" "}
           {transactionalERC20.symbol}
         </div>
 
         <div className="d-flex justify-content-end">
-          <span className="text-gray me-1">Available:</span>
-          {formatStringToCurrency(taskAmount.plus(transactionalERC20.balance).toFixed(2))}{" "}
+          <span className="text-gray me-1">{t("bounty:available")}:</span>
+          {formatStringToCurrency(transactionalERC20.balance.gt(0) ? 
+            taskAmount.plus(transactionalERC20.balance).toFixed(2) : "0.00")}{" "}
           {transactionalERC20.symbol}
         </div>
       </div>
