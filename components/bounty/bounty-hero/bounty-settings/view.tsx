@@ -6,6 +6,8 @@ import {
   
 import { useTranslation } from "next-i18next";
   
+import Button from "components/button";
+import ContractButton from "components/contract-button";
 import Modal from "components/modal";
 import Translation from "components/translation";
 
@@ -75,9 +77,14 @@ export default function BountySettingsView({
   function renderEditButton() {
     if (isWalletConnected && isBountyInDraft && isBountyOwner)
       return (
-          <span className="cursor-pointer" onClick={handleEditClick}>
-            <Translation ns="bounty" label="actions.edit-bounty" />
-          </span>
+        <Button
+          className="px-0 p font-weight-normal text-capitalize"
+          transparent
+          align="left"
+          onClick={handleEditClick}
+        >
+          <Translation ns="bounty" label="actions.edit-bounty" />
+        </Button>
       );
   }
 
@@ -93,15 +100,17 @@ export default function BountySettingsView({
   
   function renderCancel() {
     const Cancel = (isHard: boolean) => (
-        <span
-          className="cursor-pointer"
+        <ContractButton
+          className="px-0 mx-0 p font-weight-normal text-capitalize"
+          transparent
+          align="left"
           onClick={handleCancelClick(isHard)}
         >
           <Translation
             ns={isHard ? "common" : "bounty"}
             label={isHard ? "actions.cancel" : "actions.owner-cancel"}
           />
-        </span>
+        </ContractButton>
       );
 
     if (isGovernor && isCancelable)
