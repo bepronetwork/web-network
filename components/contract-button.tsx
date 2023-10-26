@@ -1,10 +1,14 @@
 import { useState } from "react";
 
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+
 import Button, { ButtonProps } from "components/button";
 import WalletMismatchModal from "components/modals/wallet-mismatch/controller";
 
 import { useAppState } from "contexts/app-state";
 import { changeNeedsToChangeChain } from "contexts/reducers/change-spinners";
+import { toastError, toastWarning } from "contexts/reducers/change-toaster";
 import { changeShowWeb3 } from "contexts/reducers/update-show-prop";
 
 import { UNSUPPORTED_CHAIN } from "helpers/constants";
@@ -15,9 +19,11 @@ export default function ContractButton({
   children,
   ...rest
 }: ButtonProps) {
+  const { t } = useTranslation(["common"]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const { state, dispatch } = useAppState();
+  const { query } = useRouter();
 
   function onCloseModal() {
     setIsModalVisible(false);
@@ -57,6 +63,30 @@ export default function ContractButton({
     return false;
   }
 
+  async function validateDao() {
+    if(state.Service?.active) return true
+
+    dispatch(toastError(t("errors.failed-load-dao")))
+
+    return false
+  }
+
+  async function validateLoadNetwork() {
+    if (query?.network) {
+      if (state.Service?.starting) {
+        dispatch(toastWarning(t("warnings.await-load-network")));
+        return false;
+      }
+
+      if (!state.Service?.starting && !state.Service?.active.network) {
+        dispatch(toastError(t("errors.failed-load-network")));
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   async function handleExecute(e) {
     try {
       if (!onClick)
@@ -66,6 +96,8 @@ export default function ContractButton({
         validateEthereum,
         validateChain,
         validateWallet,
+        validateDao,
+        validateLoadNetwork
       ];
 
       for (const validation of validations) {

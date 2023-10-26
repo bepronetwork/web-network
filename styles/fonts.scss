@@ -204,3 +204,13 @@ button,
   font-weight: 400;
   line-height: 17px; /* 121.429% */
 }
+
+.hack-fest-title {
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: 'ss04' on, 'ss02' on, 'ss03' on;
+  font-family: Space Grotesk;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 142.5%;
+}

@@ -165,7 +165,7 @@ export default function CreateBountyTokenAmount({
     const setType = type === 'reward' ? setPreviewAmount : updateIssueAmount
 
     if(needValueValidation && amountIsGtBalance(values.floatValue, tokenBalance)){
-      setInputError(t("bounty:errors.exceeds-allowance"));
+      setInputError(t("bounty:errors.exceeds-balance"));
       setType(values);
     }else if (
       needValueValidation &&

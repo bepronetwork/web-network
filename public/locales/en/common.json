@@ -377,7 +377,12 @@
     "read-only-network": "This marketplace is closed. It is set to read-only mode.",
     "results-truncated": "Results Truncated",
     "not-available-chain": "Marketplace not present on this network",
-    "something-went-wrong": "Something went wrong"
+    "something-went-wrong": "Something went wrong",
+    "failed-load-dao": "failed to load Dao Service",
+    "failed-load-network": "failed to load marketplace"
+  },
+  "warnings": {
+    "await-load-network": "await for a loading marketplace"
   },
   "404": {
     "the-page": "The page you looking for was",

@@ -34,7 +34,7 @@ export default function InputWithBalance({
   const isAllowed = ({ value: newValue }) => BigNumber(newValue !== "" && newValue || 0).lte(max || balance);
 
   return(
-    <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
+    <div className="row mx-0 bg-dark-gray border-radius-4 amount-input">
       <div className="col px-0">
         <InputNumber
           classSymbol={"text-primary"}

@@ -11,7 +11,7 @@ import {
 } from "@taikai/dappkit";
 import {TransactionReceipt} from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
-import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core, provider as Provider} from "web3-core";
+import {PromiEvent, provider as Provider, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
 import {Contract} from "web3-eth-contract";
 
 import {BountyExtended} from "interfaces/bounty";
@@ -69,12 +69,12 @@ export default class DAO {
       if (!skipAssignment)
         this._network = network;
 
-      console.table({
-        networkAddress,
-        networkTokenAddress: network.networkToken?.contractAddress,
-        registryAddress: network.registry?.contractAddress,
-        nftAddress: network.nftToken?.contractAddress,
-      });
+      // console.table({
+      //   networkAddress,
+      //   networkTokenAddress: network.networkToken?.contractAddress,
+      //   registryAddress: network.registry?.contractAddress,
+      //   nftAddress: network.nftToken?.contractAddress,
+      // });
 
 
       return network;

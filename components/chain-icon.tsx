@@ -1,3 +1,5 @@
+import getConfig from "next/config";
+
 import QuestionMarkIcon from "assets/icons/question-mark-icon";
 
 interface ChainIconProps {
@@ -5,12 +7,14 @@ interface ChainIconProps {
   size?: string;
 }
 
+const { publicRuntimeConfig } = getConfig();
+
 export default function ChainIcon({
   src,
-  size = "16"
+  size = "18"
 } : ChainIconProps) {
-  if (src)
-    return <img className="rounded-circle bg-white p-1" src={src} height={size} width={size} />
-
+  const ipfsUrl = publicRuntimeConfig?.urls?.ipfs;
+  if (src && ipfsUrl)
+    return <img className="rounded-circle" src={`${ipfsUrl}/${src}`} height={size} width={size} />
   return <QuestionMarkIcon height={size} width={size} />;
 }

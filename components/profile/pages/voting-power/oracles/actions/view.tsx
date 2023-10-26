@@ -65,12 +65,12 @@ export default function OraclesActionsView({
 
           <InputNumber
             disabled={!wallet?.address}
-            className="bg-gray-900"
+            className="bg-gray-850"
             label={t("my-oracles:fields.amount.label", {
               currency: currentLabel
             })}
             symbol={`${currentLabel}`}
-            classSymbol={`bg-gray-900 ${
+            classSymbol={`bg-gray-850 ${
               currentLabel === t("$oracles", { token: networkTokenSymbol })
                 ? "text-purple"
                 : "text-primary"
