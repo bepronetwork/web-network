@@ -3,9 +3,12 @@ import {Col, Row} from "react-bootstrap";
 
 import ColorInput from "components/color-input";
 import {FormGroup} from "components/form-group";
+import ImageUploader from "components/image-uploader";
 import Modal from "components/modal";
 
 import {MiniChainInfo} from "interfaces/mini-chain";
+
+import useApi from "x-hooks/use-api";
 
 interface AddCustomChainModalProps {
   show: boolean;
@@ -24,6 +27,12 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
   const [currencyDecimals, setCurrencyDecimals] = useState('');
   const [eventsApi, setEventsApi] = useState('');
   const [color, setColor] = useState('#4250e4');
+  const [logo, setLogo] = useState({
+    preview: "",
+    raw: undefined as File
+  });
+
+  const { uploadFiles } = useApi();
 
   function getChainModel(): MiniChainInfo {
     return {
@@ -42,6 +51,12 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
       rpc: [],
       networkId: 0
     }
+  }
+
+  async function handleAddChain() {
+    const result = logo?.raw ? await uploadFiles(logo?.raw).catch(() => null) : null;
+    const ipfsHash = result?.at(0)?.hash;
+    add({...getChainModel(), icon: ipfsHash });
   }
 
   const forms: [string, string, string,  Dispatch<SetStateAction<string>>][] = [
@@ -70,7 +85,7 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
                 title="Add custom chain"
                 okLabel="add chain"
                 okDisabled={forms.some(([,,v]) => !v)}
-                onOkClick={() => add(getChainModel())}
+                onOkClick={handleAddChain}
                 onCloseClick={() => add(null)}>
 
     <>
@@ -82,6 +97,20 @@ export default function AddCustomChainModal({show, add}: AddCustomChainModalProp
         onChange={setColor}
         onlyColorCode
       />
+
+    <Row className="mt-3 mb-2">
+      <Col>Chain logo</Col>
+    </Row>
+    <Row>
+      <Col xs="auto">
+        <ImageUploader
+          name="logoIcon"
+          value={logo}
+          onChange={setLogo}
+          accept="image/*"
+        />
+      </Col>
+    </Row>
     </>
   </Modal>
 }
