@@ -1,5 +1,6 @@
 import { NumberFormatValues } from "react-number-format";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
@@ -22,7 +23,9 @@ interface UpdateBountyAmountModalViewProps {
   transactionalERC20: useERC20;
   rewardAmount: NumberFormatValues;
   issueAmount: NumberFormatValues;
+  taskAmount?: BigNumber;
   inputError: string;
+  isSameValue?: boolean;
   distributions: DistributionsProps;
   onIssueAmountValueChange: (
     values: NumberFormatValues,
@@ -43,6 +46,8 @@ export default function UpdateBountyAmountModalView({
   issueAmount,
   inputError,
   distributions,
+  taskAmount,
+  isSameValue,
   onIssueAmountValueChange,
   handleSubmit,
   handleClose,
@@ -62,18 +67,18 @@ export default function UpdateBountyAmountModalView({
             {t("actions.cancel")}
           </Button>
           {needsApproval ? (
-            <Button
+            <ContractButton
               onClick={handleApprove}
               disabled={isExecuting || exceedsBalance}
               withLockIcon={exceedsBalance}
               isLoading={isExecuting}
             >
               <span>{t("actions.approve")}</span>
-            </Button>
+            </ContractButton>
           ) : (
             <ContractButton
-              disabled={isExecuting || exceedsBalance || !issueAmount || !!inputError}
-              withLockIcon={exceedsBalance || !issueAmount || !!inputError}
+              disabled={isExecuting || exceedsBalance || !issueAmount || !!inputError || !!isSameValue}
+              withLockIcon={exceedsBalance || !issueAmount || !!inputError || !!isSameValue}
               onClick={handleSubmit}
               isLoading={isExecuting}
             >
@@ -100,9 +105,23 @@ export default function UpdateBountyAmountModalView({
           onIssueAmountValueChange={onIssueAmountValueChange}
           classNameInputs="col-md-6 col-12 mt-1"
         />
+
         <div className="d-flex justify-content-end">
-          <span className="text-gray me-1">{t('bounty:balance')}</span>
-          {formatStringToCurrency(transactionalERC20.balance.toFixed(5))}{" "}
+          <span className="text-gray me-1">{t("bounty:your-balance")}: </span>
+          {formatStringToCurrency(transactionalERC20.balance.toFixed(2))}{" "}
+          {transactionalERC20.symbol}
+        </div>
+
+        <div className="d-flex justify-content-end">
+          <span className="text-gray me-1">{t("bounty:locked-in-the-task")}:</span>
+          {formatStringToCurrency(taskAmount.toFixed(2))}{" "}
+          {transactionalERC20.symbol}
+        </div>
+
+        <div className="d-flex justify-content-end">
+          <span className="text-gray me-1">{t("bounty:available")}:</span>
+          {formatStringToCurrency(transactionalERC20.balance.gt(0) ? 
+            taskAmount.plus(transactionalERC20.balance).toFixed(2) : "0.00")}{" "}
           {transactionalERC20.symbol}
         </div>
       </div>
