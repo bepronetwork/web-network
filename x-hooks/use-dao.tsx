@@ -1,5 +1,5 @@
 import {isZeroAddress} from "ethereumjs-util";
-import { useSession } from "next-auth/react";
+import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 import {isAddress} from "web3-utils";
 
@@ -7,11 +7,11 @@ import {useAppState} from "contexts/app-state";
 import {changeChain as changeChainReducer} from "contexts/reducers/change-chain";
 import {changeActiveDAO, changeStarting} from "contexts/reducers/change-service";
 import {changeChangingChain, changeConnecting} from "contexts/reducers/change-spinners";
-import { changeMissingMetamask } from "contexts/reducers/update-show-prop";
+import {changeMissingMetamask} from "contexts/reducers/update-show-prop";
 
 import {SUPPORT_LINK, UNSUPPORTED_CHAIN} from "helpers/constants";
 import handleEthereumProvider from "helpers/handle-ethereum-provider";
-import { lowerCaseCompare } from "helpers/string";
+import {lowerCaseCompare} from "helpers/string";
 
 import {SupportedChainData} from "interfaces/supported-chain-data";
 
@@ -126,14 +126,14 @@ export function useDao() {
   async function start() {
     if (session.status === "loading" ||
         session.status === "authenticated" && !state.currentUser?.connected) {
-      console.debug("Session not loaded yet");
+      // console.debug("Session not loaded yet");
       return;
     }
 
     const supportedChains = state.supportedChains;
 
     if (!supportedChains?.length) {
-      console.debug("No supported chains found");
+      // console.debug("No supported chains found");
       return;
     }
 
@@ -186,7 +186,7 @@ export function useDao() {
       return;
     }
 
-    console.debug("Starting DAOService");
+    // console.debug("Starting DAOService");
 
     const { chainRpc: web3Host, registryAddress: _registry } = chainToConnect;
 
@@ -206,7 +206,7 @@ export function useDao() {
       await daoService.loadRegistry()
         .catch(error => console.debug("Failed to load registry", error));
 
-    console.debug("DAOService started", daoProps);
+    //console.debug("DAOService started", daoProps);
 
     window.DAOService = daoService;
 

@@ -1,5 +1,5 @@
-const title = "Web3 Decentralized Development";
-const description = "Autonomous Protocol for Decentralized Development";
+const title = "Task-Based Marketplace";
+const description = "Connecting organizations and builders through task-based work.";
 const url =
   process.env.NEXT_PUBLIC_HOME_URL || "https://app.bepro.network";
 

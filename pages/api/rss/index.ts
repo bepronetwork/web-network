@@ -9,8 +9,8 @@ import {LogAccess} from "middleware/log-access";
 
 import {error as LogError} from 'services/logging';
 
-import { GeneralTemplates } from "server/templates";
-import { TemplateProcessor } from "server/utils/template";
+import {GeneralTemplates} from "server/templates";
+import {TemplateProcessor} from "server/utils/template";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -64,8 +64,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const ipfsUrl = publicRuntimeConfig?.urls?.ipfs;
 
     const templateData = {
-      appTitle: "Web3 Decentralized Development",
-      appDescription: "Autonomous Protocol for Decentralized Development",
+      appTitle: "Task-Based Marketplace",
+      appDescription: "Connecting organizations and builders through task-based work.",
       appLink: homeUrl,
       bounties: bounties.map(({ title, createdAt, id, seoImage, tags, network, chain }) => ({
         title,
