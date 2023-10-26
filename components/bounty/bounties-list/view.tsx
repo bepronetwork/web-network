@@ -111,18 +111,35 @@ export default function BountiesListView({
     }
   ];
 
+  function CountComponent({ count }: { count?: number }) {
+    return (
+      <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
+        {count || 0}
+      </span>
+    );
+  }
+
   return (
     <div className="px-0 mx-0 mb-4">
       <If condition={isBountyHall || isProfile || isManagement}>
         <div className="d-flex flex-wrap justify-content-between">
-          <div className="d-flex flex-row flex-wrap align-items-center gap-3">
+          <div className="d-flex flex-row flex-wrap align-items-center gap-2">
+            <div className="d-flex gap-2 align-items-center">
             <h4 className="text-capitalize font-weight-medium">
               {listTitleByType[type]}
             </h4>
-
-            <span className="p family-Regular text-gray-400 bg-gray-850 border-radius-4 p-1 px-2">
-              {type === 'deliverables' ? bounties?.totalBounties : bounties?.count || 0}
-            </span>
+            {["deliverables", "proposals"].includes(type) ? (
+                <>
+                  <CountComponent count={bounties?.totalBounties} />
+                  <span className="caption-small text-gray font-weight-medium mt-1">
+                    {t("bounty:label", { count: bounties?.count })}{" "}
+                    {bounties?.count}
+                  </span>
+                </>
+              ) : (
+                <CountComponent count={bounties?.count} />
+              )}
+            </div>
           </div>
 
           <If condition={isProfile && isOnNetwork}>
