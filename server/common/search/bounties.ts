@@ -35,8 +35,6 @@ export default async function get(query: ParsedUrlQuery) {
 
   const whereCondition: WhereOptions = {};
 
-  const includeTotalBounties = []
-
   const defaultStatesToIgnore = ["pending", "canceled"];
 
   if (["disputable", "mergeable", "proposable"].includes(state?.toString()))
@@ -135,7 +133,7 @@ export default async function get(query: ParsedUrlQuery) {
   const deliverableAssociation = 
     getAssociation( "deliverables", 
                     undefined, 
-                    false, 
+                    !!deliverabler, 
                     { prContractId: { [Op.not]: null } },
                     [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
                       address: caseInsensitiveEqual("address", deliverabler.toString())
@@ -192,7 +190,7 @@ export default async function get(query: ParsedUrlQuery) {
   } else
     sort.push("createdAt");
 
-  const useSubQuery = isMergeableState || isDisputableState ? false : undefined;
+  const useSubQuery = isMergeableState || isDisputableState || deliverabler ? false : undefined;
 
   const issues = await models.issue.findAndCountAll(paginate({
     subQuery: useSubQuery,
@@ -218,32 +216,48 @@ export default async function get(query: ParsedUrlQuery) {
         ...result,
         rows
       }
-    });
-
-  if (deliverabler)
-    includeTotalBounties.push(getAssociation( "deliverables", 
-                                              undefined, 
-                                              !!deliverabler, 
-      { prContractId: { [Op.not]: null } },
-                                              [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
-        address: caseInsensitiveEqual("address", deliverabler.toString())
-                                              }: {})]))
+    }); 
   
+  let total;
 
-  const totalBounties = await models.issue.count({
+  if(deliverabler){
+    total = await models.deliverable.count({
+      subQuery: false,
+      include: [
+        getAssociation("user", undefined, !!deliverabler, deliverabler ? {
+          address: caseInsensitiveEqual("address", deliverabler.toString())
+        }: {}),
+        getAssociation("issue", undefined, true, {}, [
+          getAssociation("network", undefined, true, networkName || network ? 
+          { 
+          networkName: caseInsensitiveEqual("name", (networkName || network).toString())
+          } : {}, [])])
+      ]
+    });
+  } else if(proposer){
+    total = await models.mergeProposal.count({
+      where: {
+        ... proposer ? { creator: caseInsensitiveEqual("creator", proposer.toString()) } : {}
+      },
+      include: [
+        networkAssociation
+      ]
+    });
+  } else {
+    total = await models.issue.count({
       where: {
         state: {
           [Op.notIn]: ["pending", "canceled"],
         },
         visible: true,
-      },
-      include: includeTotalBounties,
-  });
+      }
+    });
+  }
 
   return {
     ...issues,
     currentPage: PAGE,
     pages: calculateTotalPages(issues.count, RESULTS_LIMIT),
-    totalBounties
+    totalBounties: total
   };
 }
