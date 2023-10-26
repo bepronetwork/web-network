@@ -36,7 +36,7 @@ export function AppStateContextProvider({children}) {
     if (!authError)
       return;
 
-    console.debug(`parsingError`, authError);
+    console.debug(`Error parsing`, authError);
     dispatch(toastError(sanitizeHtml(authError, { allowedTags: [], allowedAttributes: {} })));
   }
 

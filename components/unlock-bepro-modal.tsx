@@ -14,7 +14,7 @@ import {useAppState} from "contexts/app-state";
 
 import {formatStringToCurrency} from "helpers/formatNumber";
 
-import { NetworkEvents } from "interfaces/enums/events";
+import {NetworkEvents} from "interfaces/enums/events";
 import {TransactionTypes} from "interfaces/enums/transaction-types";
 
 import useApi from "x-hooks/use-api";
@@ -59,7 +59,7 @@ export default function UnlockBeproModal({
 
   function handleError(e) {
     setDefaults();
-    console.debug('error', e);
+    console.debug('error unlocking', e);
   }
 
   function setToMax() {

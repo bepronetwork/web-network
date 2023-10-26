@@ -10,32 +10,32 @@ import {
   changeCurrentUserBalance,
   changeCurrentUserConnected,
   changeCurrentUserId,
+  changeCurrentUserisAdmin,
   changeCurrentUserKycSession,
   changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserSignature,
-  changeCurrentUserWallet,
-  changeCurrentUserisAdmin
+  changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
 import {changeActiveNetwork} from "contexts/reducers/change-service";
 import {changeSpinners} from "contexts/reducers/change-spinners";
-import { addToast } from "contexts/reducers/change-toaster";
+import {addToast} from "contexts/reducers/change-toaster";
 import {changeReAuthorizeGithub} from "contexts/reducers/update-show-prop";
 
 import {IM_AN_ADMIN, NOT_AN_ADMIN, UNSUPPORTED_CHAIN} from "helpers/constants";
 import decodeMessage from "helpers/decode-message";
-import { AddressValidator } from "helpers/validators/address";
+import {AddressValidator} from "helpers/validators/address";
 
 import {EventName} from "interfaces/analytics";
 import {CustomSession} from "interfaces/custom-session";
-import { UserRole } from "interfaces/enums/roles";
+import {UserRole} from "interfaces/enums/roles";
 
 import {WinStorage} from "services/win-storage";
 
-import { SESSION_TTL } from "server/auth/config";
+import {SESSION_TTL} from "server/auth/config";
 
-import { useSearchCurators } from "x-hooks/api/curator";
-import { useGetKycSession, useValidateKycSession } from "x-hooks/api/kyc";
+import {useSearchCurators} from "x-hooks/api/curator";
+import {useGetKycSession, useValidateKycSession} from "x-hooks/api/kyc";
 import useAnalyticEvents from "x-hooks/use-analytic-events";
 import useChain from "x-hooks/use-chain";
 import {useDao} from "x-hooks/use-dao";
@@ -139,7 +139,7 @@ export function useAuthentication() {
       .catch(error => console.debug("Failed to updateWalletBalance", error))
       .finally(() => {
         dispatch(changeSpinners.update({balance: false}));
-        console.debug(`should have updated state`, state.currentUser.balance)
+        //console.debug(`should have updated state`, state.currentUser.balance)
       });
 
     loadNetworkAmounts();

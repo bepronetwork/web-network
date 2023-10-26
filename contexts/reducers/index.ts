@@ -8,7 +8,7 @@ import {changeSpinners} from "contexts/reducers/change-spinners";
 import {changeSupportedChains} from "contexts/reducers/change-supported-chains";
 import {changeToaster} from "contexts/reducers/change-toaster";
 import {changeTxList} from "contexts/reducers/change-tx-list";
-import {Actions, addReducer} from "contexts/reducers/main";
+import {addReducer} from "contexts/reducers/main";
 import {changeShowProp} from "contexts/reducers/update-show-prop";
 
 let loaded = false;
@@ -32,10 +32,10 @@ export default function loadApplicationStateReducers() {
     changeSupportedChains
   ].forEach(addReducer);
 
-  console.debug(`Loaded State Reducers`);
-  console.table(Actions
-      .map(({id, stateKey}) => ({id, stateKey}))
-      .reduce((p, c) => ({...p, [c.id]: c.stateKey}), {}));
+  // console.debug(`Loaded State Reducers`);
+  // console.table(Actions
+  //     .map(({id, stateKey}) => ({id, stateKey}))
+  //     .reduce((p, c) => ({...p, [c.id]: c.stateKey}), {}));
 
   loaded = true;
 }
