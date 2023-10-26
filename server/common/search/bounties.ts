@@ -218,41 +218,46 @@ export default async function get(query: ParsedUrlQuery) {
       }
     }); 
   
-  let total;
-
-  if(deliverabler){
-    total = await models.deliverable.count({
-      subQuery: false,
-      include: [
-        getAssociation("user", undefined, !!deliverabler, deliverabler ? {
-          address: caseInsensitiveEqual("address", deliverabler.toString())
-        }: {}),
-        getAssociation("issue", undefined, true, {}, [
-          getAssociation("network", undefined, true, networkName || network ? 
-          { 
-          networkName: caseInsensitiveEqual("name", (networkName || network).toString())
-          } : {}, [])])
-      ]
-    });
-  } else if(proposer){
-    total = await models.mergeProposal.count({
-      where: {
-        ... proposer ? { creator: caseInsensitiveEqual("creator", proposer.toString()) } : {}
+  const actions = {
+      deliverabler: async () => {
+        return models.deliverable.count({
+          subQuery: false,
+          include: [
+            getAssociation("user", undefined, !!deliverabler, deliverabler ? {
+              address: caseInsensitiveEqual("address", deliverabler.toString())
+            }: {}),
+            getAssociation("issue", undefined, true, {}, [
+              getAssociation("network", undefined, true, networkName || network ? 
+              { 
+              networkName: caseInsensitiveEqual("name", (networkName || network).toString())
+              } : {}, [])])
+          ]
+        });
       },
-      include: [
-        networkAssociation
-      ]
-    });
-  } else {
-    total = await models.issue.count({
-      where: {
-        state: {
-          [Op.notIn]: ["pending", "canceled"],
-        },
-        visible: true,
-      }
-    });
-  }
+      proposer: async () => {
+        return models.mergeProposal.count({
+          where: {
+            ...proposer ? { creator: caseInsensitiveEqual("creator", proposer.toString()) } : {}
+          },
+          include: [
+            networkAssociation
+          ]
+        });
+      },
+      default: async () => {
+        return models.issue.count({
+          where: {
+            state: {
+              [Op.notIn]: ["pending", "canceled"],
+            },
+            visible: true,
+          }
+        });
+      },
+  };
+
+  const action = actions[deliverabler && 'deliverabler' || proposer && 'proposer' || 'default'];
+  const total = await action();
 
   return {
     ...issues,
