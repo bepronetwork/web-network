@@ -97,6 +97,17 @@ export default function BountiesList({
     });
   }, [bounties]);
 
+  useEffect(() => {
+    if (router?.query?.page)
+      router.replace({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: "1",
+        },
+      });
+  }, []);
+
   return (
     <BountiesListView
       emptyMessage={emptyMessage}
