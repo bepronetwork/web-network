@@ -153,7 +153,7 @@ export default async function get(query: ParsedUrlQuery) {
                     ], 
                     true, 
                     networkName === 'all' ? {} : (networkName || network) ? { 
-                      networkName: caseInsensitiveEqual("network.name", (networkName || network).toString())
+                      name: caseInsensitiveEqual("network.name", (networkName || network).toString())
                     } : {},
                     [getAssociation("chain", ["chainId", "chainShortName", "color"], true, chain ? {
                       chainShortName: { [Op.iLike]: chain.toString()}
@@ -222,6 +222,7 @@ export default async function get(query: ParsedUrlQuery) {
       deliverabler: async () => {
         return models.deliverable.count({
           subQuery: false,
+          where: { prContractId: { [Op.not]: null } },
           include: [
             getAssociation("user", undefined, !!deliverabler, deliverabler ? {
               address: caseInsensitiveEqual("address", deliverabler.toString())
@@ -229,7 +230,7 @@ export default async function get(query: ParsedUrlQuery) {
             getAssociation("issue", undefined, true, {}, [
               getAssociation("network", undefined, true, networkName === 'all' ? {} : networkName || network ? 
               { 
-              networkName: caseInsensitiveEqual("name", (networkName || network).toString())
+                name: caseInsensitiveEqual("name", (networkName || network).toString())
               } : {}, [])])
           ]
         });
