@@ -25,9 +25,14 @@ export default function HackFestCard() {
               </div>
             </div>
 
+            <div className="row">
+              <span className="xs-medium text-blue-50 font-weight-normal mb-3">
+                Create a task in less than 3 minutes, pay with crypto and drive your project forward.
+              </span>
+            </div>
             <div className="row mb-4">
               <span className="xs-medium text-blue-50 font-weight-normal mb-3">
-                Solve tasks, earn crypto, build your on-chain CV and be part of a thriving community.
+                If you're a builder, join the party! Browse dozens of tasks in the Open-Marketplace, solve them and earn crypto.
               </span>
             </div>
 
