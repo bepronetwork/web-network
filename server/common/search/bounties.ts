@@ -133,10 +133,10 @@ export default async function get(query: ParsedUrlQuery) {
   const deliverableAssociation = 
     getAssociation( "deliverables", 
                     undefined, 
-                    false, 
+                    !!deliverabler, 
                     { prContractId: { [Op.not]: null } },
                     [getAssociation("user", undefined, !!deliverabler, deliverabler ? {
-                      address: { [Op.iLike]: deliverabler?.toString() }
+                      address: caseInsensitiveEqual("address", deliverabler.toString())
                     }: {})]);
 
   const networkAssociation = 
@@ -152,8 +152,8 @@ export default async function get(query: ParsedUrlQuery) {
                       "proposerFeeShare"
                     ], 
                     true, 
-                    networkName || network ? { 
-                      networkName: caseInsensitiveEqual("network.name", (networkName || network).toString())
+                    networkName === 'all' ? {} : (networkName || network) ? { 
+                      name: caseInsensitiveEqual("network.name", (networkName || network).toString())
                     } : {},
                     [getAssociation("chain", ["chainId", "chainShortName", "color"], true, chain ? {
                       chainShortName: { [Op.iLike]: chain.toString()}
@@ -190,7 +190,7 @@ export default async function get(query: ParsedUrlQuery) {
   } else
     sort.push("createdAt");
 
-  const useSubQuery = isMergeableState || isDisputableState ? false : undefined;
+  const useSubQuery = isMergeableState || isDisputableState || deliverabler ? false : undefined;
 
   const issues = await models.issue.findAndCountAll(paginate({
     subQuery: useSubQuery,
@@ -216,21 +216,54 @@ export default async function get(query: ParsedUrlQuery) {
         ...result,
         rows
       }
-    });
-
-  const totalBounties = await models.issue.count({
-    where: {
-      state: {
-        [Op.notIn]: ["pending", "canceled"],
+    }); 
+  
+  const actions = {
+      deliverabler: async () => {
+        return models.deliverable.count({
+          subQuery: false,
+          where: { prContractId: { [Op.not]: null } },
+          include: [
+            getAssociation("user", undefined, !!deliverabler, deliverabler ? {
+              address: caseInsensitiveEqual("address", deliverabler.toString())
+            }: {}),
+            getAssociation("issue", undefined, true, {}, [
+              getAssociation("network", undefined, true, networkName === 'all' ? {} : networkName || network ? 
+              { 
+                name: caseInsensitiveEqual("name", (networkName || network).toString())
+              } : {}, [])])
+          ]
+        });
       },
-      visible: true,
-    }
-  });
+      proposer: async () => {
+        return models.mergeProposal.count({
+          where: {
+            ...proposer ? { creator: caseInsensitiveEqual("creator", proposer.toString()) } : {}
+          },
+          include: [
+            networkAssociation
+          ]
+        });
+      },
+      default: async () => {
+        return models.issue.count({
+          where: {
+            state: {
+              [Op.notIn]: ["pending", "canceled"],
+            },
+            visible: true,
+          }
+        });
+      },
+  };
+
+  const action = actions[deliverabler && 'deliverabler' || proposer && 'proposer' || 'default'];
+  const total = await action();
 
   return {
     ...issues,
     currentPage: PAGE,
     pages: calculateTotalPages(issues.count, RESULTS_LIMIT),
-    totalBounties
+    totalBounties: total
   };
 }

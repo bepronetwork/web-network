@@ -68,23 +68,26 @@ export default function SelectNetwork({
       const newQuery = {
         ...query,
         page: "1",
-        networkName: newValue?.value?.name || null
+        networkName: newValue?.value?.name || "all"
       };
 
       push({ pathname: pathname, query: newQuery }, asPath);
     }
   }
 
-  function handleSelectedWithNetworkName(options) {
-    const opt = options?.find(({ value }) => value?.name === query?.networkName)
+  function handleSelectedWithNetworkName(options, name) {
+    const opt = options?.find(({ value }) => value?.name === name)
     setSelected(opt);
   }
 
   useEffect(() => {
     const options = networks?.rows?.map(networkToOption);
     setOptions(options || [])
-    handleSelectedWithNetworkName(options);
-  }, [networks, query?.networkName]);
+    if(query?.networkName)
+      handleSelectedWithNetworkName(options, query?.networkName);
+    if(query?.network && !query?.networkName)
+      handleSelectedWithNetworkName(options, query?.network);
+  }, [networks, query]);
 
   useEffect(() => {
     if (state.Service?.network?.active && !selected && isCurrentDefault)
