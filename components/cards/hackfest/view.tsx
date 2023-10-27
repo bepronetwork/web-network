@@ -12,7 +12,7 @@ export default function HackFestCard() {
             <div className="row align-items-center justify-content-between mb-1">
               <div className="col-auto">
                 <span className="hack-fest-title text-white">
-                  Join the Hackfest
+                  Join the Hackfest!
                 </span>
               </div>
 
